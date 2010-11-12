@@ -1,0 +1,272 @@
+<html>
+<head><title>JSLint, The JavaScript Code Quality Tool</title>
+<link rel="icon" type="image/gif" href="http://www.JSLint.com/favicon.gif">
+<style>
+fieldset {
+    background-color: blanchedalmond;
+    border: 2px solid black;
+    color: black;
+    margin: 1em;
+    padding: 8px;
+    text-align: left;
+}
+legend {
+    background-color: thistle;
+    border: 2px solid black;
+    color: black;
+    padding: 8px;
+}
+i {
+    font-family: serif;
+    font-style: italic;
+}
+p {
+    padding-left: 10pt;
+}
+input[type="button"] {
+    background-color: navajowhite;
+    border: 2px solid black;
+    color: black;
+}
+input[type="button"]:hover {
+    background-color: lightsteelblue;
+    text-decoration: underline;
+}
+input[type="button"]:active {
+    background-color: indianred;
+    text-decoration: none;
+}
+
+input[type="text"] {
+    border: 1px dotted black;
+    text-align: center;
+}
+
+a:link {
+    color: darkblue;
+}
+a:visited {
+    color: purple;
+}
+a:hover {
+    color: blue;
+}
+a:active {
+    color: red;
+}
+body {
+    background-color: gainsboro;
+    padding-left: 5%;
+    padding-right: 5%;
+    text-align: center;
+}
+
+
+.leftcolumn {
+    float: left;
+    margin: 1em;
+}
+
+#errors {
+    margin: 1em;
+    border: 2px solid black;
+    padding: 1em;
+    background-color: mistyrose;
+}
+#errors p {
+    margin-left: 2em;
+}
+#errors p.evidence {
+    margin-left: 0;
+    font-family: monospace;
+}
+
+#functions {
+    background-color: white;
+}
+#members {
+    background-color: peachpuff;
+}
+
+#functions, #members {
+    border: 2px solid black;
+    font-family: monospace;
+    margin: 1em;
+    padding: 1em;
+}
+#functions div {
+    margin-left: 10em;
+    text-indent: -5em;
+}
+#functions div.function {
+    margin-left: 0;
+    text-indent: 0;
+}
+
+
+</style></head>
+<body>
+<table border="0">
+  <tr>
+    <td><img src="jslint.gif" width="383" height="120" alt="JSLint"> </td>
+    <td valign="middle" align="left">
+      <p><big>The <a href="http://javascript.crockford.com/">JavaScript</a>
+Code Quality Tool</big></p>
+      <p id=JSLINT_EDITION></p>
+      <p>
+        <a href="http://www.JSLint.com/lint.html">Read the instructions.</a>
+        <a href="#JSLINT_OPTIONS">Set the options.</a>
+        <a href="http://www.amazon.com/exec/obidos/ASIN/0596517742/wrrrldwideweb"
+              target="_blank">Enjoy <i>The Good Parts</i>.</a></p>
+    </td></tr></table>
+<script src="fullwebjslint.js"></script>
+
+
+<div id="JSLINT_">
+
+<p style="background-color: transparent;"><textarea id="JSLINT_INPUT" style="
+    border: 2px solid black;
+    color: black;
+    font-family: monospace;
+    height: 3in;
+    overflow: auto;
+    padding: 0.5em;
+    width: 100%;"></textarea>
+</p>
+<p>
+    <input type="button" name="jslint" value="JSLint">
+    &nbsp; &nbsp;
+    <input type="button" name="clear" value="clear">
+</p>
+<br clear="all">
+<div id="JSLINT_OUTPUT" style="text-align: left;">
+
+      <div style="text-align: center;">Paste your program into the text box
+        above and click a <input type="button" name="jslint" value="JSLint">
+        button. </div>
+      <div style="margin: 1em; border: 2px solid black; padding: 1em; background-color: lightpink;">
+      <p>Use of strict mode is highly recommended, but do not use strict mode unless you
+        fully understand what it does. Strict mode, by design, will break programs.
+        </p><p>
+        Do not concatenate strict mode and non-strict mode code together. Doing so can
+        cause the non-strict code to fail.</p>
+      </div>
+</div>
+<br clear="all">
+<p>
+    <input type="button" name="jslint" value="JSLint">
+    &nbsp; &nbsp;
+    <input type="button" name="clear" value="clear">
+</p>
+<fieldset id="JSLINT_OPTIONS" style="background-color: linen;"><legend>Options</legend>
+  <div class="leftcolumn">
+    <input type="checkbox" id="JSLINT_PASSFAIL" title="passfail"><label for="JSLINT_PASSFAIL" title="passfail">Stop on first error</label>
+  <br>
+    <input type="checkbox" id="JSLINT_WHITE" title="white" name=goodpart><label for="JSLINT_WHITE" title="white">Strict white space</label>
+  <br>
+    <input type="checkbox" id="JSLINT_BROWSER" title="browser"><label for="JSLINT_BROWSER" title="browser">Assume a browser</label>
+  <br>
+    <input type="checkbox" id="JSLINT_DEVEL" title="devel"><label for="JSLINT_DEVEL" title="devel">Assume <code>console</code>, <code>alert</code>, ...</label>
+  <br>
+    <input type="checkbox" id="JSLINT_WIDGET" title="widget"><label for="JSLINT_WIDGET" title="widget">Assume a
+        <a href="http://widgets.yahoo.com/tools/">Yahoo Widget</a></label>
+  <br>
+    <input type="checkbox" id="JSLINT_WINDOWS" title="windows"><label for="JSLINT_WINDOWS" title="windows">Assume
+        Windows</label>
+  <br>
+    <input type="checkbox" id="JSLINT_RHINO" title="rhino"><label for="JSLINT_RHINO" title="rhino">Assume
+        <a href="http://www.mozilla.org/rhino/">Rhino</a></label>
+  <br>
+    <input type="checkbox" id="JSLINT_SAFE" title="safe"><label for="JSLINT_SAFE" title="safe">Safe Subset</label>
+  <br>
+    <input type="checkbox" id="JSLINT_ADSAFE" title="adsafe"><label for="JSLINT_ADSAFE" title="adsafe"><a href="http://www.ADsafe.org">ADsafe</a></label>
+  </div>
+  <div class="leftcolumn">
+    <input type="checkbox" id="JSLINT_DEBUG" title="debug"><label for="JSLINT_DEBUG" title="debug">Tolerate <tt>debugger</tt> statements</label>
+  <br>
+    <input type="checkbox" id="JSLINT_EVIL" title="evil"><label for="JSLINT_EVIL" title="evil">Tolerate <tt>eval</tt></label>
+  <br>
+    <input type="checkbox" id="JSLINT_LAXBREAK" title="laxbreak"><label for="JSLINT_LAXBREAK" title="laxbreak">Tolerate sloppy line breaking</label>
+  <br>
+    <input type="checkbox" id="JSLINT_FORIN" title="forin"><label for="JSLINT_FORIN" title="forin">Tolerate <a href="http://yuiblog.com/blog/2006/09/26/for-in-intrigue/">unfiltered</a> <tt>for</tt> <tt>in</tt></label>
+  <br>
+    <input type="checkbox" id="JSLINT_SUB" title="sub"><label for="JSLINT_SUB" title="sub">Tolerate inefficient subscripting</label>
+  <br>
+    <input type="checkbox" id="JSLINT_CSS" title="css"><label for="JSLINT_CSS" title="css">Tolerate CSS workarounds</label>
+  <br>
+    <input type="checkbox" id="JSLINT_CAP" title="cap"><label for="JSLINT_CAP" title="cap">Tolerate <tt>HTML</tt> case</label>
+  <br>
+    <input type="checkbox" id="JSLINT_ON" title="on"><label for="JSLINT_ON" title="on">Tolerate <tt>HTML</tt> event handlers</label>
+  <br>
+    <input type="checkbox" id="JSLINT_FRAGMENT" title="fragment"><label for="JSLINT_FRAGMENT" title="fragment">Tolerate <tt>HTML</tt> fragments</label>
+  <br>
+    <input type="checkbox" id="JSLINT_ES5" title="es5"><label for="JSLINT_ES5" title="es5">Tolerate ES5 syntax</label>
+  </div>
+  <div class="leftcolumn">
+    <input type="checkbox" id="JSLINT_ONEVAR" title="onevar" name=goodpart><label for="JSLINT_ONEVAR" title="onevar">Allow one <tt>var</tt> statement per function</label>
+  <br>
+    <input type="checkbox" id="JSLINT_UNDEF" title="undef" name=goodpart><label for="JSLINT_UNDEF" title="undef">Disallow undefined variables</label>
+  <br>
+    <input type="checkbox" id="JSLINT_NOMEN" title="nomen" name=goodpart><label for="JSLINT_NOMEN" title="nomen">Disallow dangling <tt>_</tt> in identifiers</label>
+  <br>
+    <input type="checkbox" id="JSLINT_EQEQEQ" title="eqeqeq" name=goodpart><label for="JSLINT_EQEQEQ" title="eqeqeq">Disallow
+    <tt> == </tt> and <tt> != </tt></label>
+  <br>
+    <input type="checkbox" id="JSLINT_PLUSPLUS" title="plusplus" name=goodpart><label for="JSLINT_PLUSPLUS" title="plusplus">Disallow <tt>++</tt> and
+    <tt>--</tt></label>
+  <br>
+    <input type="checkbox" id="JSLINT_BITWISE" title="bitwise" name=goodpart><label for="JSLINT_BITWISE" title="bitwise">Disallow bitwise operators</label>
+  <br>
+    <input type="checkbox" id="JSLINT_REGEXP" title="regexp" name=goodpart><label for="JSLINT_REGEXP" title="regexp">Disallow insecure <tt>.</tt> and <tt>[^</tt>...<tt>]</tt> in /RegExp/</label>
+  <br>
+    <input type="checkbox" id="JSLINT_NEWCAP" title="newcap" name=goodpart><label for="JSLINT_NEWCAP" title="newcap">Require Initial Caps for constructors</label>
+  <br>
+    <input type="checkbox" id="JSLINT_IMMED" title="immed" name=goodpart><label for="JSLINT_IMMED" title="immed">Require parens around immediate invocations</label>
+  <br>
+    <input type="checkbox" id="JSLINT_STRICT" title="strict"><label for="JSLINT_STRICT" title="strict">Require <tt>"use strict";</tt></label>
+  </div>
+  <div class="leftcolumn">
+    <input type="button" id="JSLINT_GOODPARTS" value="The Good Parts">
+    <br><br>
+    <input type="button" id="JSLINT_CLEARALL" value="Clear All Options">
+</div>
+<div class="leftcolumn">
+    <input id="JSLINT_INDENT" type="text" size="2" value="4" autocomplete=off> <label for="JSLINT_INDENT" title="indent">Strict white space indentation</label><br>
+    <input id="JSLINT_MAXLEN" type="text" size="2" value="" autocomplete=off> <label for="JSLINT_MAXLEN" title="maxlen">Maximum line length</label><br>
+    <input id="JSLINT_MAXERR" type="text" size="2" value="50" autocomplete=off> <label for="JSLINT_MAXERR" title="maxerr">Maximum number of errors</label><br>
+    <label for="JSLINT_PREDEF" title="predef">Predefined&nbsp;<small>(&nbsp;<code>,</code>&nbsp;separated)</small></label>&nbsp;<input id="JSLINT_PREDEF" type="text" size="72" autocomplete=off>
+  </div>
+<br clear=all>
+<p id=JSLINT_JSLINTSTRING style="
+    background-color: peachpuff;
+    border: 2px solid black;
+    font-family: monospace;
+    margin: 1em;
+    padding: 1em;"></p>
+</fieldset>
+<p> Copyright 2002 <a href="http://www.JSLint.com/lint.html">Douglas
+  Crockford.</a> <a target="_blank" href="http://www.crockford.com/">All
+  Rights Reserved Wrrrldwide and Beyond!</a> <br>
+  <a href="http://javascript.crockford.com/code.html" target="_blank">Code
+  Conventions for the JavaScript Programming Language.</a>
+  <a href="http://tech.groups.yahoo.com/group/jslint_com/" target="_blank">Join
+  the JSLint Group.</a> </p>
+ <script>
+"use strict";
+ADSAFE.id("JSLINT_");
+</script>
+<script src="widget.js"></script>
+<script>
+"use strict";
+ADSAFE.go("JSLINT_", function (dom, lib) {
+    lib.init_jslint_ui(dom);
+});
+</script>
+
+</div>
+<a href="http://www.JSLint.com/"><img src="jslintpill.gif" width="36" height="17" border="0"></a>
+<a href="http://tech.groups.yahoo.com/group/jslint_com/"><img src="y.gif" width="31" height="17" border="0"></a>
+<a href="http://www.ADsafe.org/"><img src="adsafepill.gif" width="36" height="17" border="0"></a>
+<a href="http://www.JSON.org/"><img src="jsonpill.gif" width="36" height="17" border="0"></a>
+<a href="http://www.1and1.com/?k_id=10219574"><img src="1and1pill.gif" width="36" height="17" border="0"></a>
+</body></html>
