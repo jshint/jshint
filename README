@@ -1,0 +1,20 @@
+JSLint, The JavaScript Code Quality Tool
+
+Douglas Crockford
+douglas@crockford.com
+
+2010-11-12
+
+fulljslint.js contains the fully commented JSLINT function.
+
+fulljslint.html runs the JSLINT function in a web page. The page also depends
+on adsafe.js and json2.js (which are not included in this project) and web.js
+(which is).
+
+web.js scripts the fulljslint.html ui.
+
+rhino.js is a sample companion script to run fulljslint.js on Rhino.
+
+wsh.js is a sample companion script to run fulljslint.js on WSH.
+
+lint.html describes JSLint's usage.
