@@ -1,5 +1,5 @@
 // jslint.js
-// 2010-10-26
+// 2010-11-17
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -33,7 +33,7 @@ SOFTWARE.
     The first parameter is either a string or an array of strings. If it is a
     string, it will be split on '\n' or '\r'. If it is an array of strings, it
     is assumed that each string represents one line. The source can be a
-    JavaScript text, or HTML text, or a Konfabulator text.
+    JavaScript text, or HTML text, or a JSON text, or a CSS text.
 
     The second parameter is an optional object of options which control the
     operation of JSLINT. Most of the options are booleans: They are all are
@@ -728,17 +728,6 @@ var JSLINT = (function () {
         },
 
         scope,      // The current scope
-
-        windows = {
-            ActiveXObject: false,
-            CScript      : false,
-            Debug        : false,
-            Enumerator   : false,
-            System       : false,
-            VBArray      : false,
-            WScript      : false
-        },
-
         src,
         stack,
 
@@ -781,13 +770,13 @@ var JSLINT = (function () {
             LN10                : true,
             LOG2E               : true,
             LOG10E              : true,
-            PI                  : true,
-            SQRT1_2             : true,
-            SQRT2               : true,
             MAX_VALUE           : true,
             MIN_VALUE           : true,
             NEGATIVE_INFINITY   : true,
-            POSITIVE_INFINITY   : true
+            PI                  : true,
+            POSITIVE_INFINITY   : true,
+            SQRT1_2             : true,
+            SQRT2               : true
         },
 
         strict_mode,
@@ -877,6 +866,16 @@ var JSLINT = (function () {
             yahooLogout             : true
         },
 
+        windows = {
+            ActiveXObject: false,
+            CScript      : false,
+            Debug        : false,
+            Enumerator   : false,
+            System       : false,
+            VBArray      : false,
+            WScript      : false
+        },
+
 //  xmode is used to adapt to the exceptions in html parsing.
 //  It can have these states:
 //      false   .js script file
@@ -889,6 +888,8 @@ var JSLINT = (function () {
 
         xmode,
         xquote,
+
+// Regular expressions. Some of these are ridiculously long.
 
 // unsafe comment or string
         ax = /@cc|<\/?|script|\]*s\]|<\s*!|&lt/i,
@@ -1783,7 +1784,7 @@ klass:                                  do {
                                     line, character + l);
                             }
                             character += i;
-                            if (s[i + 2] !== '>') {
+                            if (s.charAt(i + 2) !== '>') {
                                 errorAt("Expected -->.", line, character);
                             }
                             character += 3;
@@ -5743,7 +5744,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2010-10-26';
+    itself.edition = '2010-11-17';
 
     return itself;
 
