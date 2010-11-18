@@ -1,5 +1,5 @@
 // jslint.js
-// 2010-11-17
+// 2010-11-18
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -3058,8 +3058,8 @@ loop:   for (;;) {
 
 
     cssBorderStyle = [
-        'none', 'hidden', 'dotted', 'dashed', 'solid', 'double', 'ridge',
-        'inset', 'outset'
+        'none', 'dashed', 'dotted', 'double', 'groove',
+        'hidden', 'inset', 'outset', 'ridge', 'solid'
     ];
 
     cssBreak = [
@@ -5779,7 +5779,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2010-11-17';
+    itself.edition = '2010-11-18';
 
     return itself;
 
