@@ -3,7 +3,7 @@ JSLint, The JavaScript Code Quality Tool
 Douglas Crockford
 douglas@crockford.com
 
-2010-11-18
+2010-11-27
 
 fulljslint.js contains the fully commented JSLINT function.
 
@@ -12,8 +12,6 @@ on adsafe.js and json2.js (which are not included in this project) and
 intercept.js (which is).
 
 intercept.js scripts the fulljslint.html ui by augmenting ADsafe.
-
-rhino.js is a sample companion script to run fulljslint.js on Rhino.
 
 wsh.js is a sample companion script to run fulljslint.js on WSH.
 

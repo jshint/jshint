@@ -1,5 +1,5 @@
 // jslint.js
-// 2010-11-18
+// 2010-11-27
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -4096,7 +4096,7 @@ loop:   for (;;) {
 // then we have an undefined variable.
 
             } else if (funct['(global)']) {
-                if (option.undef && predefined[v] !== 'boolean') {
+                if (option.undef && typeof predefined[v] !== 'boolean') {
                     warning("'{a}' is not defined.", token, v);
                 }
                 note_implied(token);
@@ -5779,7 +5779,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2010-11-18';
+    itself.edition = '2010-11-27';
 
     return itself;
 
