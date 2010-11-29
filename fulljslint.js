@@ -1,5 +1,5 @@
 // jslint.js
-// 2010-11-27
+// 2010-11-29
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -4380,21 +4380,6 @@ loop:   for (;;) {
                         advance('(');
                         if (nexttoken.id === ')') {
                             warning("Use the array literal notation [].", token);
-                        } else {
-                            i = parse(0);
-                            c.dimension = i;
-                            if ((i.id === '(number)' && /[.+\-Ee]/.test(i.value)) ||
-                                    (i.id === '-' && !i.right) ||
-                                    i.id === '(string)' || i.id === '[' ||
-                                    i.id === '{' || i.id === 'true' ||
-                                    i.id === 'false' ||
-                                    i.id === 'null' || i.id === 'undefined' ||
-                                    i.id === 'Infinity') {
-                                warning("Use the array literal notation [].", token);
-                            }
-                            if (nexttoken.id !== ')') {
-                                error("Use the array literal notation [].", token);
-                            }
                         }
                         advance(')');
                     }
@@ -5779,7 +5764,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2010-11-27';
+    itself.edition = '2010-11-29';
 
     return itself;
 
