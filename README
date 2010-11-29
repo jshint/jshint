@@ -8,11 +8,14 @@ douglas@crockford.com
 fulljslint.js contains the fully commented JSLINT function.
 
 fulljslint.html runs the JSLINT function in a web page. The page also depends
-on adsafe.js and json2.js (which are not included in this project) and
-intercept.js (which is).
+on adsafe.js [www.ADsafe.org] and json2.js [www.JSON.org] (which are not
+included in this project) and intercept.js and init_ui.js (which are).
 
 intercept.js scripts the fulljslint.html ui by augmenting ADsafe.
 
-wsh.js is a sample companion script to run fulljslint.js on WSH.
+init_ui.js hooks the HTML ui components to ADsafe.
 
 lint.html describes JSLint's usage.
+
+JSLint can be run anywhere that JavaScript (or Java) can run. See for example
+http://tech.groups.yahoo.com/group/jslint_com/database?method=reportRows&tbl=1
