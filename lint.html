@@ -602,9 +602,9 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
   <tr>
     <td>Predefined <small>( , separated)</small></td>
     <td><code>predef</code></td>
-    <td>An array of strings, the names of predefined global variables.
+    <td>An array of strings, the names of predefined global variables, or an object whose keys are global variable names, and whose values are booleans that determine if each variable is constant.
       <code>predef</code> is used with the <code>option</code> object, but not
-      with the <code>/*jslint */</code> comment. Use the <code>var</code>
+      with the <code>/*jslint */</code> comment. You can also use the <code>var</code>
       statement to declare global variables in a script file.</td>
   </tr>
   <tr>
