@@ -1,5 +1,5 @@
 // jslint.js
-// 2010-11-29
+// 2010-12-02
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -37,7 +37,10 @@ SOFTWARE.
 
     The second parameter is an optional object of options which control the
     operation of JSLINT. Most of the options are booleans: They are all are
-    optional and have a default value of false.
+    optional and have a default value of false. One of the options, predef,
+    can be an array of names, which will be used to declare constant globals,
+    or an object whose keys are used as global names, with a boolean value
+    that determines if they are constant.
 
     If it checks out, JSLINT returns true. Otherwise, it returns false.
 
@@ -186,31 +189,31 @@ SOFTWARE.
     darksalmon, darkseagreen, darkslateblue, darkslategray, darkturquoise,
     darkviolet, data, datalist, dd, debug, decodeURI, decodeURIComponent,
     deeppink, deepskyblue, defaultStatus, defineClass, del, deserialize,
-    details, devel, dfn, dialog, dimension, dimgray, dir, direction,
-    display, div, dl, document, dodgerblue, dt, edition, else, em, embed,
-    embossed, empty, "empty-cells", encodeURI, encodeURIComponent,
-    entityify, eqeqeq, errors, es5, escape, eval, event, evidence, evil, ex,
-    exception, exec, exps, fieldset, figure, filesystem, firebrick, first,
-    float, floor, floralwhite, focus, focusWidget, font, "font-family",
-    "font-size", "font-size-adjust", "font-stretch", "font-style",
-    "font-variant", "font-weight", footer, forestgreen, forin, form,
-    fragment, frame, frames, frameset, from, fromCharCode, fuchsia, fud,
-    funct, function, functions, g, gainsboro, gc, getComputedStyle,
-    ghostwhite, global, globals, gold, goldenrod, gray, graytext, green,
-    greenyellow, h1, h2, h3, h4, h5, h6, handheld, hasOwnProperty, head,
-    header, height, help, hgroup, highlight, highlighttext, history,
-    honeydew, hotpink, hr, "hta:application", html, i, iTunes, id,
-    identifier, iframe, img, immed, implieds, in, inactiveborder,
-    inactivecaption, inactivecaptiontext, include, indent, indexOf,
-    indianred, indigo, infobackground, infotext, init, input, ins, isAlpha,
-    isApplicationRunning, isDigit, isFinite, isNaN, ivory, join, jslint,
-    json, kbd, keygen, khaki, konfabulatorVersion, label, labelled, lang,
-    last, lavender, lavenderblush, lawngreen, laxbreak, lbp, led, left,
-    legend, lemonchiffon, length, "letter-spacing", li, lib, lightblue,
-    lightcoral, lightcyan, lightgoldenrodyellow, lightgreen, lightpink,
-    lightsalmon, lightseagreen, lightskyblue, lightslategray,
-    lightsteelblue, lightyellow, lime, limegreen, line, "line-height",
-    linen, link, "list-style", "list-style-image", "list-style-position",
+    details, devel, dfn, dialog, dimgray, dir, direction, display, div, dl,
+    document, dodgerblue, dt, edition, else, em, embed, embossed, empty,
+    "empty-cells", encodeURI, encodeURIComponent, entityify, eqeqeq, errors,
+    es5, escape, eval, event, evidence, evil, ex, exception, exec, exps,
+    fieldset, figure, filesystem, firebrick, first, float, floor,
+    floralwhite, focus, focusWidget, font, "font-family", "font-size",
+    "font-size-adjust", "font-stretch", "font-style", "font-variant",
+    "font-weight", footer, forestgreen, forin, form, fragment, frame,
+    frames, frameset, from, fromCharCode, fuchsia, fud, funct, function,
+    functions, g, gainsboro, gc, getComputedStyle, ghostwhite, global,
+    globals, gold, goldenrod, gray, graytext, green, greenyellow, h1, h2,
+    h3, h4, h5, h6, handheld, hasOwnProperty, head, header, height, help,
+    hgroup, highlight, highlighttext, history, honeydew, hotpink, hr,
+    "hta:application", html, i, iTunes, id, identifier, iframe, img, immed,
+    implieds, in, inactiveborder, inactivecaption, inactivecaptiontext,
+    include, indent, indexOf, indianred, indigo, infobackground, infotext,
+    init, input, ins, isAlpha, isApplicationRunning, isArray, isDigit,
+    isFinite, isNaN, ivory, join, jslint, json, kbd, keygen, keys, khaki,
+    konfabulatorVersion, label, labelled, lang, last, lavender,
+    lavenderblush, lawngreen, laxbreak, lbp, led, left, legend,
+    lemonchiffon, length, "letter-spacing", li, lib, lightblue, lightcoral,
+    lightcyan, lightgoldenrodyellow, lightgreen, lightpink, lightsalmon,
+    lightseagreen, lightskyblue, lightslategray, lightsteelblue,
+    lightyellow, lime, limegreen, line, "line-height", linen, link,
+    "list-style", "list-style-image", "list-style-position",
     "list-style-type", load, loadClass, location, log, m, magenta, map,
     margin, "margin-bottom", "margin-left", "margin-right", "margin-top",
     mark, "marker-offset", maroon, match, "max-height", "max-width", maxerr,
@@ -262,6 +265,45 @@ SOFTWARE.
 "use strict";
 
 var JSLINT = (function () {
+
+    function F() {}     // Used by Object.create
+
+    function is_own(object, name) {
+
+// The object.hasOwnProperty method fails when the property under consideration
+// is named 'hasOwnProperty'. So we have to use this more convoluted form.
+
+        return Object.prototype.hasOwnProperty.call(object, name);
+    }
+
+// Provide critical ES5 functions to ES3.
+
+    if (typeof Array.isArray !== 'function') {
+        Array.isArray = function (o) {
+            return Object.prototype.toString.apply(o) === '[object Array]';
+        };
+    }
+
+    if (typeof Object.create !== 'function') {
+        Object.create = function (o) {
+            F.prototype = o;
+            return new F();
+        };
+    }
+
+    if (typeof Object.keys !== 'function') {
+        Object.keys = function (o) {
+            var a = [], k;
+            for (k in o) {
+                if (is_own(o, k)) {
+                    a.push(k);
+                }
+            }
+            return a;
+        };
+    }
+
+
     var adsafe_id,      // The widget's ADsafe id.
         adsafe_may,     // The widget may load approved scripts.
         adsafe_went,    // ADSAFE.go has been called.
@@ -962,19 +1004,6 @@ var JSLINT = (function () {
             styleproperty: ssx
         };
 
-    function F() {}
-
-    if (typeof Object.create !== 'function') {
-        Object.create = function (o) {
-            F.prototype = o;
-            return new F();
-        };
-    }
-
-
-    function is_own(object, name) {
-        return Object.prototype.hasOwnProperty.call(object, name);
-    }
 
 
     function combine(t, o) {
@@ -5384,14 +5413,21 @@ loop:   for (;;) {
 // The actual JSLINT function itself.
 
     var itself = function (s, o) {
-        var a, i;
+        var a, i, k;
         JSLINT.errors = [];
         predefined = Object.create(standard);
         if (o) {
             a = o.predef;
-            if (a instanceof Array) {
-                for (i = 0; i < a.length; i += 1) {
-                    predefined[a[i]] = true;
+            if (a) {
+                if (Array.isArray(a)) {
+                    for (i = 0; i < a.length; i += 1) {
+                        predefined[a[i]] = true;
+                    }
+                } else if (typeof a === 'object') {
+                    k = Object.keys(a);
+                    for (i = 0; i < a.length; i += 1) {
+                        predefined[k[i]] = !!a[k];
+                    }
                 }
             }
             if (o.adsafe) {
@@ -5533,20 +5569,6 @@ loop:   for (;;) {
         return JSLINT.errors.length === 0;
     };
 
-    function is_array(o) {
-        return Object.prototype.toString.apply(o) === '[object Array]';
-    }
-
-    function to_array(o) {
-        var a = [], k;
-        for (k in o) {
-            if (is_own(o, k)) {
-                a.push(k);
-            }
-        }
-        return a;
-    }
-
 
 // Data summary.
 
@@ -5578,7 +5600,7 @@ loop:   for (;;) {
             data.urls = urls;
         }
 
-        globals = to_array(scope);
+        globals = Object.keys(scope);
         if (globals.length > 0) {
             data.globals = globals;
         }
@@ -5595,7 +5617,7 @@ loop:   for (;;) {
                     if (v === 'unction') {
                         v = 'unused';
                     }
-                    if (is_array(fu[v])) {
+                    if (Array.isArray(fu[v])) {
                         fu[v].push(n);
                         if (v === 'unused') {
                             unused.push({
@@ -5733,7 +5755,7 @@ loop:   for (;;) {
             }
 
             if (data.member) {
-                a = to_array(data.member);
+                a = Object.keys(data.member);
                 if (a.length) {
                     a = a.sort();
                     m = '<br><pre id=members>/*members ';
@@ -5764,7 +5786,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2010-11-29';
+    itself.edition = '2010-12-02';
 
     return itself;
 
