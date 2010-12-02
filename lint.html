@@ -64,8 +64,7 @@ at issuing warnings. <code>lint</code> is no longer needed.</p>
   language. It was originally intended to do small tasks in webpages, tasks
   for which Java was too heavy and clumsy. But JavaScript is a very capable
   language, and it is now being used in larger projects. Many of the features
-  that were intended to make the language easy to use are troublesome for
-  larger projects. A <code>lint</code> for JavaScript is needed: <a href="http://www.JSLint.com/"><code>JSLint</code></a>,
+  that were intended to make the language easy to use are troublesome when projects become complicated. A <code>lint</code> for JavaScript is needed: <a href="http://www.JSLint.com/"><code>JSLint</code></a>,
   a JavaScript syntax checker and validator.</p>
 
 <p><code>JSLint</code> takes a JavaScript source and scans it. If it finds
@@ -82,8 +81,8 @@ at issuing warnings. <code>lint</code> is no longer needed.</p>
   Conventions for the JavaScript Programming Language</i></a>. </p>
 <p>JavaScript is a sloppy language, but inside it there is an elegant, better
   language. <code>JSLint</code> helps you to program in that better language
-  and to avoid most of the slop.</p>
-<p><code>JSLint</code> can operate on JavaScript source, HTML source, or <a href="http://www.JSON.org/">JSON</a>
+  and to avoid most of the slop. JSLint will reject programs that browsers will accept because JSLint is concerned with the quality of your code and browsers are not. You should accept all of JSLint's advice.</p>
+<p><code>JSLint</code> can operate on JavaScript source, HTML source, CSS source, or <a href="http://www.JSON.org/">JSON</a>
   text.</p>
 <h2 id=global>Global Variables</h2>
 <p>JavaScript's <a href="http://yuiblog.com/blog/2006/06/01/global-domination/">biggest
@@ -103,7 +102,7 @@ at issuing warnings. <code>lint</code> is no longer needed.</p>
 <p>The declaration should appears near the top of the file. It must appear before the use of the variables
   it declares. </p>
 <p>It is necessary to use a <code>var</code> statement to declare a variable before that variable is assigned to. </p>
-<p><code>JSLint</code> also recognizes a <code>/*global */</code> comment that can indicate to <code>JSLint</code> that variables used in this file were defined in other files. The comment can contain a comma separated list of names. Each name can optionally be followed by a colon and either <code>true</code> or <code>false</code>, <code>true</code> indicated that the variable may be assigned to by this file, and <code>false</code> indicating that assignment is not allowed which is the default.</p>
+<p><code>JSLint</code> also recognizes a <code>/*global */</code> comment that can indicate to <code>JSLint</code> that variables used in this file were defined in other files. The comment can contain a comma separated list of names. Each name can optionally be followed by a colon and either <code>true</code> or <code>false</code>, <code>true</code> indicated that the variable may be assigned to by this file, and <code>false</code> indicating that assignment is not allowed (which is the default).</p>
 <p id=browser>Some globals can be predefined for you. Select the <i>Assume
   a browser</i> (<code>browser</code>) <a href="#options">option</a> to
   predefine the standard global properties that are supplied by web browsers,
@@ -113,7 +112,7 @@ at issuing warnings. <code>lint</code> is no longer needed.</p>
 <code>/*global addEventListener: false, blur: false, clearInterval: false, clearTimeout: false, close: false, closed: false, defaultStatus: false, document: false, event: false, focus: false, frames: false, getComputedStyle: false, history: false, Image: false, length: false, location: false, moveBy: false, moveTo: false, name: false, navigator: false, onblur: true, onerror: true, onfocus: true, onload: true, onresize: true, onunload: true, open: false, opener: false, Option: false, parent: false, print: false, resizeBy: false, resizeTo: false, screen: false, scroll: false, scrollBy: false, scrollTo: false, setInterval: false, setTimeout: false, status: false, top: false, XMLHttpRequest: false  */</code></blockquote>
 <p> The <code>browser</code> <a href="#options">option</a> does
   not include the aliases of the global object, <code>window</code> and
-  <code>self</code>. </p>
+  <code>self</code> because the potential for misuse is so great.</p>
 <p id=devel>Select the 
   <label for="JSLINT_DEVEL" title="devel"><em>Assume console, alert, ...</em></label> 
 (<code>devel</code>) <a href="#options">option</a> to predefine globals that are useful in development but that should be avoided in production, such as <code>console</code> and <code>alert</code>. It has the same
@@ -137,9 +136,9 @@ effect as this comment:</p>
     <p><code>/*global ActiveXObject: false, CScript: false, Debug: false, Enumerator: false, System: false, VBArray: false, WScript: false  */</code></p>
 </blockquote>
 <h2 id=semicolon>Semicolon</h2>
-<p>JavaScript uses a C-like syntax which requires the use of semicolons to delimit
-  statements. JavaScript attempts to make semicolons optional with a semicolon
-  insertion mechanism. This is dangerous.</p>
+<p>JavaScript uses a C-like syntax which requires the use of semicolons to delimit certain
+  statements. JavaScript attempts to make those semicolons optional with a semicolon
+  insertion mechanism. This is dangerous because it can mask errors.</p>
 <p>Like C, JavaScript has <code>++</code> and <code>--</code> and <code>(</code> operators
   which can be prefixes or suffixes. The disambiguation is done by the semicolon.</p>
 <p>In JavaScript, a linefeed can be whitespace or it can act as a semicolon.
@@ -149,7 +148,7 @@ effect as this comment:</p>
   <code>while</code>. <code>JSLint</code> does not expect to see unnecessary semicolons or the
   empty statement.</p>
 <h2 id=breaking>Line Breaking</h2>
-<p>As a further defense against the semicolon insertion mechanism, <code>JSLint</code>
+<p>As a further defense against the semicolon insertion mechanism and editing mishaps, <code>JSLint</code>
   expects long statements to be broken only after one of these punctuation
   characters or operators:</p>
 <p align="center"><code>,  ; : { } ( [ = &lt; &gt; ? ! + - * / % ~ ^ | &amp; </code></p>
@@ -163,7 +162,7 @@ effect as this comment:</p>
 <p><code>JSLint</code> allows you to turn on the <i>Tolerate sloppy line
   breaking</i> (<code>laxbreak</code>) <a href="#options">option</a>. </p>
 <p>Semicolon insertion can mask copy/paste errors. If you always break lines
-  after infix operators, then <code>JSLint</code> can do better at finding errors.</p>
+  after infix operators, then <code>JSLint</code> can do better at finding other errors.</p>
 <h2 id=comma>Comma</h2>
 <p>The comma operator can lead to excessively tricky expressions. It can also
   mask some programming errors.</p>
@@ -223,7 +222,7 @@ effect as this comment:</p>
   the names of all of the properties of an object. <a href="http://yuiblog.com/blog/2006/09/26/for-in-intrigue/">Unfortunately,
   it also loops through all of the members which were inherited through
   the prototype chain.</a> This has the bad side effect of serving up method
-  functions when the interest is in data members.</p>
+  functions when the interest is in data members. If a program is written without awareness of this situation, then it can fail.</p>
 <p>The body of every <code>for</code> <code>in</code> statement should be
   wrapped in an <code>if</code> statement that does filtering. It can select
   for a particular type or range of values, or it can exclude functions,
@@ -402,7 +401,7 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
 
 <p><code>JSLint</code> does not do flow analysis to determine that variables are assigned
   values before used. This is because variables are given a value (<code>undefined</code>)
-  which is a reasonable default for many applications.</p>
+  that is a reasonable default for many applications.</p>
 
 <p><code>JSLint</code> does not do any kind of global analysis. It does
   not attempt to determine that functions used with <code>new</code> are
@@ -602,8 +601,7 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
   <tr>
     <td>Predefined <small>( , separated)</small></td>
     <td><code>predef</code></td>
-    <td>An array of strings, the names of predefined global variables, or an object whose keys are global variable names, and whose values are booleans that determine if each variable is constant.
-      <code>predef</code> is used with the <code>option</code> object, but not
+    <td>An array of strings, the names of predefined global variables, or an object whose keys are global variable names, and whose values are booleans that determine if each variable is assignable (also see <a href="#global">global</a>). <code>predef</code> is used with the <code>option</code> object, but not
       with the <code>/*jslint */</code> comment. You can also use the <code>var</code>
       statement to declare global variables in a script file.</td>
   </tr>
