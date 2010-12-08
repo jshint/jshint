@@ -54,6 +54,7 @@ ADSAFE.lib("init_ui", function (lib) {
             }
             jslintstring.value('/*jslint ' + a.join(', ') + ' */');
         }
+        
         function update_options() {
 
 // Make an object containing the current options.

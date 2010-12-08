@@ -1,5 +1,5 @@
 // jslint.js
-// 2010-12-02
+// 2010-12-08
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -5419,7 +5419,7 @@ loop:   for (;;) {
                     }
                 } else if (typeof a === 'object') {
                     k = Object.keys(a);
-                    for (i = 0; i < a.length; i += 1) {
+                    for (i = 0; i < k.length; i += 1) {
                         predefined[k[i]] = !!a[k];
                     }
                 }
@@ -5780,7 +5780,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2010-12-02';
+    itself.edition = '2010-12-08';
 
     return itself;
 
