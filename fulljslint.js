@@ -1370,9 +1370,13 @@ var JSLINT = (function () {
                                         character + j);
                                     break;
                                 case '\\':
-                                case '\'':
                                 case '"':
                                 case '/':
+                                    break;
+                                case '\'':
+                                    if (jsonmode) {
+                                        warningAt("Avoid \\'.", line, character);
+                                    }
                                     break;
                                 case 'b':
                                     c = '\b';
