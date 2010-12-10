@@ -1,5 +1,5 @@
 // jslint.js
-// 2010-12-08
+// 2010-12-10
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -1397,6 +1397,9 @@ var JSLINT = (function () {
                                     esc(4);
                                     break;
                                 case 'v':
+                                    if (jsonmode) {
+                                        warningAt("Avoid \\v.", line, character);
+                                    }
                                     c = '\v';
                                     break;
                                 case 'x':
@@ -5784,7 +5787,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2010-12-08';
+    itself.edition = '2010-12-10';
 
     return itself;
 
