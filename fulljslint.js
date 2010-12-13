@@ -1,5 +1,5 @@
 // jslint.js
-// 2010-12-10
+// 2010-12-13
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -36,7 +36,7 @@ SOFTWARE.
     JavaScript text, or HTML text, or a JSON text, or a CSS text.
 
     The second parameter is an optional object of options which control the
-    operation of JSLINT. Most of the options are booleans: They are all are
+    operation of JSLINT. Most of the options are booleans: They are all
     optional and have a default value of false. One of the options, predef,
     can be an array of names, which will be used to declare global variables,
     or an object whose keys are used as global names, with a boolean value
@@ -262,9 +262,8 @@ SOFTWARE.
 // global variable. That function will be invoked immediately, and its return
 // value is the JSLINT function itself.
 
-"use strict";
-
 var JSLINT = (function () {
+    "use strict";
 
     var adsafe_id,      // The widget's ADsafe id.
         adsafe_may,     // The widget may load approved scripts.
@@ -2625,6 +2624,9 @@ loop:   for (;;) {
 
     function use_strict() {
         if (nexttoken.value === 'use strict') {
+            if (strict_mode) {
+                warning("Unnecessary \"use strict\".");
+            }
             advance();
             advance(';');
             strict_mode = true;
@@ -2639,9 +2641,6 @@ loop:   for (;;) {
 
     function statements(begin) {
         var a = [], f, p;
-        if (begin && !use_strict() && option.strict) {
-            warning('Missing "use strict" statement.', nexttoken);
-        }
         if (option.adsafe) {
             switch (begin) {
             case 'script':
@@ -2715,7 +2714,7 @@ loop:   for (;;) {
 
 
     function block(f) {
-        var a, b = inblock, old_indent = indent, s = scope, t;
+        var a, b = inblock, old_indent = indent, m = strict_mode, s = scope, t;
         inblock = f;
         scope = Object.create(scope);
         nonadjacent(token, nexttoken);
@@ -2727,10 +2726,11 @@ loop:   for (;;) {
                 while (!f && nexttoken.from > indent) {
                     indent += option.indent;
                 }
-                if (!f) {
-                    use_strict();
+                if (!use_strict() && !m && !f && option.strict) {
+                    warning("Missing \"use strict\" statement.");
                 }
                 a = statements();
+                strict_mode = m;
                 indent -= option.indent;
                 indentation();
             }
@@ -3802,6 +3802,7 @@ loop:   for (;;) {
                 if (adsafe_went) {
                     error("ADsafe script violation.", token);
                 }
+                use_strict();
                 statements('script');
             }
             xmode = 'html';
@@ -3947,6 +3948,7 @@ loop:   for (;;) {
                         wmode = option.white;
                         option.white = false;
                         advance(q);
+                        use_strict();
                         statements('on');
                         option.white = wmode;
                         if (nexttoken.id !== q) {
@@ -4905,7 +4907,7 @@ loop:   for (;;) {
     blockstmt('function', function () {
         if (inblock) {
             warning(
-"Function statements cannot be placed in blocks. Use a function expression or move the statement to the top of the outer function.", token);
+"Function statements should not be placed in blocks. Use a function expression or move the statement to the top of the outer function.", token);
 
         }
         var i = identifier();
@@ -5450,7 +5452,6 @@ loop:   for (;;) {
                 o.eqeqeq  =
                 o.nomen   =
                 o.safe    =
-                o.strict  =
                 o.undef   = true;
 
                 predefined.Date =
@@ -5554,6 +5555,7 @@ loop:   for (;;) {
                         error("Expected '{a}' and instead saw '{b}'.",
                             nexttoken, '<div>', nexttoken.value);
                     }
+                    use_strict();
                     statements('lib');
                 }
             }
@@ -5787,7 +5789,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2010-12-10';
+    itself.edition = '2010-12-13';
 
     return itself;
 

@@ -200,7 +200,7 @@ Code Quality Tool</big></p>
   <br>
     <input type="checkbox" id="JSLINT_FRAGMENT" title="fragment"><label for="JSLINT_FRAGMENT" title="fragment">Tolerate <tt>HTML</tt> fragments</label>
   <br>
-    <input type="checkbox" id="JSLINT_ES5" title="es5"><label for="JSLINT_ES5" title="es5">Tolerate ES5 syntax</label>
+    <input type="checkbox" id="JSLINT_ESV" title="es5"><label for="JSLINT_ESV" title="es5">Tolerate ES5 syntax</label>
   </div>
   <div class="leftcolumn">
     <input type="checkbox" id="JSLINT_ONEVAR" title="onevar" name=goodpart><label for="JSLINT_ONEVAR" title="onevar">Allow one <tt>var</tt> statement per function</label>
@@ -252,13 +252,12 @@ Code Quality Tool</big></p>
   <a href="http://tech.groups.yahoo.com/group/jslint_com/" target="_blank">Join
   the JSLint Group.</a> </p>
  <script>
-"use strict";
 ADSAFE.id("JSLINT_");
 </script>
 <script src="fullinit_ui.js"></script>
 <script>
-"use strict";
 ADSAFE.go("JSLINT_", function (dom, lib) {
+    "use strict";
     lib.init_ui(dom);
 });
 </script>
