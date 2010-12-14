@@ -1,5 +1,5 @@
 // jslint.js
-// 2010-12-13
+// 2010-12-14
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -5555,7 +5555,10 @@ loop:   for (;;) {
                         error("Expected '{a}' and instead saw '{b}'.",
                             nexttoken, '<div>', nexttoken.value);
                     }
-                    use_strict();
+                    if (nexttoken.value === 'use strict') {
+                        warning("Use the function form of \"use strict\".");
+                        use_strict();
+                    }
                     statements('lib');
                 }
             }
@@ -5789,7 +5792,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2010-12-13';
+    itself.edition = '2010-12-14';
 
     return itself;
 
