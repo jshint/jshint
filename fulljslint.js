@@ -4859,14 +4859,14 @@ loop:   for (;;) {
 // JavaScript does not have block scope. It only has function scope. So,
 // declaring a variable in a block can have unexpected consequences.
 
-        var id, name, value;
+        var id, name, value, v = token;
 
         if (funct['(onevar)'] && option.onevar) {
             warning("Too many var statements.");
         } else if (!funct['(global)']) {
             funct['(onevar)'] = true;
         }
-        this.first = [];
+        v.first = [];
         for (;;) {
             nonadjacent(token, nexttoken);
             id = identifier();
@@ -4878,7 +4878,7 @@ loop:   for (;;) {
                 break;
             }
             name = token;
-            this.first.push(token);
+            v.first.push(token);
             if (nexttoken.id === '=') {
                 nonadjacent(token, nexttoken);
                 advance('=');
@@ -4898,7 +4898,7 @@ loop:   for (;;) {
             }
             comma();
         }
-        return this;
+        return v;
     };
 
 
@@ -5683,7 +5683,6 @@ loop:   for (;;) {
                 o.push('</div>');
             }
         }
-
 
         if (data.errors || data.implieds || data.unused) {
             err = true;
