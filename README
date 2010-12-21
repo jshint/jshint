@@ -20,5 +20,7 @@ fullinit_ui.js hooks the HTML ui components to ADsafe.
 
 lint.html describes JSLint's usage.
 
+Direct questions and comments to http://tech.groups.yahoo.com/group/jslint_com/.
+
 JSLint can be run anywhere that JavaScript (or Java) can run. See for example
 http://tech.groups.yahoo.com/group/jslint_com/database?method=reportRows&tbl=1
