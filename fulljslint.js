@@ -1,5 +1,5 @@
 // jslint.js
-// 2010-12-16
+// 2010-12-21
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -2222,6 +2222,16 @@ loop:   for (;;) {
                         nexttoken, left.value);
             }
         }
+    }
+
+    function step_in() {
+        var old_indent = indent;
+        if (prevtoken.line !== token.line) {
+            indent = token.from;
+        }
+        return function step_out() {
+            return (indent = old_indent);
+        };
     }
 
     function indentation(bias) {
@@ -4653,7 +4663,7 @@ loop:   for (;;) {
     }, 160, true);
 
     prefix('[', function () {
-        var b = token.line !== nexttoken.line;
+        var step_out = step_in(), b = token.line !== nexttoken.line;
         this.first = [];
         if (b) {
             indent += option.indent;
@@ -4688,6 +4698,7 @@ loop:   for (;;) {
             indentation();
         }
         advance(']', this);
+        step_out();
         return this;
     }, 160);
 
@@ -4767,7 +4778,7 @@ loop:   for (;;) {
 
     (function (x) {
         x.nud = function () {
-            var b, f, i, j, p, seen = {}, t;
+            var step_out = step_in(), b, f, i, j, p, seen = {}, t;
             b = token.line !== nexttoken.line;
             if (b) {
                 indent += option.indent;
@@ -4846,6 +4857,7 @@ loop:   for (;;) {
                 indentation();
             }
             advance('}', this);
+            step_out();
             return this;
         };
         x.fud = function () {
@@ -4923,7 +4935,7 @@ loop:   for (;;) {
     });
 
     prefix('function', function () {
-        var i = optionalidentifier();
+        var step_out = step_in(), i = optionalidentifier();
         if (i) {
             adjacent(token, nexttoken);
         } else {
@@ -4933,6 +4945,7 @@ loop:   for (;;) {
         if (funct['(loopage)']) {
             warning("Don't make functions within a loop.");
         }
+        step_out();
         return this;
     });
 
@@ -5792,7 +5805,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2010-12-16';
+    itself.edition = '2010-12-21';
 
     return itself;
 
