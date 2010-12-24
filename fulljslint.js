@@ -1,5 +1,5 @@
 // jslint.js
-// 2010-12-21
+// 2010-12-23
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -2226,7 +2226,8 @@ loop:   for (;;) {
 
     function step_in() {
         var old_indent = indent;
-        if (prevtoken.line !== token.line) {
+        if (prevtoken.line !== token.line &&
+                indent + option.indent === token.from) {
             indent = token.from;
         }
         return function step_out() {
@@ -5805,7 +5806,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2010-12-21';
+    itself.edition = '2010-12-23';
 
     return itself;
 
