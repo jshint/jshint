@@ -147,22 +147,6 @@ effect as this comment:</p>
   for <code>for</code>, <code>function</code>, <code>if</code>, <code>switch</code>, <code>try</code>, and
   <code>while</code>. <code>JSLint</code> does not expect to see unnecessary semicolons or the
   empty statement.</p>
-<h2 id=breaking>Line Breaking</h2>
-<p>As a further defense against the semicolon insertion mechanism and editing mishaps, <code>JSLint</code>
-  expects long statements to be broken only after one of these punctuation
-  characters or operators:</p>
-<p align="center"><code>,  ; : { } ( [ = &lt; &gt; ? ! + - * / % ~ ^ | &amp; </code></p>
-<p align="center"><code>== != &lt;= &gt;= += -= *= /= %= ^= |= &amp;= &lt;&lt; &gt;&gt;
-  || &amp;&amp; </code></p>
-<p align="center"><code>=== !== &lt;&lt;= &gt;&gt;= &gt;&gt;&gt; &gt;&gt;&gt;= </code></p>
-<p><code>JSLint</code> does not expect to see a long statement broken after
-  an identifier, a string, a number, closer, or a suffix operator:</p>
-<p align="center"><code>. )  ] ++ --</code></p>
-
-<p><code>JSLint</code> allows you to turn on the <i>Tolerate sloppy line
-  breaking</i> (<code>laxbreak</code>) <a href="#options">option</a>. </p>
-<p>Semicolon insertion can mask copy/paste errors. If you always break lines
-  after infix operators, then <code>JSLint</code> can do better at finding other errors.</p>
 <h2 id=comma>Comma</h2>
 <p>The comma operator can lead to excessively tricky expressions. It can also
   mask some programming errors.</p>
@@ -303,9 +287,7 @@ effect as this comment:</p>
 <pre align="left">(foo == 0)</pre>
 <p align="left"> say</p>
 <pre align="left">(!foo)</pre>
-<p>The <code>===</code> and <code>!==</code> operators are preferred. There
-  is an <code>eqeqeq</code> <a href="#options">option</a> that requires
-  the use of <code>===</code> and <code>!==</code> in all cases.</p>
+<p>Always use the  <code>===</code> and <code>!==</code> operators. </p>
 <h2 id=labels>Labels</h2>
 <p>JavaScript allows any statement to have a label, and labels have a
   separate name space. <code>JSLint</code> is more strict.</p>
@@ -514,14 +496,9 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
       predefined. (<a href="#devel">more</a>)</td>
   </tr>
   <tr>
-    <td>Disallow <code>==</code> and <code>!=</code></td>
-    <td><code>eqeqeq</code></td>
-    <td><code>true</code> if <code>===</code> should be required. <a href="#equal"><small>(more)</small></a></td>
-  </tr>
-  <tr>
-    <td>Tolerate ES5 syntax</td>
-    <td><code>es5</code></td>
-    <td><code>true</code> if ES5 syntax should be allowed.</a></td>
+      <td>Tolerate ES5 syntax</td>
+      <td><code>es5</code></td>
+      <td><code>true</code> if ES5 syntax should be allowed.</a></td>
   </tr>
   <tr>
     <td>Tolerate <code>eval</code> </td>
@@ -540,25 +517,14 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
     <td><code>true</code> if HTML fragments should be allowed. <a href="#html"><small>(more)</small></a></td>
   </tr>
   <tr>
-    <td>Require parens around immediate invocations</td>
-    <td><code>immed</code></td>
-    <td><code>true</code> if immediate function invocations must be wrapped
-      in parens</td>
+      <td>Strict white space indentation</td>
+      <td><code>indent</code></td>
+      <td>The number of spaces used for indentation (default is 4)</td>
   </tr>
   <tr>
-    <td>Strict white space indentation</td>
-    <td><code>indent</code></td>
-    <td>The number of spaces used for indentation (default is 4)</td>
-  </tr>
-  <tr>
-    <td>Tolerate sloppy line breaking </td>
-    <td><code>laxbreak</code></td>
-    <td><code>true</code> if statement breaks should not be checked. <a href="#breaking"><small>(more)</small></a></td>
-  </tr>
-  <tr>
-    <td>Maximum number of errors</td>
-    <td><code>maxerr</code></td>
-    <td>The maximum number of warnings reported (default is 50)</td>
+      <td>Maximum number of errors</td>
+      <td><code>maxerr</code></td>
+      <td>The maximum number of warnings reported (default is 50)</td>
   </tr>
   <tr>
     <td>Maximum line length</td>

@@ -119,7 +119,10 @@ Code Quality Tool</big></p>
         <a href="http://www.amazon.com/exec/obidos/ASIN/0596517742/wrrrldwideweb"
               target="_blank">Enjoy <i>The Good Parts</i>.</a></p>
     </td></tr></table>
-<script src="fullwebjslint.js"></script>
+<script src="fullwebjslint.js">
+// fullwebjslint.js is the concatenation of
+//    json2.js + fulljslint.js + adsafe.js + intercept.js
+</script>
 
 
 <div id="JSLINT_">
@@ -136,6 +139,8 @@ Code Quality Tool</big></p>
 <p>
     <input type="button" name="jslint" value="JSLint">
     &nbsp; &nbsp;
+    <input type="button" name="tree" value="Syntax Tree">
+    &nbsp; &nbsp;
     <input type="button" name="clear" value="clear">
 </p>
 <br clear="all">
@@ -143,36 +148,57 @@ Code Quality Tool</big></p>
 
       <div style="text-align: center;">Paste your program into the text box
         above and click a <input type="button" name="jslint" value="JSLint">
-        button. </div>
+        button.</div>
       <div style="margin: 1em; border: 2px solid black; padding: 1em; background-color: lightpink;">
       <p><a href="http://www.yuiblog.com/blog/2010/12/14/strict-mode-is-coming-to-town/">Strict mode is coming to town.</a></p>
       </div>
 </div>
+<pre id="JSLINT_TREE" style="text-align: left;"></pre>
 <br clear="all">
 <p>
     <input type="button" name="jslint" value="JSLint">
+    &nbsp; &nbsp;
+    <input type="button" name="tree" value="Syntax Tree">
     &nbsp; &nbsp;
     <input type="button" name="clear" value="clear">
 </p>
 <fieldset id="JSLINT_OPTIONS" style="background-color: linen;"><legend>Options</legend>
   <div class="leftcolumn">
-    <input type="checkbox" id="JSLINT_PASSFAIL" title="passfail"><label for="JSLINT_PASSFAIL" title="passfail">Stop on first error</label>
-  <br>
     <input type="checkbox" id="JSLINT_WHITE" title="white" name=goodpart><label for="JSLINT_WHITE" title="white">Strict white space</label>
+  <br>
+    <input type="checkbox" id="JSLINT_ONEVAR" title="onevar" name=goodpart><label for="JSLINT_ONEVAR" title="onevar">Allow one <tt>var</tt> statement per function</label>
+  <br>
+    <input type="checkbox" id="JSLINT_UNDEF" title="undef" name=goodpart><label for="JSLINT_UNDEF" title="undef">Disallow undefined variables</label>
+  <br>
+    <input type="checkbox" id="JSLINT_NEWCAP" title="newcap" name=goodpart><label for="JSLINT_NEWCAP" title="newcap">Require Initial Caps for constructors</label>
+  <br>
+    <input type="checkbox" id="JSLINT_NOMEN" title="nomen" name=goodpart><label for="JSLINT_NOMEN" title="nomen">Disallow dangling <tt>_</tt> in identifiers</label>
+  <br>
+    <input type="checkbox" id="JSLINT_REGEXP" title="regexp" name=goodpart><label for="JSLINT_REGEXP" title="regexp">Disallow <tt>.</tt> and <tt>[^</tt>...<tt>]</tt> in /RegExp/</label>
+  <br>
+    <input type="checkbox" id="JSLINT_PLUSPLUS" title="plusplus" name=goodpart><label for="JSLINT_PLUSPLUS" title="plusplus">Disallow <tt>++</tt> and
+    <tt>--</tt></label>
+  <br>
+    <input type="checkbox" id="JSLINT_BITWISE" title="bitwise" name=goodpart><label for="JSLINT_BITWISE" title="bitwise">Disallow bitwise operators</label>
+  <br>
+    <input type="checkbox" id="JSLINT_STRICT" title="strict"><label for="JSLINT_STRICT" title="strict">Require <tt>"use strict";</tt></label>
+  </div>
+  <div class="leftcolumn">
+    <input type="checkbox" id="JSLINT_PASSFAIL" title="passfail"><label for="JSLINT_PASSFAIL" title="passfail">Stop on first error</label>
   <br>
     <input type="checkbox" id="JSLINT_BROWSER" title="browser"><label for="JSLINT_BROWSER" title="browser">Assume a browser</label>
   <br>
     <input type="checkbox" id="JSLINT_DEVEL" title="devel"><label for="JSLINT_DEVEL" title="devel">Assume <code>console</code>, <code>alert</code>, ...</label>
+  <br>
+    <input type="checkbox" id="JSLINT_RHINO" title="rhino"><label for="JSLINT_RHINO" title="rhino">Assume
+        <a href="http://www.mozilla.org/rhino/">Rhino</a></label>
   <br>
     <input type="checkbox" id="JSLINT_WIDGET" title="widget"><label for="JSLINT_WIDGET" title="widget">Assume a
         <a href="http://widgets.yahoo.com/tools/">Yahoo Widget</a></label>
   <br>
     <input type="checkbox" id="JSLINT_WINDOWS" title="windows"><label for="JSLINT_WINDOWS" title="windows">Assume
         Windows</label>
-  <br>
-    <input type="checkbox" id="JSLINT_RHINO" title="rhino"><label for="JSLINT_RHINO" title="rhino">Assume
-        <a href="http://www.mozilla.org/rhino/">Rhino</a></label>
-  <br>
+  <br><br>
     <input type="checkbox" id="JSLINT_SAFE" title="safe"><label for="JSLINT_SAFE" title="safe">Safe Subset</label>
   <br>
     <input type="checkbox" id="JSLINT_ADSAFE" title="adsafe"><label for="JSLINT_ADSAFE" title="adsafe"><a href="http://www.ADsafe.org">ADsafe</a></label>
@@ -181,8 +207,6 @@ Code Quality Tool</big></p>
     <input type="checkbox" id="JSLINT_DEBUG" title="debug"><label for="JSLINT_DEBUG" title="debug">Tolerate <tt>debugger</tt> statements</label>
   <br>
     <input type="checkbox" id="JSLINT_EVIL" title="evil"><label for="JSLINT_EVIL" title="evil">Tolerate <tt>eval</tt></label>
-  <br>
-    <input type="checkbox" id="JSLINT_LAXBREAK" title="laxbreak"><label for="JSLINT_LAXBREAK" title="laxbreak">Tolerate sloppy line breaking</label>
   <br>
     <input type="checkbox" id="JSLINT_FORIN" title="forin"><label for="JSLINT_FORIN" title="forin">Tolerate <a href="http://yuiblog.com/blog/2006/09/26/for-in-intrigue/">unfiltered</a> <tt>for</tt> <tt>in</tt></label>
   <br>
@@ -197,29 +221,6 @@ Code Quality Tool</big></p>
     <input type="checkbox" id="JSLINT_FRAGMENT" title="fragment"><label for="JSLINT_FRAGMENT" title="fragment">Tolerate <tt>HTML</tt> fragments</label>
   <br>
     <input type="checkbox" id="JSLINT_ESV" title="es5"><label for="JSLINT_ESV" title="es5">Tolerate ES5 syntax</label>
-  </div>
-  <div class="leftcolumn">
-    <input type="checkbox" id="JSLINT_ONEVAR" title="onevar" name=goodpart><label for="JSLINT_ONEVAR" title="onevar">Allow one <tt>var</tt> statement per function</label>
-  <br>
-    <input type="checkbox" id="JSLINT_UNDEF" title="undef" name=goodpart><label for="JSLINT_UNDEF" title="undef">Disallow undefined variables</label>
-  <br>
-    <input type="checkbox" id="JSLINT_NOMEN" title="nomen" name=goodpart><label for="JSLINT_NOMEN" title="nomen">Disallow dangling <tt>_</tt> in identifiers</label>
-  <br>
-    <input type="checkbox" id="JSLINT_EQEQEQ" title="eqeqeq" name=goodpart><label for="JSLINT_EQEQEQ" title="eqeqeq">Disallow
-    <tt> == </tt> and <tt> != </tt></label>
-  <br>
-    <input type="checkbox" id="JSLINT_PLUSPLUS" title="plusplus" name=goodpart><label for="JSLINT_PLUSPLUS" title="plusplus">Disallow <tt>++</tt> and
-    <tt>--</tt></label>
-  <br>
-    <input type="checkbox" id="JSLINT_BITWISE" title="bitwise" name=goodpart><label for="JSLINT_BITWISE" title="bitwise">Disallow bitwise operators</label>
-  <br>
-    <input type="checkbox" id="JSLINT_REGEXP" title="regexp" name=goodpart><label for="JSLINT_REGEXP" title="regexp">Disallow insecure <tt>.</tt> and <tt>[^</tt>...<tt>]</tt> in /RegExp/</label>
-  <br>
-    <input type="checkbox" id="JSLINT_NEWCAP" title="newcap" name=goodpart><label for="JSLINT_NEWCAP" title="newcap">Require Initial Caps for constructors</label>
-  <br>
-    <input type="checkbox" id="JSLINT_IMMED" title="immed" name=goodpart><label for="JSLINT_IMMED" title="immed">Require parens around immediate invocations</label>
-  <br>
-    <input type="checkbox" id="JSLINT_STRICT" title="strict"><label for="JSLINT_STRICT" title="strict">Require <tt>"use strict";</tt></label>
   </div>
   <div class="leftcolumn">
     <input type="button" id="JSLINT_GOODPARTS" value="The Good Parts">

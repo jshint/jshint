@@ -1,5 +1,5 @@
-// intercept.html
-// 2010-12-13
+// intercept.js
+// 2011-01-06
 
 // This file makes it possible for JSLint to run as an ADsafe widget by
 // adding lib features.
@@ -11,13 +11,15 @@
 // call JSLint directly because it is loaded as a global variable. I don't
 // want to change that because other versions of JSLint depend on that.
 
+// And it provides access to the syntax tree that JSLint constructed.
+
 /*jslint nomen: false */
 
 /*global ADSAFE, document, JSLINT */
 
 /*members ___nodes___, _intercept, cookie, edition, get, getTime,
     indexOf, innerHTML, jslint, length, parse, replace, report, set,
-    setTime, slice, stringify, toGMTString
+    setTime, slice, stringify, toGMTString, tree
 */
 
 ADSAFE._intercept(function (id, dom, lib, bunch) {
@@ -55,8 +57,7 @@ ADSAFE._intercept(function (id, dom, lib, bunch) {
             if (j.length < 2000) {
                 d = new Date();
                 d.setTime(d.getTime() + 1e9);
-                document.cookie = id + "=" + j +
-                        ';expires=' + d.toGMTString();
+                document.cookie = id + "=" + j + ';expires=' + d.toGMTString();
             }
         }
     };
@@ -64,7 +65,7 @@ ADSAFE._intercept(function (id, dom, lib, bunch) {
 
 ADSAFE._intercept(function (id, dom, lib, bunch) {
     "use strict";
-    
+
 // Give only the JSLINT_ widget access to the JSLINT function.
 // We add a jslint function to its lib that calls JSLINT and
 // then calls JSLINT.report, and stuffs the html result into
@@ -81,6 +82,9 @@ ADSAFE._intercept(function (id, dom, lib, bunch) {
         };
         lib.edition = function () {
             return JSLINT.edition;
+        };
+        lib.tree = function () {
+            return JSLINT.tree;
         };
     }
 });
