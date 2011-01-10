@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-01-06
+// 2011-01-09
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -145,7 +145,7 @@ SOFTWARE.
     latest tree is kept in JSLINT.tree. A nice stringication can be produced
     with
 
-        JSON.stringify(JSON.tree, [
+        JSON.stringify(JSLINT.tree, [
             'value',  'arity', 'name',  'first',
             'second', 'third', 'block', 'else'
         ], 4));
@@ -2717,9 +2717,16 @@ loop:   for (;;) {
             a = statements();
             strict_mode = m;
             advance('}', t);
-        } else {
+        } else if (!ordinary) {
             error("Expected '{a}' and instead saw '{b}'.",
-                    nexttoken, '{', nexttoken.value);
+                nexttoken, '{', nexttoken.value);
+        } else {
+            warning("Expected '{a}' and instead saw '{b}'.",
+                nexttoken, '{', nexttoken.value);
+            a = [statement()];
+            if (a[0].disrupt) {
+                a.disrupt = true;
+            }
         }
         funct['(verb)'] = null;
         scope = s;
@@ -3600,12 +3607,12 @@ loop:   for (;;) {
         }
         no_space();
         advance(')', t);
-        one_space();
+        one_space_only();
         this.block = block(true);
         if (nexttoken.id === 'else') {
             one_space();
             advance('else');
-            one_space();
+            one_space_only();
             this['else'] = nexttoken.id === 'if' || nexttoken.id === 'switch' ?
                 statement(true) : block(true);
             if (this['else'].disrupt && this.block.disrupt) {
@@ -3626,7 +3633,7 @@ loop:   for (;;) {
         if (option.adsafe) {
             warning("ADsafe try violation.", this);
         }
-        one_space();
+        one_space_only();
         this.arity = 'statement';
         this.block = block(false);
         if (nexttoken.id === 'catch') {
@@ -3683,7 +3690,7 @@ loop:   for (;;) {
         }
         no_space();
         advance(')', t);
-        one_space();
+        one_space_only();
         this.block = block(true);
         if (this.block.disrupt) {
             warning("Strange loop.", prevtoken);
@@ -3714,7 +3721,7 @@ loop:   for (;;) {
         this.first = expression(20);
         no_space();
         advance(')', t);
-        one_space();
+        one_space_only();
         advance('{');
         this.second = [];
         while (nexttoken.id === 'case') {
@@ -3780,7 +3787,7 @@ loop:   for (;;) {
     stmt('do', function () {
         funct['(breakage)'] += 1;
         funct['(loopage)'] += 1;
-        one_space();
+        one_space_only();
         this.arity = 'statement';
         this.block = block(true);
         if (this.block.disrupt) {
@@ -3789,7 +3796,7 @@ loop:   for (;;) {
         one_space();
         advance('while');
         var t = nexttoken;
-        one_space();
+        one_space_only();
         advance('(');
         no_space();
         this.first = expression(0);
@@ -3869,8 +3876,9 @@ loop:   for (;;) {
                     comma();
                 }
             }
+            no_space();
             advance(')', t);
-            no_space(prevtoken, token);
+            one_space_only();
             s = block(true);
         }
         if (s.disrupt) {
@@ -5728,7 +5736,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-01-06';
+    itself.edition = '2011-01-09';
 
     return itself;
 
