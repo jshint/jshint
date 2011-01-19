@@ -335,6 +335,7 @@ var JSLINT = (function () {
             nomen      : true, // if names should be checked
             on         : true, // if HTML event handlers should be allowed
             onevar     : true, // if only one var statement per function should be allowed
+            oneline    : true, // if one-line blocks should be allowed
             passfail   : true, // if the scan should stop on first error
             plusplus   : true, // if increment/decrement should not be allowed
             regexp     : true, // if the . should not be allowed in regexp literals
@@ -2693,7 +2694,7 @@ loop:   for (;;) {
     }
 
 
-    function block(ordinary) {
+    function block(ordinary, oneline) {
 
 // A block is a sequence of statements wrapped in braces.
 // ordinary is false for function bodies and try blocks.
@@ -2721,8 +2722,10 @@ loop:   for (;;) {
             error("Expected '{a}' and instead saw '{b}'.",
                 nexttoken, '{', nexttoken.value);
         } else {
-            warning("Expected '{a}' and instead saw '{b}'.",
-                nexttoken, '{', nexttoken.value);
+            if (!oneline)
+                warning("Expected '{a}' and instead saw '{b}'.",
+                    nexttoken, '{', nexttoken.value);
+
             a = [statement()];
             if (a[0].disrupt) {
                 a.disrupt = true;
@@ -3608,7 +3611,7 @@ loop:   for (;;) {
         no_space();
         advance(')', t);
         one_space_only();
-        this.block = block(true);
+        this.block = block(true, option.oneline);
         if (nexttoken.id === 'else') {
             one_space();
             advance('else');
@@ -3691,7 +3694,7 @@ loop:   for (;;) {
         no_space();
         advance(')', t);
         one_space_only();
-        this.block = block(true);
+        this.block = block(true, option.oneline);
         if (this.block.disrupt) {
             warning("Strange loop.", prevtoken);
         }
@@ -3879,7 +3882,7 @@ loop:   for (;;) {
             no_space();
             advance(')', t);
             one_space_only();
-            s = block(true);
+            s = block(true, option.oneline);
         }
         if (s.disrupt) {
             warning("Strange loop.", prevtoken);

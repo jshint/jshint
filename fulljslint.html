@@ -119,10 +119,14 @@ Code Quality Tool</big></p>
         <a href="http://www.amazon.com/exec/obidos/ASIN/0596517742/wrrrldwideweb"
               target="_blank">Enjoy <i>The Good Parts</i>.</a></p>
     </td></tr></table>
-<script src="fullwebjslint.js">
+<!--<script src="fullwebjslint.js">
 // fullwebjslint.js is the concatenation of
 //    json2.js + fulljslint.js + adsafe.js + intercept.js
-</script>
+</script>-->
+
+<script src="fulljslint.js"></script>
+<script src="adsafe.js"></script>
+<script src="intercept.js"></script>
 
 
 <div id="JSLINT_">
@@ -221,6 +225,8 @@ Code Quality Tool</big></p>
     <input type="checkbox" id="JSLINT_FRAGMENT" title="fragment"><label for="JSLINT_FRAGMENT" title="fragment">Tolerate <tt>HTML</tt> fragments</label>
   <br>
     <input type="checkbox" id="JSLINT_ESV" title="es5"><label for="JSLINT_ESV" title="es5">Tolerate ES5 syntax</label>
+  <br>
+    <input type="checkbox" id="JSLINT_ONELINE" title="oneline"><label for="JSLINT_ONELINE" title="oneline">Tolerate one-line blocks</label>    
   </div>
   <div class="leftcolumn">
     <input type="button" id="JSLINT_GOODPARTS" value="The Good Parts">
