@@ -324,6 +324,7 @@ var JSLINT = (function () {
             bitwise    : true, // if bitwise operators should not be allowed
             browser    : true, // if the standard browser globals should be predefined
             cap        : true, // if upper case HTML should be allowed
+            calref     : true, // if arguments.callee and arguments.caller should be disallowed
             css        : true, // if CSS workarounds should be tolerated
             debug      : true, // if debugger statements should be allowed
             devel      : true, // if logging should be allowed (console, alert, etc.)
@@ -3230,7 +3231,7 @@ loop:   for (;;) {
         }
         that.first = left;
         that.second = m;
-        if (left && left.value === 'arguments' &&
+        if (option.calref && left && left.value === 'arguments' &&
                 (m === 'callee' || m === 'caller')) {
             warning("Avoid arguments.{a}.", left, m);
         } else if (!option.evil && left && left.value === 'document' &&
