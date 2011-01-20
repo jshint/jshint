@@ -5744,3 +5744,5 @@ loop:   for (;;) {
     return itself;
 
 }());
+
+exports.JSLINT = JSLINT;

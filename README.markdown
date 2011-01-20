@@ -33,7 +33,19 @@ JSLint gripes you encounter.
 
 
 Development
--------
+-----------
 
 We don't have a stable version of JSHint yet. Stay tuned!
 
+
+Tests
+-----
+
+To run tests you will need to install [node.js](http://nodejs.org/) and
+node-jasmine. You can install the latter with npm:
+
+    npm install node-jasmine
+    
+After that, running tests is as easy as:
+
+    node runtests.js
