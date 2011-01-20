@@ -2,10 +2,10 @@ JSHint, The (Gentler) JavaScript Code Quality Tool
 ==================================================
 
 JSHint is a fork of Douglas Crockford's [JSLint](http://jslint.com/) that does
-tyrannize your code. It is designed to detect errors that actually break your
+not tyrannize your code. It is designed to detect errors that actually break your
 code while skipping things that, according to Crockford, “are known to
 contribute mistakes in projects”. In other words, JSHint is a fork of JSLint
-for real world.
+for the real world.
 
 For example, JSLint does not tolerate the following constructions:
 
