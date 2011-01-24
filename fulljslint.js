@@ -5746,4 +5746,6 @@ loop:   for (;;) {
 
 }());
 
-exports.JSLINT = JSLINT;
+// Make JSHINT a Node module, if possible.
+if (typeof exports == 'object' && exports)
+    exports.JSLINT = JSLINT;
