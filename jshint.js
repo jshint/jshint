@@ -1,266 +1,272 @@
-// jslint.js
-// 2010-12-14
+/*
+ * JSHint, by JSHint Community.
+ *
+ * Licensed under the MIT license.
+ *
+ * JSHint is a derivative work of JSLint:
+ *
+ *   Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
+ *
+ *   Permission is hereby granted, free of charge, to any person obtaining
+ *   a copy of this software and associated documentation files (the "Software"),
+ *   to deal in the Software without restriction, including without limitation
+ *   the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ *   and/or sell copies of the Software, and to permit persons to whom
+ *   the Software is furnished to do so, subject to the following conditions:
+ *
+ *   The above copyright notice and this permission notice shall be included
+ *   in all copies or substantial portions of the Software.
+ *
+ *   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ *   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ *   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *   DEALINGS IN THE SOFTWARE.
+ *
+ * JSHint was forked from 2010-12-14 edition of JSLint.
+ *
+ */
 
 /*
-Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
+ JSHINT is a global function. It takes two parameters.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
+     var myResult = JSHINT(source, option);
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+ The first parameter is either a string or an array of strings. If it is a
+ string, it will be split on '\n' or '\r'. If it is an array of strings, it
+ is assumed that each string represents one line. The source can be a
+ JavaScript text, or HTML text, or a JSON text, or a CSS text.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+ The second parameter is an optional object of options which control the
+ operation of JSHINT. Most of the options are booleans: They are all
+ optional and have a default value of false. One of the options, predef,
+ can be an array of names, which will be used to declare global variables,
+ or an object whose keys are used as global names, with a boolean value
+ that determines if they are assignable.
 
-/*
-    JSLINT is a global function. It takes two parameters.
+ If it checks out, JSHINT returns true. Otherwise, it returns false.
 
-        var myResult = JSLINT(source, option);
+ If false, you can inspect JSHINT.errors to find out the problems.
+ JSHINT.errors is an array of objects containing these members:
 
-    The first parameter is either a string or an array of strings. If it is a
-    string, it will be split on '\n' or '\r'. If it is an array of strings, it
-    is assumed that each string represents one line. The source can be a
-    JavaScript text, or HTML text, or a JSON text, or a CSS text.
+ {
+     line      : The line (relative to 0) at which the lint was found
+     character : The character (relative to 0) at which the lint was found
+     reason    : The problem
+     evidence  : The text line in which the problem occurred
+     raw       : The raw message before the details were inserted
+     a         : The first detail
+     b         : The second detail
+     c         : The third detail
+     d         : The fourth detail
+ }
 
-    The second parameter is an optional object of options which control the
-    operation of JSLINT. Most of the options are booleans: They are all
-    optional and have a default value of false. One of the options, predef,
-    can be an array of names, which will be used to declare global variables,
-    or an object whose keys are used as global names, with a boolean value
-    that determines if they are assignable.
+ If a fatal error was found, a null will be the last element of the
+ JSHINT.errors array.
 
-    If it checks out, JSLINT returns true. Otherwise, it returns false.
+ You can request a Function Report, which shows all of the functions
+ and the parameters and vars that they use. This can be used to find
+ implied global variables and other problems. The report is in HTML and
+ can be inserted in an HTML <body>.
 
-    If false, you can inspect JSLINT.errors to find out the problems.
-    JSLINT.errors is an array of objects containing these members:
+     var myReport = JSHINT.report(limited);
 
-    {
-        line      : The line (relative to 0) at which the lint was found
-        character : The character (relative to 0) at which the lint was found
-        reason    : The problem
-        evidence  : The text line in which the problem occurred
-        raw       : The raw message before the details were inserted
-        a         : The first detail
-        b         : The second detail
-        c         : The third detail
-        d         : The fourth detail
-    }
+ If limited is true, then the report will be limited to only errors.
 
-    If a fatal error was found, a null will be the last element of the
-    JSLINT.errors array.
+ You can request a data structure which contains JSHint's results.
 
-    You can request a Function Report, which shows all of the functions
-    and the parameters and vars that they use. This can be used to find
-    implied global variables and other problems. The report is in HTML and
-    can be inserted in an HTML <body>.
+     var myData = JSHINT.data();
 
-        var myReport = JSLINT.report(limited);
+ It returns a structure with this form:
 
-    If limited is true, then the report will be limited to only errors.
+ {
+     errors: [
+         {
+             line: NUMBER,
+             character: NUMBER,
+             reason: STRING,
+             evidence: STRING
+         }
+     ],
+     functions: [
+         name: STRING,
+         line: NUMBER,
+         last: NUMBER,
+         param: [
+             STRING
+         ],
+         closure: [
+             STRING
+         ],
+         var: [
+             STRING
+         ],
+         exception: [
+             STRING
+         ],
+         outer: [
+             STRING
+         ],
+         unused: [
+             STRING
+         ],
+         global: [
+             STRING
+         ],
+         label: [
+             STRING
+         ]
+     ],
+     globals: [
+         STRING
+     ],
+     member: {
+         STRING: NUMBER
+     },
+     unuseds: [
+         {
+             name: STRING,
+             line: NUMBER
+         }
+     ],
+     implieds: [
+         {
+             name: STRING,
+             line: NUMBER
+         }
+     ],
+     urls: [
+         STRING
+     ],
+     json: BOOLEAN
+ }
 
-    You can request a data structure which contains JSLint's results.
-
-        var myData = JSLINT.data();
-
-    It returns a structure with this form:
-
-    {
-        errors: [
-            {
-                line: NUMBER,
-                character: NUMBER,
-                reason: STRING,
-                evidence: STRING
-            }
-        ],
-        functions: [
-            name: STRING,
-            line: NUMBER,
-            last: NUMBER,
-            param: [
-                STRING
-            ],
-            closure: [
-                STRING
-            ],
-            var: [
-                STRING
-            ],
-            exception: [
-                STRING
-            ],
-            outer: [
-                STRING
-            ],
-            unused: [
-                STRING
-            ],
-            global: [
-                STRING
-            ],
-            label: [
-                STRING
-            ]
-        ],
-        globals: [
-            STRING
-        ],
-        member: {
-            STRING: NUMBER
-        },
-        unuseds: [
-            {
-                name: STRING,
-                line: NUMBER
-            }
-        ],
-        implieds: [
-            {
-                name: STRING,
-                line: NUMBER
-            }
-        ],
-        urls: [
-            STRING
-        ],
-        json: BOOLEAN
-    }
-
-    Empty arrays will not be included.
+ Empty arrays will not be included.
 
 */
 
-/*jslint
-    evil: true, nomen: false, onevar: false, regexp: false, strict: true
+/*jshint
+ evil: true, nomen: false, onevar: false, regexp: false, strict: true
 */
 
 /*members "\b", "\t", "\n", "\f", "\r", "!=", "!==", "\"", "%",
-    "(begin)", "(breakage)", "(context)", "(error)", "(global)",
-    "(identifier)", "(last)", "(line)", "(loopage)", "(name)", "(onevar)",
-    "(params)", "(scope)", "(statement)", "(verb)", "*", "+", "++", "-",
-    "--", "\/", "<", "<=", "==", "===", ">", ">=", ADSAFE,
-    ActiveXObject, Array, Boolean, COM, CScript, Canvas, CustomAnimation,
-    Date, Debug, E, Enumerator, Error, EvalError, FadeAnimation, Flash,
-    FormField, Frame, Function, HotKey, Image, JSON, LN10, LN2, LOG10E,
-    LOG2E, MAX_VALUE, MIN_VALUE, Math, MenuItem, MoveAnimation,
-    NEGATIVE_INFINITY, Number, Object, Option, PI, POSITIVE_INFINITY, Point,
-    RangeError, Rectangle, ReferenceError, RegExp, ResizeAnimation,
-    RotateAnimation, SQRT1_2, SQRT2, ScrollBar, String, Style, SyntaxError,
-    System, Text, TextArea, Timer, TypeError, URIError, URL, VBArray,
-    WScript, Web, Window, XMLDOM, XMLHttpRequest, "\\", a, abbr, acronym,
-    activeborder, activecaption, addEventListener, address, adsafe, alert,
-    aliceblue, all, animator, antiquewhite, appleScript, applet, apply,
-    approved, appworkspace, aqua, aquamarine, area, arguments, arity,
-    article, aside, audio, autocomplete, azure, b, background,
-    "background-attachment", "background-color", "background-image",
-    "background-position", "background-repeat", base, bdo, beep, beige, big,
-    bisque, bitwise, black, blanchedalmond, block, blockquote, blue,
-    blueviolet, blur, body, border, "border-bottom", "border-bottom-color",
-    "border-bottom-style", "border-bottom-width", "border-collapse",
-    "border-color", "border-left", "border-left-color", "border-left-style",
-    "border-left-width", "border-right", "border-right-color",
-    "border-right-style", "border-right-width", "border-spacing",
-    "border-style", "border-top", "border-top-color", "border-top-style",
-    "border-top-width", "border-width", bottom, br, braille, brown, browser,
-    burlywood, button, buttonface, buttonhighlight, buttonshadow,
-    buttontext, bytesToUIString, c, cadetblue, call, callee, caller, canvas,
-    cap, caption, "caption-side", captiontext, cases, center, charAt,
-    charCodeAt, character, chartreuse, chocolate, chooseColor, chooseFile,
-    chooseFolder, cite, clear, clearInterval, clearTimeout, clip, close,
-    closeWidget, closed, closure, cm, code, col, colgroup, color, command,
-    comment, condition, confirm, console, constructor, content,
-    convertPathToHFS, convertPathToPlatform, coral, cornflowerblue,
-    cornsilk, "counter-increment", "counter-reset", create, crimson, css,
-    cursor, cyan, d, darkblue, darkcyan, darkgoldenrod, darkgray, darkgreen,
-    darkkhaki, darkmagenta, darkolivegreen, darkorange, darkorchid, darkred,
-    darksalmon, darkseagreen, darkslateblue, darkslategray, darkturquoise,
-    darkviolet, data, datalist, dd, debug, decodeURI, decodeURIComponent,
-    deeppink, deepskyblue, defaultStatus, defineClass, del, deserialize,
-    details, devel, dfn, dialog, dimgray, dir, direction, display, div, dl,
-    document, dodgerblue, dt, edition, else, em, embed, embossed, empty,
-    "empty-cells", encodeURI, encodeURIComponent, entityify, eqeqeq, errors,
-    es5, escape, eval, event, evidence, evil, ex, exception, exec, exps,
-    fieldset, figure, filesystem, firebrick, first, float, floor,
-    floralwhite, focus, focusWidget, font, "font-family", "font-size",
-    "font-size-adjust", "font-stretch", "font-style", "font-variant",
-    "font-weight", footer, forestgreen, forin, form, fragment, frame,
-    frames, frameset, from, fromCharCode, fuchsia, fud, funct, function,
-    functions, g, gainsboro, gc, getComputedStyle, ghostwhite, global,
-    globals, gold, goldenrod, gray, graytext, green, greenyellow, h1, h2,
-    h3, h4, h5, h6, handheld, hasOwnProperty, head, header, height, help,
-    hgroup, highlight, highlighttext, history, honeydew, hotpink, hr,
-    "hta:application", html, i, iTunes, id, identifier, iframe, img, immed,
-    implieds, in, inactiveborder, inactivecaption, inactivecaptiontext,
-    include, indent, indexOf, indianred, indigo, infobackground, infotext,
-    init, input, ins, isAlpha, isApplicationRunning, isArray, isDigit,
-    isFinite, isNaN, ivory, join, jslint, json, kbd, keygen, keys, khaki,
-    konfabulatorVersion, label, labelled, lang, last, lavender,
-    lavenderblush, lawngreen, laxbreak, lbp, led, left, legend,
-    lemonchiffon, length, "letter-spacing", li, lib, lightblue, lightcoral,
-    lightcyan, lightgoldenrodyellow, lightgreen, lightpink, lightsalmon,
-    lightseagreen, lightskyblue, lightslategray, lightsteelblue,
-    lightyellow, lime, limegreen, line, "line-height", linen, link,
-    "list-style", "list-style-image", "list-style-position",
-    "list-style-type", load, loadClass, location, log, m, magenta, map,
-    margin, "margin-bottom", "margin-left", "margin-right", "margin-top",
-    mark, "marker-offset", maroon, match, "max-height", "max-width", maxerr,
-    maxlen, md5, mediumaquamarine, mediumblue, mediumorchid, mediumpurple,
-    mediumseagreen, mediumslateblue, mediumspringgreen, mediumturquoise,
-    mediumvioletred, member, menu, menutext, message, meta, meter,
-    midnightblue, "min-height", "min-width", mintcream, mistyrose, mm,
-    moccasin, moveBy, moveTo, name, nav, navajowhite, navigator, navy, new,
-    newcap, noframes, nomen, noscript, nud, object, ol, oldlace, olive,
-    olivedrab, on, onbeforeunload, onblur, onerror, onevar, onfocus, onload,
-    onresize, onunload, opacity, open, openURL, opener, opera, optgroup,
-    option, orange, orangered, orchid, outer, outline, "outline-color",
-    "outline-style", "outline-width", output, overflow, "overflow-x",
-    "overflow-y", p, padding, "padding-bottom", "padding-left",
-    "padding-right", "padding-top", "page-break-after", "page-break-before",
-    palegoldenrod, palegreen, paleturquoise, palevioletred, papayawhip,
-    param, parent, parseFloat, parseInt, passfail, pc, peachpuff, peru,
-    pink, play, plum, plusplus, pop, popupMenu, position, powderblue, pre,
-    predef, preferenceGroups, preferences, print, progress, projection,
-    prompt, prototype, pt, purple, push, px, q, quit, quotes, random, range,
-    raw, reach, readFile, readUrl, reason, red, regexp, reloadWidget,
-    removeEventListener, replace, report, reserved, resizeBy, resizeTo,
-    resolvePath, resumeUpdates, rhino, right, rosybrown, royalblue, rp, rt,
-    ruby, runCommand, runCommandInBg, saddlebrown, safe, salmon, samp,
-    sandybrown, saveAs, savePreferences, screen, script, scroll, scrollBy,
-    scrollTo, scrollbar, seagreen, seal, search, seashell, section, select,
-    serialize, setInterval, setTimeout, shift, showWidgetPreferences,
-    sienna, silver, skyblue, slateblue, slategray, sleep, slice, small,
-    snow, sort, source, span, spawn, speak, speech, split, springgreen, src,
-    stack, status, steelblue, strict, strong, style, styleproperty, sub,
-    substr, sup, supplant, suppressUpdates, sync, system, table,
-    "table-layout", tan, tbody, td, teal, tellWidget, test, "text-align",
-    "text-decoration", "text-indent", "text-shadow", "text-transform",
-    textarea, tfoot, th, thead, thistle, threeddarkshadow, threedface,
-    threedhighlight, threedlightshadow, threedshadow, time, title,
-    toLowerCase, toString, toUpperCase, toint32, token, tomato, top, tr, tt,
-    tty, turquoise, tv, type, u, ul, undef, unescape, "unicode-bidi",
-    unused, unwatch, updateNow, urls, value, valueOf, var, version,
-    "vertical-align", video, violet, visibility, watch, wheat, white,
-    "white-space", whitesmoke, widget, width, window, windowframe, windows,
-    windowtext, "word-spacing", "word-wrap", yahooCheckLogin, yahooLogin,
-    yahooLogout, yellow, yellowgreen, "z-index"
+ "(begin)", "(breakage)", "(context)", "(error)", "(global)",
+ "(identifier)", "(last)", "(line)", "(loopage)", "(name)", "(onevar)",
+ "(params)", "(scope)", "(statement)", "(verb)", "*", "+", "++", "-",
+ "--", "\/", "<", "<=", "==", "===", ">", ">=", ADSAFE,
+ ActiveXObject, Array, Boolean, COM, CScript, Canvas, CustomAnimation,
+ Date, Debug, E, Enumerator, Error, EvalError, FadeAnimation, Flash,
+ FormField, Frame, Function, HotKey, Image, JSON, LN10, LN2, LOG10E,
+ LOG2E, MAX_VALUE, MIN_VALUE, Math, MenuItem, MoveAnimation,
+ NEGATIVE_INFINITY, Number, Object, Option, PI, POSITIVE_INFINITY, Point,
+ RangeError, Rectangle, ReferenceError, RegExp, ResizeAnimation,
+ RotateAnimation, SQRT1_2, SQRT2, ScrollBar, String, Style, SyntaxError,
+ System, Text, TextArea, Timer, TypeError, URIError, URL, VBArray,
+ WScript, Web, Window, XMLDOM, XMLHttpRequest, "\\", a, abbr, acronym,
+ activeborder, activecaption, addEventListener, address, adsafe, alert,
+ aliceblue, all, animator, antiquewhite, appleScript, applet, apply,
+ approved, appworkspace, aqua, aquamarine, area, arguments, arity,
+ article, aside, audio, autocomplete, azure, b, background,
+ "background-attachment", "background-color", "background-image",
+ "background-position", "background-repeat", base, bdo, beep, beige, big,
+ bisque, bitwise, black, blanchedalmond, block, blockquote, blue,
+ blueviolet, blur, body, border, "border-bottom", "border-bottom-color",
+ "border-bottom-style", "border-bottom-width", "border-collapse",
+ "border-color", "border-left", "border-left-color", "border-left-style",
+ "border-left-width", "border-right", "border-right-color",
+ "border-right-style", "border-right-width", "border-spacing",
+ "border-style", "border-top", "border-top-color", "border-top-style",
+ "border-top-width", "border-width", bottom, br, braille, brown, browser,
+ burlywood, button, buttonface, buttonhighlight, buttonshadow,
+ buttontext, bytesToUIString, c, cadetblue, call, callee, caller, canvas,
+ cap, caption, "caption-side", captiontext, cases, center, charAt,
+ charCodeAt, character, chartreuse, chocolate, chooseColor, chooseFile,
+ chooseFolder, cite, clear, clearInterval, clearTimeout, clip, close,
+ closeWidget, closed, closure, cm, code, col, colgroup, color, command,
+ comment, condition, confirm, console, constructor, content,
+ convertPathToHFS, convertPathToPlatform, coral, cornflowerblue,
+ cornsilk, "counter-increment", "counter-reset", create, crimson, css,
+ cursor, cyan, d, darkblue, darkcyan, darkgoldenrod, darkgray, darkgreen,
+ darkkhaki, darkmagenta, darkolivegreen, darkorange, darkorchid, darkred,
+ darksalmon, darkseagreen, darkslateblue, darkslategray, darkturquoise,
+ darkviolet, data, datalist, dd, debug, decodeURI, decodeURIComponent,
+ deeppink, deepskyblue, defaultStatus, defineClass, del, deserialize,
+ details, devel, dfn, dialog, dimgray, dir, direction, display, div, dl,
+ document, dodgerblue, dt, edition, else, em, embed, embossed, empty,
+ "empty-cells", encodeURI, encodeURIComponent, entityify, eqeqeq, errors,
+ es5, escape, eval, event, evidence, evil, ex, exception, exec, exps,
+ fieldset, figure, filesystem, firebrick, first, float, floor,
+ floralwhite, focus, focusWidget, font, "font-family", "font-size",
+ "font-size-adjust", "font-stretch", "font-style", "font-variant",
+ "font-weight", footer, forestgreen, forin, form, fragment, frame,
+ frames, frameset, from, fromCharCode, fuchsia, fud, funct, function,
+ functions, g, gainsboro, gc, getComputedStyle, ghostwhite, global,
+ globals, gold, goldenrod, gray, graytext, green, greenyellow, h1, h2,
+ h3, h4, h5, h6, handheld, hasOwnProperty, head, header, height, help,
+ hgroup, highlight, highlighttext, history, honeydew, hotpink, hr,
+ "hta:application", html, i, iTunes, id, identifier, iframe, img, immed,
+ implieds, in, inactiveborder, inactivecaption, inactivecaptiontext,
+ include, indent, indexOf, indianred, indigo, infobackground, infotext,
+ init, input, ins, isAlpha, isApplicationRunning, isArray, isDigit,
+ isFinite, isNaN, ivory, join, jshint, json, kbd, keygen, keys, khaki,
+ konfabulatorVersion, label, labelled, lang, last, lavender,
+ lavenderblush, lawngreen, laxbreak, lbp, led, left, legend,
+ lemonchiffon, length, "letter-spacing", li, lib, lightblue, lightcoral,
+ lightcyan, lightgoldenrodyellow, lightgreen, lightpink, lightsalmon,
+ lightseagreen, lightskyblue, lightslategray, lightsteelblue,
+ lightyellow, lime, limegreen, line, "line-height", linen, link,
+ "list-style", "list-style-image", "list-style-position",
+ "list-style-type", load, loadClass, location, log, m, magenta, map,
+ margin, "margin-bottom", "margin-left", "margin-right", "margin-top",
+ mark, "marker-offset", maroon, match, "max-height", "max-width", maxerr,
+ maxlen, md5, mediumaquamarine, mediumblue, mediumorchid, mediumpurple,
+ mediumseagreen, mediumslateblue, mediumspringgreen, mediumturquoise,
+ mediumvioletred, member, menu, menutext, message, meta, meter,
+ midnightblue, "min-height", "min-width", mintcream, mistyrose, mm,
+ moccasin, moveBy, moveTo, name, nav, navajowhite, navigator, navy, new,
+ newcap, noframes, nomen, noscript, nud, object, ol, oldlace, olive,
+ olivedrab, on, onbeforeunload, onblur, onerror, onevar, onfocus, onload,
+ onresize, onunload, opacity, open, openURL, opener, opera, optgroup,
+ option, orange, orangered, orchid, outer, outline, "outline-color",
+ "outline-style", "outline-width", output, overflow, "overflow-x",
+ "overflow-y", p, padding, "padding-bottom", "padding-left",
+ "padding-right", "padding-top", "page-break-after", "page-break-before",
+ palegoldenrod, palegreen, paleturquoise, palevioletred, papayawhip,
+ param, parent, parseFloat, parseInt, passfail, pc, peachpuff, peru,
+ pink, play, plum, plusplus, pop, popupMenu, position, powderblue, pre,
+ predef, preferenceGroups, preferences, print, progress, projection,
+ prompt, prototype, pt, purple, push, px, q, quit, quotes, random, range,
+ raw, reach, readFile, readUrl, reason, red, regexp, reloadWidget,
+ removeEventListener, replace, report, reserved, resizeBy, resizeTo,
+ resolvePath, resumeUpdates, rhino, right, rosybrown, royalblue, rp, rt,
+ ruby, runCommand, runCommandInBg, saddlebrown, safe, salmon, samp,
+ sandybrown, saveAs, savePreferences, screen, script, scroll, scrollBy,
+ scrollTo, scrollbar, seagreen, seal, search, seashell, section, select,
+ serialize, setInterval, setTimeout, shift, showWidgetPreferences,
+ sienna, silver, skyblue, slateblue, slategray, sleep, slice, small,
+ snow, sort, source, span, spawn, speak, speech, split, springgreen, src,
+ stack, status, steelblue, strict, strong, style, styleproperty, sub,
+ substr, sup, supplant, suppressUpdates, sync, system, table,
+ "table-layout", tan, tbody, td, teal, tellWidget, test, "text-align",
+ "text-decoration", "text-indent", "text-shadow", "text-transform",
+ textarea, tfoot, th, thead, thistle, threeddarkshadow, threedface,
+ threedhighlight, threedlightshadow, threedshadow, time, title,
+ toLowerCase, toString, toUpperCase, toint32, token, tomato, top, tr, tt,
+ tty, turquoise, tv, type, u, ul, undef, unescape, "unicode-bidi",
+ unused, unwatch, updateNow, urls, value, valueOf, var, version,
+ "vertical-align", video, violet, visibility, watch, wheat, white,
+ "white-space", whitesmoke, widget, width, window, windowframe, windows,
+ windowtext, "word-spacing", "word-wrap", yahooCheckLogin, yahooLogin,
+ yahooLogout, yellow, yellowgreen, "z-index"
 */
 
 // We build the application inside a function so that we produce only a single
 // global variable. That function will be invoked immediately, and its return
-// value is the JSLINT function itself.
+// value is the JSHINT function itself.
 
-var JSLINT = (function () {
+var JSHINT = (function () {
     "use strict";
 
     var adsafe_id,      // The widget's ADsafe id.
@@ -272,24 +278,24 @@ var JSLINT = (function () {
 // These are operators that should not be used with the ! operator.
 
         bang = {
-            '<': true,
-            '<=': true,
-            '==': true,
+            '<'  : true,
+            '<=' : true,
+            '==' : true,
             '===': true,
             '!==': true,
-            '!=': true,
-            '>': true,
-            '>=': true,
-            '+': true,
-            '-': true,
-            '*': true,
-            '/': true,
-            '%': true
+            '!=' : true,
+            '>'  : true,
+            '>=' : true,
+            '+'  : true,
+            '-'  : true,
+            '*'  : true,
+            '/'  : true,
+            '%'  : true
         },
 
 // These are property names that should not be permitted in the safe subset.
 
-        banned = {              // the member names that ADsafe prohibits.
+        banned = { // the member names that ADsafe prohibits.
             'arguments'     : true,
             callee          : true,
             caller          : true,
@@ -303,7 +309,7 @@ var JSLINT = (function () {
         },
 
 
-// These are the JSLint boolean options.
+// These are the JSHint boolean options.
 
         boolOptions = {
             adsafe     : true, // if ADsafe should be enforced
@@ -311,6 +317,7 @@ var JSLINT = (function () {
             browser    : true, // if the standard browser globals should be predefined
             cap        : true, // if upper case HTML should be allowed
             css        : true, // if CSS workarounds should be tolerated
+            curly      : true, // if curly braces around blocks should be required (even in if/for/while)
             debug      : true, // if debugger statements should be allowed
             devel      : true, // if logging should be allowed (console, alert, etc.)
             eqeqeq     : true, // if === should be required
@@ -321,6 +328,8 @@ var JSLINT = (function () {
             immed      : true, // if immediate invocations must be wrapped in parens
             laxbreak   : true, // if line breaks should not be checked
             newcap     : true, // if constructor names must be capitalized
+            noarg      : true, // if arguments.caller and arguments.callee should be disallowed
+            nonew      : true, // if using `new` for side-effects should be disallowed
             nomen      : true, // if names should be checked
             on         : true, // if HTML event handlers should be allowed
             onevar     : true, // if only one var statement per function should be allowed
@@ -932,7 +941,7 @@ var JSLINT = (function () {
 // unsafe characters that are silently deleted by one or more browsers
         cx = /[\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/,
 // token
-        tx = /^\s*([(){}\[.,:;'"~\?\]#@]|==?=?|\/(\*(jslint|members?|global)?|=|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|%=?|&[&=]?|\|[|=]?|>>?>?=?|<([\/=!]|\!(\[|--)?|<=?)?|\^=?|\!=?=?|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+\-]?[0-9]+)?)/,
+        tx = /^\s*([(){}\[.,:;'"~\?\]#@]|==?=?|\/(\*(jshint|members?|global)?|=|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|%=?|&[&=]?|\|[|=]?|>>?>?=?|<([\/=!]|\!(\[|--)?|<=?)?|\^=?|\!=?=?|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+\-]?[0-9]+)?)/,
 // html token
         hx = /^\s*(['"=>\/&#]|<(?:\/|\!(?:--)?)?|[a-zA-Z][a-zA-Z0-9_\-:]*|[0-9]+|--)/,
 // characters in strings that need escapement
@@ -1094,7 +1103,7 @@ var JSLINT = (function () {
 
     function quit(m, l, ch) {
         throw {
-            name: 'JSLintError',
+            name: 'JSHintError',
             line: l,
             character: ch,
             message: m + " (" + Math.floor((l / lines.length) * 100) +
@@ -1122,7 +1131,7 @@ var JSLINT = (function () {
             d: d
         };
         w.reason = m.supplant(w);
-        JSLINT.errors.push(w);
+        JSHINT.errors.push(w);
         if (option.passfail) {
             quit('Stopping. ', l, ch);
         }
@@ -1541,11 +1550,11 @@ var JSLINT = (function () {
                             token.comment = true;
                             break;
 
-    //      /*members /*jslint /*global
+    //      /*members /*jshint /*global
 
                         case '/*members':
                         case '/*member':
-                        case '/*jslint':
+                        case '/*jshint':
                         case '/*global':
                         case '*/':
                             return {
@@ -1943,7 +1952,7 @@ klass:                                  do {
             }
             obj = membersOnly;
             break;
-        case '/*jslint':
+        case '/*jshint':
             if (option.safe) {
                 warning("ADsafe restriction.");
             }
@@ -1981,7 +1990,7 @@ loop:   for (;;) {
                     error("Expected '{a}' and instead saw '{b}'.",
                             t, '*/', ':');
                 }
-                if (t.value === 'indent' && o === '/*jslint') {
+                if (t.value === 'indent' && o === '/*jshint') {
                     b = +v.value;
                     if (typeof b !== 'number' || !isFinite(b) || b <= 0 ||
                             Math.floor(b) !== b) {
@@ -1990,7 +1999,7 @@ loop:   for (;;) {
                     }
                     obj.white = true;
                     obj.indent = b;
-                } else if (t.value === 'maxerr' && o === '/*jslint') {
+                } else if (t.value === 'maxerr' && o === '/*jshint') {
                     b = +v.value;
                     if (typeof b !== 'number' || !isFinite(b) || b <= 0 ||
                             Math.floor(b) !== b) {
@@ -1998,7 +2007,7 @@ loop:   for (;;) {
                                 v, v.value);
                     }
                     obj.maxerr = b;
-                } else if (t.value === 'maxlen' && o === '/*jslint') {
+                } else if (t.value === 'maxlen' && o === '/*jshint') {
                     b = +v.value;
                     if (typeof b !== 'number' || !isFinite(b) || b <= 0 ||
                             Math.floor(b) !== b) {
@@ -2015,7 +2024,7 @@ loop:   for (;;) {
                 }
                 t = lex.token();
             } else {
-                if (o === '/*jslint') {
+                if (o === '/*jshint') {
                     error("Missing option value.", t);
                 }
                 obj[t.value] = false;
@@ -2107,7 +2116,7 @@ loop:   for (;;) {
     }
 
 
-// This is the heart of JSLINT, the Pratt parser. In addition to parsing, it
+// This is the heart of JSHINT, the Pratt parser. In addition to parsing, it
 // is looking for ad hoc lint patterns. We add .fud to Pratt's model, which is
 // like .nud except that it is only used on the first token of a statement.
 // Having .fud makes it much easier to define statement-oriented languages like
@@ -2596,15 +2605,12 @@ loop:   for (;;) {
 
         if (!t.block) {
             if (!r || !r.exps) {
-                warning(
-"Expected an assignment or function call and instead saw an expression.",
-                        token);
-            } else if (r.id === '(' && r.left.id === 'new') {
+                warning("Expected an assignment or function call and instead saw an expression.", token);
+            } else if (option.nonew && r.id === '(' && r.left.id === 'new') {
                 warning("Do not use 'new' for side effects.");
             }
             if (nexttoken.id !== ';') {
-                warningAt("Missing semicolon.", token.line,
-                        token.from + token.value.length);
+                warningAt("Missing semicolon.", token.line, token.from + token.value.length);
             } else {
                 adjacent(token, nexttoken);
                 advance(';');
@@ -2643,7 +2649,7 @@ loop:   for (;;) {
             switch (begin) {
             case 'script':
 
-// JSLint is also the static analizer for ADsafe. See www.ADsafe.org.
+// JSHint is also the static analizer for ADsafe. See www.ADsafe.org.
 
                 if (!adsafe_may) {
                     if (nexttoken.value !== 'ADSAFE' ||
@@ -2711,21 +2717,35 @@ loop:   for (;;) {
     }
 
 
-    function block(f) {
-        var a, b = inblock, old_indent = indent, m = strict_mode, s = scope, t;
-        inblock = f;
+    /*
+     * Parses a single block. A block is a sequence of statements wrapped in
+     * braces.
+     * 
+     * ordinary - true for everything but function bodies and try blocks. 
+     * stmt     - true if block can be a single statement (e.g. in if/for/while).     
+     */ 
+    function block(ordinary, stmt) {
+        var a,
+            b = inblock,
+            old_indent = indent,
+            m = strict_mode,
+            s = scope,
+            t;
+
+        inblock = ordinary;
         scope = Object.create(scope);
         nonadjacent(token, nexttoken);
         t = nexttoken;
+
         if (nexttoken.id === '{') {
             advance('{');
             if (nexttoken.id !== '}' || token.line !== nexttoken.line) {
                 indent += option.indent;
-                while (!f && nexttoken.from > indent) {
+                while (!ordinary && nexttoken.from > indent) {
                     indent += option.indent;
                 }
                 if (!ordinary && !use_strict() && !m && option.strict &&
-                  funct['(context)']['(global)']) {
+                        funct['(context)']['(global)']) {
                     warning("Missing \"use strict\" statement.");
                 }
                 a = statements();
@@ -2735,9 +2755,14 @@ loop:   for (;;) {
             }
             advance('}', t);
             indent = old_indent;
+        } else if (!ordinary) {
+            error("Expected '{a}' and instead saw '{b}'.",
+                  nexttoken, '{', nexttoken.value);
         } else {
-            warning("Expected '{a}' and instead saw '{b}'.",
-                    nexttoken, '{', nexttoken.value);
+            if (!stmt || option.curly)
+                warning("Expected '{a}' and instead saw '{b}'.",
+                        nexttoken, '{', nexttoken.value);
+
             noreach = true;
             a = [statement()];
             noreach = false;
@@ -2745,7 +2770,7 @@ loop:   for (;;) {
         funct['(verb)'] = null;
         scope = s;
         inblock = b;
-        if (f && (!a || a.length === 0)) {
+        if (ordinary && (!a || a.length === 0)) {
             warning("Empty block.");
         }
         return a;
@@ -4467,7 +4492,7 @@ loop:   for (;;) {
         }
         that.left = left;
         that.right = m;
-        if (left && left.value === 'arguments' &&
+        if (option.noarg && left && left.value === 'arguments' &&
                 (m === 'callee' || m === 'caller')) {
             warning("Avoid arguments.{a}.", left, m);
         } else if (!option.evil && left && left.value === 'document' &&
@@ -4947,14 +4972,14 @@ loop:   for (;;) {
         }
         advance(')', t);
         nospace(prevtoken, token);
-        block(true);
+        block(true, true);
         if (nexttoken.id === 'else') {
             nonadjacent(token, nexttoken);
             advance('else');
             if (nexttoken.id === 'if' || nexttoken.id === 'switch') {
                 statement(true);
             } else {
-                block(true);
+                block(true, true);
             }
         }
         return this;
@@ -5011,7 +5036,7 @@ loop:   for (;;) {
         }
         advance(')', t);
         nospace(prevtoken, token);
-        block(true);
+        block(true, true);
         funct['(breakage)'] -= 1;
         funct['(loopage)'] -= 1;
         return this;
@@ -5169,7 +5194,7 @@ loop:   for (;;) {
             advance('in');
             expression(20);
             advance(')', t);
-            s = block(true);
+            s = block(true, true);
             if (!f && (s.length > 1 || typeof s[0] !== 'object' ||
                     s[0].value !== 'if')) {
                 warning("The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.", this);
@@ -5219,7 +5244,7 @@ loop:   for (;;) {
             }
             advance(')', t);
             nospace(prevtoken, token);
-            block(true);
+            block(true, true);
             funct['(breakage)'] -= 1;
             funct['(loopage)'] -= 1;
             return this;
@@ -5412,11 +5437,11 @@ loop:   for (;;) {
     }
 
 
-// The actual JSLINT function itself.
+// The actual JSHINT function itself.
 
     var itself = function (s, o) {
         var a, i, k;
-        JSLINT.errors = [];
+        JSHINT.errors = [];
         predefined = Object.create(standard);
         if (o) {
             a = o.predef;
@@ -5564,14 +5589,14 @@ loop:   for (;;) {
             advance('(end)');
         } catch (e) {
             if (e) {
-                JSLINT.errors.push({
+                JSHINT.errors.push({
                     reason    : e.message,
                     line      : e.line || nexttoken.line,
                     character : e.character || nexttoken.from
                 }, null);
             }
         }
-        return JSLINT.errors.length === 0;
+        return JSHINT.errors.length === 0;
     };
 
 
@@ -5789,10 +5814,12 @@ loop:   for (;;) {
         }
         return o.join('');
     };
-    itself.jslint = itself;
-
-    itself.edition = '2010-12-14';
+    itself.jshint = itself;
 
     return itself;
 
 }());
+
+// Make JSHINT a Node module, if possible.
+if (typeof exports == 'object' && exports)
+    exports.JSHINT = JSHINT;
