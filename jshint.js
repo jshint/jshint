@@ -1,6 +1,3 @@
-// jslint.js
-// 2011-01-22
-
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -26,9 +23,9 @@ SOFTWARE.
 */
 
 /*
-    JSLINT is a global function. It takes two parameters.
+    JSHINT is a global function. It takes two parameters.
 
-        var myResult = JSLINT(source, option);
+        var myResult = JSHINT(source, option);
 
     The first parameter is either a string or an array of strings. If it is a
     string, it will be split on '\n' or '\r'. If it is an array of strings, it
@@ -36,16 +33,16 @@ SOFTWARE.
     JavaScript text, or HTML text, or a JSON text, or a CSS text.
 
     The second parameter is an optional object of options which control the
-    operation of JSLINT. Most of the options are booleans: They are all
+    operation of JSHINT. Most of the options are booleans: They are all
     optional and have a default value of false. One of the options, predef,
     can be an array of names, which will be used to declare global variables,
     or an object whose keys are used as global names, with a boolean value
     that determines if they are assignable.
 
-    If it checks out, JSLINT returns true. Otherwise, it returns false.
+    If it checks out, JSHINT returns true. Otherwise, it returns false.
 
-    If false, you can inspect JSLINT.errors to find out the problems.
-    JSLINT.errors is an array of objects containing these members:
+    If false, you can inspect JSHINT.errors to find out the problems.
+    JSHINT.errors is an array of objects containing these members:
 
     {
         line      : The line (relative to 0) at which the lint was found
@@ -60,20 +57,20 @@ SOFTWARE.
     }
 
     If a fatal error was found, a null will be the last element of the
-    JSLINT.errors array.
+    JSHINT.errors array.
 
     You can request a Function Report, which shows all of the functions
     and the parameters and vars that they use. This can be used to find
     implied global variables and other problems. The report is in HTML and
     can be inserted in an HTML <body>.
 
-        var myReport = JSLINT.report(limited);
+        var myReport = JSHINT.report(limited);
 
     If limited is true, then the report will be limited to only errors.
 
     You can request a data structure which contains JSLint's results.
 
-        var myData = JSLINT.data();
+        var myData = JSHINT.data();
 
     It returns a structure with this form:
 
@@ -142,10 +139,10 @@ SOFTWARE.
     Empty arrays will not be included.
 
     You can obtain the parse tree that JSLint constructed while parsing. The
-    latest tree is kept in JSLINT.tree. A nice stringication can be produced
+    latest tree is kept in JSHINT.tree. A nice stringication can be produced
     with
 
-        JSON.stringify(JSLINT.tree, [
+        JSON.stringify(JSHINT.tree, [
             'value',  'arity', 'name',  'first',
             'second', 'third', 'block', 'else'
         ], 4));
@@ -271,10 +268,10 @@ SOFTWARE.
 
 // We build the application inside a function so that we produce only a single
 // global variable. That function will be invoked immediately, and its return
-// value is the JSLINT function itself. That function is also an object that
+// value is the JSHINT function itself. That function is also an object that
 // can contain data and other functions.
 
-var JSLINT = (function () {
+var JSHINT = (function () {
     "use strict";
 
     var adsafe_id,      // The widget's ADsafe id.
@@ -1157,7 +1154,7 @@ var JSLINT = (function () {
             d: d
         };
         w.reason = m.supplant(w);
-        JSLINT.errors.push(w);
+        JSHINT.errors.push(w);
         if (option.passfail) {
             quit("Stopping. ", l, ch);
         }
@@ -2454,7 +2451,7 @@ loop:   for (;;) {
     }
 
 
-// This is the heart of JSLINT, the Pratt parser. In addition to parsing, it
+// This is the heart of JSHINT, the Pratt parser. In addition to parsing, it
 // is looking for ad hoc lint patterns. We add .fud to Pratt's model, which is
 // like .nud except that it is only used on the first token of a statement.
 // Having .fud makes it much easier to define statement-oriented languages like
@@ -5706,12 +5703,12 @@ loop:   for (;;) {
     }
 
 
-// The actual JSLINT function itself.
+// The actual JSHINT function itself.
 
     var itself = function (s, o) {
         var a, i, k;
-        JSLINT.errors = [];
-        JSLINT.tree = '';
+        JSHINT.errors = [];
+        JSHINT.tree = '';
         predefined = Object.create(standard);
         if (o) {
             a = o.predef;
@@ -5863,8 +5860,8 @@ loop:   for (;;) {
                         warning("Use the function form of \"use strict\".");
                         use_strict();
                     }
-                    JSLINT.tree = statements('lib');
-                    if (JSLINT.tree.disrupt) {
+                    JSHINT.tree = statements('lib');
+                    if (JSHINT.tree.disrupt) {
                         warning("Weird program.", prevtoken);
                     }
                 }
@@ -5873,14 +5870,14 @@ loop:   for (;;) {
             advance('(end)');
         } catch (e) {
             if (e) {
-                JSLINT.errors.push({
+                JSHINT.errors.push({
                     reason    : e.message,
                     line      : e.line || nexttoken.line,
                     character : e.character || nexttoken.from
                 }, null);
             }
         }
-        return JSLINT.errors.length === 0;
+        return JSHINT.errors.length === 0;
     };
 
 
@@ -6116,4 +6113,4 @@ loop:   for (;;) {
 
 // Make JSHINT a Node module, if possible.
 if (typeof exports == 'object' && exports)
-    exports.JSLINT = JSLINT;
+    exports.JSHINT = JSHINT;
