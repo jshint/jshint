@@ -314,6 +314,7 @@ var JSHINT = (function () {
         boolOptions = {
             adsafe     : true, // if ADsafe should be enforced
             bitwise    : true, // if bitwise operators should not be allowed
+            boss       : true, // if assignments inside if/for/while/do should be allowed
             browser    : true, // if the standard browser globals should be predefined
             cap        : true, // if upper case HTML should be allowed
             css        : true, // if CSS workarounds should be tolerated
@@ -4966,7 +4967,8 @@ loop:   for (;;) {
         nospace();
         expression(20);
         if (nexttoken.id === '=') {
-            warning("Expected a conditional expression and instead saw an assignment.");
+            if (!option.boss)
+                warning("Expected a conditional expression and instead saw an assignment.");
             advance('=');
             expression(20);
         }
@@ -5030,7 +5032,8 @@ loop:   for (;;) {
         nospace();
         expression(20);
         if (nexttoken.id === '=') {
-            warning("Expected a conditional expression and instead saw an assignment.");
+            if (!option.boss)
+                warning("Expected a conditional expression and instead saw an assignment.");
             advance('=');
             expression(20);
         }
@@ -5153,7 +5156,8 @@ loop:   for (;;) {
             nospace();
             expression(20);
             if (nexttoken.id === '=') {
-                warning("Expected a conditional expression and instead saw an assignment.");
+                if (!option.boss)
+                    warning("Expected a conditional expression and instead saw an assignment.");
                 advance('=');
                 expression(20);
             }
@@ -5222,7 +5226,8 @@ loop:   for (;;) {
             if (nexttoken.id !== ';') {
                 expression(20);
                 if (nexttoken.id === '=') {
-                    warning("Expected a conditional expression and instead saw an assignment.");
+                    if (!option.boss)
+                        warning("Expected a conditional expression and instead saw an assignment.");
                     advance('=');
                     expression(20);
                 }

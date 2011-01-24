@@ -58,3 +58,24 @@ describe("Functions", function () {
         expect(JSHINT(na, { nonew: true })).toEqual(true);
     });
 });
+
+describe("Control statements", function () {
+    var cond  = "if (e = 1) { doSmth(); }",
+        loopw = "while (obj = arr.next()) { hey(); }",
+        loopf = "for (var b; b = arr.next();) { hey(); }",
+        loopd = "do { smth(b); } while (b = arr.next());";
+
+    it("should warn about using assignments by default", function () {
+        expect(JSHINT(cond)).toEqual(false);
+        expect(JSHINT(loopw)).toEqual(false);
+        expect(JSHINT(loopf)).toEqual(false);
+        expect(JSHINT(loopd)).toEqual(false);
+    });
+
+    it("should allow using assignments when boss:true", function () {
+        expect(JSHINT(cond, { boss: true })).toEqual(true);
+        expect(JSHINT(loopw, { boss: true })).toEqual(true);
+        expect(JSHINT(loopf, { boss: true })).toEqual(true);
+        expect(JSHINT(loopd, { boss: true })).toEqual(true);
+    });
+});
