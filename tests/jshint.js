@@ -33,7 +33,10 @@ describe("Blocks", function () {
 
 describe("Functions", function () {
     var ce = "function test() { return arguments.callee; }",
-        cr = "function test() { return arguments.caller; }";
+        cr = "function test() { return arguments.caller; }",
+
+        ns = "new Klass();",
+        na = "var obj = new Klass();";
     
     it("must tolerate arguments.callee and arguments.caller by default", function () {
         expect(JSHINT(ce)).toEqual(true);
@@ -43,5 +46,15 @@ describe("Functions", function () {
     it("must not tolerate arguments.callee and arguments.caller with noarg:true", function () {
         expect(JSHINT(ce, { noarg: true })).toEqual(false);
         expect(JSHINT(cr, { noarg: true })).toEqual(false);
+    });
+
+    it("must tolerate using constructors for side-effects", function () {
+        expect(JSHINT(ns)).toEqual(true);
+        expect(JSHINT(na)).toEqual(true);
+    });
+
+    it("must not tolerate using constructors for side-effects with nonew:true", function () {
+        expect(JSHINT(ns, { nonew: true })).toEqual(false);
+        expect(JSHINT(na, { nonew: true })).toEqual(true);
     });
 });
