@@ -2,16 +2,31 @@ var JSLINT = require("../fulljslint.js").JSLINT;
 
 describe("Blocks", function () {
     it("must tolerate one-line blocks", function () {
-        var ol = "if (cond) return true;",
-            ml = "if (cond) { return true; }";
+        var ol = [
+                "if (cond) return true;",
+                "for (;;) console.log('test');",
+                "while (true) console.log('test');"
+            ],
 
-        // Without oneline
-        expect(JSLINT(ml)).toEqual(true);
-        expect(JSLINT(ol)).toEqual(false);
+            ml = [
+                "if (cond) { return true; }",
+                "for (;;) { console.log('test'); }",
+                "while (true) { console.log('test'); }"
+            ];
 
-        // With oneline
-        expect(JSLINT(ml, { oneline: true })).toEqual(true);
-        expect(JSLINT(ol, { oneline: true })).toEqual(true);
+        // By default, tolerate one-line blocks
+        for (var i = 0, stmt; stmt = ol[i]; i++)
+            expect(JSLINT(stmt)).toEqual(true);
+
+        for (var i = 0, stmt; stmt = ml[i]; i++)
+            expect(JSLINT(stmt)).toEqual(true);
+
+        // If curly:true, require blocks to be wrapped with { }
+        for (var i = 0, stmt; stmt = ol[i]; i++)
+            expect(JSLINT(stmt, { curly: true })).toEqual(false);
+
+        for (var i = 0, stmt; stmt = ml[i]; i++)
+            expect(JSLINT(stmt, { curly: true })).toEqual(true);
     });
 
     it("must tolerate arguments.callee and arguments.caller by default", function () {
@@ -21,8 +36,8 @@ describe("Blocks", function () {
         expect(JSLINT(ce)).toEqual(true);
         expect(JSLINT(cr)).toEqual(true);
 
-        // Go back to Crockford's world with `callee` switch
-        expect(JSLINT(ce, { calref: true })).toEqual(false);
-        expect(JSLINT(cr, { calref: true })).toEqual(false);
+        // Go back to Crockford's world with noarg:true
+        expect(JSLINT(ce, { noarg: true })).toEqual(false);
+        expect(JSLINT(cr, { noarg: true })).toEqual(false);
     });
 });

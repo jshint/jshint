@@ -103,6 +103,9 @@ body {
     text-indent: 0;
 }
 
+#JSLINT_OUTPUT {
+    text-align: left;
+}
 
 </style></head>
 <body>
@@ -148,7 +151,7 @@ Code Quality Tool</big></p>
     <input type="button" name="clear" value="clear">
 </p>
 <br clear="all">
-<div id="JSLINT_OUTPUT" style="text-align: left;">
+<div id="JSLINT_OUTPUT">
 
       <div style="text-align: center;">Paste your program into the text box
         above and click a <input type="button" name="jslint" value="JSLint">
@@ -234,9 +237,9 @@ Code Quality Tool</big></p>
     <input type="button" id="JSLINT_CLEARALL" value="Clear All Options">
 </div>
 <div class="leftcolumn">
-    <input id="JSLINT_INDENT" type="text" size="2" value="4" autocomplete=off> <label for="JSLINT_INDENT" title="indent">Strict white space indentation</label><br>
-    <input id="JSLINT_MAXLEN" type="text" size="2" value="" autocomplete=off> <label for="JSLINT_MAXLEN" title="maxlen">Maximum line length</label><br>
-    <input id="JSLINT_MAXERR" type="text" size="2" value="50" autocomplete=off> <label for="JSLINT_MAXERR" title="maxerr">Maximum number of errors</label><br>
+    <input id="JSLINT_INDENT" type="text" size="2" title="indent" value="" autocomplete=off> <label for="JSLINT_INDENT" title="indent">Indentation</label><br>
+    <input id="JSLINT_MAXLEN" type="text" size="2" title="maxlen" value="" autocomplete=off> <label for="JSLINT_MAXLEN" title="maxlen">Maximum line length</label><br>
+    <input id="JSLINT_MAXERR" type="text" size="2" title="maxerr" value="" autocomplete=off> <label for="JSLINT_MAXERR" title="maxerr">Maximum number of errors</label><br>
     <label for="JSLINT_PREDEF" title="predef">Predefined&nbsp;<small>(&nbsp;<code>,</code>&nbsp;separated)</small></label>&nbsp;<input id="JSLINT_PREDEF" type="text" size="72" autocomplete=off>
   </div>
 <br clear=all>

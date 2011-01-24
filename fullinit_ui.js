@@ -1,5 +1,5 @@
 // init_ui.js
-// 2011-01-05
+// 2011-01-19
 
 // This is the web browser companion to fulljslint.js. It is an ADsafe
 // lib file that implements a web ui by adding behavior to the widget's
@@ -10,10 +10,12 @@
 
 // option = {adsafe: true, fragment: false}
 
-/*members check, cookie, each, edition, get, getTitle, getValue, indent,
-    isArray, join, jslint, lib, maxerr, maxlen, on, passfail, predef, push,
-    q, select, set, split, stringify, tree, value, white
+/*members check, cookie, each, edition, get, getCheck, getTitle,
+    getValue, indent, isArray, join, jslint, length, lib, maxerr, maxlen,
+    on, predef, push, q, select, set, split, stringify, target, tree, value
 */
+
+/*global ADSAFE, JSMAX */
 
 ADSAFE.lib("init_ui", function (lib) {
     "use strict";
@@ -31,75 +33,84 @@ ADSAFE.lib("init_ui", function (lib) {
             tree = dom.q('#JSLINT_TREE'),
             predefined = dom.q('#JSLINT_PREDEF');
 
-        function show_jslint_options() {
+        function show_jslint_control() {
 
 // Build and display a jslint control comment.
-
 // The comment can be copied into a .js file.
 
             var a = [], name;
             for (name in option) {
-                if (typeof ADSAFE.get(option, name) === 'boolean') {
+                if (ADSAFE.get(option, name) === true) {
                     a.push(name + ': true');
                 }
             }
-            if (+option.maxerr > 0) {
+            if (typeof option.maxerr === 'number' && option.maxerr >= 0) {
                 a.push('maxerr: ' + option.maxerr);
             }
-            if (+option.maxlen > 0) {
+            if (typeof option.maxlen === 'number' && option.maxlen >= 0) {
                 a.push('maxlen: ' + option.maxlen);
             }
-            if (+option.indent > 0) {
+            if (typeof option.indent === 'number' && option.indent >= 0) {
                 a.push('indent: ' + option.indent);
             }
             jslintstring.value('/*jslint ' + a.join(', ') + ' */');
+
+// Make a JSON cookie of the option object.
+
+            lib.cookie.set(option);
         }
 
-        function update_options() {
-
-// Make an object containing the current options.
-
-            var value;
-            option = {};
-            checkboxes.q(':checked').each(function (bunch) {
-                ADSAFE.set(option, bunch.getTitle(), true);
+        function show_options() {
+            checkboxes.each(function (bunch) {
+                bunch.check(ADSAFE.get(option, bunch.getTitle()));
             });
-            if (option.white) {
-                value = +indent.getValue();
-                if (value && value !== 4) {
-                    option.indent = value;
-                }
-            }
-            if (!option.passfail) {
-                value = +maxerr.getValue();
-                if (value && value !== 50) {
-                    option.maxerr = value;
-                }
-            }
-            value = +maxlen.getValue();
-            option.maxlen = value && value > 0 ? value : 0;
-            value = predefined.getValue();
-            if (value) {
-                option.predef = value.split(/\s*,\s*/);
-            }
-            show_jslint_options();
+            indent.value(String(option.indent));
+            maxlen.value(String(option.maxlen || ''));
+            maxerr.value(String(option.maxerr));
+            predefined.value(ADSAFE.isArray(option.predef) ? option.predef.join(',') : '');
+            show_jslint_control();
         }
+
+        function update_check(event) {
+            option[event.target.getTitle()] = event.target.getCheck();
+            show_jslint_control();
+        }
+
+        function update_number(event) {
+            var value = event.target.getValue();
+            if (value.length === 0 || +value < 0 || !isFinite(value)) {
+                value = '';
+            }
+            option[event.target.getTitle()] = +value;
+            event.target.value(String(value));
+            show_jslint_control();
+        }
+
+        function update_list(event) {
+            var value = event.target.getValue().split(/\s*,\s*/);
+            option[event.target.getTitle()] = value;
+            event.target.value(value.join(', '));
+            show_jslint_control();
+        }
+
 
 // Restore the options from a JSON cookie.
 
         if (!option || typeof option !== 'object') {
-            option = {};
+            option = {
+                indent: 4,
+                maxerr: 50
+            };
         } else {
-            checkboxes.each(function (bunch) {
-                bunch.check(ADSAFE.get(option, bunch.getTitle()));
-            });
-            indent.value(option.indent || '4');
-            maxlen.value(option.maxlen || '');
-            maxerr.value(option.maxerr || '50');
-            predefined.value(ADSAFE.isArray(option.predef) ?
-                    option.predef.join(',') : '');
+            option.indent =
+                typeof option.indent === 'number' && option.indent >= 0 ?
+                option.indent : 4;
+            option.maxerr =
+                typeof option.maxerr === 'number' && option.maxerr >= 0 ?
+                option.maxerr : 50;
         }
-        show_jslint_options();
+        show_options();
+
 
 // Display the edition.
 
@@ -109,10 +120,6 @@ ADSAFE.lib("init_ui", function (lib) {
 
         dom.q('input&jslint').on('click', function (e) {
             tree.value('');
-
-// Make a JSON cookie of the option object.
-
-            lib.cookie.set(option);
 
 // Call JSLint and display the report.
 
@@ -130,30 +137,40 @@ ADSAFE.lib("init_ui", function (lib) {
             input.select();
         });
 
+        //dom.q('input&jsmax').on('click', function (e) {
+        //    output.value('JSMax:');
+        //    tree.value(JSMAX(lib.tree()));
+        //    input.select();
+        //});
+
         dom.q('input&clear').on('click', function (e) {
             output.value('');
             tree.value('');
             input.value('').select();
         });
 
+
         dom.q('#JSLINT_CLEARALL').on('click', function (e) {
-            checkboxes.check(false);
-            indent.value(option.indent || '4');
-            maxlen.value(option.maxlen || '');
-            maxerr.value(option.maxerr || '50');
-            update_options();
+            option = {
+                indent: 4,
+                maxerr: 50
+            };
+            show_options();
         });
 
         dom.q('#JSLINT_GOODPARTS').on('click', function (e) {
-            goodparts.check(true);
-            update_options();
+            goodparts.each(function (bunch) {
+                option[bunch.getTitle()] = true;
+            });
+            option.indent = 4;
+            show_options();
         });
 
-        checkboxes.on('click', update_options);
-        indent.on('change', update_options);
-        maxerr.on('change', update_options);
-        maxlen.on('change', update_options);
-        predefined.on('change', update_options);
+        checkboxes.on('click', update_check);
+        indent.on('change', update_number);
+        maxerr.on('change', update_number);
+        maxlen.on('change', update_number);
+        predefined.on('change', update_list);
         input
             .on('change', function (e) {
                 output.value('');
