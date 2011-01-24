@@ -11,7 +11,9 @@ describe("Blocks", function () {
             "if (cond) { return true; }",
             "for (;;) { console.log('test'); }",
             "while (true) { console.log('test'); }"
-        ];
+        ],
+
+        eb = "for (;;) {}";
     
     it("must tolerate one-line blocks by default", function () {
         // By default, tolerate one-line blocks
@@ -28,6 +30,14 @@ describe("Blocks", function () {
 
         for (var i = 0, stmt; stmt = ml[i]; i++)
             expect(JSHINT(stmt, { curly: true })).toEqual(true);
+    });
+
+    it("must tolerate empty blocks", function () {
+        expect(JSHINT(eb)).toEqual(true);
+    });
+
+    it("must not tolerate empty blocks if noempty:true", function () {
+        expect(JSHINT(eb, { noempty: true })).toEqual(false);
     });
 });
 

@@ -333,6 +333,7 @@ var JSHINT = (function () {
             laxbreak   : true, // if line breaks should not be checked
             newcap     : true, // if constructor names must be capitalized
             noarg      : true, // if arguments.caller and arguments.callee should be disallowed
+            noempty    : true, // if empty blocks should be disallowed
             nonew      : true, // if using `new` for side-effects should be disallowed
             nomen      : true, // if names should be checked
             on         : true, // if HTML event handlers should be allowed
@@ -2774,7 +2775,7 @@ loop:   for (;;) {
         funct['(verb)'] = null;
         scope = s;
         inblock = b;
-        if (ordinary && (!a || a.length === 0)) {
+        if (ordinary && option.noempty && (!a || a.length === 0)) {
             warning("Empty block.");
         }
         return a;
