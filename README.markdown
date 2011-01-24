@@ -17,8 +17,7 @@ It expects all blocks to be enclosed in braces ({}):
       statement();
     }
 
-JSHint adds an option, oneline, that allows you to use one-line blocks in 
-for, while and if constructions.
+JSHint removes that requirement (but it is still available as an option).
 
 
 Community
@@ -35,7 +34,8 @@ JSLint gripes you encounter.
 Development
 -----------
 
-We don't have a stable version of JSHint yet. Stay tuned!
+JSHint was forked from the JSLint, edition 2010-12-16. We don't have a stable
+version of JSHint yet. Stay tuned!
 
 
 Tests
