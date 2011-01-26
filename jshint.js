@@ -2194,7 +2194,7 @@ loop:   for (;;) {
     function nobreak(left, right) {
         left = left || token;
         right = right || nexttoken;
-        if (left.character !== right.from || left.line !== right.line) {
+        if (option.white && (left.character !== right.from || left.line !== right.line)) {
             warning("Unexpected space before '{a}'.", right, right.value);
         }
     }
