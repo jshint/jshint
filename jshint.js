@@ -151,7 +151,7 @@
 */
 
 /*jshint
- evil: true, nomen: false, onevar: false, regexp: false, strict: true
+ evil: true, nomen: false, onevar: false, regexp: false, strict: true, boss: true
 */
 
 /*members "\b", "\t", "\n", "\f", "\r", "!=", "!==", "\"", "%",
@@ -181,7 +181,7 @@
  "border-left-width", "border-right", "border-right-color",
  "border-right-style", "border-right-width", "border-spacing",
  "border-style", "border-top", "border-top-color", "border-top-style",
- "border-top-width", "border-width", bottom, br, braille, brown, browser,
+ "border-top-width", "border-width", bottom, boss, br, braille, brown, browser,
  burlywood, button, buttonface, buttonhighlight, buttonshadow,
  buttontext, bytesToUIString, c, cadetblue, call, callee, caller, canvas,
  cap, caption, "caption-side", captiontext, cases, center, charAt,
@@ -190,7 +190,7 @@
  closeWidget, closed, closure, cm, code, col, colgroup, color, command,
  comment, condition, confirm, console, constructor, content,
  convertPathToHFS, convertPathToPlatform, coral, cornflowerblue,
- cornsilk, "counter-increment", "counter-reset", create, crimson, css,
+ cornsilk, "counter-increment", "counter-reset", create, crimson, css, curly,
  cursor, cyan, d, darkblue, darkcyan, darkgoldenrod, darkgray, darkgreen,
  darkkhaki, darkmagenta, darkolivegreen, darkorange, darkorchid, darkred,
  darksalmon, darkseagreen, darkslateblue, darkslategray, darkturquoise,
@@ -199,7 +199,7 @@
  details, devel, dfn, dialog, dimgray, dir, direction, display, div, dl,
  document, dodgerblue, dt, edition, else, em, embed, embossed, empty,
  "empty-cells", encodeURI, encodeURIComponent, entityify, eqeqeq, errors,
- es5, escape, eval, event, evidence, evil, ex, exception, exec, exps,
+ es5, escape, eval, event, evidence, evil, ex, exception, exec, exps, exports,
  fieldset, figure, filesystem, firebrick, first, float, floor,
  floralwhite, focus, focusWidget, font, "font-family", "font-size",
  "font-size-adjust", "font-stretch", "font-style", "font-variant",
@@ -213,7 +213,7 @@
  implieds, in, inactiveborder, inactivecaption, inactivecaptiontext,
  include, indent, indexOf, indianred, indigo, infobackground, infotext,
  init, input, ins, isAlpha, isApplicationRunning, isArray, isDigit,
- isFinite, isNaN, ivory, join, jshint, json, kbd, keygen, keys, khaki,
+ isFinite, isNaN, ivory, join, jshint, JSHINT, json, kbd, keygen, keys, khaki,
  konfabulatorVersion, label, labelled, lang, last, lavender,
  lavenderblush, lawngreen, laxbreak, lbp, led, left, legend,
  lemonchiffon, length, "letter-spacing", li, lib, lightblue, lightcoral,
@@ -229,10 +229,10 @@
  mediumvioletred, member, menu, menutext, message, meta, meter,
  midnightblue, "min-height", "min-width", mintcream, mistyrose, mm,
  moccasin, moveBy, moveTo, name, nav, navajowhite, navigator, navy, new,
- newcap, noframes, nomen, noscript, nud, object, ol, oldlace, olive,
- olivedrab, on, onbeforeunload, onblur, onerror, onevar, onfocus, onload,
- onresize, onunload, opacity, open, openURL, opener, opera, optgroup,
- option, orange, orangered, orchid, outer, outline, "outline-color",
+ newcap, noarg, noempty, noframes, nomen, nonew, noscript, nud, object, ol,
+ oldlace, olive, olivedrab, on, onbeforeunload, onblur, onerror, onevar,
+ onfocus, onload, onresize, onunload, opacity, open, openURL, opener, opera,
+ optgroup, option, orange, orangered, orchid, outer, outline, "outline-color",
  "outline-style", "outline-width", output, overflow, "overflow-x",
  "overflow-y", p, padding, "padding-bottom", "padding-left",
  "padding-right", "padding-top", "page-break-after", "page-break-before",
@@ -264,6 +264,8 @@
  windowtext, "word-spacing", "word-wrap", yahooCheckLogin, yahooLogin,
  yahooLogout, yellow, yellowgreen, "z-index"
 */
+
+/*global exports: false */
 
 // We build the application inside a function so that we produce only a single
 // global variable. That function will be invoked immediately, and its return
