@@ -77,6 +77,14 @@ describe("Functions", function () {
     });
 });
 
+describe("Statements", function () {
+    var ml = "chain().chain().chain().\n    chain();";
+
+    it("must tolerate new line after dot", function () {
+        expect(JSHINT(ml)).toEqual(true);
+    });
+});
+
 describe("Control statements", function () {
     var cond  = "if (e = 1) { doSmth(); }",
         loopw = "while (obj = arr.next()) { hey(); }",
