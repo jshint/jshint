@@ -1,4 +1,12 @@
-var JSHINT = require("../jshint.js").JSHINT;
+var JSHINT = require("../jshint.js").JSHINT,
+    fs     = require("fs");
+
+describe("JSHint", function () {
+    it("must pass its own check", function () {
+        var src = fs.readFileSync(__dirname + "/../jshint.js", "utf8");
+        expect(JSHINT(src)).toEqual(true);
+    });
+});
 
 describe("Blocks", function () {
     var ol = [
