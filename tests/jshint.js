@@ -105,3 +105,16 @@ describe("Control statements", function () {
         expect(JSHINT(loopd, { boss: true })).toEqual(true);
     });
 });
+
+describe("Globals", function () {
+    var win = "window.location = 'http://google.com/';",
+        report;
+
+    it("must know that window is a predefined global", function () {
+        JSHINT(win, { browser: true });
+        report = JSHINT.data();
+        expect(report.implieds).toEqual(undefined);
+        expect(report.globals.length).toEqual(1);
+        expect(report.globals[0]).toEqual("window");
+    });
+});
