@@ -400,6 +400,7 @@ var JSHINT = (function () {
             setTimeout      : false,
             status          : false,
             top             : false,
+            window          : false,
             XMLHttpRequest  : false
         },
 
