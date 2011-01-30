@@ -110,12 +110,14 @@ describe("Control statements", function () {
 describe("Globals", function () {
     var win  = "window.location = 'http://google.com/';",
         node = [
-            "__filename",
-            "__dirname",
-            "global",
-            "module",
-            "process",
-            "require"
+            "__filename"
+          , "__dirname"
+          , "Buffer"
+          , "GLOBAL"
+          , "global"
+          , "module"
+          , "process"
+          , "require"
         ];
 
     it("must know that window is a predefined global", function () {
@@ -133,7 +135,7 @@ describe("Globals", function () {
         var report = JSHINT.data()
 
         expect(report.implieds).toEqual(undefined);
-        expect(report.globals.length).toEqual(6);
+        expect(report.globals.length).toEqual(8);
 
         var globals = {};
         for (var i = 0, g; g = report.globals[i]; i++)
