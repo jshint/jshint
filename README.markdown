@@ -38,6 +38,17 @@ JSHint was forked from the JSLint, edition 2010-12-16. We don't have a stable
 version of JSHint yet. Stay tuned!
 
 
+Environments
+------------
+
+JSHint can be used as a Node module out of the box:
+
+    var JSHINT = require("jshint.js").JSHINT;
+
+If you use Rhino, we have a special wrapper script for that:
+
+    java -jar /path/to/js.jar env/rhino.js myscript.js
+
 Tests
 -----
 
