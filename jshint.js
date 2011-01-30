@@ -158,7 +158,7 @@
  "(begin)", "(breakage)", "(context)", "(error)", "(global)",
  "(identifier)", "(last)", "(line)", "(loopage)", "(name)", "(onevar)",
  "(params)", "(scope)", "(statement)", "(verb)", "*", "+", "++", "-",
- "--", "\/", "<", "<=", "==", "===", ">", ">=", ADSAFE,
+ "--", "\/", "<", "<=", "==", "===", ">", ">=", ADSAFE, __filename, __dirname,
  ActiveXObject, Array, Boolean, COM, CScript, Canvas, CustomAnimation,
  Date, Debug, E, Enumerator, Error, EvalError, FadeAnimation, Flash,
  FormField, Frame, Function, HotKey, Image, JSON, LN10, LN2, LOG10E,
@@ -228,8 +228,8 @@
  mediumseagreen, mediumslateblue, mediumspringgreen, mediumturquoise,
  mediumvioletred, member, menu, menutext, message, meta, meter,
  midnightblue, "min-height", "min-width", mintcream, mistyrose, mm,
- moccasin, moveBy, moveTo, name, nav, navajowhite, navigator, navy, new,
- newcap, noarg, noempty, noframes, nomen, nonew, noscript, nud, object, ol,
+ moccasin, module, moveBy, moveTo, name, nav, navajowhite, navigator, navy, new,
+ newcap, noarg, node, noempty, noframes, nomen, nonew, noscript, nud, object, ol,
  oldlace, olive, olivedrab, on, onbeforeunload, onblur, onerror, onevar,
  onfocus, onload, onresize, onunload, opacity, open, openURL, opener, opera,
  optgroup, option, orange, orangered, orchid, outer, outline, "outline-color",
@@ -239,10 +239,10 @@
  palegoldenrod, palegreen, paleturquoise, palevioletred, papayawhip,
  param, parent, parseFloat, parseInt, passfail, pc, peachpuff, peru,
  pink, play, plum, plusplus, pop, popupMenu, position, powderblue, pre,
- predef, preferenceGroups, preferences, print, progress, projection,
+ predef, preferenceGroups, preferences, print, process, progress, projection,
  prompt, prototype, pt, purple, push, px, q, quit, quotes, random, range,
  raw, reach, readFile, readUrl, reason, red, regexp, reloadWidget,
- removeEventListener, replace, report, reserved, resizeBy, resizeTo,
+ removeEventListener, replace, report, require, reserved, resizeBy, resizeTo,
  resolvePath, resumeUpdates, rhino, right, rosybrown, royalblue, rp, rt,
  ruby, runCommand, runCommandInBg, saddlebrown, safe, salmon, samp,
  sandybrown, saveAs, savePreferences, screen, script, scroll, scrollBy,
@@ -335,6 +335,7 @@ var JSHINT = (function () {
             laxbreak   : true, // if line breaks should not be checked
             newcap     : true, // if constructor names must be capitalized
             noarg      : true, // if arguments.caller and arguments.callee should be disallowed
+            node       : true, // if the Node.js environment globals should be predefined
             noempty    : true, // if empty blocks should be disallowed
             nonew      : true, // if using `new` for side-effects should be disallowed
             nomen      : true, // if names should be checked
@@ -754,6 +755,16 @@ var JSHINT = (function () {
         member,
         membersOnly,
         nexttoken,
+
+        node = {
+            __filename  : false,
+            __dirname   : false,
+            global      : false,
+            module      : false,
+            process     : false,
+            require     : false
+        },
+
         noreach,
         option,
         predefined,     // Global variables defined by option
@@ -1090,6 +1101,9 @@ var JSHINT = (function () {
         if (!option.safe) {
             if (option.rhino) {
                 combine(predefined, rhino);
+            }
+            if (option.node) {
+                combine(predefined, node);
             }
             if (option.devel) {
                 combine(predefined, devel);
