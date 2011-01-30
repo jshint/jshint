@@ -5,6 +5,7 @@ describe("JSHint", function () {
     it("must pass its own check", function () {
         var src = fs.readFileSync(__dirname + "/../jshint.js", "utf8");
         expect(JSHINT(src)).toEqual(true);
+        expect(JSHINT.data().implieds).toEqual(undefined);
     });
 });
 
@@ -107,14 +108,38 @@ describe("Control statements", function () {
 });
 
 describe("Globals", function () {
-    var win = "window.location = 'http://google.com/';",
-        report;
+    var win  = "window.location = 'http://google.com/';",
+        node = [
+            "__filename",
+            "__dirname",
+            "global",
+            "module",
+            "process",
+            "require"
+        ];
 
     it("must know that window is a predefined global", function () {
         JSHINT(win, { browser: true });
-        report = JSHINT.data();
+        var report = JSHINT.data();
         expect(report.implieds).toEqual(undefined);
         expect(report.globals.length).toEqual(1);
         expect(report.globals[0]).toEqual("window");
     });
+
+    it("must know about node.js globals", function () {
+        var code = "(function () { return [ " + node.join(",") + " ]; }());";
+
+        JSHINT(code, { node: true });
+        var report = JSHINT.data()
+
+        expect(report.implieds).toEqual(undefined);
+        expect(report.globals.length).toEqual(6);
+
+        var globals = {};
+        for (var i = 0, g; g = report.globals[i]; i++)
+            globals[g] = true;
+
+        for (i = 0, g; g = node[i]; i++)
+            expect(g in globals).toEqual(true);
+    })
 });
