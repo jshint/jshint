@@ -1,3 +1,5 @@
+/*jshint boss: true */
+
 load("jshint.js");
 
 (function (args) {
@@ -24,5 +26,5 @@ load("jshint.js");
         quit(1);
     }
 
-    quit(0); 
+    quit(0);
 }(arguments));
