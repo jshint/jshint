@@ -1,3 +1,6 @@
+/*jshint boss: true, laxbreak: true */
+/*global describe: false, it: false, expect: false */
+
 var JSHINT = require("../jshint.js").JSHINT,
     fs     = require("fs");
 
@@ -6,6 +9,16 @@ describe("JSHint", function () {
         var src = fs.readFileSync(__dirname + "/../jshint.js", "utf8");
         expect(JSHINT(src)).toEqual(true);
         expect(JSHINT.data().implieds).toEqual(undefined);
+    });
+
+    it("rhino.js must pass jshint check", function () {
+        var src = fs.readFileSync(__dirname + "/../env/rhino.js", "utf8");
+        expect(JSHINT(src, { rhino: true })).toEqual(true);
+    });
+
+    it("tests/jshint.js must pass jshint check", function () {
+        var src = fs.readFileSync(__dirname + "/jshint.js", "utf8");
+        expect(JSHINT(src, { node: true })).toEqual(true);
     });
 });
 
@@ -23,13 +36,13 @@ describe("Blocks", function () {
         ],
 
         eb = "for (;;) {}";
-    
+
     it("must tolerate one-line blocks by default", function () {
         // By default, tolerate one-line blocks
         for (var i = 0, stmt; stmt = ol[i]; i++)
             expect(JSHINT(stmt)).toEqual(true);
 
-        for (var i = 0, stmt; stmt = ml[i]; i++)
+        for (i = 0, stmt; stmt = ml[i]; i++)
             expect(JSHINT(stmt)).toEqual(true);
     });
 
@@ -37,7 +50,7 @@ describe("Blocks", function () {
         for (var i = 0, stmt; stmt = ol[i]; i++)
             expect(JSHINT(stmt, { curly: true })).toEqual(false);
 
-        for (var i = 0, stmt; stmt = ml[i]; i++)
+        for (i = 0, stmt; stmt = ml[i]; i++)
             expect(JSHINT(stmt, { curly: true })).toEqual(true);
     });
 
@@ -56,7 +69,7 @@ describe("Functions", function () {
 
         ns = "new Klass();",
         na = "var obj = new Klass();";
-    
+
     it("must tolerate arguments.callee and arguments.caller by default", function () {
         expect(JSHINT(ce)).toEqual(true);
         expect(JSHINT(cr)).toEqual(true);
@@ -132,7 +145,7 @@ describe("Globals", function () {
         var code = "(function () { return [ " + node.join(",") + " ]; }());";
 
         JSHINT(code, { node: true });
-        var report = JSHINT.data()
+        var report = JSHINT.data();
 
         expect(report.implieds).toEqual(undefined);
         expect(report.globals.length).toEqual(8);
@@ -143,5 +156,5 @@ describe("Globals", function () {
 
         for (i = 0, g; g = node[i]; i++)
             expect(g in globals).toEqual(true);
-    })
+    });
 });
