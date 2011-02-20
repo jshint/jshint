@@ -1,2 +1,17 @@
+February 19, 2011
+  * New edition: 2011-02-19
+
+  * Library can act as a Node.js module and a Rhino program
+
+  * Tolerate single statements in if/for/while constructions ('curly' to disallow)
+  * Tolerate arguments.callee and arguments.caller ('noarg' to disallow)
+  * Tolerate empty blocks ('noempty' to disallow)
+  * Tolerate the use of `new` for side-effects ('nonew' to disallow)
+  * Less strict styling check by default ('white' to revert)
+
+  * New option 'boss' to tolerate assignments inside if/for/while
+  * New option 'node' to assume Node environment
+  * New option 'jquery' to assume jQuery environment
+
 January 19, 2011
   * Forked JSLint from the edition 2010-12-16
