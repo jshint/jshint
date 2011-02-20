@@ -5854,6 +5854,8 @@ loop:   for (;;) {
     };
     itself.jshint = itself;
 
+    itself.edition = '2011-02-19';
+
     return itself;
 
 }());
