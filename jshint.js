@@ -155,7 +155,7 @@
  "(begin)", "(breakage)", "(context)", "(error)", "(global)",
  "(identifier)", "(last)", "(line)", "(loopage)", "(name)", "(onevar)",
  "(params)", "(scope)", "(statement)", "(verb)", "*", "+", "++", "-",
- "--", "\/", "<", "<=", "==", "===", ">", ">=", ADSAFE, __filename, __dirname,
+ "--", "\/", "<", "<=", "==", "===", ">", ">=", $, ADSAFE, __filename, __dirname,
  ActiveXObject, Array, Boolean, Buffer, COM, CScript, Canvas, CustomAnimation,
  Date, Debug, E, Enumerator, Error, EvalError, FadeAnimation, Flash,
  FormField, Frame, Function, HotKey, Image, JSON, LN10, LN2, LOG10E,
@@ -210,9 +210,9 @@
  implieds, in, inactiveborder, inactivecaption, inactivecaptiontext,
  include, indent, indexOf, indianred, indigo, infobackground, infotext,
  init, input, ins, isAlpha, isApplicationRunning, isArray, isDigit,
- isFinite, isNaN, ivory, join, jshint, JSHINT, json, kbd, keygen, keys, khaki,
- konfabulatorVersion, label, labelled, lang, last, lavender,
- lavenderblush, lawngreen, laxbreak, lbp, led, left, legend,
+ isFinite, isNaN, ivory, join, jshint, JSHINT, json, jquery, jQuery, kbd,
+ keygen, keys, khaki, konfabulatorVersion, label, labelled, lang, last,
+ lavender, lavenderblush, lawngreen, laxbreak, lbp, led, left, legend,
  lemonchiffon, length, "letter-spacing", li, lib, lightblue, lightcoral,
  lightcyan, lightgoldenrodyellow, lightgreen, lightpink, lightsalmon,
  lightseagreen, lightskyblue, lightslategray, lightsteelblue,
@@ -329,6 +329,7 @@ var JSHINT = (function () {
             forin      : true, // if for in statements must filter
             fragment   : true, // if HTML fragments should be allowed
             immed      : true, // if immediate invocations must be wrapped in parens
+            jquery     : true, // if jQuery globals should be predefined
             laxbreak   : true, // if line breaks should not be checked
             newcap     : true, // if constructor names must be capitalized
             noarg      : true, // if arguments.caller and arguments.callee should be disallowed
@@ -747,6 +748,12 @@ var JSHINT = (function () {
         inblock,
         indent,
         jsonmode,
+
+        jquery = {
+            '$'    : false,
+            jQuery : false
+        },
+
         lines,
         lookahead,
         member,
@@ -1097,26 +1104,29 @@ var JSHINT = (function () {
     }
 
     function assume() {
-        if (!option.safe) {
-            if (option.rhino) {
-                combine(predefined, rhino);
-            }
-            if (option.node) {
-                combine(predefined, node);
-            }
-            if (option.devel) {
-                combine(predefined, devel);
-            }
-            if (option.browser) {
-                combine(predefined, browser);
-            }
-            if (option.windows) {
-                combine(predefined, windows);
-            }
-            if (option.widget) {
-                combine(predefined, widget);
-            }
-        }
+        if (option.safe)
+            return;
+
+        if (option.rhino)
+            combine(predefined, rhino);
+
+        if (option.node)
+            combine(predefined, node);
+
+        if (option.devel)
+            combine(predefined, devel);
+
+        if (option.browser)
+            combine(predefined, browser);
+
+        if (option.jquery)
+            combine(predefined, jquery);
+
+        if (option.windows)
+            combine(predefined, windows);
+
+        if (option.widget)
+            combine(predefined, widget);
     }
 
 
@@ -2741,10 +2751,10 @@ loop:   for (;;) {
     /*
      * Parses a single block. A block is a sequence of statements wrapped in
      * braces.
-     * 
-     * ordinary - true for everything but function bodies and try blocks. 
-     * stmt     - true if block can be a single statement (e.g. in if/for/while).     
-     */ 
+     *
+     * ordinary - true for everything but function bodies and try blocks.
+     * stmt     - true if block can be a single statement (e.g. in if/for/while).
+     */
     function block(ordinary, stmt) {
         var a,
             b = inblock,
