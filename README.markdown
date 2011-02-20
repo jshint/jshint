@@ -10,7 +10,7 @@ for the real world.
 For example, JSLint does not tolerate the following constructions:
 
     if (cond) statement();
-    
+
 It expects all blocks to be enclosed in braces ({}):
 
     if (cond) {
@@ -34,8 +34,8 @@ JSLint gripes you encounter.
 Development
 -----------
 
-JSHint was forked from the JSLint, edition 2010-12-16. We don't have a stable
-version of JSHint yet. Stay tuned!
+JSHint was forked from the JSLint, edition 2010-12-16.
+The current stable edition is [2011-02-19](http://jshint.com/jshint.js).
 
 
 Environments
@@ -56,7 +56,7 @@ To run tests you will need to install [node.js](http://nodejs.org/) and
 node-jasmine. You can install the latter with npm:
 
     npm install node-jasmine
-    
+
 After that, running tests is as easy as:
 
     node runtests.js
