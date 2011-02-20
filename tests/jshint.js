@@ -121,8 +121,9 @@ describe("Control statements", function () {
 });
 
 describe("Globals", function () {
-    var win  = "window.location = 'http://google.com/';",
-        node = [
+    var win    = "window.location = 'http://google.com/';",
+        jquery = [ "jQuery", "$" ],
+        node   = [
             "__filename"
           , "__dirname"
           , "Buffer"
@@ -156,5 +157,18 @@ describe("Globals", function () {
 
         for (i = 0, g; g = node[i]; i++)
             expect(g in globals).toEqual(true);
+    });
+
+    it("must know about jQuery globals", function () {
+        var code = "(function () { return [ " + jquery.join(",") + " ]; }());";
+
+        JSHINT(code, { jquery: true });
+        var report = JSHINT.data();
+
+        expect(report.implieds).toEqual(undefined);
+        expect(report.globals.length).toEqual(2);
+
+        for (var i = 0, g; g = report.globals[i]; i++)
+            expect(g == "jQuery" || g == "$").toEqual(true);
     });
 });
