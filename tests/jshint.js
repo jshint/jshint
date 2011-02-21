@@ -97,6 +97,18 @@ describe("Statements", function () {
     it("must tolerate new line after dot", function () {
         expect(JSHINT(ml)).toEqual(true);
     });
+});
+
+describe("Operators", function () {
+    var dc = "delete NullReference;";
+
+    it("must tolerate deleting variables by default", function () {
+        expect(JSHINT(dc)).toEqual(true);
+    });
+
+    it("must not tolerate deleting variables if safe:true", function () {
+        expect(JSHINT(dc, { safe: true })).toEqual(false);
+    });
 
     it("must report of undefined variables when undef:true", function () {
         var global = "hey();",
