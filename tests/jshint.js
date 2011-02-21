@@ -118,6 +118,19 @@ describe("Control statements", function () {
         expect(JSHINT(loopf, { boss: true })).toEqual(true);
         expect(JSHINT(loopd, { boss: true })).toEqual(true);
     });
+
+    var eqnull = "if (e == null) { doSmth(); }",
+        nulleq = "if (null == e) { doSmth(); }";
+
+    it("should warn about `== null` by default", function () {
+        expect(JSHINT(eqnull)).toEqual(false);
+        expect(JSHINT(nulleq)).toEqual(false);
+    });
+
+    it("should allow `== null` if boss:true", function () {
+        expect(JSHINT(eqnull, { boss: true })).toEqual(true);
+        expect(JSHINT(nulleq, { boss: true })).toEqual(true);
+    });
 });
 
 describe("Globals", function () {
