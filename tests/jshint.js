@@ -119,15 +119,20 @@ describe("Operators", function () {
     });
 
     /*
-     * Operator typeof accepts a reference. There is no
+     * Operators typeof and delete accept a reference. There is no
      * runtime error, if the base object of that reference is null.
      */
     it("must tolerate references in typeof and delete", function () {
         var localTypeof  = "(function () { if (typeof NullReference) {} }());",
-            globalTypeof = "if (typeof NullReference) {}";
+            globalTypeof = "if (typeof NullReference) {}",
+            localDelete  = "(function () { delete NullReference; }());",
+            globalDelete = "delete NullReference;";
 
         expect(JSHINT(globalTypeof, { undef: true })).toEqual(true);
         expect(JSHINT(localTypeof, { undef: true })).toEqual(true);
+
+        expect(JSHINT(localDelete, { undef: true })).toEqual(true);
+        expect(JSHINT(globalDelete, { undef: true })).toEqual(true);
     });
 });
 
