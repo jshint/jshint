@@ -3,10 +3,10 @@
 load("jshint.js");
 
 (function (args) {
-    var name = args[0],
+    var name   = args[0],
         optstr = args[1], // arg1=val1,arg2=val2,...
-        opts = {rhino: true},
-        input, optname, optval;
+        opts   = { rhino: true },
+        input;
 
     if (!name) {
         print('Usage: jshint.js file.js');
@@ -14,9 +14,9 @@ load("jshint.js");
     }
 
     if (optstr) {
-        optstr.split(',').forEach(function(arg) {
-            [optname,optval] = arg.split('=');
-            opts[optname] = optval;
+        optstr.split(',').forEach(function (arg) {
+            var o = arg.split('=');
+            opts[o[0]] = o[1];
         });
     }
 
