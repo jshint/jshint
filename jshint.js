@@ -170,8 +170,8 @@
  WScript, Web, Window, XMLDOM, XMLHttpRequest, "\\", a, abbr, acronym,
  activeborder, activecaption, addEventListener, address, adsafe, alert,
  aliceblue, all, animator, antiquewhite, appleScript, applet, apply,
- approved, appworkspace, aqua, aquamarine, area, arguments, arity,
- article, aside, audio, autocomplete, azure, b, background,
+ approved, appworkspace, applicationCache, aqua, aquamarine, area, arguments,
+ arity, article, aside, audio, autocomplete, azure, b, background,
  "background-attachment", "background-color", "background-image",
  "background-position", "background-repeat", base, bdo, beep, beige, big,
  bisque, bitwise, black, blanchedalmond, block, blockquote, blue,
@@ -221,8 +221,8 @@
  lightseagreen, lightskyblue, lightslategray, lightsteelblue,
  lightyellow, lime, limegreen, line, "line-height", linen, link,
  "list-style", "list-style-image", "list-style-position",
- "list-style-type", load, loadClass, location, log, m, magenta, map,
- margin, "margin-bottom", "margin-left", "margin-right", "margin-top",
+ "list-style-type", load, loadClass, localStorage, location, log, m, magenta,
+ map, margin, "margin-bottom", "margin-left", "margin-right", "margin-top",
  mark, "marker-offset", maroon, match, "max-height", "max-width", maxerr,
  maxlen, md5, mediumaquamarine, mediumblue, mediumorchid, mediumpurple,
  mediumseagreen, mediumslateblue, mediumspringgreen, mediumturquoise,
@@ -231,8 +231,8 @@
  moccasin, module, moveBy, moveTo, name, nav, navajowhite, navigator, navy, new,
  newcap, noarg, node, noempty, noframes, nomen, nonew, noscript, nud, object, ol,
  oldlace, olive, olivedrab, on, onbeforeunload, onblur, onerror, onevar,
- onfocus, onload, onresize, onunload, opacity, open, openURL, opener, opera,
- optgroup, option, orange, orangered, orchid, outer, outline, "outline-color",
+ onfocus, onload, onresize, onunload, opacity, open, openDatabase, openURL, opener,
+ opera, optgroup, option, orange, orangered, orchid, outer, outline, "outline-color",
  "outline-style", "outline-width", output, overflow, "overflow-x",
  "overflow-y", p, padding, "padding-bottom", "padding-left",
  "padding-right", "padding-top", "page-break-after", "page-break-before",
@@ -259,10 +259,10 @@
  toLowerCase, toString, toUpperCase, toint32, token, tomato, top, tr, tt,
  tty, turquoise, tv, type, u, ul, undef, unescape, "unicode-bidi",
  unused, unwatch, updateNow, urls, value, valueOf, var, version,
- "vertical-align", video, violet, visibility, watch, wheat, white,
+ "vertical-align", video, violet, visibility, watch, WebSocket, wheat, white,
  "white-space", whitesmoke, widget, width, window, windowframe, windows,
- windowtext, "word-spacing", "word-wrap", yahooCheckLogin, yahooLogin,
- yahooLogout, yellow, yellowgreen, "z-index"
+ windowtext, Worker, "word-spacing", "word-wrap", yahooCheckLogin,
+ yahooLogin, yahooLogout, yellow, yellowgreen, "z-index"
 */
 
 /*global exports: false */
@@ -361,6 +361,7 @@ var JSHINT = (function () {
 
         browser = {
             addEventListener: false,
+            applicationCache: false,
             blur            : false,
             clearInterval   : false,
             clearTimeout    : false,
@@ -375,6 +376,7 @@ var JSHINT = (function () {
             history         : false,
             Image           : false,
             length          : false,
+            localStorage    : false,
             location        : false,
             moveBy          : false,
             moveTo          : false,
@@ -388,6 +390,7 @@ var JSHINT = (function () {
             onresize        : true,
             onunload        : true,
             open            : false,
+            openDatabase    : false,
             opener          : false,
             Option          : false,
             parent          : false,
@@ -403,7 +406,9 @@ var JSHINT = (function () {
             setTimeout      : false,
             status          : false,
             top             : false,
+            WebSocket       : false,
             window          : false,
+            Worker          : false,
             XMLHttpRequest  : false
         },
 
