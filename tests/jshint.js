@@ -97,6 +97,26 @@ describe("Statements", function () {
     it("must tolerate new line after dot", function () {
         expect(JSHINT(ml)).toEqual(true);
     });
+
+    it("must report of undefined variables when undef:true", function () {
+        var global = "hey();",
+            local  = "(function () { hey(); }());";
+
+        expect(JSHINT(global, { undef: true })).toEqual(false);
+        expect(JSHINT(local, { undef: true })).toEqual(false);
+    });
+
+    /*
+     * Operator typeof accepts a reference. There is no
+     * runtime error, if the base object of that reference is null.
+     */
+    it("must tolerate references in typeof and delete", function () {
+        var localTypeof  = "(function () { if (typeof NullReference) {} }());",
+            globalTypeof = "if (typeof NullReference) {}";
+
+        expect(JSHINT(globalTypeof, { undef: true })).toEqual(true);
+        expect(JSHINT(localTypeof, { undef: true })).toEqual(true);
+    });
 });
 
 describe("Control statements", function () {
