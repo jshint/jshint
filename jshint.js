@@ -2566,22 +2566,30 @@ loop:   for (;;) {
     }
 
 
-    function optionalidentifier() {
+    // fnparam means that this identifier is being defined as a function
+    // argument (see identifier())
+    function optionalidentifier(fnparam) {
         if (nexttoken.identifier) {
             advance();
             if (option.safe && banned[token.value]) {
                 warning("ADsafe violation: '{a}'.", token, token.value);
             } else if (token.reserved && !option.es5) {
-                warning("Expected an identifier and instead saw '{a}' (a reserved word).",
-                        token, token.id);
+                // `undefined` as a function param is a common pattern to protect
+                // against the case when somebody does `undefined = true` and
+                // help with minification. More info: https://gist.github.com/315916
+                if (!fnparam || token.value != 'undefined') {
+                    warning("Expected an identifier and instead saw '{a}' (a reserved word).",
+                            token, token.id);
+                }
             }
             return token.value;
         }
     }
 
-
-    function identifier() {
-        var i = optionalidentifier();
+    // fnparam means that this identifier is being defined as a function
+    // argument
+    function identifier(fnparam) {
+        var i = optionalidentifier(fnparam);
         if (i) {
             return i;
         }
@@ -4809,7 +4817,7 @@ loop:   for (;;) {
             return;
         }
         for (;;) {
-            i = identifier();
+            i = identifier(true);
             p.push(i);
             addlabel(i, 'parameter');
             if (nexttoken.id === ',') {
