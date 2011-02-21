@@ -319,7 +319,7 @@ var JSHINT = (function () {
         boolOptions = {
             adsafe     : true, // if ADsafe should be enforced
             bitwise    : true, // if bitwise operators should not be allowed
-            boss       : true, // if assignments inside if/for/while/do should be allowed
+            boss       : true, // if advanced usage of assignments and == should be allowed
             browser    : true, // if the standard browser globals should be predefined
             cap        : true, // if upper case HTML should be allowed
             couch      : true, // if CouchDB globals should be predefined
@@ -2460,10 +2460,10 @@ loop:   for (;;) {
         return node &&
               ((node.type === '(number)' && +node.value === 0) ||
                (node.type === '(string)' && node.value === '') ||
+               (node.type === 'null' && !option.boss) ||
                 node.type === 'true' ||
                 node.type === 'false' ||
-                node.type === 'undefined' ||
-                node.type === 'null');
+                node.type === 'undefined');
     }
 
 
