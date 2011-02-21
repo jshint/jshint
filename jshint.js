@@ -4460,7 +4460,7 @@ loop:   for (;;) {
     syntax['--'].exps = true;
     prefix('delete', function () {
         var p = expression(0);
-        if (!p || (p.id !== '.' && p.id !== '[')) {
+        if (option.safe && (!p || (p.id !== '.' && p.id !== '['))) {
             warning("Variables should not be deleted.");
         }
         this.first = p;
