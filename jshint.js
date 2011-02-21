@@ -4207,9 +4207,12 @@ loop:   for (;;) {
 
 // The name is not defined in the function.  If we are in the global scope,
 // then we have an undefined variable.
+//
+// Operator typeof does not raise runtime errors even if the base object of
+// a reference is null so no need to display warning if we're inside of typeof.
 
             } else if (funct['(global)']) {
-                if (option.undef && typeof predefined[v] !== 'boolean') {
+                if (anonname != 'typeof' && option.undef && typeof predefined[v] !== 'boolean') {
                     warning("'{a}' is not defined.", token, v);
                 }
                 note_implied(token);
@@ -4242,7 +4245,11 @@ loop:   for (;;) {
                         warning("'{a}' is not allowed.", token, v);
                         note_implied(token);
                     } else if (typeof s !== 'object') {
-                        if (option.undef) {
+
+// Operator typeof does not raise runtime errors even if the base object of
+// a reference is null so no need to display warning if we're inside of typeof.
+
+                        if (anonname != 'typeof' && option.undef) {
                             warning("'{a}' is not defined.", token, v);
                         } else {
                             funct[v] = true;
