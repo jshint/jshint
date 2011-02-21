@@ -123,6 +123,7 @@ describe("Control statements", function () {
 describe("Globals", function () {
     var win    = "window.location = 'http://google.com/';",
         jquery = [ "jQuery", "$" ],
+
         node   = [
             "__filename"
           , "__dirname"
@@ -132,6 +133,19 @@ describe("Globals", function () {
           , "module"
           , "process"
           , "require"
+        ],
+
+        couch   = [
+            "require"
+          , "respond"
+          , "getRow"
+          , "emit"
+          , "send"
+          , "start"
+          , "sum"
+          , "log"
+          , "exports"
+          , "module"
         ];
 
     it("must know that window is a predefined global", function () {
@@ -170,5 +184,22 @@ describe("Globals", function () {
 
         for (var i = 0, g; g = report.globals[i]; i++)
             expect(g == "jQuery" || g == "$").toEqual(true);
+    });
+
+    it("must know about CouchDB globals", function () {
+        var code = "(function () { return [ " + couch.join(",") + " ]; }());";
+
+        JSHINT(code, { couch: true });
+        var report = JSHINT.data();
+
+        expect(report.implieds).toEqual(undefined);
+        expect(report.globals.length).toEqual(10);
+
+        var globals = {};
+        for (var i = 0, g; g = report.globals[i]; i++)
+            globals[g] = true;
+
+        for (i = 0, g; g = couch[i]; i++)
+            expect(g in globals).toEqual(true);
     });
 });

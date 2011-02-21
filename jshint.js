@@ -190,14 +190,14 @@
  closeWidget, closed, closure, cm, code, col, colgroup, color, command,
  comment, condition, confirm, console, constructor, content,
  convertPathToHFS, convertPathToPlatform, coral, cornflowerblue,
- cornsilk, "counter-increment", "counter-reset", create, crimson, css, curly,
- cursor, cyan, d, darkblue, darkcyan, darkgoldenrod, darkgray, darkgreen,
- darkkhaki, darkmagenta, darkolivegreen, darkorange, darkorchid, darkred,
- darksalmon, darkseagreen, darkslateblue, darkslategray, darkturquoise,
+ cornsilk, couch, "counter-increment", "counter-reset", create, crimson,
+ css, curly, cursor, cyan, d, darkblue, darkcyan, darkgoldenrod, darkgray,
+ darkgreen, darkkhaki, darkmagenta, darkolivegreen, darkorange, darkorchid,
+ darkred, darksalmon, darkseagreen, darkslateblue, darkslategray, darkturquoise,
  darkviolet, data, datalist, dd, debug, decodeURI, decodeURIComponent,
  deeppink, deepskyblue, defaultStatus, defineClass, del, deserialize,
  details, devel, dfn, dialog, dimgray, dir, direction, display, div, dl,
- document, dodgerblue, dt, edition, else, em, embed, embossed, empty,
+ document, dodgerblue, dt, edition, else, em, embed, embossed, emit, empty,
  "empty-cells", encodeURI, encodeURIComponent, entityify, eqeqeq, errors,
  es5, escape, eval, event, evidence, evil, ex, exception, exec, exps, exports,
  fieldset, figure, filesystem, firebrick, first, float, floor,
@@ -205,7 +205,7 @@
  "font-size-adjust", "font-stretch", "font-style", "font-variant",
  "font-weight", footer, forestgreen, forin, form, fragment, frame,
  frames, frameset, from, fromCharCode, fuchsia, fud, funct, function,
- functions, g, gainsboro, gc, getComputedStyle, ghostwhite, GLOBAL, global,
+ functions, g, gainsboro, gc, getComputedStyle, getRow, ghostwhite, GLOBAL, global,
  globals, gold, goldenrod, gray, graytext, green, greenyellow, h1, h2,
  h3, h4, h5, h6, handheld, hasOwnProperty, head, header, height, help,
  hgroup, highlight, highlighttext, history, honeydew, hotpink, hr,
@@ -243,15 +243,15 @@
  prompt, prototype, pt, purple, push, px, q, quit, quotes, random, range,
  raw, reach, readFile, readUrl, reason, red, regexp, reloadWidget,
  removeEventListener, replace, report, require, reserved, resizeBy, resizeTo,
- resolvePath, resumeUpdates, rhino, right, rosybrown, royalblue, rp, rt,
- ruby, runCommand, runCommandInBg, saddlebrown, safe, salmon, samp,
+ resolvePath, resumeUpdates, respond, rhino, right, rosybrown, royalblue,
+ rp, rt, ruby, runCommand, runCommandInBg, saddlebrown, safe, salmon, samp,
  sandybrown, saveAs, savePreferences, screen, script, scroll, scrollBy,
- scrollTo, scrollbar, seagreen, seal, search, seashell, section, select,
+ scrollTo, scrollbar, seagreen, seal, search, seashell, section, send, select,
  serialize, setInterval, setTimeout, shift, showWidgetPreferences,
  sienna, silver, skyblue, slateblue, slategray, sleep, slice, small,
  snow, sort, source, span, spawn, speak, speech, split, springgreen, src,
- stack, status, steelblue, strict, strong, style, styleproperty, sub,
- substr, sup, supplant, suppressUpdates, sync, system, table,
+ stack, status, start, steelblue, strict, strong, style, styleproperty, sub,
+ substr, sum, sup, supplant, suppressUpdates, sync, system, table,
  "table-layout", tan, tbody, td, teal, tellWidget, test, "text-align",
  "text-decoration", "text-indent", "text-shadow", "text-transform",
  textarea, tfoot, th, thead, thistle, threeddarkshadow, threedface,
@@ -322,6 +322,7 @@ var JSHINT = (function () {
             boss       : true, // if assignments inside if/for/while/do should be allowed
             browser    : true, // if the standard browser globals should be predefined
             cap        : true, // if upper case HTML should be allowed
+            couch      : true, // if CouchDB globals should be predefined
             css        : true, // if CSS workarounds should be tolerated
             curly      : true, // if curly braces around blocks should be required (even in if/for/while)
             debug      : true, // if debugger statements should be allowed
@@ -404,6 +405,19 @@ var JSHINT = (function () {
             top             : false,
             window          : false,
             XMLHttpRequest  : false
+        },
+
+        couch = {
+            "require" : false,
+            respond   : false,
+            getRow    : false,
+            emit      : false,
+            send      : false,
+            start     : false,
+            sum       : false,
+            log       : false,
+            exports   : false,
+            module    : false
         },
 
         cssAttributeData,
@@ -1109,6 +1123,9 @@ var JSHINT = (function () {
     function assume() {
         if (option.safe)
             return;
+
+        if (option.couch)
+            combine(predefined, couch);
 
         if (option.rhino)
             combine(predefined, rhino);
