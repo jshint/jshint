@@ -102,12 +102,9 @@ describe("Statements", function () {
 describe("Operators", function () {
     var dc = "delete NullReference;";
 
-    it("must tolerate deleting variables by default", function () {
-        expect(JSHINT(dc)).toEqual(true);
-    });
-
-    it("must not tolerate deleting variables if safe:true", function () {
-        expect(JSHINT(dc, { safe: true })).toEqual(false);
+    // http://perfectionkills.com/understanding-delete/#built_ins_and_dontdelete
+    it("must not tolerate deleting variables", function () {
+        expect(JSHINT(dc)).toEqual(false);
     });
 
     it("must report of undefined variables when undef:true", function () {
@@ -131,8 +128,10 @@ describe("Operators", function () {
         expect(JSHINT(globalTypeof, { undef: true })).toEqual(true);
         expect(JSHINT(localTypeof, { undef: true })).toEqual(true);
 
-        expect(JSHINT(localDelete, { undef: true })).toEqual(true);
-        expect(JSHINT(globalDelete, { undef: true })).toEqual(true);
+        expect(JSHINT(localDelete, { undef: true })).toEqual(false);
+        expect(JSHINT.data().errors.length).toEqual(1);
+        expect(JSHINT(globalDelete, { undef: true })).toEqual(false);
+        expect(JSHINT.data().errors.length).toEqual(1);
     });
 });
 
