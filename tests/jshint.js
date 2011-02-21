@@ -135,6 +135,23 @@ describe("Operators", function () {
     });
 });
 
+describe("Keywords", function () {
+    it("must not tolerate reassigning of undefined", function () {
+        var undef = "var undefined = 1;";
+        expect(JSHINT(undef)).toEqual(false);
+    });
+
+    /*
+     * `undefined` as a function param is a common pattern to protect
+     * against the case when somebody does `undefined = true` and
+     * help with minification. More info: https://gist.github.com/315916
+     */
+    it("must tolerate undefined as an argument", function () {
+       var undef = "(function (undefined) {}(undefined));";
+       expect(JSHINT(undef)).toEqual(true);
+    });
+});
+
 describe("Control statements", function () {
     var cond  = "if (e = 1) { doSmth(); }",
         loopw = "while (obj = arr.next()) { hey(); }",
