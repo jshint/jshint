@@ -4511,6 +4511,9 @@ loop:   for (;;) {
                         if (nexttoken.id === ')') {
                             warning("Use the array literal notation [].", token);
                         }
+                        if (nexttoken.id === '(number)') {
+                            advance('(number)');
+                        }
                         advance(')');
                     }
                     this.first = c;
