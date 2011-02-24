@@ -1009,6 +1009,8 @@ var JSHINT = (function () {
         qx = /[^a-zA-Z0-9+\-_\/ ]/,
 // query characters for ids
         dx = /[\[\]\/\\"'*<>.&:(){}+=#]/,
+// catches /* falls through */ comments
+        ft = /^\s*\/\*\s*falls\sthrough\s*\*\/\s*$/,
 
         rx = {
             outer: hx,
@@ -5145,9 +5147,14 @@ loop:   for (;;) {
                 case 'throw':
                     break;
                 default:
-                    warning(
-                        "Expected a 'break' statement before 'case'.",
-                        token);
+                    // You can tell JSHint that you don't use break intentionally by
+                    // adding a comment /* falls through */ on a line just before
+                    // the next `case`.
+                    if (!ft.test(lines[nexttoken.line - 2])) {
+                        warning(
+                            "Expected a 'break' statement before 'case'.",
+                            token);
+                    }
                 }
                 indentation(-option.indent);
                 advance('case');
