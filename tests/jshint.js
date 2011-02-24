@@ -92,10 +92,19 @@ describe("Functions", function () {
 });
 
 describe("Statements", function () {
-    var ml = "chain().chain().chain().\n    chain();";
+    var ml = "chain().chain().chain().\n    chain();",
+        sc = "hello()";
 
     it("must tolerate new line after dot", function () {
         expect(JSHINT(ml)).toEqual(true);
+    });
+
+    it("must not tolerate missing semicolons by default", function () {
+        expect(JSHINT(sc)).toEqual(false);
+    });
+
+    it("must tolerate missing semicolons when asi:true", function () {
+        expect(JSHINT(sc, { asi: true })).toEqual(true);
     });
 });
 
