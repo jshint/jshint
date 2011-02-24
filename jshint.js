@@ -5174,9 +5174,11 @@ loop:   for (;;) {
                 case 'throw':
                     break;
                 default:
-                    warning(
-                        "Expected a 'break' statement before 'default'.",
-                        token);
+                    if (!ft.test(lines[nexttoken.line - 2])) {
+                        warning(
+                            "Expected a 'break' statement before 'default'.",
+                            token);
+                    }
                 }
                 indentation(-option.indent);
                 advance('default');

@@ -194,7 +194,7 @@ describe("Control statements", function () {
         expect(JSHINT(nulleq, { boss: true })).toEqual(true);
     });
 
-    it("should not implicit allow case statement fall through by default", function () {
+    it("should not allow implicit case statement fall through by default", function () {
         var code = [
             "switch(foo) {"
           , "case 1:"
@@ -214,6 +214,32 @@ describe("Control statements", function () {
           ,     "doSmth();"
           ,     "/* falls through */"
           , "case 2:"
+          ,     "doSmth();"
+          , "}"
+        ];
+        expect(JSHINT(code)).toEqual(true);
+    });
+
+    it("should not allow implicit case statement fall through by default", function () {
+        var code = [
+            "switch(foo) {"
+          , "case 1:"
+          , "case 2:"
+          , "default:"
+          ,     "doSmth();"
+          , "}"
+        ];
+        expect(JSHINT(code)).toEqual(false);
+    });
+
+    it("should allow explicit case statement fall through", function () {
+        var code = [
+            "switch(foo) {"
+          , "case 1:"
+          ,     "/* falls through */"
+          , "case 2:"
+          ,     "/* falls through */"
+          , "default:"
           ,     "doSmth();"
           , "}"
         ];
