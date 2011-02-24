@@ -184,6 +184,32 @@ describe("Control statements", function () {
         expect(JSHINT(eqnull, { boss: true })).toEqual(true);
         expect(JSHINT(nulleq, { boss: true })).toEqual(true);
     });
+
+    it("should not implicit allow case statement fall through by default", function () {
+        var code = [
+            "switch(foo) {"
+          , "case 1:"
+          ,     "doSmth();"
+          , "case 2:"
+          ,     "doSmth();"
+          , "}"
+        ];
+
+        expect(JSHINT(code)).toEqual(false);
+    });
+
+    it("should allow explicit case statement fall through", function () {
+        var code = [
+            "switch(foo) {"
+          , "case 1:"
+          ,     "doSmth();"
+          ,     "/* falls through */"
+          , "case 2:"
+          ,     "doSmth();"
+          , "}"
+        ];
+        expect(JSHINT(code)).toEqual(true);
+    });
 });
 
 describe("Globals", function () {
