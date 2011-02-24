@@ -168,7 +168,7 @@
  activeborder, activecaption, addEventListener, address, adsafe, alert,
  aliceblue, all, animator, antiquewhite, appleScript, applet, apply,
  approved, appworkspace, applicationCache, aqua, aquamarine, area, arguments,
- arity, article, aside, audio, autocomplete, azure, b, background,
+ arity, article, asi, aside, audio, autocomplete, azure, b, background,
  "background-attachment", "background-color", "background-image",
  "background-position", "background-repeat", base, bdo, beep, beige, big,
  bisque, bitwise, black, blanchedalmond, block, blockquote, blue,
@@ -315,6 +315,7 @@ var JSHINT = (function () {
 
         boolOptions = {
             adsafe     : true, // if ADsafe should be enforced
+            asi        : true, // if automatic semicolon insertion should be tolerated
             bitwise    : true, // if bitwise operators should not be allowed
             boss       : true, // if advanced usage of assignments and == should be allowed
             browser    : true, // if the standard browser globals should be predefined
@@ -2674,7 +2675,9 @@ loop:   for (;;) {
                 warning("Do not use 'new' for side effects.");
             }
             if (nexttoken.id !== ';') {
-                warningAt("Missing semicolon.", token.line, token.from + token.value.length);
+                if (!option.asi) {
+                    warningAt("Missing semicolon.", token.line, token.from + token.value.length);
+                }
             } else {
                 adjacent(token, nexttoken);
                 advance(';');
