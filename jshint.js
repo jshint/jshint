@@ -172,7 +172,7 @@
  "background-attachment", "background-color", "background-image",
  "background-position", "background-repeat", base, bdo, beep, beige, big,
  bisque, bitwise, black, blanchedalmond, block, blockquote, blue,
- blueviolet, blur, body, border, "border-bottom", "border-bottom-color",
+ blueviolet, blur, body, boolOptions, border, "border-bottom", "border-bottom-color",
  "border-bottom-style", "border-bottom-width", "border-collapse",
  "border-color", "border-left", "border-left-color", "border-left-style",
  "border-left-width", "border-right", "border-right-color",
@@ -5529,10 +5529,11 @@ loop:   for (;;) {
 
 // The actual JSHINT function itself.
 
-    var itself = function (s, o) {
+    var itself = function (s, o, g) {
         var a, i, k;
         JSHINT.errors = [];
         predefined = Object.create(standard);
+        combine(predefined, g || {});
         if (o) {
             a = o.predef;
             if (a) {

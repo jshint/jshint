@@ -329,6 +329,25 @@ describe("Globals", function () {
         for (i = 0, g; g = couch[i]; i++)
             expect(g in globals).toEqual(true);
     });
+
+    it("must allow custom globals, so it's not necessary to spam code " +
+       "with comments when the globals are obvious", function () {
+        var code = "(function () { return [ fooGlobal, barGlobal ]; }());",
+            customGlobals = { fooGlobal: false, barGlobal: false };
+
+        expect(JSHINT(code, {}, customGlobals)).toEqual(true);
+        var report = JSHINT.data();
+
+        expect(report.implieds).toEqual(undefined);
+        expect(report.globals.length).toEqual(2);
+
+        var globals = {};
+        for (var i = 0, g; g = report.globals[i]; i++)
+            globals[g] = true;
+
+        for (i = 0, g; g = customGlobals[i]; i++)
+            expect(g in globals).toEqual(true);
+    });
 });
 
 describe("Objects", function () {
@@ -337,7 +356,6 @@ describe("Objects", function () {
             expr   = "new Array(v+1);";
 
         expect(JSHINT(simple)).toEqual(true);
-        console.log(JSHINT.errors);
         expect(JSHINT(expr)).toEqual(true);
     });
 });
