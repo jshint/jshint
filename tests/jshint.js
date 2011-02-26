@@ -330,3 +330,14 @@ describe("Globals", function () {
             expect(g in globals).toEqual(true);
     });
 });
+
+describe("Objects", function () {
+    it("must parse `new Array(<expr>);`", function () {
+        var simple = "new Array(1);",
+            expr   = "new Array(v+1);";
+
+        expect(JSHINT(simple)).toEqual(true);
+        console.log(JSHINT.errors);
+        expect(JSHINT(expr)).toEqual(true);
+    });
+});
