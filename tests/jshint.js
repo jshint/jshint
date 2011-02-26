@@ -335,7 +335,7 @@ describe("Globals", function () {
         var code = "(function () { return [ fooGlobal, barGlobal ]; }());";
         
         var myCustomGlobals = {fooGlobal:false, barGlobal:false};
-        JSHINT(code, { myGlobals: myCustomGlobals });
+        JSHINT(code, {}, myCustomGlobals);
         
         var report = JSHINT.data();
 

@@ -228,7 +228,7 @@
  mediumseagreen, mediumslateblue, mediumspringgreen, mediumturquoise,
  mediumvioletred, member, menu, menutext, message, meta, meter,
  midnightblue, "min-height", "min-width", mintcream, mistyrose, mm,
- moccasin, module, moveBy, moveTo, myGlobals, name, nav, navajowhite, navigator, navy, new,
+ moccasin, module, moveBy, moveTo, name, nav, navajowhite, navigator, navy, new,
  newcap, noarg, node, noempty, noframes, nomen, nonew, noscript, nud, object, ol,
  oldlace, olive, olivedrab, on, onbeforeunload, onblur, onerror, onevar,
  onfocus, onload, onresize, onunload, opacity, open, openDatabase, openURL, opener,
@@ -326,7 +326,6 @@ var JSHINT = (function () {
             couch      : true, // if CouchDB globals should be predefined
             css        : true, // if CSS workarounds should be tolerated
             curly      : true, // if curly braces around blocks should be required (even in if/for/while)
-            myGlobals  : {},   // supply your own globals
             debug      : true, // if debugger statements should be allowed
             devel      : true, // if logging should be allowed (console, alert, etc.)
             eqeqeq     : true, // if === should be required
@@ -1157,8 +1156,6 @@ var JSHINT = (function () {
 
         if (option.widget)
             combine(predefined, widget);
-
-        combine(predefined, option.myGlobals);
     }
 
 
@@ -5532,10 +5529,11 @@ loop:   for (;;) {
 
 // The actual JSHINT function itself.
 
-    var itself = function (s, o) {
+    var itself = function (s, o, g) {
         var a, i, k;
         JSHINT.errors = [];
         predefined = Object.create(standard);
+        combine(predefined, g || {});
         if (o) {
             a = o.predef;
             if (a) {
