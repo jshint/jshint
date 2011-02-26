@@ -175,7 +175,7 @@
  "background-attachment", "background-color", "background-image",
  "background-position", "background-repeat", base, bdo, beep, beige, big,
  bisque, bitwise, black, blanchedalmond, block, blockquote, blue,
- blueviolet, blur, body, border, "border-bottom", "border-bottom-color",
+ blueviolet, blur, body, boolOptions, border, "border-bottom", "border-bottom-color",
  "border-bottom-style", "border-bottom-width", "border-collapse",
  "border-color", "border-left", "border-left-color", "border-left-style",
  "border-left-width", "border-right", "border-right-color",
@@ -314,9 +314,9 @@ var JSHINT = (function () {
         },
 
 
-// These are the JSHint options.
+// These are the JSHint boolean options.
 
-        options = {
+        boolOptions = {
             adsafe     : true, // if ADsafe should be enforced
             asi        : true, // if automatic semicolon insertion should be tolerated
             bitwise    : true, // if bitwise operators should not be allowed
@@ -2017,7 +2017,7 @@ klass:                                  do {
                 warning("ADsafe restriction.");
             }
             obj = option;
-            filter = options;
+            filter = boolOptions;
             break;
         case '/*global':
             if (option.safe) {
