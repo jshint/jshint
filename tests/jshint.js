@@ -245,6 +245,17 @@ describe("Control statements", function () {
         ];
         expect(JSHINT(code)).toEqual(true);
     });
+    
+    it("should not allow functions to be defined in loops by default", function () {
+        expect(JSHINT("while(true){ var f = function(){}; }")).toEqual(false);
+        expect(JSHINT("for(var i=0; i<5; i++){ var f = function(){}; }")).toEqual(false);
+    });
+    
+    it("should allow functions to be defined in loops if loopfunc:true", function () {
+        expect(JSHINT("while(true){ var f = function(){}; }", {loopfunc:true})).toEqual(true);
+        expect(JSHINT("for(var i=0; i<5; i++){ var f = function(){}; }", {loopfunc:true})).toEqual(true);
+    });
+    
 });
 
 describe("Globals", function () {
