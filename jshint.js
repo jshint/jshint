@@ -228,7 +228,7 @@
  mediumseagreen, mediumslateblue, mediumspringgreen, mediumturquoise,
  mediumvioletred, member, menu, menutext, message, meta, meter,
  midnightblue, "min-height", "min-width", mintcream, mistyrose, mm,
- moccasin, module, moveBy, moveTo, name, nav, navajowhite, navigator, navy, new,
+ moccasin, module, moveBy, moveTo, myGlobals, name, nav, navajowhite, navigator, navy, new,
  newcap, noarg, node, noempty, noframes, nomen, nonew, noscript, nud, object, ol,
  oldlace, olive, olivedrab, on, onbeforeunload, onblur, onerror, onevar,
  onfocus, onload, onresize, onunload, opacity, open, openDatabase, openURL, opener,
@@ -314,9 +314,9 @@ var JSHINT = (function () {
         },
 
 
-// These are the JSHint boolean options.
+// These are the JSHint options.
 
-        boolOptions = {
+        options = {
             adsafe     : true, // if ADsafe should be enforced
             asi        : true, // if automatic semicolon insertion should be tolerated
             bitwise    : true, // if bitwise operators should not be allowed
@@ -326,6 +326,7 @@ var JSHINT = (function () {
             couch      : true, // if CouchDB globals should be predefined
             css        : true, // if CSS workarounds should be tolerated
             curly      : true, // if curly braces around blocks should be required (even in if/for/while)
+            myGlobals  : {},   // supply your own globals
             debug      : true, // if debugger statements should be allowed
             devel      : true, // if logging should be allowed (console, alert, etc.)
             eqeqeq     : true, // if === should be required
@@ -356,7 +357,7 @@ var JSHINT = (function () {
             white      : true, // if strict whitespace rules apply
             widget     : true  // if the Yahoo Widgets globals should be predefined
         },
-
+        
 // browser contains a set of global names which are commonly provided by a
 // web browser environment.
 
@@ -1156,6 +1157,8 @@ var JSHINT = (function () {
 
         if (option.widget)
             combine(predefined, widget);
+
+        combine(predefined, option.myGlobals);
     }
 
 
@@ -2017,7 +2020,7 @@ klass:                                  do {
                 warning("ADsafe restriction.");
             }
             obj = option;
-            filter = boolOptions;
+            filter = options;
             break;
         case '/*global':
             if (option.safe) {

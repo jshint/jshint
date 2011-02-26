@@ -329,4 +329,25 @@ describe("Globals", function () {
         for (i = 0, g; g = couch[i]; i++)
             expect(g in globals).toEqual(true);
     });
+    
+    it("must allow custom globals, so it's not necessary to spam code " +
+       "with comments when the globals are obvious", function () {
+        var code = "(function () { return [ fooGlobal, barGlobal ]; }());";
+        
+        var myCustomGlobals = {fooGlobal:false, barGlobal:false};
+        JSHINT(code, { myGlobals: myCustomGlobals });
+        
+        var report = JSHINT.data();
+
+        expect(report.implieds).toEqual(undefined);
+        expect(report.globals.length).toEqual(2);
+
+        var globals = {};
+        for (var i = 0, g; g = report.globals[i]; i++)
+            globals[g] = true;
+
+        for (i = 0, g; g = myCustomGlobals[i]; i++)
+            expect(g in globals).toEqual(true);
+    });
+    
 });
