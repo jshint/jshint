@@ -4512,7 +4512,10 @@ loop:   for (;;) {
                         advance('(');
                         if (nexttoken.id === ')') {
                             warning("Use the array literal notation [].", token);
+                        } else {
+                            expression(0);
                         }
+
                         advance(')');
                     }
                     this.first = c;
