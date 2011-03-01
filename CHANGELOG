@@ -1,3 +1,20 @@
+March 01, 2011
+  * New edition: 2011-03-02
+
+  * When library is used from Rhino, you can provide options via command line arguments
+
+  * Added new HTML5 globals to the 'browser' option
+  * Tolerate == null when boss:true
+  * Tolerate undefined variables in the typeof and delete
+  * Tolerate undefined as a formal parameter
+  * Recognize new Array(<expr>) as a valid expression
+  * Added support for explicit case statement fallthroughs (using special comments)
+  * Added third formal parameter to JSHINT for specifying pre-defined globals
+
+  * New option 'asi' to tolerate the use of automatic semicolon insertion
+  * New option 'jquery' to assume jQuery environment
+  * New option 'couch' to assume CouchDB environment
+
 February 19, 2011
   * New edition: 2011-02-19
 
@@ -11,7 +28,6 @@ February 19, 2011
 
   * New option 'boss' to tolerate assignments inside if/for/while
   * New option 'node' to assume Node environment
-  * New option 'jquery' to assume jQuery environment
 
 January 19, 2011
   * Forked JSLint from the edition 2010-12-16
