@@ -2597,7 +2597,7 @@ loop:   for (;;) {
             return i;
         }
         if (token.id === 'function' && nexttoken.id === '(') {
-            warning("Missing name in function statement.");
+            warning("Missing name in function declaration.");
         } else {
             error("Expected an identifier and instead saw '{a}'.",
                     nexttoken, nexttoken.value);
@@ -5010,7 +5010,7 @@ loop:   for (;;) {
     blockstmt('function', function () {
         if (inblock) {
             warning(
-"Function statements should not be placed in blocks. Use a function expression or move the statement to the top of the outer function.", token);
+"Function declarations should not be placed in blocks. Use a function expression or move the statement to the top of the outer function.", token);
 
         }
         var i = identifier();
@@ -5019,7 +5019,7 @@ loop:   for (;;) {
         doFunction(i, true);
         if (nexttoken.id === '(' && nexttoken.line === token.line) {
             error(
-"Function statements are not invocable. Wrap the whole function invocation in parens.");
+"Function declarations are not invocable. Wrap the whole function invocation in parens.");
         }
         return this;
     });
