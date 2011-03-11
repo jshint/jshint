@@ -159,10 +159,11 @@
  "(identifier)", "(last)", "(line)", "(loopage)", "(name)", "(onevar)",
  "(params)", "(scope)", "(statement)", "(verb)", "*", "+", "++", "-",
  "--", "\/", "<", "<=", "==", "===", ">", ">=", $, ADSAFE, __filename, __dirname,
- ActiveXObject, Array, Boolean, Buffer, COM, CScript, Canvas, CustomAnimation,
- Date, Debug, E, Enumerator, Error, EvalError, FadeAnimation, Flash,
- FormField, Frame, Function, HotKey, Image, JSON, LN10, LN2, LOG10E,
- LOG2E, MAX_VALUE, MIN_VALUE, Math, MenuItem, MoveAnimation,
+ ActiveXObject, Array, ArrayBuffer, ArrayBufferView, Boolean, Buffer, COM,
+ CScript, Canvas, CustomAnimation, DataView, Date, Debug, E, Enumerator,
+ Error, EvalError, FadeAnimation, Flash, Float32Array, Float64Array,
+ FormField, Frame, Function, HotKey, Image, Int16Array, Int32Array, Int8Array,
+ JSON, LN10, LN2, LOG10E, LOG2E, MAX_VALUE, MIN_VALUE, Math, MenuItem, MoveAnimation,
  NEGATIVE_INFINITY, Number, Object, Option, PI, POSITIVE_INFINITY, Point,
  RangeError, Rectangle, ReferenceError, RegExp, ResizeAnimation,
  RotateAnimation, SQRT1_2, SQRT2, ScrollBar, String, Style, SyntaxError,
@@ -257,12 +258,12 @@
  textarea, tfoot, th, thead, thistle, threeddarkshadow, threedface,
  threedhighlight, threedlightshadow, threedshadow, time, title,
  toLowerCase, toString, toUpperCase, toint32, token, tomato, top, tr, tt,
- tty, turquoise, tv, type, u, ul, undef, unescape, "unicode-bidi",
- unused, unwatch, updateNow, urls, value, valueOf, var, version,
- "vertical-align", video, violet, visibility, watch, WebSocket, wheat, white,
- "white-space", whitesmoke, widget, width, window, windowframe, windows,
- windowtext, Worker, "word-spacing", "word-wrap", yahooCheckLogin,
- yahooLogin, yahooLogout, yellow, yellowgreen, "z-index"
+ tty, turquoise, tv, type, typed, Uint16Array, Uint32Array, Uint8Array, u, ul, undef,
+ unescape, "unicode-bidi", unused, unwatch, updateNow, urls, value, valueOf,
+ var, version, "vertical-align", video, violet, visibility, watch,
+ WebSocket, wheat, white, "white-space", whitesmoke, widget, width,
+ window, windowframe, windows, windowtext, Worker, "word-spacing", "word-wrap",
+ yahooCheckLogin, yahooLogin, yahooLogout, yellow, yellowgreen, "z-index"
 */
 
 /*global exports: false */
@@ -351,6 +352,7 @@ var JSHINT = (function () {
             rhino      : true, // if the Rhino environment globals should be predefined
             undef      : true, // if variables should be declared before used
             safe       : true, // if use of some browser features should be restricted
+            typed      : true, // if typed array globals should be predefined
             windows    : true, // if MS Windows-specific globals should be predefined
             strict     : true, // require the "use strict"; pragma
             sub        : true, // if all forms of subscript notation are tolerated
@@ -878,6 +880,21 @@ var JSHINT = (function () {
         syntax = {},
         tab,
         token,
+
+        typed = {
+            ArrayBuffer     : false,
+            ArrayBufferView : false,
+            DataView        : false,
+            Float32Array    : false,
+            Float64Array    : false,
+            Int16Array      : false,
+            Int32Array      : false,
+            Int8Array       : false,
+            Uint16Array     : false,
+            Uint32Array     : false,
+            Uint8Array      : false
+        },
+
         urls,
         warnings,
 
@@ -1151,6 +1168,9 @@ var JSHINT = (function () {
 
         if (option.jquery)
             combine(predefined, jquery);
+
+        if (option.typed)
+            combine(predefined, typed);
 
         if (option.windows)
             combine(predefined, windows);
