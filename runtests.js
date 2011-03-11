@@ -1,9 +1,12 @@
+#!/usr/bin/env node
+
 var jasmine = require('jasmine-node'),
     verbose = true,
     colored = true;
 
 for (var key in jasmine) {
-    global[key] = jasmine[key];
+    if (jasmine.hasOwnProperty(key))
+        global[key] = jasmine[key];
 }
 
 process.argv.forEach(function (arg) {
