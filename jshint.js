@@ -4239,7 +4239,7 @@ loop:   for (;;) {
                 switch (funct[v]) {
                 case 'closure':
                 case 'function':
-                case 'var':
+                case 'var':/* This might be part of what needs changed to modify the var errors */
                 case 'unused':
                     warning("'{a}' used out of scope.", token, v);
                     break;
