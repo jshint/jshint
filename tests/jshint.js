@@ -20,6 +20,11 @@ describe("JSHint", function () {
         var src = fs.readFileSync(__dirname + "/jshint.js", "utf8");
         expect(JSHINT(src, { node: true })).toEqual(true);
     });
+
+    it("runtests.js must pass jshint check", function () {
+        var src = fs.readFileSync(__dirname + "/../runtests.js", "utf8");
+        expect(JSHINT(src)).toEqual(true);
+    });
 });
 
 describe("Blocks", function () {
