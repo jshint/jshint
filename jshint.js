@@ -255,7 +255,7 @@
  textarea, tfoot, th, thead, thistle, threeddarkshadow, threedface,
  threedhighlight, threedlightshadow, threedshadow, time, title,
  toLowerCase, toString, toUpperCase, toint32, token, tomato, top, tr, tt,
- tty, turquoise, tv, type, typed, Uint16Array, Uint32Array, Uint8Array, u, ul, undef,
+ tty, turquoise, tv, type, Uint16Array, Uint32Array, Uint8Array, u, ul, undef,
  unescape, "unicode-bidi", unused, unwatch, updateNow, urls, value, valueOf,
  var, version, "vertical-align", video, violet, visibility, watch,
  WebSocket, wheat, white, "white-space", whitesmoke, widget, width,
@@ -349,7 +349,6 @@ var JSHINT = (function () {
             rhino      : true, // if the Rhino environment globals should be predefined
             undef      : true, // if variables should be declared before used
             safe       : true, // if use of some browser features should be restricted
-            typed      : true, // if typed array globals should be predefined
             windows    : true, // if MS Windows-specific globals should be predefined
             strict     : true, // require the "use strict"; pragma
             sub        : true, // if all forms of subscript notation are tolerated
@@ -361,6 +360,8 @@ var JSHINT = (function () {
 // web browser environment.
 
         browser = {
+            ArrayBuffer     : false,
+            ArrayBufferView : false,
             addEventListener: false,
             applicationCache: false,
             blur            : false,
@@ -368,14 +369,20 @@ var JSHINT = (function () {
             clearTimeout    : false,
             close           : false,
             closed          : false,
+            DataView        : false,
             defaultStatus   : false,
             document        : false,
             event           : false,
             FileReader      : false,
+            Float32Array    : false,
+            Float64Array    : false,
             focus           : false,
             frames          : false,
             getComputedStyle: false,
             history         : false,
+            Int16Array      : false,
+            Int32Array      : false,
+            Int8Array       : false,
             Image           : false,
             length          : false,
             localStorage    : false,
@@ -408,6 +415,9 @@ var JSHINT = (function () {
             setTimeout      : false,
             status          : false,
             top             : false,
+            Uint16Array     : false,
+            Uint32Array     : false,
+            Uint8Array      : false,
             WebSocket       : false,
             window          : false,
             Worker          : false,
@@ -877,21 +887,6 @@ var JSHINT = (function () {
         syntax = {},
         tab,
         token,
-
-        typed = {
-            ArrayBuffer     : false,
-            ArrayBufferView : false,
-            DataView        : false,
-            Float32Array    : false,
-            Float64Array    : false,
-            Int16Array      : false,
-            Int32Array      : false,
-            Int8Array       : false,
-            Uint16Array     : false,
-            Uint32Array     : false,
-            Uint8Array      : false
-        },
-
         urls,
         warnings,
 
@@ -1165,9 +1160,6 @@ var JSHINT = (function () {
 
         if (option.jquery)
             combine(predefined, jquery);
-
-        if (option.typed)
-            combine(predefined, typed);
 
         if (option.windows)
             combine(predefined, windows);
