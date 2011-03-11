@@ -372,7 +372,7 @@ describe("Globals", function () {
     it("must know about typed arrays", function () {
         var code = "(function () { return [ " + typed.join(",") + " ]; }());";
 
-        JSHINT(code, { typed: true });
+        JSHINT(code, { browser: true });
         var report = JSHINT.data();
 
         expect(report.implieds).toEqual(undefined);
