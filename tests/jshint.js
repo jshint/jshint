@@ -297,7 +297,22 @@ describe("Globals", function () {
           , "log"
           , "exports"
           , "module"
+        ],
+
+        typed   = [
+            "ArrayBuffer"
+          , "ArrayBufferView"
+          , "DataView"
+          , "Float32Array"
+          , "Float64Array"
+          , "Int16Array"
+          , "Int32Array"
+          , "Int8Array"
+          , "Uint16Array"
+          , "Uint32Array"
+          , "Uint8Array"
         ];
+
 
     it("must know that window is a predefined global", function () {
         JSHINT(win, { browser: true });
@@ -351,6 +366,23 @@ describe("Globals", function () {
             globals[g] = true;
 
         for (i = 0, g; g = couch[i]; i++)
+            expect(g in globals).toEqual(true);
+    });
+
+    it("must know about typed arrays", function () {
+        var code = "(function () { return [ " + typed.join(",") + " ]; }());";
+
+        JSHINT(code, { typed: true });
+        var report = JSHINT.data();
+
+        expect(report.implieds).toEqual(undefined);
+        expect(report.globals.length).toEqual(11);
+
+        var globals = {};
+        for (var i = 0, g; g = report.globals[i]; i++)
+            globals[g] = true;
+
+        for (i = 0, g; g = typed[i]; i++)
             expect(g in globals).toEqual(true);
     });
 
