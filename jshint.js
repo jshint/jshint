@@ -218,7 +218,7 @@
  lightseagreen, lightskyblue, lightslategray, lightsteelblue,
  lightyellow, lime, limegreen, line, "line-height", linen, link,
  "list-style", "list-style-image", "list-style-position",
- "list-style-type", load, loadClass, localStorage, location, log, m, magenta,
+ "list-style-type", load, loadClass, localStorage, location, log, loopfunc, m, magenta,
  map, margin, "margin-bottom", "margin-left", "margin-right", "margin-top",
  mark, "marker-offset", maroon, match, "max-height", "max-width", maxerr,
  maxlen, md5, mediumaquamarine, mediumblue, mediumorchid, mediumpurple,
@@ -333,6 +333,7 @@ var JSHINT = (function () {
             immed      : true, // if immediate invocations must be wrapped in parens
             jquery     : true, // if jQuery globals should be predefined
             laxbreak   : true, // if line breaks should not be checked
+            loopfunc   : true, // if functions should be allowed to be defined within loops
             newcap     : true, // if constructor names must be capitalized
             noarg      : true, // if arguments.caller and arguments.callee should be disallowed
             node       : true, // if the Node.js environment globals should be predefined
@@ -4896,7 +4897,7 @@ loop:   for (;;) {
                     t = nexttoken;
                     adjacent(token, nexttoken);
                     f = doFunction(i);
-                    if (funct['(loopage)']) {
+                    if (!option.loopfunc && funct['(loopage)']) {
                         warning("Don't make functions within a loop.", t);
                     }
                     p = f['(params)'];
@@ -5032,7 +5033,7 @@ loop:   for (;;) {
             nonadjacent(token, nexttoken);
         }
         doFunction(i);
-        if (funct['(loopage)']) {
+        if (!option.loopfunc && funct['(loopage)']) {
             warning("Don't make functions within a loop.");
         }
         return this;
@@ -5552,22 +5553,23 @@ loop:   for (;;) {
                 o.safe = true;
             }
             if (o.safe) {
-                o.browser =
-                o.css     =
-                o.debug   =
-                o.devel   =
-                o.evil    =
-                o.forin   =
-                o.on      =
-                o.rhino   =
-                o.windows =
-                o.sub     =
-                o.widget  = false;
+                o.browser  =
+                o.css      =
+                o.debug    =
+                o.devel    =
+                o.evil     =
+                o.forin    =
+                o.loopfunc =
+                o.on       =
+                o.rhino    =
+                o.windows  =
+                o.sub      =
+                o.widget   = false;
 
-                o.eqeqeq  =
-                o.nomen   =
-                o.safe    =
-                o.undef   = true;
+                o.eqeqeq   =
+                o.nomen    =
+                o.safe     =
+                o.undef    = true;
 
                 predefined.Date =
                 predefined['eval'] =
