@@ -245,17 +245,25 @@ describe("Control statements", function () {
         ];
         expect(JSHINT(code)).toEqual(true);
     });
-    
+
+    var lp1 = "while (true) { var f = function() {}; }",
+        lp2 = "for (var i = 0; i < 5; i++) { var f = function () {}; }",
+        lp3 = "while (true) { function sup() {} }";
+
     it("should not allow functions to be defined in loops by default", function () {
-        expect(JSHINT("while(true){ var f = function(){}; }")).toEqual(false);
-        expect(JSHINT("for(var i=0; i<5; i++){ var f = function(){}; }")).toEqual(false);
+        expect(JSHINT(lp1)).toEqual(false);
+        expect(JSHINT(lp2)).toEqual(false);
+        expect(JSHINT(lp3)).toEqual(false);
     });
-    
+
     it("should allow functions to be defined in loops if loopfunc:true", function () {
-        expect(JSHINT("while(true){ var f = function(){}; }", {loopfunc:true})).toEqual(true);
-        expect(JSHINT("for(var i=0; i<5; i++){ var f = function(){}; }", {loopfunc:true})).toEqual(true);
+        expect(JSHINT(lp1, { loopfunc: true })).toEqual(true);
+        expect(JSHINT(lp2, { loopfunc: true })).toEqual(true);
+
+        // Function statements should still not be allowed.
+        expect(JSHINT(lp3, { loopfunc: true })).toEqual(false);
     });
-    
+
 });
 
 describe("Globals", function () {
