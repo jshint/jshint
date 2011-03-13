@@ -53,9 +53,9 @@ Tests
 -----
 
 To run tests you will need to install [node.js](http://nodejs.org/) and
-node-jasmine. You can install the latter with npm:
+jasmine-node. You can install the latter with npm:
 
-    npm install node-jasmine
+    npm install jasmine-node
 
 After that, running tests is as easy as:
 
