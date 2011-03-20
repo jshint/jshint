@@ -167,10 +167,22 @@ describe("Keywords", function () {
 });
 
 describe("Control statements", function () {
-    var cond  = "if (e = 1) { doSmth(); }",
-        loopw = "while (obj = arr.next()) { hey(); }",
-        loopf = "for (var b; b = arr.next();) { hey(); }",
-        loopd = "do { smth(b); } while (b = arr.next());";
+    var cond   = "if (e = 1) { doSmth(); }",
+        loopw  = "while (obj = arr.next()) { hey(); }",
+        loopf  = "for (var b; b = arr.next();) { hey(); }",
+        loopd  = "do { smth(b); } while (b = arr.next());",
+        forin  = "for (var key in objects) { hey(); }",
+        forin1 = "for (var key in objects) { if (objects.hasOwnProperty(key)) { hey(); } }";
+
+    it("should not require for in filtering by default", function () {
+        expect(JSHINT(forin)).toEqual(true);
+        expect(JSHINT(forin1)).toEqual(true);
+    });
+
+    it("should require for in filtering when forin:true", function () {
+        expect(JSHINT(forin, { forin: true })).toEqual(false);
+        expect(JSHINT(forin1)).toEqual(true);
+    });
 
     it("should warn about using assignments by default", function () {
         expect(JSHINT(cond)).toEqual(false);
