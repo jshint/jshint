@@ -419,7 +419,9 @@ describe("Objects", function () {
 describe("Variables", function () {
     var gfn = ["fn();", "function fn() {}"],
         lfn = ["(function () {", "fn();", "function fn() {}", "}());"],
-        vr  = "if (!vr) { var vr = 'o_O'; }";
+        vr  = "if (!vr) { var vr = 'o_O'; }",
+
+        redef = "var a = 1; var a = 2";
 
     it("must know about all variables in the local scope by default", function () {
         expect(JSHINT(gfn)).toEqual(true);
@@ -428,6 +430,9 @@ describe("Variables", function () {
 
         // Raise an error when variable/function is actually missing
         expect(JSHINT(gfn[0], { undef: true })).toEqual(false);
+
+        // Complain about re-definition
+        expect(JSHINT(redef)).toEqual(false);
     });
 
     it("must tolerate the use of variables before definition when latedef:true", function () {
@@ -437,5 +442,8 @@ describe("Variables", function () {
 
         // Raise an error when variable/function is actually missing
         expect(JSHINT(gfn[0], { undef: true, latedef: true })).toEqual(false);
+
+        // Complain about re-definition
+        expect(JSHINT(redef)).toEqual(false);
     });
 });
