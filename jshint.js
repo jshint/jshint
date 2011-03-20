@@ -252,7 +252,7 @@
  sienna, silver, skyblue, slateblue, slategray, sleep, slice, small,
  snow, sort, source, span, spawn, speak, speech, split, springgreen, src,
  stack, status, start, steelblue, strict, strong, style, styleproperty, sub,
- substr, sum, sup, supplant, suppressUpdates, sync, system, table,
+ substr, sum, sup, supplant, suppressUpdates, sync, system, shadow, table,
  "table-layout", tan, tbody, td, teal, tellWidget, test, "text-align",
  "text-decoration", "text-indent", "text-shadow", "text-transform",
  textarea, tfoot, th, thead, thistle, threeddarkshadow, threedface,
@@ -353,6 +353,7 @@ var JSHINT = (function () {
             rhino      : true, // if the Rhino environment globals should be predefined
             undef      : true, // if variables should be declared before used
             safe       : true, // if use of some browser features should be restricted
+            shadow     : true, // if variable shadowing should be tolerated
             windows    : true, // if MS Windows-specific globals should be predefined
             strict     : true, // require the "use strict"; pragma
             sub        : true, // if all forms of subscript notation are tolerated
@@ -2004,7 +2005,8 @@ klass:                                  do {
                 if (option.latedef)
                     warning("'{a}' was used before it was defined.", nexttoken, t);
             } else {
-                warning("'{a}' is already defined.", nexttoken, t);
+                if (!option.shadow)
+                    warning("'{a}' is already defined.", nexttoken, t);
             }
         }
 
