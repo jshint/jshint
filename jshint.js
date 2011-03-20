@@ -216,7 +216,7 @@
  init, input, ins, isAlpha, isApplicationRunning, isArray, isDigit,
  isFinite, isNaN, ivory, join, jshint, JSHINT, json, jquery, jQuery, kbd,
  keygen, keys, khaki, konfabulatorVersion, label, labelled, lang, last,
- lavender, lavenderblush, lawngreen, laxbreak, lbp, led, left, legend,
+ lavender, lavenderblush, lawngreen, laxbreak, latedef, lbp, led, left, legend,
  lemonchiffon, length, "letter-spacing", li, lib, lightblue, lightcoral,
  lightcyan, lightgoldenrodyellow, lightgreen, lightpink, lightsalmon,
  lightseagreen, lightskyblue, lightslategray, lightsteelblue,
@@ -336,6 +336,7 @@ var JSHINT = (function () {
             fragment   : true, // if HTML fragments should be allowed
             immed      : true, // if immediate invocations must be wrapped in parens
             jquery     : true, // if jQuery globals should be predefined
+            latedef    : true, // if the use before definition should not be tolerated
             laxbreak   : true, // if line breaks should not be checked
             loopfunc   : true, // if functions should be allowed to be defined within loops
             newcap     : true, // if constructor names must be capitalized
@@ -1998,17 +1999,19 @@ klass:                                  do {
 
 // Define t in the current function in the current scope.
 
-        if (is_own(funct, t) && !funct['(global)']) {
+        if (is_own(funct, t) && !funct['(global)'] && option.latedef) {
             warning(funct[t] === true ?
                 "'{a}' was used before it was defined." :
                 "'{a}' is already defined.",
                 nexttoken, t);
         }
+
         funct[t] = type;
         if (funct['(global)']) {
             global[t] = funct;
             if (is_own(implied, t)) {
-                warning("'{a}' was used before it was defined.", nexttoken, t);
+                if (option.latedef)
+                    warning("'{a}' was used before it was defined.", nexttoken, t);
                 delete implied[t];
             }
         } else {
