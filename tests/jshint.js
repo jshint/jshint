@@ -421,7 +421,15 @@ describe("Variables", function () {
         lfn = ["(function () {", "fn();", "function fn() {}", "}());"],
         vr  = "if (!vr) { var vr = 'o_O'; }",
 
-        redef = "var a = 1; var a = 2";
+        redef = [
+            "(function () {",
+            "if (b) {",
+                "var a = 1;",
+            "}", "else if (c) {",
+                "var a = 2;",
+            "}",
+            "}());"
+        ];
 
     it("must know about all variables in the local scope by default", function () {
         expect(JSHINT(gfn)).toEqual(true);
@@ -444,6 +452,14 @@ describe("Variables", function () {
         expect(JSHINT(gfn[0], { undef: true, latedef: true })).toEqual(false);
 
         // Complain about re-definition
+        expect(JSHINT(redef, { latedef: true })).toEqual(false);
+    });
+
+    it("must not tolerate variable shadowing by default", function () {
         expect(JSHINT(redef)).toEqual(false);
+    });
+
+    it("must tolerate vairable shadowing if shadow:true", function () {
+        expect(JSHINT(redef, { shadow: true })).toEqual(true);
     });
 });
