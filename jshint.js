@@ -5286,7 +5286,7 @@ loop:   for (;;) {
     }());
 
     blockstmt('for', function () {
-        var f = option.forin, s, t = nexttoken;
+        var s, t = nexttoken;
         funct['(breakage)'] += 1;
         funct['(loopage)'] += 1;
         advance('(');
@@ -5313,7 +5313,7 @@ loop:   for (;;) {
             expression(20);
             advance(')', t);
             s = block(true, true);
-            if (!f && (s.length > 1 || typeof s[0] !== 'object' ||
+            if (option.forin && (s.length > 1 || typeof s[0] !== 'object' ||
                     s[0].value !== 'if')) {
                 warning("The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.", this);
             }
