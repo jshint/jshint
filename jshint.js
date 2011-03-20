@@ -1996,11 +1996,13 @@ klass:                                  do {
 
 // Define t in the current function in the current scope.
 
-        if (is_own(funct, t) && !funct['(global)'] && option.latedef) {
-            warning(funct[t] === true ?
-                "'{a}' was used before it was defined." :
-                "'{a}' is already defined.",
-                nexttoken, t);
+        if (is_own(funct, t) && !funct['(global)']) {
+            if (funct[t] === true) {
+                if (option.latedef)
+                    warning("'{a}' was used before it was defined.", nexttoken, t);
+            } else {
+                warning("'{a}' is already defined.", nexttoken, t);
+            }
         }
 
         funct[t] = type;
