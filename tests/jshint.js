@@ -429,6 +429,12 @@ describe("Variables", function () {
                 "var a = 2;",
             "}",
             "}());"
+        ],
+
+        redef1 = [
+            "function test(foo) {",
+                "var foo = foo || false;",
+            "}"
         ];
 
     it("must know about all variables in the local scope by default", function () {
@@ -441,6 +447,7 @@ describe("Variables", function () {
 
         // Complain about re-definition
         expect(JSHINT(redef)).toEqual(false);
+        expect(JSHINT(redef1)).toEqual(false);
     });
 
     it("must tolerate the use of variables before definition when latedef:true", function () {
@@ -453,13 +460,16 @@ describe("Variables", function () {
 
         // Complain about re-definition
         expect(JSHINT(redef, { latedef: true })).toEqual(false);
+        expect(JSHINT(redef1, { latedef: true })).toEqual(false);
     });
 
     it("must not tolerate variable shadowing by default", function () {
         expect(JSHINT(redef)).toEqual(false);
+        expect(JSHINT(redef1)).toEqual(false);
     });
 
     it("must tolerate vairable shadowing if shadow:true", function () {
         expect(JSHINT(redef, { shadow: true })).toEqual(true);
+        expect(JSHINT(redef1, { shadow: true })).toEqual(true);
     });
 });
