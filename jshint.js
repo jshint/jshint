@@ -148,7 +148,7 @@
 */
 
 /*jshint
- evil: true, nomen: false, onevar: false, regexp: false, strict: true, boss: true
+ evil: true, nomen: false, onevar: false, regexp: false, strict: false, boss: true
 */
 
 /*members "\b", "\t", "\n", "\f", "\r", "!=", "!==", "\"", "%",
@@ -270,7 +270,10 @@
 // value is the JSHINT function itself.
 
 var JSHINT = (function () {
-    "use strict";
+    // "use strict"; TODO: This is temporary to make JSHint work in Fx4.
+    //                     Bigger problem here is that the library leaks its
+    //                     properties into the global scope due to incorrect
+    //                     usage of `this`.
 
     var adsafe_id,      // The widget's ADsafe id.
         adsafe_may,     // The widget may load approved scripts.
