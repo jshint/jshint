@@ -16,7 +16,16 @@ load("jshint.js");
     if (optstr) {
         optstr.split(',').forEach(function (arg) {
             var o = arg.split('=');
-            opts[o[0]] = o[1];
+            opts[o[0]] = (function (ov) {
+                switch (ov) {
+                case 'true':
+                    return true;
+                case 'false':
+                    return false;
+                default:
+                    return ov;
+                }
+            })(o[1]);
         });
     }
 
