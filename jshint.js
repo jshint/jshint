@@ -151,7 +151,7 @@
 */
 
 /*jshint
- evil: true, nomen: false, onevar: false, regexp: false, strict: false, boss: true
+ evil: true, nomen: false, onevar: false, regexp: false, strict: true, boss: true
 */
 
 /*members "\b", "\t", "\n", "\f", "\r", "!=", "!==", "\"", "%",
@@ -273,10 +273,7 @@
 // value is the JSHINT function itself.
 
 var JSHINT = (function () {
-    // "use strict"; TODO: This is temporary to make JSHint work in Fx4.
-    //                     Bigger problem here is that the library leaks its
-    //                     properties into the global scope due to incorrect
-    //                     usage of `this`.
+    "use strict";
 
     var adsafe_id,      // The widget's ADsafe id.
         adsafe_may,     // The widget may load approved scripts.
@@ -4511,7 +4508,6 @@ loop:   for (;;) {
         return this;
     }).exps = true;
 
-
     prefix('~', function () {
         if (option.bitwise) {
             warning("Unexpected '{a}'.", this, '~');
@@ -4519,6 +4515,7 @@ loop:   for (;;) {
         expression(150);
         return this;
     });
+
     prefix('!', function () {
         this.right = expression(150);
         this.arity = 'unary';
@@ -4987,12 +4984,9 @@ loop:   for (;;) {
         };
     }(delim('{')));
 
-
-    var varstatement = function varstatement(prefix) {
-
-// JavaScript does not have block scope. It only has function scope. So,
-// declaring a variable in a block can have unexpected consequences.
-
+    var varstatement = stmt('var', function (prefix) {
+        // JavaScript does not have block scope. It only has function scope. So,
+        // declaring a variable in a block can have unexpected consequences.
         var id, name, value;
 
         if (funct['(onevar)'] && option.onevar) {
@@ -5033,11 +5027,8 @@ loop:   for (;;) {
             comma();
         }
         return this;
-    };
-
-
-    stmt('var', varstatement).exps = true;
-
+    });
+    varstatement.exps = true;
 
     blockstmt('function', function () {
         if (inblock) {
@@ -5298,7 +5289,7 @@ loop:   for (;;) {
         if (peek(nexttoken.id === 'var' ? 1 : 0).id === 'in') {
             if (nexttoken.id === 'var') {
                 advance('var');
-                varstatement(true);
+                varstatement.fud.call(varstatement, true);
             } else {
                 switch (funct[nexttoken.value]) {
                 case 'unused':
@@ -5327,7 +5318,7 @@ loop:   for (;;) {
             if (nexttoken.id !== ';') {
                 if (nexttoken.id === 'var') {
                     advance('var');
-                    varstatement();
+                    varstatement.fud.call(varstatement);
                 } else {
                     for (;;) {
                         expression(0, 'for');
