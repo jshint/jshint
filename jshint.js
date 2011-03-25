@@ -1321,10 +1321,10 @@ var JSHINT = (function () {
                     lines = source;
                 }
 
-                // If the first line is a shebang (#!), remove it and move on.
+                // If the first line is a shebang (#!), make it a blank and move on.
                 // Shebangs are used by Node scripts.
                 if (lines[0] && lines[0].substr(0, 2) == '#!')
-                    lines.shift();
+                    lines[0] = '';
 
                 line = 0;
                 nextLine();
