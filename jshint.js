@@ -197,7 +197,7 @@
  details, devel, dfn, dialog, dimgray, dir, direction, display, div, dl,
  document, dodgerblue, dt, edition, else, em, embed, embossed, emit, empty,
  "empty-cells", encodeURI, encodeURIComponent, entityify, eqeqeq, errors,
- es5, escape, eval, event, evidence, evil, ex, exception, exec, exps, exports,
+ es5, escape, eval, event, evidence, evil, ex, exception, exec, exps, expr, exports,
  fieldset, figure, filesystem, FileReader, firebrick, first, float, floor,
  floralwhite, focus, focusWidget, font, "font-family", "font-size",
  "font-size-adjust", "font-stretch", "font-style", "font-variant",
@@ -329,6 +329,7 @@ var JSHINT = (function () {
             eqeqeq     : true, // if === should be required
             es5        : true, // if ES5 syntax should be allowed
             evil       : true, // if eval should be allowed
+            expr       : true, // if ExpressionStatement should be allowed as Programs
             forin      : true, // if for in statements must filter
             fragment   : true, // if HTML fragments should be allowed
             immed      : true, // if immediate invocations must be wrapped in parens
@@ -2695,7 +2696,7 @@ loop:   for (;;) {
 // Look for the final semicolon.
 
         if (!t.block) {
-            if (!r || !r.exps) {
+            if (!option.expr && (!r || !r.exps)) {
                 warning("Expected an assignment or function call and instead saw an expression.", token);
             } else if (option.nonew && r.id === '(' && r.left.id === 'new') {
                 warning("Do not use 'new' for side effects.");
