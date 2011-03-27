@@ -113,6 +113,26 @@ describe("Statements", function () {
     });
 });
 
+describe("Expressions", function () {
+    var exps = [
+        "obj && obj.method && obj.method();",
+        "myvar && func(myvar);",
+        "1;",
+        "true;",
+        "+function () {};"
+    ];
+
+    it("must not tolerate ExpressionStatement as a Program code by default", function () {
+        for (var i = 0, exp; exp = exps[i]; i++)
+            expect(JSHINT(exp)).toEqual(false);
+    });
+
+    it("must tolerate ExpressionStatement as a Program code when expr:true", function () {
+        for (var i = 0, exp; exp = exps[i]; i++)
+            expect(JSHINT(exp, { expr: true })).toEqual(true);
+    });
+});
+
 describe("Operators", function () {
     var dc = "delete NullReference;";
 
