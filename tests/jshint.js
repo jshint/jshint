@@ -343,6 +343,47 @@ describe("Globals", function () {
           , "Uint16Array"
           , "Uint32Array"
           , "Uint8Array"
+        ],
+
+        prototypejs = [
+            "$"
+          , "$$"
+          , "$A"
+          , "$F"
+          , "$H"
+          , "$R"
+          , "$break"
+          , "$continue"
+          , "$w"
+          , "Abstract"
+          , "Ajax"
+          , "Class"
+          , "Enumerable"
+          , "Element"
+          , "Event"
+          , "Field"
+          , "Form"
+          , "Hash"
+          , "Insertion"
+          , "ObjectRange"
+          , "PeriodicalExecuter"
+          , "Position"
+          , "Prototype"
+          , "Selector"
+          , "Template"
+          , "Toggle"
+          , "Try"
+          , "Autocompleter"
+          , "Builder"
+          , "Control"
+          , "Draggable"
+          , "Draggables"
+          , "Droppables"
+          , "Effect"
+          , "Sortable"
+          , "SortableObserver"
+          , "Sound"
+          , "Scriptaculous"
         ];
 
 
@@ -398,6 +439,23 @@ describe("Globals", function () {
             globals[g] = true;
 
         for (i = 0, g; g = couch[i]; i++)
+            expect(g in globals).toEqual(true);
+    });
+
+    it("must know about Prototype and Scriptaculous globals", function () {
+        var code = "(function () { return [ " + prototypejs.join(",") + " ]; }());";
+
+        JSHINT(code, { prototypejs: true });
+        var report = JSHINT.data();
+
+        expect(report.implieds).toEqual(undefined);
+        expect(report.globals.length).toEqual(38);
+
+        var globals = {};
+        for (var i = 0, g; g = report.globals[i]; i++)
+            globals[g] = true;
+
+        for (i = 0, g; g = prototypejs[i]; i++)
             expect(g in globals).toEqual(true);
     });
 

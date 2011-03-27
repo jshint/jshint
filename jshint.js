@@ -158,19 +158,25 @@
  "(begin)", "(breakage)", "(context)", "(error)", "(global)",
  "(identifier)", "(last)", "(line)", "(loopage)", "(name)", "(onevar)",
  "(params)", "(scope)", "(statement)", "(verb)", "*", "+", "++", "-",
- "--", "\/", "<", "<=", "==", "===", ">", ">=", $, ADSAFE, __filename, __dirname,
- ActiveXObject, Array, ArrayBuffer, ArrayBufferView, Boolean, Buffer, COM,
- CScript, Canvas, CustomAnimation, DataView, Date, Debug, E, Enumerator,
- Error, EvalError, FadeAnimation, Flash, Float32Array, Float64Array,
- FormField, Frame, Function, HotKey, Image, Int16Array, Int32Array, Int8Array,
- JSON, LN10, LN2, LOG10E, LOG2E, MAX_VALUE, MIN_VALUE, Math, MenuItem, MoveAnimation,
- NEGATIVE_INFINITY, Number, Object, Option, PI, POSITIVE_INFINITY, Point,
- RangeError, Rectangle, ReferenceError, RegExp, ResizeAnimation,
- RotateAnimation, SQRT1_2, SQRT2, ScrollBar, String, Style, SyntaxError,
- System, Text, TextArea, Timer, TypeError, URIError, URL, VBArray,
- WScript, Web, Window, XMLDOM, XMLHttpRequest, "\\", a, abbr, acronym,
- activeborder, activecaption, addEventListener, address, adsafe, alert,
- aliceblue, all, animator, antiquewhite, appleScript, applet, apply,
+ "--", "\/", "<", "<=", "==", "===", ">", ">=", $, $$, $A, $F, $H, $R, $break,
+ $continue, $w, Abstract, Ajax, ADSAFE, __filename, __dirname,
+ ActiveXObject, Array, ArrayBuffer, ArrayBufferView, Autocompleter,
+ Boolean, Builder, Buffer, COM, CScript, Canvas, CustomAnimation,
+ Class, Control, DataView, Date, Debug, Draggable, Draggables,
+ Droppables, E, Enumerator, Enumerable, Element, Error, Effect,
+ EvalError, Event, FadeAnimation, Field, Flash, Float32Array, Float64Array,
+ Form, FormField, Frame, Function, Hash, HotKey, Image, Int16Array,
+ Int32Array, Int8Array, Insertion, JSON, LN10, LN2, LOG10E, LOG2E,
+ MAX_VALUE, MIN_VALUE, Math, MenuItem, MoveAnimation, NEGATIVE_INFINITY,
+ Number, Object, ObjectRange, Option, PI, POSITIVE_INFINITY,
+ PeriodicalExecuter, Point, Position, Prototype, RangeError, Rectangle,
+ ReferenceError, RegExp, ResizeAnimation, RotateAnimation, SQRT1_2, SQRT2,
+ ScrollBar, Scriptaculous, Selector, String, Style, SyntaxError, Sortable,
+ SortableObserver, Sound, System, Text, TextArea, Template, Timer,
+ TypeError, Toggle, Try, URIError, URL, VBArray, WScript, Web, Window,
+ XMLDOM, XMLHttpRequest, "\\", a, abbr, acronym, activeborder, activecaption,
+ addEventListener, address, adsafe, alert, aliceblue, all, animator,
+ antiquewhite, appleScript, applet, apply,
  approved, appworkspace, applicationCache, aqua, aquamarine, area, arguments,
  arity, article, asi, aside, audio, autocomplete, azure, b, background,
  "background-attachment", "background-color", "background-image",
@@ -241,7 +247,7 @@
  param, parent, parseFloat, parseInt, passfail, pc, peachpuff, peru,
  pink, play, plum, plusplus, pop, popupMenu, position, powderblue, pre,
  predef, preferenceGroups, preferences, print, process, progress, projection,
- prompt, prototype, pt, purple, push, px, q, quit, quotes, random, range,
+ prompt, prototype, prototypejs, pt, purple, push, px, q, quit, quotes, random, range,
  raw, reach, readFile, readUrl, reason, red, regexp, reloadWidget,
  removeEventListener, replace, report, require, reserved, resizeBy, resizeTo,
  resolvePath, resumeUpdates, respond, rhino, right, rosybrown, royalblue,
@@ -350,6 +356,7 @@ var JSHINT = (function () {
             onevar     : true, // if only one var statement per function should be allowed
             passfail   : true, // if the scan should stop on first error
             plusplus   : true, // if increment/decrement should not be allowed
+            prototypejs: true, // if Prototype and Scriptaculous globals shoudl be predefined
             regexp     : true, // if the . should not be allowed in regexp literals
             rhino      : true, // if the Rhino environment globals should be predefined
             undef      : true, // if variables should be declared before used
@@ -817,6 +824,47 @@ var JSHINT = (function () {
         prereg,
         prevtoken,
 
+        prototypejs = {
+            '$'               : false,
+            '$$'              : false,
+            '$A'              : false,
+            '$F'              : false,
+            '$H'              : false,
+            '$R'              : false,
+            '$break'          : false,
+            '$continue'       : false,
+            '$w'              : false,
+            Abstract          : false,
+            Ajax              : false,
+            Class             : false,
+            Enumerable        : false,
+            Element           : false,
+            Event             : false,
+            Field             : false,
+            Form              : false,
+            Hash              : false,
+            Insertion         : false,
+            ObjectRange       : false,
+            PeriodicalExecuter: false,
+            Position          : false,
+            Prototype         : false,
+            Selector          : false,
+            Template          : false,
+            Toggle            : false,
+            Try               : false,
+            Autocompleter     : false,
+            Builder           : false,
+            Control           : false,
+            Draggable         : false,
+            Draggables        : false,
+            Droppables        : false,
+            Effect            : false,
+            Sortable          : false,
+            SortableObserver  : false,
+            Sound             : false,
+            Scriptaculous     : false
+        },
+
         rhino = {
             defineClass : false,
             deserialize : false,
@@ -1154,6 +1202,9 @@ var JSHINT = (function () {
 
         if (option.rhino)
             combine(predefined, rhino);
+
+        if (option.prototypejs)
+            combine(predefined, prototypejs);
 
         if (option.node)
             combine(predefined, node);
