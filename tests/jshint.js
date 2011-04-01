@@ -393,8 +393,24 @@ describe("Globals", function () {
           , "SortableObserver"
           , "Sound"
           , "Scriptaculous"
-        ];
+        ],
 
+        jasmine   = [
+            "jasmine"
+          , "isCommonJS"
+          , "exports"
+          , "spyOn"
+          , "it"
+          , "xit"
+          , "expect"
+          , "runs"
+          , "waits"
+          , "waitsFor"
+          , "beforeEach"
+          , "afterEach"
+          , "describe"
+          , "xdescribe"
+        ];
 
     it("must know that window is a predefined global", function () {
         JSHINT(win, { browser: true });
@@ -465,6 +481,23 @@ describe("Globals", function () {
             globals[g] = true;
 
         for (i = 0, g; g = prototypejs[i]; i++)
+            expect(g in globals).toEqual(true);
+    });
+
+    it("must know about Jasmine globals", function () {
+        var code = "(function () { return [ " + jasmine.join(",") + " ]; }());";
+
+        JSHINT(code, { jasmine: true });
+        var report = JSHINT.data();
+
+        expect(report.implieds).toEqual(undefined);
+        expect(report.globals.length).toEqual(14);
+
+        var globals = {};
+        for (var i = 0, g; g = report.globals[i]; i++)
+            globals[g] = true;
+
+        for (i = 0, g; g = jasmine[i]; i++)
             expect(g in globals).toEqual(true);
     });
 

@@ -175,12 +175,12 @@
  SortableObserver, Sound, System, Text, TextArea, Template, Timer,
  TypeError, Toggle, Try, URIError, URL, VBArray, WScript, Web, Window,
  XMLDOM, XMLHttpRequest, "\\", a, abbr, acronym, activeborder, activecaption,
- addEventListener, address, adsafe, alert, aliceblue, all, animator,
+ addEventListener, address, adsafe, afterEach, alert, aliceblue, all, animator,
  antiquewhite, appleScript, applet, apply,
  approved, appworkspace, applicationCache, aqua, aquamarine, area, arguments,
  arity, article, asi, aside, audio, autocomplete, azure, b, background,
  "background-attachment", "background-color", "background-image",
- "background-position", "background-repeat", base, bdo, beep, beige, big,
+ "background-position", "background-repeat", base, bdo, beep, beforeEach, beige, big,
  bisque, bitwise, black, blanchedalmond, block, blockquote, blue,
  blueviolet, blur, body, boolOptions, border, "border-bottom", "border-bottom-color",
  "border-bottom-style", "border-bottom-width", "border-collapse",
@@ -202,11 +202,11 @@
  darkgreen, darkkhaki, darkmagenta, darkolivegreen, darkorange, darkorchid,
  darkred, darksalmon, darkseagreen, darkslateblue, darkslategray, darkturquoise,
  darkviolet, data, datalist, dd, debug, decodeURI, decodeURIComponent,
- deeppink, deepskyblue, defaultStatus, defineClass, del, deserialize,
+ deeppink, deepskyblue, defaultStatus, defineClass, del, describe, deserialize,
  details, devel, dfn, dialog, dimgray, dir, direction, display, div, dl,
  document, dodgerblue, dt, edition, else, em, embed, embossed, emit, empty,
  "empty-cells", encodeURI, encodeURIComponent, entityify, eqeqeq, errors,
- es5, escape, eval, event, evidence, evil, ex, exception, exec, exps, expr, exports,
+ es5, escape, eval, event, evidence, evil, ex, exception, exec, expect, exps, expr, exports,
  fieldset, figure, filesystem, FileReader, firebrick, first, float, floor,
  floralwhite, focus, focusWidget, font, "font-family", "font-size",
  "font-size-adjust", "font-stretch", "font-style", "font-variant",
@@ -219,8 +219,8 @@
  "hta:application", html, i, iTunes, id, identifier, iframe, img, immed,
  implieds, in, inactiveborder, inactivecaption, inactivecaptiontext,
  include, indent, indexOf, indianred, indigo, infobackground, infotext,
- init, input, ins, isAlpha, isApplicationRunning, isArray, isDigit,
- isFinite, isNaN, ivory, join, jshint, JSHINT, json, jquery, jQuery, kbd,
+ init, input, ins, isAlpha, isApplicationRunning, isArray, isCommonJS, isDigit,
+ isFinite, isNaN, it, ivory, jasmine, join, jshint, JSHINT, json, jquery, jQuery, kbd,
  keygen, keys, khaki, konfabulatorVersion, label, labelled, lang, last,
  lavender, lavenderblush, lawngreen, laxbreak, latedef, lbp, led, left, legend,
  lemonchiffon, length, "letter-spacing", li, lib, lightblue, lightcoral,
@@ -251,12 +251,12 @@
  raw, reach, readFile, readUrl, reason, red, regexp, reloadWidget,
  removeEventListener, replace, report, require, reserved, resizeBy, resizeTo,
  resolvePath, resumeUpdates, respond, rhino, right, rosybrown, royalblue,
- rp, rt, ruby, runCommand, runCommandInBg, saddlebrown, safe, salmon, samp,
+ rp, rt, ruby, runCommand, runCommandInBg, runs, saddlebrown, safe, salmon, samp,
  sandybrown, saveAs, savePreferences, screen, script, scroll, scrollBy,
  scrollTo, scrollbar, seagreen, seal, search, seashell, section, send, select,
  serialize, setInterval, setTimeout, shift, showWidgetPreferences,
  sienna, silver, skyblue, slateblue, slategray, sleep, slice, small,
- snow, sort, source, span, spawn, speak, speech, split, springgreen, src,
+ snow, sort, source, span, spawn, speak, speech, split, springgreen, spyOn, src,
  stack, status, start, steelblue, strict, strong, style, styleproperty, sub,
  substr, sum, sup, supplant, suppressUpdates, sync, system, shadow, table,
  "table-layout", tan, tbody, td, teal, tellWidget, test, "text-align",
@@ -266,10 +266,10 @@
  toLowerCase, toString, toUpperCase, toint32, token, tomato, top, tr, tt,
  tty, turquoise, tv, type, Uint16Array, Uint32Array, Uint8Array, u, ul, undef,
  unescape, "unicode-bidi", unused, unwatch, updateNow, urls, value, valueOf,
- var, version, "vertical-align", video, violet, visibility, watch,
+ var, version, "vertical-align", video, violet, visibility, watch, waits, waitsFor,
  WebSocket, wheat, white, "white-space", whitesmoke, widget, width,
- window, windowframe, windows, windowtext, Worker, "word-spacing", "word-wrap",
- yahooCheckLogin, yahooLogin, yahooLogout, yellow, yellowgreen, "z-index"
+ window, windowframe, windows, windowtext, Worker, "word-spacing", "word-wrap", xdescribe,
+ xit, yahooCheckLogin, yahooLogin, yahooLogout, yellow, yellowgreen, "z-index"
 */
 
 /*global exports: false */
@@ -342,6 +342,7 @@ var JSHINT = (function () {
             forin      : true, // if for in statements must filter
             fragment   : true, // if HTML fragments should be allowed
             immed      : true, // if immediate invocations must be wrapped in parens
+            jasmine    : true, // if Jasmine globals should be predefined
             jquery     : true, // if jQuery globals should be predefined
             latedef    : true, // if the use before definition should not be tolerated
             laxbreak   : true, // if line breaks should not be checked
@@ -794,6 +795,24 @@ var JSHINT = (function () {
         implied,        // Implied globals
         inblock,
         indent,
+
+        jasmine = {
+            jasmine    : false,
+            isCommonJS : false,
+            exports    : false,
+            spyOn      : false,
+            it         : false,
+            xit        : false,
+            expect     : false,
+            runs       : false,
+            waits      : false,
+            waitsFor   : false,
+            beforeEach : false,
+            afterEach  : false,
+            describe   : false,
+            xdescribe   : false
+        },
+
         jsonmode,
 
         jquery = {
@@ -1214,6 +1233,9 @@ var JSHINT = (function () {
 
         if (option.browser)
             combine(predefined, browser);
+
+        if (option.jasmine)
+            combine(predefined, jasmine);
 
         if (option.jquery)
             combine(predefined, jquery);
