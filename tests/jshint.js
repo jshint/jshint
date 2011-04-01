@@ -331,6 +331,15 @@ describe("Globals", function () {
           , "module"
         ],
 
+        devel   = [
+            "alert"
+          , "confirm"
+          , "console"
+          , "Debug"
+          , "opera"
+          , "prompt"
+        ],
+
         typed   = [
             "ArrayBuffer"
           , "ArrayBufferView"
@@ -476,6 +485,24 @@ describe("Globals", function () {
             expect(g in globals).toEqual(true);
     });
 
+    it("must know about logging globals", function () {
+        var code = "(function () { return [ " + devel.join(",") + " ]; }());";
+
+        JSHINT(code, { devel: true });
+        var report = JSHINT.data();
+
+        expect(report.implieds).toEqual(undefined);
+        expect(report.globals.length).toEqual(6);
+
+        var globals = {};
+        for (var i = 0, g; g = report.globals[i]; i++)
+            globals[g] = true;
+
+        for (i = 0, g; g = devel[i]; i++)
+            expect(g in globals).toEqual(true);
+    });
+
+
     it("must allow custom globals, so it's not necessary to spam code " +
        "with comments when the globals are obvious", function () {
         var code = "(function () { return [ fooGlobal, barGlobal ]; }());",
@@ -558,7 +585,7 @@ describe("Variables", function () {
         expect(JSHINT(redef1)).toEqual(false);
     });
 
-    it("must tolerate vairable shadowing if shadow:true", function () {
+    it("must tolerate variable shadowing if shadow:true", function () {
         expect(JSHINT(redef, { shadow: true })).toEqual(true);
         expect(JSHINT(redef1, { shadow: true })).toEqual(true);
     });

@@ -331,7 +331,7 @@ var JSHINT = (function () {
             css        : true, // if CSS workarounds should be tolerated
             curly      : true, // if curly braces around blocks should be required (even in if/for/while)
             debug      : true, // if debugger statements should be allowed
-            devel      : true, // if logging should be allowed (console, alert, etc.)
+            devel      : true, // if logging globals should be predefined (console, alert, etc.)
             eqeqeq     : true, // if === should be required
             es5        : true, // if ES5 syntax should be allowed
             evil       : true, // if eval should be allowed
