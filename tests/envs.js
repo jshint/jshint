@@ -151,3 +151,83 @@ exports.testDevel = function () {
     assert.globalsImplied(globals);
     assert.globalsKnown(globals, { devel: true });
 };
+
+/**
+ * Option `browser` predefines globals usually found in browser environments.
+ * In addition to stuff like window, setInterval,.. it also supports some
+ * more or less stable HTML5 variables like FileReader, localStorage,..
+ * and typed arrays like Int32Array, Uint32Array, etc.
+ *
+ * More info:
+ *  + HTML5: http://www.html5rocks.com/
+ *  + Typed arrays: https://developer.mozilla.org/en/JavaScript_typed_arrays
+ */
+exports.testBrowser = function () {
+    var globals = [
+            'ArrayBuffer'
+          , 'ArrayBufferView'
+          , 'addEventListener'
+          , 'applicationCache'
+          , 'blur'
+          , 'clearInterval'
+          , 'clearTimeout'
+          , 'close'
+          , 'closed'
+          , 'DataView'
+          , 'defaultStatus'
+          , 'document'
+          , 'event'
+          , 'FileReader'
+          , 'Float32Array'
+          , 'Float64Array'
+          , 'focus'
+          , 'frames'
+          , 'getComputedStyle'
+          , 'history'
+          , 'Int16Array'
+          , 'Int32Array'
+          , 'Int8Array'
+          , 'Image'
+          , 'length'
+          , 'localStorage'
+          , 'location'
+          , 'moveBy'
+          , 'moveTo'
+          , 'name'
+          , 'navigator'
+          , 'onbeforeunload'
+          , 'onblur'
+          , 'onerror'
+          , 'onfocus'
+          , 'onload'
+          , 'onresize'
+          , 'onunload'
+          , 'open'
+          , 'openDatabase'
+          , 'opener'
+          , 'Option'
+          , 'parent'
+          , 'print'
+          , 'removeEventListener'
+          , 'resizeBy'
+          , 'resizeTo'
+          , 'screen'
+          , 'scroll'
+          , 'scrollBy'
+          , 'scrollTo'
+          , 'setInterval'
+          , 'setTimeout'
+          , 'status'
+          , 'top'
+          , 'Uint16Array'
+          , 'Uint32Array'
+          , 'Uint8Array'
+          , 'WebSocket'
+          , 'window'
+          , 'Worker'
+          , 'XMLHttpRequest'
+        ];
+
+    assert.globalsImplied(globals);
+    assert.globalsKnown(globals, { browser: true });
+};
