@@ -63,3 +63,15 @@ exports.testNewArray = function () {
     assert.ok(JSHINT(code));
     assert.ok(JSHINT(code1));
 };
+
+/**
+ * Test that JSHint allows `undefined` to be a function parameter.
+ * It is a common pattern to protect against the case when somebody
+ * overwrites undefined. It also helps with minification.
+ *
+ * More info: https://gist.github.com/315916
+ */
+exports.testUndefinedAsParam = function () {
+    var code = '(function (undefined) {}());';
+    assert.ok(JSHINT(code));
+};
