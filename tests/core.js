@@ -54,3 +54,12 @@ exports.testCustomGlobals = function () {
     for (i = 0, g = null; g = custom[i]; i++)
         assert.ok(g in dict);
 };
+
+/** Test that JSHint recognizes `new Array(<expr>)` as a valid expression */
+exports.testNewArray = function () {
+    var code  = 'new Array(1);',
+        code1 = 'new Array(v + 1);';
+
+    assert.ok(JSHINT(code));
+    assert.ok(JSHINT(code1));
+};
