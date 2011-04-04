@@ -33,3 +33,40 @@ exports.shadow = function () {
     // Allow variable shadowing when shadow is true
     assert.ok(JSHINT(src, { shadow: true }));
 };
+
+/**
+ * Option `latedef` allows you to prohibit the use of variable before their
+ * definitions.
+ *
+ * E.g.:
+ *   fn(); // fn will be defined later in code
+ *   function fn() {};
+ *
+ * Since JavaScript has function-scope only, you can define variables and
+ * functions wherever you want. But if you want to be more strict, use
+ * this option.
+ */
+exports.latedef = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/latedef.js', 'utf8'),
+        src1 = fs.readFileSync(__dirname + '/fixtures/redef.js', 'utf8');
+
+    // By default, tolerate the use of variable before its definition
+    assert.ok(JSHINT(src));
+
+    // However, JSHint must complain if variable is actually missing
+    assert.ok(!JSHINT('fn()', { undef: true }));
+    assert.eql(JSHINT.errors[0].line, 1);
+    assert.eql(JSHINT.errors[0].reason, "'fn' is not defined.");
+
+    // And it also must complain about the redefinition (see option `shadow`)
+    assert.ok(!JSHINT(src1));
+
+    // When latedef is true, JSHint must not tolerate the use before definition
+    assert.ok(!JSHINT(src, { latedef: true }));
+    assert.eql(JSHINT.errors[0].line, 2);
+    assert.eql(JSHINT.errors[0].reason, "'fn' was used before it was defined.");
+    assert.eql(JSHINT.errors[1].line, 6);
+    assert.eql(JSHINT.errors[1].reason, "'fn1' was used before it was defined.");
+    assert.eql(JSHINT.errors[2].line, 10);
+    assert.eql(JSHINT.errors[2].reason, "'vr' was used before it was defined.");
+};
