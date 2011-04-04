@@ -101,3 +101,16 @@ exports.curly = function () {
 
     assert.ok(JSHINT(src1, { curly: true }));
 };
+
+/** Option `noempty` prohibits the use of empty blocks. */
+exports.noempty = function () {
+    var code = 'for (;;) {}';
+
+    // By default, tolerate empty blocks since they are valid JavaScript
+    assert.ok(JSHINT(code));
+
+    // Do not tolerate, when noempty is true
+    assert.ok(!JSHINT(code, { noempty: true }));
+    assert.eql(JSHINT.errors[0].line, 1);
+    assert.eql(JSHINT.errors[0].reason, 'Empty block.');
+}
