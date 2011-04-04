@@ -5,17 +5,6 @@ var JSHINT = require("../jshint.js").JSHINT,
     fs     = require("fs");
 
 describe("JSHint", function () {
-    it("must pass its own check", function () {
-        var src = fs.readFileSync(__dirname + "/../jshint.js", "utf8");
-        expect(JSHINT(src)).toEqual(true);
-        expect(JSHINT.data().implieds).toEqual(undefined);
-    });
-
-    it("rhino.js must pass jshint check", function () {
-        var src = fs.readFileSync(__dirname + "/../env/rhino.js", "utf8");
-        expect(JSHINT(src, { rhino: true })).toEqual(true);
-    });
-
     it("tests/jshint.js must pass jshint check", function () {
         var src = fs.readFileSync(__dirname + "/jshint.js", "utf8");
         expect(JSHINT(src, { node: true })).toEqual(true);
@@ -305,40 +294,6 @@ describe("Control statements", function () {
 
 describe("Globals", function () {
     var win    = "window.location = 'http://google.com/';",
-        jquery = [ "jQuery", "$" ],
-
-        node   = [
-            "__filename"
-          , "__dirname"
-          , "Buffer"
-          , "GLOBAL"
-          , "global"
-          , "module"
-          , "process"
-          , "require"
-        ],
-
-        couch   = [
-            "require"
-          , "respond"
-          , "getRow"
-          , "emit"
-          , "send"
-          , "start"
-          , "sum"
-          , "log"
-          , "exports"
-          , "module"
-        ],
-
-        devel   = [
-            "alert"
-          , "confirm"
-          , "console"
-          , "Debug"
-          , "opera"
-          , "prompt"
-        ],
 
         typed   = [
             "ArrayBuffer"
@@ -354,47 +309,6 @@ describe("Globals", function () {
           , "Uint8Array"
         ],
 
-        prototypejs = [
-            "$"
-          , "$$"
-          , "$A"
-          , "$F"
-          , "$H"
-          , "$R"
-          , "$break"
-          , "$continue"
-          , "$w"
-          , "Abstract"
-          , "Ajax"
-          , "Class"
-          , "Enumerable"
-          , "Element"
-          , "Event"
-          , "Field"
-          , "Form"
-          , "Hash"
-          , "Insertion"
-          , "ObjectRange"
-          , "PeriodicalExecuter"
-          , "Position"
-          , "Prototype"
-          , "Selector"
-          , "Template"
-          , "Toggle"
-          , "Try"
-          , "Autocompleter"
-          , "Builder"
-          , "Control"
-          , "Draggable"
-          , "Draggables"
-          , "Droppables"
-          , "Effect"
-          , "Sortable"
-          , "SortableObserver"
-          , "Sound"
-          , "Scriptaculous"
-        ];
-
 
     it("must know that window is a predefined global", function () {
         JSHINT(win, { browser: true });
@@ -402,70 +316,6 @@ describe("Globals", function () {
         expect(report.implieds).toEqual(undefined);
         expect(report.globals.length).toEqual(1);
         expect(report.globals[0]).toEqual("window");
-    });
-
-    it("must know about node.js globals", function () {
-        var code = "(function () { return [ " + node.join(",") + " ]; }());";
-
-        JSHINT(code, { node: true });
-        var report = JSHINT.data();
-
-        expect(report.implieds).toEqual(undefined);
-        expect(report.globals.length).toEqual(8);
-
-        var globals = {};
-        for (var i = 0, g; g = report.globals[i]; i++)
-            globals[g] = true;
-
-        for (i = 0, g; g = node[i]; i++)
-            expect(g in globals).toEqual(true);
-    });
-
-    it("must know about jQuery globals", function () {
-        var code = "(function () { return [ " + jquery.join(",") + " ]; }());";
-
-        JSHINT(code, { jquery: true });
-        var report = JSHINT.data();
-
-        expect(report.implieds).toEqual(undefined);
-        expect(report.globals.length).toEqual(2);
-
-        for (var i = 0, g; g = report.globals[i]; i++)
-            expect(g == "jQuery" || g == "$").toEqual(true);
-    });
-
-    it("must know about CouchDB globals", function () {
-        var code = "(function () { return [ " + couch.join(",") + " ]; }());";
-
-        JSHINT(code, { couch: true });
-        var report = JSHINT.data();
-
-        expect(report.implieds).toEqual(undefined);
-        expect(report.globals.length).toEqual(10);
-
-        var globals = {};
-        for (var i = 0, g; g = report.globals[i]; i++)
-            globals[g] = true;
-
-        for (i = 0, g; g = couch[i]; i++)
-            expect(g in globals).toEqual(true);
-    });
-
-    it("must know about Prototype and Scriptaculous globals", function () {
-        var code = "(function () { return [ " + prototypejs.join(",") + " ]; }());";
-
-        JSHINT(code, { prototypejs: true });
-        var report = JSHINT.data();
-
-        expect(report.implieds).toEqual(undefined);
-        expect(report.globals.length).toEqual(38);
-
-        var globals = {};
-        for (var i = 0, g; g = report.globals[i]; i++)
-            globals[g] = true;
-
-        for (i = 0, g; g = prototypejs[i]; i++)
-            expect(g in globals).toEqual(true);
     });
 
     it("must know about typed arrays", function () {
@@ -484,24 +334,6 @@ describe("Globals", function () {
         for (i = 0, g; g = typed[i]; i++)
             expect(g in globals).toEqual(true);
     });
-
-    it("must know about logging globals", function () {
-        var code = "(function () { return [ " + devel.join(",") + " ]; }());";
-
-        JSHINT(code, { devel: true });
-        var report = JSHINT.data();
-
-        expect(report.implieds).toEqual(undefined);
-        expect(report.globals.length).toEqual(6);
-
-        var globals = {};
-        for (var i = 0, g; g = report.globals[i]; i++)
-            globals[g] = true;
-
-        for (i = 0, g; g = devel[i]; i++)
-            expect(g in globals).toEqual(true);
-    });
-
 
     it("must allow custom globals, so it's not necessary to spam code " +
        "with comments when the globals are obvious", function () {
