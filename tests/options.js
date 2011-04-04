@@ -70,3 +70,23 @@ exports.latedef = function () {
     assert.eql(JSHINT.errors[2].line, 10);
     assert.eql(JSHINT.errors[2].reason, "'vr' was used before it was defined.");
 };
+
+exports.curly = function () {
+    var src  = fs.readFileSync(__dirname + '/fixtures/curly.js', 'utf8'),
+        src1 = fs.readFileSync(__dirname + '/fixtures/curly2.js', 'utf-8');
+
+    // By default, tolerate one-line blocks since they are valid JavaScript
+    assert.ok(JSHINT(src));
+    assert.ok(JSHINT(src1));
+
+    // Require all blocks to be wrapped with curly braces if curly is true
+    assert.ok(!JSHINT(src, { curly: true }));
+    assert.eql(JSHINT.errors[0].line, 2);
+    assert.eql(JSHINT.errors[0].reason, "Expected '{' and instead saw 'return'.");
+    assert.eql(JSHINT.errors[1].line, 5);
+    assert.eql(JSHINT.errors[1].reason, "Expected '{' and instead saw 'doSomething'.");
+    assert.eql(JSHINT.errors[2].line, 8);
+    assert.eql(JSHINT.errors[2].reason, "Expected '{' and instead saw 'doSomething'.");
+
+    assert.ok(JSHINT(src1, { curly: true }));
+};
