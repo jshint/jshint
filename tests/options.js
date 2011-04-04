@@ -113,4 +113,4 @@ exports.noempty = function () {
     assert.ok(!JSHINT(code, { noempty: true }));
     assert.eql(JSHINT.errors[0].line, 1);
     assert.eql(JSHINT.errors[0].reason, 'Empty block.');
-}
+};
