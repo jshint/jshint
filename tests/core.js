@@ -72,6 +72,10 @@ exports.testNewArray = function () {
  * More info: https://gist.github.com/315916
  */
 exports.testUndefinedAsParam = function () {
-    var code = '(function (undefined) {}());';
+    var code  = '(function (undefined) {}());',
+        code1 = 'var undefined = 1;';
+
     assert.ok(JSHINT(code));
+    // But it must never tolerate reassigning of undefined
+    assert.ok(!JSHINT(code1));
 };
