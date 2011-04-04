@@ -231,3 +231,28 @@ exports.browser = function () {
     assert.globalsImplied(globals);
     assert.globalsKnown(globals, { browser: true });
 };
+
+exports.rhino = function () {
+    var globals = [
+            'defineClass'
+          , 'deserialize'
+          , 'gc'
+          , 'help'
+          , 'load'
+          , 'loadClass'
+          , 'print'
+          , 'quit'
+          , 'readFile'
+          , 'readUrl'
+          , 'runCommand'
+          , 'seal'
+          , 'serialize'
+          , 'spawn'
+          , 'sync'
+          , 'toint32'
+          , 'version'
+        ];
+
+    assert.globalsImplied(globals);
+    assert.globalsKnown(globals, { rhino: true });
+};
