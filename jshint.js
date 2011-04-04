@@ -435,6 +435,11 @@ var JSHINT = (function () {
             window          : false,
             Worker          : false,
             XMLHttpRequest  : false,
+            XPathEvaluator  : false,
+            XPathException  : false,
+            XPathExpression  : false,
+            XPathNamespace  : false,
+            XPathNSResolver  : false,
             XPathResult  : false
         },
 
