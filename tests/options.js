@@ -47,7 +47,7 @@ exports.shadow = function () {
  * this option.
  */
 exports.latedef = function () {
-    var src = fs.readFileSync(__dirname + '/fixtures/latedef.js', 'utf8'),
+    var src  = fs.readFileSync(__dirname + '/fixtures/latedef.js', 'utf8'),
         src1 = fs.readFileSync(__dirname + '/fixtures/redef.js', 'utf8');
 
     // By default, tolerate the use of variable before its definition
