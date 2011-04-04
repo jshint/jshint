@@ -810,6 +810,7 @@ var JSHINT = (function () {
         node = {
             __filename  : false,
             __dirname   : false,
+            exports     : false,
             Buffer      : false,
             GLOBAL      : false,
             global      : false,
