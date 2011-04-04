@@ -292,69 +292,6 @@ describe("Control statements", function () {
 
 });
 
-describe("Globals", function () {
-    var win    = "window.location = 'http://google.com/';",
-
-        typed   = [
-            "ArrayBuffer"
-          , "ArrayBufferView"
-          , "DataView"
-          , "Float32Array"
-          , "Float64Array"
-          , "Int16Array"
-          , "Int32Array"
-          , "Int8Array"
-          , "Uint16Array"
-          , "Uint32Array"
-          , "Uint8Array"
-        ],
-
-
-    it("must know that window is a predefined global", function () {
-        JSHINT(win, { browser: true });
-        var report = JSHINT.data();
-        expect(report.implieds).toEqual(undefined);
-        expect(report.globals.length).toEqual(1);
-        expect(report.globals[0]).toEqual("window");
-    });
-
-    it("must know about typed arrays", function () {
-        var code = "(function () { return [ " + typed.join(",") + " ]; }());";
-
-        JSHINT(code, { browser: true });
-        var report = JSHINT.data();
-
-        expect(report.implieds).toEqual(undefined);
-        expect(report.globals.length).toEqual(11);
-
-        var globals = {};
-        for (var i = 0, g; g = report.globals[i]; i++)
-            globals[g] = true;
-
-        for (i = 0, g; g = typed[i]; i++)
-            expect(g in globals).toEqual(true);
-    });
-
-    it("must allow custom globals, so it's not necessary to spam code " +
-       "with comments when the globals are obvious", function () {
-        var code = "(function () { return [ fooGlobal, barGlobal ]; }());",
-            customGlobals = { fooGlobal: false, barGlobal: false };
-
-        expect(JSHINT(code, {}, customGlobals)).toEqual(true);
-        var report = JSHINT.data();
-
-        expect(report.implieds).toEqual(undefined);
-        expect(report.globals.length).toEqual(2);
-
-        var globals = {};
-        for (var i = 0, g; g = report.globals[i]; i++)
-            globals[g] = true;
-
-        for (i = 0, g; g = customGlobals[i]; i++)
-            expect(g in globals).toEqual(true);
-    });
-});
-
 describe("Objects", function () {
     it("must parse `new Array(<expr>);`", function () {
         var simple = "new Array(1);",
