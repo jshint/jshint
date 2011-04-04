@@ -43,7 +43,7 @@ assert.globalsImplied = function (globals, options) {
 };
 
 /** Option `node` predefines Node.js globals */
-exports.testNodeJS = function () {
+exports.node = function () {
     var globals = [
             "__filename"
           , "__dirname"
@@ -61,7 +61,7 @@ exports.testNodeJS = function () {
 };
 
 /** Option `jquery` predefines jQuery globals */
-exports.testJQuery = function () {
+exports.jquery = function () {
     var globals = [ 'jQuery', '$' ];
 
     assert.globalsImplied(globals);
@@ -69,7 +69,7 @@ exports.testJQuery = function () {
 };
 
 /** Option `couch` predefines CouchDB globals */
-exports.testCouchDB = function () {
+exports.couch = function () {
     var globals = [
             "require"
           , "respond"
@@ -88,7 +88,7 @@ exports.testCouchDB = function () {
 };
 
 /** Option `prototypejs` predefines Prototype.js and Scriptaculous globals */
-exports.testPrototype = function () {
+exports.prototypejs = function () {
     var globals = [
             "$"
           , "$$"
@@ -138,7 +138,7 @@ exports.testPrototype = function () {
  * Option `devel` predefines global functions used for development
  * (console, alert, etc.)
  */
-exports.testDevel = function () {
+exports.devel = function () {
     var globals = [
             "alert"
           , "confirm"
@@ -162,7 +162,7 @@ exports.testDevel = function () {
  *  + HTML5: http://www.html5rocks.com/
  *  + Typed arrays: https://developer.mozilla.org/en/JavaScript_typed_arrays
  */
-exports.testBrowser = function () {
+exports.browser = function () {
     var globals = [
             'ArrayBuffer'
           , 'ArrayBufferView'
