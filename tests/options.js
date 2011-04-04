@@ -71,6 +71,17 @@ exports.latedef = function () {
     assert.eql(JSHINT.errors[2].reason, "'vr' was used before it was defined.");
 };
 
+/**
+ * Option `curly` allows you to enforce the use of curly braces around
+ * control blocks. JavaScript allows one-line blocks to go without curly
+ * braces but some people like to always use curly bracse. This option is
+ * for them.
+ *
+ * E.g.:
+ *   if (cond) return;
+ *     vs.
+ *   if (cond) { return; }
+ */
 exports.curly = function () {
     var src  = fs.readFileSync(__dirname + '/fixtures/curly.js', 'utf8'),
         src1 = fs.readFileSync(__dirname + '/fixtures/curly2.js', 'utf-8');
