@@ -84,3 +84,12 @@ exports.testUndefinedAsParam = function () {
 exports.newLineAfterDot = function () {
     assert.ok(JSHINT([ "chain().chain().", "chain();" ]));
 };
+
+/**
+ * JSHint does not tolerate deleting variables.
+ * More info: http://perfectionkills.com/understanding-delete/
+ */
+exports.noDelete = function () {
+    assert.ok(!JSHINT('delete NullReference;'));
+    assert.eql(JSHINT.errors[0].reason, 'Variables should not be deleted.');
+};
