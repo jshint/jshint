@@ -79,3 +79,8 @@ exports.testUndefinedAsParam = function () {
     // But it must never tolerate reassigning of undefined
     assert.ok(!JSHINT(code1));
 };
+
+/** Tests that JSHint accepts new line after a dot (.) operator */
+exports.newLineAfterDot = function () {
+    assert.ok(JSHINT([ "chain().chain().", "chain();" ]));
+};
