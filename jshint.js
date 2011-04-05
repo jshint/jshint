@@ -434,7 +434,13 @@ var JSHINT = (function () {
             WebSocket       : false,
             window          : false,
             Worker          : false,
-            XMLHttpRequest  : false
+            XMLHttpRequest  : false,
+            XPathEvaluator  : false,
+            XPathException  : false,
+            XPathExpression  : false,
+            XPathNamespace  : false,
+            XPathNSResolver  : false,
+            XPathResult  : false
         },
 
         couch = {
