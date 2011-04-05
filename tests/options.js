@@ -149,3 +149,14 @@ exports.nonew = function () {
     assert.eql(JSHINT.errors[0].reason, "Do not use 'new' for side effects.");
     assert.ok(JSHINT(code1, { nonew: true }));
 };
+
+/** Option `asi` allows you to use automatic-semicolon insertion */
+exports.asi = function () {
+    var code = 'hello()';
+
+    assert.ok(!JSHINT(code));
+    assert.eql(JSHINT.errors[0].line, 1);
+    assert.eql(JSHINT.errors[0].reason, 'Missing semicolon.');
+
+    assert.ok(JSHINT(code, { asi: true }));
+};
