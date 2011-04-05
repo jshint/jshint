@@ -114,3 +114,24 @@ exports.noempty = function () {
     assert.eql(JSHINT.errors[0].line, 1);
     assert.eql(JSHINT.errors[0].reason, 'Empty block.');
 };
+
+/**
+ * Option `noarg` prohibits the use of arguments.callee and arguments.caller.
+ * JSHint allows them by default but you have to know what you are doing since:
+ *  - They are not supported by all JavaScript implementations
+ *  - They might prevent an interpreter from doing some optimization tricks
+ *  - They are prohibited in the strict mode
+ */
+exports.noarg = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/noarg.js', 'utf8');
+
+    // By default, tolerate both arguments.callee and arguments.caller
+    assert.ok(JSHINT(src));
+
+    // Do not tolerate both .callee and .caller when noarg is true
+    assert.ok(!JSHINT(src, { noarg: true }));
+    assert.eql(JSHINT.errors[0].line, 2);
+    assert.eql(JSHINT.errors[0].reason, 'Avoid arguments.callee.');
+    assert.eql(JSHINT.errors[1].line, 6);
+    assert.eql(JSHINT.errors[1].reason, 'Avoid arguments.caller.');
+};
