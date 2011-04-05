@@ -188,6 +188,7 @@ exports.expr = function () {
         assert.ok(JSHINT(exp, { expr: true }));
 };
 
+/** Option `undef` requires you to always define variables you use */
 exports.undef = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/undef.js', 'utf8');
 
