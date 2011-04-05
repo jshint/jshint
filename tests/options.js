@@ -253,3 +253,37 @@ exports.loopfunc = function () {
     assert.eql(JSHINT.errors[0].line, 10);
     assert.eql(JSHINT.errors[0].reason, "Function declarations should not be placed in blocks. Use a function expression or move the statement to the top of the outer function.");
 };
+
+/** Option `boss` unlocks some useful but unsafe features of JavaScript. */
+exports.boss = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/boss.js', 'utf8');
+
+    // By default, warn about suspicious assignments
+    assert.ok(!JSHINT(src));
+    assert.eql(JSHINT.errors.length, 4);
+    assert.eql(JSHINT.errors[0].line, 1);
+    assert.eql(JSHINT.errors[0].reason, 'Expected a conditional expression and instead saw an assignment.');
+    assert.eql(JSHINT.errors[1].line, 4);
+    assert.eql(JSHINT.errors[1].reason, 'Expected a conditional expression and instead saw an assignment.');
+    assert.eql(JSHINT.errors[2].line, 7);
+    assert.eql(JSHINT.errors[2].reason, 'Expected a conditional expression and instead saw an assignment.');
+    assert.eql(JSHINT.errors[3].line, 12);
+    assert.eql(JSHINT.errors[3].reason, 'Expected a conditional expression and instead saw an assignment.');
+
+    // But if you are the boss, all is good
+    assert.ok(JSHINT(src, { boss: true }));
+
+    var code = [
+        'if (e == null) doSomething();'
+      , 'if (null == e) doSomething();'
+    ];
+
+    // Also, by default, warn about `== null` comparison
+    assert.ok(!JSHINT(code));
+    assert.eql(JSHINT.errors.length, 2);
+    assert.eql(JSHINT.errors[0].reason, "Use '===' to compare with 'null'.");
+    assert.eql(JSHINT.errors[1].reason, "Use '===' to compare with 'null'.");
+
+    // And again, if you're the boss, no questions asked
+    assert.ok(JSHINT(code, { boss: true }));
+};
