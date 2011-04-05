@@ -53,10 +53,10 @@ Tests
 -----
 
 To run tests you will need to install [node.js](http://nodejs.org/) and
-jasmine-node. You can install the latter with npm:
+expresso. You can install the latter with npm:
 
-    npm install jasmine-node
+    npm install expresso
 
 After that, running tests is as easy as:
 
-    node runtests.js
+    expresso tests/*.js
