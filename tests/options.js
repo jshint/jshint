@@ -160,3 +160,30 @@ exports.asi = function () {
 
     assert.ok(JSHINT(code, { asi: true }));
 };
+
+/**
+ * Option `expr` allows you to use ExpressionStatement as a Program code.
+ *
+ * Even though ExpressionStatement as a Program (i.e. without assingment
+ * of its result) is a valid JavaScript, more often than not it is a typo.
+ * That's why by default JSHint complains about it. But if you know what
+ * are you doing, there is nothing wrong with it.
+ */
+exports.expr = function () {
+    var exps = [
+        "obj && obj.method && obj.method();",
+        "myvar && func(myvar);",
+        "1;",
+        "true;",
+        "+function () {};"
+    ];
+
+    for (var i = 0, exp; exp = exps[i]; i++) {
+        assert.ok(!JSHINT(exp));
+        assert.eql(JSHINT.errors[0].line, 1);
+        assert.eql(JSHINT.errors[0].reason, 'Expected an assignment or function call and instead saw an expression.');
+    }
+
+    for (i = 0, exp = null; exp = exps[i]; i++)
+        assert.ok(JSHINT(exp, { expr: true }));
+};
