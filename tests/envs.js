@@ -226,6 +226,12 @@ exports.browser = function () {
           , 'window'
           , 'Worker'
           , 'XMLHttpRequest'
+          , 'XPathEvaluator'
+          , 'XPathException'
+          , 'XPathExpression'
+          , 'XPathNamespace'
+          , 'XPathNSResolver'
+          , 'XPathResult'
         ];
 
     assert.globalsImplied(globals);
