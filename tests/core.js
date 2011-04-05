@@ -93,3 +93,17 @@ exports.noDelete = function () {
     assert.ok(!JSHINT('delete NullReference;'));
     assert.eql(JSHINT.errors[0].reason, 'Variables should not be deleted.');
 };
+
+/**
+ * JSHint allows case statement fall through only when it is made explicit
+ * using special comments.
+ */
+exports.switchFallThrough = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/switchFallThrough.js', 'utf8');
+    assert.ok(!JSHINT(src));
+    assert.eql(JSHINT.errors.length, 2);
+    assert.eql(JSHINT.errors[0].line, 3);
+    assert.eql(JSHINT.errors[0].reason, "Expected a 'break' statement before 'case'.");
+    assert.eql(JSHINT.errors[1].line, 18);
+    assert.eql(JSHINT.errors[1].reason, "Expected a 'break' statement before 'default'.");
+};
