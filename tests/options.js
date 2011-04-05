@@ -202,3 +202,24 @@ exports.undef = function () {
     assert.eql(JSHINT.errors[1].line, 6);
     assert.eql(JSHINT.errors[1].reason, "'localUndef' is not defined.");
 };
+
+/**
+ * Option `forin` disallows the use of for in loops without hasOwnProperty.
+ *
+ * The for in statement is used to loop through the names of properties
+ * of an object, including those inherited through the prototype chain.
+ * The method hasOwnPropery is used to check if the property belongs to
+ * an object or was inherited through the prototype chain.
+ */
+exports.forin = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/forin.js', 'utf8');
+
+    // Make sure there are no other errors
+    assert.ok(JSHINT(src));
+
+    // Make sure it fails when forin is true
+    assert.ok(!JSHINT(src, { forin: true }));
+    assert.eql(JSHINT.errors.length, 1);
+    assert.eql(JSHINT.errors[0].line, 1);
+    assert.eql(JSHINT.errors[0].reason, 'The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.');
+};
