@@ -224,3 +224,32 @@ exports.forin = function () {
     assert.eql(JSHINT.errors[0].line, 1);
     assert.eql(JSHINT.errors[0].reason, 'The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.');
 };
+
+/**
+ * Option `loopfunc` allows you to use function expression in the loop.
+ * E.g.:
+ *   while (true) x = function () {};
+ *
+ * This is generally a bad idea since it is too easy to make a
+ * closure-related mistake.
+ */
+exports.loopfunc = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/loopfunc.js', 'utf8');
+
+    // By default, not functions are allowed inside loops
+    assert.ok(!JSHINT(src));
+    assert.eql(JSHINT.errors.length, 3);
+    assert.eql(JSHINT.errors[0].line, 2);
+    assert.eql(JSHINT.errors[0].reason, "Don't make functions within a loop.");
+    assert.eql(JSHINT.errors[1].line, 6);
+    assert.eql(JSHINT.errors[1].reason, "Don't make functions within a loop.");
+    assert.eql(JSHINT.errors[2].line, 10);
+    assert.eql(JSHINT.errors[2].reason, "Function declarations should not be placed in blocks. Use a function expression or move the statement to the top of the outer function.");
+
+    // When loopfunc is true, only function declaration should fail.
+    // Expressions are okay.
+    assert.ok(!JSHINT(src, { loopfunc: true }));
+    assert.eql(JSHINT.errors.length, 1);
+    assert.eql(JSHINT.errors[0].line, 10);
+    assert.eql(JSHINT.errors[0].reason, "Function declarations should not be placed in blocks. Use a function expression or move the statement to the top of the outer function.");
+};
