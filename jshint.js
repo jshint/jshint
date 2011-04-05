@@ -174,7 +174,9 @@
  ScrollBar, Scriptaculous, Selector, String, Style, SyntaxError, Sortable,
  SortableObserver, Sound, System, Text, TextArea, Template, Timer,
  TypeError, Toggle, Try, URIError, URL, VBArray, WScript, Web, Window,
- XMLDOM, XMLHttpRequest, "\\", a, abbr, acronym, activeborder, activecaption,
+ XMLDOM, XMLHttpRequest, XPathEvaluator, XPathException, XPathExpression,
+ XPathNamespace, XPathNSResolver, XPathResult,
+ "\\", a, abbr, acronym, activeborder, activecaption,
  addEventListener, address, adsafe, alert, aliceblue, all, animator,
  antiquewhite, appleScript, applet, apply,
  approved, appworkspace, applicationCache, aqua, aquamarine, area, arguments,
@@ -437,10 +439,10 @@ var JSHINT = (function () {
             XMLHttpRequest  : false,
             XPathEvaluator  : false,
             XPathException  : false,
-            XPathExpression  : false,
+            XPathExpression : false,
             XPathNamespace  : false,
-            XPathNSResolver  : false,
-            XPathResult  : false
+            XPathNSResolver : false,
+            XPathResult     : false
         },
 
         couch = {
