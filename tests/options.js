@@ -187,3 +187,18 @@ exports.expr = function () {
     for (i = 0, exp = null; exp = exps[i]; i++)
         assert.ok(JSHINT(exp, { expr: true }));
 };
+
+exports.undef = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/undef.js', 'utf8');
+
+    // Make sure there are no other errors
+    assert.ok(JSHINT(src));
+
+    // Make sure it fails when undef is true
+    assert.ok(!JSHINT(src, { undef: true }));
+    assert.eql(JSHINT.errors.length, 2);
+    assert.eql(JSHINT.errors[0].line, 1);
+    assert.eql(JSHINT.errors[0].reason, "'undef' is not defined.");
+    assert.eql(JSHINT.errors[1].line, 6);
+    assert.eql(JSHINT.errors[1].reason, "'localUndef' is not defined.");
+};
