@@ -135,3 +135,17 @@ exports.noarg = function () {
     assert.eql(JSHINT.errors[1].line, 6);
     assert.eql(JSHINT.errors[1].reason, 'Avoid arguments.caller.');
 };
+
+/** Option `nonew` prohibits the use of constructors for side-effects */
+exports.nonew = function () {
+    var code  = "new Thing();",
+        code1 = "var obj = new Thing();";
+
+    assert.ok(JSHINT(code));
+    assert.ok(JSHINT(code1));
+
+    assert.ok(!JSHINT(code, { nonew: true }));
+    assert.eql(JSHINT.errors[0].line, 1);
+    assert.eql(JSHINT.errors[0].reason, "Do not use 'new' for side effects.");
+    assert.ok(JSHINT(code1, { nonew: true }));
+};
