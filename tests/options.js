@@ -84,7 +84,7 @@ exports.latedef = function () {
  */
 exports.curly = function () {
     var src  = fs.readFileSync(__dirname + '/fixtures/curly.js', 'utf8'),
-        src1 = fs.readFileSync(__dirname + '/fixtures/curly2.js', 'utf-8');
+        src1 = fs.readFileSync(__dirname + '/fixtures/curly2.js', 'utf8');
 
     // By default, tolerate one-line blocks since they are valid JavaScript
     assert.ok(JSHINT(src));
