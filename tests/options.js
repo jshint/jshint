@@ -338,3 +338,14 @@ exports.eqeqeq = function () {
     assert.eql(JSHINT.errors[2].line, 8);
     assert.eql(JSHINT.errors[2].reason, "Expected '===' and instead saw '=='.");
 };
+
+/** Option `evil` allows the use of eval. */
+exports.evil = function () {
+    var src = "eval('hey();');";
+
+    assert.ok(!JSHINT(src)); // Eval?                        SHUT.
+    assert.eql(JSHINT.errors.length, 1); //                  DOWN.
+    assert.eql(JSHINT.errors[0].reason, "eval is evil."); // EVERYTHING.
+
+    assert.ok(JSHINT(src, { evil: true }));
+};
