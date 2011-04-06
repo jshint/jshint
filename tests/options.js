@@ -306,3 +306,16 @@ exports.bitwise = function () {
     assert.eql(JSHINT.errors.length, 1);
     assert.eql(JSHINT.errors[0].reason, "Unexpected '~'.");
 };
+
+/** Option `debug` allows the use of debugger statements. */
+exports.debug = function () {
+    var code = 'function test () { debugger; return true; }';
+
+    // By default disallow debugger statements.
+    assert.ok(!JSHINT(code));
+    assert.eql(JSHINT.errors.length, 1);
+    assert.eql(JSHINT.errors[0].reason, "All 'debugger' statements should be removed.");
+
+    // But allow them if debug is true.
+    assert.ok(JSHINT(code, { debug: true }));
+};
