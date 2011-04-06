@@ -349,3 +349,30 @@ exports.evil = function () {
 
     assert.ok(JSHINT(src, { evil: true }));
 };
+
+/**
+ * Option `immed` forces you to wrap immediate invocations in parens.
+ *
+ * Functions in JavaScript can be immediately invoce but that can confuse
+ * readers of your code. To make it less confusing, wrap the invocations in
+ * parens.
+ *
+ * E.g. (note the parens):
+ *   var a = (function () {
+ *     return 'a';
+ *   }());
+ *   console.log(a); // --> 'a'
+ */
+exports.immed = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/immed.js', 'utf8');
+
+    assert.ok(JSHINT(src));
+    assert.ok(!JSHINT(src, { immed: true }));
+    assert.eql(JSHINT.errors.length, 2);
+    assert.eql(JSHINT.errors[0].line, 3);
+    assert.eql(JSHINT.errors[0].reason, "Wrap an immediate function invocation in parentheses " +
+                                        "to assist the reader in understanding that the expression " +
+                                        "is the result of a function, and not the function itself.");
+    assert.eql(JSHINT.errors[1].line, 7);
+    assert.eql(JSHINT.errors[1].reason, 'Move the invocation into the parens that contain the function.');
+};
