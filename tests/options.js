@@ -394,3 +394,18 @@ exports.nomen = function () {
     assert.ok(JSHINT('var hey;'));
     assert.ok(JSHINT('var hey;', { nomen: true }));
 };
+
+/** Option `passfail` tells JSHint to stop at the first error. */
+exports.passfail = function () {
+    var code = [
+        'one()'
+      , 'two()'
+      , 'three()'
+    ];
+
+    assert.ok(!JSHINT(code));
+    assert.eql(JSHINT.errors.length, 3);
+
+    assert.ok(!JSHINT(code, { passfail: true }));
+    assert.ok(JSHINT.errors.length, 1);
+};
