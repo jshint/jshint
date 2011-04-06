@@ -376,3 +376,21 @@ exports.immed = function () {
     assert.eql(JSHINT.errors[1].line, 7);
     assert.eql(JSHINT.errors[1].reason, 'Move the invocation into the parens that contain the function.');
 };
+
+/** Option `nomen` disallows variable names with dangling '_'. */
+exports.nomen = function () {
+    var names = [ '_hey', 'hey_' ];
+
+    for (var i = 0, name; name = names[i]; i++)
+        assert.ok(JSHINT('var ' + name + ';'));
+
+    for (i = 0, name = null; name = names[i]; i++) {
+        assert.ok(!JSHINT('var ' + name + ';', { nomen: true }));
+        assert.eql(JSHINT.errors.length, 1);
+        assert.eql(JSHINT.errors[0].reason, "Unexpected dangling '_' in '" + name + "'.");
+    }
+
+    // Normal names should pass all the time
+    assert.ok(JSHINT('var hey;'));
+    assert.ok(JSHINT('var hey;', { nomen: true }));
+};
