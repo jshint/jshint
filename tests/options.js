@@ -319,3 +319,22 @@ exports.debug = function () {
     // But allow them if debug is true.
     assert.ok(JSHINT(code, { debug: true }));
 };
+
+/** Option `eqeqeq` requires you to use === all the time. */
+exports.eqeqeq = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/eqeqeq.js', 'utf8');
+
+    assert.ok(!JSHINT(src));
+    assert.eql(JSHINT.errors.length, 1); // Only == null should fail
+    assert.eql(JSHINT.errors[0].line, 8);
+    assert.eql(JSHINT.errors[0].reason, "Use '===' to compare with 'null'.");
+
+    assert.ok(!JSHINT(src, { eqeqeq: true }));
+    assert.eql(JSHINT.errors.length, 3); // All relations in that file should fail
+    assert.eql(JSHINT.errors[0].line, 2);
+    assert.eql(JSHINT.errors[0].reason, "Expected '===' and instead saw '=='.");
+    assert.eql(JSHINT.errors[1].line, 5);
+    assert.eql(JSHINT.errors[1].reason, "Expected '!==' and instead saw '!='.");
+    assert.eql(JSHINT.errors[2].line, 8);
+    assert.eql(JSHINT.errors[2].reason, "Expected '===' and instead saw '=='.");
+};
