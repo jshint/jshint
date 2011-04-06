@@ -269,8 +269,8 @@
  tty, turquoise, tv, type, Uint16Array, Uint32Array, Uint8Array, u, ul, undef,
  unescape, "unicode-bidi", unused, unwatch, updateNow, urls, value, valueOf,
  var, version, "vertical-align", video, violet, visibility, watch,
- WebSocket, wheat, white, "white-space", whitesmoke, widget, width,
- window, windowframe, windows, windowtext, Worker, "word-spacing", "word-wrap",
+ WebSocket, wheat, white, "white-space", whitesmoke, width,
+ window, windowframe, windowtext, Worker, "word-spacing", "word-wrap",
  yahooCheckLogin, yahooLogin, yahooLogout, yellow, yellowgreen, "z-index"
 */
 
@@ -364,11 +364,9 @@ var JSHINT = (function () {
             undef      : true, // if variables should be declared before used
             safe       : true, // if use of some browser features should be restricted
             shadow     : true, // if variable shadowing should be tolerated
-            windows    : true, // if MS Windows-specific globals should be predefined
             strict     : true, // require the "use strict"; pragma
             sub        : true, // if all forms of subscript notation are tolerated
-            white      : true, // if strict whitespace rules apply
-            widget     : true  // if the Yahoo Widgets globals should be predefined
+            white      : true  // if strict whitespace rules apply
         },
 
 // browser contains a set of global names which are commonly provided by a
@@ -953,96 +951,6 @@ var JSHINT = (function () {
         urls,
         warnings,
 
-// widget contains the global names which are provided to a Yahoo
-// (fna Konfabulator) widget.
-
-        widget = {
-            alert                   : true,
-            animator                : true,
-            appleScript             : true,
-            beep                    : true,
-            bytesToUIString         : true,
-            Canvas                  : true,
-            chooseColor             : true,
-            chooseFile              : true,
-            chooseFolder            : true,
-            closeWidget             : true,
-            COM                     : true,
-            convertPathToHFS        : true,
-            convertPathToPlatform   : true,
-            CustomAnimation         : true,
-            escape                  : true,
-            FadeAnimation           : true,
-            filesystem              : true,
-            Flash                   : true,
-            focusWidget             : true,
-            form                    : true,
-            FormField               : true,
-            Frame                   : true,
-            HotKey                  : true,
-            Image                   : true,
-            include                 : true,
-            isApplicationRunning    : true,
-            iTunes                  : true,
-            konfabulatorVersion     : true,
-            log                     : true,
-            md5                     : true,
-            MenuItem                : true,
-            MoveAnimation           : true,
-            openURL                 : true,
-            play                    : true,
-            Point                   : true,
-            popupMenu               : true,
-            preferenceGroups        : true,
-            preferences             : true,
-            print                   : true,
-            prompt                  : true,
-            random                  : true,
-            Rectangle               : true,
-            reloadWidget            : true,
-            ResizeAnimation         : true,
-            resolvePath             : true,
-            resumeUpdates           : true,
-            RotateAnimation         : true,
-            runCommand              : true,
-            runCommandInBg          : true,
-            saveAs                  : true,
-            savePreferences         : true,
-            screen                  : true,
-            ScrollBar               : true,
-            showWidgetPreferences   : true,
-            sleep                   : true,
-            speak                   : true,
-            Style                   : true,
-            suppressUpdates         : true,
-            system                  : true,
-            tellWidget              : true,
-            Text                    : true,
-            TextArea                : true,
-            Timer                   : true,
-            unescape                : true,
-            updateNow               : true,
-            URL                     : true,
-            Web                     : true,
-            widget                  : true,
-            Window                  : true,
-            XMLDOM                  : true,
-            XMLHttpRequest          : true,
-            yahooCheckLogin         : true,
-            yahooLogin              : true,
-            yahooLogout             : true
-        },
-
-        windows = {
-            ActiveXObject: false,
-            CScript      : false,
-            Debug        : false,
-            Enumerator   : false,
-            System       : false,
-            VBArray      : false,
-            WScript      : false
-        },
-
 //  xmode is used to adapt to the exceptions in html parsing.
 //  It can have these states:
 //      false   .js script file
@@ -1226,12 +1134,6 @@ var JSHINT = (function () {
 
         if (option.jquery)
             combine(predefined, jquery);
-
-        if (option.windows)
-            combine(predefined, windows);
-
-        if (option.widget)
-            combine(predefined, widget);
     }
 
 
@@ -5645,9 +5547,7 @@ loop:   for (;;) {
                 o.loopfunc =
                 o.on       =
                 o.rhino    =
-                o.windows  =
-                o.sub      =
-                o.widget   = false;
+                o.sub      = false;
 
                 o.eqeqeq   =
                 o.nomen    =
