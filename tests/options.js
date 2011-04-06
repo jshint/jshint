@@ -287,3 +287,22 @@ exports.boss = function () {
     // And again, if you're the boss, no questions asked
     assert.ok(JSHINT(code, { boss: true }));
 };
+
+/** Option `bitwise` disallows the use of bitwise operators. */
+exports.bitwise = function () {
+    var ops = [ '&', '|', '^', '<<' , '>>', '>>>' ];
+
+    // By default allow bitwise operators
+    for (var i = 0, op; op = ops[i]; i++)
+        assert.ok(JSHINT('var c = a ' + op + ' b;'));
+    assert.ok(JSHINT('var c = ~a;'));
+
+    for (i = 0, op = null; op = ops[i]; i++) {
+        assert.ok(!JSHINT('var c = a ' + op + ' b;', { bitwise: true }));
+        assert.eql(JSHINT.errors.length, 1);
+        assert.eql(JSHINT.errors[0].reason, "Unexpected use of '" + op + "'.");
+    }
+    assert.ok(!JSHINT('var c = ~a;', { bitwise: true }));
+    assert.eql(JSHINT.errors.length, 1);
+    assert.eql(JSHINT.errors[0].reason, "Unexpected '~'.");
+};
