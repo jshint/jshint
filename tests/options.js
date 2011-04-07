@@ -409,3 +409,17 @@ exports.passfail = function () {
     assert.ok(!JSHINT(code, { passfail: true }));
     assert.ok(JSHINT.errors.length, 1);
 };
+
+/**
+ * Option `onevar` allows you to use only one var statement
+ * per function. Don't ask me why.
+ */
+exports.onevar = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/onevar.js', 'utf8');
+
+    assert.ok(JSHINT(src));
+    assert.ok(!JSHINT(src, { onevar: true }));
+    assert.eql(JSHINT.errors.length, 1);
+    assert.eql(JSHINT.errors[0].line, 10);
+    assert.eql(JSHINT.errors[0].reason, 'Too many var statements.');
+};
