@@ -423,3 +423,23 @@ exports.onevar = function () {
     assert.eql(JSHINT.errors[0].line, 10);
     assert.eql(JSHINT.errors[0].reason, 'Too many var statements.');
 };
+
+/** Option `plusplus` prohibits the use of increments/decrements. */
+exports.plusplus = function () {
+    var ops = [ '++', '--' ];
+
+    for (var i = 0, op; op = ops[i]; i++) {
+        assert.ok(JSHINT('var i = j' + op + ';'));
+        assert.ok(JSHINT('var i = ' + op + 'j;'));
+    }
+
+    for (i = 0, op = null; op = ops[i]; i++) {
+        assert.ok(!JSHINT('var i = j' + op + ';', { plusplus: true }));
+        assert.ok(JSHINT.errors.length, 1);
+        assert.ok(JSHINT.errors[0].reason, "Unexpected use of '" + op + "'.");
+
+        assert.ok(!JSHINT('var i = ' + op + 'j;', { plusplus: true }));
+        assert.ok(JSHINT.errors.length, 1);
+        assert.ok(JSHINT.errors[0].reason, "Unexpected use of '" + op + "'.");
+    }
+};
