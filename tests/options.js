@@ -469,3 +469,11 @@ exports.newcap = function () {
     assert.eql(JSHINT.errors[1].line, 5);
     assert.eql(JSHINT.errors[1].reason, "Missing 'new' prefix when invoking a constructor.");
 };
+
+/** Option `sub` allows all forms of subscription. */
+exports.sub = function () {
+    assert.ok(!JSHINT("window.obj = obj['prop'];"));
+    assert.eql(JSHINT.errors.length, 1);
+    assert.eql(JSHINT.errors[0].reason, "['prop'] is better written in dot notation.");
+    assert.ok(JSHINT("window.obj = obj['prop'];", { sub: true }));
+};
