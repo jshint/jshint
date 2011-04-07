@@ -477,3 +477,18 @@ exports.sub = function () {
     assert.eql(JSHINT.errors[0].reason, "['prop'] is better written in dot notation.");
     assert.ok(JSHINT("window.obj = obj['prop'];", { sub: true }));
 };
+
+/** Option `strict` requires you to use "use strict"; */
+exports.strict = function () {
+    var code  = "(function () { return; }());",
+        code1 = '(function () { "use strict"; return; }());';
+
+    assert.ok(JSHINT(code));
+    assert.ok(JSHINT(code1));
+
+    assert.ok(!JSHINT(code, { strict: true }));
+    assert.eql(JSHINT.errors.length, 1);
+    assert.eql(JSHINT.errors[0].reason, 'Missing "use strict" statement.');
+
+    assert.ok(JSHINT(code1, { strict: true }));
+};
