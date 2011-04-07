@@ -443,3 +443,29 @@ exports.plusplus = function () {
         assert.ok(JSHINT.errors[0].reason, "Unexpected use of '" + op + "'.");
     }
 };
+
+/**
+ * Option `newcap` requires constructors to be capitalized.
+ *
+ * Constructors are functions that are designed to be used with the `new` statement.
+ * `new` creates a new object and binds it to the implied this parameter.
+ * A constructor executed without new will have its this assigned to a global object,
+ * leading to errors.
+ *
+ * Unfortunately, JavaScript gives us absolutely no way of telling if a function is a
+ * constructor. There is a convention to capitalize all constructor names to prevent
+ * those mistakes. This option enforces that convention.
+ */
+exports.newcap = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/newcap.js', 'utf8');
+
+    assert.ok(JSHINT(src)); // By default, everything is fine
+
+    // When newcap is true, enforce the conventions
+    assert.ok(!JSHINT(src, { newcap: true }));
+    assert.eql(JSHINT.errors.length, 2);
+    assert.eql(JSHINT.errors[0].line, 1);
+    assert.eql(JSHINT.errors[0].reason, 'A constructor name should start with an uppercase letter.');
+    assert.eql(JSHINT.errors[1].line, 5);
+    assert.eql(JSHINT.errors[1].reason, "Missing 'new' prefix when invoking a constructor.");
+};
