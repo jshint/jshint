@@ -492,3 +492,25 @@ exports.strict = function () {
 
     assert.ok(JSHINT(code1, { strict: true }));
 };
+
+/** Option `regexp` disallows the use of . and [^...] in regular expressions. */
+exports.regexp = function () {
+    var code = [
+        'var a = /hey/;'
+      , 'var a = /h.ey/;'
+      , 'var a = /h[^...]/;'
+    ];
+
+    for (var i = 0, st; st = code[i]; i++)
+        assert.ok(JSHINT(code));
+
+    assert.ok(JSHINT(code[0], { regexp: true }));
+
+    assert.ok(!JSHINT(code[1], { regexp: true }));
+    assert.eql(JSHINT.errors.length, 1);
+    assert.eql(JSHINT.errors[0].reason, "Insecure '.'.");
+
+    assert.ok(!JSHINT(code[2], { regexp: true }));
+    assert.eql(JSHINT.errors.length, 1);
+    assert.eql(JSHINT.errors[0].reason, "Insecure '^'.");
+};
