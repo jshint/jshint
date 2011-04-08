@@ -543,3 +543,21 @@ exports.laxbreak = function () {
     assert.eql(JSHINT.errors[0].reason, "Bad line breaking before '?'.");
     assert.ok(JSHINT(code, { laxbreak: true }));
 };
+
+exports.white = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/white.js', 'utf8');
+
+    assert.ok(JSHINT(src));
+    assert.ok(!JSHINT(src, { white: true }));
+    assert.eql(JSHINT.errors.length, 5);
+    assert.eql(JSHINT.errors[0].line, 1);
+    assert.eql(JSHINT.errors[0].reason, "Unexpected space after 'hello'.");
+    assert.eql(JSHINT.errors[1].line, 2);
+    assert.eql(JSHINT.errors[1].reason, "Unexpected space after 'true'.");
+    assert.eql(JSHINT.errors[2].line, 5);
+    assert.eql(JSHINT.errors[2].reason, "Missing space after 'function'.");
+    assert.eql(JSHINT.errors[3].line, 6);
+    assert.eql(JSHINT.errors[3].reason, "Missing space after 'if'.");
+    assert.eql(JSHINT.errors[4].line, 6);
+    assert.eql(JSHINT.errors[4].reason, "Missing space after ')'.");
+};
