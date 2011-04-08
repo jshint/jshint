@@ -514,3 +514,32 @@ exports.regexp = function () {
     assert.eql(JSHINT.errors.length, 1);
     assert.eql(JSHINT.errors[0].reason, "Insecure '^'.");
 };
+
+/** Option `laxbreak` allows you to insert newlines before some operators. */
+exports.laxbreak = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/laxbreak.js', 'utf8');
+
+    assert.ok(!JSHINT(src));
+    assert.eql(JSHINT.errors.length, 2);
+    assert.eql(JSHINT.errors[0].line, 2);
+    assert.eql(JSHINT.errors[0].reason, "Bad line breaking before ','.");
+    assert.eql(JSHINT.errors[1].line, 12);
+    assert.eql(JSHINT.errors[1].reason, "Bad line breaking before ','.");
+
+    var ops = [ '||', '&&', '*', '/', '%', '+', '-', '>=',
+                '==', '===', '!=', '!==', '>', '<', '<=', 'instanceof' ];
+
+    for (var i = 0, op, code; op = ops[i]; i++) {
+        code = ['var a = b ', op + ' c;'];
+        assert.ok(!JSHINT(code));
+        assert.eql(JSHINT.errors.length, 1);
+        assert.eql(JSHINT.errors[0].reason, "Bad line breaking before '" + op + "'.");
+        assert.ok(JSHINT(code, { laxbreak: true }));
+    }
+
+    code = [ 'var a = b ', '? c : d;' ];
+    assert.ok(!JSHINT(code));
+    assert.eql(JSHINT.errors.length, 1);
+    assert.eql(JSHINT.errors[0].reason, "Bad line breaking before '?'.");
+    assert.ok(JSHINT(code, { laxbreak: true }));
+};
