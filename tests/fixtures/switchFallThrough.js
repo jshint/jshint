@@ -28,3 +28,13 @@ case 2:
 default:
     doSomething();
 }
+
+(function () {
+    switch (foo) {
+    case 1:
+        return; // Return is a valid alternative to break;
+    case 2:
+    case 3:
+        return;
+    }
+}());
