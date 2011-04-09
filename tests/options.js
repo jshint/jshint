@@ -272,24 +272,29 @@ exports.boss = function () {
 
     // But if you are the boss, all is good
     assert.ok(JSHINT(src, { boss: true }));
+};
 
+/**
+ * Options `eqnull` allows you to use '== null' comparisons.
+ * It is useful when you want to check if value is null _or_ undefined.
+ */
+exports.eqnull = function () {
     var code = [
         'if (e == null) doSomething();'
       , 'if (null == e) doSomething();'
     ];
 
-    // Also, by default, warn about `== null` comparison
+    // By default, warn about `== null` comparison
     assert.ok(!JSHINT(code));
     assert.eql(JSHINT.errors.length, 2);
     assert.eql(JSHINT.errors[0].reason, "Use '===' to compare with 'null'.");
     assert.eql(JSHINT.errors[1].reason, "Use '===' to compare with 'null'.");
 
-    // And again, if you're the boss, no questions asked
-    assert.ok(JSHINT(code, { boss: true }));
+    // But when `eqnull` is true, no questions asked
+    assert.ok(JSHINT(code, { eqnull: true }));
 
-    // Make sure that `boss` has precedence over `eqeqeq` when it
-    // comes to `== null`
-    assert.ok(JSHINT(code, { eqeqeq: true, boss: true }));
+    // Make sure that `eqnull` has precedence over `eqeqeq`
+    assert.ok(JSHINT(code, { eqeqeq: true, eqnull: true }));
 };
 
 /** Option `bitwise` disallows the use of bitwise operators. */

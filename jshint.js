@@ -204,7 +204,7 @@
  deeppink, deepskyblue, defaultStatus, defineClass, del, deserialize,
  details, devel, dfn, dialog, dimgray, dir, direction, display, div, dl,
  document, dodgerblue, dt, edition, else, em, embed, embossed, emit, empty,
- "empty-cells", encodeURI, encodeURIComponent, entityify, eqeqeq, errors,
+ "empty-cells", encodeURI, encodeURIComponent, entityify, eqeqeq, eqnull, errors,
  es5, escape, eval, event, evidence, evil, ex, exception, exec, exps, expr, exports,
  fieldset, figure, filesystem, FileReader, firebrick, first, float, floor,
  floralwhite, focus, focusWidget, font, "font-family", "font-size",
@@ -305,7 +305,7 @@ var JSHINT = (function () {
         boolOptions = {
             asi        : true, // if automatic semicolon insertion should be tolerated
             bitwise    : true, // if bitwise operators should not be allowed
-            boss       : true, // if advanced usage of assignments and == should be allowed
+            boss       : true, // if advanced usage of assignments should be allowed
             browser    : true, // if the standard browser globals should be predefined
             cap        : true, // if upper case HTML should be allowed
             couch      : true, // if CouchDB globals should be predefined
@@ -314,6 +314,7 @@ var JSHINT = (function () {
             debug      : true, // if debugger statements should be allowed
             devel      : true, // if logging globals should be predefined (console, alert, etc.)
             eqeqeq     : true, // if === should be required
+            eqnull     : true, // if == null comparisons should be tolerated
             es5        : true, // if ES5 syntax should be allowed
             evil       : true, // if eval should be allowed
             expr       : true, // if ExpressionStatement should be allowed as Programs
@@ -2394,7 +2395,7 @@ loop:   for (;;) {
         return node &&
               ((node.type === '(number)' && +node.value === 0) ||
                (node.type === '(string)' && node.value === '') ||
-               (node.type === 'null' && !option.boss) ||
+               (node.type === 'null' && !option.eqnull) ||
                 node.type === 'true' ||
                 node.type === 'false' ||
                 node.type === 'undefined');
@@ -4158,10 +4159,10 @@ loop:   for (;;) {
     bitwise('^', 'bitxor', 80);
     bitwise('&', 'bitand', 90);
     relation('==', function (left, right) {
-        var unsafeAllowed = option.boss &&
+        var eqnull = option.eqnull &&
                 (left.value == 'null' || right.value == 'null');
 
-        if (!unsafeAllowed && option.eqeqeq) {
+        if (!eqnull && option.eqeqeq) {
             warning("Expected '{a}' and instead saw '{b}'.",
                     this, '===', '==');
         } else if (isPoorRelation(left)) {
