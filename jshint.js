@@ -4587,6 +4587,7 @@ loop:   for (;;) {
     (function (x) {
         x.nud = function () {
             var b, f, i, j, p, seen = {}, t;
+
             b = token.line !== nexttoken.line;
             if (b) {
                 indent += option.indent;
@@ -4612,7 +4613,7 @@ loop:   for (;;) {
                     }
                     t = nexttoken;
                     adjacent(token, nexttoken);
-                    f = doFunction(i);
+                    f = doFunction();
                     if (!option.loopfunc && funct['(loopage)']) {
                         warning("Don't make functions within a loop.", t);
                     }
@@ -4630,7 +4631,7 @@ loop:   for (;;) {
                     }
                     t = nexttoken;
                     adjacent(token, nexttoken);
-                    f = doFunction(i);
+                    f = doFunction();
                     p = f['(params)'];
                     if (!p || p.length !== 1 || p[0] !== 'value') {
                         warning("Expected (value) in set {a} function.", t, i);

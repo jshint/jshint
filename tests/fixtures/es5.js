@@ -8,7 +8,11 @@ var b = {
     b: 2,
 };
 
-var obj = {
-    get x() { return; },
-    set x(value) { return; }
-};
+(function () {
+    var _x;
+
+    var obj = {
+        get x() { return _x; },
+        set x(value) { _x = value; }
+    };
+}());
