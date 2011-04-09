@@ -4158,7 +4158,10 @@ loop:   for (;;) {
     bitwise('^', 'bitxor', 80);
     bitwise('&', 'bitand', 90);
     relation('==', function (left, right) {
-        if (option.eqeqeq) {
+        var unsafeAllowed = option.boss &&
+                (left.value == 'null' || right.value == 'null');
+
+        if (!unsafeAllowed && option.eqeqeq) {
             warning("Expected '{a}' and instead saw '{b}'.",
                     this, '===', '==');
         } else if (isPoorRelation(left)) {

@@ -286,6 +286,10 @@ exports.boss = function () {
 
     // And again, if you're the boss, no questions asked
     assert.ok(JSHINT(code, { boss: true }));
+
+    // Make sure that `boss` has precedence over `eqeqeq` when it
+    // comes to `== null`
+    assert.ok(JSHINT(code, { eqeqeq: true, boss: true }));
 };
 
 /** Option `bitwise` disallows the use of bitwise operators. */
