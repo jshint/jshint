@@ -1572,8 +1572,7 @@ loop:   for (;;) {
         switch (token.id) {
         case '(number)':
             if (nexttoken.id === '.') {
-                warning(
-"A dot following a number can be confused with a decimal point.", token);
+                warning("A dot following a number can be confused with a decimal point.", token);
             }
             break;
         case '-':
@@ -1596,8 +1595,7 @@ loop:   for (;;) {
                 if (nexttoken.id === '(end)') {
                     warning("Unmatched '{a}'.", t, t.id);
                 } else {
-                    warning(
-"Expected '{a}' to match '{b}' from line {c} and instead saw '{d}'.",
+                    warning("Expected '{a}' to match '{b}' from line {c} and instead saw '{d}'.",
                             nexttoken, id, t.id, t.line, nexttoken.value);
                 }
             } else if (nexttoken.type !== '(identifier)' ||
@@ -1639,10 +1637,11 @@ loop:   for (;;) {
 // They are elements of the parsing method called Top Down Operator Precedence.
 
     function expression(rbp, initial) {
-        var left;
-        if (nexttoken.id === '(end)') {
+        var left, isArray = false;
+
+        if (nexttoken.id === '(end)')
             error("Unexpected early end of program.", token);
-        }
+
         advance();
         if (initial) {
             anonname = 'anonymous';
@@ -1665,7 +1664,10 @@ loop:   for (;;) {
                 }
             }
             while (rbp < nexttoken.lbp) {
+                isArray = token.value == 'Array';
                 advance();
+                if (isArray && token.id == '(' && nexttoken.id == ')')
+                    warning("Use the array literal notation [].", token);
                 if (token.led) {
                     left = token.led(left);
                 } else {
@@ -2582,21 +2584,6 @@ loop:   for (;;) {
                 case 'Object':
                     warning("Use the object literal notation {}.", token);
                     break;
-                case 'Array':
-                    if (nexttoken.id !== '(') {
-                        warning("Use the array literal notation [].", token);
-                    } else {
-                        advance('(');
-                        if (nexttoken.id === ')') {
-                            warning("Use the array literal notation [].", token);
-                        } else {
-                            expression(0);
-                        }
-
-                        advance(')');
-                    }
-                    this.first = c;
-                    return this;
                 case 'Number':
                 case 'String':
                 case 'Boolean':
@@ -2616,9 +2603,7 @@ loop:   for (;;) {
                     if (c.id !== 'function') {
                         i = c.value.substr(0, 1);
                         if (option.newcap && (i < 'A' || i > 'Z')) {
-                            warning(
-                    "A constructor name should start with an uppercase letter.",
-                                token);
+                            warning("A constructor name should start with an uppercase letter.", token);
                         }
                     }
                 }
