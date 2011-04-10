@@ -184,6 +184,7 @@ exports.browser = function () {
           , 'frames'
           , 'getComputedStyle'
           , 'history'
+          , 'HTMLElement'
           , 'Int16Array'
           , 'Int32Array'
           , 'Int8Array'
