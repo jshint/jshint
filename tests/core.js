@@ -7,6 +7,10 @@ var JSHINT = require('../jshint.js').JSHINT,
 /** JSHint must pass its own check */
 exports.checkJSHint = function () {
     var res = JSHINT(fs.readFileSync(__dirname + "/../jshint.js", "utf8"));
+
+    if (!res)
+        console.log(JSHINT.errors);
+
     assert.ok(res);
     assert.isUndefined(JSHINT.data().implieds);
 };
