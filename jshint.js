@@ -4404,6 +4404,8 @@ loop:   for (;;) {
     });
     syntax['new'].exps = true;
 
+    prefix('void').exps = true;
+
     infix('.', function (left, that) {
         adjacent(prevtoken, token);
         nobreak();
@@ -5178,8 +5180,6 @@ loop:   for (;;) {
         reachable('throw');
         return this;
     }).exps = true;
-
-    reserve('void');
 
 //  Superfluous reserved words
 

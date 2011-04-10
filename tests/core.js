@@ -111,3 +111,12 @@ exports.switchFallThrough = function () {
     assert.eql(JSHINT.errors[1].line, 18);
     assert.eql(JSHINT.errors[1].reason, "Expected a 'break' statement before 'default'.");
 };
+
+exports.testVoid = function () {
+    var code = [
+        "void(0);"
+      , "void 0;"
+      , "var a = void(1);"
+    ];
+    assert.ok(JSHINT(code));
+};
