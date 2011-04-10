@@ -502,6 +502,25 @@ exports.strict = function () {
     assert.ok(JSHINT(code1, { strict: true }));
 };
 
+/** Option `globalstrict` allows you to use global "use strict"; */
+exports.globalstrict = function () {
+    var code = [
+        '"use strict";'
+      , 'function hello() { return; }'
+    ];
+
+    assert.ok(!JSHINT(code, { strict: true }));
+    assert.eql(JSHINT.errors.length, 1);
+    assert.eql(JSHINT.errors[0].line, 1);
+    assert.eql(JSHINT.errors[0].reason, 'Use the function form of "use strict".');
+    assert.ok(JSHINT(code, { globalstrict: true }));
+
+    // Check that globalstrict also enabled strict
+    assert.ok(!JSHINT(code[1], { globalstrict: true }));
+    assert.eql(JSHINT.errors.length, 1);
+    assert.eql(JSHINT.errors[0].reason, 'Missing "use strict" statement.');
+};
+
 /** Option `regexp` disallows the use of . and [^...] in regular expressions. */
 exports.regexp = function () {
     var code = [
