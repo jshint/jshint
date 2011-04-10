@@ -287,3 +287,55 @@ exports.es5 = function () {
     src = fs.readFileSync(__dirname + "/fixtures/es5.funcexpr.js", "utf8");
     assert.ok(JSHINT(src, { es5: true }));
 };
+
+exports.mootools = function () {
+    var globals = [
+            '$'
+          , '$$'
+          , 'Assets'
+          , 'Browser'
+          , 'Chain'
+          , 'Class'
+          , 'Color'
+          , 'Cookie'
+          , 'Core'
+          , 'Document'
+          , 'DomReady'
+          , 'DOMReady'
+          , 'Drag'
+          , 'Element'
+          , 'Elements'
+          , 'Event'
+          , 'Events'
+          , 'Fx'
+          , 'Group'
+          , 'Hash'
+          , 'HtmlTable'
+          , 'Iframe'
+          , 'IframeShim'
+          , 'InputValidator'
+          , 'instanceOf'
+          , 'Keyboard'
+          , 'Locale'
+          , 'Mask'
+          , 'MooTools'
+          , 'Native'
+          , 'Options'
+          , 'OverText'
+          , 'Request'
+          , 'Scroller'
+          , 'Slick'
+          , 'Slider'
+          , 'Sortables'
+          , 'Spinner'
+          , 'Swiff'
+          , 'Tips'
+          , 'Type'
+          , 'typeOf'
+          , 'URI'
+          , 'Window'
+    ];
+
+    assert.globalsImplied(globals);
+    assert.globalsKnown(globals, { mootools: true });
+};

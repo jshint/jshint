@@ -160,23 +160,25 @@
  "(params)", "(scope)", "(statement)", "(verb)", "*", "+", "++", "-",
  "--", "\/", "<", "<=", "==", "===", ">", ">=", $, $$, $A, $F, $H, $R, $break,
  $continue, $w, Abstract, Ajax, __filename, __dirname,
- ActiveXObject, Array, ArrayBuffer, ArrayBufferView, Autocompleter,
- Boolean, Builder, Buffer, COM, CScript, Canvas, CustomAnimation,
- Class, Control, DataView, Date, Debug, Draggable, Draggables,
- Droppables, E, Enumerator, Enumerable, Element, Error, Effect,
- EvalError, Event, FadeAnimation, Field, Flash, Float32Array, Float64Array,
- Form, FormField, Frame, Function, Hash, HotKey, Image, Int16Array,
- Int32Array, Int8Array, Insertion, JSON, LN10, LN2, LOG10E, LOG2E,
- MAX_VALUE, MIN_VALUE, Math, MenuItem, MoveAnimation, NEGATIVE_INFINITY,
- Number, Object, ObjectRange, Option, PI, POSITIVE_INFINITY,
+ ActiveXObject, Array, ArrayBuffer, ArrayBufferView, Autocompleter, Assets,
+ Boolean, Builder, Buffer, Browser, COM, CScript, Canvas, CustomAnimation,
+ Class, Control, Chain, Color, Cookie, Core, DataView, Date, Debug, Draggable,
+ Draggables, Droppables, Document, DomReady, DOMReady, Drag, E, Enumerator,
+ Enumerable, Element, Elements, Error, Effect, EvalError, Event, Events,
+ FadeAnimation, Field, Flash, Float32Array, Float64Array, Form, FormField, Frame,
+ Function, Fx, Group, Hash, HotKey, HtmlTable, Iframe, IframeShim,
+ Image, Int16Array, Int32Array, Int8Array, Insertion, InputValidator,
+ JSON, Keyboard, Locale, LN10, LN2, LOG10E, LOG2E, MAX_VALUE, MIN_VALUE,
+ Mask, Math, MenuItem, MoveAnimation, MooTools, Native, NEGATIVE_INFINITY,
+ Number, Object, ObjectRange, Option, Options, OverText, PI, POSITIVE_INFINITY,
  PeriodicalExecuter, Point, Position, Prototype, RangeError, Rectangle,
- ReferenceError, RegExp, ResizeAnimation, RotateAnimation, SQRT1_2, SQRT2,
- ScrollBar, Scriptaculous, Selector, String, Style, SyntaxError, Sortable,
- SortableObserver, Sound, System, Text, TextArea, Template, Timer,
- TypeError, Toggle, Try, URIError, URL, VBArray, WScript, Web, Window,
- XMLDOM, XMLHttpRequest, XPathEvaluator, XPathException, XPathExpression,
- XPathNamespace, XPathNSResolver, XPathResult,
- "\\", a, abbr, acronym, activeborder, activecaption,
+ ReferenceError, RegExp, ResizeAnimation, Request, RotateAnimation, SQRT1_2, SQRT2,
+ ScrollBar, Scriptaculous, Scroller, Slick, Slider, Selector, String, Style,
+ SyntaxError, Sortable, Sortables, SortableObserver, Sound, Spinner, System,
+ Swiff, Text, TextArea, Template, Timer, Tips, Type, TypeError, Toggle,
+ Try, URI, URIError, URL, VBArray, WScript, Web, Window, XMLDOM, XMLHttpRequest,
+ XPathEvaluator, XPathException, XPathExpression, XPathNamespace, XPathNSResolver,
+ XPathResult, "\\", a, abbr, acronym, activeborder, activecaption,
  addEventListener, address, alert, aliceblue, all, animator,
  antiquewhite, appleScript, applet, apply, appworkspace,
  applicationCache, aqua, aquamarine, area, arguments,
@@ -221,7 +223,7 @@
  "hta:application", html, i, iTunes, id, identifier, iframe, img, immed,
  implieds, in, inactiveborder, inactivecaption, inactivecaptiontext,
  include, indent, indexOf, indianred, indigo, infobackground, infotext,
- init, input, ins, isAlpha, isApplicationRunning, isArray, isDigit,
+ init, input, ins, instanceOf, isAlpha, isApplicationRunning, isArray, isDigit,
  isFinite, isNaN, ivory, join, jshint, JSHINT, json, jquery, jQuery, kbd,
  keygen, keys, khaki, konfabulatorVersion, label, labelled, lang, last,
  lavender, lavenderblush, lawngreen, laxbreak, latedef, lbp, led, left, legend,
@@ -237,7 +239,7 @@
  mediumseagreen, mediumslateblue, mediumspringgreen, mediumturquoise,
  mediumvioletred, member, menu, menutext, message, meta, meter,
  midnightblue, "min-height", "min-width", mintcream, mistyrose, mm,
- moccasin, module, moveBy, moveTo, name, nav, navajowhite, navigator, navy, new,
+ moccasin, module, moveBy, moveTo, mootools, name, nav, navajowhite, navigator, navy, new,
  newcap, noarg, node, noempty, noframes, nomen, nonew, noscript, nud, object, ol,
  oldlace, olive, olivedrab, on, onbeforeunload, onblur, onerror, onevar,
  onfocus, onload, onresize, onunload, opacity, open, openDatabase, openURL, opener,
@@ -266,10 +268,10 @@
  textarea, tfoot, th, thead, thistle, threeddarkshadow, threedface,
  threedhighlight, threedlightshadow, threedshadow, time, title,
  toLowerCase, toString, toUpperCase, toint32, token, tomato, top, tr, tt,
- tty, turquoise, tv, type, Uint16Array, Uint32Array, Uint8Array, u, ul, undef,
- unescape, "unicode-bidi", unused, unwatch, updateNow, urls, value, valueOf,
- var, version, "vertical-align", video, violet, visibility, watch,
- WebSocket, wheat, white, "white-space", whitesmoke, width,
+ tty, turquoise, tv, type, typeOf, Uint16Array, Uint32Array, Uint8Array,
+ u, ul, undef, unescape, "unicode-bidi", unused, unwatch, updateNow, urls,
+ value, valueOf, var, version, "vertical-align", video, violet,
+ visibility, watch, WebSocket, wheat, white, "white-space", whitesmoke, width,
  window, windowframe, windowtext, Worker, "word-spacing", "word-wrap",
  yahooCheckLogin, yahooLogin, yahooLogout, yellow, yellowgreen, "z-index"
 */
@@ -328,6 +330,7 @@ var JSHINT = (function () {
             latedef    : true, // if the use before definition should not be tolerated
             laxbreak   : true, // if line breaks should not be checked
             loopfunc   : true, // if functions should be allowed to be defined within loops
+            mootools   : true, // if MooTools globals should be predefined
             newcap     : true, // if constructor names must be capitalized
             noarg      : true, // if arguments.caller and arguments.callee should be disallowed
             node       : true, // if the Node.js environment globals should be predefined
@@ -790,6 +793,54 @@ var JSHINT = (function () {
         lookahead,
         member,
         membersOnly,
+
+        mootools = {
+            '$'             : false,
+            '$$'            : false,
+            Assets          : false,
+            Browser         : false,
+            Chain           : false,
+            Class           : false,
+            Color           : false,
+            Cookie          : false,
+            Core            : false,
+            Document        : false,
+            DomReady        : false,
+            DOMReady        : false,
+            Drag            : false,
+            Element         : false,
+            Elements        : false,
+            Event           : false,
+            Events          : false,
+            Fx              : false,
+            Group           : false,
+            Hash            : false,
+            HtmlTable       : false,
+            Iframe          : false,
+            IframeShim      : false,
+            InputValidator  : false,
+            instanceOf      : false,
+            Keyboard        : false,
+            Locale          : false,
+            Mask            : false,
+            MooTools        : false,
+            Native          : false,
+            Options         : false,
+            OverText        : false,
+            Request         : false,
+            Scroller        : false,
+            Slick           : false,
+            Slider          : false,
+            Sortables       : false,
+            Spinner         : false,
+            Swiff           : false,
+            Tips            : false,
+            Type            : false,
+            typeOf          : false,
+            URI             : false,
+            Window          : false
+        },
+
         nexttoken,
 
         node = {
@@ -1110,6 +1161,9 @@ var JSHINT = (function () {
 
         if (option.jquery)
             combine(predefined, jquery);
+
+        if (option.mootools)
+            combine(predefined, mootools);
     }
 
 
