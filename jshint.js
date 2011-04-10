@@ -214,7 +214,7 @@
  "font-weight", footer, forestgreen, forin, form, fragment, frame,
  frames, frameset, from, fromCharCode, fuchsia, fud, funct, function,
  functions, g, gainsboro, gc, getComputedStyle, getRow, ghostwhite, GLOBAL, global,
- globals, gold, goldenrod, gray, graytext, green, greenyellow, h1, h2,
+ globals, globalstrict, gold, goldenrod, gray, graytext, green, greenyellow, h1, h2,
  h3, h4, h5, h6, handheld, hasOwnProperty, head, header, height, help,
  hgroup, highlight, highlighttext, history, honeydew, hotpink, hr,
  "hta:application", html, i, iTunes, id, identifier, iframe, img, immed,
@@ -305,47 +305,48 @@ var JSHINT = (function () {
 // These are the JSHint boolean options.
 
         boolOptions = {
-            asi        : true, // if automatic semicolon insertion should be tolerated
-            bitwise    : true, // if bitwise operators should not be allowed
-            boss       : true, // if advanced usage of assignments should be allowed
-            browser    : true, // if the standard browser globals should be predefined
-            cap        : true, // if upper case HTML should be allowed
-            couch      : true, // if CouchDB globals should be predefined
-            css        : true, // if CSS workarounds should be tolerated
-            curly      : true, // if curly braces around blocks should be required (even in if/for/while)
-            debug      : true, // if debugger statements should be allowed
-            devel      : true, // if logging globals should be predefined (console, alert, etc.)
-            eqeqeq     : true, // if === should be required
-            eqnull     : true, // if == null comparisons should be tolerated
-            es5        : true, // if ES5 syntax should be allowed
-            evil       : true, // if eval should be allowed
-            expr       : true, // if ExpressionStatement should be allowed as Programs
-            forin      : true, // if for in statements must filter
-            fragment   : true, // if HTML fragments should be allowed
-            immed      : true, // if immediate invocations must be wrapped in parens
-            jquery     : true, // if jQuery globals should be predefined
-            latedef    : true, // if the use before definition should not be tolerated
-            laxbreak   : true, // if line breaks should not be checked
-            loopfunc   : true, // if functions should be allowed to be defined within loops
-            mootools   : true, // if MooTools globals should be predefined
-            newcap     : true, // if constructor names must be capitalized
-            noarg      : true, // if arguments.caller and arguments.callee should be disallowed
-            node       : true, // if the Node.js environment globals should be predefined
-            noempty    : true, // if empty blocks should be disallowed
-            nonew      : true, // if using `new` for side-effects should be disallowed
-            nomen      : true, // if names should be checked
-            on         : true, // if HTML event handlers should be allowed
-            onevar     : true, // if only one var statement per function should be allowed
-            passfail   : true, // if the scan should stop on first error
-            plusplus   : true, // if increment/decrement should not be allowed
-            prototypejs: true, // if Prototype and Scriptaculous globals shoudl be predefined
-            regexp     : true, // if the . should not be allowed in regexp literals
-            rhino      : true, // if the Rhino environment globals should be predefined
-            undef      : true, // if variables should be declared before used
-            shadow     : true, // if variable shadowing should be tolerated
-            strict     : true, // require the "use strict"; pragma
-            sub        : true, // if all forms of subscript notation are tolerated
-            white      : true  // if strict whitespace rules apply
+            asi         : true, // if automatic semicolon insertion should be tolerated
+            bitwise     : true, // if bitwise operators should not be allowed
+            boss        : true, // if advanced usage of assignments should be allowed
+            browser     : true, // if the standard browser globals should be predefined
+            cap         : true, // if upper case HTML should be allowed
+            couch       : true, // if CouchDB globals should be predefined
+            css         : true, // if CSS workarounds should be tolerated
+            curly       : true, // if curly braces around blocks should be required (even in if/for/while)
+            debug       : true, // if debugger statements should be allowed
+            devel       : true, // if logging globals should be predefined (console, alert, etc.)
+            eqeqeq      : true, // if === should be required
+            eqnull      : true, // if == null comparisons should be tolerated
+            es5         : true, // if ES5 syntax should be allowed
+            evil        : true, // if eval should be allowed
+            expr        : true, // if ExpressionStatement should be allowed as Programs
+            forin       : true, // if for in statements must filter
+            fragment    : true, // if HTML fragments should be allowed
+            globalstrict: true, // if global "use strict"; should be allowed (also enables 'strict')
+            immed       : true, // if immediate invocations must be wrapped in parens
+            jquery      : true, // if jQuery globals should be predefined
+            latedef     : true, // if the use before definition should not be tolerated
+            laxbreak    : true, // if line breaks should not be checked
+            loopfunc    : true, // if functions should be allowed to be defined within loops
+            mootools    : true, // if MooTools globals should be predefined
+            newcap      : true, // if constructor names must be capitalized
+            noarg       : true, // if arguments.caller and arguments.callee should be disallowed
+            node        : true, // if the Node.js environment globals should be predefined
+            noempty     : true, // if empty blocks should be disallowed
+            nonew       : true, // if using `new` for side-effects should be disallowed
+            nomen       : true, // if names should be checked
+            on          : true, // if HTML event handlers should be allowed
+            onevar      : true, // if only one var statement per function should be allowed
+            passfail    : true, // if the scan should stop on first error
+            plusplus    : true, // if increment/decrement should not be allowed
+            prototypejs : true, // if Prototype and Scriptaculous globals shoudl be predefined
+            regexp      : true, // if the . should not be allowed in regexp literals
+            rhino       : true, // if the Rhino environment globals should be predefined
+            undef       : true, // if variables should be declared before used
+            shadow      : true, // if variable shadowing should be tolerated
+            strict      : true, // require the "use strict"; pragma
+            sub         : true, // if all forms of subscript notation are tolerated
+            white       : true  // if strict whitespace rules apply
         },
 
 // browser contains a set of global names which are commonly provided by a
@@ -1161,6 +1162,9 @@ var JSHINT = (function () {
 
         if (option.mootools)
             combine(predefined, mootools);
+
+        if (option.globalstrict)
+            option.strict = true;
     }
 
 
@@ -5386,7 +5390,8 @@ loop:   for (;;) {
 
                 default:
                     if (nexttoken.value === 'use strict') {
-                        warning("Use the function form of \"use strict\".");
+                        if (!option.globalstrict)
+                            warning("Use the function form of \"use strict\".");
                         use_strict();
                     }
                     statements('lib');
