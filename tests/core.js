@@ -62,10 +62,15 @@ exports.testCustomGlobals = function () {
 /** Test that JSHint recognizes `new Array(<expr>)` as a valid expression */
 exports.testNewArray = function () {
     var code  = 'new Array(1);',
-        code1 = 'new Array(v + 1);';
+        code1 = 'new Array(v + 1);',
+        code2 = 'new Array("hello", "there", "chaps");';
 
     assert.ok(JSHINT(code));
     assert.ok(JSHINT(code1));
+    assert.ok(JSHINT(code2));
+
+    assert.ok(!JSHINT('new Array();'));
+    assert.eql(JSHINT.errors[0].reason, "Use the array literal notation [].");
 };
 
 /**
