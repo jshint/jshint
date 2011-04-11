@@ -2841,8 +2841,13 @@ loop:   for (;;) {
 
 
     function doFunction(i, statement) {
-        var f, s = scope;
-        scope = Object.create(s);
+        var f,
+            oldOption = option,
+            oldScope  = scope;
+
+        option = Object.create(option);
+        scope = Object.create(scope);
+
         funct = {
             '(name)'     : i || '"' + anonname + '"',
             '(line)'     : nexttoken.line,
@@ -2861,7 +2866,8 @@ loop:   for (;;) {
         funct['(params)'] = functionparams();
 
         block(false);
-        scope = s;
+        scope = oldScope;
+        option = oldOption;
         funct['(last)'] = token.line;
         funct = funct['(context)'];
         return f;

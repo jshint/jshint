@@ -125,3 +125,13 @@ exports.testVoid = function () {
     ];
     assert.ok(JSHINT(code));
 };
+
+exports.functionScopedOptions = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/functionScopedOptions.js', 'utf8');
+    assert.ok(!JSHINT(src));
+    assert.eql(JSHINT.errors.length, 2);
+    assert.eql(JSHINT.errors[0].line, 1);
+    assert.eql(JSHINT.errors[0].reason, "eval is evil.");
+    assert.eql(JSHINT.errors[1].line, 8);
+    assert.eql(JSHINT.errors[1].reason, "eval is evil.");
+};
