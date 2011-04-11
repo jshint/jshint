@@ -202,8 +202,8 @@
  report, require, reserved, resizeBy, resizeTo, resolvePath, resumeUpdates,
  respond, rhino, right, runCommand, scroll, screen, scrollBy, scrollTo,
  scrollbar, search, seal, send, serialize, setInterval, setTimeout, shift,
- slice, sort,spawn, split, stack, status, start, strict, sub, substr, shadow,
- supplant, sum, sync, test, toLowerCase, toString, toUpperCase, toint32,
+ slice, sort,spawn, split, stack, status, start, strict, sub, substr, supernew,
+ shadow, supplant, sum, sync, test, toLowerCase, toString, toUpperCase, toint32,
  token, top, type, typeOf, Uint16Array, Uint32Array, Uint8Array, undef,
  unused, urls, value, valueOf, var, version, WebSocket, white, window, Worker
 */
@@ -277,6 +277,7 @@ var JSHINT = (function () {
             shadow      : true, // if variable shadowing should be tolerated
             strict      : true, // require the "use strict"; pragma
             sub         : true, // if all forms of subscript notation are tolerated
+            supernew    : true, // if `new function () { ... };` and `new Object;` should be tolerated
             white       : true  // if strict whitespace rules apply
         },
 
@@ -2622,10 +2623,11 @@ loop:   for (;;) {
                 }
             }
         } else {
-            warning("Weird construction. Delete 'new'.", this);
+            if (!option.supernew)
+                warning("Weird construction. Delete 'new'.", this);
         }
         adjacent(token, nexttoken);
-        if (nexttoken.id !== '(') {
+        if (nexttoken.id !== '(' && !option.supernew) {
             warning("Missing '()' invoking a constructor.");
         }
         this.first = c;

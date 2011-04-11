@@ -297,6 +297,29 @@ exports.eqnull = function () {
     assert.ok(JSHINT(code, { eqeqeq: true, eqnull: true }));
 };
 
+/**
+ * Option `supernew` allows you to use operator `new` with anonymous functions
+ * and objects without invocation.
+ *
+ * Ex.:
+ *   new function () { ... };
+ *   new Date;
+ */
+exports.supernew = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/supernew.js', 'utf8');
+
+    assert.ok(!JSHINT(src));
+    assert.eql(JSHINT.errors.length, 3);
+    assert.eql(JSHINT.errors[0].line, 1);
+    assert.eql(JSHINT.errors[0].reason, "Weird construction. Delete 'new'.");
+    assert.eql(JSHINT.errors[1].line, 9);
+    assert.eql(JSHINT.errors[1].reason, "Missing '()' invoking a constructor.");
+    assert.eql(JSHINT.errors[2].line, 11);
+    assert.eql(JSHINT.errors[2].reason, "Missing '()' invoking a constructor.");
+
+    assert.ok(JSHINT(src, { supernew: true }));
+};
+
 /** Option `bitwise` disallows the use of bitwise operators. */
 exports.bitwise = function () {
     var ops = [ '&', '|', '^', '<<' , '>>', '>>>' ];
