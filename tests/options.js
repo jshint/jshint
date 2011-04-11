@@ -588,4 +588,17 @@ exports.white = function () {
     assert.eql(JSHINT.errors[3].reason, "Missing space after 'if'.");
     assert.eql(JSHINT.errors[4].line, 6);
     assert.eql(JSHINT.errors[4].reason, "Missing space after ')'.");
+
+    // Check for trailing whitespaces
+    var code = [
+        'hey();'
+      , 'sup(); '
+      , 'notmuch();'
+    ];
+
+    assert.ok(JSHINT(code));
+    assert.ok(!JSHINT(code, { white: true }));
+    assert.eql(JSHINT.errors.length, 1);
+    assert.eql(JSHINT.errors[0].line, 2);
+    assert.eql(JSHINT.errors[0].reason, "Trailing whitespace.");
 };
