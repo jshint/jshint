@@ -830,25 +830,34 @@ var JSHINT = (function () {
 // Private lex methods
 
         function nextLine() {
-            var at;
-            if (line >= lines.length) {
+            var at,
+                tw; // trailing whitespace check
+
+            if (line >= lines.length)
                 return false;
-            }
+
             character = 1;
             s = lines[line];
             line += 1;
             at = s.search(/ \t/);
-            if (at >= 0) {
+
+            if (at >= 0)
                 warningAt("Mixed spaces and tabs.", line, at + 1);
-            }
+
             s = s.replace(/\t/g, tab);
             at = s.search(cx);
-            if (at >= 0) {
+
+            if (at >= 0)
                 warningAt("Unsafe character.", line, at);
-            }
-            if (option.maxlen && option.maxlen < s.length) {
+
+            if (option.maxlen && option.maxlen < s.length)
                 warningAt("Line too long.", line, s.length);
-            }
+
+            // Check for trailing whitespaces
+            tw = s.search(/\s+$/);
+            if (option.white && ~tw)
+                warningAt("Trailing whitespace.", line, tw);
+
             return true;
         }
 
