@@ -135,3 +135,9 @@ exports.functionScopedOptions = function () {
     assert.eql(JSHINT.errors[1].line, 8);
     assert.eql(JSHINT.errors[1].reason, "eval is evil.");
 };
+
+/** JSHint should not only read jshint, but also jslint options */
+exports.jslintOptions = function() {
+    var src = fs.readFileSync(__dirname + '/fixtures/jslintOptions.js', 'utf8');
+    assert.ok(JSHINT(src));
+};
