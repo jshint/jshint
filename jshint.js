@@ -761,13 +761,14 @@ var JSHINT = (function () {
 
 // Produce an error warning.
 
-    function quit(m, l, ch) {
+    function quit(message, line, chr) {
+        var percentage = Math.floor((line / lines.length) * 100);
+
         throw {
             name: 'JSHintError',
-            line: l,
-            character: ch,
-            message: m + " (" + Math.floor((l / lines.length) * 100) +
-                    "% scanned)."
+            line: line,
+            character: chr,
+            message: message + " (" + percentage + "% scanned)."
         };
     }
 
