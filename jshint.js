@@ -3840,7 +3840,7 @@ loop:   for (;;) {
     };
     itself.jshint = itself;
 
-    itself.edition = '2011-03-01';
+    itself.edition = '2011-04-16';
 
     return itself;
 
