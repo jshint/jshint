@@ -205,7 +205,8 @@
  slice, sort,spawn, split, stack, status, start, strict, sub, substr, supernew,
  shadow, supplant, sum, sync, test, toLowerCase, toString, toUpperCase, toint32,
  token, top, type, typeOf, Uint16Array, Uint32Array, Uint8Array, undef,
- unused, urls, value, valueOf, var, version, WebSocket, white, window, Worker
+ unused, urls, value, valueOf, var, version, WebSocket, white, window, Worker,
+ wsh
 */
 
 /*global exports: false */
@@ -278,7 +279,8 @@ var JSHINT = (function () {
             strict      : true, // require the "use strict"; pragma
             sub         : true, // if all forms of subscript notation are tolerated
             supernew    : true, // if `new function () { ... };` and `new Object;` should be tolerated
-            white       : true  // if strict whitespace rules apply
+            white       : true, // if strict whitespace rules apply
+            wsh         : true  // if the Windows Scripting Host environment globals should be predefined
         },
 
 // browser contains a set of global names which are commonly provided by a
@@ -601,6 +603,19 @@ var JSHINT = (function () {
         urls,
         warnings,
 
+        wsh = {
+            ActiveXObject             : true,
+            Enumerator                : true,
+            GetObject                 : true,
+            ScriptEngine              : true,
+            ScriptEngineBuildVersion  : true,
+            ScriptEngineMajorVersion  : true,
+            ScriptEngineMinorVersion  : true,
+            VBArray                   : true,
+            WSH                       : true,
+            WScript                   : true
+        },
+
 // Regular expressions. Some of these are stupidly long.
 
 // unsafe comment or string
@@ -750,6 +765,9 @@ var JSHINT = (function () {
 
         if (option.mootools)
             combine(predefined, mootools);
+
+        if (option.wsh)
+            combine(predefined, wsh);
 
         if (option.globalstrict)
             option.strict = true;

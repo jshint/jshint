@@ -1,5 +1,5 @@
-/*jshint evil: true */
-/*global ActiveXObject: false, JSHINT: false, WScript: false */
+/*jshint evil: true, wsh: true */
+/*global JSHINT: false */
 
 (function() {
 	var formatters = {
