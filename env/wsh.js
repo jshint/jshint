@@ -56,8 +56,13 @@
 		}
 	};
 
+	var scriptName = WScript.ScriptName;
+	var scriptPath = WScript.ScriptFullName;
+
+	scriptPath = scriptPath.substr(0, scriptPath.length - scriptName.length);
+
 	// load JSHint if the two scripts have not been concatenated
-	if (typeof JSHINT === "undefined") eval(new ActiveXObject("Scripting.FileSystemObject").OpenTextFile("..\\jshint.js", 1).ReadAll());
+	if (typeof JSHINT === "undefined") eval(new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(scriptPath + "..\\jshint.js", 1).ReadAll());
 
 	var globals = {};
 	var options = {};
@@ -65,15 +70,15 @@
 	var unnamed = WScript.Arguments.Unnamed;
 
 	if (unnamed.length !== 1) {
-		WScript.StdOut.WriteLine("    usage: cscript env/wsh.js [options] <script>");
+		WScript.StdOut.WriteLine("    usage: cscript " + scriptName + " [options] <script>");
 		WScript.StdOut.WriteLine("");
 		WScript.StdOut.WriteLine("Scans the specified script with JSHint and reports any errors encountered.  If");
 		WScript.StdOut.WriteLine("the script name is \"-\", it will be read from standard input instead.");
 		WScript.StdOut.WriteLine("");
 		WScript.StdOut.WriteLine("JSHint configuration options can be passed in via optional, Windows-style");
 		WScript.StdOut.WriteLine("arguments.  For example:");
-		WScript.StdOut.WriteLine("    cscript env/wsh.js /jquery:true myscript.js");
-		WScript.StdOut.WriteLine("    cscript env/wsh.js /globals:QUnit:false,_:false,foo:true foo.js");
+		WScript.StdOut.WriteLine("    cscript " + scriptName + " /jquery:true myscript.js");
+		WScript.StdOut.WriteLine("    cscript " + scriptName + " /globals:QUnit:false,_:false,foo:true foo.js");
 
 		WScript.Quit(-1);
 	}
