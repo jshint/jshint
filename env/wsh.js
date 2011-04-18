@@ -59,10 +59,45 @@
 	// load JSHint if the two scripts have not been concatenated
 	if (typeof JSHINT === "undefined") eval(new ActiveXObject("Scripting.FileSystemObject").OpenTextFile("..\\jshint.js", 1).ReadAll());
 
-	var source = WScript.StdIn.ReadAll();
+	var globals = {};
+	var options = {};
+	var named = WScript.Arguments.Named;
+	var unnamed = WScript.Arguments.Unnamed;
+
+	if (unnamed.length !== 1) {
+		WScript.StdOut.WriteLine("    usage: cscript env/wsh.js [options] <script>");
+		WScript.StdOut.WriteLine("");
+		WScript.StdOut.WriteLine("Scans the specified script with JSHint and reports any errors encountered.  If");
+		WScript.StdOut.WriteLine("the script name is \"-\", it will be read from standard input instead.");
+		WScript.StdOut.WriteLine("");
+		WScript.StdOut.WriteLine("JSHint configuration options can be passed in via optional, Windows-style");
+		WScript.StdOut.WriteLine("arguments.  For example:");
+		WScript.StdOut.WriteLine("    cscript env/wsh.js /jquery:true myscript.js");
+		WScript.StdOut.WriteLine("    cscript env/wsh.js /globals:QUnit:false,_:false,foo:true foo.js");
+
+		WScript.Quit(1);
+	}
+
+	var script = unnamed(0);
+
+	if (script === "-") {
+		script = WScript.StdIn.ReadAll();
+	} else {
+		script = new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(script, 1).ReadAll();
+	}
+
+	for (var etor = new Enumerator(named); !etor.atEnd(); etor.moveNext()) {
+		var option = etor.item();
+		var value = named(option);
+
+		if (option === "global") {
+		} else {
+			options[option] = value === "true" ? true : value === "false" ? false : value;
+		}
+	}
 
 	// trim junk character; not sure where it comes from
-	JSHINT(source.substr(0, source.length - 1), { passfail: false });
+	JSHINT(script.substr(0, script.length - 1), options, globals);
 
 	var data = JSHINT.data();
 	var lines = [];
