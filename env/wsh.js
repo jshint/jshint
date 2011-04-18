@@ -75,7 +75,7 @@
 		WScript.StdOut.WriteLine("    cscript env/wsh.js /jquery:true myscript.js");
 		WScript.StdOut.WriteLine("    cscript env/wsh.js /globals:QUnit:false,_:false,foo:true foo.js");
 
-		WScript.Quit(1);
+		WScript.Quit(-1);
 	}
 
 	var script = unnamed(0);
@@ -91,6 +91,22 @@
 		var value = named(option);
 
 		if (option === "global") {
+			value = value.split(",");
+
+			for (var i = 0; i < value.length; i++) {
+				var name = value[i].split(":");
+
+				if (name.length === 1 || name[1] === "false") {
+					globals[name[0]] = false;
+				} else if (name[1] === "true") {
+					globals[name[0]] = true;
+				} else {
+					WScript.StdOut.WriteLine("Unrecognized value for global: " + name[0]);
+					WScript.StdOut.WriteLine("Must be \"true\", \"false\", or omitted.");
+
+					WScript.Quit(-1);
+				}
+			}
 		} else {
 			options[option] = value === "true" ? true : value === "false" ? false : value;
 		}
