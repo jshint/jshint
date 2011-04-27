@@ -2,6 +2,14 @@
 /*global JSHINT: false */
 
 (function() {
+	function readFile(path) {
+		try {
+			return new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(path, 1).ReadAll();
+		} catch (ex) {
+			return null;
+		}
+	}
+
 	var formatters = {
 		errors: function(errors, lines) {
 			for (var i = 0; i < errors.length; i++) {
@@ -62,7 +70,15 @@
 	scriptPath = scriptPath.substr(0, scriptPath.length - scriptName.length);
 
 	// load JSHint if the two scripts have not been concatenated
-	if (typeof JSHINT === "undefined") eval(new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(scriptPath + "..\\jshint.js", 1).ReadAll());
+	if (typeof JSHINT === "undefined") {
+		eval(readFile(scriptPath + "..\\jshint.js"));
+
+		if (typeof JSHINT === "undefined") {
+			WScript.StdOut.WriteLine("ERROR: Could not find 'jshint.js'.");
+
+			WScript.Quit(-2);
+		}
+	}
 
 	var globals = {};
 	var options = {};
@@ -86,9 +102,19 @@
 	var script = unnamed(0);
 
 	if (script === "-") {
-		script = WScript.StdIn.ReadAll();
+		try {
+			script = WScript.StdIn.ReadAll();
+		} catch (ex) {
+			script = null;
+		}
 	} else {
-		script = new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(script, 1).ReadAll();
+		script = readFile(script);
+	}
+
+	if (script === null) {
+		WScript.StdOut.WriteLine("ERROR: Could not read target script.");
+
+		WScript.Quit(2);
 	}
 
 	for (var etor = new Enumerator(named); !etor.atEnd(); etor.moveNext()) {
