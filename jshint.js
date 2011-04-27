@@ -273,7 +273,7 @@ var JSHINT = (function () {
             onevar      : true, // if only one var statement per function should be allowed
             passfail    : true, // if the scan should stop on first error
             plusplus    : true, // if increment/decrement should not be allowed
-            prototypejs : true, // if Prototype and Scriptaculous globals shoudl be predefined
+            prototypejs : true, // if Prototype and Scriptaculous globals should be predefined
             regexp      : true, // if the . should not be allowed in regexp literals
             rhino       : true, // if the Rhino environment globals should be predefined
             undef       : true, // if variables should be declared before used
