@@ -143,8 +143,7 @@
 		}
 	}
 
-	// trim junk character; not sure where it comes from
-	JSHINT(script.substr(0, script.length - 1), options, globals);
+	JSHINT(script, options, globals);
 
 	var data = JSHINT.data();
 	var lines = [];
