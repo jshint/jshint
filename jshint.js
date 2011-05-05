@@ -192,9 +192,9 @@
  GLOBAL, global, globals, globalstrict, hasOwnProperty, help, history, i, id,
  identifier, immed, implieds, include, indent, indexOf, init, ins, instanceOf,
  isAlpha, isApplicationRunning, isArray, isDigit, isFinite, isNaN, join, jshint,
- JSHINT, json, jquery, jQuery, keys, label, labelled, last, laxbreak, latedef,
- lbp, led, left, length, line, load, loadClass, localStorage, location, log,
- loopfunc, m, match, maxerr, maxlen, member,message, meta, module, moveBy,
+ JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastsemic, laxbreak,
+ latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
+ log, loopfunc, m, match, maxerr, maxlen, member,message, meta, module, moveBy,
  moveTo, mootools, name, navigator, new, newcap, noarg, node, noempty, nomen,
  nonew, nud, onbeforeunload, onblur, onerror, onevar, onfocus, onload, onresize,
  onunload, open, openDatabase, openURL, opener, opera, outer, param, parent,
@@ -2144,7 +2144,7 @@ loop:   for (;;) {
                 warning("Do not use 'new' for side effects.");
             }
             if (nexttoken.id !== ';') {
-                if (!option.asi) {
+                if (!option.asi && !(option.lastsemic && nexttoken.id == '}' && nexttoken.line == token.line)) {
                     warningAt("Missing semicolon.", token.line, token.from + token.value.length);
                 }
             } else {
