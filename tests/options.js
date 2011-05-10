@@ -611,17 +611,16 @@ exports.white = function () {
     assert.eql(JSHINT.errors[3].reason, "Missing space after 'if'.");
     assert.eql(JSHINT.errors[4].line, 6);
     assert.eql(JSHINT.errors[4].reason, "Missing space after ')'.");
+};
 
-    // Check for trailing whitespaces
-    var code = [
-        'hey();'
-      , 'sup(); '
-      , 'notmuch();'
-    ];
+exports.trailing = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/white.js', 'utf8');
 
-    assert.ok(JSHINT(code));
-    assert.ok(!JSHINT(code, { white: true }));
-    assert.eql(JSHINT.errors.length, 1);
-    assert.eql(JSHINT.errors[0].line, 2);
+    assert.ok(JSHINT(src));
+    assert.ok(!JSHINT(src, { trailing: true }));
+    assert.eql(JSHINT.errors.length, 2);
+    assert.eql(JSHINT.errors[0].line, 7);
     assert.eql(JSHINT.errors[0].reason, "Trailing whitespace.");
+    assert.eql(JSHINT.errors[1].line, 9);
+    assert.eql(JSHINT.errors[1].reason, "Trailing whitespace.");
 };
