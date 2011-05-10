@@ -4,6 +4,7 @@ function hello () {
 
 var bye = function() {
     if(hey){
+        
         return;
-    }
+    } 
 };
