@@ -264,6 +264,24 @@ exports.rhino = function () {
     assert.globalsKnown(globals, { rhino: true });
 };
 
+exports.wsh = function () {
+    var globals = [
+            'ActiveXObject'
+          , 'Enumerator'
+          , 'GetObject'
+          , 'ScriptEngine'
+          , 'ScriptEngineBuildVersion'
+          , 'ScriptEngineMajorVersion'
+          , 'ScriptEngineMinorVersion'
+          , 'VBArray'
+          , 'WSH'
+          , 'WScript'
+        ];
+
+    assert.globalsImplied(globals);
+    assert.globalsKnown(globals, { wsh: true });
+};
+
 exports.es5 = function () {
     var src = fs.readFileSync(__dirname + "/fixtures/es5.js", "utf8");
 
