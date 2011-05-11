@@ -49,6 +49,10 @@ If you use Rhino, we have a special wrapper script for that:
 
     java -jar /path/to/js.jar env/rhino.js myscript.js
 
+Also included is a Windows Scripting Host wrapper:
+
+    cscript env/wsh.js myscript.js
+
 Tests
 -----
 

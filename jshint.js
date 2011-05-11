@@ -154,62 +154,60 @@
  evil: true, nomen: false, onevar: false, regexp: false, strict: true, boss: true
 */
 
-/*members "\b", "\t", "\n", "\f", "\r", "!=", "!==", "\"", "%",
- "(begin)", "(breakage)", "(context)", "(error)", "(global)",
- "(identifier)", "(last)", "(line)", "(loopage)", "(name)", "(onevar)",
- "(params)", "(scope)", "(statement)", "(verb)", "*", "+", "++", "-",
- "--", "\/", "<", "<=", "==", "===", ">", ">=", $, $$, $A, $F, $H, $R, $break,
- $continue, $w, Abstract, Ajax, __filename, __dirname, ActiveXObject, Array,
- ArrayBuffer, ArrayBufferView, Autocompleter, Assets, Boolean, Builder,
- Buffer, Browser, COM, CScript, Canvas, CustomAnimation, Class, Control,
- Chain, Color, Cookie, Core, DataView, Date, Debug, Draggable, Draggables,
- Droppables, Document, DomReady, DOMReady, Drag, E, Enumerator, Enumerable,
- Element, Elements, Error, Effect, EvalError, Event, Events, FadeAnimation,
- Field, Flash, Float32Array, Float64Array, Form, FormField, Frame, Function,
- Fx, Group, Hash, HotKey, HTMLElement, HtmlTable, Iframe, IframeShim, Image,
- Int16Array, Int32Array, Int8Array, Insertion, InputValidator, JSON, Keyboard,
- Locale, LN10, LN2, LOG10E, LOG2E, MAX_VALUE, MIN_VALUE, Mask, Math, MenuItem,
- MoveAnimation, MooTools, Native, NEGATIVE_INFINITY, Number, Object,
- ObjectRange, Option, Options, OverText, PI, POSITIVE_INFINITY,
- PeriodicalExecuter, Point, Position, Prototype, RangeError, Rectangle,
- ReferenceError, RegExp, ResizeAnimation, Request, RotateAnimation, SQRT1_2,
- SQRT2, ScrollBar, Scriptaculous, Scroller, Slick, Slider, Selector, String,
- Style, SyntaxError, Sortable, Sortables, SortableObserver, Sound, Spinner,
- System, Swiff, Text, TextArea, Template, Timer, Tips, Type, TypeError,
- Toggle, Try, URI, URIError, URL, VBArray, WScript, Web, Window, XMLDOM,
- XMLHttpRequest, XPathEvaluator, XPathException, XPathExpression,
- XPathNamespace, XPathNSResolver, XPathResult, "\\", a, addEventListener,
- address, alert,  apply, applicationCache, arguments, arity, asi, b, bitwise,
- block, blur, boolOptions, boss, browser, c, call, callee, caller, cases,
- charAt, charCodeAt, character, clearInterval, clearTimeout, close, closed,
- closure, comment, condition, confirm, console, constructor, content, couch,
- create, css, curly, d, data, datalist, dd, debug, decodeURI,
- decodeURIComponent, defaultStatus, defineClass, deserialize, devel,
- document, edition, else, emit, encodeURI, encodeURIComponent, entityify,
- eqeqeq, weakeqeq, eqnull, errors, es5, escape, eval, event, evidence, evil, ex,
- exception, exec, exps, expr, exports, FileReader, first, floor, focus,
- forin, fragment, frames, from, fromCharCode, fud, funct, function, functions,
- g, gc, getComputedStyle, getRow, GLOBAL, global, globals, globalstrict,
- hasOwnProperty, help, history, i, id, identifier, immed, implieds,
- include, indent, indexOf, init, ins, instanceOf, isAlpha,
- isApplicationRunning, isArray, isDigit, isFinite, isNaN, join, jshint,
- JSHINT, json, jquery, jQuery, keys, label, labelled, last, laxbreak,
- latedef, lbp, led, left, length, line, load, loadClass, localStorage,
- location, log, loopfunc, m, match, maxerr, maxlen, member,message, meta,
- module, moveBy, moveTo, mootools, name, navigator, new, newcap, noarg,
- node, noempty, nomen, nonew, nud, onbeforeunload, onblur, onerror, onevar,
- onfocus, onload, onresize, onunload, open, openDatabase, openURL, opener,
- opera, outer, param, parent, parseFloat, parseInt, passfail, plusplus,
- predef, print, process, prompt, prototype, prototypejs, push, quit, range,
- raw, reach, reason, regexdash, regexp, readFile, readUrl, removeEventListener, replace,
- report, require, reserved, resizeBy, resizeTo, resolvePath, resumeUpdates,
- respond, rhino, right, runCommand, scroll, screen, scrollBy, scrollTo,
- scrollbar, search, seal, send, serialize, setInterval, setTimeout, shift,
- slice, sort,spawn, split, stack, status, start, strict, sub, substr, supernew,
- shadow, supplant, sum, sync, test, toLowerCase, toString, toUpperCase, toint32,
- token, top, type, typeOf, Uint16Array, Uint32Array, Uint8Array, undef,
- unused, urls, value, valueOf, var, version, WebSocket, white, whiteline, window, Worker
-*/
+/*members "\b", "\t", "\n", "\f", "\r", "!=", "!==", "\"", "%", "(begin)",
+ "(breakage)", "(context)", "(error)", "(global)", "(identifier)", "(last)",
+ "(line)", "(loopage)", "(name)", "(onevar)", "(params)", "(scope)",
+ "(statement)", "(verb)", "*", "+", "++", "-", "--", "\/", "<", "<=", "==",
+ "===", ">", ">=", $, $$, $A, $F, $H, $R, $break, $continue, $w, Abstract, Ajax,
+ __filename, __dirname, ActiveXObject, Array, ArrayBuffer, ArrayBufferView,
+ Autocompleter, Assets, Boolean, Builder, Buffer, Browser, COM, CScript, Canvas,
+ CustomAnimation, Class, Control, Chain, Color, Cookie, Core, DataView, Date,
+ Debug, Draggable, Draggables, Droppables, Document, DomReady, DOMReady, Drag,
+ E, Enumerator, Enumerable, Element, Elements, Error, Effect, EvalError, Event,
+ Events, FadeAnimation, Field, Flash, Float32Array, Float64Array, Form,
+ FormField, Frame, Function, Fx, GetObject, Group, Hash, HotKey, HTMLElement,
+ HtmlTable, Iframe, IframeShim, Image, Int16Array, Int32Array, Int8Array,
+ Insertion, InputValidator, JSON, Keyboard, Locale, LN10, LN2, LOG10E, LOG2E,
+ MAX_VALUE, MIN_VALUE, Mask, Math, MenuItem, MoveAnimation, MooTools, Native,
+ NEGATIVE_INFINITY, Number, Object, ObjectRange, Option, Options, OverText, PI,
+ POSITIVE_INFINITY, PeriodicalExecuter, Point, Position, Prototype, RangeError,
+ Rectangle, ReferenceError, RegExp, ResizeAnimation, Request, RotateAnimation,
+ SQRT1_2, SQRT2, ScrollBar, ScriptEngine, ScriptEngineBuildVersion,
+ ScriptEngineMajorVersion, ScriptEngineMinorVersion, Scriptaculous, Scroller,
+ Slick, Slider, Selector, String, Style, SyntaxError, Sortable, Sortables,
+ SortableObserver, Sound, Spinner, System, Swiff, Text, TextArea, Template,
+ Timer, Tips, Type, TypeError, Toggle, Try, URI, URIError, URL, VBArray, WSH,
+ WScript, Web, Window, XMLDOM, XMLHttpRequest, XPathEvaluator, XPathException,
+ XPathExpression, XPathNamespace, XPathNSResolver, XPathResult, "\\", a,
+ addEventListener, address, alert, apply, applicationCache, arguments, arity,
+ asi, b, bitwise, block, blur, boolOptions, boss, browser, c, call, callee,
+ caller, cases, charAt, charCodeAt, character, clearInterval, clearTimeout,
+ close, closed, closure, comment, condition, confirm, console, constructor,
+ content, couch, create, css, curly, d, data, datalist, dd, debug, decodeURI,
+ decodeURIComponent, defaultStatus, defineClass, deserialize, devel, document,
+ edition, else, emit, encodeURI, encodeURIComponent, entityify, eqeqeq, eqnull,
+ errors, es5, escape, eval, event, evidence, evil, ex, exception, exec, exps,
+ expr, exports, FileReader, first, floor, focus, forin, fragment, frames, from,
+ fromCharCode, fud, funct, function, functions, g, gc, getComputedStyle, getRow,
+ GLOBAL, global, globals, globalstrict, hasOwnProperty, help, history, i, id,
+ identifier, immed, implieds, include, indent, indexOf, init, ins, instanceOf,
+ isAlpha, isApplicationRunning, isArray, isDigit, isFinite, isNaN, join, jshint,
+ JSHINT, json, jquery, jQuery, keys, label, labelled, last, laxbreak, latedef,
+ lbp, led, left, length, line, load, loadClass, localStorage, location, log,
+ loopfunc, m, match, maxerr, maxlen, member,message, meta, module, moveBy,
+ moveTo, mootools, name, navigator, new, newcap, noarg, node, noempty, nomen,
+ nonew, nud, onbeforeunload, onblur, onerror, onevar, onfocus, onload, onresize,
+ onunload, open, openDatabase, openURL, opener, opera, outer, param, parent,
+ parseFloat, parseInt, passfail, plusplus, predef, print, process, prompt,
+ prototype, prototypejs, push, quit, range, raw, reach, reason, regexp,
+ readFile, readUrl, regexdash, removeEventListener, replace, report, require, reserved,
+ resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
+ runCommand, scroll, screen, scrollBy, scrollTo, scrollbar, search, seal, send,
+ serialize, setInterval, setTimeout, shift, slice, sort,spawn, split, stack,
+ status, start, strict, sub, substr, supernew, shadow, supplant, sum, sync,
+ test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing, type,
+ typeOf, Uint16Array, Uint32Array, Uint8Array, undef, unused, urls, value, valueOf,
+ var, version, weakeqeq, WebSocket, white, whiteline, window, Worker, wsh*/
 
 /*global exports: false */
 
@@ -273,7 +271,7 @@ var JSHINT = (function () {
             onevar      : true, // if only one var statement per function should be allowed
             passfail    : true, // if the scan should stop on first error
             plusplus    : true, // if increment/decrement should not be allowed
-            prototypejs : true, // if Prototype and Scriptaculous globals shoudl be predefined
+            prototypejs : true, // if Prototype and Scriptaculous globals should be predefined
             regexdash   : true, // if the last - in [ -] should be escaped
             regexp      : true, // if the . should not be allowed in regexp literals
             rhino       : true, // if the Rhino environment globals should be predefined
@@ -282,8 +280,10 @@ var JSHINT = (function () {
             strict      : true, // require the "use strict"; pragma
             sub         : true, // if all forms of subscript notation are tolerated
             supernew    : true, // if `new function () { ... };` and `new Object;` should be tolerated
+            trailing    : true, // if trailing whitespace rules apply
             weakeqeq    : true, // if === should be required for weak comparisons (ie. === 0)
             white       : true, // if strict whitespace rules apply
+            wsh         : true, // if the Windows Scripting Host environment globals should be predefined
             whiteline   : true  // if empty lines with only whitespace are allowed (caused by auto-indenters)
         },
 
@@ -607,6 +607,19 @@ var JSHINT = (function () {
         urls,
         warnings,
 
+        wsh = {
+            ActiveXObject             : true,
+            Enumerator                : true,
+            GetObject                 : true,
+            ScriptEngine              : true,
+            ScriptEngineBuildVersion  : true,
+            ScriptEngineMajorVersion  : true,
+            ScriptEngineMinorVersion  : true,
+            VBArray                   : true,
+            WSH                       : true,
+            WScript                   : true
+        },
+
 // Regular expressions. Some of these are stupidly long.
 
 // unsafe comment or string
@@ -757,6 +770,9 @@ var JSHINT = (function () {
         if (option.mootools)
             combine(predefined, mootools);
 
+        if (option.wsh)
+            combine(predefined, wsh);
+
         if (option.globalstrict)
             option.strict = true;
     }
@@ -861,6 +877,8 @@ var JSHINT = (function () {
 
             // Check for trailing whitespaces
             tw = s.search(/\s+$/);
+            if (option.trailing && ~tw)
+                warningAt("Trailing whitespace.", line, tw);
             if (option.white && ~tw) {
                 fl = s.search(/^\s+$/);
                 if (~fl) {
