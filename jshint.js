@@ -181,7 +181,7 @@
  XPathExpression, XPathNamespace, XPathNSResolver, XPathResult, "\\", a,
  addEventListener, address, alert, apply, applicationCache, arguments, arity,
  asi, b, bitwise, block, blur, boolOptions, boss, browser, c, call, callee,
- caller, cases, charAt, charCodeAt, character, clearInterval, clearTimeout,
+ caller, caseindent, cases, charAt, charCodeAt, character, clearInterval, clearTimeout,
  close, closed, closure, comment, condition, confirm, console, constructor,
  content, couch, create, css, curly, d, data, datalist, dd, debug, decodeURI,
  decodeURIComponent, defaultStatus, defineClass, deserialize, devel, document,
@@ -194,7 +194,7 @@
  isAlpha, isApplicationRunning, isArray, isDigit, isFinite, isNaN, join, jshint,
  JSHINT, json, jquery, jQuery, keys, label, labelled, last, laxbreak, latedef,
  lbp, led, left, length, line, load, loadClass, localStorage, location, log,
- loopfunc, m, match, maxerr, maxlen, member,message, meta, module, moveBy,
+ loopfunc, m, match, maxerr, maxlen, member, message, meta, module, moveBy,
  moveTo, mootools, name, navigator, new, newcap, noarg, node, noempty, nomen,
  nonew, nud, onbeforeunload, onblur, onerror, onevar, onfocus, onload, onresize,
  onunload, open, openDatabase, openURL, opener, opera, outer, param, parent,
@@ -207,7 +207,7 @@
  status, start, strict, sub, substr, supernew, shadow, supplant, sum, sync,
  test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing, type,
  typeOf, Uint16Array, Uint32Array, Uint8Array, undef, unused, urls, value, valueOf,
- var, version, weakeqeq, WebSocket, white, whiteline, window, Worker, wsh*/
+ var, version, WebSocket, white, whiteline, window, Worker, wsh*/
 
 /*global exports: false */
 
@@ -245,6 +245,7 @@ var JSHINT = (function () {
             bitwise     : true, // if bitwise operators should not be allowed
             boss        : true, // if advanced usage of assignments should be allowed
             browser     : true, // if the standard browser globals should be predefined
+            caseindent  : true, // if case statements in switches should be indented
             couch       : true, // if CouchDB globals should be predefined
             curly       : true, // if curly braces around blocks should be required (even in if/for/while)
             debug       : true, // if debugger statements should be allowed
@@ -281,7 +282,6 @@ var JSHINT = (function () {
             sub         : true, // if all forms of subscript notation are tolerated
             supernew    : true, // if `new function () { ... };` and `new Object;` should be tolerated
             trailing    : true, // if trailing whitespace rules apply
-            weakeqeq    : true, // if === should be required for weak comparisons (ie. === 0)
             white       : true, // if strict whitespace rules apply
             wsh         : true, // if the Windows Scripting Host environment globals should be predefined
             whiteline   : true  // if empty lines with only whitespace are allowed (caused by auto-indenters)
@@ -2509,10 +2509,10 @@ loop:   for (;;) {
         if (!eqnull && option.eqeqeq) {
             warning("Expected '{a}' and instead saw '{b}'.",
                     this, '===', '==');
-        } else if (option.weakeqeq && isPoorRelation(left)) {
+        } else if (isPoorRelation(left)) {
             warning("Use '{a}' to compare with '{b}'.",
                 this, '===', left.value);
-        } else if (option.weakeqeq && isPoorRelation(right)) {
+        } else if (isPoorRelation(right)) {
             warning("Use '{a}' to compare with '{b}'.",
                 this, '===', right.value);
         }
@@ -2523,10 +2523,10 @@ loop:   for (;;) {
         if (option.eqeqeq) {
             warning("Expected '{a}' and instead saw '{b}'.",
                     this, '!==', '!=');
-        } else if (option.weakeqeq && isPoorRelation(left)) {
+        } else if (isPoorRelation(left)) {
             warning("Use '{a}' to compare with '{b}'.",
                     this, '!==', left.value);
-        } else if (option.weakeqeq && isPoorRelation(right)) {
+        } else if (isPoorRelation(right)) {
             warning("Use '{a}' to compare with '{b}'.",
                     this, '!==', right.value);
         }
@@ -3182,7 +3182,7 @@ loop:   for (;;) {
         t = nexttoken;
         advance('{');
         nonadjacent(token, nexttoken);
-        indent += option.indent;
+        indent += (option.caseindent ? option.indent * 2 : option.indent);
         this.cases = [];
         for (;;) {
             switch (nexttoken.id) {
@@ -3232,7 +3232,7 @@ loop:   for (;;) {
                 advance(':');
                 break;
             case '}':
-                indent -= option.indent;
+                indent -= (option.caseindent ? option.indent * 2 : option.indent);
                 indentation();
                 advance('}', t);
                 if (this.cases.length === 1 || this.condition.id === 'true' ||
