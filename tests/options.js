@@ -7,7 +7,7 @@
 /*jshint boss: true, laxbreak: true, node: true */
 
 var JSHINT = require('../jshint.js').JSHINT,
-    assert = require('assert'),
+    helper = require("./testhelper").setup.testhelper,
     fs     = require('fs');
 
 /**
@@ -23,15 +23,17 @@ var JSHINT = require('../jshint.js').JSHINT,
 exports.shadow = function () {
     var src = fs.readFileSync(__dirname + "/fixtures/redef.js", "utf8");
 
-    // Do not tolerate variable shadowing by default
-    assert.ok(!JSHINT(src));
-    assert.eql(JSHINT.errors[0].line, 5);
-    assert.eql(JSHINT.errors[0].reason, "'a' is already defined.");
-    assert.eql(JSHINT.errors[1].line, 10);
-    assert.eql(JSHINT.errors[1].reason, "'foo' is already defined.");
-
-    // Allow variable shadowing when shadow is true
-    assert.ok(JSHINT(src, { shadow: true }));
+    helper(JSHINT, src)
+        // Do not tolerate variable shadowing by default
+        .init(false)
+        .run()
+            .hasError(5, "'a' is already defined.")
+            .hasError(10, "'foo' is already defined.")
+        .end()
+        
+        // Allow variable shadowing when shadow is true
+        .init(true, { shadow: true })
+    ;
 };
 
 /**
@@ -50,25 +52,28 @@ exports.latedef = function () {
     var src  = fs.readFileSync(__dirname + '/fixtures/latedef.js', 'utf8'),
         src1 = fs.readFileSync(__dirname + '/fixtures/redef.js', 'utf8');
 
-    // By default, tolerate the use of variable before its definition
-    assert.ok(JSHINT(src));
-
-    // However, JSHint must complain if variable is actually missing
-    assert.ok(!JSHINT('fn()', { undef: true }));
-    assert.eql(JSHINT.errors[0].line, 1);
-    assert.eql(JSHINT.errors[0].reason, "'fn' is not defined.");
-
-    // And it also must complain about the redefinition (see option `shadow`)
-    assert.ok(!JSHINT(src1));
-
-    // When latedef is true, JSHint must not tolerate the use before definition
-    assert.ok(!JSHINT(src, { latedef: true }));
-    assert.eql(JSHINT.errors[0].line, 2);
-    assert.eql(JSHINT.errors[0].reason, "'fn' was used before it was defined.");
-    assert.eql(JSHINT.errors[1].line, 6);
-    assert.eql(JSHINT.errors[1].reason, "'fn1' was used before it was defined.");
-    assert.eql(JSHINT.errors[2].line, 10);
-    assert.eql(JSHINT.errors[2].reason, "'vr' was used before it was defined.");
+    helper(JSHINT)
+        // By default, tolerate the use of variable before its definition
+        .init(true, {}, src)
+        
+        // However, JSHint must complain if variable is actually missing
+        .init(false, { undef: true }, 'fn()')
+        .run()
+            .hasError(1, "'fn' is not defined.")
+            .hasError(1, "Missing semicolon.")
+        .end()
+        
+        // And it also must complain about the redefinition (see option `shadow`)
+        .init(false, { }, src1)
+        
+        // When latedef is true, JSHint must not tolerate the use before definition
+        .init(false, { latedef: true }, src)
+        .run()
+            .hasError(2, "'fn' was used before it was defined.")
+            .hasError(6, "'fn1' was used before it was defined.")
+            .hasError(10, "'vr' was used before it was defined.")
+        .end()
+    ;
 };
 
 /**
@@ -86,33 +91,37 @@ exports.curly = function () {
     var src  = fs.readFileSync(__dirname + '/fixtures/curly.js', 'utf8'),
         src1 = fs.readFileSync(__dirname + '/fixtures/curly2.js', 'utf8');
 
-    // By default, tolerate one-line blocks since they are valid JavaScript
-    assert.ok(JSHINT(src));
-    assert.ok(JSHINT(src1));
-
-    // Require all blocks to be wrapped with curly braces if curly is true
-    assert.ok(!JSHINT(src, { curly: true }));
-    assert.eql(JSHINT.errors[0].line, 2);
-    assert.eql(JSHINT.errors[0].reason, "Expected '{' and instead saw 'return'.");
-    assert.eql(JSHINT.errors[1].line, 5);
-    assert.eql(JSHINT.errors[1].reason, "Expected '{' and instead saw 'doSomething'.");
-    assert.eql(JSHINT.errors[2].line, 8);
-    assert.eql(JSHINT.errors[2].reason, "Expected '{' and instead saw 'doSomething'.");
-
-    assert.ok(JSHINT(src1, { curly: true }));
+    helper(JSHINT)
+        // By default, tolerate one-line blocks since they are valid JavaScript
+        .init(true, {}, src)
+        .init(true, {}, src1)
+        
+        // Require all blocks to be wrapped with curly braces if curly is true
+        .init(false, { curly: true }, src)
+        .run()
+            .hasError(2, "Expected '{' and instead saw 'return'.")
+            .hasError(5, "Expected '{' and instead saw 'doSomething'.")
+            .hasError(8, "Expected '{' and instead saw 'doSomething'.")
+        .end()
+        
+        .init(true, { curly: true }, src1)
+    ;
 };
 
 /** Option `noempty` prohibits the use of empty blocks. */
 exports.noempty = function () {
     var code = 'for (;;) {}';
 
-    // By default, tolerate empty blocks since they are valid JavaScript
-    assert.ok(JSHINT(code));
-
-    // Do not tolerate, when noempty is true
-    assert.ok(!JSHINT(code, { noempty: true }));
-    assert.eql(JSHINT.errors[0].line, 1);
-    assert.eql(JSHINT.errors[0].reason, 'Empty block.');
+    helper(JSHINT, code)
+        // By default, tolerate empty blocks since they are valid JavaScript
+        .init(true)
+        
+        // Do not tolerate, when noempty is true
+        .init(false, { noempty: true })
+        .run()
+            .hasError(1, "Empty block.")
+        .end()
+    ;
 };
 
 /**
@@ -125,15 +134,17 @@ exports.noempty = function () {
 exports.noarg = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/noarg.js', 'utf8');
 
-    // By default, tolerate both arguments.callee and arguments.caller
-    assert.ok(JSHINT(src));
-
-    // Do not tolerate both .callee and .caller when noarg is true
-    assert.ok(!JSHINT(src, { noarg: true }));
-    assert.eql(JSHINT.errors[0].line, 2);
-    assert.eql(JSHINT.errors[0].reason, 'Avoid arguments.callee.');
-    assert.eql(JSHINT.errors[1].line, 6);
-    assert.eql(JSHINT.errors[1].reason, 'Avoid arguments.caller.');
+    helper(JSHINT, src)
+        // By default, tolerate both arguments.callee and arguments.caller
+        .init(true)
+        
+        // Do not tolerate both .callee and .caller when noarg is true
+        .init(false, { noarg: true })
+        .run()
+            .hasError(2, "Avoid arguments.callee.")
+            .hasError(6, "Avoid arguments.caller.")
+        .end()
+    ;
 };
 
 /** Option `nonew` prohibits the use of constructors for side-effects */
@@ -141,24 +152,29 @@ exports.nonew = function () {
     var code  = "new Thing();",
         code1 = "var obj = new Thing();";
 
-    assert.ok(JSHINT(code));
-    assert.ok(JSHINT(code1));
-
-    assert.ok(!JSHINT(code, { nonew: true }));
-    assert.eql(JSHINT.errors[0].line, 1);
-    assert.eql(JSHINT.errors[0].reason, "Do not use 'new' for side effects.");
-    assert.ok(JSHINT(code1, { nonew: true }));
+    helper(JSHINT)
+        .init(true, {}, code)
+        .init(true, {}, code1)
+        
+        .init(false, { nonew: true }, code)
+        .run()
+            .hasError(1, "Do not use 'new' for side effects.")
+        .end()
+        .init(true, { nonew: true }, code1)
+    ;
 };
 
 /** Option `asi` allows you to use automatic-semicolon insertion */
 exports.asi = function () {
     var code = 'hello()';
 
-    assert.ok(!JSHINT(code));
-    assert.eql(JSHINT.errors[0].line, 1);
-    assert.eql(JSHINT.errors[0].reason, 'Missing semicolon.');
-
-    assert.ok(JSHINT(code, { asi: true }));
+    helper(JSHINT, code)
+        .init(false)
+        .run()
+            .hasError(1, "Missing semicolon.")
+        .end()
+        .init(true, { asi: true })
+    ;
 };
 
 /**
@@ -179,29 +195,32 @@ exports.expr = function () {
     ];
 
     for (var i = 0, exp; exp = exps[i]; i++) {
-        assert.ok(!JSHINT(exp));
-        assert.eql(JSHINT.errors[0].line, 1);
-        assert.eql(JSHINT.errors[0].reason, 'Expected an assignment or function call and instead saw an expression.');
+        helper(JSHINT, exp)
+            .init(false)
+            .run()
+                .hasError(1, "Expected an assignment or function call and instead saw an expression.")
+            .end()
+            
+            .init(true, { expr: true })
+        ;
     }
-
-    for (i = 0, exp = null; exp = exps[i]; i++)
-        assert.ok(JSHINT(exp, { expr: true }));
 };
 
 /** Option `undef` requires you to always define variables you use */
 exports.undef = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/undef.js', 'utf8');
 
-    // Make sure there are no other errors
-    assert.ok(JSHINT(src));
-
-    // Make sure it fails when undef is true
-    assert.ok(!JSHINT(src, { undef: true }));
-    assert.eql(JSHINT.errors.length, 2);
-    assert.eql(JSHINT.errors[0].line, 1);
-    assert.eql(JSHINT.errors[0].reason, "'undef' is not defined.");
-    assert.eql(JSHINT.errors[1].line, 6);
-    assert.eql(JSHINT.errors[1].reason, "'localUndef' is not defined.");
+    helper(JSHINT, src)
+        // Make sure there are no other errors
+        .init(true)
+        
+        // Make sure it fails when undef is true
+        .init(false, { undef: true })
+        .run()
+            .hasError(1, "'undef' is not defined.")
+            .hasError(6, "'localUndef' is not defined.")
+        .end()
+    ;
 };
 
 /**
@@ -215,14 +234,16 @@ exports.undef = function () {
 exports.forin = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/forin.js', 'utf8');
 
-    // Make sure there are no other errors
-    assert.ok(JSHINT(src));
-
-    // Make sure it fails when forin is true
-    assert.ok(!JSHINT(src, { forin: true }));
-    assert.eql(JSHINT.errors.length, 1);
-    assert.eql(JSHINT.errors[0].line, 1);
-    assert.eql(JSHINT.errors[0].reason, 'The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.');
+    helper(JSHINT, src)
+        // Make sure there are no other errors
+        .init(true)
+        
+        // Make sure it fails when forin is true
+        .init(false, { forin: true })
+        .run()
+            .hasError(1, "The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.")
+        .end()
+    ;
 };
 
 /**
@@ -236,42 +257,41 @@ exports.forin = function () {
 exports.loopfunc = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/loopfunc.js', 'utf8');
 
-    // By default, not functions are allowed inside loops
-    assert.ok(!JSHINT(src));
-    assert.eql(JSHINT.errors.length, 3);
-    assert.eql(JSHINT.errors[0].line, 2);
-    assert.eql(JSHINT.errors[0].reason, "Don't make functions within a loop.");
-    assert.eql(JSHINT.errors[1].line, 6);
-    assert.eql(JSHINT.errors[1].reason, "Don't make functions within a loop.");
-    assert.eql(JSHINT.errors[2].line, 10);
-    assert.eql(JSHINT.errors[2].reason, "Function declarations should not be placed in blocks. Use a function expression or move the statement to the top of the outer function.");
-
-    // When loopfunc is true, only function declaration should fail.
-    // Expressions are okay.
-    assert.ok(!JSHINT(src, { loopfunc: true }));
-    assert.eql(JSHINT.errors.length, 1);
-    assert.eql(JSHINT.errors[0].line, 10);
-    assert.eql(JSHINT.errors[0].reason, "Function declarations should not be placed in blocks. Use a function expression or move the statement to the top of the outer function.");
+    helper(JSHINT, src)
+        // By default, not functions are allowed inside loops
+        .init(false)
+        .run()
+            .hasError(2, "Don't make functions within a loop.")
+            .hasError(6, "Don't make functions within a loop.")
+            .hasError(10, "Function declarations should not be placed in blocks. Use a function expression or move the statement to the top of the outer function.")
+        .end()
+        
+        // When loopfunc is true, only function declaration should fail.
+        // Expressions are okay.
+        .init(false, { loopfunc: true })
+        .run()
+            .hasError(10, "Function declarations should not be placed in blocks. Use a function expression or move the statement to the top of the outer function.")
+        .end()
+    ;
 };
 
 /** Option `boss` unlocks some useful but unsafe features of JavaScript. */
 exports.boss = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/boss.js', 'utf8');
 
-    // By default, warn about suspicious assignments
-    assert.ok(!JSHINT(src));
-    assert.eql(JSHINT.errors.length, 4);
-    assert.eql(JSHINT.errors[0].line, 1);
-    assert.eql(JSHINT.errors[0].reason, 'Expected a conditional expression and instead saw an assignment.');
-    assert.eql(JSHINT.errors[1].line, 4);
-    assert.eql(JSHINT.errors[1].reason, 'Expected a conditional expression and instead saw an assignment.');
-    assert.eql(JSHINT.errors[2].line, 7);
-    assert.eql(JSHINT.errors[2].reason, 'Expected a conditional expression and instead saw an assignment.');
-    assert.eql(JSHINT.errors[3].line, 12);
-    assert.eql(JSHINT.errors[3].reason, 'Expected a conditional expression and instead saw an assignment.');
-
-    // But if you are the boss, all is good
-    assert.ok(JSHINT(src, { boss: true }));
+    helper(JSHINT, src)
+         // By default, warn about suspicious assignments
+        .init(false)
+        .run()
+            .hasError(1, "Expected a conditional expression and instead saw an assignment.")
+            .hasError(4, "Expected a conditional expression and instead saw an assignment.")
+            .hasError(7, "Expected a conditional expression and instead saw an assignment.")
+            .hasError(12, "Expected a conditional expression and instead saw an assignment.")
+        .end()
+        
+        // But if you are the boss, all is good
+        .init(true, { boss: true })
+    ;
 };
 
 /**
@@ -284,17 +304,20 @@ exports.eqnull = function () {
       , 'if (null == e) doSomething();'
     ];
 
-    // By default, warn about `== null` comparison
-    assert.ok(!JSHINT(code));
-    assert.eql(JSHINT.errors.length, 2);
-    assert.eql(JSHINT.errors[0].reason, "Use '===' to compare with 'null'.");
-    assert.eql(JSHINT.errors[1].reason, "Use '===' to compare with 'null'.");
-
-    // But when `eqnull` is true, no questions asked
-    assert.ok(JSHINT(code, { eqnull: true }));
-
-    // Make sure that `eqnull` has precedence over `eqeqeq`
-    assert.ok(JSHINT(code, { eqeqeq: true, eqnull: true }));
+    helper(JSHINT, code)
+        // By default, warn about `== null` comparison
+        .init(false)
+        .run()
+            .hasError(1, "Use '===' to compare with 'null'.")
+            .hasError(2, "Use '===' to compare with 'null'.")
+        .end()
+        
+        // But when `eqnull` is true, no questions asked
+        .init(true, { eqnull: true })
+        
+        // Make sure that `eqnull` has precedence over `eqeqeq`
+        .init(true, { eqeqeq: true, eqnull: true })
+    ;
 };
 
 /**
@@ -308,16 +331,16 @@ exports.eqnull = function () {
 exports.supernew = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/supernew.js', 'utf8');
 
-    assert.ok(!JSHINT(src));
-    assert.eql(JSHINT.errors.length, 3);
-    assert.eql(JSHINT.errors[0].line, 1);
-    assert.eql(JSHINT.errors[0].reason, "Weird construction. Delete 'new'.");
-    assert.eql(JSHINT.errors[1].line, 9);
-    assert.eql(JSHINT.errors[1].reason, "Missing '()' invoking a constructor.");
-    assert.eql(JSHINT.errors[2].line, 11);
-    assert.eql(JSHINT.errors[2].reason, "Missing '()' invoking a constructor.");
-
-    assert.ok(JSHINT(src, { supernew: true }));
+    helper(JSHINT, src)
+        .init(false)
+        .run()
+            .hasError(1, "Weird construction. Delete 'new'.")
+            .hasError(9, "Missing '()' invoking a constructor.")
+            .hasError(11, "Missing '()' invoking a constructor.")
+        .end()
+        
+        .init(true, { supernew: true })
+    ;
 };
 
 /** Option `bitwise` disallows the use of bitwise operators. */
@@ -325,61 +348,73 @@ exports.bitwise = function () {
     var ops = [ '&', '|', '^', '<<' , '>>', '>>>' ];
 
     // By default allow bitwise operators
-    for (var i = 0, op; op = ops[i]; i++)
-        assert.ok(JSHINT('var c = a ' + op + ' b;'));
-    assert.ok(JSHINT('var c = ~a;'));
-
-    for (i = 0, op = null; op = ops[i]; i++) {
-        assert.ok(!JSHINT('var c = a ' + op + ' b;', { bitwise: true }));
-        assert.eql(JSHINT.errors.length, 1);
-        assert.eql(JSHINT.errors[0].reason, "Unexpected use of '" + op + "'.");
+    helper(JSHINT, 'var c = ~a;')
+        .init(true)
+        .init(false, { bitwise: true })
+        .run()
+            .hasError(1, "Unexpected '~'.")
+        .end()
+    ;
+    for (var i = 0, op; op = ops[i]; i++) {
+        helper(JSHINT)
+            .init(true, {}, 'var c = a ' + op + ' b;')
+            .init(false, { bitwise: true }, 'var c = a ' + op + ' b;')
+            .run()
+                .hasError(1, "Unexpected use of '" + op + "'.")
+            .end()
+        ;
     }
-    assert.ok(!JSHINT('var c = ~a;', { bitwise: true }));
-    assert.eql(JSHINT.errors.length, 1);
-    assert.eql(JSHINT.errors[0].reason, "Unexpected '~'.");
 };
 
 /** Option `debug` allows the use of debugger statements. */
 exports.debug = function () {
     var code = 'function test () { debugger; return true; }';
 
-    // By default disallow debugger statements.
-    assert.ok(!JSHINT(code));
-    assert.eql(JSHINT.errors.length, 1);
-    assert.eql(JSHINT.errors[0].reason, "All 'debugger' statements should be removed.");
-
-    // But allow them if debug is true.
-    assert.ok(JSHINT(code, { debug: true }));
+    helper(JSHINT, code)
+        // By default disallow debugger statements.
+        .init(false)
+        .run()
+            .hasError(1, "All 'debugger' statements should be removed.")
+        .end()
+        
+        // But allow them if debug is true.
+        .init(true, { debug: true })
+    ;
 };
 
 /** Option `eqeqeq` requires you to use === all the time. */
 exports.eqeqeq = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/eqeqeq.js', 'utf8');
 
-    assert.ok(!JSHINT(src));
-    assert.eql(JSHINT.errors.length, 1); // Only == null should fail
-    assert.eql(JSHINT.errors[0].line, 8);
-    assert.eql(JSHINT.errors[0].reason, "Use '===' to compare with 'null'.");
-
-    assert.ok(!JSHINT(src, { eqeqeq: true }));
-    assert.eql(JSHINT.errors.length, 3); // All relations in that file should fail
-    assert.eql(JSHINT.errors[0].line, 2);
-    assert.eql(JSHINT.errors[0].reason, "Expected '===' and instead saw '=='.");
-    assert.eql(JSHINT.errors[1].line, 5);
-    assert.eql(JSHINT.errors[1].reason, "Expected '!==' and instead saw '!='.");
-    assert.eql(JSHINT.errors[2].line, 8);
-    assert.eql(JSHINT.errors[2].reason, "Expected '===' and instead saw '=='.");
+    helper(JSHINT, src)
+        // Only == null should fail
+        .init(false)
+        .run()
+            .hasError(8, "Use '===' to compare with 'null'.")
+        .end()
+        
+        // All relations in that file should fail
+        .init(false, { eqeqeq: true })
+        .run()
+            .hasError(2, "Expected '===' and instead saw '=='.")
+            .hasError(5, "Expected '!==' and instead saw '!='.")
+            .hasError(8, "Expected '===' and instead saw '=='.")
+        .end()
+    ;
 };
 
 /** Option `evil` allows the use of eval. */
 exports.evil = function () {
     var src = "eval('hey();');";
 
-    assert.ok(!JSHINT(src)); // Eval?                        SHUT.
-    assert.eql(JSHINT.errors.length, 1); //                  DOWN.
-    assert.eql(JSHINT.errors[0].reason, "eval is evil."); // EVERYTHING.
-
-    assert.ok(JSHINT(src, { evil: true }));
+    helper(JSHINT, src)
+        .init(false)
+        .run()
+            .hasError(1, "eval is evil.")
+        .end()
+        
+        .init(true, { evil: true })
+    ;
 };
 
 /**
@@ -398,33 +433,36 @@ exports.evil = function () {
 exports.immed = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/immed.js', 'utf8');
 
-    assert.ok(JSHINT(src));
-    assert.ok(!JSHINT(src, { immed: true }));
-    assert.eql(JSHINT.errors.length, 2);
-    assert.eql(JSHINT.errors[0].line, 3);
-    assert.eql(JSHINT.errors[0].reason, "Wrap an immediate function invocation in parentheses " +
-                                        "to assist the reader in understanding that the expression " +
-                                        "is the result of a function, and not the function itself.");
-    assert.eql(JSHINT.errors[1].line, 7);
-    assert.eql(JSHINT.errors[1].reason, 'Move the invocation into the parens that contain the function.');
+    helper(JSHINT, src)
+        .init(true)
+        .init(false, { immed: true })
+        .run()
+            .hasError(3, "Wrap an immediate function invocation in parentheses " +
+                    "to assist the reader in understanding that the expression " +
+                    "is the result of a function, and not the function itself.")
+            .hasError(7, "Move the invocation into the parens that contain the function.")
+        .end()
+    ;
 };
 
 /** Option `nomen` disallows variable names with dangling '_'. */
 exports.nomen = function () {
     var names = [ '_hey', 'hey_' ];
 
-    for (var i = 0, name; name = names[i]; i++)
-        assert.ok(JSHINT('var ' + name + ';'));
-
-    for (i = 0, name = null; name = names[i]; i++) {
-        assert.ok(!JSHINT('var ' + name + ';', { nomen: true }));
-        assert.eql(JSHINT.errors.length, 1);
-        assert.eql(JSHINT.errors[0].reason, "Unexpected dangling '_' in '" + name + "'.");
+    for (var i = 0, name; name = names[i]; i++) {
+        helper(JSHINT, 'var ' + name + ';')
+            .init(true)
+            .init(false, { nomen: true })
+            .run()
+                .hasError(1, "Unexpected dangling '_' in '" + name + "'.")
+            .end()
+        ;
     }
-
-    // Normal names should pass all the time
-    assert.ok(JSHINT('var hey;'));
-    assert.ok(JSHINT('var hey;', { nomen: true }));
+    
+    helper(JSHINT, 'var hey;')
+        .init(true)
+        .init(true, { nomen: true })
+    ;
 };
 
 /** Option `passfail` tells JSHint to stop at the first error. */
@@ -435,11 +473,18 @@ exports.passfail = function () {
       , 'three()'
     ];
 
-    assert.ok(!JSHINT(code));
-    assert.eql(JSHINT.errors.length, 3);
-
-    assert.ok(!JSHINT(code, { passfail: true }));
-    assert.ok(JSHINT.errors.length, 1);
+    helper(JSHINT, code)
+        .init(false)
+        .run()
+            .hasError(1, "Missing semicolon.")
+            .hasError(2, "Missing semicolon.")
+            .hasError(3, "Missing semicolon.")
+        .end()
+        .init(false, { passfail: true })
+        .run()
+            .hasError(1, "Missing semicolon.")
+        .end()
+    ;
 };
 
 /**
@@ -449,11 +494,13 @@ exports.passfail = function () {
 exports.onevar = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/onevar.js', 'utf8');
 
-    assert.ok(JSHINT(src));
-    assert.ok(!JSHINT(src, { onevar: true }));
-    assert.eql(JSHINT.errors.length, 1);
-    assert.eql(JSHINT.errors[0].line, 10);
-    assert.eql(JSHINT.errors[0].reason, 'Too many var statements.');
+    helper(JSHINT, src)
+        .init(true)
+        .init(false, { onevar: true })
+        .run()
+            .hasError(10, "Too many var statements.")
+        .end()
+    ;
 };
 
 /** Option `plusplus` prohibits the use of increments/decrements. */
@@ -461,18 +508,18 @@ exports.plusplus = function () {
     var ops = [ '++', '--' ];
 
     for (var i = 0, op; op = ops[i]; i++) {
-        assert.ok(JSHINT('var i = j' + op + ';'));
-        assert.ok(JSHINT('var i = ' + op + 'j;'));
-    }
-
-    for (i = 0, op = null; op = ops[i]; i++) {
-        assert.ok(!JSHINT('var i = j' + op + ';', { plusplus: true }));
-        assert.ok(JSHINT.errors.length, 1);
-        assert.ok(JSHINT.errors[0].reason, "Unexpected use of '" + op + "'.");
-
-        assert.ok(!JSHINT('var i = ' + op + 'j;', { plusplus: true }));
-        assert.ok(JSHINT.errors.length, 1);
-        assert.ok(JSHINT.errors[0].reason, "Unexpected use of '" + op + "'.");
+        helper(JSHINT)
+            .init(true, {}, 'var i = j' + op + ';')
+            .init(true, {}, 'var i = ' + op + 'j;')
+            .init(false, { plusplus: true }, 'var i = j' + op + ';')
+            .run()
+                .hasError(1, "Unexpected use of '" + op + "'.")
+            .end()
+            .init(false, { plusplus: true }, 'var i = ' + op + 'j;')
+            .run()
+                .hasError(1, "Unexpected use of '" + op + "'.")
+            .end()
+        ;
     }
 };
 
@@ -491,23 +538,29 @@ exports.plusplus = function () {
 exports.newcap = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/newcap.js', 'utf8');
 
-    assert.ok(JSHINT(src)); // By default, everything is fine
-
-    // When newcap is true, enforce the conventions
-    assert.ok(!JSHINT(src, { newcap: true }));
-    assert.eql(JSHINT.errors.length, 2);
-    assert.eql(JSHINT.errors[0].line, 1);
-    assert.eql(JSHINT.errors[0].reason, 'A constructor name should start with an uppercase letter.');
-    assert.eql(JSHINT.errors[1].line, 5);
-    assert.eql(JSHINT.errors[1].reason, "Missing 'new' prefix when invoking a constructor.");
+    helper(JSHINT, src)
+        // By default, everything is fine
+        .init(true)
+        
+        // When newcap is true, enforce the conventions
+        .init(false, { newcap: true })
+        .run()
+            .hasError(1, "A constructor name should start with an uppercase letter.")
+            .hasError(5, "Missing 'new' prefix when invoking a constructor.")
+        .end()
+    ;
 };
 
 /** Option `sub` allows all forms of subscription. */
 exports.sub = function () {
-    assert.ok(!JSHINT("window.obj = obj['prop'];"));
-    assert.eql(JSHINT.errors.length, 1);
-    assert.eql(JSHINT.errors[0].reason, "['prop'] is better written in dot notation.");
-    assert.ok(JSHINT("window.obj = obj['prop'];", { sub: true }));
+    helper(JSHINT, "window.obj = obj['prop'];")
+        .init(false)
+        .run()
+            .hasError(1, "['prop'] is better written in dot notation.")
+        .end()
+        
+        .init(true, { sub: true })
+    ;
 };
 
 /** Option `strict` requires you to use "use strict"; */
@@ -515,14 +568,17 @@ exports.strict = function () {
     var code  = "(function () { return; }());",
         code1 = '(function () { "use strict"; return; }());';
 
-    assert.ok(JSHINT(code));
-    assert.ok(JSHINT(code1));
-
-    assert.ok(!JSHINT(code, { strict: true }));
-    assert.eql(JSHINT.errors.length, 1);
-    assert.eql(JSHINT.errors[0].reason, 'Missing "use strict" statement.');
-
-    assert.ok(JSHINT(code1, { strict: true }));
+    helper(JSHINT)
+        .init(true, {}, code)
+        .init(true, {}, code1)
+        
+        .init(false, { strict: true }, code)
+        .run()
+            .hasError(1, 'Missing "use strict" statement.')
+        .end()
+        
+        .init(true, { strict: true }, code1)
+    ;
 };
 
 /** Option `globalstrict` allows you to use global "use strict"; */
@@ -532,16 +588,20 @@ exports.globalstrict = function () {
       , 'function hello() { return; }'
     ];
 
-    assert.ok(!JSHINT(code, { strict: true }));
-    assert.eql(JSHINT.errors.length, 1);
-    assert.eql(JSHINT.errors[0].line, 1);
-    assert.eql(JSHINT.errors[0].reason, 'Use the function form of "use strict".');
-    assert.ok(JSHINT(code, { globalstrict: true }));
-
-    // Check that globalstrict also enabled strict
-    assert.ok(!JSHINT(code[1], { globalstrict: true }));
-    assert.eql(JSHINT.errors.length, 1);
-    assert.eql(JSHINT.errors[0].reason, 'Missing "use strict" statement.');
+    helper(JSHINT, code)
+        .init(false, { strict: true })
+        .run()
+            .hasError(1, 'Use the function form of "use strict".')
+        .end()
+        
+        .init(true, { globalstrict: true })
+        
+        // Check that globalstrict also enabled strict
+        .init(false, { globalstrict: true }, code[1])
+        .run()
+            .hasError(1, 'Missing "use strict" statement.')
+        .end()
+    ;
 };
 
 /** Option `regexp` disallows the use of . and [^...] in regular expressions. */
@@ -551,84 +611,92 @@ exports.regexp = function () {
       , 'var a = /h.ey/;'
       , 'var a = /h[^...]/;'
     ];
-
-    for (var i = 0, st; st = code[i]; i++)
-        assert.ok(JSHINT(code));
-
-    assert.ok(JSHINT(code[0], { regexp: true }));
-
-    assert.ok(!JSHINT(code[1], { regexp: true }));
-    assert.eql(JSHINT.errors.length, 1);
-    assert.eql(JSHINT.errors[0].reason, "Insecure '.'.");
-
-    assert.ok(!JSHINT(code[2], { regexp: true }));
-    assert.eql(JSHINT.errors.length, 1);
-    assert.eql(JSHINT.errors[0].reason, "Insecure '^'.");
+    for (var i = 0, st; st = code[i]; i++) {
+        helper(JSHINT)
+            .init(true, {}, code)
+        ;
+    }
+    
+    helper(JSHINT)
+        .init(true, { regexp: true }, code[0])
+        .init(false, { regexp: true }, code[1])
+        .run()
+            .hasError(1, "Insecure '.'.")
+        .end()
+        .init(false, { regexp: true }, code[2])
+        .run()
+            .hasError(1, "Insecure '^'.")
+        .end()
+    ;
 };
 
 /** Option `laxbreak` allows you to insert newlines before some operators. */
 exports.laxbreak = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/laxbreak.js', 'utf8');
 
-    assert.ok(!JSHINT(src));
-    assert.eql(JSHINT.errors.length, 2);
-    assert.eql(JSHINT.errors[0].line, 2);
-    assert.eql(JSHINT.errors[0].reason, "Bad line breaking before ','.");
-    assert.eql(JSHINT.errors[1].line, 12);
-    assert.eql(JSHINT.errors[1].reason, "Bad line breaking before ','.");
-
+    helper(JSHINT, src)
+        .init(false)
+        .run()
+            .hasError(2, "Bad line breaking before ','.")
+            .hasError(12, "Bad line breaking before ','.")
+        .end()
+    ;
     var ops = [ '||', '&&', '*', '/', '%', '+', '-', '>=',
                 '==', '===', '!=', '!==', '>', '<', '<=', 'instanceof' ];
 
     for (var i = 0, op, code; op = ops[i]; i++) {
         code = ['var a = b ', op + ' c;'];
-        assert.ok(!JSHINT(code));
-        assert.eql(JSHINT.errors.length, 1);
-        assert.eql(JSHINT.errors[0].reason, "Bad line breaking before '" + op + "'.");
-        assert.ok(JSHINT(code, { laxbreak: true }));
+        
+        helper(JSHINT, code)
+            .init(false)
+            .run()
+                .hasError(2, "Bad line breaking before '" + op + "'.")
+            .end()
+        
+            .init(true, { laxbreak: true })
+        ;
     }
 
     code = [ 'var a = b ', '? c : d;' ];
-    assert.ok(!JSHINT(code));
-    assert.eql(JSHINT.errors.length, 1);
-    assert.eql(JSHINT.errors[0].reason, "Bad line breaking before '?'.");
-    assert.ok(JSHINT(code, { laxbreak: true }));
+    helper(JSHINT, code)
+        .init(false)
+        .run()
+            .hasError(2, "Bad line breaking before '?'.")
+        .end()
+        
+        .init(true, { laxbreak: true })
+    ;
 };
 
 exports.white = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/white.js', 'utf8');
 
-    assert.ok(JSHINT(src));
-    assert.ok(!JSHINT(src, { white: true }));
-    assert.eql(JSHINT.errors.length, 9);
-    assert.eql(JSHINT.errors[0].line, 1);
-    assert.eql(JSHINT.errors[0].reason, "Unexpected space after 'hello'.");
-    assert.eql(JSHINT.errors[1].line, 2);
-    assert.eql(JSHINT.errors[1].reason, "Unexpected space after 'true'.");
-    assert.eql(JSHINT.errors[2].line, 5);
-    assert.eql(JSHINT.errors[2].reason, "Missing space after 'function'.");
-    assert.eql(JSHINT.errors[3].line, 6);
-    assert.eql(JSHINT.errors[3].reason, "Missing space after 'if'.");
-    assert.eql(JSHINT.errors[4].line, 6);
-    assert.eql(JSHINT.errors[4].reason, "Missing space after ')'.");
-    assert.eql(JSHINT.errors[5].line, 14);
-    assert.eql(JSHINT.errors[5].reason, "Unexpected space after 'true'.");
-    assert.eql(JSHINT.errors[6].line, 15);
-    assert.eql(JSHINT.errors[6].reason, "Missing space after ':'.");
-    assert.eql(JSHINT.errors[7].line, 18);
-    assert.eql(JSHINT.errors[7].reason, "Unexpected space after '('.");
-    assert.eql(JSHINT.errors[8].line, 18);
-    assert.eql(JSHINT.errors[8].reason, "Unexpected space after 'ex'.");
+    helper(JSHINT, src)
+        .init(true)
+        .init(false, { white: true })
+        .run()
+            .hasError(1, "Unexpected space after 'hello'.")
+            .hasError(2, "Unexpected space after 'true'.")
+            .hasError(5, "Missing space after 'function'.")
+            .hasError(6, "Missing space after 'if'.")
+            .hasError(6, "Missing space after ')'.")
+            .hasError(14, "Unexpected space after 'true'.")
+            .hasError(15, "Missing space after ':'.")
+            .hasError(18, "Unexpected space after '('.")
+            .hasError(18, "Unexpected space after 'ex'.")
+        .end()
+    ;
 };
 
 exports.trailing = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/white.js', 'utf8');
 
-    assert.ok(JSHINT(src));
-    assert.ok(!JSHINT(src, { trailing: true }));
-    assert.eql(JSHINT.errors.length, 2);
-    assert.eql(JSHINT.errors[0].line, 7);
-    assert.eql(JSHINT.errors[0].reason, "Trailing whitespace.");
-    assert.eql(JSHINT.errors[1].line, 9);
-    assert.eql(JSHINT.errors[1].reason, "Trailing whitespace.");
+    helper(JSHINT, src)
+        .init(true)
+        .init(false, { trailing: true })
+        .run()
+            .hasError(7, "Trailing whitespace.")
+            .hasError(9, "Trailing whitespace.")
+        .end()
+    ;
 };

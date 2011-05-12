@@ -1,0 +1,187 @@
+#!/usr/bin/env node
+/**
+ * Helper for JSHint-tests.
+ * Export itself as function in shadow.testhelper to
+ * prevent expresso to use it as test...
+ * 
+ * Use it with method chaining, so you get something like
+ *
+ *       var JSHINT = require('../jshint.js').JSHINT,
+ *           helper = require("./testhelper").setup.testhelper;
+ *
+ *       helper(JSHINT, source?)
+ *           .init(shouldWork, jshintOptions?, newSource?)
+ *             .run(options?)
+ *               .hasError(line, message)
+ *               .hasError(line, message)
+ *           .end()
+ *       ;
+ *
+ * helper()
+ *     source:         optional. source for all init's and run's
+ *                     this can be a single string (whole text) or an array of lines
+ *                     if not provided here, it must be provided with init()
+ *
+ * .init()             inits JSHint. breaks, if shouldwork differs from JSHINT-object
+ *     shouldWork:     true, if there should be no error
+ *                     false, if there should be some errors
+ *     jshintOptions:  optional. options for JSHint
+ *     newSource:      optional. use this source instead of the one passed to helper()
+ *
+ * .run()              starts a test run
+ *     options:        optional. currently only 2 options are available
+ *                         sequential:     if true, .hasError() checks also the
+ *                                         sequence of the errors.
+ *                                         if false, it's not important at which position
+ *                                         the error is reported. (default: false)
+ *                         testErrorCount: if ture, .end() tests the count of errors
+ *                                         (default: true)
+ * 
+ * .hasError()         tests if there is a specific error in the errors-list of JSHint
+ *                     breaks, if the error is not found (line and message are always compared),
+ *                     index in sequence only, if opition provided
+ *     line:           the line where the error is reported
+ *     message:        the message of the reported error
+ *
+ * .end()              optionally tests if the counts of tested errors and reported errors are equal
+ *                     returns the same object, helper() has returned before, so you can
+ *                     call .run() and .add().
+ *
+ */
+ 
+var assert = require('assert');
+
+if (exports.setup === undefined || exports.setup === null) {
+    exports.setup = {};
+}
+
+exports.setup.testhelper = function (JSHINT, source){
+    var defaultOptions = {
+        sequential: false,              // if true, test also the sequence of elements
+        testErrorCount: true            // if true, proove if all errors are known by test
+    };
+    
+    var initCounter = 0, runCounter = 0, seq = 0, errors, checked = [];
+    
+    var helperObj = {
+        init: function(shouldWork, jshintOptions, newSource) {
+            initCounter++;
+            runCounter = 0;
+            
+            var ret = !!JSHINT(newSource || source, jshintOptions);
+            errors = JSHINT.errors.filter( function(er){
+                return er && er.id === "(error)";
+            } );
+            
+            if (shouldWork !== undefined && shouldWork !== null) {
+                assert.eql(
+                    ret, shouldWork,
+                    (shouldWork ?
+                        "JSHINT shouldn't return any errors, but there are " + errors.length + getMoreErrors(0, 5) :
+                        "JSHINT should return an error, but there are no errors") + errorData()
+                );
+            }
+            return helperObj;
+        },
+        
+        run: function(options) {
+            var runObj;
+            if (initCounter === 0 ) {
+                helperObj.init(); //auto-init
+            }
+            runCounter++;
+            checked.length = 0;
+            seq = 0;
+            options = combine(defaultOptions, options);
+            
+            runObj = {
+                hasError: function(line, message){
+                    var l = errors.filter(function(e, idx) {
+                        var ret = e && e.line === line &&
+                            e.reason === message &&
+                            (
+                                !options.sequential ||
+                                idx === seq
+                            )
+                        ;
+                        if (ret && checked.indexOf(idx) === -1) {
+                            checked.push(idx); // store to compare at end
+                        }
+                        return ret;
+                    });
+                    
+                    if (l.length === 0) {
+                        var found = "";
+                        if (errors.length > seq) {
+                            // output even if not sequential..
+                            var er = errors[seq];
+                            found = "\n        Found    '" + er.reason + "' in line " + er.line;
+                        }
+                        assert.ok(false, "\n        Expected '" + message + "' in line " + line + found + errorData());
+                    }
+                    seq++;
+                    return runObj;
+                },
+                
+                end: function (){
+                    if (options.testErrorCount) {
+                        var notTested = errors.filter(function (er, idx) {
+                            return checked.indexOf(idx) === -1;
+                        });
+                        var el = notTested.length;
+                        if(el > 0){
+                            var more = getMoreErrors(0, 5, notTested)
+                            assert.ok(false, "\n    Found " + el + " more error(s) than expected" + errorData() + more);
+                        }
+                    }
+                    return helperObj;
+                }
+            };
+            return runObj;
+        }
+    };
+    
+    function errorData() {
+        var ret = "\n    Position: init #" + initCounter;
+        if (runCounter > 0) ret += ", run #" + runCounter;
+        if (seq > 0) ret += ", hasError #" + seq;
+        return ret;
+    }
+    
+    function getMoreErrors(startAt, maxCount, useArr){
+        useArr = useArr || errors;
+        if (!useArr || useArr.length === 0) return "";
+        var ret = "";
+        var el = useArr.length;
+        if(el > startAt){
+            for (var i = startAt; i < el; i++) {
+                if (i >= startAt + maxCount) {
+                    ret += "\n        ...";
+                    break;
+                }
+                var er = useArr[i];
+                if (er && er.reason) {
+                    ret += "\n        " + er.reason + " on line " + er.line;
+                }
+            }
+        }
+        return ret;
+    }
+    
+    function combine(){
+        var n = {};
+        for (var i = 0; i < arguments.length; i++) {
+            var obj = arguments[i];
+            if (obj !== undefined && obj !== null) {
+                for (var name in obj) {
+                    if (obj.hasOwnProperty(name)) {
+                        n[name] = obj[name];
+                    }
+                }
+            }
+        }
+        return n;
+    }
+    
+    return helperObj;
+};
