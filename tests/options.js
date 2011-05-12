@@ -600,7 +600,7 @@ exports.white = function () {
 
     assert.ok(JSHINT(src));
     assert.ok(!JSHINT(src, { white: true }));
-    assert.eql(JSHINT.errors.length, 5);
+    assert.eql(JSHINT.errors.length, 9);
     assert.eql(JSHINT.errors[0].line, 1);
     assert.eql(JSHINT.errors[0].reason, "Unexpected space after 'hello'.");
     assert.eql(JSHINT.errors[1].line, 2);
@@ -611,6 +611,14 @@ exports.white = function () {
     assert.eql(JSHINT.errors[3].reason, "Missing space after 'if'.");
     assert.eql(JSHINT.errors[4].line, 6);
     assert.eql(JSHINT.errors[4].reason, "Missing space after ')'.");
+    assert.eql(JSHINT.errors[5].line, 14);
+    assert.eql(JSHINT.errors[5].reason, "Unexpected space after 'true'.");
+    assert.eql(JSHINT.errors[6].line, 15);
+    assert.eql(JSHINT.errors[6].reason, "Missing space after ':'.");
+    assert.eql(JSHINT.errors[7].line, 18);
+    assert.eql(JSHINT.errors[7].reason, "Unexpected space after '('.");
+    assert.eql(JSHINT.errors[8].line, 18);
+    assert.eql(JSHINT.errors[8].reason, "Unexpected space after 'ex'.");
 };
 
 exports.trailing = function () {
