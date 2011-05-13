@@ -32,7 +32,7 @@ exports.checkTestFiles = function () {
             res = JSHINT(src);
 
         if (!res)
-            console.log(JSHINT.errors);
+            console.log(name, JSHINT.errors);
 
         assert.ok(res);
         assert.isUndefined(JSHINT.data().implieds);
