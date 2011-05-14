@@ -542,6 +542,9 @@ exports.globalstrict = function () {
     assert.ok(!JSHINT(code[1], { globalstrict: true }));
     assert.eql(JSHINT.errors.length, 1);
     assert.eql(JSHINT.errors[0].reason, 'Missing "use strict" statement.');
+
+    // Don't enforce "use strict"; if strict has been explicitly set to false
+    assert.ok(JSHINT(code[1], { globalstrict: true, strict: false }));
 };
 
 /** Option `regexp` disallows the use of . and [^...] in regular expressions. */
