@@ -767,7 +767,7 @@ var JSHINT = (function () {
         if (option.wsh)
             combine(predefined, wsh);
 
-        if (option.globalstrict)
+        if (option.globalstrict && option.strict !== false)
             option.strict = true;
     }
 
