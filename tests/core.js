@@ -23,14 +23,16 @@ exports.checkRhino = function () {
 
 /** All test files must pass JSHint check */
 exports.checkTestFiles = function () {
-    var files = [ 'core.js', 'envs.js', 'options.js' ];
+    var files = fs.readdirSync(__dirname + '/../tests/').filter( function (e) {
+        return e.length > 2 && e.substr(e.length-3, 3) === '.js';
+    });
 
     for (var i = 0, name; name = files[i]; i++) {
         var src = fs.readFileSync(__dirname + '/../tests/' + name, 'utf8'),
             res = JSHINT(src);
 
         if (!res)
-            console.log(JSHINT.errors);
+            console.log(name, JSHINT.errors);
 
         assert.ok(res);
         assert.isUndefined(JSHINT.data().implieds);
