@@ -161,6 +161,35 @@ exports.asi = function () {
     assert.ok(JSHINT(code, { asi: true }));
 };
 
+/** Option `lastsemic` allows you to skip the semicolon after last statement in a block,
+  * if that statement is followed by the closing brace on the same line. */
+exports.lastsemic = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/lastsemic.js', 'utf8');
+
+    // without lastsemic
+    assert.eql(false, JSHINT(src));
+    assert.eql(JSHINT.errors.length, 3);
+    assert.eql(JSHINT.errors[0].line, 2);
+    assert.eql(JSHINT.errors[0].reason, 'Missing semicolon.');  // missing semicolon in the middle of a block
+    assert.eql(JSHINT.errors[1].line, 4);
+    assert.eql(JSHINT.errors[1].reason, 'Missing semicolon.');  // missing semicolon in a one-liner function
+    assert.eql(JSHINT.errors[2].line, 5);
+    assert.eql(JSHINT.errors[2].reason, 'Missing semicolon.');  // missing semicolon at the end of a block
+
+    // with lastsemic
+    assert.eql(false, JSHINT(src, { lastsemic: true }));
+    assert.eql(JSHINT.errors.length, 2);
+    assert.eql(JSHINT.errors[0].line, 2);
+    assert.eql(JSHINT.errors[0].reason, 'Missing semicolon.');
+    assert.eql(JSHINT.errors[1].line, 5);
+    assert.eql(JSHINT.errors[1].reason, 'Missing semicolon.');
+    // this line is valid now: [1, 2, 3].forEach(function(i) { print(i) });
+    // line 5 isn't, because the block doesn't close on the same line
+
+    // it shouldn't interfere with asi option
+    assert.eql(true, JSHINT(src, { lastsemic: true, asi: true }));
+};
+
 /**
  * Option `expr` allows you to use ExpressionStatement as a Program code.
  *
