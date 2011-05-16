@@ -200,14 +200,14 @@
  onunload, open, openDatabase, openURL, opener, opera, outer, param, parent,
  parseFloat, parseInt, passfail, plusplus, predef, print, process, prompt,
  prototype, prototypejs, push, quit, range, raw, reach, reason, regexp,
- readFile, readUrl, regexdash, removeEventListener, replace, report, require, reserved,
+ readFile, readUrl, removeEventListener, replace, report, require, reserved,
  resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
  runCommand, scroll, screen, scrollBy, scrollTo, scrollbar, search, seal, send,
  serialize, setInterval, setTimeout, shift, slice, sort,spawn, split, stack,
  status, start, strict, sub, substr, supernew, shadow, supplant, sum, sync,
  test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing, type,
  typeOf, Uint16Array, Uint32Array, Uint8Array, undef, unused, urls, value, valueOf,
- var, version, WebSocket, white, whiteline, window, Worker, wsh*/
+ var, version, WebSocket, white, window, Worker, wsh*/
 
 /*global exports: false */
 
@@ -273,7 +273,6 @@ var JSHINT = (function () {
             passfail    : true, // if the scan should stop on first error
             plusplus    : true, // if increment/decrement should not be allowed
             prototypejs : true, // if Prototype and Scriptaculous globals should be predefined
-            regexdash   : true, // if the last - in [ -] should be escaped
             regexp      : true, // if the . should not be allowed in regexp literals
             rhino       : true, // if the Rhino environment globals should be predefined
             undef       : true, // if variables should be declared before used
@@ -283,8 +282,7 @@ var JSHINT = (function () {
             supernew    : true, // if `new function () { ... };` and `new Object;` should be tolerated
             trailing    : true, // if trailing whitespace rules apply
             white       : true, // if strict whitespace rules apply
-            wsh         : true, // if the Windows Scripting Host environment globals should be predefined
-            whiteline   : true  // if empty lines with only whitespace are allowed (caused by auto-indenters)
+            wsh         : true  // if the Windows Scripting Host environment globals should be predefined
         },
 
 // browser contains a set of global names which are commonly provided by a
@@ -852,8 +850,7 @@ var JSHINT = (function () {
 
         function nextLine() {
             var at,
-                tw, // trailing whitespace check
-                fl; // full line of whitespace check
+                tw; // trailing whitespace check
 
             if (line >= lines.length)
                 return false;
@@ -879,15 +876,6 @@ var JSHINT = (function () {
             tw = s.search(/\s+$/);
             if (option.trailing && ~tw)
                 warningAt("Trailing whitespace.", line, tw);
-            if (option.white && ~tw) {
-                fl = s.search(/^\s+$/);
-                if (~fl) {
-                    if (option.whiteline)
-                        warningAt("Full line of trailing whitespace.", line, fl);
-                } else {
-                    warningAt("Trailing whitespace.", line, tw);
-                }
-            }
 
             return true;
         }
@@ -1332,12 +1320,12 @@ klass:                                  do {
                                                     q = false;
                                                 } else {
                                                     warningAt("Unescaped '{a}'.",
-                                                            line, from + l, c);
+                                                            line, from + l, '-');
                                                     q = true;
                                                 }
                                                 break;
                                             case ']':
-                                                if (!q && !option.regexdash) {
+                                                if (!q) {
                                                     warningAt("Unescaped '{a}'.",
                                                             line, from + l - 1, '-');
                                                 }
