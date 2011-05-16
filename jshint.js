@@ -181,7 +181,7 @@
  XPathExpression, XPathNamespace, XPathNSResolver, XPathResult, "\\", a,
  addEventListener, address, alert, apply, applicationCache, arguments, arity,
  asi, b, bitwise, block, blur, boolOptions, boss, browser, c, call, callee,
- caller, caseindent, cases, charAt, charCodeAt, character, clearInterval, clearTimeout,
+ caller, cases, charAt, charCodeAt, character, clearInterval, clearTimeout,
  close, closed, closure, comment, condition, confirm, console, constructor,
  content, couch, create, css, curly, d, data, datalist, dd, debug, decodeURI,
  decodeURIComponent, defaultStatus, defineClass, deserialize, devel, document,
@@ -207,7 +207,7 @@
  status, start, strict, sub, substr, supernew, shadow, supplant, sum, sync,
  test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing, type,
  typeOf, Uint16Array, Uint32Array, Uint8Array, undef, unused, urls, value, valueOf,
- var, version, WebSocket, white, whiteline, window, Worker, wsh*/
+ var, version, WebSocket, white, window, Worker, wsh*/
 
 /*global exports: false */
 
@@ -245,7 +245,6 @@ var JSHINT = (function () {
             bitwise     : true, // if bitwise operators should not be allowed
             boss        : true, // if advanced usage of assignments should be allowed
             browser     : true, // if the standard browser globals should be predefined
-            caseindent  : true, // if case statements in switches should be indented
             couch       : true, // if CouchDB globals should be predefined
             curly       : true, // if curly braces around blocks should be required (even in if/for/while)
             debug       : true, // if debugger statements should be allowed
@@ -283,8 +282,7 @@ var JSHINT = (function () {
             supernew    : true, // if `new function () { ... };` and `new Object;` should be tolerated
             trailing    : true, // if trailing whitespace rules apply
             white       : true, // if strict whitespace rules apply
-            wsh         : true, // if the Windows Scripting Host environment globals should be predefined
-            whiteline   : true  // if empty lines with only whitespace are allowed (caused by auto-indenters)
+            wsh         : true  // if the Windows Scripting Host environment globals should be predefined
         },
 
 // browser contains a set of global names which are commonly provided by a
@@ -852,8 +850,7 @@ var JSHINT = (function () {
 
         function nextLine() {
             var at,
-                tw, // trailing whitespace check
-                fl; // full line of whitespace check
+                tw; // trailing whitespace check
 
             if (line >= lines.length)
                 return false;
@@ -879,15 +876,6 @@ var JSHINT = (function () {
             tw = s.search(/\s+$/);
             if (option.trailing && ~tw)
                 warningAt("Trailing whitespace.", line, tw);
-            if (option.white && ~tw) {
-                fl = s.search(/^\s+$/);
-                if (~fl) {
-                    if (option.whiteline)
-                        warningAt("Full line of trailing whitespace.", line, fl);
-                } else {
-                    warningAt("Trailing whitespace.", line, tw);
-                }
-            }
 
             return true;
         }
@@ -3182,7 +3170,7 @@ loop:   for (;;) {
         t = nexttoken;
         advance('{');
         nonadjacent(token, nexttoken);
-        indent += (option.caseindent ? option.indent * 2 : option.indent);
+        indent += option.indent;
         this.cases = [];
         for (;;) {
             switch (nexttoken.id) {
@@ -3232,7 +3220,7 @@ loop:   for (;;) {
                 advance(':');
                 break;
             case '}':
-                indent -= (option.caseindent ? option.indent * 2 : option.indent);
+                indent -= option.indent;
                 indentation();
                 advance('}', t);
                 if (this.cases.length === 1 || this.condition.id === 'true' ||
