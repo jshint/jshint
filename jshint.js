@@ -205,9 +205,9 @@
  runCommand, scroll, screen, scrollBy, scrollTo, scrollbar, search, seal, send,
  serialize, setInterval, setTimeout, shift, slice, sort,spawn, split, stack,
  status, start, strict, sub, substr, supernew, shadow, supplant, sum, sync,
- test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing, type,
+ test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing, trailline, type,
  typeOf, Uint16Array, Uint32Array, Uint8Array, undef, unused, urls, value, valueOf,
- var, version, WebSocket, white, whiteline, window, Worker, wsh*/
+ var, version, WebSocket, white, window, Worker, wsh*/
 
 /*global exports: false */
 
@@ -280,9 +280,9 @@ var JSHINT = (function () {
             sub         : true, // if all forms of subscript notation are tolerated
             supernew    : true, // if `new function () { ... };` and `new Object;` should be tolerated
             trailing    : true, // if trailing whitespace rules apply
+            trailline   : true, // if trailing lines of whitespace should be allowed (used with trailing)
             white       : true, // if strict whitespace rules apply
-            wsh         : true, // if the Windows Scripting Host environment globals should be predefined
-            whiteline   : true  // if empty lines with only whitespace are allowed (caused by auto-indenters)
+            wsh         : true  // if the Windows Scripting Host environment globals should be predefined
         },
 
 // browser contains a set of global names which are commonly provided by a
@@ -875,12 +875,10 @@ var JSHINT = (function () {
 
             // Check for trailing whitespaces
             tw = s.search(/\s+$/);
-            if (option.trailing && ~tw)
-                warningAt("Trailing whitespace.", line, tw);
-            if (option.white && ~tw) {
+            if (option.trailing && ~tw) {
                 fl = s.search(/^\s+$/);
                 if (~fl) {
-                    if (option.whiteline)
+                    if (option.trailline !== true)
                         warningAt("Full line of trailing whitespace.", line, fl);
                 } else {
                     warningAt("Trailing whitespace.", line, tw);
