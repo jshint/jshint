@@ -181,7 +181,7 @@
  XPathExpression, XPathNamespace, XPathNSResolver, XPathResult, "\\", a,
  addEventListener, address, alert, apply, applicationCache, arguments, arity,
  asi, b, bitwise, block, blur, boolOptions, boss, browser, c, call, callee,
- caller, caseindent, cases, charAt, charCodeAt, character, clearInterval, clearTimeout,
+ caller, cases, charAt, charCodeAt, character, clearInterval, clearTimeout,
  close, closed, closure, comment, condition, confirm, console, constructor,
  content, couch, create, css, curly, d, data, datalist, dd, debug, decodeURI,
  decodeURIComponent, defaultStatus, defineClass, deserialize, devel, document,
@@ -200,7 +200,7 @@
  onunload, open, openDatabase, openURL, opener, opera, outer, param, parent,
  parseFloat, parseInt, passfail, plusplus, predef, print, process, prompt,
  prototype, prototypejs, push, quit, range, raw, reach, reason, regexp,
- readFile, readUrl, regexdash, removeEventListener, replace, report, require, reserved,
+ readFile, readUrl, removeEventListener, replace, report, require, reserved,
  resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
  runCommand, scroll, screen, scrollBy, scrollTo, scrollbar, search, seal, send,
  serialize, setInterval, setTimeout, shift, slice, sort,spawn, split, stack,
@@ -245,7 +245,6 @@ var JSHINT = (function () {
             bitwise     : true, // if bitwise operators should not be allowed
             boss        : true, // if advanced usage of assignments should be allowed
             browser     : true, // if the standard browser globals should be predefined
-            caseindent  : true, // if case statements in switches should be indented
             couch       : true, // if CouchDB globals should be predefined
             curly       : true, // if curly braces around blocks should be required (even in if/for/while)
             debug       : true, // if debugger statements should be allowed
@@ -273,7 +272,6 @@ var JSHINT = (function () {
             passfail    : true, // if the scan should stop on first error
             plusplus    : true, // if increment/decrement should not be allowed
             prototypejs : true, // if Prototype and Scriptaculous globals should be predefined
-            regexdash   : true, // if the last - in [ -] should be escaped
             regexp      : true, // if the . should not be allowed in regexp literals
             rhino       : true, // if the Rhino environment globals should be predefined
             undef       : true, // if variables should be declared before used
@@ -1332,12 +1330,12 @@ klass:                                  do {
                                                     q = false;
                                                 } else {
                                                     warningAt("Unescaped '{a}'.",
-                                                            line, from + l, c);
+                                                            line, from + l, '-');
                                                     q = true;
                                                 }
                                                 break;
                                             case ']':
-                                                if (!q && !option.regexdash) {
+                                                if (!q) {
                                                     warningAt("Unescaped '{a}'.",
                                                             line, from + l - 1, '-');
                                                 }
@@ -3182,7 +3180,7 @@ loop:   for (;;) {
         t = nexttoken;
         advance('{');
         nonadjacent(token, nexttoken);
-        indent += (option.caseindent ? option.indent * 2 : option.indent);
+        indent += option.indent;
         this.cases = [];
         for (;;) {
             switch (nexttoken.id) {
@@ -3232,7 +3230,7 @@ loop:   for (;;) {
                 advance(':');
                 break;
             case '}':
-                indent -= (option.caseindent ? option.indent * 2 : option.indent);
+                indent -= option.indent;
                 indentation();
                 advance('}', t);
                 if (this.cases.length === 1 || this.condition.id === 'true' ||
