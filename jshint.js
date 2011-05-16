@@ -899,11 +899,7 @@ var JSHINT = (function () {
             }
             if (type === '(identifier)') {
                 t.identifier = true;
-                if (value === '__iterator__' || value === '__proto__') {
-                    errorAt("Reserved name '{a}'.",
-                        line, from, value);
-                } else if (option.nomen &&
-                        (value.charAt(0) === '_' ||
+                if (option.nomen && (value.charAt(0) === '_' ||
                          value.charAt(value.length - 1) === '_')) {
                     warningAt("Unexpected {a} in '{b}'.", line, from,
                         "dangling '_'", value);
@@ -3484,9 +3480,6 @@ loop:   for (;;) {
                     }
                     if (o[nexttoken.value] === true) {
                         warning("Duplicate key '{a}'.",
-                                nexttoken, nexttoken.value);
-                    } else if (nexttoken.value === '__proto__') {
-                        warning("Stupid key '{a}'.",
                                 nexttoken, nexttoken.value);
                     } else {
                         o[nexttoken.value] = true;

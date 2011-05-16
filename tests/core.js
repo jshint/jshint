@@ -126,6 +126,12 @@ exports.testVoid = function () {
     assert.ok(JSHINT(code));
 };
 
+// See issue 148.
+exports.testMozilla = function () {
+  assert.ok(JSHINT(fs.readFileSync(__dirname + '/fixtures/mozilla.js', 'utf8')));
+  assert.ok(JSHINT('{"__proto__": true, "__iterator__": false, "_identifier": null, "property": 123}'));
+};
+
 exports.functionScopedOptions = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/functionScopedOptions.js', 'utf8');
     assert.ok(!JSHINT(src));
