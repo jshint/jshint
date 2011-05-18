@@ -656,3 +656,25 @@ exports.trailing = function () {
     assert.eql(JSHINT.errors[1].line, 9);
     assert.eql(JSHINT.errors[1].reason, "Trailing whitespace.");
 };
+
+exports.regexdash = function () {
+    var code = [
+        'var a = /[-ab]/;'
+      , 'var a = /[ab-]/;'
+    ];
+
+    // Default behavior
+    assert.ok(!JSHINT(code[0]));
+    assert.eql(JSHINT.errors.length, 1);
+    assert.eql(JSHINT.errors[0].reason, "Unescaped '-'.");
+
+    assert.ok(!JSHINT(code[1]));
+    assert.eql(JSHINT.errors.length, 1);
+    assert.eql(JSHINT.errors[0].reason, "Unescaped '-'.");
+
+    // Regex dash is on
+    assert.ok(!JSHINT(code[0], { regexdash: true }));
+    assert.eql(JSHINT.errors.length, 1);
+    assert.eql(JSHINT.errors[0].reason, "Unescaped '-'.");
+    assert.ok(JSHINT(code[1], { regexdash: true }));
+};
