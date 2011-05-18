@@ -197,8 +197,8 @@
  onunload, open, openDatabase, openURL, opener, opera, outer, param, parent,
  parseFloat, parseInt, passfail, plusplus, predef, print, process, prompt,
  prototype, prototypejs, push, quit, range, raw, reach, reason, regexp,
- readFile, readUrl, removeEventListener, replace, report, require, reserved,
- resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
+ readFile, readUrl, regexdash, removeEventListener, replace, report, require,
+ reserved, resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
  runCommand, scroll, screen, scrollBy, scrollTo, scrollbar, search, seal, send,
  serialize, setInterval, setTimeout, shift, slice, sort,spawn, split, stack,
  status, start, strict, sub, substr, supernew, shadow, supplant, sum, sync,
@@ -269,6 +269,7 @@ var JSHINT = (function () {
             passfail    : true, // if the scan should stop on first error
             plusplus    : true, // if increment/decrement should not be allowed
             prototypejs : true, // if Prototype and Scriptaculous globals should be predefined
+            regexdash   : true, // if unescaped last dash (-) inside brackets should be tolerated
             regexp      : true, // if the . should not be allowed in regexp literals
             rhino       : true, // if the Rhino environment globals should be predefined
             undef       : true, // if variables should be declared before used
@@ -1321,7 +1322,7 @@ klass:                                  do {
                                                 }
                                                 break;
                                             case ']':
-                                                if (!q) {
+                                                if (!q && !option.regexdash) {
                                                     warningAt("Unescaped '{a}'.",
                                                             line, from + l - 1, '-');
                                                 }
