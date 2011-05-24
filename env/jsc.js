@@ -9,7 +9,13 @@ load("jshint.js");
     var name  = args[0],
         input = args[1],
         opts  = (function(arg){
-            return (typeof arg === 'undefined') ? {} : eval('(' + arg + ')');
+            switch (arg) {
+            case undefined:
+            case '':
+                return {};
+            default:
+                return eval('(' + arg + ')');
+            }
         })(args[2]);
 
     if (!name) {
