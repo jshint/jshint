@@ -72,6 +72,37 @@ exports.latedef = function () {
 };
 
 /**
+ * The `proto` and `iterator` options allow you to prohibit the use of the
+ * special `__proto__` and `__iterator__` properties, respectively.
+ */
+exports.testProtoAndIterator = function () {
+  var source = fs.readFileSync(__dirname + '/fixtures/protoiterator.js', 'utf8'),
+      json = '{"__proto__": true, "__iterator__": false, "_identifier": null, "property": 123}';
+  
+  // JSHint should allow the `__proto__` and `__iterator__` properties by default.
+  assert.ok(JSHINT(source));
+  assert.ok(JSHINT(json));
+  
+  // A warning should be reported if `__proto__` is explicitly disallowed.
+  assert.ok(!JSHINT(source, { proto: true }));
+  assert.eql(JSHINT.errors.length, 5);
+  assert.eql(JSHINT.errors[0].line, 7);
+  assert.eql(JSHINT.errors[0].reason, "The '__proto__' property is deprecated.");
+  
+  assert.ok(!JSHINT(json, { proto: true }));
+  assert.eql(JSHINT.errors[0].reason, "The '__proto__' key may produce unexpected results.");
+  
+  // A warning should be reported if `__iterator__` is explicitly disallowed.
+  assert.ok(!JSHINT(source, { iterator: true }));
+  assert.eql(JSHINT.errors.length, 2);
+  assert.eql(JSHINT.errors[0].line, 27);
+  assert.eql(JSHINT.errors[0].reason, "'__iterator__' is only available in JavaScript 1.7.");
+  
+  assert.ok(!JSHINT(json, { iterator: true }));
+  assert.eql(JSHINT.errors[0].reason, "The '__iterator__' key may produce unexpected results.");
+};
+
+/**
  * Option `curly` allows you to enforce the use of curly braces around
  * control blocks. JavaScript allows one-line blocks to go without curly
  * braces but some people like to always use curly bracse. This option is
