@@ -53,6 +53,10 @@ Also included is a Windows Scripting Host wrapper:
 
     cscript env/wsh.js myscript.js
 
+And if you're on OS X, use Apple's built-in JavaScriptCore:
+
+	env/jsc.sh myscript.js
+
 Tests
 -----
 
