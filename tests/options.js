@@ -233,6 +233,32 @@ exports.undef = function () {
     assert.eql(JSHINT.errors[1].reason, "'localUndef' is not defined.");
 };
 
+/** Option `scripturl` allows the use of javascript-type URLs */
+exports.scripturl = function() {
+    var code = "var foo = { 'count': 12, 'href': 'javascript:' };",
+        src = fs.readFileSync(__dirname + '/fixtures/scripturl.js', 'utf8');
+
+    // Make sure there is an error
+    assert.ok(!JSHINT(code));
+    assert.eql(JSHINT.errors.length, 1);
+    assert.eql(JSHINT.errors[0].reason, 'Script URL.');
+
+    // Make sure the error goes away when javascript URLs are tolerated
+    assert.ok(JSHINT(code, { scripturl: true }));
+
+    // Make sure an error exists for labels that look like URLs
+    assert.ok(!JSHINT(src));
+    assert.eql(JSHINT.errors.length, 1);
+    assert.eql(JSHINT.errors[0].line, 2);
+    assert.eql(JSHINT.errors[0].reason, "Label 'javascript' looks like a javascript url.");
+
+    // Make sure the label error exists even if javascript URLs are tolerated
+    assert.ok(!JSHINT(src, { scripturl: true }));
+    assert.eql(JSHINT.errors.length, 1);
+    assert.eql(JSHINT.errors[0].line, 2);
+    assert.eql(JSHINT.errors[0].reason, "Label 'javascript' looks like a javascript url.");
+};
+
 /**
  * Option `forin` disallows the use of for in loops without hasOwnProperty.
  *
