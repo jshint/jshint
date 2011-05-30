@@ -202,7 +202,7 @@
  prototype, prototypejs, push, quit, range, raw, reach, reason, regexp,
  readFile, readUrl, regexdash, removeEventListener, replace, report, require,
  reserved, resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
- runCommand, scroll, screen, scrollBy, scrollTo, scrollbar, search, seal, send,
+ runCommand, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal, send,
  serialize, setInterval, setTimeout, shift, slice, sort,spawn, split, stack,
  status, start, strict, sub, substr, supernew, shadow, supplant, sum, sync,
  test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing, type,
@@ -276,6 +276,7 @@ var JSHINT = (function () {
             regexp      : true, // if the . should not be allowed in regexp literals
             rhino       : true, // if the Rhino environment globals should be predefined
             undef       : true, // if variables should be declared before used
+            scripturl   : true, // if script-targeted URLs should be tolerated
             shadow      : true, // if variable shadowing should be tolerated
             strict      : true, // require the "use strict"; pragma
             sub         : true, // if all forms of subscript notation are tolerated
@@ -894,7 +895,7 @@ var JSHINT = (function () {
             }
             t = Object.create(t);
             if (type === '(string)' || type === '(range)') {
-                if (jx.test(value)) {
+                if (!option.scripturl && jx.test(value)) {
                     warningAt("Script URL.", line, from);
                 }
             }
@@ -2535,7 +2536,7 @@ loop:   for (;;) {
         if (left && right && left.id === '(string)' && right.id === '(string)') {
             left.value += right.value;
             left.character = right.character;
-            if (jx.test(left.value)) {
+            if (!option.scripturl && jx.test(left.value)) {
                 warning("JavaScript URL.", left);
             }
             return left;
