@@ -6,6 +6,7 @@ load("jshint.js");
     var name   = args[0],
         optstr = args[1], // arg1=val1,arg2=val2,...
         opts   = { rhino: true },
+        predef = {},
         input;
 
     if (!name) {
@@ -27,6 +28,15 @@ load("jshint.js");
                 }
             })(o[1]);
         });
+        if (opts.predef) {
+            opts.predef.split(';').forEach(function (def) {
+                var d = def.split(':');
+                predef[d[0]] = (function (dv) {
+                    return (dv === 'false') ? false : true;
+                })(d[1]);
+            });
+            opts.predef = predef;
+        }
     }
 
     input = readFile(name);
