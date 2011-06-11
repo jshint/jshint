@@ -875,7 +875,7 @@ var JSHINT = (function () {
 
             // Check for trailing whitespaces
             tw = s.search(/\s+$/);
-            if (option.trailing && ~tw)
+            if (option.trailing && ~tw && !~s.search(/^\s+$/))
                 warningAt("Trailing whitespace.", line, tw);
 
             return true;

@@ -4,7 +4,7 @@ function hello () {
 
 var bye = function() {
     if(hey){
-        
-        return;
-    } 
+        // Next line has a trailing whitespace
+        return;  
+    }  
 };

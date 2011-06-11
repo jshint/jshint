@@ -677,7 +677,7 @@ exports.trailing = function () {
     assert.ok(JSHINT(src));
     assert.ok(!JSHINT(src, { trailing: true }));
     assert.eql(JSHINT.errors.length, 2);
-    assert.eql(JSHINT.errors[0].line, 7);
+    assert.eql(JSHINT.errors[0].line, 8);
     assert.eql(JSHINT.errors[0].reason, "Trailing whitespace.");
     assert.eql(JSHINT.errors[1].line, 9);
     assert.eql(JSHINT.errors[1].reason, "Trailing whitespace.");
