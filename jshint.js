@@ -377,20 +377,20 @@ var JSHINT = (function () {
         },
 
         devel = {
-            alert           : false,
-            confirm         : false,
-            console         : false,
-            Debug           : false,
-            opera           : false,
-            prompt          : false
+            alert   : false,
+            confirm : false,
+            console : false,
+            Debug   : false,
+            opera   : false,
+            prompt  : false
         },
 
         dojo = {
-            dojo    : false,
-            dijit   : false,
-            dojox   : false,
-            define  : false,
-            require : false
+            dojo      : false,
+            dijit     : false,
+            dojox     : false,
+            define    : false,
+            "require" : false
         },
 
         escapes = {
