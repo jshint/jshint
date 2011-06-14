@@ -264,6 +264,7 @@ var JSHINT = (function () {
             laxbreak    : true, // if line breaks should not be checked
             loopfunc    : true, // if functions should be allowed to be defined within loops
             mootools    : true, // if MooTools globals should be predefined
+            mediawiki   : true, // if MediaWiki is to be expected to be the target, ignores certain string escapes like [\~\{\}]
             newcap      : true, // if constructor names must be capitalized
             noarg       : true, // if arguments.caller and arguments.callee should be disallowed
             node        : true, // if the Node.js environment globals should be predefined
@@ -1087,6 +1088,15 @@ var JSHINT = (function () {
                                 }
                                 esc(2);
                                 break;
+                            case '~':
+                            case '{':
+                            case '}':
+                            case '[':
+                            case ']':
+                                if(option.mediawiki) {
+                                    esc(2);
+                                    break;
+                                }
                             default:
                                 warningAt("Bad escapement.", line, character);
                             }
