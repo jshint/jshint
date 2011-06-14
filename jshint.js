@@ -185,11 +185,12 @@
  close, closed, closure, comment, condition, confirm, console, constructor,
  content, couch, create, css, curly, d, data, datalist, dd, debug, decodeURI,
  decodeURIComponent, defaultStatus, defineClass, deserialize, devel, document,
- edition, else, emit, encodeURI, encodeURIComponent, entityify, eqeqeq, eqnull,
- errors, es5, escape, eval, event, evidence, evil, ex, exception, exec, exps,
- expr, exports, FileReader, first, floor, focus, forin, fragment, frames, from,
- fromCharCode, fud, funct, function, functions, g, gc, getComputedStyle, getRow,
- GLOBAL, global, globals, globalstrict, hasOwnProperty, help, history, i, id,
+ dojo, dijit, dojox, define, edition, else, emit, encodeURI, encodeURIComponent,
+ entityify, eqeqeq, eqnull, errors, es5, escape, eval, event, evidence, evil,
+ ex, exception, exec, exps, expr, exports, FileReader, first, floor, focus,
+ forin, fragment, frames, from, fromCharCode, fud, funct, function, functions,
+ g, gc, getComputedStyle, getRow, GLOBAL, global, globals, globalstrict,
+ hasOwnProperty, help, history, i, id,
  identifier, immed, implieds, include, indent, indexOf, init, ins, instanceOf,
  isAlpha, isApplicationRunning, isArray, isDigit, isFinite, isNaN, join, jshint,
  JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastsemic, laxbreak,
@@ -249,6 +250,7 @@ var JSHINT = (function () {
             curly       : true, // if curly braces around blocks should be required (even in if/for/while)
             debug       : true, // if debugger statements should be allowed
             devel       : true, // if logging globals should be predefined (console, alert, etc.)
+            dojo        : true, // if Dojo Toolkit globals should be predefined
             eqeqeq      : true, // if === should be required
             eqnull      : true, // if == null comparisons should be tolerated
             es5         : true, // if ES5 syntax should be allowed
@@ -381,6 +383,14 @@ var JSHINT = (function () {
             Debug           : false,
             opera           : false,
             prompt          : false
+        },
+
+        dojo = {
+            dojo    : false,
+            dijit   : false,
+            dojox   : false,
+            define  : false,
+            require : false
         },
 
         escapes = {
@@ -759,6 +769,9 @@ var JSHINT = (function () {
 
         if (option.devel)
             combine(predefined, devel);
+
+        if (option.dojo)
+            combine(predefined, dojo);
 
         if (option.browser)
             combine(predefined, browser);
