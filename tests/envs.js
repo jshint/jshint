@@ -358,3 +358,16 @@ exports.mootools = function () {
     assert.globalsImplied(globals);
     assert.globalsKnown(globals, { mootools: true });
 };
+
+exports.dojo = function () {
+  var globals = [
+      'dojo'
+    , 'dijit'
+    , 'dojox'
+    , 'define'
+    , 'require'
+  ];
+
+  assert.globalsImplied(globals);
+  assert.globalsKnown(globals, { dojo: true });
+};
