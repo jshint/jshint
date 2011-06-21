@@ -5,8 +5,8 @@ load("jshint.js");
 (function (args) {
     var name   = args[0],
         optstr = args[1], // arg1=val1,arg2=val2,...
+        predef = args[2], // global1=override,global2,global3,...
         opts   = { rhino: true },
-        predef = {},
         input;
 
     if (!name) {
@@ -28,15 +28,16 @@ load("jshint.js");
                 }
             })(o[1]);
         });
-        if (opts.predef) {
-            opts.predef.split(';').forEach(function (def) {
-                var d = def.split(':');
-                predef[d[0]] = (function (dv) {
-                    return (dv === 'false') ? false : true;
-                })(d[1]);
-            });
-            opts.predef = predef;
-        }
+    }
+    
+    if (predef) {
+    	opts.predef = {};
+    	predef.split(',').forEach(function (arg) {
+    		var global = arg.split('=');
+    		opts.predef[global[0]] = (function (override) {
+    			return (override === 'false') ? false : true;
+    		})(global[1]);
+    	});
     }
 
     input = readFile(name);
