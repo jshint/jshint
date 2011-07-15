@@ -1,8 +1,11 @@
 /*jshint boss: true */
 
 // usage:
-//   jsc ${env_home}/jsc.js -- ${env_home} ${file} "$(cat ${file})" "{option1:true,option2:false}"
-var env_home = arguments[0].toString().replace(/\/env$/, '/');
+//   jsc ${env_home}/jsc.js -- ${file} "$(cat ${file})" "{option1:true,option2:false} ${env_home}"
+var env_home = '';
+if (arguments.length > 3) {
+  env_home = arguments[3].toString().replace(/\/env$/, '/');
+}
 load(env_home + "jshint.js");
 
 if (typeof(JSHINT) === 'undefined') {
@@ -11,9 +14,9 @@ if (typeof(JSHINT) === 'undefined') {
 }
 
 (function(args){
-    var home  = args[0]
-        name  = args[1],
-        input = args[2],
+    var home  = args[3]
+        name  = args[0],
+        input = args[1],
         opts  = (function(arg){
             switch (arg) {
             case undefined:
@@ -22,7 +25,7 @@ if (typeof(JSHINT) === 'undefined') {
             default:
                 return eval('(' + arg + ')');
             }
-        })(args[3]);
+        })(args[2]);
 
     if (!name) {
         print('jshint: No file name was provided.');
