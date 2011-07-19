@@ -1,4 +1,4 @@
-/*
+/*!
  * JSHint, by JSHint Community.
  *
  * Licensed under the same slightly modified MIT license that JSLint is.
