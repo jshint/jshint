@@ -2172,12 +2172,14 @@ loop:   for (;;) {
 
         if (!t.block) {
             if (!option.expr && (!r || !r.exps)) {
-                warning("Expected an assignment or function call and instead saw an expression.", token);
+                warning("Expected an assignment or function call and instead saw an expression.",
+                    token);
             } else if (option.nonew && r.id === '(' && r.left.id === 'new') {
                 warning("Do not use 'new' for side effects.");
             }
             if (nexttoken.id !== ';') {
-                if (!option.asi && !(option.lastsemic && nexttoken.id == '}' && nexttoken.line == token.line)) {
+                if (!option.asi && !(option.lastsemic && nexttoken.id == '}' &&
+                        nexttoken.line == token.line)) {
                     warningAt("Missing semicolon.", token.line, token.from + token.value.length);
                 }
             } else {
@@ -2540,7 +2542,10 @@ loop:   for (;;) {
     });
     relation('===');
     relation('!=', function (left, right) {
-        if (option.eqeqeq) {
+        var eqnull = option.eqnull &&
+                (left.value == 'null' || right.value == 'null');
+
+        if (!eqnull && option.eqeqeq) {
             warning("Expected '{a}' and instead saw '{b}'.",
                     this, '!==', '!=');
         } else if (isPoorRelation(left)) {
@@ -2668,7 +2673,8 @@ loop:   for (;;) {
                     if (c.id !== 'function') {
                         i = c.value.substr(0, 1);
                         if (option.newcap && (i < 'A' || i > 'Z')) {
-                            warning("A constructor name should start with an uppercase letter.", token);
+                            warning("A constructor name should start with "+
+                                "an uppercase letter.", token);
                         }
                     }
                 }
@@ -3074,8 +3080,9 @@ loop:   for (;;) {
 
     blockstmt('function', function () {
         if (inblock) {
-            warning(
-"Function declarations should not be placed in blocks. Use a function expression or move the statement to the top of the outer function.", token);
+            warning("Function declarations should not be placed in blocks. " +
+                "Use a function expression or move the statement to the top of " +
+                "the outer function.", token);
 
         }
         var i = identifier();
@@ -3349,7 +3356,8 @@ loop:   for (;;) {
             s = block(true, true);
             if (option.forin && (s.length > 1 || typeof s[0] !== 'object' ||
                     s[0].value !== 'if')) {
-                warning("The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.", this);
+                warning("The body of a for in should be wrapped in an if statement to filter " +
+                        "unwanted properties from the prototype.", this);
             }
             funct['(breakage)'] -= 1;
             funct['(loopage)'] -= 1;
