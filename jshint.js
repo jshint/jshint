@@ -151,7 +151,8 @@
 */
 
 /*jshint
- evil: true, nomen: false, onevar: false, regexp: false, strict: true, boss: true
+ evil: true, nomen: false, onevar: false, regexp: false, strict: true, boss: true,
+ undef: true, maxlen: 100
 */
 
 /*members "\b", "\t", "\n", "\f", "\r", "!=", "!==", "\"", "%", "(begin)",
@@ -247,7 +248,7 @@ var JSHINT = (function () {
             boss        : true, // if advanced usage of assignments should be allowed
             browser     : true, // if the standard browser globals should be predefined
             couch       : true, // if CouchDB globals should be predefined
-            curly       : true, // if curly braces around blocks should be required (even in if/for/while)
+            curly       : true, // if curly braces around all blocks should be required
             debug       : true, // if debugger statements should be allowed
             devel       : true, // if logging globals should be predefined (console, alert, etc.)
             dojo        : true, // if Dojo Toolkit globals should be predefined
@@ -284,10 +285,12 @@ var JSHINT = (function () {
             shadow      : true, // if variable shadowing should be tolerated
             strict      : true, // require the "use strict"; pragma
             sub         : true, // if all forms of subscript notation are tolerated
-            supernew    : true, // if `new function () { ... };` and `new Object;` should be tolerated
+            supernew    : true, // if `new function () { ... };` and `new Object;`
+                                // should be tolerated
             trailing    : true, // if trailing whitespace rules apply
             white       : true, // if strict whitespace rules apply
-            wsh         : true  // if the Windows Scripting Host environment globals should be predefined
+            wsh         : true  // if the Windows Scripting Host environment globals should
+                                // be predefined
         },
 
 // browser contains a set of global names which are commonly provided by a
@@ -629,27 +632,38 @@ var JSHINT = (function () {
             VBArray                   : true,
             WSH                       : true,
             WScript                   : true
-        },
+        };
 
-// Regular expressions. Some of these are stupidly long.
+        // Regular expressions. Some of these are stupidly long.
+        var ax, cx, tx, nx, nxg, lx, ix, jx, ft;
+        (function () {
+            /*jshint maxlen:300 */
 
-// unsafe comment or string
-        ax = /@cc|<\/?|script|\]\s*\]|<\s*!|&lt/i,
-// unsafe characters that are silently deleted by one or more browsers
-        cx = /[\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/,
-// token
-        tx = /^\s*([(){}\[.,:;'"~\?\]#@]|==?=?|\/(\*(jshint|jslint|members?|global)?|=|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|%=?|&[&=]?|\|[|=]?|>>?>?=?|<([\/=!]|\!(\[|--)?|<=?)?|\^=?|\!=?=?|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+\-]?[0-9]+)?)/,
-// characters in strings that need escapement
-        nx = /[\u0000-\u001f&<"\/\\\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/,
-        nxg = /[\u0000-\u001f&<"\/\\\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
-// star slash
-        lx = /\*\/|\/\*/,
-// identifier
-        ix = /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/,
-// javascript url
-        jx = /^(?:javascript|jscript|ecmascript|vbscript|mocha|livescript)\s*:/i,
-// catches /* falls through */ comments
-        ft = /^\s*\/\*\s*falls\sthrough\s*\*\/\s*$/;
+            // unsafe comment or string
+            ax = /@cc|<\/?|script|\]\s*\]|<\s*!|&lt/i;
+
+            // unsafe characters that are silently deleted by one or more browsers
+            cx = /[\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/;
+
+            // token
+            tx = /^\s*([(){}\[.,:;'"~\?\]#@]|==?=?|\/(\*(jshint|jslint|members?|global)?|=|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|%=?|&[&=]?|\|[|=]?|>>?>?=?|<([\/=!]|\!(\[|--)?|<=?)?|\^=?|\!=?=?|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+\-]?[0-9]+)?)/;
+
+            // characters in strings that need escapement
+            nx = /[\u0000-\u001f&<"\/\\\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/;
+            nxg = /[\u0000-\u001f&<"\/\\\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
+
+            // star slash
+            lx = /\*\/|\/\*/;
+
+            // identifier
+            ix = /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/;
+
+            // javascript url
+            jx = /^(?:javascript|jscript|ecmascript|vbscript|mocha|livescript)\s*:/i;
+
+            // catches /* falls through */ comments
+            ft = /^\s*\/\*\s*falls\sthrough\s*\*\/\s*$/;
+        }());
 
     function F() {}     // Used by Object.create
 
