@@ -29,15 +29,15 @@ load("jshint.js");
             })(o[1]);
         });
     }
-    
+
     if (predef) {
-    	opts.predef = {};
-    	predef.split(',').forEach(function (arg) {
-    		var global = arg.split('=');
-    		opts.predef[global[0]] = (function (override) {
-    			return (override === 'false') ? false : true;
-    		})(global[1]);
-    	});
+        opts.predef = {};
+        predef.split(',').forEach(function (arg) {
+            var global = arg.split('=');
+            opts.predef[global[0]] = (function (override) {
+                return (override === 'false') ? false : true;
+            })(global[1]);
+        });
     }
 
     input = readFile(name);
