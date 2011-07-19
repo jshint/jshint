@@ -367,13 +367,17 @@ exports.eqnull = function () {
     var code = [
         'if (e == null) doSomething();'
       , 'if (null == e) doSomething();'
+      , 'if (e != null) doSomething();'
+      , 'if (null != e) doSomething();'
     ];
 
     // By default, warn about `== null` comparison
     assert.ok(!JSHINT(code));
-    assert.eql(JSHINT.errors.length, 2);
+    assert.eql(JSHINT.errors.length, 4);
     assert.eql(JSHINT.errors[0].reason, "Use '===' to compare with 'null'.");
     assert.eql(JSHINT.errors[1].reason, "Use '===' to compare with 'null'.");
+    assert.eql(JSHINT.errors[2].reason, "Use '!==' to compare with 'null'.");
+    assert.eql(JSHINT.errors[3].reason, "Use '!==' to compare with 'null'.");
 
     // But when `eqnull` is true, no questions asked
     assert.ok(JSHINT(code, { eqnull: true }));
