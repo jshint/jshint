@@ -190,9 +190,9 @@
  ex, exception, exec, exps, expr, exports, FileReader, first, floor, focus,
  forin, fragment, frames, from, fromCharCode, fud, funct, function, functions,
  g, gc, getComputedStyle, getRow, GLOBAL, global, globals, globalstrict,
- hasOwnProperty, help, history, i, id,
- identifier, immed, implieds, include, indent, indexOf, init, ins, instanceOf,
- isAlpha, isApplicationRunning, isArray, isDigit, isFinite, isNaN, join, jshint,
+ hasOwnProperty, help, history, i, id, identifier, immed, implieds, include,
+ indent, indexOf, init, ins, instanceOf, isAlpha, isApplicationRunning, isArray,
+ isDigit, isFinite, isNaN, iterator, join, jshint,
  JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastsemic, laxbreak,
  latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
  log, loopfunc, m, match, maxerr, maxlen, member,message, meta, module, moveBy,
@@ -200,7 +200,7 @@
  nonew, nud, onbeforeunload, onblur, onerror, onevar, onfocus, onload, onresize,
  onunload, open, openDatabase, openURL, opener, opera, outer, param, parent,
  parseFloat, parseInt, passfail, plusplus, predef, print, process, prompt,
- prototype, prototypejs, push, quit, range, raw, reach, reason, regexp,
+ proto, prototype, prototypejs, push, quit, range, raw, reach, reason, regexp,
  readFile, readUrl, regexdash, removeEventListener, replace, report, require,
  reserved, resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
  runCommand, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal, send,
@@ -259,6 +259,7 @@ var JSHINT = (function () {
             forin       : true, // if for in statements must filter
             globalstrict: true, // if global "use strict"; should be allowed (also enables 'strict')
             immed       : true, // if immediate invocations must be wrapped in parens
+            iterator    : true, // if the `__iterator__` property should be disallowed
             jquery      : true, // if jQuery globals should be predefined
             latedef     : true, // if the use before definition should not be tolerated
             laxbreak    : true, // if line breaks should not be checked
@@ -273,6 +274,7 @@ var JSHINT = (function () {
             onevar      : true, // if only one var statement per function should be allowed
             passfail    : true, // if the scan should stop on first error
             plusplus    : true, // if increment/decrement should not be allowed
+            proto       : true, // if the `__proto__` property should be disallowed
             prototypejs : true, // if Prototype and Scriptaculous globals should be predefined
             regexdash   : true, // if unescaped last dash (-) inside brackets should be tolerated
             regexp      : true, // if the . should not be allowed in regexp literals
@@ -914,11 +916,13 @@ var JSHINT = (function () {
             }
             if (type === '(identifier)') {
                 t.identifier = true;
-                if (value === '__iterator__' || value === '__proto__') {
-                    errorAt("Reserved name '{a}'.",
+                if (value === '__proto__' && !option.proto) {
+                    warningAt("The '{a}' property is deprecated.",
                         line, from, value);
-                } else if (option.nomen &&
-                        (value.charAt(0) === '_' ||
+                } else if (value === '__iterator__' && !option.iterator) {
+                    warningAt("'{a}' is only available in JavaScript 1.7.",
+                        line, from, value);
+                } else if (option.nomen && (value.charAt(0) === '_' ||
                          value.charAt(value.length - 1) === '_')) {
                     warningAt("Unexpected {a} in '{b}'.", line, from,
                         "dangling '_'", value);
@@ -3500,8 +3504,10 @@ loop:   for (;;) {
                     if (o[nexttoken.value] === true) {
                         warning("Duplicate key '{a}'.",
                                 nexttoken, nexttoken.value);
-                    } else if (nexttoken.value === '__proto__') {
-                        warning("Stupid key '{a}'.",
+                    } else if ((nexttoken.value === '__proto__' &&
+                        !option.proto) || (nexttoken.value === '__iterator__' &&
+                        !option.iterator)) {
+                            warning("The '{a}' key may produce unexpected results.",
                                 nexttoken, nexttoken.value);
                     } else {
                         o[nexttoken.value] = true;
