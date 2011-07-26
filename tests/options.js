@@ -182,13 +182,29 @@ exports.nonew = function () {
 
 /** Option `asi` allows you to use automatic-semicolon insertion */
 exports.asi = function () {
-    var code = 'hello()';
+    var src = fs.readFileSync(__dirname + '/fixtures/asi.js', 'utf8');
 
-    assert.ok(!JSHINT(code));
-    assert.eql(JSHINT.errors[0].line, 1);
-    assert.eql(JSHINT.errors[0].reason, 'Missing semicolon.');
+    assert.ok(!JSHINT(src));
+    assert.eql(JSHINT.errors.length, 9);
 
-    assert.ok(JSHINT(code, { asi: true }));
+    var errors = [
+        [2, "Line breaking error 'return'."],
+        [3, "Expected an identifier and instead saw 'var'."],
+        [3, "Missing semicolon."],
+        [3, "Missing semicolon."], // TODO: Why there are two Missing semicolon warnings?
+        [7, "Line breaking error 'continue'."],
+        [7, "Missing semicolon."],
+        [8, "Line breaking error 'break'."],
+        [8, "Missing semicolon."],
+        [11, "Missing semicolon."]
+    ];
+
+    for (var i = 0, err; err = errors[i]; i++) {
+        assert.eql(JSHINT.errors[i].line, err[0]);
+        assert.eql(JSHINT.errors[i].reason, err[1]);
+    }
+
+    assert.ok(JSHINT(src, { asi: true }));
 };
 
 /** Option `lastsemic` allows you to skip the semicolon after last statement in a block,

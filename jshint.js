@@ -3413,10 +3413,13 @@ loop:   for (;;) {
 
     stmt('break', function () {
         var v = nexttoken.value;
-        if (funct['(breakage)'] === 0) {
+
+        if (funct['(breakage)'] === 0)
             warning("Unexpected '{a}'.", nexttoken, this.value);
-        }
-        nolinebreak(this);
+
+        if (!option.asi)
+            nolinebreak(this);
+
         if (nexttoken.id !== ';') {
             if (token.line === nexttoken.line) {
                 if (funct[v] !== 'label') {
@@ -3435,10 +3438,13 @@ loop:   for (;;) {
 
     stmt('continue', function () {
         var v = nexttoken.value;
-        if (funct['(breakage)'] === 0) {
+
+        if (funct['(breakage)'] === 0)
             warning("Unexpected '{a}'.", nexttoken, this.value);
-        }
-        nolinebreak(this);
+
+        if (!option.asi)
+            nolinebreak(this);
+
         if (nexttoken.id !== ';') {
             if (token.line === nexttoken.line) {
                 if (funct[v] !== 'label') {
@@ -3458,14 +3464,19 @@ loop:   for (;;) {
 
 
     stmt('return', function () {
-        nolinebreak(this);
-        if (nexttoken.id === '(regexp)') {
+        if (!option.asi)
+            nolinebreak(this);
+
+        if (nexttoken.id === '(regexp)')
             warning("Wrap the /regexp/ literal in parens to disambiguate the slash operator.");
+
+        if (this.line === nexttoken.line || !option.asi) {
+            if (nexttoken.id !== ';' && !nexttoken.reach) {
+                nonadjacent(token, nexttoken);
+                this.first = expression(20);
+            }
         }
-        if (nexttoken.id !== ';' && !nexttoken.reach) {
-            nonadjacent(token, nexttoken);
-            this.first = expression(20);
-        }
+
         reachable('return');
         return this;
     }).exps = true;
