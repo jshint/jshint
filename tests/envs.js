@@ -286,18 +286,13 @@ exports.es5 = function () {
     var src = fs.readFileSync(__dirname + "/fixtures/es5.js", "utf8");
 
     assert.ok(!JSHINT(src));
-    assert.eql(JSHINT.errors.length, 5);
+    assert.eql(JSHINT.errors.length, 3);
     assert.eql(JSHINT.errors[0].line, 3);
     assert.eql(JSHINT.errors[0].reason, "Extra comma.");
     assert.eql(JSHINT.errors[1].line, 8);
     assert.eql(JSHINT.errors[1].reason, "Extra comma.");
     assert.eql(JSHINT.errors[2].line, 15);
     assert.eql(JSHINT.errors[2].reason, "get/set are ES5 features.");
-
-    // get/set are fatal errors when not in ES5 mode
-    assert.eql(JSHINT.errors[3].line, 15);
-    assert.eql(JSHINT.errors[3].reason, "Stopping, unable to continue. (83% scanned).");
-    assert.eql(JSHINT.errors[4], null);
 
     assert.ok(JSHINT(src, { es5: true }));
 

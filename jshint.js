@@ -803,8 +803,7 @@ var JSHINT = (function () {
     }
 
 
-// Produce an error warning.
-
+    // Produce an error warning.
     function quit(message, line, chr) {
         var percentage = Math.floor((line / lines.length) * 100);
 
@@ -856,7 +855,6 @@ var JSHINT = (function () {
 
     function error(m, t, a, b, c, d) {
         var w = warning(m, t, a, b, c, d);
-        quit("Stopping, unable to continue.", w.line, w.character);
     }
 
     function errorAt(m, l, ch, a, b, c, d) {
@@ -3685,9 +3683,7 @@ loop:   for (;;) {
         return JSHINT.errors.length === 0;
     };
 
-
-// Data summary.
-
+    // Data summary.
     itself.data = function () {
 
         var data = {functions: []}, fu, globals, implieds = [], f, i, j,
