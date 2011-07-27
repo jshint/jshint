@@ -260,6 +260,8 @@ var JSHINT = (function () {
             immed       : true, // if immediate invocations must be wrapped in parens
             iterator    : true, // if the `__iterator__` property should be disallowed
             jquery      : true, // if jQuery globals should be predefined
+            lastsemic   : true, // if semicolons may be ommitted for the trailing
+                                // statements inside of a one-line blocks.
             latedef     : true, // if the use before definition should not be tolerated
             laxbreak    : true, // if line breaks should not be checked
             loopfunc    : true, // if functions should be allowed to be defined within
@@ -1661,6 +1663,7 @@ loop:   for (;;) {
             }
             break;
         }
+
         if (token.type === '(string)' || token.identifier) {
             anonname = token.value;
         }
@@ -1679,6 +1682,7 @@ loop:   for (;;) {
                         nexttoken, id, nexttoken.value);
             }
         }
+
         prevtoken = token;
         token = nexttoken;
         for (;;) {
@@ -2178,8 +2182,7 @@ loop:   for (;;) {
         }
         r = expression(0, true);
 
-// Look for the final semicolon.
-
+        // Look for the final semicolon.
         if (!t.block) {
             if (!option.expr && (!r || !r.exps)) {
                 warning("Expected an assignment or function call and instead saw an expression.",
@@ -2187,10 +2190,21 @@ loop:   for (;;) {
             } else if (option.nonew && r.id === '(' && r.left.id === 'new') {
                 warning("Do not use 'new' for side effects.");
             }
+
             if (nexttoken.id !== ';') {
+                if (!option.asi) {
+                    // If this is the last statement in a block that ends on
+                    // the same line *and* option lastsemic is on, ignore the warning.
+                    // Otherwise, complain about missing semicolon.
+                    if (!option.lastsemic || nexttoken.id != '}' ||
+                            nexttoken.line != token.line) {
+                        warningAt("Missing semicolon.", token.line, token.from +
+                            token.value.length);
+                    }
+                }
                 if (!option.asi && !(option.lastsemic && nexttoken.id == '}' &&
                         nexttoken.line == token.line)) {
-                    warningAt("Missing semicolon.", token.line, token.from + token.value.length);
+
                 }
             } else {
                 adjacent(token, nexttoken);
@@ -3685,6 +3699,7 @@ loop:   for (;;) {
                         warning("Use the function form of \"use strict\".");
                     use_strict();
                 }
+
                 statements('lib');
             }
             advance('(end)');
