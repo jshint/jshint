@@ -366,3 +366,13 @@ exports.dojo = function () {
   assert.globalsImplied(globals);
   assert.globalsKnown(globals, { dojo: true });
 };
+
+exports.nonstandard = function () {
+  var globals = [
+      'escape'
+    , 'unescape'
+  ];
+
+  assert.globalsImplied(globals);
+  assert.globalsKnown(globals, { nonstandard: true });
+};
