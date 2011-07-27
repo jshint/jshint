@@ -174,7 +174,7 @@
  ScriptEngineMajorVersion, ScriptEngineMinorVersion, Scriptaculous, Scroller,
  Slick, Slider, Selector, String, Style, SyntaxError, Sortable, Sortables,
  SortableObserver, Sound, Spinner, System, Swiff, Text, TextArea, Template,
- Timer, Tips, Type, TypeError, Toggle, Try, URI, URIError, URL, VBArray, WSH,
+ Timer, Tips, Type, TypeError, Toggle, Try, unescape, URI, URIError, URL, VBArray, WSH,
  WScript, Web, Window, XMLDOM, XMLHttpRequest, XPathEvaluator, XPathException,
  XPathExpression, XPathNamespace, XPathNSResolver, XPathResult, "\\", a,
  addEventListener, address, alert, apply, applicationCache, arguments, arity,
@@ -195,14 +195,14 @@
  latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
  log, loopfunc, m, match, maxerr, maxlen, member,message, meta, module, moveBy,
  moveTo, mootools, name, navigator, new, newcap, noarg, node, noempty, nomen,
- nonew, nud, onbeforeunload, onblur, onerror, onevar, onfocus, onload, onresize,
- onunload, open, openDatabase, openURL, opener, opera, outer, param, parent,
+ nonew, nonstandard, nud, onbeforeunload, onblur, onerror, onevar, onfocus, onload,
+ onresize, onunload, open, openDatabase, openURL, opener, opera, outer, param, parent,
  parseFloat, parseInt, passfail, plusplus, predef, print, process, prompt,
  proto, prototype, prototypejs, push, quit, range, raw, reach, reason, regexp,
  readFile, readUrl, regexdash, removeEventListener, replace, report, require,
  reserved, resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
- runCommand, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal, send,
- serialize, setInterval, setTimeout, shift, slice, sort,spawn, split, stack,
+ runCommand, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal,
+ send, serialize, setInterval, setTimeout, shift, slice, sort,spawn, split, stack,
  status, start, strict, sub, substr, supernew, shadow, supplant, sum, sync,
  test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing, type,
  typeOf, Uint16Array, Uint32Array, Uint8Array, undef, unused, urls, value, valueOf,
@@ -237,8 +237,7 @@ var JSHINT = (function () {
             '%'  : true
         },
 
-// These are the JSHint boolean options.
-
+        // These are the JSHint boolean options.
         boolOptions = {
             asi         : true, // if automatic semicolon insertion should be tolerated
             bitwise     : true, // if bitwise operators should not be allowed
@@ -247,7 +246,8 @@ var JSHINT = (function () {
             couch       : true, // if CouchDB globals should be predefined
             curly       : true, // if curly braces around all blocks should be required
             debug       : true, // if debugger statements should be allowed
-            devel       : true, // if logging globals should be predefined (console, alert, etc.)
+            devel       : true, // if logging globals should be predefined (console,
+                                // alert, etc.)
             dojo        : true, // if Dojo Toolkit globals should be predefined
             eqeqeq      : true, // if === should be required
             eqnull      : true, // if == null comparisons should be tolerated
@@ -255,26 +255,35 @@ var JSHINT = (function () {
             evil        : true, // if eval should be allowed
             expr        : true, // if ExpressionStatement should be allowed as Programs
             forin       : true, // if for in statements must filter
-            globalstrict: true, // if global "use strict"; should be allowed (also enables 'strict')
+            globalstrict: true, // if global "use strict"; should be allowed (also
+                                // enables 'strict')
             immed       : true, // if immediate invocations must be wrapped in parens
             iterator    : true, // if the `__iterator__` property should be disallowed
             jquery      : true, // if jQuery globals should be predefined
             latedef     : true, // if the use before definition should not be tolerated
             laxbreak    : true, // if line breaks should not be checked
-            loopfunc    : true, // if functions should be allowed to be defined within loops
+            loopfunc    : true, // if functions should be allowed to be defined within
+                                // loops
             mootools    : true, // if MooTools globals should be predefined
             newcap      : true, // if constructor names must be capitalized
-            noarg       : true, // if arguments.caller and arguments.callee should be disallowed
-            node        : true, // if the Node.js environment globals should be predefined
+            noarg       : true, // if arguments.caller and arguments.callee should be
+                                // disallowed
+            node        : true, // if the Node.js environment globals should be
+                                // predefined
             noempty     : true, // if empty blocks should be disallowed
             nonew       : true, // if using `new` for side-effects should be disallowed
+            nonstandard : true, // if non-standard (but widely adopted) globals should
+                                // be predefined
             nomen       : true, // if names should be checked
-            onevar      : true, // if only one var statement per function should be allowed
+            onevar      : true, // if only one var statement per function should be
+                                // allowed
             passfail    : true, // if the scan should stop on first error
             plusplus    : true, // if increment/decrement should not be allowed
             proto       : true, // if the `__proto__` property should be disallowed
-            prototypejs : true, // if Prototype and Scriptaculous globals should be predefined
-            regexdash   : true, // if unescaped last dash (-) inside brackets should be tolerated
+            prototypejs : true, // if Prototype and Scriptaculous globals should be
+                                // predefined
+            regexdash   : true, // if unescaped last dash (-) inside brackets should be
+                                // tolerated
             regexp      : true, // if the . should not be allowed in regexp literals
             rhino       : true, // if the Rhino environment globals should be predefined
             undef       : true, // if variables should be declared before used
@@ -286,13 +295,12 @@ var JSHINT = (function () {
                                 // should be tolerated
             trailing    : true, // if trailing whitespace rules apply
             white       : true, // if strict whitespace rules apply
-            wsh         : true  // if the Windows Scripting Host environment globals should
-                                // be predefined
+            wsh         : true  // if the Windows Scripting Host environment globals
+                                // should be predefined
         },
 
-// browser contains a set of global names which are commonly provided by a
-// web browser environment.
-
+        // browser contains a set of global names which are commonly provided by a
+        // web browser environment.
         browser = {
             ArrayBuffer     : false,
             ArrayBufferView : false,
@@ -563,9 +571,8 @@ var JSHINT = (function () {
         src,
         stack,
 
-// standard contains the global names that are provided by the
-// ECMAScript standard.
-
+        // standard contains the global names that are provided by the
+        // ECMAScript standard.
         standard = {
             Array               : false,
             Boolean             : false,
@@ -594,6 +601,12 @@ var JSHINT = (function () {
             SyntaxError         : false,
             TypeError           : false,
             URIError            : false
+        },
+
+        // widely adopted global names that are not part of ECMAScript standard
+        nonstandard = {
+            escape              : false,
+            unescape            : false
         },
 
         standard_member = {
@@ -788,6 +801,9 @@ var JSHINT = (function () {
 
         if (option.browser)
             combine(predefined, browser);
+
+        if (option.nonstandard)
+            combine(predefined, nonstandard);
 
         if (option.jquery)
             combine(predefined, jquery);
