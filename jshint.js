@@ -969,8 +969,7 @@ var JSHINT = (function () {
             return t;
         }
 
-// Public lex methods
-
+        // Public lex methods
         return {
             init: function (source) {
                 if (typeof source === 'string') {
@@ -1019,8 +1018,8 @@ var JSHINT = (function () {
 
             },
 
-// token -- this is called by advance to get the next token.
 
+            // token -- this is called by advance to get the next token
             token: function () {
                 var b, c, captures, d, depth, high, i, l, low, q, t;
 
@@ -2328,11 +2327,12 @@ loop:   for (;;) {
         }
     }
 
-// Build the syntax table by declaring the syntactic elements of the language.
+    // Build the syntax table by declaring the syntactic elements of the language.
 
     type('(number)', function () {
         return this;
     });
+
     type('(string)', function () {
         return this;
     });
@@ -2345,10 +2345,9 @@ loop:   for (;;) {
             var v = this.value,
                 s = scope[v],
                 f;
+
             if (typeof s === 'function') {
-
-// Protection against accidental inheritance.
-
+                // Protection against accidental inheritance.
                 s = undefined;
             } else if (typeof s === 'boolean') {
                 f = funct;
@@ -2358,12 +2357,9 @@ loop:   for (;;) {
                 funct = f;
             }
 
-// The name is in scope and defined in the current function.
-
+            // The name is in scope and defined in the current function.
             if (funct === s) {
-
-//      Change 'unused' to 'var', and reject labels.
-
+                // Change 'unused' to 'var', and reject labels.
                 switch (funct[v]) {
                 case 'unused':
                     funct[v] = 'var';
@@ -2379,25 +2375,22 @@ loop:   for (;;) {
                     warning("'{a}' is a statement label.", token, v);
                     break;
                 }
-
-// The name is not defined in the function.  If we are in the global scope,
-// then we have an undefined variable.
-//
-// Operators typeof and delete do not raise runtime errors even if the base
-// object of a reference is null so no need to display warning if we're
-// inside of typeof or delete.
-
             } else if (funct['(global)']) {
+                // The name is not defined in the function.  If we are in the global
+                // scope, then we have an undefined variable.
+                //
+                // Operators typeof and delete do not raise runtime errors even if
+                // the base object of a reference is null so no need to display warning
+                // if we're inside of typeof or delete.
                 if (anonname != 'typeof' && anonname != 'delete' &&
                     option.undef && typeof predefined[v] !== 'boolean') {
                     warning("'{a}' is not defined.", token, v);
                 }
                 note_implied(token);
-
-// If the name is already defined in the current
-// function, but not as outer, then there is a scope error.
-
             } else {
+                // If the name is already defined in the current
+                // function, but not as outer, then there is a scope error.
+
                 switch (funct[v]) {
                 case 'closure':
                 case 'function':
@@ -2412,20 +2405,17 @@ loop:   for (;;) {
                 case 'global':
                     break;
                 default:
-
-// If the name is defined in an outer function, make an outer entry, and if
-// it was unused, make it var.
-
+                    // If the name is defined in an outer function, make an outer entry,
+                    // and if it was unused, make it var.
                     if (s === true) {
                         funct[v] = true;
                     } else if (s === null) {
                         warning("'{a}' is not allowed.", token, v);
                         note_implied(token);
                     } else if (typeof s !== 'object') {
-
-// Operators typeof and delete do not raise runtime errors even if the base object of
-// a reference is null so no need to display warning if we're inside of typeof or delete.
-
+                        // Operators typeof and delete do not raise runtime errors even
+                        // if the base object of a reference is null so no need to
+                        // display warning if we're inside of typeof or delete.
                         if (anonname != 'typeof' && anonname != 'delete' && option.undef) {
                             warning("'{a}' is not defined.", token, v);
                         } else {
@@ -3924,12 +3914,11 @@ loop:   for (;;) {
         }
         return o.join('');
     };
-    itself.jshint = itself;
 
+    itself.jshint = itself;
     itself.edition = '2011-04-16';
 
     return itself;
-
 }());
 
 // Make JSHINT a Node module, if possible.
