@@ -166,6 +166,7 @@ exports.browser = function () {
     var globals = [
             'ArrayBuffer'
           , 'ArrayBufferView'
+          , 'Audio'
           , 'addEventListener'
           , 'applicationCache'
           , 'blur'
@@ -216,6 +217,8 @@ exports.browser = function () {
           , 'scroll'
           , 'scrollBy'
           , 'scrollTo'
+          , 'SharedWorker'
+          , 'sessionStorage'
           , 'setInterval'
           , 'setTimeout'
           , 'status'
