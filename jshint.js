@@ -198,9 +198,9 @@
  latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
  log, loopfunc, m, match, maxerr, maxlen, member,message, meta, module, moveBy,
  moveTo, mootools, name, navigator, new, newcap, noarg, node, noempty, nomen,
- nonew, nonstandard, nud, onbeforeunload, onblur, onerror, onevar, onfocus, onload,
- onresize, onunload, open, openDatabase, openURL, opener, opera, outer, param, parent,
- parseFloat, parseInt, passfail, plusplus, predef, print, process, prompt,
+ nonew, nonstandard, nud, onbeforeunload, onblur, onerror, onevar, onecase, onfocus,
+ onload, onresize, onunload, open, openDatabase, openURL, opener, opera, outer, param,
+ parent, parseFloat, parseInt, passfail, plusplus, predef, print, process, prompt,
  proto, prototype, prototypejs, push, quit, range, raw, reach, reason, regexp,
  readFile, readUrl, regexdash, removeEventListener, replace, report, require,
  reserved, resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
@@ -282,6 +282,7 @@ var JSHINT = (function () {
             nomen       : true, // if names should be checked
             onevar      : true, // if only one var statement per function should be
                                 // allowed
+            onecase     : true, // if one case switch statements should be allowed
             passfail    : true, // if the scan should stop on first error
             plusplus    : true, // if increment/decrement should not be allowed
             proto       : true, // if the `__proto__` property should be disallowed
@@ -3278,7 +3279,8 @@ loop:   for (;;) {
                 advance('}', t);
                 if (this.cases.length === 1 || this.condition.id === 'true' ||
                         this.condition.id === 'false') {
-                    warning("This 'switch' should be an 'if'.", this);
+                    if (!option.onecase)
+                        warning("This 'switch' should be an 'if'.", this);
                 }
                 funct['(breakage)'] -= 1;
                 funct['(verb)'] = undefined;

@@ -754,3 +754,13 @@ exports.regexdash = function () {
     assert.eql(JSHINT.errors[0].reason, "Unescaped '-'.");
     assert.ok(JSHINT(code[1], { regexdash: true }));
 };
+
+exports.onecase = function () {
+    var code = "switch (a) { case '1': b(); }";
+
+    assert.ok(!JSHINT(code));
+    assert.eql(JSHINT.errors.length, 1);
+    assert.eql(JSHINT.errors[0].reason, "This 'switch' should be an 'if'.");
+
+    assert.ok(JSHINT(code, { onecase: true }));
+};
