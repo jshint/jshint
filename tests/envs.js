@@ -181,6 +181,7 @@ exports.browser = function () {
           , 'FileReader'
           , 'Float32Array'
           , 'Float64Array'
+          , 'FormData'
           , 'focus'
           , 'frames'
           , 'getComputedStyle'
