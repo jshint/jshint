@@ -764,3 +764,16 @@ exports.onecase = function () {
 
     assert.ok(JSHINT(code, { onecase: true }));
 };
+
+exports.validthis = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/strict_this.js', 'utf8');
+
+    assert.ok(!JSHINT(src));
+    assert.eql(JSHINT.errors.length, 3);
+    assert.eql(JSHINT.errors[0].reason, "Possible strict violation.");
+    assert.eql(JSHINT.errors[0].line, 8);
+    assert.eql(JSHINT.errors[1].reason, "Possible strict violation.");
+    assert.eql(JSHINT.errors[1].line, 9);
+    assert.eql(JSHINT.errors[2].reason, "Possible strict violation.");
+    assert.eql(JSHINT.errors[2].line, 11);
+};

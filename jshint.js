@@ -2512,7 +2512,7 @@ loop:   for (;;) {
     reservevar('this', function (x) {
         if (strict_mode && ((funct['(statement)'] &&
                 funct['(name)'].charAt(0) > 'Z') || funct['(global)'])) {
-            warning("Strict violation.", x);
+            warning("Possible strict violation.", x);
         }
     });
     reservevar('true');
