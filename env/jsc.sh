@@ -7,13 +7,16 @@
 alias jsc="/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc"
 FILE="${1}"
 OPTS="${2}"
+
+FILE_CONTENT=$(cat "${FILE}")
+
 if [ -L $BASH_SOURCE ]; then
   ENV_HOME="$( cd "$( dirname "$(readlink "$BASH_SOURCE")" )" && pwd )"
 else
   ENV_HOME="$( cd "$( dirname "$BASH_SOURCE" )" && pwd )"
 fi
 
-LINT_RESULT="$(jsc ${ENV_HOME}/jsc.js -- ${FILE} "$(cat ${FILE})" "${OPTS}" ${ENV_HOME})"
+LINT_RESULT=$(jsc "${ENV_HOME}"/jsc.js -- "${FILE}" "${FILE_CONTENT}" "${OPTS}" "${ENV_HOME}")
 ERRORS=$(echo ${LINT_RESULT} | egrep [^\s] -c)
 
 if [[ ${ERRORS} -ne 0 ]]; then
