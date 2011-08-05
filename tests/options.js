@@ -775,3 +775,31 @@ exports.onecase = function () {
 
     assert.ok(JSHINT(code, { onecase: true }));
 };
+
+exports.validthis = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/strict_this.js', 'utf8');
+
+    assert.ok(!JSHINT(src));
+    assert.eql(JSHINT.errors.length, 3);
+    assert.eql(JSHINT.errors[0].reason, "Possible strict violation.");
+    assert.eql(JSHINT.errors[0].line, 8);
+    assert.eql(JSHINT.errors[1].reason, "Possible strict violation.");
+    assert.eql(JSHINT.errors[1].line, 9);
+    assert.eql(JSHINT.errors[2].reason, "Possible strict violation.");
+    assert.eql(JSHINT.errors[2].line, 11);
+
+    src = fs.readFileSync(__dirname + '/fixtures/strict_this2.js', 'utf8');
+    assert.ok(JSHINT(src));
+
+    // Test for erroneus use of validthis
+
+    var code = ['/*jshint validthis:true */', 'hello();'];
+    assert.ok(!JSHINT(code));
+    assert.eql(JSHINT.errors.length, 1);
+    assert.eql(JSHINT.errors[0].reason, "Option 'validthis' can't be used in a global scope.");
+
+    code = ['function x() {', '/*jshint validthis:heya */', 'hello();', '}'];
+    assert.ok(!JSHINT(code));
+    assert.eql(JSHINT.errors.length, 1);
+    assert.eql(JSHINT.errors[0].reason, "Bad option value.");
+};
