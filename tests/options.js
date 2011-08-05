@@ -617,8 +617,9 @@ exports.sub = function () {
 
 /** Option `strict` requires you to use "use strict"; */
 exports.strict = function () {
-    var code  = "(function () { return; }());",
-        code1 = '(function () { "use strict"; return; }());';
+    var code  = "(function () { return; }());";
+    var code1 = '(function () { "use strict"; return; }());';
+    var src = fs.readFileSync(__dirname + '/fixtures/strict_violations.js', 'utf8');
 
     assert.ok(JSHINT(code));
     assert.ok(JSHINT(code1));
@@ -628,6 +629,16 @@ exports.strict = function () {
     assert.eql(JSHINT.errors[0].reason, 'Missing "use strict" statement.');
 
     assert.ok(JSHINT(code1, { strict: true }));
+
+    // Test for strict mode violations
+    assert.ok(!JSHINT(src, { strict: true }));
+    assert.eql(JSHINT.errors.length, 3);
+    assert.eql(JSHINT.errors[0].line, 4);
+    assert.eql(JSHINT.errors[0].reason, 'Strict violation.');
+    assert.eql(JSHINT.errors[1].line, 7);
+    assert.eql(JSHINT.errors[1].reason, 'Strict violation.');
+    assert.eql(JSHINT.errors[2].line, 8);
+    assert.eql(JSHINT.errors[2].reason, 'Strict violation.');
 };
 
 /** Option `globalstrict` allows you to use global "use strict"; */
