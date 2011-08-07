@@ -503,8 +503,9 @@ var JSHINT = (function () {
         node = {
             __filename  : false,
             __dirname   : false,
-            exports     : false,
             Buffer      : false,
+            console     : false,
+            exports     : false,
             GLOBAL      : false,
             global      : false,
             module      : false,
