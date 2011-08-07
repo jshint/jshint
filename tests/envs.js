@@ -54,6 +54,7 @@ exports.node = function () {
           , "process"
           , "require"
           , "exports"
+          , "console"
         ];
 
     assert.globalsImplied(globals);
