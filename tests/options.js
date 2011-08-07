@@ -634,7 +634,7 @@ exports.strict = function () {
     assert.ok(!JSHINT(src, { strict: true }));
     assert.eql(JSHINT.errors.length, 3);
     assert.eql(JSHINT.errors[0].line, 4);
-    assert.eql(JSHINT.errors[0].reason, 'Strict violation.');
+    assert.eql(JSHINT.errors[0].reason, 'Possible strict violation.');
     assert.eql(JSHINT.errors[1].line, 7);
     assert.eql(JSHINT.errors[1].reason, 'Strict violation.');
     assert.eql(JSHINT.errors[2].line, 8);
