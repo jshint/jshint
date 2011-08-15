@@ -1029,8 +1029,10 @@ var JSHINT = (function () {
                         line, from, value);
                 } else if (option.nomen && (value.charAt(0) === '_' ||
                          value.charAt(value.length - 1) === '_')) {
-                    warningAt("Unexpected {a} in '{b}'.", line, from,
-                        "dangling '_'", value);
+                    if (!option.node || token.id == '.' ||
+                            (value != '__dirname' && value != '__filename')) {
+                        warningAt("Unexpected {a} in '{b}'.", line, from, "dangling '_'", value);
+                    }
                 }
             }
             t.value = value;
