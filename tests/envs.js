@@ -59,6 +59,25 @@ exports.node = function () {
 
     assert.globalsImplied(globals);
     assert.globalsKnown(globals, { node: true });
+
+    // Make sure that the `node` option doesn't conflict with `nomen`
+    var asGlobals = [
+      'console.log(__dirname);',
+      'console.log(__filename);'
+    ];
+
+    var asProps = [
+      'console.log(a.__dirname);',
+      'console.log(a.__filename);',
+      'console.log(__hello);'
+    ];
+
+    assert.ok(JSHINT(asGlobals, { node: true, nomen: true }));
+    assert.ok(!JSHINT(asProps, { node: true, nomen: true }));
+    assert.eql(JSHINT.errors.length, 3);
+    assert.eql(JSHINT.errors[0].reason, "Unexpected dangling '_' in '__dirname'.");
+    assert.eql(JSHINT.errors[1].reason, "Unexpected dangling '_' in '__filename'.");
+    assert.eql(JSHINT.errors[2].reason, "Unexpected dangling '_' in '__hello'.");
 };
 
 /** Option `jquery` predefines jQuery globals */
