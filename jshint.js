@@ -3141,10 +3141,13 @@ loop:   for (;;) {
         for (;;) {
             nonadjacent(token, nexttoken);
             id = identifier();
+            if (funct[id] === "const") {
+                warning("const '" + id + "' has already been declared");
+            }
             if (funct['(global)'] && predefined[id] === false) {
                 warning("Redefinition of '{a}'.", token, id);
             }
-            addlabel(id, 'unused');
+            addlabel(id, 'const');
             if (prefix) {
                 break;
             }
@@ -3158,7 +3161,7 @@ loop:   for (;;) {
                     warning("It is not necessary to initialize '{a}' to 'undefined'.", token, id);
                 }
                 if (peek(0).id === '=' && nexttoken.identifier) {
-                    error("Variable {a} was not declared correctly.",
+                    error("Constant {a} was not declared correctly.",
                             nexttoken, nexttoken.value);
                 }
                 value = expression(0);
@@ -3177,7 +3180,6 @@ loop:   for (;;) {
         // JavaScript does not have block scope. It only has function scope. So,
         // declaring a variable in a block can have unexpected consequences.
         var id, name, value;
-
         if (funct['(onevar)'] && option.onevar) {
             warning("Too many var statements.");
         } else if (!funct['(global)']) {
@@ -3187,6 +3189,9 @@ loop:   for (;;) {
         for (;;) {
             nonadjacent(token, nexttoken);
             id = identifier();
+            if (funct[id] === "const") {
+                warning("const '" + id + "' has already been declared");
+            }
             if (funct['(global)'] && predefined[id] === false) {
                 warning("Redefinition of '{a}'.", token, id);
             }
@@ -3227,6 +3232,9 @@ loop:   for (;;) {
 
         }
         var i = identifier();
+        if (funct[i] === "const") {
+            warning("const '" + i + "' has already been declared");
+        }
         adjacent(token, nexttoken);
         addlabel(i, 'unction');
         doFunction(i, true);
