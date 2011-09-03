@@ -17,7 +17,7 @@ exports.checkJSHint = function () {
 
 /** Rhino wrapper must pass JSHint check */
 exports.checkRhino = function () {
-    var src = fs.readFileSync(__dirname + "/../env/rhino.js", "utf8");
+    var src = fs.readFileSync(__dirname + "/../env/jshint-rhino.js", "utf8");
     assert.ok(JSHINT(src, { rhino: true }));
 };
 

@@ -54,10 +54,30 @@ exports.node = function () {
           , "process"
           , "require"
           , "exports"
+          , "console"
         ];
 
     assert.globalsImplied(globals);
     assert.globalsKnown(globals, { node: true });
+
+    // Make sure that the `node` option doesn't conflict with `nomen`
+    var asGlobals = [
+      'console.log(__dirname);',
+      'console.log(__filename);'
+    ];
+
+    var asProps = [
+      'console.log(a.__dirname);',
+      'console.log(a.__filename);',
+      'console.log(__hello);'
+    ];
+
+    assert.ok(JSHINT(asGlobals, { node: true, nomen: true }));
+    assert.ok(!JSHINT(asProps, { node: true, nomen: true }));
+    assert.eql(JSHINT.errors.length, 3);
+    assert.eql(JSHINT.errors[0].reason, "Unexpected dangling '_' in '__dirname'.");
+    assert.eql(JSHINT.errors[1].reason, "Unexpected dangling '_' in '__filename'.");
+    assert.eql(JSHINT.errors[2].reason, "Unexpected dangling '_' in '__hello'.");
 };
 
 /** Option `jquery` predefines jQuery globals */
@@ -166,6 +186,7 @@ exports.browser = function () {
     var globals = [
             'ArrayBuffer'
           , 'ArrayBufferView'
+          , 'Audio'
           , 'addEventListener'
           , 'applicationCache'
           , 'blur'
@@ -180,11 +201,65 @@ exports.browser = function () {
           , 'FileReader'
           , 'Float32Array'
           , 'Float64Array'
+          , 'FormData'
           , 'focus'
           , 'frames'
           , 'getComputedStyle'
           , 'history'
           , 'HTMLElement'
+          , 'HTMLAnchorElement'
+          , 'HTMLBaseElement'
+          , 'HTMLBlockquoteElement'
+          , 'HTMLBodyElement'
+          , 'HTMLBRElement'
+          , 'HTMLButtonElement'
+          , 'HTMLCanvasElement'
+          , 'HTMLDirectoryElement'
+          , 'HTMLDivElement'
+          , 'HTMLDListElement'
+          , 'HTMLFieldSetElement'
+          , 'HTMLFontElement'
+          , 'HTMLFormElement'
+          , 'HTMLFrameElement'
+          , 'HTMLFrameSetElement'
+          , 'HTMLHeadElement'
+          , 'HTMLHeadingElement'
+          , 'HTMLHRElement'
+          , 'HTMLHtmlElement'
+          , 'HTMLIFrameElement'
+          , 'HTMLImageElement'
+          , 'HTMLInputElement'
+          , 'HTMLIsIndexElement'
+          , 'HTMLLabelElement'
+          , 'HTMLLayerElement'
+          , 'HTMLLegendElement'
+          , 'HTMLLIElement'
+          , 'HTMLLinkElement'
+          , 'HTMLMapElement'
+          , 'HTMLMenuElement'
+          , 'HTMLMetaElement'
+          , 'HTMLModElement'
+          , 'HTMLObjectElement'
+          , 'HTMLOListElement'
+          , 'HTMLOptGroupElement'
+          , 'HTMLOptionElement'
+          , 'HTMLParagraphElement'
+          , 'HTMLParamElement'
+          , 'HTMLPreElement'
+          , 'HTMLQuoteElement'
+          , 'HTMLScriptElement'
+          , 'HTMLSelectElement'
+          , 'HTMLStyleElement'
+          , 'HTMLTableCaptionElement'
+          , 'HTMLTableCellElement'
+          , 'HTMLTableColElement'
+          , 'HTMLTableElement'
+          , 'HTMLTableRowElement'
+          , 'HTMLTableSectionElement'
+          , 'HTMLTextAreaElement'
+          , 'HTMLTitleElement'
+          , 'HTMLUListElement'
+          , 'HTMLVideoElement'
           , 'Int16Array'
           , 'Int32Array'
           , 'Int8Array'
@@ -216,6 +291,8 @@ exports.browser = function () {
           , 'scroll'
           , 'scrollBy'
           , 'scrollTo'
+          , 'SharedWorker'
+          , 'sessionStorage'
           , 'setInterval'
           , 'setTimeout'
           , 'status'
@@ -286,18 +363,13 @@ exports.es5 = function () {
     var src = fs.readFileSync(__dirname + "/fixtures/es5.js", "utf8");
 
     assert.ok(!JSHINT(src));
-    assert.eql(JSHINT.errors.length, 5);
+    assert.eql(JSHINT.errors.length, 3);
     assert.eql(JSHINT.errors[0].line, 3);
     assert.eql(JSHINT.errors[0].reason, "Extra comma.");
     assert.eql(JSHINT.errors[1].line, 8);
     assert.eql(JSHINT.errors[1].reason, "Extra comma.");
     assert.eql(JSHINT.errors[2].line, 15);
     assert.eql(JSHINT.errors[2].reason, "get/set are ES5 features.");
-
-    // get/set are fatal errors when not in ES5 mode
-    assert.eql(JSHINT.errors[3].line, 15);
-    assert.eql(JSHINT.errors[3].reason, "Stopping, unable to continue. (83% scanned).");
-    assert.eql(JSHINT.errors[4], null);
 
     assert.ok(JSHINT(src, { es5: true }));
 
@@ -370,4 +442,14 @@ exports.dojo = function () {
 
   assert.globalsImplied(globals);
   assert.globalsKnown(globals, { dojo: true });
+};
+
+exports.nonstandard = function () {
+  var globals = [
+      'escape'
+    , 'unescape'
+  ];
+
+  assert.globalsImplied(globals);
+  assert.globalsKnown(globals, { nonstandard: true });
 };

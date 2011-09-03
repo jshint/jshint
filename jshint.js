@@ -1,4 +1,4 @@
-/*
+/*!
  * JSHint, by JSHint Community.
  *
  * Licensed under the same slightly modified MIT license that JSLint is.
@@ -151,7 +151,8 @@
 */
 
 /*jshint
- evil: true, nomen: false, onevar: false, regexp: false, strict: true, boss: true
+ evil: true, nomen: false, onevar: false, regexp: false, strict: true, boss: true,
+ undef: true, maxlen: 100
 */
 
 /*members "\b", "\t", "\n", "\f", "\r", "!=", "!==", "\"", "%", "(begin)",
@@ -159,14 +160,28 @@
  "(line)", "(loopage)", "(name)", "(onevar)", "(params)", "(scope)",
  "(statement)", "(verb)", "*", "+", "++", "-", "--", "\/", "<", "<=", "==",
  "===", ">", ">=", $, $$, $A, $F, $H, $R, $break, $continue, $w, Abstract, Ajax,
- __filename, __dirname, ActiveXObject, Array, ArrayBuffer, ArrayBufferView,
+ __filename, __dirname, ActiveXObject, Array, ArrayBuffer, ArrayBufferView, Audio,
  Autocompleter, Assets, Boolean, Builder, Buffer, Browser, COM, CScript, Canvas,
  CustomAnimation, Class, Control, Chain, Color, Cookie, Core, DataView, Date,
  Debug, Draggable, Draggables, Droppables, Document, DomReady, DOMReady, Drag,
  E, Enumerator, Enumerable, Element, Elements, Error, Effect, EvalError, Event,
  Events, FadeAnimation, Field, Flash, Float32Array, Float64Array, Form,
- FormField, Frame, Function, Fx, GetObject, Group, Hash, HotKey, HTMLElement,
- HtmlTable, Iframe, IframeShim, Image, Int16Array, Int32Array, Int8Array,
+ FormField, Frame, FormData, Function, Fx, GetObject, Group, Hash, HotKey,
+ HTMLElement, HTMLAnchorElement, HTMLBaseElement, HTMLBlockquoteElement,
+ HTMLBodyElement, HTMLBRElement, HTMLButtonElement, HTMLCanvasElement, HTMLDirectoryElement,
+ HTMLDivElement, HTMLDListElement, HTMLFieldSetElement,
+ HTMLFontElement, HTMLFormElement, HTMLFrameElement, HTMLFrameSetElement,
+ HTMLHeadElement, HTMLHeadingElement, HTMLHRElement, HTMLHtmlElement,
+ HTMLIFrameElement, HTMLImageElement, HTMLInputElement, HTMLIsIndexElement,
+ HTMLLabelElement, HTMLLayerElement, HTMLLegendElement, HTMLLIElement,
+ HTMLLinkElement, HTMLMapElement, HTMLMenuElement, HTMLMetaElement,
+ HTMLModElement, HTMLObjectElement, HTMLOListElement, HTMLOptGroupElement,
+ HTMLOptionElement, HTMLParagraphElement, HTMLParamElement, HTMLPreElement,
+ HTMLQuoteElement, HTMLScriptElement, HTMLSelectElement, HTMLStyleElement,
+ HtmlTable, HTMLTableCaptionElement, HTMLTableCellElement, HTMLTableColElement,
+ HTMLTableElement, HTMLTableRowElement, HTMLTableSectionElement,
+ HTMLTextAreaElement, HTMLTitleElement, HTMLUListElement, HTMLVideoElement
+ Iframe, IframeShim, Image, Int16Array, Int32Array, Int8Array,
  Insertion, InputValidator, JSON, Keyboard, Locale, LN10, LN2, LOG10E, LOG2E,
  MAX_VALUE, MIN_VALUE, Mask, Math, MenuItem, MoveAnimation, MooTools, Native,
  NEGATIVE_INFINITY, Number, Object, ObjectRange, Option, Options, OverText, PI,
@@ -174,9 +189,9 @@
  Rectangle, ReferenceError, RegExp, ResizeAnimation, Request, RotateAnimation,
  SQRT1_2, SQRT2, ScrollBar, ScriptEngine, ScriptEngineBuildVersion,
  ScriptEngineMajorVersion, ScriptEngineMinorVersion, Scriptaculous, Scroller,
- Slick, Slider, Selector, String, Style, SyntaxError, Sortable, Sortables,
+ Slick, Slider, Selector, SharedWorker, String, Style, SyntaxError, Sortable, Sortables,
  SortableObserver, Sound, Spinner, System, Swiff, Text, TextArea, Template,
- Timer, Tips, Type, TypeError, Toggle, Try, URI, URIError, URL, VBArray, WSH,
+ Timer, Tips, Type, TypeError, Toggle, Try, unescape, URI, URIError, URL, VBArray, WSH,
  WScript, Web, Window, XMLDOM, XMLHttpRequest, XPathEvaluator, XPathException,
  XPathExpression, XPathNamespace, XPathNSResolver, XPathResult, "\\", a,
  addEventListener, address, alert, apply, applicationCache, arguments, arity,
@@ -190,24 +205,24 @@
  ex, exception, exec, exps, expr, exports, FileReader, first, floor, focus,
  forin, fragment, frames, from, fromCharCode, fud, funct, function, functions,
  g, gc, getComputedStyle, getRow, GLOBAL, global, globals, globalstrict,
- hasOwnProperty, help, history, i, id,
- identifier, immed, implieds, include, indent, indexOf, init, ins, instanceOf,
- isAlpha, isApplicationRunning, isArray, isDigit, isFinite, isNaN, join, jshint,
+ hasOwnProperty, help, history, i, id, identifier, immed, implieds, include,
+ indent, indexOf, init, ins, instanceOf, isAlpha, isApplicationRunning, isArray,
+ isDigit, isFinite, isNaN, iterator, join, jshint,
  JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastsemic, laxbreak,
  latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
  log, loopfunc, m, match, maxerr, maxlen, member,message, meta, module, moveBy,
  moveTo, mootools, name, navigator, new, newcap, noarg, node, noempty, nomen,
- nonew, nud, onbeforeunload, onblur, onerror, onevar, onfocus, onload, onresize,
- onunload, open, openDatabase, openURL, opener, opera, outer, param, parent,
- parseFloat, parseInt, passfail, plusplus, predef, print, process, prompt,
- prototype, prototypejs, push, quit, range, raw, reach, reason, regexp,
+ nonew, nonstandard, nud, onbeforeunload, onblur, onerror, onevar, onecase, onfocus,
+ onload, onresize, onunload, open, openDatabase, openURL, opener, opera, outer, param,
+ parent, parseFloat, parseInt, passfail, plusplus, predef, print, process, prompt,
+ proto, prototype, prototypejs, push, quit, range, raw, reach, reason, regexp,
  readFile, readUrl, regexdash, removeEventListener, replace, report, require,
  reserved, resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
- runCommand, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal, send,
- serialize, setInterval, setTimeout, shift, slice, sort,spawn, split, stack,
- status, start, strict, sub, substr, supernew, shadow, supplant, sum, sync,
- test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing, type,
- typeOf, Uint16Array, Uint32Array, Uint8Array, undef, unused, urls, value, valueOf,
+ runCommand, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal,
+ send, serialize, sessionStorage, setInterval, setTimeout, shift, slice, sort,spawn,
+ split, stack, status, start, strict, sub, substr, supernew, shadow, supplant, sum,
+ sync, test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing, type,
+ typeOf, Uint16Array, Uint32Array, Uint8Array, undef, unused, urls, validthis, value, valueOf,
  var, version, WebSocket, white, window, Worker, wsh*/
 
 /*global exports: false */
@@ -239,17 +254,17 @@ var JSHINT = (function () {
             '%'  : true
         },
 
-// These are the JSHint boolean options.
-
+        // These are the JSHint boolean options.
         boolOptions = {
             asi         : true, // if automatic semicolon insertion should be tolerated
             bitwise     : true, // if bitwise operators should not be allowed
             boss        : true, // if advanced usage of assignments should be allowed
             browser     : true, // if the standard browser globals should be predefined
             couch       : true, // if CouchDB globals should be predefined
-            curly       : true, // if curly braces around blocks should be required (even in if/for/while)
+            curly       : true, // if curly braces around all blocks should be required
             debug       : true, // if debugger statements should be allowed
-            devel       : true, // if logging globals should be predefined (console, alert, etc.)
+            devel       : true, // if logging globals should be predefined (console,
+                                // alert, etc.)
             dojo        : true, // if Dojo Toolkit globals should be predefined
             eqeqeq      : true, // if === should be required
             eqnull      : true, // if == null comparisons should be tolerated
@@ -257,24 +272,38 @@ var JSHINT = (function () {
             evil        : true, // if eval should be allowed
             expr        : true, // if ExpressionStatement should be allowed as Programs
             forin       : true, // if for in statements must filter
-            globalstrict: true, // if global "use strict"; should be allowed (also enables 'strict')
+            globalstrict: true, // if global "use strict"; should be allowed (also
+                                // enables 'strict')
             immed       : true, // if immediate invocations must be wrapped in parens
+            iterator    : true, // if the `__iterator__` property should be disallowed
             jquery      : true, // if jQuery globals should be predefined
+            lastsemic   : true, // if semicolons may be ommitted for the trailing
+                                // statements inside of a one-line blocks.
             latedef     : true, // if the use before definition should not be tolerated
             laxbreak    : true, // if line breaks should not be checked
-            loopfunc    : true, // if functions should be allowed to be defined within loops
+            loopfunc    : true, // if functions should be allowed to be defined within
+                                // loops
             mootools    : true, // if MooTools globals should be predefined
             newcap      : true, // if constructor names must be capitalized
-            noarg       : true, // if arguments.caller and arguments.callee should be disallowed
-            node        : true, // if the Node.js environment globals should be predefined
+            noarg       : true, // if arguments.caller and arguments.callee should be
+                                // disallowed
+            node        : true, // if the Node.js environment globals should be
+                                // predefined
             noempty     : true, // if empty blocks should be disallowed
             nonew       : true, // if using `new` for side-effects should be disallowed
+            nonstandard : true, // if non-standard (but widely adopted) globals should
+                                // be predefined
             nomen       : true, // if names should be checked
-            onevar      : true, // if only one var statement per function should be allowed
+            onevar      : true, // if only one var statement per function should be
+                                // allowed
+            onecase     : true, // if one case switch statements should be allowed
             passfail    : true, // if the scan should stop on first error
             plusplus    : true, // if increment/decrement should not be allowed
-            prototypejs : true, // if Prototype and Scriptaculous globals should be predefined
-            regexdash   : true, // if unescaped last dash (-) inside brackets should be tolerated
+            proto       : true, // if the `__proto__` property should be disallowed
+            prototypejs : true, // if Prototype and Scriptaculous globals should be
+                                // predefined
+            regexdash   : true, // if unescaped last dash (-) inside brackets should be
+                                // tolerated
             regexp      : true, // if the . should not be allowed in regexp literals
             rhino       : true, // if the Rhino environment globals should be predefined
             undef       : true, // if variables should be declared before used
@@ -282,85 +311,145 @@ var JSHINT = (function () {
             shadow      : true, // if variable shadowing should be tolerated
             strict      : true, // require the "use strict"; pragma
             sub         : true, // if all forms of subscript notation are tolerated
-            supernew    : true, // if `new function () { ... };` and `new Object;` should be tolerated
+            supernew    : true, // if `new function () { ... };` and `new Object;`
+                                // should be tolerated
             trailing    : true, // if trailing whitespace rules apply
+            validthis   : true, // if 'this' inside a non-constructor function is valid.
+                                // This is a function scoped option only.
             white       : true, // if strict whitespace rules apply
-            wsh         : true  // if the Windows Scripting Host environment globals should be predefined
+            wsh         : true  // if the Windows Scripting Host environment globals
+                                // should be predefined
         },
 
-// browser contains a set of global names which are commonly provided by a
-// web browser environment.
-
+        // browser contains a set of global names which are commonly provided by a
+        // web browser environment.
         browser = {
-            ArrayBuffer     : false,
-            ArrayBufferView : false,
-            addEventListener: false,
-            applicationCache: false,
-            blur            : false,
-            clearInterval   : false,
-            clearTimeout    : false,
-            close           : false,
-            closed          : false,
-            DataView        : false,
-            defaultStatus   : false,
-            document        : false,
-            event           : false,
-            FileReader      : false,
-            Float32Array    : false,
-            Float64Array    : false,
-            focus           : false,
-            frames          : false,
-            getComputedStyle: false,
-            HTMLElement     : false,
-            history         : false,
-            Int16Array      : false,
-            Int32Array      : false,
-            Int8Array       : false,
-            Image           : false,
-            length          : false,
-            localStorage    : false,
-            location        : false,
-            moveBy          : false,
-            moveTo          : false,
-            name            : false,
-            navigator       : false,
-            onbeforeunload  : true,
-            onblur          : true,
-            onerror         : true,
-            onfocus         : true,
-            onload          : true,
-            onresize        : true,
-            onunload        : true,
-            open            : false,
-            openDatabase    : false,
-            opener          : false,
-            Option          : false,
-            parent          : false,
-            print           : false,
-            removeEventListener: false,
-            resizeBy        : false,
-            resizeTo        : false,
-            screen          : false,
-            scroll          : false,
-            scrollBy        : false,
-            scrollTo        : false,
-            setInterval     : false,
-            setTimeout      : false,
-            status          : false,
-            top             : false,
-            Uint16Array     : false,
-            Uint32Array     : false,
-            Uint8Array      : false,
-            WebSocket       : false,
-            window          : false,
-            Worker          : false,
-            XMLHttpRequest  : false,
-            XPathEvaluator  : false,
-            XPathException  : false,
-            XPathExpression : false,
-            XPathNamespace  : false,
-            XPathNSResolver : false,
-            XPathResult     : false
+            ArrayBuffer              :  false,
+            ArrayBufferView          :  false,
+            Audio                    :  false,
+            addEventListener         :  false,
+            applicationCache         :  false,
+            blur                     :  false,
+            clearInterval            :  false,
+            clearTimeout             :  false,
+            close                    :  false,
+            closed                   :  false,
+            DataView                 :  false,
+            defaultStatus            :  false,
+            document                 :  false,
+            event                    :  false,
+            FileReader               :  false,
+            Float32Array             :  false,
+            Float64Array             :  false,
+            FormData                 :  false,
+            focus                    :  false,
+            frames                   :  false,
+            getComputedStyle         :  false,
+            HTMLElement              :  false,
+            HTMLAnchorElement        :  false,
+            HTMLBaseElement          :  false,
+            HTMLBlockquoteElement    :  false,
+            HTMLBodyElement          :  false,
+            HTMLBRElement            :  false,
+            HTMLButtonElement        :  false,
+            HTMLCanvasElement        :  false,
+            HTMLDirectoryElement     :  false,
+            HTMLDivElement           :  false,
+            HTMLDListElement         :  false,
+            HTMLFieldSetElement      :  false,
+            HTMLFontElement          :  false,
+            HTMLFormElement          :  false,
+            HTMLFrameElement         :  false,
+            HTMLFrameSetElement      :  false,
+            HTMLHeadElement          :  false,
+            HTMLHeadingElement       :  false,
+            HTMLHRElement            :  false,
+            HTMLHtmlElement          :  false,
+            HTMLIFrameElement        :  false,
+            HTMLImageElement         :  false,
+            HTMLInputElement         :  false,
+            HTMLIsIndexElement       :  false,
+            HTMLLabelElement         :  false,
+            HTMLLayerElement         :  false,
+            HTMLLegendElement        :  false,
+            HTMLLIElement            :  false,
+            HTMLLinkElement          :  false,
+            HTMLMapElement           :  false,
+            HTMLMenuElement          :  false,
+            HTMLMetaElement          :  false,
+            HTMLModElement           :  false,
+            HTMLObjectElement        :  false,
+            HTMLOListElement         :  false,
+            HTMLOptGroupElement      :  false,
+            HTMLOptionElement        :  false,
+            HTMLParagraphElement     :  false,
+            HTMLParamElement         :  false,
+            HTMLPreElement           :  false,
+            HTMLQuoteElement         :  false,
+            HTMLScriptElement        :  false,
+            HTMLSelectElement        :  false,
+            HTMLStyleElement         :  false,
+            HTMLTableCaptionElement  :  false,
+            HTMLTableCellElement     :  false,
+            HTMLTableColElement      :  false,
+            HTMLTableElement         :  false,
+            HTMLTableRowElement      :  false,
+            HTMLTableSectionElement  :  false,
+            HTMLTextAreaElement      :  false,
+            HTMLTitleElement         :  false,
+            HTMLUListElement         :  false,
+            HTMLVideoElement         :  false,
+            history                  :  false,
+            Int16Array               :  false,
+            Int32Array               :  false,
+            Int8Array                :  false,
+            Image                    :  false,
+            length                   :  false,
+            localStorage             :  false,
+            location                 :  false,
+            moveBy                   :  false,
+            moveTo                   :  false,
+            name                     :  false,
+            navigator                :  false,
+            onbeforeunload           :  true,
+            onblur                   :  true,
+            onerror                  :  true,
+            onfocus                  :  true,
+            onload                   :  true,
+            onresize                 :  true,
+            onunload                 :  true,
+            open                     :  false,
+            openDatabase             :  false,
+            opener                   :  false,
+            Option                   :  false,
+            parent                   :  false,
+            print                    :  false,
+            removeEventListener      :  false,
+            resizeBy                 :  false,
+            resizeTo                 :  false,
+            screen                   :  false,
+            scroll                   :  false,
+            scrollBy                 :  false,
+            scrollTo                 :  false,
+            sessionStorage           :  false,
+            setInterval              :  false,
+            setTimeout               :  false,
+            SharedWorker             :  false,
+            status                   :  false,
+            top                      :  false,
+            Uint16Array              :  false,
+            Uint32Array              :  false,
+            Uint8Array               :  false,
+            WebSocket                :  false,
+            window                   :  false,
+            Worker                   :  false,
+            XMLHttpRequest           :  false,
+            XPathEvaluator           :  false,
+            XPathException           :  false,
+            XPathExpression          :  false,
+            XPathNamespace           :  false,
+            XPathNSResolver          :  false,
+            XPathResult              :  false
         },
 
         couch = {
@@ -481,8 +570,9 @@ var JSHINT = (function () {
         node = {
             __filename  : false,
             __dirname   : false,
-            exports     : false,
             Buffer      : false,
+            console     : false,
+            exports     : false,
             GLOBAL      : false,
             global      : false,
             module      : false,
@@ -561,9 +651,8 @@ var JSHINT = (function () {
         src,
         stack,
 
-// standard contains the global names that are provided by the
-// ECMAScript standard.
-
+        // standard contains the global names that are provided by the
+        // ECMAScript standard.
         standard = {
             Array               : false,
             Boolean             : false,
@@ -592,6 +681,12 @@ var JSHINT = (function () {
             SyntaxError         : false,
             TypeError           : false,
             URIError            : false
+        },
+
+        // widely adopted global names that are not part of ECMAScript standard
+        nonstandard = {
+            escape              : false,
+            unescape            : false
         },
 
         standard_member = {
@@ -627,27 +722,38 @@ var JSHINT = (function () {
             VBArray                   : true,
             WSH                       : true,
             WScript                   : true
-        },
+        };
 
-// Regular expressions. Some of these are stupidly long.
+        // Regular expressions. Some of these are stupidly long.
+        var ax, cx, tx, nx, nxg, lx, ix, jx, ft;
+        (function () {
+            /*jshint maxlen:300 */
 
-// unsafe comment or string
-        ax = /@cc|<\/?|script|\]\s*\]|<\s*!|&lt/i,
-// unsafe characters that are silently deleted by one or more browsers
-        cx = /[\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/,
-// token
-        tx = /^\s*([(){}\[.,:;'"~\?\]#@]|==?=?|\/(\*(jshint|jslint|members?|global)?|=|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|%=?|&[&=]?|\|[|=]?|>>?>?=?|<([\/=!]|\!(\[|--)?|<=?)?|\^=?|\!=?=?|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+\-]?[0-9]+)?)/,
-// characters in strings that need escapement
-        nx = /[\u0000-\u001f&<"\/\\\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/,
-        nxg = /[\u0000-\u001f&<"\/\\\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
-// star slash
-        lx = /\*\/|\/\*/,
-// identifier
-        ix = /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/,
-// javascript url
-        jx = /^(?:javascript|jscript|ecmascript|vbscript|mocha|livescript)\s*:/i,
-// catches /* falls through */ comments
-        ft = /^\s*\/\*\s*falls\sthrough\s*\*\/\s*$/;
+            // unsafe comment or string
+            ax = /@cc|<\/?|script|\]\s*\]|<\s*!|&lt/i;
+
+            // unsafe characters that are silently deleted by one or more browsers
+            cx = /[\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/;
+
+            // token
+            tx = /^\s*([(){}\[.,:;'"~\?\]#@]|==?=?|\/(\*(jshint|jslint|members?|global)?|=|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|%=?|&[&=]?|\|[|=]?|>>?>?=?|<([\/=!]|\!(\[|--)?|<=?)?|\^=?|\!=?=?|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+\-]?[0-9]+)?)/;
+
+            // characters in strings that need escapement
+            nx = /[\u0000-\u001f&<"\/\\\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/;
+            nxg = /[\u0000-\u001f&<"\/\\\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
+
+            // star slash
+            lx = /\*\/|\/\*/;
+
+            // identifier
+            ix = /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/;
+
+            // javascript url
+            jx = /^(?:javascript|jscript|ecmascript|vbscript|mocha|livescript)\s*:/i;
+
+            // catches /* falls through */ comments
+            ft = /^\s*\/\*\s*falls\sthrough\s*\*\/\s*$/;
+        }());
 
     function F() {}     // Used by Object.create
 
@@ -776,6 +882,9 @@ var JSHINT = (function () {
         if (option.browser)
             combine(predefined, browser);
 
+        if (option.nonstandard)
+            combine(predefined, nonstandard);
+
         if (option.jquery)
             combine(predefined, jquery);
 
@@ -790,8 +899,7 @@ var JSHINT = (function () {
     }
 
 
-// Produce an error warning.
-
+    // Produce an error warning.
     function quit(message, line, chr) {
         var percentage = Math.floor((line / lines.length) * 100);
 
@@ -843,7 +951,6 @@ var JSHINT = (function () {
 
     function error(m, t, a, b, c, d) {
         var w = warning(m, t, a, b, c, d);
-        quit("Stopping, unable to continue.", w.line, w.character);
     }
 
     function errorAt(m, l, ch, a, b, c, d) {
@@ -914,14 +1021,18 @@ var JSHINT = (function () {
             }
             if (type === '(identifier)') {
                 t.identifier = true;
-                if (value === '__iterator__' || value === '__proto__') {
-                    errorAt("Reserved name '{a}'.",
+                if (value === '__proto__' && !option.proto) {
+                    warningAt("The '{a}' property is deprecated.",
                         line, from, value);
-                } else if (option.nomen &&
-                        (value.charAt(0) === '_' ||
+                } else if (value === '__iterator__' && !option.iterator) {
+                    warningAt("'{a}' is only available in JavaScript 1.7.",
+                        line, from, value);
+                } else if (option.nomen && (value.charAt(0) === '_' ||
                          value.charAt(value.length - 1) === '_')) {
-                    warningAt("Unexpected {a} in '{b}'.", line, from,
-                        "dangling '_'", value);
+                    if (!option.node || token.id == '.' ||
+                            (value != '__dirname' && value != '__filename')) {
+                        warningAt("Unexpected {a} in '{b}'.", line, from, "dangling '_'", value);
+                    }
                 }
             }
             t.value = value;
@@ -937,8 +1048,7 @@ var JSHINT = (function () {
             return t;
         }
 
-// Public lex methods
-
+        // Public lex methods
         return {
             init: function (source) {
                 if (typeof source === 'string') {
@@ -987,8 +1097,8 @@ var JSHINT = (function () {
 
             },
 
-// token -- this is called by advance to get the next token.
 
+            // token -- this is called by advance to get the next token
             token: function () {
                 var b, c, captures, d, depth, high, i, l, low, q, t;
 
@@ -1570,6 +1680,15 @@ loop:   for (;;) {
                                 v, v.value);
                     }
                     obj.maxlen = b;
+                } else if (t.value == 'validthis') {
+                    if (funct['(global)']) {
+                        error("Option 'validthis' can't be used in a global scope.");
+                    } else {
+                        if (v.value === 'true' || v.value === 'false')
+                            obj[t.value] = v.value === 'true';
+                        else
+                            error("Bad option value.", v);
+                    }
                 } else if (v.value === 'true') {
                     obj[t.value] = true;
                 } else if (v.value === 'false') {
@@ -1633,6 +1752,7 @@ loop:   for (;;) {
             }
             break;
         }
+
         if (token.type === '(string)' || token.identifier) {
             anonname = token.value;
         }
@@ -1651,6 +1771,7 @@ loop:   for (;;) {
                         nexttoken, id, nexttoken.value);
             }
         }
+
         prevtoken = token;
         token = nexttoken;
         for (;;) {
@@ -2150,17 +2271,29 @@ loop:   for (;;) {
         }
         r = expression(0, true);
 
-// Look for the final semicolon.
-
+        // Look for the final semicolon.
         if (!t.block) {
             if (!option.expr && (!r || !r.exps)) {
-                warning("Expected an assignment or function call and instead saw an expression.", token);
+                warning("Expected an assignment or function call and instead saw an expression.",
+                    token);
             } else if (option.nonew && r.id === '(' && r.left.id === 'new') {
                 warning("Do not use 'new' for side effects.");
             }
+
             if (nexttoken.id !== ';') {
-                if (!option.asi && !(option.lastsemic && nexttoken.id == '}' && nexttoken.line == token.line)) {
-                    warningAt("Missing semicolon.", token.line, token.from + token.value.length);
+                if (!option.asi) {
+                    // If this is the last statement in a block that ends on
+                    // the same line *and* option lastsemic is on, ignore the warning.
+                    // Otherwise, complain about missing semicolon.
+                    if (!option.lastsemic || nexttoken.id != '}' ||
+                            nexttoken.line != token.line) {
+                        warningAt("Missing semicolon.", token.line, token.from +
+                            token.value.length);
+                    }
+                }
+                if (!option.asi && !(option.lastsemic && nexttoken.id == '}' &&
+                        nexttoken.line == token.line)) {
+
                 }
             } else {
                 adjacent(token, nexttoken);
@@ -2294,11 +2427,12 @@ loop:   for (;;) {
         }
     }
 
-// Build the syntax table by declaring the syntactic elements of the language.
+    // Build the syntax table by declaring the syntactic elements of the language.
 
     type('(number)', function () {
         return this;
     });
+
     type('(string)', function () {
         return this;
     });
@@ -2311,10 +2445,9 @@ loop:   for (;;) {
             var v = this.value,
                 s = scope[v],
                 f;
+
             if (typeof s === 'function') {
-
-// Protection against accidental inheritance.
-
+                // Protection against accidental inheritance.
                 s = undefined;
             } else if (typeof s === 'boolean') {
                 f = funct;
@@ -2324,12 +2457,9 @@ loop:   for (;;) {
                 funct = f;
             }
 
-// The name is in scope and defined in the current function.
-
+            // The name is in scope and defined in the current function.
             if (funct === s) {
-
-//      Change 'unused' to 'var', and reject labels.
-
+                // Change 'unused' to 'var', and reject labels.
                 switch (funct[v]) {
                 case 'unused':
                     funct[v] = 'var';
@@ -2345,25 +2475,22 @@ loop:   for (;;) {
                     warning("'{a}' is a statement label.", token, v);
                     break;
                 }
-
-// The name is not defined in the function.  If we are in the global scope,
-// then we have an undefined variable.
-//
-// Operators typeof and delete do not raise runtime errors even if the base
-// object of a reference is null so no need to display warning if we're
-// inside of typeof or delete.
-
             } else if (funct['(global)']) {
+                // The name is not defined in the function.  If we are in the global
+                // scope, then we have an undefined variable.
+                //
+                // Operators typeof and delete do not raise runtime errors even if
+                // the base object of a reference is null so no need to display warning
+                // if we're inside of typeof or delete.
                 if (anonname != 'typeof' && anonname != 'delete' &&
                     option.undef && typeof predefined[v] !== 'boolean') {
                     warning("'{a}' is not defined.", token, v);
                 }
                 note_implied(token);
-
-// If the name is already defined in the current
-// function, but not as outer, then there is a scope error.
-
             } else {
+                // If the name is already defined in the current
+                // function, but not as outer, then there is a scope error.
+
                 switch (funct[v]) {
                 case 'closure':
                 case 'function':
@@ -2378,20 +2505,17 @@ loop:   for (;;) {
                 case 'global':
                     break;
                 default:
-
-// If the name is defined in an outer function, make an outer entry, and if
-// it was unused, make it var.
-
+                    // If the name is defined in an outer function, make an outer entry,
+                    // and if it was unused, make it var.
                     if (s === true) {
                         funct[v] = true;
                     } else if (s === null) {
                         warning("'{a}' is not allowed.", token, v);
                         note_implied(token);
                     } else if (typeof s !== 'object') {
-
-// Operators typeof and delete do not raise runtime errors even if the base object of
-// a reference is null so no need to display warning if we're inside of typeof or delete.
-
+                        // Operators typeof and delete do not raise runtime errors even
+                        // if the base object of a reference is null so no need to
+                        // display warning if we're inside of typeof or delete.
                         if (anonname != 'typeof' && anonname != 'delete' && option.undef) {
                             warning("'{a}' is not defined.", token, v);
                         } else {
@@ -2470,9 +2594,9 @@ loop:   for (;;) {
     reservevar('NaN');
     reservevar('null');
     reservevar('this', function (x) {
-        if (strict_mode && ((funct['(statement)'] &&
+        if (strict_mode && !option.validthis && ((funct['(statement)'] &&
                 funct['(name)'].charAt(0) > 'Z') || funct['(global)'])) {
-            warning("Strict violation.", x);
+            warning("Possible strict violation.", x);
         }
     });
     reservevar('true');
@@ -2505,24 +2629,23 @@ loop:   for (;;) {
     bitwise('^', 'bitxor', 80);
     bitwise('&', 'bitand', 90);
     relation('==', function (left, right) {
-        var eqnull = option.eqnull &&
-                (left.value == 'null' || right.value == 'null');
+        var eqnull = option.eqnull && (left.value == 'null' || right.value == 'null');
 
-        if (!eqnull && option.eqeqeq) {
-            warning("Expected '{a}' and instead saw '{b}'.",
-                    this, '===', '==');
-        } else if (isPoorRelation(left)) {
-            warning("Use '{a}' to compare with '{b}'.",
-                this, '===', left.value);
-        } else if (isPoorRelation(right)) {
-            warning("Use '{a}' to compare with '{b}'.",
-                this, '===', right.value);
-        }
+        if (!eqnull && option.eqeqeq)
+            warning("Expected '{a}' and instead saw '{b}'.", this, '===', '==');
+        else if (isPoorRelation(left))
+            warning("Use '{a}' to compare with '{b}'.", this, '===', left.value);
+        else if (isPoorRelation(right))
+            warning("Use '{a}' to compare with '{b}'.", this, '===', right.value);
+
         return this;
     });
     relation('===');
     relation('!=', function (left, right) {
-        if (option.eqeqeq) {
+        var eqnull = option.eqnull &&
+                (left.value == 'null' || right.value == 'null');
+
+        if (!eqnull && option.eqeqeq) {
             warning("Expected '{a}' and instead saw '{b}'.",
                     this, '!==', '!=');
         } else if (isPoorRelation(left)) {
@@ -2650,7 +2773,8 @@ loop:   for (;;) {
                     if (c.id !== 'function') {
                         i = c.value.substr(0, 1);
                         if (option.newcap && (i < 'A' || i > 'Z')) {
-                            warning("A constructor name should start with an uppercase letter.", token);
+                            warning("A constructor name should start with "+
+                                "an uppercase letter.", token);
                         }
                     }
                 }
@@ -2683,9 +2807,11 @@ loop:   for (;;) {
         }
         that.left = left;
         that.right = m;
-        if (option.noarg && left && left.value === 'arguments' &&
-                (m === 'callee' || m === 'caller')) {
-            warning("Avoid arguments.{a}.", left, m);
+        if (left && left.value === 'arguments' && (m === 'callee' || m === 'caller')) {
+            if (option.noarg)
+                warning("Avoid arguments.{a}.", left, m);
+            else if (strict_mode)
+                error('Strict violation.');
         } else if (!option.evil && left && left.value === 'document' &&
                 (m === 'write' || m === 'writeln')) {
             warning("document.write can be a form of eval.", left);
@@ -3095,8 +3221,9 @@ loop:   for (;;) {
 
     blockstmt('function', function () {
         if (inblock) {
-            warning(
-"Function declarations should not be placed in blocks. Use a function expression or move the statement to the top of the outer function.", token);
+            warning("Function declarations should not be placed in blocks. " +
+                "Use a function expression or move the statement to the top of " +
+                "the outer function.", token);
 
         }
         var i = identifier();
@@ -3278,7 +3405,8 @@ loop:   for (;;) {
                 advance('}', t);
                 if (this.cases.length === 1 || this.condition.id === 'true' ||
                         this.condition.id === 'false') {
-                    warning("This 'switch' should be an 'if'.", this);
+                    if (!option.onecase)
+                        warning("This 'switch' should be an 'if'.", this);
                 }
                 funct['(breakage)'] -= 1;
                 funct['(verb)'] = undefined;
@@ -3370,7 +3498,8 @@ loop:   for (;;) {
             s = block(true, true);
             if (option.forin && (s.length > 1 || typeof s[0] !== 'object' ||
                     s[0].value !== 'if')) {
-                warning("The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.", this);
+                warning("The body of a for in should be wrapped in an if statement to filter " +
+                        "unwanted properties from the prototype.", this);
             }
             funct['(breakage)'] -= 1;
             funct['(loopage)'] -= 1;
@@ -3428,10 +3557,13 @@ loop:   for (;;) {
 
     stmt('break', function () {
         var v = nexttoken.value;
-        if (funct['(breakage)'] === 0) {
+
+        if (funct['(breakage)'] === 0)
             warning("Unexpected '{a}'.", nexttoken, this.value);
-        }
-        nolinebreak(this);
+
+        if (!option.asi)
+            nolinebreak(this);
+
         if (nexttoken.id !== ';') {
             if (token.line === nexttoken.line) {
                 if (funct[v] !== 'label') {
@@ -3450,10 +3582,13 @@ loop:   for (;;) {
 
     stmt('continue', function () {
         var v = nexttoken.value;
-        if (funct['(breakage)'] === 0) {
+
+        if (funct['(breakage)'] === 0)
             warning("Unexpected '{a}'.", nexttoken, this.value);
-        }
-        nolinebreak(this);
+
+        if (!option.asi)
+            nolinebreak(this);
+
         if (nexttoken.id !== ';') {
             if (token.line === nexttoken.line) {
                 if (funct[v] !== 'label') {
@@ -3473,14 +3608,19 @@ loop:   for (;;) {
 
 
     stmt('return', function () {
-        nolinebreak(this);
-        if (nexttoken.id === '(regexp)') {
+        if (!option.asi)
+            nolinebreak(this);
+
+        if (nexttoken.id === '(regexp)')
             warning("Wrap the /regexp/ literal in parens to disambiguate the slash operator.");
+
+        if (this.line === nexttoken.line || !option.asi) {
+            if (nexttoken.id !== ';' && !nexttoken.reach) {
+                nonadjacent(token, nexttoken);
+                this.first = expression(20);
+            }
         }
-        if (nexttoken.id !== ';' && !nexttoken.reach) {
-            nonadjacent(token, nexttoken);
-            this.first = expression(20);
-        }
+
         reachable('return');
         return this;
     }).exps = true;
@@ -3539,8 +3679,10 @@ loop:   for (;;) {
                     if (o[nexttoken.value] === true) {
                         warning("Duplicate key '{a}'.",
                                 nexttoken, nexttoken.value);
-                    } else if (nexttoken.value === '__proto__') {
-                        warning("Stupid key '{a}'.",
+                    } else if ((nexttoken.value === '__proto__' &&
+                        !option.proto) || (nexttoken.value === '__iterator__' &&
+                        !option.iterator)) {
+                            warning("The '{a}' key may produce unexpected results.",
                                 nexttoken, nexttoken.value);
                     } else {
                         o[nexttoken.value] = true;
@@ -3626,7 +3768,7 @@ loop:   for (;;) {
                 } else if (typeof a === 'object') {
                     k = Object.keys(a);
                     for (i = 0; i < k.length; i += 1) {
-                        predefined[k[i]] = !!a[k];
+                        predefined[k[i]] = !!a[k[i]];
                     }
                 }
             }
@@ -3684,6 +3826,7 @@ loop:   for (;;) {
                         warning("Use the function form of \"use strict\".");
                     use_strict();
                 }
+
                 statements('lib');
             }
             advance('(end)');
@@ -3699,9 +3842,7 @@ loop:   for (;;) {
         return JSHINT.errors.length === 0;
     };
 
-
-// Data summary.
-
+    // Data summary.
     itself.data = function () {
 
         var data = {functions: []}, fu, globals, implieds = [], f, i, j,
@@ -3912,12 +4053,11 @@ loop:   for (;;) {
         }
         return o.join('');
     };
-    itself.jshint = itself;
 
+    itself.jshint = itself;
     itself.edition = '2011-04-16';
 
     return itself;
-
 }());
 
 // Make JSHINT a Node module, if possible.
