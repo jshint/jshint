@@ -3071,6 +3071,8 @@ loop:   for (;;) {
                     i = property_name();
                     if (!i) {
                         error("Missing property name.");
+                    } else {
+                        i = 'get ' + i;
                     }
                     t = nexttoken;
                     adjacent(token, nexttoken);
@@ -3080,22 +3082,26 @@ loop:   for (;;) {
                     }
                     p = f['(params)'];
                     if (p) {
-                        warning("Unexpected parameter '{a}' in get {b} function.", t, p[0], i);
+                        warning("Unexpected parameter '{a}' in {b} function.", t, p[0], i);
                     }
                     adjacent(token, nexttoken);
-                    advance(',');
-                    indentation();
+                } else if (nexttoken.value === 'set' && peek().id !== ':') {
                     advance('set');
-                    j = property_name();
-                    if (i !== j) {
-                        error("Expected {a} and instead saw {b}.", token, i, j);
+                    if (!option.es5) {
+                        error("get/set are ES5 features.");
+                    }
+                    i = property_name();
+                    if (!i) {
+                        error("Missing property name.");
+                    } else {
+                        i = 'set ' + i;
                     }
                     t = nexttoken;
                     adjacent(token, nexttoken);
                     f = doFunction();
                     p = f['(params)'];
                     if (!p || p.length !== 1 || p[0] !== 'value') {
-                        warning("Expected (value) in set {a} function.", t, i);
+                        warning("Expected (value) in {a} function.", t, i);
                     }
                 } else {
                     i = property_name();
