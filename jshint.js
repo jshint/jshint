@@ -316,6 +316,7 @@ var JSHINT = (function () {
             trailing    : true, // if trailing whitespace rules apply
             validthis   : true, // if 'this' inside a non-constructor function is valid.
                                 // This is a function scoped option only.
+            v8          : true, // if V8 specific syntax should be allowed
             white       : true, // if strict whitespace rules apply
             wsh         : true  // if the Windows Scripting Host environment globals
                                 // should be predefined
@@ -893,6 +894,9 @@ var JSHINT = (function () {
 
         if (option.wsh)
             combine(predefined, wsh);
+
+        if (option.v8)
+            useV8Syntax();
 
         if (option.globalstrict && option.strict !== false)
             option.strict = true;
@@ -3134,47 +3138,51 @@ loop:   for (;;) {
         };
     }(delim('{')));
 
-    var conststatement = stmt('const', function (prefix) {
-        var id, name, value;
+    // This Function is called when v8 option is set to true
+    // it adds the `const` statement to JSHINT
+    function useV8Syntax() {
+        var conststatement = stmt('const', function (prefix) {
+            var id, name, value;
 
-        this.first = [];
-        for (;;) {
-            nonadjacent(token, nexttoken);
-            id = identifier();
-            if (funct[id] === "const") {
-                warning("const '" + id + "' has already been declared");
-            }
-            if (funct['(global)'] && predefined[id] === false) {
-                warning("Redefinition of '{a}'.", token, id);
-            }
-            addlabel(id, 'const');
-            if (prefix) {
-                break;
-            }
-            name = token;
-            this.first.push(token);
-            if (nexttoken.id === '=') {
+            this.first = [];
+            for (;;) {
                 nonadjacent(token, nexttoken);
-                advance('=');
-                nonadjacent(token, nexttoken);
-                if (nexttoken.id === 'undefined') {
-                    warning("It is not necessary to initialize '{a}' to 'undefined'.", token, id);
+                id = identifier();
+                if (funct[id] === "const") {
+                    warning("const '" + id + "' has already been declared");
                 }
-                if (peek(0).id === '=' && nexttoken.identifier) {
-                    error("Constant {a} was not declared correctly.",
-                            nexttoken, nexttoken.value);
+                if (funct['(global)'] && predefined[id] === false) {
+                    warning("Redefinition of '{a}'.", token, id);
                 }
-                value = expression(0);
-                name.first = value;
+                addlabel(id, 'const'); // TODO unused?
+                if (prefix) {
+                    break;
+                }
+                name = token;
+                this.first.push(token);
+                if (nexttoken.id === '=') {
+                    nonadjacent(token, nexttoken);
+                    advance('=');
+                    nonadjacent(token, nexttoken);
+                    if (nexttoken.id === 'undefined') {
+                        warning("It is not necessary to initialize '{a}' to 'undefined'.", token, id);
+                    }
+                    if (peek(0).id === '=' && nexttoken.identifier) {
+                        error("Constant {a} was not declared correctly.",
+                                nexttoken, nexttoken.value);
+                    }
+                    value = expression(0);
+                    name.first = value;
+                }
+                if (nexttoken.id !== ',') {
+                    break;
+                }
+                comma();
             }
-            if (nexttoken.id !== ',') {
-                break;
-            }
-            comma();
-        }
-        return this;
-    });
-    conststatement.exps = true;
+            return this;
+        });
+        conststatement.exps = true;
+    }
 
     var varstatement = stmt('var', function (prefix) {
         // JavaScript does not have block scope. It only has function scope. So,
@@ -3189,7 +3197,7 @@ loop:   for (;;) {
         for (;;) {
             nonadjacent(token, nexttoken);
             id = identifier();
-            if (funct[id] === "const") {
+            if (funct[id] === "const" && option.v8) {
                 warning("const '" + id + "' has already been declared");
             }
             if (funct['(global)'] && predefined[id] === false) {
@@ -3232,7 +3240,7 @@ loop:   for (;;) {
 
         }
         var i = identifier();
-        if (funct[i] === "const") {
+        if (funct[id] === "const" && option.v8) {
             warning("const '" + i + "' has already been declared");
         }
         adjacent(token, nexttoken);
@@ -3815,6 +3823,11 @@ loop:   for (;;) {
         lex.init(s);
         prereg = true;
         strict_mode = false;
+
+        // if v8 option is set, we can use v8 syntax
+        if (option.v8) {
+            useV8Syntax();
+        }
 
         prevtoken = token = nexttoken = syntax['(begin)'];
         assume();
