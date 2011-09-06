@@ -3138,8 +3138,9 @@ loop:   for (;;) {
         };
     }(delim('{')));
 
-    // This Function is called when v8 option is set to true
-    // it adds the `const` statement to JSHINT
+// This Function is called when v8 option is set to true
+// it adds the `const` statement to JSHINT
+
     function useV8Syntax() {
         var conststatement = stmt('const', function (prefix) {
             var id, name, value;
