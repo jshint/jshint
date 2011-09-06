@@ -810,11 +810,17 @@ exports.constants = function () {
     assert.ok(JSHINT(src, { v8: true }));
     assert.equal(JSHINT.errors.length, 0);
 
-    var code = ['/*jshint v8: true */', 'const myConst = true; var myConst = function () { };'];
+    var code = ['/*jshint v8: true */',
+                'const myConst = true;',
+                'const foo = 9;',
+                'var myConst = function () { };',
+                'foo = "hello world";'];
 
     assert.ok(!JSHINT(code));
-    assert.equal(JSHINT.errors.length, 1);
+    assert.equal(JSHINT.errors.length, 2);
     assert.equal(JSHINT.errors[0].reason, "const 'myConst' has already been declared");
-    assert.equal(JSHINT.errors[0].line, 2);
+    assert.equal(JSHINT.errors[0].line, 4);
+    assert.equal(JSHINT.errors[1].reason, "Attempting to override 'foo' which is a constant");
+    assert.equal(JSHINT.errors[1].line, 5);
 };
 

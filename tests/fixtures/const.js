@@ -41,11 +41,6 @@ const immutable7 = ["foo"];
 // comma separated is ok
 const immutable8 = "testing", immutable9 = true;
 
-// this is actually ok for some reason (you won't get a runtime TypeError)
-// but immutable2 doesn't get "This is valid" as a String
-// it remains as 6.
-immutable2 = "This is valid";
-
 // in scope
 (function () {
   // valid
@@ -53,10 +48,6 @@ immutable2 = "This is valid";
   const immutable5 = "w00t";
 
   const immutable6 = true, immutable7 = ["bar"];
-
-  // one can try and overwrite immutable3 from global scope
-  // but same rules apply, it doesn't actually override immutable3
-  immutable3 = true;
 
   // tests
   assert(immutable3, false);
