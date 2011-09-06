@@ -2099,6 +2099,9 @@ loop:   for (;;) {
                 warning("'{a}' is a function.", left, left.value);
             }
             if (left) {
+                if (option.v8 && funct[left.value] === 'const') {
+                    warning("Attempting to override '{a}' which is a constant", left, left.value);
+                }
                 if (left.id === '.' || left.id === '[') {
                     if (!left.left || left.left.value === 'arguments') {
                         warning('Bad assignment.', that);
@@ -3198,7 +3201,7 @@ loop:   for (;;) {
         for (;;) {
             nonadjacent(token, nexttoken);
             id = identifier();
-            if (funct[id] === "const" && option.v8) {
+            if (option.v8 && funct[id] === "const") {
                 warning("const '" + id + "' has already been declared");
             }
             if (funct['(global)'] && predefined[id] === false) {
@@ -3241,7 +3244,7 @@ loop:   for (;;) {
 
         }
         var i = identifier();
-        if (funct[id] === "const" && option.v8) {
+        if (option.v8 && funct[id] === "const") {
             warning("const '" + i + "' has already been declared");
         }
         adjacent(token, nexttoken);
