@@ -803,3 +803,18 @@ exports.validthis = function () {
     assert.eql(JSHINT.errors.length, 1);
     assert.eql(JSHINT.errors[0].reason, "Bad option value.");
 };
+
+exports.constants = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/const.js', 'utf8');
+
+    assert.ok(JSHINT(src, { v8: true }));
+    assert.equal(JSHINT.errors.length, 0);
+
+    var code = ['/*jshint v8: true */', 'const myConst = true; var myConst = function () { };'];
+
+    assert.ok(!JSHINT(code));
+    assert.equal(JSHINT.errors.length, 1);
+    assert.equal(JSHINT.errors[0].reason, "const 'myConst' has already been declared");
+    assert.equal(JSHINT.errors[0].line, 2);
+};
+
