@@ -3244,7 +3244,7 @@ loop:   for (;;) {
 
         }
         var i = identifier();
-        if (option.v8 && funct[id] === "const") {
+        if (option.v8 && funct[i] === "const") {
             warning("const '" + i + "' has already been declared");
         }
         adjacent(token, nexttoken);
