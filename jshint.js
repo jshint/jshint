@@ -223,7 +223,7 @@
  split, stack, status, start, strict, sub, substr, supernew, shadow, supplant, sum,
  sync, test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing, type,
  typeOf, Uint16Array, Uint32Array, Uint8Array, undef, unused, urls, validthis, value, valueOf,
- var, version, WebSocket, white, window, Worker, wsh*/
+ v8, var, version, WebSocket, white, window, Worker, wsh*/
 
 /*global exports: false */
 
@@ -710,6 +710,7 @@ var JSHINT = (function () {
         tab,
         token,
         urls,
+        useV8Syntax,
         warnings,
 
         wsh = {
@@ -2434,6 +2435,7 @@ loop:   for (;;) {
         }
     }
 
+
     // Build the syntax table by declaring the syntactic elements of the language.
 
     type('(number)', function () {
@@ -3144,7 +3146,7 @@ loop:   for (;;) {
 // This Function is called when v8 option is set to true
 // it adds the `const` statement to JSHINT
 
-    function useV8Syntax() {
+    useV8Syntax = function () {
         var conststatement = stmt('const', function (prefix) {
             var id, name, value;
 
@@ -3158,7 +3160,7 @@ loop:   for (;;) {
                 if (funct['(global)'] && predefined[id] === false) {
                     warning("Redefinition of '{a}'.", token, id);
                 }
-                addlabel(id, 'const'); // TODO unused?
+                addlabel(id, 'const');
                 if (prefix) {
                     break;
                 }
@@ -3169,7 +3171,8 @@ loop:   for (;;) {
                     advance('=');
                     nonadjacent(token, nexttoken);
                     if (nexttoken.id === 'undefined') {
-                        warning("It is not necessary to initialize '{a}' to 'undefined'.", token, id);
+                        warning("It is not necessary to initialize " +
+                          "'{a}' to 'undefined'.", token, id);
                     }
                     if (peek(0).id === '=' && nexttoken.identifier) {
                         error("Constant {a} was not declared correctly.",
@@ -3186,7 +3189,7 @@ loop:   for (;;) {
             return this;
         });
         conststatement.exps = true;
-    }
+    };
 
     var varstatement = stmt('var', function (prefix) {
         // JavaScript does not have block scope. It only has function scope. So,
