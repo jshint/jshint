@@ -691,6 +691,14 @@ exports.white = function () {
             .addError(6, "Missing space after 'if'.")
             .addError(6, "Missing space after ')'.")
             .test(src, { white: true });
+    assert.eql(JSHINT.errors[5].line, 14);
+    assert.eql(JSHINT.errors[5].reason, "Unexpected space after 'true'.");
+    assert.eql(JSHINT.errors[6].line, 15);
+    assert.eql(JSHINT.errors[6].reason, "Missing space after ':'.");
+    assert.eql(JSHINT.errors[7].line, 18);
+    assert.eql(JSHINT.errors[7].reason, "Unexpected space after '('.");
+    assert.eql(JSHINT.errors[8].line, 18);
+    assert.eql(JSHINT.errors[8].reason, "Unexpected space after 'ex'.");
 };
 
 exports.trailing = function () {

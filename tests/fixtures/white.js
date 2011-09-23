@@ -8,3 +8,13 @@ var bye = function() {
         return;  
     }  
 };
+
+try {
+    var other = {
+        a: true ,
+        b :false
+    };
+}    catch    ( ex )    { // no errors thrown
+    if ( ex ) {           // errors
+    }
+}
