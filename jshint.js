@@ -200,7 +200,7 @@
  close, closed, closure, comment, condition, confirm, console, constructor,
  content, couch, create, css, curly, d, data, datalist, dd, debug, decodeURI,
  decodeURIComponent, defaultStatus, defineClass, deserialize, devel, document,
- dojo, dijit, dojox, define, edition, else, emit, encodeURI, encodeURIComponent,
+ dojo, dijit, dojox, swfobject, define, edition, else, emit, encodeURI, encodeURIComponent,
  entityify, eqeqeq, eqnull, errors, es5, escape, eval, event, evidence, evil,
  ex, exception, exec, exps, expr, exports, FileReader, first, floor, focus,
  forin, fragment, frames, from, fromCharCode, fud, funct, function, functions,
@@ -313,6 +313,7 @@ var JSHINT = (function () {
             sub         : true, // if all forms of subscript notation are tolerated
             supernew    : true, // if `new function () { ... };` and `new Object;`
                                 // should be tolerated
+            swfobject   : true, // if swfobject globals should be predefined
             trailing    : true, // if trailing whitespace rules apply
             validthis   : true, // if 'this' inside a non-constructor function is valid.
                                 // This is a function scoped option only.
@@ -705,6 +706,9 @@ var JSHINT = (function () {
         },
 
         strict_mode,
+        swfobject = {
+            swfobject : false
+        },
         syntax = {},
         tab,
         token,
@@ -894,6 +898,9 @@ var JSHINT = (function () {
         if (option.wsh)
             combine(predefined, wsh);
 
+        if (option.swfobject)
+            combine(predefined, swfobject);
+        
         if (option.globalstrict && option.strict !== false)
             option.strict = true;
     }
