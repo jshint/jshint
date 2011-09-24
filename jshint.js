@@ -189,7 +189,7 @@
  Slick, Slider, Selector, SharedWorker, String, Style, SyntaxError, Sortable, Sortables,
  SortableObserver, Sound, Spinner, System, Swiff, Text, TextArea, Template,
  Timer, Tips, Type, TypeError, Toggle, Try, unescape, URI, URIError, URL, VBArray, WSH,
- WScript, Web, Window, XMLDOM, XMLHttpRequest, XPathEvaluator, XPathException,
+ WScript, XDomainRequest, Web, Window, XMLDOM, XMLHttpRequest, XPathEvaluator, XPathException,
  XPathExpression, XPathNamespace, XPathNSResolver, XPathResult, "\\", a,
  addEventListener, address, alert, apply, applicationCache, arguments, arity,
  asi, b, bitwise, block, blur, boolOptions, boss, browser, c, call, callee,
@@ -718,7 +718,8 @@ var JSHINT = (function () {
             ScriptEngineMinorVersion  : true,
             VBArray                   : true,
             WSH                       : true,
-            WScript                   : true
+            WScript                   : true,
+            XDomainRequest            : true
         };
 
         // Regular expressions. Some of these are stupidly long.

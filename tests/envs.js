@@ -353,6 +353,7 @@ exports.wsh = function () {
           , 'VBArray'
           , 'WSH'
           , 'WScript'
+          , 'XDomainRequest'
         ];
 
     assert.globalsImplied(globals);
