@@ -453,3 +453,12 @@ exports.nonstandard = function () {
   assert.globalsImplied(globals);
   assert.globalsKnown(globals, { nonstandard: true });
 };
+
+exports.extjs = function () {
+  var globals = [
+      'Ext'
+  ];
+
+  assert.globalsImplied(globals);
+  assert.globalsKnown(globals, { extjs: true });
+};

@@ -200,7 +200,7 @@
  close, closed, closure, comment, condition, confirm, console, constructor,
  content, couch, create, css, curly, d, data, datalist, dd, debug, decodeURI,
  decodeURIComponent, defaultStatus, defineClass, deserialize, devel, document,
- dojo, dijit, dojox, define, edition, else, emit, encodeURI, encodeURIComponent,
+ dojo, dijit, dojox, extjs, Ext, define, edition, else, emit, encodeURI, encodeURIComponent,
  entityify, eqeqeq, eqnull, errors, es5, escape, eval, event, evidence, evil,
  ex, exception, exec, exps, expr, exports, FileReader, first, floor, focus,
  forin, fragment, frames, from, fromCharCode, fud, funct, function, functions,
@@ -269,6 +269,7 @@ var JSHINT = (function () {
             eqeqeq      : true, // if === should be required
             eqnull      : true, // if == null comparisons should be tolerated
             es5         : true, // if ES5 syntax should be allowed
+            extjs       : true, // if ExtJS globals should be predefined
             evil        : true, // if eval should be allowed
             expr        : true, // if ExpressionStatement should be allowed as Programs
             forin       : true, // if for in statements must filter
@@ -493,6 +494,10 @@ var JSHINT = (function () {
             '\\': '\\\\'
         },
 
+        extjs = {
+            Ext : false
+        },
+        
         funct,          // The current function
 
         functionicity = [
@@ -878,6 +883,9 @@ var JSHINT = (function () {
 
         if (option.dojo)
             combine(predefined, dojo);
+        
+        if (option.extjs)
+            combine(predefined, extjs);
 
         if (option.browser)
             combine(predefined, browser);
