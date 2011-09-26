@@ -94,7 +94,7 @@
 		WScript.StdOut.WriteLine("JSHint configuration options can be passed in via optional, Windows-style");
 		WScript.StdOut.WriteLine("arguments.  For example:");
 		WScript.StdOut.WriteLine("    cscript " + scriptName + " /jquery:true myscript.js");
-		WScript.StdOut.WriteLine("    cscript " + scriptName + " /globals:QUnit:false,_:false,foo:true foo.js");
+		WScript.StdOut.WriteLine("    cscript " + scriptName + " /global:QUnit:false,_:false,foo:true foo.js");
 
 		WScript.Quit(-1);
 	}
