@@ -445,6 +445,15 @@ exports.dojo = function () {
   assert.globalsKnown(globals, { dojo: true });
 };
 
+exports.swfobject = function () {
+  var globals = [
+      'swfobject'
+  ];
+
+  assert.globalsImplied(globals);
+  assert.globalsKnown(globals, { swfobject: true });
+};
+
 exports.nonstandard = function () {
   var globals = [
       'escape'
