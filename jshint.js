@@ -629,6 +629,8 @@ var JSHINT = (function () {
             deserialize : false,
             gc          : false,
             help        : false,
+            importPackage: false,
+            java        : false,
             load        : false,
             loadClass   : false,
             print       : false,
