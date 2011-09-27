@@ -803,3 +803,35 @@ exports.validthis = function () {
     assert.eql(JSHINT.errors.length, 1);
     assert.eql(JSHINT.errors[0].reason, "Bad option value.");
 };
+
+/** Test string relevant options
+ *    multistr    allows multiline strings
+ *
+ */
+exports.strings = function() {
+    var src = fs.readFileSync(__dirname + '/fixtures/strings.js', 'utf8');
+
+    assert.ok(!JSHINT(src, { multistr: true }));
+    assert.eql(JSHINT.errors.length, 3);
+    assert.eql(JSHINT.errors[0].line, 9);
+    assert.eql(JSHINT.errors[0].reason, "Unclosed string.");
+    assert.eql(JSHINT.errors[1].line, 10);
+    assert.eql(JSHINT.errors[1].reason, "Unclosed string.");
+    assert.eql(JSHINT.errors[2].line, 15);
+    assert.eql(JSHINT.errors[2].reason, "Unclosed string.");
+
+    assert.ok(!JSHINT(src));
+    assert.eql(JSHINT.errors.length, 6);
+    assert.eql(JSHINT.errors[0].line, 3);
+    assert.eql(JSHINT.errors[0].reason, "Bad escapement of EOL. Use option multistr if needed.");
+    assert.eql(JSHINT.errors[1].line, 4);
+    assert.eql(JSHINT.errors[1].reason, "Bad escapement of EOL. Use option multistr if needed.");
+    assert.eql(JSHINT.errors[2].line, 9);
+    assert.eql(JSHINT.errors[2].reason, "Unclosed string.");
+    assert.eql(JSHINT.errors[3].line, 10);
+    assert.eql(JSHINT.errors[3].reason, "Unclosed string.");
+    assert.eql(JSHINT.errors[4].line, 14);
+    assert.eql(JSHINT.errors[4].reason, "Bad escapement of EOL. Use option multistr if needed.");
+    assert.eql(JSHINT.errors[5].line, 15);
+    assert.eql(JSHINT.errors[5].reason, "Unclosed string.");
+};
