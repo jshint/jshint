@@ -747,23 +747,52 @@ exports.trailing = function () {
 exports.regexdash = function () {
     var code = [
         'var a = /[-ab]/;'
-      , 'var a = /[ab-]/;'
+      , 'var b = /[ab-]/;'
+      , 'var c = /[a-c-e]/;'
+      , 'var d = /[\\s-\\d]/;'
+      , 'var e = /[\\s-]/;'
+      , 'var f = /[-\\d]/;'
+      , 'var g = /[a-]/;'
+      , 'var h = /[-z]/;'
+      , 'var g = /[a-\\w]/;'
+      , 'var h = /[\\d-z]/;'
     ];
 
     // Default behavior
-    assert.ok(!JSHINT(code[0]));
-    assert.eql(JSHINT.errors.length, 1);
+    assert.ok(!JSHINT(code));
+    assert.eql(JSHINT.errors.length, 10);
+    assert.eql(JSHINT.errors[0].line, 1);
     assert.eql(JSHINT.errors[0].reason, "Unescaped '-'.");
-
-    assert.ok(!JSHINT(code[1]));
-    assert.eql(JSHINT.errors.length, 1);
-    assert.eql(JSHINT.errors[0].reason, "Unescaped '-'.");
+    assert.eql(JSHINT.errors[1].line, 2);
+    assert.eql(JSHINT.errors[1].reason, "Unescaped '-'.");
+    assert.eql(JSHINT.errors[2].line, 3);
+    assert.eql(JSHINT.errors[2].reason, "Unescaped '-'.");
+    assert.eql(JSHINT.errors[3].line, 4);
+    assert.eql(JSHINT.errors[3].reason, "Unescaped '-'.");
+    assert.eql(JSHINT.errors[4].line, 5);
+    assert.eql(JSHINT.errors[4].reason, "Unescaped '-'.");
+    assert.eql(JSHINT.errors[5].line, 6);
+    assert.eql(JSHINT.errors[5].reason, "Unescaped '-'.");
+    assert.eql(JSHINT.errors[6].line, 7);
+    assert.eql(JSHINT.errors[6].reason, "Unescaped '-'.");
+    assert.eql(JSHINT.errors[7].line, 8);
+    assert.eql(JSHINT.errors[7].reason, "Unescaped '-'.");
+    assert.eql(JSHINT.errors[8].line, 9);
+    assert.eql(JSHINT.errors[8].reason, "Unescaped '-'.");
+    assert.eql(JSHINT.errors[9].line, 10);
+    assert.eql(JSHINT.errors[9].reason, "Unescaped '-'.");
 
     // Regex dash is on
-    assert.ok(!JSHINT(code[0], { regexdash: true }));
-    assert.eql(JSHINT.errors.length, 1);
+    assert.ok(!JSHINT(code, { regexdash: true }));
+    assert.eql(JSHINT.errors.length, 4);
+    assert.eql(JSHINT.errors[0].line, 3);
     assert.eql(JSHINT.errors[0].reason, "Unescaped '-'.");
-    assert.ok(JSHINT(code[1], { regexdash: true }));
+    assert.eql(JSHINT.errors[1].line, 4);
+    assert.eql(JSHINT.errors[1].reason, "Unescaped '-'.");
+    assert.eql(JSHINT.errors[2].line, 9);
+    assert.eql(JSHINT.errors[2].reason, "Unescaped '-'.");
+    assert.eql(JSHINT.errors[3].line, 10);
+    assert.eql(JSHINT.errors[3].reason, "Unescaped '-'.");
 };
 
 exports.onecase = function () {

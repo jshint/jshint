@@ -302,8 +302,8 @@ var JSHINT = (function () {
             proto       : true, // if the `__proto__` property should be disallowed
             prototypejs : true, // if Prototype and Scriptaculous globals should be
                                 // predefined
-            regexdash   : true, // if unescaped last dash (-) inside brackets should be
-                                // tolerated
+            regexdash   : true, // if unescaped first/last dash (-) inside brackets
+                                // should be tolerated
             regexp      : true, // if the . should not be allowed in regexp literals
             rhino       : true, // if the Rhino environment globals should be predefined
             undef       : true, // if variables should be declared before used
@@ -1101,7 +1101,7 @@ var JSHINT = (function () {
 
             // token -- this is called by advance to get the next token
             token: function () {
-                var b, c, captures, d, depth, high, i, l, low, q, t;
+                var b, c, captures, d, depth, high, i, l, low, q, t, isLiteral, isInRange;
 
                 function match(x) {
                     var r = x.exec(s), r1;
@@ -1424,12 +1424,12 @@ var JSHINT = (function () {
                                                     line, from + l, '^');
                                             }
                                         }
-                                        q = false;
                                         if (c === ']') {
                                             warningAt("Empty class.", line,
                                                     from + l - 1);
-                                            q = true;
                                         }
+                                        isLiteral = false;
+                                        isInRange = false;
 klass:                                  do {
                                             c = s.charAt(l);
                                             l += 1;
@@ -1438,19 +1438,31 @@ klass:                                  do {
                                             case '^':
                                                 warningAt("Unescaped '{a}'.",
                                                         line, from + l, c);
-                                                q = true;
+                                                if (isInRange) {
+                                                    isInRange = false;
+                                                } else {
+                                                    isLiteral = true;
+                                                }
                                                 break;
                                             case '-':
-                                                if (q) {
-                                                    q = false;
+                                                if (isLiteral && !isInRange) {
+                                                    isLiteral = false;
+                                                    isInRange = true;
+                                                } else if (isInRange) {
+                                                    isInRange = false;
+                                                } else if (s.charAt(l) === ']') {
+                                                    isInRange = true;
                                                 } else {
-                                                    warningAt("Unescaped '{a}'.",
-                                                            line, from + l, '-');
-                                                    q = true;
+                                                    if (option.regexdash !== (l === 2 || (l === 3 &&
+                                                        s.charAt(2) === '^')) ) {
+                                                        warningAt("Unescaped '{a}'.",
+                                                            line, from + l - 1, '-');
+                                                    }
+                                                    isLiteral = true;
                                                 }
                                                 break;
                                             case ']':
-                                                if (!q && !option.regexdash) {
+                                                if (isInRange && !option.regexdash) {
                                                     warningAt("Unescaped '{a}'.",
                                                             line, from + l - 1, '-');
                                                 }
@@ -1465,18 +1477,44 @@ klass:                                  do {
 "Unexpected escaped character '{a}' in regular expression.", line, from + l, c);
                                                 }
                                                 l += 1;
-                                                q = true;
+                                                
+                                                // \w, \s and \d are never part of a character range
+                                                if (/[wsd]/i.test(c)) {
+                                                    if (isInRange) {
+                                                        warningAt("Unescaped '{a}'.",
+                                                            line, from + l, '-');
+                                                        isInRange = false;
+                                                    }
+                                                    isLiteral = false;
+                                                } else if (isInRange) {
+                                                    isInRange = false;
+                                                } else {
+                                                    isLiteral = true;
+                                                }
                                                 break;
                                             case '/':
                                                 warningAt("Unescaped '{a}'.",
                                                         line, from + l - 1, '/');
-                                                q = true;
+                                                
+                                                if (isInRange) {
+                                                    isInRange = false;
+                                                } else {
+                                                    isLiteral = true;
+                                                }
                                                 break;
                                             case '<':
-                                                q = true;
+                                                if (isInRange) {
+                                                    isInRange = false;
+                                                } else {
+                                                    isLiteral = true;
+                                                }
                                                 break;
                                             default:
-                                                q = true;
+                                                if (isInRange) {
+                                                    isInRange = false;
+                                                } else {
+                                                    isLiteral = true;
+                                                }
                                             }
                                         } while (c);
                                         break;
