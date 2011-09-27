@@ -803,3 +803,34 @@ exports.validthis = function () {
     assert.eql(JSHINT.errors.length, 1);
     assert.eql(JSHINT.errors[0].reason, "Bad option value.");
 };
+
+exports.indentation = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/indent.js', 'utf8');
+
+    assert.ok(!JSHINT(src));
+    assert.eql(JSHINT.errors.length, 2);
+    assert.eql(JSHINT.errors[0].line, 5);
+    assert.eql(JSHINT.errors[0].reason, "Mixed spaces and tabs.");
+    assert.eql(JSHINT.errors[1].line, 6);
+    assert.eql(JSHINT.errors[1].reason, "Mixed spaces and tabs.");
+
+    assert.ok(!JSHINT(src, { indent: 4, white: true }));
+    assert.eql(JSHINT.errors.length, 2);
+    assert.eql(JSHINT.errors[0].line, 5);
+    assert.eql(JSHINT.errors[0].reason, "Mixed spaces and tabs.");
+    assert.eql(JSHINT.errors[1].line, 6);
+    assert.eql(JSHINT.errors[1].reason, "Mixed spaces and tabs.");
+
+    assert.ok(!JSHINT(src, { indent: 2, white: true }));
+    assert.eql(JSHINT.errors.length, 5);
+    assert.eql(JSHINT.errors[0].line, 5);
+    assert.eql(JSHINT.errors[0].reason, "Mixed spaces and tabs.");
+    assert.eql(JSHINT.errors[1].line, 5);
+    assert.eql(JSHINT.errors[1].reason, "Expected 'var' to have an indentation at 5 instead at 7.");
+    assert.eql(JSHINT.errors[2].line, 6);
+    assert.eql(JSHINT.errors[2].reason, "Mixed spaces and tabs.");
+    assert.eql(JSHINT.errors[3].line, 6);
+    assert.eql(JSHINT.errors[3].reason, "Expected 'var' to have an indentation at 5 instead at 7.");
+    assert.eql(JSHINT.errors[4].line, 7);
+    assert.eql(JSHINT.errors[4].reason, "Expected '}' to have an indentation at 3 instead at 5.");
+};
