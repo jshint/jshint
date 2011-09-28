@@ -1,8 +1,9 @@
 /*jshint boss: true, laxbreak: true, node: true, devel: true */
 
-var JSHINT = require('../jshint.js').JSHINT,
-    assert = require('assert'),
-    fs     = require('fs');
+var JSHINT  = require('../jshint.js').JSHINT,
+    assert  = require('assert'),
+    fs      = require('fs'),
+    TestRun = require("./testhelper").setup.testRun;
 
 /** JSHint must pass its own check */
 exports.checkJSHint = function () {
@@ -18,7 +19,7 @@ exports.checkJSHint = function () {
 /** Rhino wrapper must pass JSHint check */
 exports.checkRhino = function () {
     var src = fs.readFileSync(__dirname + "/../env/jshint-rhino.js", "utf8");
-    assert.ok(JSHINT(src, { rhino: true }));
+    TestRun().test(src, { rhino: true });
 };
 
 /** All test files must pass JSHint check */
@@ -65,12 +66,13 @@ exports.testNewArray = function () {
         code1 = 'new Array(v + 1);',
         code2 = 'new Array("hello", "there", "chaps");';
 
-    assert.ok(JSHINT(code));
-    assert.ok(JSHINT(code1));
-    assert.ok(JSHINT(code2));
+    TestRun().test(code);
+    TestRun().test(code1);
+    TestRun().test(code2);
 
-    assert.ok(!JSHINT('new Array();'));
-    assert.eql(JSHINT.errors[0].reason, "Use the array literal notation [].");
+    TestRun()
+        .addError(1, "Use the array literal notation [].")
+        .test('new Array();');
 };
 
 /**
@@ -84,14 +86,16 @@ exports.testUndefinedAsParam = function () {
     var code  = '(function (undefined) {}());',
         code1 = 'var undefined = 1;';
 
-    assert.ok(JSHINT(code));
+    TestRun().test(code);
     // But it must never tolerate reassigning of undefined
-    assert.ok(!JSHINT(code1));
+    TestRun()
+        .addError(1, "Expected an identifier and instead saw 'undefined' (a reserved word).")
+        .test(code1);
 };
 
 /** Tests that JSHint accepts new line after a dot (.) operator */
 exports.newLineAfterDot = function () {
-    assert.ok(JSHINT([ "chain().chain().", "chain();" ]));
+    TestRun().test([ "chain().chain().", "chain();" ]);
 };
 
 /**
@@ -99,8 +103,9 @@ exports.newLineAfterDot = function () {
  * More info: http://perfectionkills.com/understanding-delete/
  */
 exports.noDelete = function () {
-    assert.ok(!JSHINT('delete NullReference;'));
-    assert.eql(JSHINT.errors[0].reason, 'Variables should not be deleted.');
+    TestRun()
+        .addError(1, 'Variables should not be deleted.')
+        .test('delete NullReference;');
 };
 
 /**
@@ -109,12 +114,10 @@ exports.noDelete = function () {
  */
 exports.switchFallThrough = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/switchFallThrough.js', 'utf8');
-    assert.ok(!JSHINT(src));
-    assert.eql(JSHINT.errors.length, 2);
-    assert.eql(JSHINT.errors[0].line, 3);
-    assert.eql(JSHINT.errors[0].reason, "Expected a 'break' statement before 'case'.");
-    assert.eql(JSHINT.errors[1].line, 18);
-    assert.eql(JSHINT.errors[1].reason, "Expected a 'break' statement before 'default'.");
+    TestRun()
+        .addError(3, "Expected a 'break' statement before 'case'.")
+        .addError(18, "Expected a 'break' statement before 'default'.")
+        .test(src);
 };
 
 exports.testVoid = function () {
@@ -123,21 +126,19 @@ exports.testVoid = function () {
       , "void 0;"
       , "var a = void(1);"
     ];
-    assert.ok(JSHINT(code));
+    TestRun().test(code);
 };
 
 exports.functionScopedOptions = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/functionScopedOptions.js', 'utf8');
-    assert.ok(!JSHINT(src));
-    assert.eql(JSHINT.errors.length, 2);
-    assert.eql(JSHINT.errors[0].line, 1);
-    assert.eql(JSHINT.errors[0].reason, "eval is evil.");
-    assert.eql(JSHINT.errors[1].line, 8);
-    assert.eql(JSHINT.errors[1].reason, "eval is evil.");
+    TestRun()
+        .addError(1, "eval is evil.")
+        .addError(8, "eval is evil.")
+        .test(src);
 };
 
 /** JSHint should not only read jshint, but also jslint options */
 exports.jslintOptions = function() {
     var src = fs.readFileSync(__dirname + '/fixtures/jslintOptions.js', 'utf8');
-    assert.ok(JSHINT(src));
+    TestRun().test(src);
 };
