@@ -5,9 +5,10 @@
 /*jshint boss: true, laxbreak: true, node: true */
 /*global wrap: true */
 
-var JSHINT = require('../jshint.js').JSHINT,
-    assert = require('assert'),
-    fs     = require('fs');
+var JSHINT  = require('../jshint.js').JSHINT,
+    assert  = require('assert'),
+    fs      = require('fs'),
+    TestRun = require("./testhelper").setup.testRun;
 
 function wrap(globals) {
     return '(function () { return [ ' + globals.join(',') + ' ]; }());';
@@ -72,12 +73,12 @@ exports.node = function () {
       'console.log(__hello);'
     ];
 
-    assert.ok(JSHINT(asGlobals, { node: true, nomen: true }));
-    assert.ok(!JSHINT(asProps, { node: true, nomen: true }));
-    assert.eql(JSHINT.errors.length, 3);
-    assert.eql(JSHINT.errors[0].reason, "Unexpected dangling '_' in '__dirname'.");
-    assert.eql(JSHINT.errors[1].reason, "Unexpected dangling '_' in '__filename'.");
-    assert.eql(JSHINT.errors[2].reason, "Unexpected dangling '_' in '__hello'.");
+    TestRun().test(asGlobals, { node: true, nomen: true });
+    TestRun()
+        .addError(1, "Unexpected dangling '_' in '__dirname'.")
+        .addError(2, "Unexpected dangling '_' in '__filename'.")
+        .addError(3, "Unexpected dangling '_' in '__hello'.")
+        .test(asProps, { node: true, nomen: true });
 };
 
 /** Option `jquery` predefines jQuery globals */
@@ -322,6 +323,8 @@ exports.rhino = function () {
           , 'deserialize'
           , 'gc'
           , 'help'
+          , 'importPackage'
+          , 'java'
           , 'load'
           , 'loadClass'
           , 'print'
@@ -363,21 +366,17 @@ exports.wsh = function () {
 exports.es5 = function () {
     var src = fs.readFileSync(__dirname + "/fixtures/es5.js", "utf8");
 
-    assert.ok(!JSHINT(src));
-    assert.eql(JSHINT.errors.length, 3);
-    assert.eql(JSHINT.errors[0].line, 3);
-    assert.eql(JSHINT.errors[0].reason, "Extra comma.");
-    assert.eql(JSHINT.errors[1].line, 8);
-    assert.eql(JSHINT.errors[1].reason, "Extra comma.");
-    assert.eql(JSHINT.errors[2].line, 15);
-    assert.eql(JSHINT.errors[2].reason, "get/set are ES5 features.");
-
-    assert.ok(JSHINT(src, { es5: true }));
+    TestRun()
+        .addError(3, "Extra comma.")
+        .addError(8, "Extra comma.")
+        .addError(15, "get/set are ES5 features.")
+        .test(src);
+    TestRun().test(src, { es5: true });
 
     // Make sure that JSHint parses getters/setters as function expressions
     // (https://github.com/jshint/jshint/issues/96)
     src = fs.readFileSync(__dirname + "/fixtures/es5.funcexpr.js", "utf8");
-    assert.ok(JSHINT(src, { es5: true }));
+    TestRun().test(src, { es5: true });
 };
 
 exports.mootools = function () {
