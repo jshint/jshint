@@ -323,6 +323,8 @@ exports.rhino = function () {
           , 'deserialize'
           , 'gc'
           , 'help'
+          , 'importPackage'
+          , 'java'
           , 'load'
           , 'loadClass'
           , 'print'
