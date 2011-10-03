@@ -211,7 +211,7 @@
  JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastsemic, laxbreak,
  latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
  log, loopfunc, m, match, maxerr, maxlen, member,message, meta, module, moveBy,
- moveTo, mootools, name, navigator, new, newcap, noarg, node, noempty, nomen,
+ moveTo, mootools, multistr, name, navigator, new, newcap, noarg, node, noempty, nomen,
  nonew, nonstandard, nud, onbeforeunload, onblur, onerror, onevar, onecase, onfocus,
  onload, onresize, onunload, open, openDatabase, openURL, opener, opera, options, outer, param,
  parent, parseFloat, parseInt, passfail, plusplus, predef, print, process, prompt,
@@ -284,6 +284,7 @@ var JSHINT = (function () {
             loopfunc    : true, // if functions should be allowed to be defined within
                                 // loops
             mootools    : true, // if MooTools globals should be predefined
+            multistr    : true, // allow multiline strings
             newcap      : true, // if constructor names must be capitalized
             noarg       : true, // if arguments.caller and arguments.callee should be
                                 // disallowed
@@ -1119,7 +1120,7 @@ var JSHINT = (function () {
                 }
 
                 function string(x) {
-                    var c, j, r = '';
+                    var c, j, r = '', allowNewLine = false;
 
                     if (jsonmode && x !== '"') {
                         warningAt("Strings must use doublequote.",
@@ -1140,6 +1141,11 @@ var JSHINT = (function () {
                     for (;;) {
                         while (j >= s.length) {
                             j = 0;
+                            if (allowNewLine) {
+                                allowNewLine = false;
+                            } else {
+                                warningAt("Unclosed string.", line, from);
+                            }
                             if (!nextLine()) {
                                 errorAt("Unclosed string.", line, from);
                             }
@@ -1199,6 +1205,22 @@ var JSHINT = (function () {
                                     warningAt("Avoid \\x-.", line, character);
                                 }
                                 esc(2);
+                                break;
+                            case '':
+                                // last character is escape character
+                                // always allow new line if escaped, but show
+                                // warning if option is not set
+                                allowNewLine = true;
+                                if (option.multistr) {
+                                    if (jsonmode) {
+                                        warningAt("Avoid EOL escapement.", line, character);
+                                    }
+                                    c = '';
+                                    character -= 1;
+                                    break;
+                                }
+                                warningAt("Bad escapement of EOL. Use option multistr if needed.",
+                                    line, character);
                                 break;
                             default:
                                 warningAt("Bad escapement.", line, character);

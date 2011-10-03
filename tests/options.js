@@ -366,7 +366,7 @@ exports.eqnull = function () {
         .addError(3, "Use '!==' to compare with 'null'.")
         .addError(4, "Use '!==' to compare with 'null'.")
         .test(code);
-        
+
     // But when `eqnull` is true, no questions asked
     TestRun().test(code, { eqnull: true });
 
@@ -782,4 +782,27 @@ exports.indentation = function () {
         .addError(6, "Expected 'var' to have an indentation at 5 instead at 7.")
         .addError(7, "Expected '}' to have an indentation at 3 instead at 5.")
         .test(src, { indent: 2, white: true });
+};
+
+/*
+ * Test string relevant options
+ *   multistr    allows multiline strings
+ */
+exports.strings = function() {
+    var src = fs.readFileSync(__dirname + '/fixtures/strings.js', 'utf8');
+
+    TestRun()
+        .addError(9, "Unclosed string.")
+        .addError(10, "Unclosed string.")
+        .addError(15, "Unclosed string.")
+        .test(src, { multistr: true });
+
+    TestRun()
+        .addError(3, "Bad escapement of EOL. Use option multistr if needed.")
+        .addError(4, "Bad escapement of EOL. Use option multistr if needed.")
+        .addError(9, "Unclosed string.")
+        .addError(10, "Unclosed string.")
+        .addError(14, "Bad escapement of EOL. Use option multistr if needed.")
+        .addError(15, "Unclosed string.")
+        .test(src);
 };
