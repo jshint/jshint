@@ -761,3 +761,25 @@ exports.validthis = function () {
             .addError(2, "Bad option value.")
             .test(code);
 };
+
+exports.indentation = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/indent.js', 'utf8');
+
+    TestRun()
+        .addError(5, "Mixed spaces and tabs.")
+        .addError(6, "Mixed spaces and tabs.")
+        .test(src);
+
+    TestRun()
+        .addError(5, "Mixed spaces and tabs.")
+        .addError(6, "Mixed spaces and tabs.")
+        .test(src, { indent: 4, white: true });
+
+    TestRun()
+        .addError(5, "Mixed spaces and tabs.")
+        .addError(5, "Expected 'var' to have an indentation at 5 instead at 7.")
+        .addError(6, "Mixed spaces and tabs.")
+        .addError(6, "Expected 'var' to have an indentation at 5 instead at 7.")
+        .addError(7, "Expected '}' to have an indentation at 3 instead at 5.")
+        .test(src, { indent: 2, white: true });
+};
