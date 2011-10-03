@@ -982,7 +982,7 @@ var JSHINT = (function () {
             character = 1;
             s = lines[line];
             line += 1;
-            at = s.search(/ \t/);
+            at = s.search(/ \t|\t /);
 
             if (at >= 0)
                 warningAt("Mixed spaces and tabs.", line, at + 1);
