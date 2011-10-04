@@ -1047,7 +1047,8 @@ var JSHINT = (function () {
             if (i !== '(endline)') {
                 prereg = i &&
                     (('(,=:[!&|?{};'.indexOf(i.charAt(i.length - 1)) >= 0) ||
-                    i === 'return');
+                    i === 'return' ||
+                    i === 'case');
             }
             return t;
         }
