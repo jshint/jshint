@@ -142,3 +142,10 @@ exports.jslintOptions = function() {
     var src = fs.readFileSync(__dirname + '/fixtures/jslintOptions.js', 'utf8');
     TestRun().test(src);
 };
+
+exports.caseExpressions = function() {
+    var src = fs.readFileSync(__dirname + '/fixtures/caseExpressions.js', 'utf8');
+    TestRun()
+        .addError(2, "This 'switch' should be an 'if'.")
+        .test(src);
+};
