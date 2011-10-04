@@ -52,6 +52,15 @@ After that, running tests is as easy as:
 
     expresso tests/*.js
 
+Attribution
+-----------
+
+Maintainer: [Anton Kovalyov](http://anton.kovalyov.net/) ([@valueof](http://twitter.com/valueof))
+
+Distinguished Contributors:
+
+ * Wolfgang Kluge
+
 Thank you!
 ----------
 
