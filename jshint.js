@@ -3408,10 +3408,12 @@ loop:   for (;;) {
                         break;
                     default:
                         error("Missing ':' on a case clause.", token);
+                        return;
                     }
                 } else {
                     error("Expected '{a}' and instead saw '{b}'.",
                         nexttoken, 'case', nexttoken.value);
+                    return;
                 }
             }
         }
