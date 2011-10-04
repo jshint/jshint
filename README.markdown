@@ -59,7 +59,7 @@ Maintainer: [Anton Kovalyov](http://anton.kovalyov.net/) ([@valueof](http://twit
 
 Distinguished Contributors:
 
- * Wolfgang Kluge
+ * [Wolfgang Kluge](http://klugesoftware.de/) ([blog](http://gehirnwindung.de/))
 
 Thank you!
 ----------
