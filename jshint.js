@@ -211,8 +211,8 @@
  JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastsemic, laxbreak,
  latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
  log, loopfunc, m, match, maxerr, maxlen, member,message, meta, module, moveBy,
- moveTo, mootools, multistr, name, navigator, new, newcap, noarg, node, noempty, nomen,
- nonew, nonstandard, nud, onbeforeunload, onblur, onerror, onevar, onecase, onfocus,
+ moveTo, mootools, multistr, name, navigator, new, newcap, noarg, node, nocommafirst, 
+ noempty, nomen, nonew, nonstandard, nud, onbeforeunload, onblur, onerror, onevar, onecase, onfocus,
  onload, onresize, onunload, open, openDatabase, openURL, opener, opera, options, outer, param,
  parent, parseFloat, parseInt, passfail, plusplus, predef, print, process, prompt,
  proto, prototype, prototypejs, push, quit, range, raw, reach, reason, regexp,
@@ -290,6 +290,7 @@ var JSHINT = (function () {
                                 // disallowed
             node        : true, // if the Node.js environment globals should be
                                 // predefined
+            nocommafirst: true, // if comma-first should not be tolerated
             noempty     : true, // if empty blocks should be disallowed
             nonew       : true, // if using `new` for side-effects should be disallowed
             nonstandard : true, // if non-standard (but widely adopted) globals should
@@ -1952,7 +1953,7 @@ loop:   for (;;) {
 
     function comma() {
         if (token.line !== nexttoken.line) {
-            if (!option.laxbreak) {
+            if (!option.laxbreak || option.nocommafirst) {
                 warning("Bad line breaking before '{a}'.", token, nexttoken.id);
             }
         } else if (token.character !== nexttoken.from && option.white) {
