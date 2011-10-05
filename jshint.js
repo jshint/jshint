@@ -2402,7 +2402,7 @@ loop:   for (;;) {
     }
 
 
-    function statements(begin) {
+    function statements() {
         var a = [], f, p;
 
         while (!nexttoken.reach && nexttoken.id !== '(end)') {
@@ -3866,7 +3866,7 @@ loop:   for (;;) {
                     use_strict();
                 }
 
-                statements('lib');
+                statements();
             }
             advance('(end)');
         } catch (e) {
