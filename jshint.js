@@ -2405,7 +2405,7 @@ loop:   for (;;) {
     }
 
 
-    function statements() {
+    function statements(startLine) {
         var a = [], f, p;
 
         while (!nexttoken.reach && nexttoken.id !== '(end)') {
@@ -2413,7 +2413,7 @@ loop:   for (;;) {
                 warning("Unnecessary semicolon.");
                 advance(';');
             } else {
-                a.push(statement());
+                a.push(statement(startLine === nexttoken.line));
             }
         }
         return a;
@@ -2433,7 +2433,8 @@ loop:   for (;;) {
             old_indent = indent,
             m = strict_mode,
             s = scope,
-            t;
+            t,
+            line;
 
         inblock = ordinary;
         if (!ordinary || !option.funcscope) scope = Object.create(scope);
@@ -2442,7 +2443,8 @@ loop:   for (;;) {
 
         if (nexttoken.id === '{') {
             advance('{');
-            if (nexttoken.id !== '}' || token.line !== nexttoken.line) {
+            line = token.line;
+            if (nexttoken.id !== '}' || line !== nexttoken.line) {
                 indent += option.indent;
                 while (!ordinary && nexttoken.from > indent) {
                     indent += option.indent;
@@ -2451,10 +2453,12 @@ loop:   for (;;) {
                         funct['(context)']['(global)']) {
                     warning("Missing \"use strict\" statement.");
                 }
-                a = statements();
+                a = statements(line);
                 strict_mode = m;
                 indent -= option.indent;
-                indentation();
+                if (line !== nexttoken.line) {
+                    indentation();
+                }
             }
             advance('}', t);
             indent = old_indent;
