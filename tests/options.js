@@ -806,3 +806,12 @@ exports.strings = function() {
         .addError(15, "Unclosed string.")
         .test(src);
 };
+
+exports.scope = function() {
+    var src = fs.readFileSync(__dirname + '/fixtures/scope.js', 'utf8');
+
+    TestRun()
+        .addError(37, "'cc' is not defined.")
+        .addError(42, "'bb' is not defined.")
+        .test(src);
+};

@@ -2383,7 +2383,7 @@ loop:   for (;;) {
             t;
 
         inblock = ordinary;
-        scope = Object.create(scope);
+        if (!ordinary) scope = Object.create(scope);
         nonadjacent(token, nexttoken);
         t = nexttoken;
 
@@ -2418,7 +2418,7 @@ loop:   for (;;) {
             noreach = false;
         }
         funct['(verb)'] = null;
-        scope = s;
+        if (!ordinary) scope = s;
         inblock = b;
         if (ordinary && option.noempty && (!a || a.length === 0)) {
             warning("Empty block.");
