@@ -215,7 +215,7 @@
  nonew, nonstandard, nud, onbeforeunload, onblur, onerror, onevar, onecase, onfocus,
  onload, onresize, onunload, open, openDatabase, openURL, opener, opera, options, outer, param,
  parent, parseFloat, parseInt, passfail, plusplus, predef, print, process, prompt,
- proto, prototype, prototypejs, push, quit, range, raw, reach, reason, regexp,
+ proto, prototype, prototypejs, pseudoscope, push, quit, range, raw, reach, reason, regexp,
  readFile, readUrl, regexdash, removeEventListener, replace, report, require,
  reserved, resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
  runCommand, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal,
@@ -303,6 +303,7 @@ var JSHINT = (function () {
             proto       : true, // if the `__proto__` property should be disallowed
             prototypejs : true, // if Prototype and Scriptaculous globals should be
                                 // predefined
+            pseudoscope : true, // if scope checking uses every block
             regexdash   : true, // if unescaped last dash (-) inside brackets should be
                                 // tolerated
             regexp      : true, // if the . should not be allowed in regexp literals
@@ -2383,7 +2384,7 @@ loop:   for (;;) {
             t;
 
         inblock = ordinary;
-        if (!ordinary) scope = Object.create(scope);
+        if (!ordinary || option.pseudoscope) scope = Object.create(scope);
         nonadjacent(token, nexttoken);
         t = nexttoken;
 
@@ -2418,7 +2419,7 @@ loop:   for (;;) {
             noreach = false;
         }
         funct['(verb)'] = null;
-        if (!ordinary) scope = s;
+        if (!ordinary || option.pseudoscope) scope = s;
         inblock = b;
         if (ordinary && option.noempty && (!a || a.length === 0)) {
             warning("Empty block.");

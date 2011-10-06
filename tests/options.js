@@ -810,8 +810,19 @@ exports.strings = function() {
 exports.scope = function() {
     var src = fs.readFileSync(__dirname + '/fixtures/scope.js', 'utf8');
 
-    TestRun()
+    TestRun(1)
         .addError(37, "'cc' is not defined.")
         .addError(42, "'bb' is not defined.")
         .test(src);
+
+    TestRun(2)
+        .addError(11, "'j' used out of scope.") // 3x
+        .addError(12, "'x' used out of scope.")
+        .addError(20, "'aa' used out of scope.")
+        .addError(27, "'bb' used out of scope.")
+        .addError(32, "'bb' is not defined.")
+        .addError(36, "'bb' is not defined.")
+        .addError(37, "'cc' is not defined.")
+        .addError(42, "'bb' is not defined.")
+        .test(src, { pseudoscope: true });
 };
