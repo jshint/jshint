@@ -275,7 +275,7 @@ var JSHINT = (function () {
             globalstrict: true, // if global "use strict"; should be allowed (also
                                 // enables 'strict')
             immed       : true, // if immediate invocations must be wrapped in parens
-            iterator    : true, // if the `__iterator__` property should be disallowed
+            iterator    : true, // if the `__iterator__` property should be allowed
             jquery      : true, // if jQuery globals should be predefined
             lastsemic   : true, // if semicolons may be ommitted for the trailing
                                 // statements inside of a one-line blocks.
@@ -300,7 +300,7 @@ var JSHINT = (function () {
             onecase     : true, // if one case switch statements should be allowed
             passfail    : true, // if the scan should stop on first error
             plusplus    : true, // if increment/decrement should not be allowed
-            proto       : true, // if the `__proto__` property should be disallowed
+            proto       : true, // if the `__proto__` property should be allowed
             prototypejs : true, // if Prototype and Scriptaculous globals should be
                                 // predefined
             regexdash   : true, // if unescaped last dash (-) inside brackets should be
