@@ -3594,19 +3594,17 @@ loop:   for (;;) {
 
 
     stmt('return', function () {
-        if (!option.asi)
-            nolinebreak(this);
+        if (this.line === nexttoken.line) {
+            if (nexttoken.id === '(regexp)')
+                warning("Wrap the /regexp/ literal in parens to disambiguate the slash operator.");
 
-        if (nexttoken.id === '(regexp)')
-            warning("Wrap the /regexp/ literal in parens to disambiguate the slash operator.");
-
-        if (this.line === nexttoken.line || !option.asi) {
             if (nexttoken.id !== ';' && !nexttoken.reach) {
                 nonadjacent(token, nexttoken);
                 this.first = expression(20);
             }
+        } else if (!option.asi) {
+            nolinebreak(this); // always warn (Line breaking error)
         }
-
         reachable('return');
         return this;
     }).exps = true;
