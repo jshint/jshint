@@ -53,7 +53,7 @@ exports.setup.testRun = function (name){
             } );
 
             if (errors.length === 0 && definedErrors.length === 0) {
-            //    return;
+                return;
             }
 
             // filter all thrown errors
@@ -65,8 +65,8 @@ exports.setup.testRun = function (name){
             } );
 
             // filter all defined errors
-            var unthrownErrors = definedErrors.filter( function(er) {
-                return !errors.some( function(def) {
+            var unthrownErrors = definedErrors.filter( function(def) {
+                return !errors.some( function(er) {
                     return def.line === er.line &&
                         def.message === er.reason;
                 } );
