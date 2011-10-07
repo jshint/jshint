@@ -1,5 +1,5 @@
-/*jshint undef: true*/
-
+/*jshint undef: true, globalstrict: true*/
+"use strict"
 function foo () {
     if (true) return
     var x = 1

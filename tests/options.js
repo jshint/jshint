@@ -183,6 +183,7 @@ exports.asi = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/asi.js', 'utf8');
 
     TestRun(1)
+        .addError(2, "Missing semicolon.")
         .addError(4, "Line breaking error 'return'.")
         .addError(4, "Missing semicolon.")
         .addError(5, "Missing semicolon.")
