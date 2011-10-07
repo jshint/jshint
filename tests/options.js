@@ -182,18 +182,27 @@ exports.nonew = function () {
 exports.asi = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/asi.js', 'utf8');
 
-    TestRun()
-        .addError(2, "Line breaking error 'return'.")
-        .addError(3, "Expected an identifier and instead saw 'var'.")
-        .addError(3, "Missing semicolon.") // TODO: Why there are two Missing semicolon warnings?
-        .addError(7, "Line breaking error 'continue'.")
-        .addError(7, "Missing semicolon.")
-        .addError(8, "Line breaking error 'break'.")
-        .addError(8, "Missing semicolon.")
+    TestRun(1)
+        .addError(4, "Line breaking error 'return'.")
+        .addError(4, "Missing semicolon.")
+        .addError(5, "Missing semicolon.")
+        .addError(9, "Line breaking error 'continue'.")
+        .addError(9, "Missing semicolon.")
+        .addError(10, "Missing semicolon.")
+        .addError(11, "Line breaking error 'break'.")
         .addError(11, "Missing semicolon.")
+        .addError(12, "Missing semicolon.")
+        .addError(16, "Missing semicolon.")
+        .addError(17, "Line breaking error 'return'.")
+        .addError(17, "Missing semicolon.")
+        .addError(19, "Line breaking error 'break'.")
+        .addError(19, "Missing semicolon.")
+        .addError(21, "Line breaking error 'break'.")
+        .addError(21, "Missing semicolon.")
+        .addError(25, "Missing semicolon.")
         .test(src);
 
-    TestRun().test(src, { asi: true });
+    TestRun(2).test(src, { asi: true });
 };
 
 /** Option `lastsemic` allows you to skip the semicolon after last statement in a block,
