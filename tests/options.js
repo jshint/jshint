@@ -707,24 +707,38 @@ exports.trailing = function () {
 exports.regexdash = function () {
     var code = [
         'var a = /[-ab]/;'
-      , 'var a = /[ab-]/;'
+      , 'var b = /[ab-]/;'
+      , 'var c = /[a-c-e]/;'
+      , 'var d = /[\\s-\\d]/;'
+      , 'var e = /[\\s-]/;'
+      , 'var f = /[-\\d]/;'
+      , 'var g = /[a-]/;'
+      , 'var h = /[-z]/;'
+      , 'var g = /[a-\\w]/;'
+      , 'var h = /[\\d-z]/;'
     ];
 
     // Default behavior
     TestRun()
-            .addError(1, "Unescaped '-'.")
-            .test(code[0]);
-
-    TestRun()
         .addError(1, "Unescaped '-'.")
-        .test(code[1]);
+        .addError(2, "Unescaped '-'.")
+        .addError(3, "Unescaped '-'.")
+        .addError(4, "Unescaped '-'.")
+        .addError(5, "Unescaped '-'.")
+        .addError(6, "Unescaped '-'.")
+        .addError(7, "Unescaped '-'.")
+        .addError(8, "Unescaped '-'.")
+        .addError(9, "Unescaped '-'.")
+        .addError(10, "Unescaped '-'.")
+        .test(code);
 
     // Regex dash is on
     TestRun()
-            .addError(1, "Unescaped '-'.")
-            .test(code[0], { regexdash: true });
-
-    TestRun().test(code[1], { regexdash: true });
+        .addError(3, "Unescaped '-'.")
+        .addError(4, "Unescaped '-'.")
+        .addError(9, "Unescaped '-'.")
+        .addError(10, "Unescaped '-'.")
+        .test(code, { regexdash: true });
 };
 
 exports.onecase = function () {
