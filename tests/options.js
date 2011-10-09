@@ -524,7 +524,7 @@ exports.passfail = function () {
 exports.onevar = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/onevar.js', 'utf8');
 
-	TestRun().test(src);
+    TestRun().test(src);
     TestRun()
         .addError(10, "Too many var statements.")
         .test(src, { onevar: true });
@@ -674,8 +674,8 @@ exports.laxbreak = function () {
 
     code = [ 'var a = b ', '? c : d;' ];
     TestRun()
-            .addError(2, "Bad line breaking before '?'.")
-            .test(code);
+        .addError(2, "Bad line breaking before '?'.")
+        .test(code);
 
     TestRun().test(code, { laxbreak: true });
 };
@@ -685,12 +685,16 @@ exports.white = function () {
 
     TestRun().test(src);
     TestRun()
-            .addError(1, "Unexpected space after 'hello'.")
-            .addError(2, "Unexpected space after 'true'.")
-            .addError(5, "Missing space after 'function'.")
-            .addError(6, "Missing space after 'if'.")
-            .addError(6, "Missing space after ')'.")
-            .test(src, { white: true });
+        .addError(1, "Unexpected space after 'hello'.")
+        .addError(2, "Unexpected space after 'true'.")
+        .addError(5, "Missing space after 'function'.")
+        .addError(6, "Missing space after 'if'.")
+        .addError(6, "Missing space after ')'.")
+        .addError(14, "Unexpected space after 'true'.")
+        .addError(15, "Missing space after ':'.")
+        .addError(18, "Unexpected space after '('.")
+        .addError(18, "Unexpected space after 'ex'.")
+        .test(src, { white: true });
 };
 
 exports.trailing = function () {
@@ -699,9 +703,9 @@ exports.trailing = function () {
     TestRun().test(src);
 
     TestRun()
-            .addError(8, "Trailing whitespace.")
-            .addError(9, "Trailing whitespace.")
-            .test(src, { trailing: true });
+        .addError(8, "Trailing whitespace.")
+        .addError(9, "Trailing whitespace.")
+        .test(src, { trailing: true });
 };
 
 exports.regexdash = function () {
@@ -745,8 +749,8 @@ exports.onecase = function () {
     var code = "switch (a) { case '1': b(); }";
 
     TestRun()
-            .addError(1, "This 'switch' should be an 'if'.")
-            .test(code);
+        .addError(1, "This 'switch' should be an 'if'.")
+        .test(code);
 
     TestRun().test(code, { onecase: true });
 };
@@ -755,10 +759,10 @@ exports.validthis = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/strict_this.js', 'utf8');
 
     TestRun()
-            .addError(8, "Possible strict violation.")
-            .addError(9, "Possible strict violation.")
-            .addError(11, "Possible strict violation.")
-            .test(src);
+        .addError(8, "Possible strict violation.")
+        .addError(9, "Possible strict violation.")
+        .addError(11, "Possible strict violation.")
+        .test(src);
 
     src = fs.readFileSync(__dirname + '/fixtures/strict_this2.js', 'utf8');
     TestRun().test(src);
@@ -767,13 +771,13 @@ exports.validthis = function () {
 
     var code = ['/*jshint validthis:true */', 'hello();'];
     TestRun()
-            .addError(1, "Option 'validthis' can't be used in a global scope.")
-            .test(code);
+        .addError(1, "Option 'validthis' can't be used in a global scope.")
+        .test(code);
 
     code = ['function x() {', '/*jshint validthis:heya */', 'hello();', '}'];
     TestRun()
-            .addError(2, "Bad option value.")
-            .test(code);
+        .addError(2, "Bad option value.")
+        .test(code);
 };
 
 exports.indentation = function () {

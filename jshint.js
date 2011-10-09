@@ -2462,7 +2462,10 @@ loop:   for (;;) {
                         nexttoken, '{', nexttoken.value);
 
             noreach = true;
-            a = [statement()];
+            indent += option.indent;
+            // test indentation only if statement is in new line
+            a = [statement(nexttoken.line === token.line)];
+            indent -= option.indent;
             noreach = false;
         }
         funct['(verb)'] = null;
