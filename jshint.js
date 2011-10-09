@@ -152,7 +152,7 @@
 
 /*jshint
  evil: true, nomen: false, onevar: false, regexp: false, strict: true, boss: true,
- undef: true, maxlen: 100
+ undef: true, maxlen: 100, indent:4
 */
 
 /*members "\b", "\t", "\n", "\f", "\r", "!=", "!==", "\"", "%", "(begin)",
@@ -1491,7 +1491,7 @@ klass:                                  do {
                                                     isInRange = true;
                                                 } else {
                                                     if (option.regexdash !== (l === 2 || (l === 3 &&
-                                                        s.charAt(2) === '^')) ) {
+                                                        s.charAt(2) === '^'))) {
                                                         warningAt("Unescaped '{a}'.",
                                                             line, from + l - 1, '-');
                                                     }
@@ -2852,8 +2852,8 @@ loop:   for (;;) {
                     if (c.id !== 'function') {
                         i = c.value.substr(0, 1);
                         if (option.newcap && (i < 'A' || i > 'Z')) {
-                            warning("A constructor name should start with "+
-                                "an uppercase letter.", token);
+                            warning("A constructor name should start with an uppercase letter.",
+                                token);
                         }
                     }
                 }
@@ -3722,8 +3722,8 @@ loop:   for (;;) {
                     } else if ((nexttoken.value === '__proto__' &&
                         !option.proto) || (nexttoken.value === '__iterator__' &&
                         !option.iterator)) {
-                            warning("The '{a}' key may produce unexpected results.",
-                                nexttoken, nexttoken.value);
+                        warning("The '{a}' key may produce unexpected results.",
+                            nexttoken, nexttoken.value);
                     } else {
                         o[nexttoken.value] = true;
                     }
