@@ -1010,10 +1010,10 @@ var JSHINT = (function () {
                 warningAt("Line too long.", line, s.length);
 
             // Check for trailing whitespaces
-            tw = s.search(/\s+$/);
-            if (option.trailing && ~tw && !~s.search(/^\s+$/))
+            tw = /\s+$/.test(s);
+            if (option.trailing && tw && !/^\s+$/.test(s)) {
                 warningAt("Trailing whitespace.", line, tw);
-
+            }
             return true;
         }
 
@@ -2366,10 +2366,6 @@ loop:   for (;;) {
                         warningAt("Missing semicolon.", token.line, token.from +
                             token.value.length);
                     }
-                }
-                if (!option.asi && !(option.lastsemic && nexttoken.id == '}' &&
-                        nexttoken.line == token.line)) {
-
                 }
             } else {
                 adjacent(token, nexttoken);

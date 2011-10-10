@@ -246,13 +246,13 @@ exports.expr = function () {
         "+function () {};"
     ];
 
-    for (var i = 0, exp; exp = exps[i]; i++) {
+    for (var i = 0, exp; exp = exps[i]; i += 1) {
         TestRun()
             .addError(1, 'Expected an assignment or function call and instead saw an expression.')
             .test(exp);
     }
 
-    for (i = 0, exp = null; exp = exps[i]; i++) {
+    for (i = 0, exp = null; exp = exps[i]; i += 1) {
         TestRun().test(exp, { expr: true });
     }
 };
@@ -272,7 +272,7 @@ exports.undef = function () {
 };
 
 /** Option `scripturl` allows the use of javascript-type URLs */
-exports.scripturl = function() {
+exports.scripturl = function () {
     var code = "var foo = { 'count': 12, 'href': 'javascript:' };",
         src = fs.readFileSync(__dirname + '/fixtures/scripturl.js', 'utf8');
 
@@ -405,15 +405,15 @@ exports.supernew = function () {
 
 /** Option `bitwise` disallows the use of bitwise operators. */
 exports.bitwise = function () {
-    var ops = [ '&', '|', '^', '<<' , '>>', '>>>' ];
+    var ops = [ '&', '|', '^', '<<', '>>', '>>>' ];
 
     // By default allow bitwise operators
-    for (var i = 0, op; op = ops[i]; i++) {
+    for (var i = 0, op; op = ops[i]; i += 1) {
         TestRun().test('var c = a ' + op + ' b;');
     }
     TestRun().test('var c = ~a;');
 
-    for (i = 0, op = null; op = ops[i]; i++) {
+    for (i = 0, op = null; op = ops[i]; i += 1) {
         TestRun()
             .addError(1, "Unexpected use of '" + op + "'.")
             .test('var c = a ' + op + ' b;', { bitwise: true });
@@ -492,11 +492,11 @@ exports.immed = function () {
 exports.nomen = function () {
     var names = [ '_hey', 'hey_' ];
 
-    for (var i = 0, name; name = names[i]; i++) {
+    for (var i = 0, name; name = names[i]; i += 1) {
         TestRun().test('var ' + name + ';');
     }
 
-    for (i = 0, name = null; name = names[i]; i++) {
+    for (i = 0, name = null; name = names[i]; i += 1) {
         TestRun()
             .addError(1, "Unexpected dangling '_' in '" + name + "'.")
             .test('var ' + name + ';', { nomen: true });
@@ -543,12 +543,12 @@ exports.onevar = function () {
 exports.plusplus = function () {
     var ops = [ '++', '--' ];
 
-    for (var i = 0, op; op = ops[i]; i++) {
+    for (var i = 0, op; op = ops[i]; i += 1) {
         TestRun().test('var i = j' + op + ';');
         TestRun().test('var i = ' + op + 'j;');
     }
 
-    for (i = 0, op = null; op = ops[i]; i++) {
+    for (i = 0, op = null; op = ops[i]; i += 1) {
         TestRun()
             .addError(1, "Unexpected use of '" + op + "'.")
             .test('var i = j' + op + ';', { plusplus: true });
@@ -645,7 +645,7 @@ exports.regexp = function () {
       , 'var a = /h[^...]/;'
     ];
 
-    for (var i = 0, st; st = code[i]; i++) {
+    for (var i = 0, st; st = code[i]; i += 1) {
         TestRun().test(code);
     }
 
@@ -672,7 +672,7 @@ exports.laxbreak = function () {
     var ops = [ '||', '&&', '*', '/', '%', '+', '-', '>=',
                 '==', '===', '!=', '!==', '>', '<', '<=', 'instanceof' ];
 
-    for (var i = 0, op, code; op = ops[i]; i++) {
+    for (var i = 0, op, code; op = ops[i]; i += 1) {
         code = ['var a = b ', op + ' c;'];
         TestRun()
             .addError(2, "Bad line breaking before '" + op + "'.")
@@ -815,7 +815,7 @@ exports.indentation = function () {
  * Test string relevant options
  *   multistr    allows multiline strings
  */
-exports.strings = function() {
+exports.strings = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/strings.js', 'utf8');
 
     TestRun()
