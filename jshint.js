@@ -2341,13 +2341,11 @@ loop:   for (;;) {
                 warning("Unnecessary \"use strict\".");
             }
             advance();
-            if (!option.asi || token.line === nexttoken.line) {
-                if (nexttoken.id === ';') {
-                    advance(';');
-                } else {
-                    warningAt("Missing semicolon.", token.line, token.from +
-                        token.value.length + 1);
-                }
+            if (token.line === nexttoken.line && nexttoken.id === ';') {
+                advance(';');
+            } else {
+                warningAt("Missing semicolon.", token.line, token.from +
+                    token.value.length + 1);
             }
             strict_mode = true;
             option.newcap = true;

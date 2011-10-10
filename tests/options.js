@@ -203,7 +203,9 @@ exports.asi = function () {
         .addError(25, "Missing semicolon.")
         .test(src);
 
-    TestRun(2).test(src, { asi: true });
+    TestRun(2)
+        .addError(2, "Missing semicolon.") // throw on "use strict", even option asi is used
+        .test(src, { asi: true });
 };
 
 /** Option `lastsemic` allows you to skip the semicolon after last statement in a block,
