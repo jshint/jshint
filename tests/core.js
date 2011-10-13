@@ -22,6 +22,12 @@ exports.checkRhino = function () {
     TestRun().test(src, { rhino: true });
 };
 
+/* JavaScriptCore wrapper must pass JSHint check */
+exports.checkJSC = function () {
+    var src = fs.readFileSync(__dirname + "/../env/jsc.js", "utf8");
+    TestRun().test(src);
+};
+
 /** All test files must pass JSHint check */
 exports.checkTestFiles = function () {
     var files = fs.readdirSync(__dirname + '/../tests/').filter( function (e) {
