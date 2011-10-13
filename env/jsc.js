@@ -1,4 +1,4 @@
-/*jshint boss: true */
+/*jshint boss:true, evil:true */
 
 // usage:
 //   jsc ${env_home}/jsc.js -- ${file} "$(cat ${file})" "{option1:true,option2:false} ${env_home}"
@@ -14,16 +14,24 @@ if (typeof(JSHINT) === 'undefined') {
 }
 
 (function(args){
-    var home  = args[3]
+    var home  = args[3],
         name  = args[0],
         input = args[1],
         opts  = (function(arg){
+            var opts = {};
+            var item;
+
             switch (arg) {
             case undefined:
             case '':
-                return {};
+                return opts;
             default:
-                return eval('(' + arg + ')');
+                arg = arg.split(',');
+                for (var i = 0, ii = arg.length; i < ii; i++) {
+                    item = arg[i].split(':');
+                    opts[item[0]] = eval(item[1]);
+                }
+                return opts;
             }
         })(args[2]);
 
