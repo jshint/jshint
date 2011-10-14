@@ -1,4 +1,5 @@
-/*jshint boss: true */
+/*jshint boss: true, rhino: true */
+/*globals JSHINT*/
 
 load("jshint.js");
 
@@ -26,7 +27,7 @@ load("jshint.js");
                 default:
                     return ov;
                 }
-            })(o[1]);
+            }(o[1]));
         });
     }
 
@@ -36,7 +37,7 @@ load("jshint.js");
             var global = arg.split('=');
             opts.predef[global[0]] = (function (override) {
                 return (override === 'false') ? false : true;
-            })(global[1]);
+            }(global[1]));
         });
     }
 
@@ -48,7 +49,7 @@ load("jshint.js");
     }
 
     if (!JSHINT(input, opts)) {
-        for (var i = 0, err; err = JSHINT.errors[i]; i++) {
+        for (var i = 0, err; err = JSHINT.errors[i]; i += 1) {
             print(err.reason + ' (' + name + ':' + err.line + ':' + err.character + ')');
             print('> ' + (err.evidence || '').replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"));
             print('');
