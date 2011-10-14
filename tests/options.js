@@ -837,7 +837,7 @@ exports.strings = function () {
         .test(src);
 };
 
-exports.scope = function() {
+exports.scope = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/scope.js', 'utf8');
 
     TestRun(1)
