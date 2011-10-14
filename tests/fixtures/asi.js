@@ -1,5 +1,5 @@
-/*jshint undef: true*/
-
+/*jshint undef: true, globalstrict: true*/
+"use strict"
 function foo () {
     if (true) return
     var x = 1
@@ -10,7 +10,7 @@ for (var i = 0; i < 10; i++) {
     var y = 2
     if (i === 1) break
     var z = 3
-    
+
     switch (z) {
         case 3:
             var m = ""
