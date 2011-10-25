@@ -37,3 +37,11 @@ function test2(a, b, c, d) {
   while (a)
     return;
 }
+
+/*fix for indentation on single-line blocks*/
+var name1 = (function () { var x = 2; return 'Anton'; }());
+
+/*unfortunately (as a side effect), this is also allowed*/
+var name2 = (function () { var x = 2;
+                            return 'Anton';
+                        }());
