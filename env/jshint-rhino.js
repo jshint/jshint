@@ -10,10 +10,10 @@ load("jshint.js");
         opts   = { rhino: true },
         retval = 0;
 
-    args.forEach(function(arg){
-        if (arg.indexOf("=") > -1){
+    args.forEach(function (arg) {
+        if (arg.indexOf("=") > -1) {
             //first time it's the options
-            if (!optstr){
+            if (!optstr) {
                 optstr = arg;
             } else if (!predef) {
                 predef = arg;
@@ -40,21 +40,21 @@ load("jshint.js");
                 default:
                     return ov;
                 }
-            })(o[1]);
+            }(o[1]));
         });
     }
-    
+
     if (predef) {
         opts.predef = {};
         predef.split(',').forEach(function (arg) {
             var global = arg.split('=');
             opts.predef[global[0]] = (function (override) {
                 return (override === 'false') ? false : true;
-            })(global[1]);
+            }(global[1]));
         });
     }
 
-    filenames.forEach(function(name){
+    filenames.forEach(function (name) {
 
         var input = readFile(name);
 
@@ -64,7 +64,7 @@ load("jshint.js");
         }
 
         if (!JSHINT(input, opts)) {
-            for (var i = 0, err; err = JSHINT.errors[i]; i++) {
+            for (var i = 0, err; err = JSHINT.errors[i]; i += 1) {
                 print(err.reason + ' (' + name + ':' + err.line + ':' + err.character + ')');
                 print('> ' + (err.evidence || '').replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"));
                 print('');
