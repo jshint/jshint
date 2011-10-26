@@ -198,7 +198,7 @@
  content, couch, create, css, curly, d, data, datalist, dd, debug, decodeURI,
  decodeURIComponent, defaultStatus, defineClass, deserialize, devel, document,
  dojo, dijit, dojox, define, edition, else, emit, encodeURI, encodeURIComponent,
- entityify, eqeqeq, eqnull, errors, es5, escape, eval, event, evidence, evil,
+ entityify, eqeqeq, eqnull, errors, es5, escape, esnext, eval, event, evidence, evil,
  ex, exception, exec, exps, expr, exports, FileReader, first, floor, focus,
  forin, fragment, frames, from, fromCharCode, fud, funcscope, funct, function, functions,
  g, gc, getComputedStyle, getRow, GLOBAL, global, globals, globalstrict,
@@ -266,6 +266,7 @@ var JSHINT = (function () {
             eqeqeq      : true, // if === should be required
             eqnull      : true, // if == null comparisons should be tolerated
             es5         : true, // if ES5 syntax should be allowed
+            esnext      : true, // if es.next specific syntax should be allowed
             evil        : true, // if eval should be allowed
             expr        : true, // if ExpressionStatement should be allowed as Programs
             forin       : true, // if for in statements must filter
@@ -710,6 +711,7 @@ var JSHINT = (function () {
         tab,
         token,
         urls,
+        useESNextSyntax,
         warnings,
 
         wsh = {
@@ -905,6 +907,10 @@ var JSHINT = (function () {
 
         if (option.wsh) {
             combine(predefined, wsh);
+        }
+
+        if (option.esnext) {
+            useESNextSyntax();
         }
 
         if (option.globalstrict && option.strict !== false) {
@@ -2169,6 +2175,9 @@ loop:   for (;;) {
                 warning("'{a}' is a function.", left, left.value);
             }
             if (left) {
+                if (option.esnext && funct[left.value] === 'const') {
+                    warning("Attempting to override '{a}' which is a constant", left, left.value);
+                }
                 if (left.id === '.' || left.id === '[') {
                     if (!left.left || left.left.value === 'arguments') {
                         warning('Bad assignment.', that);
@@ -2508,6 +2517,7 @@ loop:   for (;;) {
             a.push(line);
         }
     }
+
 
     // Build the syntax table by declaring the syntactic elements of the language.
 
@@ -3216,6 +3226,54 @@ loop:   for (;;) {
         };
     }(delim('{')));
 
+// This Function is called when esnext option is set to true
+// it adds the `const` statement to JSHINT
+
+    useESNextSyntax = function () {
+        var conststatement = stmt('const', function (prefix) {
+            var id, name, value;
+
+            this.first = [];
+            for (;;) {
+                nonadjacent(token, nexttoken);
+                id = identifier();
+                if (funct[id] === "const") {
+                    warning("const '" + id + "' has already been declared");
+                }
+                if (funct['(global)'] && predefined[id] === false) {
+                    warning("Redefinition of '{a}'.", token, id);
+                }
+                addlabel(id, 'const');
+                if (prefix) {
+                    break;
+                }
+                name = token;
+                this.first.push(token);
+                if (nexttoken.id === '=') {
+                    nonadjacent(token, nexttoken);
+                    advance('=');
+                    nonadjacent(token, nexttoken);
+                    if (nexttoken.id === 'undefined') {
+                        warning("It is not necessary to initialize " +
+                          "'{a}' to 'undefined'.", token, id);
+                    }
+                    if (peek(0).id === '=' && nexttoken.identifier) {
+                        error("Constant {a} was not declared correctly.",
+                                nexttoken, nexttoken.value);
+                    }
+                    value = expression(0);
+                    name.first = value;
+                }
+                if (nexttoken.id !== ',') {
+                    break;
+                }
+                comma();
+            }
+            return this;
+        });
+        conststatement.exps = true;
+    };
+
     var varstatement = stmt('var', function (prefix) {
         // JavaScript does not have block scope. It only has function scope. So,
         // declaring a variable in a block can have unexpected consequences.
@@ -3230,6 +3288,9 @@ loop:   for (;;) {
         for (;;) {
             nonadjacent(token, nexttoken);
             id = identifier();
+            if (option.esnext && funct[id] === "const") {
+                warning("const '" + id + "' has already been declared");
+            }
             if (funct['(global)'] && predefined[id] === false) {
                 warning("Redefinition of '{a}'.", token, id);
             }
@@ -3270,6 +3331,9 @@ loop:   for (;;) {
 
         }
         var i = identifier();
+        if (option.esnext && funct[i] === "const") {
+            warning("const '" + i + "' has already been declared");
+        }
         adjacent(token, nexttoken);
         addlabel(i, 'unction');
         doFunction(i, true);
@@ -3850,6 +3914,11 @@ loop:   for (;;) {
         lex.init(s);
         prereg = true;
         strict_mode = false;
+
+        // if esnext option is set, we can use esnext syntax
+        if (option.esnext) {
+            useESNextSyntax();
+        }
 
         prevtoken = token = nexttoken = syntax['(begin)'];
         assume();
