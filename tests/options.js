@@ -775,6 +775,7 @@ exports.constants = function () {
     TestRun().test(src);
 
     TestRun()
-        .addError(1, "const 'myConst' has already been declared")
+        .addError(4, "const 'myConst' has already been declared")
+        .addError(5, "Attempting to override 'foo' which is a constant")
         .test(code);
 };
