@@ -794,9 +794,9 @@ exports.validthis = function () {
 };
 
 exports.constants = function () {
-    var src = "/*jshint v8: true */\n" + fs.readFileSync(__dirname + '/fixtures/const.js', 'utf8');
+    var src = "/*jshint esnext: true */\n" + fs.readFileSync(__dirname + '/fixtures/const.js', 'utf8');
 
-    var code = ['/*jshint v8: true */',
+    var code = ['/*jshint esnext: true */',
                 'const myConst = true;',
                 'const foo = 9;',
                 'var myConst = function () { };',
