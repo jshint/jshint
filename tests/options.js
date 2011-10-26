@@ -178,22 +178,34 @@ exports.nonew = function () {
         .test(code, { nonew: true });
 };
 
-/** Option `asi` allows you to use automatic-semicolon insertion */
+// Option `asi` allows you to use automatic-semicolon insertion
 exports.asi = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/asi.js', 'utf8');
 
-    TestRun()
-        .addError(2, "Line breaking error 'return'.")
-        .addError(3, "Expected an identifier and instead saw 'var'.")
-        .addError(3, "Missing semicolon.") // TODO: Why there are two Missing semicolon warnings?
-        .addError(7, "Line breaking error 'continue'.")
-        .addError(7, "Missing semicolon.")
-        .addError(8, "Line breaking error 'break'.")
-        .addError(8, "Missing semicolon.")
+    TestRun(1)
+        .addError(2, "Missing semicolon.")
+        .addError(4, "Line breaking error 'return'.")
+        .addError(4, "Missing semicolon.")
+        .addError(5, "Missing semicolon.")
+        .addError(9, "Line breaking error 'continue'.")
+        .addError(9, "Missing semicolon.")
+        .addError(10, "Missing semicolon.")
+        .addError(11, "Line breaking error 'break'.")
         .addError(11, "Missing semicolon.")
+        .addError(12, "Missing semicolon.")
+        .addError(16, "Missing semicolon.")
+        .addError(17, "Line breaking error 'return'.")
+        .addError(17, "Missing semicolon.")
+        .addError(19, "Line breaking error 'break'.")
+        .addError(19, "Missing semicolon.")
+        .addError(21, "Line breaking error 'break'.")
+        .addError(21, "Missing semicolon.")
+        .addError(25, "Missing semicolon.")
         .test(src);
 
-    TestRun().test(src, { asi: true });
+    TestRun(2)
+        .addError(2, "Missing semicolon.") // throw on "use strict", even option asi is used
+        .test(src, { asi: true });
 };
 
 /** Option `lastsemic` allows you to skip the semicolon after last statement in a block,
@@ -237,13 +249,13 @@ exports.expr = function () {
         "+function () {};"
     ];
 
-    for (var i = 0, exp; exp = exps[i]; i++) {
+    for (var i = 0, exp; exp = exps[i]; i += 1) {
         TestRun()
             .addError(1, 'Expected an assignment or function call and instead saw an expression.')
             .test(exp);
     }
 
-    for (i = 0, exp = null; exp = exps[i]; i++) {
+    for (i = 0, exp = null; exp = exps[i]; i += 1) {
         TestRun().test(exp, { expr: true });
     }
 };
@@ -263,7 +275,7 @@ exports.undef = function () {
 };
 
 /** Option `scripturl` allows the use of javascript-type URLs */
-exports.scripturl = function() {
+exports.scripturl = function () {
     var code = "var foo = { 'count': 12, 'href': 'javascript:' };",
         src = fs.readFileSync(__dirname + '/fixtures/scripturl.js', 'utf8');
 
@@ -396,15 +408,15 @@ exports.supernew = function () {
 
 /** Option `bitwise` disallows the use of bitwise operators. */
 exports.bitwise = function () {
-    var ops = [ '&', '|', '^', '<<' , '>>', '>>>' ];
+    var ops = [ '&', '|', '^', '<<', '>>', '>>>' ];
 
     // By default allow bitwise operators
-    for (var i = 0, op; op = ops[i]; i++) {
+    for (var i = 0, op; op = ops[i]; i += 1) {
         TestRun().test('var c = a ' + op + ' b;');
     }
     TestRun().test('var c = ~a;');
 
-    for (i = 0, op = null; op = ops[i]; i++) {
+    for (i = 0, op = null; op = ops[i]; i += 1) {
         TestRun()
             .addError(1, "Unexpected use of '" + op + "'.")
             .test('var c = a ' + op + ' b;', { bitwise: true });
@@ -483,11 +495,11 @@ exports.immed = function () {
 exports.nomen = function () {
     var names = [ '_hey', 'hey_' ];
 
-    for (var i = 0, name; name = names[i]; i++) {
+    for (var i = 0, name; name = names[i]; i += 1) {
         TestRun().test('var ' + name + ';');
     }
 
-    for (i = 0, name = null; name = names[i]; i++) {
+    for (i = 0, name = null; name = names[i]; i += 1) {
         TestRun()
             .addError(1, "Unexpected dangling '_' in '" + name + "'.")
             .test('var ' + name + ';', { nomen: true });
@@ -524,7 +536,7 @@ exports.passfail = function () {
 exports.onevar = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/onevar.js', 'utf8');
 
-	TestRun().test(src);
+    TestRun().test(src);
     TestRun()
         .addError(10, "Too many var statements.")
         .test(src, { onevar: true });
@@ -534,12 +546,12 @@ exports.onevar = function () {
 exports.plusplus = function () {
     var ops = [ '++', '--' ];
 
-    for (var i = 0, op; op = ops[i]; i++) {
+    for (var i = 0, op; op = ops[i]; i += 1) {
         TestRun().test('var i = j' + op + ';');
         TestRun().test('var i = ' + op + 'j;');
     }
 
-    for (i = 0, op = null; op = ops[i]; i++) {
+    for (i = 0, op = null; op = ops[i]; i += 1) {
         TestRun()
             .addError(1, "Unexpected use of '" + op + "'.")
             .test('var i = j' + op + ';', { plusplus: true });
@@ -636,7 +648,7 @@ exports.regexp = function () {
       , 'var a = /h[^...]/;'
     ];
 
-    for (var i = 0, st; st = code[i]; i++) {
+    for (var i = 0, st; st = code[i]; i += 1) {
         TestRun().test(code);
     }
 
@@ -663,7 +675,7 @@ exports.laxbreak = function () {
     var ops = [ '||', '&&', '*', '/', '%', '+', '-', '>=',
                 '==', '===', '!=', '!==', '>', '<', '<=', 'instanceof' ];
 
-    for (var i = 0, op, code; op = ops[i]; i++) {
+    for (var i = 0, op, code; op = ops[i]; i += 1) {
         code = ['var a = b ', op + ' c;'];
         TestRun()
             .addError(2, "Bad line breaking before '" + op + "'.")
@@ -674,8 +686,8 @@ exports.laxbreak = function () {
 
     code = [ 'var a = b ', '? c : d;' ];
     TestRun()
-            .addError(2, "Bad line breaking before '?'.")
-            .test(code);
+        .addError(2, "Bad line breaking before '?'.")
+        .test(code);
 
     TestRun().test(code, { laxbreak: true });
 };
@@ -685,12 +697,16 @@ exports.white = function () {
 
     TestRun().test(src);
     TestRun()
-            .addError(1, "Unexpected space after 'hello'.")
-            .addError(2, "Unexpected space after 'true'.")
-            .addError(5, "Missing space after 'function'.")
-            .addError(6, "Missing space after 'if'.")
-            .addError(6, "Missing space after ')'.")
-            .test(src, { white: true });
+        .addError(1, "Unexpected space after 'hello'.")
+        .addError(2, "Unexpected space after 'true'.")
+        .addError(5, "Missing space after 'function'.")
+        .addError(6, "Missing space after 'if'.")
+        .addError(6, "Missing space after ')'.")
+        .addError(14, "Unexpected space after 'true'.")
+        .addError(15, "Missing space after ':'.")
+        .addError(18, "Unexpected space after '('.")
+        .addError(18, "Unexpected space after 'ex'.")
+        .test(src, { white: true });
 };
 
 exports.trailing = function () {
@@ -699,40 +715,54 @@ exports.trailing = function () {
     TestRun().test(src);
 
     TestRun()
-            .addError(8, "Trailing whitespace.")
-            .addError(9, "Trailing whitespace.")
-            .test(src, { trailing: true });
+        .addError(8, "Trailing whitespace.")
+        .addError(9, "Trailing whitespace.")
+        .test(src, { trailing: true });
 };
 
 exports.regexdash = function () {
     var code = [
         'var a = /[-ab]/;'
-      , 'var a = /[ab-]/;'
+      , 'var b = /[ab-]/;'
+      , 'var c = /[a-c-e]/;'
+      , 'var d = /[\\s-\\d]/;'
+      , 'var e = /[\\s-]/;'
+      , 'var f = /[-\\d]/;'
+      , 'var g = /[a-]/;'
+      , 'var h = /[-z]/;'
+      , 'var g = /[a-\\w]/;'
+      , 'var h = /[\\d-z]/;'
     ];
 
     // Default behavior
     TestRun()
-            .addError(1, "Unescaped '-'.")
-            .test(code[0]);
-
-    TestRun()
         .addError(1, "Unescaped '-'.")
-        .test(code[1]);
+        .addError(2, "Unescaped '-'.")
+        .addError(3, "Unescaped '-'.")
+        .addError(4, "Unescaped '-'.")
+        .addError(5, "Unescaped '-'.")
+        .addError(6, "Unescaped '-'.")
+        .addError(7, "Unescaped '-'.")
+        .addError(8, "Unescaped '-'.")
+        .addError(9, "Unescaped '-'.")
+        .addError(10, "Unescaped '-'.")
+        .test(code);
 
     // Regex dash is on
     TestRun()
-            .addError(1, "Unescaped '-'.")
-            .test(code[0], { regexdash: true });
-
-    TestRun().test(code[1], { regexdash: true });
+        .addError(3, "Unescaped '-'.")
+        .addError(4, "Unescaped '-'.")
+        .addError(9, "Unescaped '-'.")
+        .addError(10, "Unescaped '-'.")
+        .test(code, { regexdash: true });
 };
 
 exports.onecase = function () {
     var code = "switch (a) { case '1': b(); }";
 
     TestRun()
-            .addError(1, "This 'switch' should be an 'if'.")
-            .test(code);
+        .addError(1, "This 'switch' should be an 'if'.")
+        .test(code);
 
     TestRun().test(code, { onecase: true });
 };
@@ -741,10 +771,10 @@ exports.validthis = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/strict_this.js', 'utf8');
 
     TestRun()
-            .addError(8, "Possible strict violation.")
-            .addError(9, "Possible strict violation.")
-            .addError(11, "Possible strict violation.")
-            .test(src);
+        .addError(8, "Possible strict violation.")
+        .addError(9, "Possible strict violation.")
+        .addError(11, "Possible strict violation.")
+        .test(src);
 
     src = fs.readFileSync(__dirname + '/fixtures/strict_this2.js', 'utf8');
     TestRun().test(src);
@@ -753,8 +783,8 @@ exports.validthis = function () {
 
     var code = ['/*jshint validthis:true */', 'hello();'];
     TestRun()
-            .addError(1, "Option 'validthis' can't be used in a global scope.")
-            .test(code);
+        .addError(1, "Option 'validthis' can't be used in a global scope.")
+        .test(code);
 
     code = ['function x() {', '/*jshint validthis:heya */', 'hello();', '}'];
 
@@ -778,4 +808,69 @@ exports.constants = function () {
         .addError(4, "const 'myConst' has already been declared")
         .addError(5, "Attempting to override 'foo' which is a constant")
         .test(code);
+};
+
+exports.indentation = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/indent.js', 'utf8');
+
+    TestRun()
+        .addError(5, "Mixed spaces and tabs.")
+        .addError(6, "Mixed spaces and tabs.")
+        .test(src);
+
+    TestRun()
+        .addError(5, "Mixed spaces and tabs.")
+        .addError(6, "Mixed spaces and tabs.")
+        .test(src, { indent: 4, white: true });
+
+    TestRun()
+        .addError(5, "Mixed spaces and tabs.")
+        .addError(5, "Expected 'var' to have an indentation at 5 instead at 7.")
+        .addError(6, "Mixed spaces and tabs.")
+        .addError(6, "Expected 'var' to have an indentation at 5 instead at 7.")
+        .addError(7, "Expected '}' to have an indentation at 3 instead at 5.")
+        .test(src, { indent: 2, white: true });
+};
+
+/*
+ * Test string relevant options
+ *   multistr    allows multiline strings
+ */
+exports.strings = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/strings.js', 'utf8');
+
+    TestRun()
+        .addError(9, "Unclosed string.")
+        .addError(10, "Unclosed string.")
+        .addError(15, "Unclosed string.")
+        .test(src, { multistr: true });
+
+    TestRun()
+        .addError(3, "Bad escapement of EOL. Use option multistr if needed.")
+        .addError(4, "Bad escapement of EOL. Use option multistr if needed.")
+        .addError(9, "Unclosed string.")
+        .addError(10, "Unclosed string.")
+        .addError(14, "Bad escapement of EOL. Use option multistr if needed.")
+        .addError(15, "Unclosed string.")
+        .test(src);
+};
+
+exports.scope = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/scope.js', 'utf8');
+
+    TestRun(1)
+        .addError(11, "'j' used out of scope.") // 3x
+        .addError(12, "'x' used out of scope.")
+        .addError(20, "'aa' used out of scope.")
+        .addError(27, "'bb' used out of scope.")
+        .addError(32, "'bb' is not defined.")
+        .addError(36, "'bb' is not defined.")
+        .addError(37, "'cc' is not defined.")
+        .addError(42, "'bb' is not defined.")
+        .test(src);
+
+    TestRun(2)
+        .addError(37, "'cc' is not defined.")
+        .addError(42, "'bb' is not defined.")
+        .test(src, { funcscope: true });
 };

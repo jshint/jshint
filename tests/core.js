@@ -7,10 +7,28 @@ var JSHINT  = require('../jshint.js').JSHINT,
 
 /** JSHint must pass its own check */
 exports.checkJSHint = function () {
-    var res = JSHINT(fs.readFileSync(__dirname + "/../jshint.js", "utf8"));
+    var res = JSHINT(fs.readFileSync(__dirname + "/../jshint.js", "utf8"), {
+            bitwise: true,
+            eqeqeqe: true,
+            forin: true,
+            immed: true,
+            latedef: true,
+            newcap: true,
+            noarg: true,
+            noempty: true,
+            nonew: true,
+            plusplus: true,
+            regexp: true,
+            undef: true,
+            strict: true,
+            trailing: true,
+            white: true
+        });
 
-    if (!res)
+    if (!res) {
+        console.log("file: jshint.js");
         console.log(JSHINT.errors);
+    }
 
     assert.ok(res);
     assert.isUndefined(JSHINT.data().implieds);
@@ -19,20 +37,62 @@ exports.checkJSHint = function () {
 /** Rhino wrapper must pass JSHint check */
 exports.checkRhino = function () {
     var src = fs.readFileSync(__dirname + "/../env/jshint-rhino.js", "utf8");
-    TestRun().test(src, { rhino: true });
+    TestRun("jshint-rhino").test(src, {
+            bitwise: true,
+            eqeqeqe: true,
+            forin: true,
+            immed: true,
+            latedef: true,
+            newcap: true,
+            noarg: true,
+            noempty: true,
+            nonew: true,
+            plusplus: true,
+            regexp: true,
+            undef: true,
+            strict: false,
+            trailing: true,
+            white: true
+        });
+};
+
+/* JavaScriptCore wrapper must pass JSHint check */
+exports.checkJSC = function () {
+    var src = fs.readFileSync(__dirname + "/../env/jsc.js", "utf8");
+    TestRun().test(src);
 };
 
 /** All test files must pass JSHint check */
 exports.checkTestFiles = function () {
-    var files = [ 'core.js', 'envs.js', 'options.js' ];
+    var files = fs.readdirSync(__dirname + '/../tests/').filter(function (e) {
+        return e.length > 2 && e.substr(e.length - 3, 3) === '.js';
+    });
 
-    for (var i = 0, name; name = files[i]; i++) {
+    for (var i = 0, name; name = files[i]; i += 1) {
         var src = fs.readFileSync(__dirname + '/../tests/' + name, 'utf8'),
-            res = JSHINT(src);
+            res = JSHINT(src, {
+                bitwise: true,
+                eqeqeqe: true,
+                forin: true,
+                immed: true,
+                latedef: true,
+                newcap: false,
+                noarg: true,
+                noempty: true,
+                nonew: true,
+                plusplus: true,
+                regexp: true,
+                undef: true,
+                strict: false,
+                trailing: true,
+                white: true
+            });
 
-        if (!res)
+        if (!res) {
+            console.log("file: " + name);
             console.log(JSHINT.errors);
-
+        }
+        
         assert.ok(res);
         assert.isUndefined(JSHINT.data().implieds);
     }
@@ -53,10 +113,10 @@ exports.testCustomGlobals = function () {
     assert.eql(report.globals.length, 2);
 
     var dict = {};
-    for (var i = 0, g; g = report.globals[i]; i++)
+    for (var i = 0, g; g = report.globals[i]; i += 1)
         dict[g] = true;
 
-    for (i = 0, g = null; g = custom[i]; i++)
+    for (i = 0, g = null; g = custom[i]; i += 1)
         assert.ok(g in dict);
 };
 
@@ -138,7 +198,14 @@ exports.functionScopedOptions = function () {
 };
 
 /** JSHint should not only read jshint, but also jslint options */
-exports.jslintOptions = function() {
+exports.jslintOptions = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/jslintOptions.js', 'utf8');
     TestRun().test(src);
+};
+
+exports.caseExpressions = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/caseExpressions.js', 'utf8');
+    TestRun()
+        .addError(2, "This 'switch' should be an 'if'.")
+        .test(src);
 };

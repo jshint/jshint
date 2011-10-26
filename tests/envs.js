@@ -22,10 +22,10 @@ assert.globalsKnown = function (globals, options) {
     assert.eql(report.globals.length, globals.length);
 
     var dict = {};
-    for (var i = 0, g; g = report.globals[i]; i++)
+    for (var i = 0, g; g = report.globals[i]; i += 1)
         globals[g] = true;
 
-    for (i = 0, g = null; g = globals[i]; i++)
+    for (i = 0, g = null; g = globals[i]; i += 1)
         assert.ok(g in globals);
 };
 
@@ -37,7 +37,7 @@ assert.globalsImplied = function (globals, options) {
     assert.isUndefined(report.globals, 0);
 
     var implieds = [];
-    for (var i = 0, warn; warn = report.implieds[i]; i++)
+    for (var i = 0, warn; warn = report.implieds[i]; i += 1)
         implieds.push(warn.name);
 
     assert.eql(implieds.length, globals.length);
@@ -63,14 +63,14 @@ exports.node = function () {
 
     // Make sure that the `node` option doesn't conflict with `nomen`
     var asGlobals = [
-      'console.log(__dirname);',
-      'console.log(__filename);'
+        'console.log(__dirname);',
+        'console.log(__filename);'
     ];
 
     var asProps = [
-      'console.log(a.__dirname);',
-      'console.log(a.__filename);',
-      'console.log(__hello);'
+        'console.log(a.__dirname);',
+        'console.log(a.__filename);',
+        'console.log(__hello);'
     ];
 
     TestRun().test(asGlobals, { node: true, nomen: true });
@@ -425,31 +425,31 @@ exports.mootools = function () {
           , 'typeOf'
           , 'URI'
           , 'Window'
-    ];
+        ];
 
     assert.globalsImplied(globals);
     assert.globalsKnown(globals, { mootools: true });
 };
 
 exports.dojo = function () {
-  var globals = [
-      'dojo'
-    , 'dijit'
-    , 'dojox'
-    , 'define'
-    , 'require'
-  ];
+    var globals = [
+        'dojo'
+      , 'dijit'
+      , 'dojox'
+      , 'define'
+      , 'require'
+    ];
 
-  assert.globalsImplied(globals);
-  assert.globalsKnown(globals, { dojo: true });
+    assert.globalsImplied(globals);
+    assert.globalsKnown(globals, { dojo: true });
 };
 
 exports.nonstandard = function () {
-  var globals = [
-      'escape'
-    , 'unescape'
-  ];
+    var globals = [
+        'escape'
+      , 'unescape'
+    ];
 
-  assert.globalsImplied(globals);
-  assert.globalsKnown(globals, { nonstandard: true });
+    assert.globalsImplied(globals);
+    assert.globalsKnown(globals, { nonstandard: true });
 };
