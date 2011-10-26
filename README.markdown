@@ -1,61 +1,44 @@
-JSHint, The (Gentler) JavaScript Code Quality Tool
+JSHint, A Static Code Analysis Tool for JavaScript
 ==================================================
 
-JSHint is a fork of Douglas Crockford's [JSLint](http://jslint.com/) that does
-not tyrannize your code. It is designed to detect errors that actually break your
-code while skipping things that, according to Crockford, “are known to
-contribute mistakes in projects”. In other words, JSHint is a fork of JSLint
-for the real world.
+JSHint is a community-driven tool to detect errors and potential problems in
+JavaScript code and to enforce your team's coding conventions.
 
-For example, JSLint does not tolerate the following constructions:
+**IMPORTANT**:
 
-    if (cond) statement();
+ * This README is for people who are thinking about contributing to JSHint. For general usage
+   please refer to [our website](http://jshint.com/).
+ * If you want to report a bug about the website, please go to the
+   [jshint/site](https://github.com/jshint/site/) repository.
+ * If you want to report a bug or contribute to our NPM package, please go to the
+   [jshint/node-jshint](https://github.com/jshint/node-jshint/) repository.
 
-It expects all blocks to be enclosed in braces ({}):
+Reporting a bug
+---------------
 
-    if (cond) {
-      statement();
-    }
+To report a bug simply create a [new GitHub Issue](https://github.com/jshint/jshint/issues/new) and
+describe your problem or suggestion. We welcome all kind of feedback regarding JSHint including but
+not limited to:
 
-JSHint removes that requirement (but it is still available as an option).
+ * When JSHint doesn't work as expected
+ * When JSHint complains about valid JavaScript code that works in all browsers
+ * When you simply want a new option or feature
 
+Please, before reporting a bug look around to see if there are any open or closed tickets that
+cover your issue. And remember the wisdom: pull request > bug report > tweet.
 
-Community
----------
+Submitting patches
+------------------
 
-The most important part is that JSHint is developed and supported by
-the JavaScript developers community and not by one very opinionated person.
+The best way to make sure your issue is addressed is to submit a patch. GitHub provides a very
+nice interface--pull requests--for that but we accept patches through all mediums: email, issue
+comment, tweet with a link to a snippet, etc.
 
-If you use JSLint and think that it is too strict, use
-[Issues](https://github.com/jshint/jshint/issues) to describe most annoying
-JSLint gripes you encounter.
+Before submitting a patch make sure that you comply to our style. We don't have specific style
+guide so just look around the code you are changing.
 
-
-Development
------------
-
-JSHint was forked from the JSLint, edition 2010-12-16.
-The current stable edition is [2011-02-19](http://jshint.com/jshint.js).
-
-
-Environments
-------------
-
-JSHint can be used as a Node module out of the box:
-
-    var JSHINT = require("jshint.js").JSHINT;
-
-If you use Rhino, we have a special wrapper script for that:
-
-    java -jar /path/to/js.jar env/rhino.js myscript.js
-
-Also included is a Windows Scripting Host wrapper:
-
-    cscript env/wsh.js myscript.js
-
-And if you're on OS X, use Apple's built-in JavaScriptCore:
-
-	env/jsc.sh myscript.js
+Also, make sure that you write tests for new features and make sure that all tests pass before
+submitting a patch. Patches that break the build will be rejected.
 
 Tests
 -----
@@ -68,3 +51,8 @@ expresso. You can install the latter with npm:
 After that, running tests is as easy as:
 
     expresso tests/*.js
+
+Thank you!
+----------
+
+We really appreciate all kind of feedback and contributions. Thanks for using and supporing JSHint!
