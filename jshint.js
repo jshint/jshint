@@ -3252,6 +3252,12 @@ loop:   for (;;) {
                 }
                 name = token;
                 this.first.push(token);
+
+                if (nexttoken.id !== "=") {
+                    warning("const " +
+                      "'{a}' is initialized to 'undefined'.", token, id);
+                }
+
                 if (nexttoken.id === '=') {
                     nonadjacent(token, nexttoken);
                     advance('=');
@@ -3267,6 +3273,7 @@ loop:   for (;;) {
                     value = expression(0);
                     name.first = value;
                 }
+
                 if (nexttoken.id !== ',') {
                     break;
                 }

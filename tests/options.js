@@ -869,7 +869,9 @@ exports.constants = function () {
                 'var myConst = function () { };',
                 'foo = "hello world";'];
 
-    TestRun().test(src);
+    TestRun()
+        .addError(23, "const 'immutable4' is initialized to 'undefined'.")
+        .test(src);
 
     TestRun()
         .addError(4, "const 'myConst' has already been declared")
