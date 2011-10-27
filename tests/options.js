@@ -787,8 +787,26 @@ exports.validthis = function () {
         .test(code);
 
     code = ['function x() {', '/*jshint validthis:heya */', 'hello();', '}'];
+
     TestRun()
-        .addError(2, "Bad option value.")
+            .addError(2, "Bad option value.")
+            .test(code);
+};
+
+exports.constants = function () {
+    var src = "/*jshint esnext: true */\n" + fs.readFileSync(__dirname + '/fixtures/const.js', 'utf8');
+
+    var code = ['/*jshint esnext: true */',
+                'const myConst = true;',
+                'const foo = 9;',
+                'var myConst = function () { };',
+                'foo = "hello world";'];
+
+    TestRun().test(src);
+
+    TestRun()
+        .addError(4, "const 'myConst' has already been declared")
+        .addError(5, "Attempting to override 'foo' which is a constant")
         .test(code);
 };
 
