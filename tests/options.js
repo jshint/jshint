@@ -4,7 +4,7 @@
  * of global variables.
  */
 
-/*jshint boss: true, laxbreak: true, node: true */
+/*jshint boss: true, laxbreak: true, node: true, maxlen:100 */
 
 var JSHINT  = require('../jshint.js').JSHINT,
     fs      = require('fs'),
@@ -308,13 +308,15 @@ exports.scripturl = function () {
  */
 exports.forin = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/forin.js', 'utf8');
+    var msg = 'The body of a for in should be wrapped in an if statement to filter unwanted ' +
+              'properties from the prototype.';
 
     // Make sure there are no other errors
     TestRun().test(src);
 
     // Make sure it fails when forin is true
     TestRun()
-        .addError(1, 'The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.')
+        .addError(1, msg)
         .test(src, { forin: true });
 };
 
@@ -333,13 +335,15 @@ exports.loopfunc = function () {
     TestRun()
         .addError(2, "Don't make functions within a loop.")
         .addError(6, "Don't make functions within a loop.")
-        .addError(10, "Function declarations should not be placed in blocks. Use a function expression or move the statement to the top of the outer function.")
+        .addError(10, "Function declarations should not be placed in blocks. Use a function " +
+                      "expression or move the statement to the top of the outer function.")
         .test(src);
 
     // When loopfunc is true, only function declaration should fail.
     // Expressions are okay.
     TestRun()
-        .addError(10, "Function declarations should not be placed in blocks. Use a function expression or move the statement to the top of the outer function.")
+        .addError(10, "Function declarations should not be placed in blocks. Use a function " +
+                      "expression or move the statement to the top of the outer function.")
         .test(src, { loopfunc: true });
 };
 
@@ -860,21 +864,22 @@ exports.scope = function () {
 /*
  * Tests the `esnext` option
  */
-exports.constants = function () {
-    var src = "/*jshint esnext: true */\n" + fs.readFileSync(__dirname + '/fixtures/const.js', 'utf8');
+exports.esnext = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/const.js', 'utf8');
 
-    var code = ['/*jshint esnext: true */',
-                'const myConst = true;',
-                'const foo = 9;',
-                'var myConst = function () { };',
-                'foo = "hello world";'];
-
-    TestRun()
-        .addError(23, "const 'immutable4' is initialized to 'undefined'.")
-        .test(src);
+    var code = [
+        'const myConst = true;',
+        'const foo = 9;',
+        'var myConst = function () { };',
+        'foo = "hello world";'
+    ];
 
     TestRun()
-        .addError(4, "const 'myConst' has already been declared")
-        .addError(5, "Attempting to override 'foo' which is a constant")
-        .test(code);
+        .addError(21, "const 'immutable4' is initialized to 'undefined'.")
+        .test(src, { esnext: true });
+
+    TestRun()
+        .addError(3, "const 'myConst' has already been declared")
+        .addError(4, "Attempting to override 'foo' which is a constant")
+        .test(code, { esnext: true });
 };
