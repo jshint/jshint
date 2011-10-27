@@ -453,6 +453,10 @@ exports.devel = function () {
     TestRun()
         .addError(2, "'console' is not defined.")
         .addError(3, "'alert' is not defined.")
+        .addError(4, "'confirm' is not defined.")
+        .addError(5, "'prompt' is not defined.")
+        .addError(6, "'Debug' is not defined.")
+        .addError(7, "'opera' is not defined.")
         .test(src, { devel: false });
 };
 
