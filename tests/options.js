@@ -439,6 +439,27 @@ exports.debug = function () {
     TestRun().test(code, { debug: true });
 };
 
+/** This option defines globals that are usually used for logging poor-man's debugging: console, alert, etc.
+It is usually a good idea to not to ship them in production because,
+for example, console.log breaks in legacy versions of Internet Explorer.. */
+// NOTE: `devel` depends on `undef: true`
+exports.devel = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/devel.js', 'utf8');
+
+    // passing
+    TestRun().test(src, { devel: true });
+
+    // failing
+    TestRun()
+        .addError(2, "'console' is not defined.")
+        .addError(3, "'alert' is not defined.")
+        .addError(4, "'confirm' is not defined.")
+        .addError(5, "'prompt' is not defined.")
+        .addError(6, "'Debug' is not defined.")
+        .addError(7, "'opera' is not defined.")
+        .test(src, { devel: false });
+};
+
 /** Option `eqeqeq` requires you to use === all the time. */
 exports.eqeqeq = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/eqeqeq.js', 'utf8');
