@@ -856,3 +856,25 @@ exports.scope = function () {
         .addError(42, "'bb' is not defined.")
         .test(src, { funcscope: true });
 };
+
+/*
+ * Tests the `esnext` option
+ */
+exports.constants = function () {
+    var src = "/*jshint esnext: true */\n" + fs.readFileSync(__dirname + '/fixtures/const.js', 'utf8');
+
+    var code = ['/*jshint esnext: true */',
+                'const myConst = true;',
+                'const foo = 9;',
+                'var myConst = function () { };',
+                'foo = "hello world";'];
+
+    TestRun()
+        .addError(23, "const 'immutable4' is initialized to 'undefined'.")
+        .test(src);
+
+    TestRun()
+        .addError(4, "const 'myConst' has already been declared")
+        .addError(5, "Attempting to override 'foo' which is a constant")
+        .test(code);
+};
