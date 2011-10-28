@@ -1967,7 +1967,7 @@ loop:   for (;;) {
             right = right || nexttoken;
             if (left.line === right.line && left.character === right.from) {
                 warning("Missing space after '{a}'.",
-                        nexttoken, left.value);
+                        left, left.value);
             }
         }
     }
@@ -1982,7 +1982,7 @@ loop:   for (;;) {
             right = right || nexttoken;
             if (left.character === right.from) {
                 warning("Missing space after '{a}'.",
-                        nexttoken, left.value);
+                        left, left.value);
             }
         }
     }
