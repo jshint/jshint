@@ -604,6 +604,7 @@ exports.strict = function () {
     var code  = "(function () { return; }());";
     var code1 = '(function () { "use strict"; return; }());';
     var src = fs.readFileSync(__dirname + '/fixtures/strict_violations.js', 'utf8');
+    var src2 = fs.readFileSync(__dirname + '/fixtures/strict_incorrect.js', 'utf8');
 
     TestRun().test(code);
     TestRun().test(code1);
@@ -620,6 +621,13 @@ exports.strict = function () {
         .addError(7, 'Strict violation.')
         .addError(8, 'Strict violation.')
         .test(src, { strict: true });
+
+    TestRun()
+        .addError(4, 'Expected an assignment or function call and instead saw an expression.')
+        .addError(9, 'Missing semicolon.')
+        .addError(28, 'Expected an assignment or function call and instead saw an expression.')
+        .addError(53, 'Expected an assignment or function call and instead saw an expression.')
+        .test(src2, { strict: false });
 };
 
 /** Option `globalstrict` allows you to use global "use strict"; */
