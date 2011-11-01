@@ -2373,8 +2373,7 @@ loop:   for (;;) {
                     // Otherwise, complain about missing semicolon.
                     if (!option.lastsemic || nexttoken.id != '}' ||
                             nexttoken.line != token.line) {
-                        warningAt("Missing semicolon.", token.line, token.from +
-                            token.value.length);
+                        warningAt("Missing semicolon.", token.line, token.character);
                     }
                 }
             } else {
@@ -2401,8 +2400,7 @@ loop:   for (;;) {
             if (token.line === nexttoken.line && nexttoken.id === ';') {
                 advance(';');
             } else {
-                warningAt("Missing semicolon.", token.line, token.from +
-                    token.value.length + 1);
+                warningAt("Missing semicolon.", token.line, token.character);
             }
             strict_mode = true;
             option.newcap = true;
