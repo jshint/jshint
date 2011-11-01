@@ -201,6 +201,12 @@ exports.testMissingSpaces = function () {
         .addError(5, "Missing space after '1'.", { character: 11 })
         .addError(7, "Missing space after '2'.", { character: 10 })
         .addError(7, "Missing space after '+'.", { character: 11 })
+        .addError(8, "Missing space after '/'.", { character: 14 })
+        .addError(8, "Missing space after '+'.", { character: 15 })
+        .addError(8, "Missing space after 'uid'.", { character: 20 })
+        .addError(8, "Missing space after '+'.", { character: 21 })
+        .addError(8, "Missing space after '/likes?access_token='.", { character: 43 })
+        .addError(8, "Missing space after '+'.", { character: 44 })
         .test(src, { white: true });
 };
 
