@@ -3,7 +3,7 @@
  * Helper for JSHint-tests.
  * Export itself as function in setup.testhelper to
  * prevent expresso to use it as test...
- * 
+ *
  * Use it with method chaining, so you get something like
  *
  *      var TestRun = require("./testhelper").setup.testRun;
@@ -37,10 +37,11 @@ exports.setup.testRun = function (name){
     var initCounter = 0, runCounter = 0, seq = 0, checked = [], definedErrors = [];
 
     var helperObj = {
-        addError: function(line, message){
+        addError: function(line, message, extras){
             definedErrors.push({
                 line: line,
-                message: message
+                message: message,
+                extras: extras
             });
 
             return helperObj;
@@ -59,8 +60,21 @@ exports.setup.testRun = function (name){
             // filter all thrown errors
             var undefinedErrors = errors.filter( function(er) {
                 return !definedErrors.some( function(def) {
-                    return def.line === er.line &&
+                    var result = def.line === er.line &&
                         def.message === er.reason;
+                    if (def.extras) {
+                        for (var extra in def.extras) {
+                            if (def.extras.hasOwnProperty(extra) &&
+                                    er.hasOwnProperty(extra)) {
+                                result = (def.extras[extra] === er[extra]);
+                                if (!result) {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    return result;
                 } );
             } );
 
@@ -107,7 +121,7 @@ exports.setup.testRun = function (name){
 
             assert.ok(
                 undefinedErrors.length === 0 && unthrownErrors.length === 0 && wrongLineNumbers.length === 0,
-                
+
                 (name == null ? "" : "\n      TestRun: [bold]{" + name + "}") +
                 unthrownErrors.map( function(el, idx) {
                     return (idx === 0 ? "\n      [yellow]{Errors defined, but not thrown by JSHINT}\n" : "") +
