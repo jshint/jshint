@@ -62,18 +62,22 @@ exports.setup.testRun = function (name){
                 return !definedErrors.some( function(def) {
                     var result = def.line === er.line &&
                         def.message === er.reason;
+
+                    if (!result) {
+                      return result;
+                    }
+
                     if (def.extras) {
                         for (var extra in def.extras) {
                             if (def.extras.hasOwnProperty(extra) &&
                                     er.hasOwnProperty(extra)) {
                                 result = (def.extras[extra] === er[extra]);
                                 if (!result) {
-                                    break;
+                                    return result;
                                 }
                             }
                         }
                     }
-
                     return result;
                 } );
             } );
