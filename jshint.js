@@ -3797,7 +3797,7 @@ loop:   for (;;) {
 
             if (nexttoken.id !== ';' && !nexttoken.reach) {
                 nonadjacent(token, nexttoken);
-                this.first = expression(20);
+                this.first = expression(0);
             }
         } else if (!option.asi) {
             nolinebreak(this); // always warn (Line breaking error)
