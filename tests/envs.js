@@ -43,7 +43,12 @@ assert.globalsImplied = function (globals, options) {
     assert.eql(implieds.length, globals.length);
 };
 
-/** Option `node` predefines Node.js globals */
+/*
+ * Option `node` predefines Node.js (v 0.5.9) globals
+ *
+ * More info:
+ *  + http://nodejs.org/docs/v0.5.9/api/globals.html
+ */
 exports.node = function () {
     var globals = [
             "__filename"
@@ -56,6 +61,10 @@ exports.node = function () {
           , "require"
           , "exports"
           , "console"
+          , "setTimeout"
+          , "clearTimeout"
+          , "setInterval"
+          , "clearInterval"
         ];
 
     assert.globalsImplied(globals);
@@ -173,7 +182,7 @@ exports.devel = function () {
     assert.globalsKnown(globals, { devel: true });
 };
 
-/**
+/*
  * Option `browser` predefines globals usually found in browser environments.
  * In addition to stuff like window, setInterval,.. it also supports some
  * more or less stable HTML5 variables like FileReader, localStorage,..
@@ -452,4 +461,43 @@ exports.nonstandard = function () {
 
     assert.globalsImplied(globals);
     assert.globalsKnown(globals, { nonstandard: true });
+};
+
+/*
+ * By default JSHint supports all globals provided by the ECMAScript 5.1 specification.
+ *
+ * More info:
+ *  + http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf
+ */
+exports.standard = function () {
+    var globals = [
+        'Array'
+      , 'Boolean'
+      , 'Date'
+      , 'decodeURI'
+      , 'decodeURIComponent'
+      , 'encodeURI'
+      , 'encodeURIComponent'
+      , 'Error'
+      , 'EvalError'
+      , 'Function'
+      , 'hasOwnProperty'
+      , 'isFinite'
+      , 'isNaN'
+      , 'JSON'
+      , 'Math'
+      , 'Number'
+      , 'Object'
+      , 'parseInt'
+      , 'parseFloat'
+      , 'RangeError'
+      , 'ReferenceError'
+      , 'RegExp'
+      , 'String'
+      , 'SyntaxError'
+      , 'TypeError'
+      , 'URIError'
+    ];
+
+    assert.globalsKnown(globals); // You don't need any option to recognize standard globals
 };
