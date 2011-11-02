@@ -3993,6 +3993,9 @@ loop:   for (;;) {
         prevtoken = token = nexttoken = syntax['(begin)'];
         assume();
 
+        // combine the passed globals after we've assumed all our options
+        combine(predefined, g || {});
+
         try {
             advance();
             switch (nexttoken.id) {
