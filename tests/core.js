@@ -230,3 +230,11 @@ exports.caseExpressions = function () {
         .addError(2, "This 'switch' should be an 'if'.")
         .test(src);
 };
+
+exports.returnStatement = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/return.js', 'utf8');
+
+    TestRun()
+        .addError(38, "Line breaking error 'return'.")
+        .test(src, { maxerr: 1 });
+};
