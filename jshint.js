@@ -191,9 +191,9 @@
  ScriptEngineMajorVersion, ScriptEngineMinorVersion, Scriptaculous, Scroller,
  Slick, Slider, Selector, SharedWorker, String, Style, SyntaxError, Sortable, Sortables,
  SortableObserver, Sound, Spinner, System, Swiff, Text, TextArea, Template,
- Timer, Tips, Type, TypeError, Toggle, Try, unescape, URI, URIError, URL, VBArray, WSH,
- WScript, XDomainRequest, Web, Window, XMLDOM, XMLHttpRequest, XPathEvaluator, XPathException,
- XPathExpression, XPathNamespace, XPathNSResolver, XPathResult, "\\", a,
+ Timer, Tips, Type, TypeError, Toggle, Try, "use strict", unescape, URI, URIError, URL,
+ VBArray, WSH, WScript, XDomainRequest, Web, Window, XMLDOM, XMLHttpRequest, XPathEvaluator,
+ XPathException, XPathExpression, XPathNamespace, XPathNSResolver, XPathResult, "\\", a,
  addEventListener, address, alert, apply, applicationCache, arguments, arity,
  asi, b, bitwise, block, blur, boolOptions, boss, browser, c, call, callee,
  caller, cases, charAt, charCodeAt, character, clearInterval, clearTimeout,
@@ -709,7 +709,7 @@ var JSHINT = (function () {
             SQRT2               : true
         },
 
-        strict_mode,
+        directive,
         syntax = {},
         tab,
         token,
@@ -1966,8 +1966,9 @@ loop:   for (;;) {
             left = left || token;
             right = right || nexttoken;
             if (left.line === right.line && left.character === right.from) {
+                left.from += (left.character - left.from);
                 warning("Missing space after '{a}'.",
-                        nexttoken, left.value);
+                        left, left.value);
             }
         }
     }
@@ -1981,8 +1982,9 @@ loop:   for (;;) {
             left = left || token;
             right = right || nexttoken;
             if (left.character === right.from) {
+                left.from += (left.character - left.from);
                 warning("Missing space after '{a}'.",
-                        nexttoken, left.value);
+                        left, left.value);
             }
         }
     }
@@ -2391,27 +2393,6 @@ loop:   for (;;) {
     }
 
 
-    function use_strict() {
-        if (nexttoken.value === 'use strict') {
-            if (strict_mode) {
-                warning("Unnecessary \"use strict\".");
-            }
-            advance();
-            if (token.line === nexttoken.line && nexttoken.id === ';') {
-                advance(';');
-            } else {
-                warningAt("Missing semicolon.", token.line, token.character);
-            }
-            strict_mode = true;
-            option.newcap = true;
-            option.undef = true;
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-
     function statements(startLine) {
         var a = [], f, p;
 
@@ -2428,20 +2409,81 @@ loop:   for (;;) {
 
 
     /*
+     * read all directives
+     * recognizes a simple form of asi, but always
+     * warns, if it is used
+     */
+    function directives() {
+        var i, p, pn;
+
+        for (;;) {
+            if (nexttoken.id === "(string)") {
+                p = peek(0);
+                if (p.id === "(endline)") {
+                    i = 1;
+                    do {
+                        pn = peek(i);
+                        i = i + 1;
+                    } while (pn.id === "(endline)");
+
+                    if (pn.id !== ";") {
+                        if (pn.id !== "(string)" && pn.id !== "(number)" &&
+                            pn.id !== "(regexp)" && pn.identifier !== true &&
+                            pn.id !== "}") {
+                            break;
+                        }
+                        warning("Missing semicolon.", nexttoken);
+                    } else {
+                        p = pn;
+                    }
+                } else if (p.id === "}") {
+                    // directive with no other statements, warn about missing semicolon
+                    warning("Missing semicolon.", p);
+                } else if (p.id !== ";") {
+                    break;
+                }
+
+                indentation();
+                advance();
+                if (directive[token.value]) {
+                    warning("Unnecessary directive \"{a}\".", token, token.value);
+                }
+
+                if (token.value === "use strict") {
+                    option.newcap = true;
+                    option.undef = true;
+                }
+
+                // there's no directive negation, so always set to true
+                directive[token.value] = true;
+
+                if (p.id === ";") {
+                    advance(";");
+                }
+                continue;
+            }
+            break;
+        }
+    }
+
+
+    /*
      * Parses a single block. A block is a sequence of statements wrapped in
      * braces.
      *
      * ordinary - true for everything but function bodies and try blocks.
      * stmt     - true if block can be a single statement (e.g. in if/for/while).
+     * isfunc   - true if block is a function body
      */
-    function block(ordinary, stmt) {
+    function block(ordinary, stmt, isfunc) {
         var a,
             b = inblock,
             old_indent = indent,
-            m = strict_mode,
+            m,
             s = scope,
             t,
-            line;
+            line,
+            d;
 
         inblock = ordinary;
         if (!ordinary || !option.funcscope) scope = Object.create(scope);
@@ -2451,21 +2493,40 @@ loop:   for (;;) {
         if (nexttoken.id === '{') {
             advance('{');
             line = token.line;
-            if (nexttoken.id !== '}' || line !== nexttoken.line) {
+            if (nexttoken.id !== '}') {
                 indent += option.indent;
                 while (!ordinary && nexttoken.from > indent) {
                     indent += option.indent;
                 }
-                if (!ordinary && !use_strict() && !m && option.strict &&
-                        funct['(context)']['(global)']) {
-                    warning("Missing \"use strict\" statement.");
+
+                if (isfunc) {
+                    m = {};
+                    for (d in directive) {
+                        if (is_own(directive, d)) {
+                            m[d] = directive[d];
+                        }
+                    }
+                    directives();
+
+                    if (option.strict && funct['(context)']['(global)']) {
+                        if (!m["use strict"] && !directive["use strict"]) {
+                            warning("Missing \"use strict\" statement.");
+                        }
+                    }
                 }
+
                 a = statements(line);
-                strict_mode = m;
+
+                if (isfunc) {
+                    directive = m;
+                }
+
                 indent -= option.indent;
                 if (line !== nexttoken.line) {
                     indentation();
                 }
+            } else if (line !== nexttoken.line) {
+                indentation();
             }
             advance('}', t);
             indent = old_indent;
@@ -2677,7 +2738,7 @@ loop:   for (;;) {
     reserve('default').reach = true;
     reserve('finally');
     reservevar('arguments', function (x) {
-        if (strict_mode && funct['(global)']) {
+        if (directive['use strict'] && funct['(global)']) {
             warning("Strict violation.", x);
         }
     });
@@ -2687,7 +2748,7 @@ loop:   for (;;) {
     reservevar('NaN');
     reservevar('null');
     reservevar('this', function (x) {
-        if (strict_mode && !option.validthis && ((funct['(statement)'] &&
+        if (directive['use strict'] && !option.validthis && ((funct['(statement)'] &&
                 funct['(name)'].charAt(0) > 'Z') || funct['(global)'])) {
             warning("Possible strict violation.", x);
         }
@@ -2903,7 +2964,7 @@ loop:   for (;;) {
         if (left && left.value === 'arguments' && (m === 'callee' || m === 'caller')) {
             if (option.noarg)
                 warning("Avoid arguments.{a}.", left, m);
-            else if (strict_mode)
+            else if (directive['use strict'])
                 error('Strict violation.');
         } else if (!option.evil && left && left.value === 'document' &&
                 (m === 'write' || m === 'writeln')) {
@@ -3129,7 +3190,7 @@ loop:   for (;;) {
         }
         funct['(params)'] = functionparams();
 
-        block(false);
+        block(false, false, true);
         scope = oldScope;
         option = oldOption;
         funct['(last)'] = token.line;
@@ -3921,7 +3982,7 @@ loop:   for (;;) {
         warnings = 0;
         lex.init(s);
         prereg = true;
-        strict_mode = false;
+        directive = {};
 
         // if esnext option is set, we can use esnext syntax
         if (option.esnext) {
@@ -3941,10 +4002,9 @@ loop:   for (;;) {
                 jsonValue();
                 break;
             default:
-                if (nexttoken.value === 'use strict') {
-                    if (!option.globalstrict)
-                        warning("Use the function form of \"use strict\".");
-                    use_strict();
+                directives();
+                if (directive["use strict"] && !option.globalstrict) {
+                    warning("Use the function form of \"use strict\".", prevtoken);
                 }
 
                 statements();
