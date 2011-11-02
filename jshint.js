@@ -1676,7 +1676,7 @@ klass:                                  do {
                 if (option.latedef)
                     warning("'{a}' was used before it was defined.", nexttoken, t);
             } else {
-                if (!option.shadow)
+                if (!option.shadow && type !== "exception")
                     warning("'{a}' is already defined.", nexttoken, t);
             }
         }
