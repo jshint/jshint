@@ -235,6 +235,6 @@ exports.returnStatement = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/return.js', 'utf8');
 
     TestRun()
-        .addError(34, "Line breaking error 'return'.")
+        .addError(38, "Line breaking error 'return'.")
         .test(src, { maxerr: 1 });
 };
