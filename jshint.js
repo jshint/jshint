@@ -3985,11 +3985,6 @@ loop:   for (;;) {
         prereg = true;
         directive = {};
 
-        // if esnext option is set, we can use esnext syntax
-        if (option.esnext) {
-            useESNextSyntax();
-        }
-
         prevtoken = token = nexttoken = syntax['(begin)'];
         assume();
 
