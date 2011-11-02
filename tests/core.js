@@ -239,3 +239,19 @@ exports.returnStatement = function () {
         .addError(38, "Line breaking error 'return'.")
         .test(src, { maxerr: 1 });
 };
+
+exports.globalDeclarations = function () {
+    var src = 'exports = module.exports = function () {};';
+
+    // Test should pass
+    TestRun().test(src, { node: true }, { exports: true });
+
+    // Test should pass as well
+    src = [
+        '/*jshint node:true */',
+        '/*global exports:true */',
+        'exports = module.exports = function () {};'
+    ];
+
+    TestRun().test(src.join('\n'));
+};
