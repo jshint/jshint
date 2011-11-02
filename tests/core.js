@@ -230,3 +230,10 @@ exports.caseExpressions = function () {
         .addError(2, "This 'switch' should be an 'if'.")
         .test(src);
 };
+
+exports.globalDeclarations = function () {
+    var src = 'exports = module.exports = function () {};';
+
+    // test should pass
+    TestRun().test(src, { node: true }, { exports: true });
+};
