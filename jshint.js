@@ -3602,6 +3602,7 @@ loop:   for (;;) {
                         error("Each value should have its own case label.");
                         return;
                     case ':':
+                        g = false;
                         statements();
                         break;
                     default:
@@ -3609,9 +3610,15 @@ loop:   for (;;) {
                         return;
                     }
                 } else {
-                    error("Expected '{a}' and instead saw '{b}'.",
-                        nexttoken, 'case', nexttoken.value);
-                    return;
+                    if (token.id === ':') {
+                        advance(':');
+                        error("Unexpected '{a}'.", token, ':');
+                        statements();
+                    } else {
+                        error("Expected '{a}' and instead saw '{b}'.",
+                            nexttoken, 'case', nexttoken.value);
+                        return;
+                    }
                 }
             }
         }
