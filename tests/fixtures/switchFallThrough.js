@@ -33,7 +33,7 @@ default:
     switch (foo) {
     case 1:
         return; // Return is a valid alternative to break;
-    case 2:
+    case 2:: // doubled colon (fix)
     case 3:
         return;
     }
