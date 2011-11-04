@@ -712,15 +712,15 @@ exports.white = function () {
 
     TestRun().test(src);
     TestRun()
-        .addError(1, "Unexpected space after 'hello'.")
-        .addError(2, "Unexpected space after 'true'.")
+        .addError(1, "Unexpected space after 'hello'.", { character: 15 })
+        .addError(2, "Unexpected space after 'true'.", { character: 16 })
         .addError(5, "Missing space after 'function'.")
         .addError(6, "Missing space after 'if'.")
         .addError(6, "Missing space after ')'.")
-        .addError(14, "Unexpected space after 'true'.")
+        .addError(14, "Unexpected space after 'true'.", { character: 16 })
         .addError(15, "Missing space after ':'.")
-        .addError(18, "Unexpected space after '('.")
-        .addError(18, "Unexpected space after 'ex'.")
+        .addError(18, "Unexpected space after '('.", { character: 9 })
+        .addError(18, "Unexpected space after 'ex'.", { character: 12 })
         .test(src, { white: true });
 };
 
