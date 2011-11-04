@@ -2020,7 +2020,8 @@ loop:   for (;;) {
                 warning("Bad line breaking before '{a}'.", token, nexttoken.id);
             }
         } else if (token.character !== nexttoken.from && option.white) {
-            warning("Unexpected space after '{a}'.", nexttoken, token.value);
+            token.from += (token.character - token.from);
+            warning("Unexpected space after '{a}'.", token, token.value);
         }
         advance(',');
         nonadjacent(token, nexttoken);
