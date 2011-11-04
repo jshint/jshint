@@ -3604,6 +3604,7 @@ loop:   for (;;) {
                         error("Each value should have its own case label.");
                         return;
                     case ':':
+                        g = false;
                         statements();
                         break;
                     default:
@@ -3611,9 +3612,15 @@ loop:   for (;;) {
                         return;
                     }
                 } else {
-                    error("Expected '{a}' and instead saw '{b}'.",
-                        nexttoken, 'case', nexttoken.value);
-                    return;
+                    if (token.id === ':') {
+                        advance(':');
+                        error("Unexpected '{a}'.", token, ':');
+                        statements();
+                    } else {
+                        error("Expected '{a}' and instead saw '{b}'.",
+                            nexttoken, 'case', nexttoken.value);
+                        return;
+                    }
                 }
             }
         }
@@ -3799,7 +3806,7 @@ loop:   for (;;) {
 
             if (nexttoken.id !== ';' && !nexttoken.reach) {
                 nonadjacent(token, nexttoken);
-                this.first = expression(20);
+                this.first = expression(0);
             }
         } else if (!option.asi) {
             nolinebreak(this); // always warn (Line breaking error)
@@ -3991,13 +3998,11 @@ loop:   for (;;) {
         prereg = true;
         directive = {};
 
-        // if esnext option is set, we can use esnext syntax
-        if (option.esnext) {
-            useESNextSyntax();
-        }
-
         prevtoken = token = nexttoken = syntax['(begin)'];
         assume();
+
+        // combine the passed globals after we've assumed all our options
+        combine(predefined, g || {});
 
         try {
             advance();
