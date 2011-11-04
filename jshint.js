@@ -1942,7 +1942,8 @@ loop:   for (;;) {
         right = right || nexttoken;
         if (option.white) {
             if (left.character !== right.from && left.line === right.line) {
-                warning("Unexpected space after '{a}'.", right, left.value);
+                left.from += (left.character - left.from);
+                warning("Unexpected space after '{a}'.", left, left.value);
             }
         }
     }
@@ -2019,7 +2020,8 @@ loop:   for (;;) {
                 warning("Bad line breaking before '{a}'.", token, nexttoken.id);
             }
         } else if (token.character !== nexttoken.from && option.white) {
-            warning("Unexpected space after '{a}'.", nexttoken, token.value);
+            token.from += (token.character - token.from);
+            warning("Unexpected space after '{a}'.", token, token.value);
         }
         advance(',');
         nonadjacent(token, nexttoken);
