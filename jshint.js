@@ -1942,7 +1942,8 @@ loop:   for (;;) {
         right = right || nexttoken;
         if (option.white) {
             if (left.character !== right.from && left.line === right.line) {
-                warning("Unexpected space after '{a}'.", right, left.value);
+                left.from += (left.character - left.from);
+                warning("Unexpected space after '{a}'.", left, left.value);
             }
         }
     }
