@@ -45,3 +45,9 @@ var name1 = (function () { var x = 2; return 'Anton'; }());
 var name2 = (function () { var x = 2;
                             return 'Anton';
                         }());
+
+// Make sure that comments inside a function's parameters
+// don't count towards `unexpected space` warnings.
+function inspectPrefiltersOrTransports(dataType/* internal */, inspected /* internal */) {
+    return 2;
+}
