@@ -2018,7 +2018,7 @@ loop:   for (;;) {
             if (!option.laxbreak) {
                 warning("Bad line breaking before '{a}'.", token, nexttoken.id);
             }
-        } else if (token.character !== nexttoken.from && option.white) {
+        } else if (!token.comment && token.character !== nexttoken.from && option.white) {
             warning("Unexpected space after '{a}'.", nexttoken, token.value);
         }
         advance(',');
