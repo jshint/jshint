@@ -319,7 +319,7 @@ exports.forin = function () {
 
     // Make sure it fails when forin is true
     TestRun()
-        .addError(1, msg)
+        .addError(13, msg)
         .test(src, { forin: true });
 };
 
