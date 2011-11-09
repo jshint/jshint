@@ -309,10 +309,8 @@ exports.testPrototype = function () {
         .addError(451, "Missing semicolon.")
         .addError(482, "Unescaped '^'.")
         .addError(482, "Unescaped '['.")
-        .addError(558, "Expected a conditional expression and instead saw an assignment.")
         .addError(563, "Missing semicolon.")
         .addError(563, "Expected an identifier and instead saw ','.")
-        .addError(563, "Expected an assignment or function call and instead saw an expression.")
         .addError(563, "Missing semicolon.")
         .addError(633, "Use '!==' to compare with 'undefined'.")
         .addError(737, "Use '===' to compare with ''.")
@@ -320,35 +318,39 @@ exports.testPrototype = function () {
         .addError(799, "Unescaped '['.")
         .addError(805, "Unescaped ']'.")
         .addError(807, "Use '===' to compare with ''.")
-        .addError(855, "Expected a conditional expression and instead saw an assignment.")
         .addError(1137, "Use '===' to compare with '0'.")
-        .addError(1163, "Expected an assignment or function call and instead saw an expression.")
         .addError(1215, "Missing semicolon.")
         .addError(1224, "Unnecessary semicolon.")
-        .addError(1763, "Expected a conditional expression and instead saw an assignment.")
         .addError(1916, "Missing semicolon.")
         .addError(2034, "Missing semicolon.")
-        .addError(2137, "Expected a conditional expression and instead saw an assignment.")
         .addError(2210, "Missing semicolon.")
         .addError(2210, "Expected an identifier and instead saw ','.")
-        .addError(2210, "Expected an assignment or function call and instead saw an expression.")
         .addError(2210, "Missing semicolon.")
         .addError(2222, "Missing semicolon.")
         .addError(2222, "Expected an identifier and instead saw ','.")
-        .addError(2222, "Expected an assignment or function call and instead saw an expression.")
         .addError(2222, "Missing semicolon.")
         .addError(2345, "Missing semicolon.")
         .addError(2345, "Expected an identifier and instead saw ','.")
-        .addError(2345, "Expected an assignment or function call and instead saw an expression.")
         .addError(2345, "Missing semicolon.")
-        .addError(2353, "Expected a conditional expression and instead saw an assignment.")
+        .addError(2662, "Missing semicolon.")
+        .addError(2735, "Missing semicolon.")
+        .addError(2924, "Missing semicolon.")
+        .addError(2987, "'tagName' used out of scope.")
+        .addError(2989, "'tagName' used out of scope.")
+        .addError(2989, "'tagName' used out of scope.")
+        .addError(2990, "'tagName' used out of scope.")
+        .addError(3844, "'positionedOffset' is a function.")
+        .addError(3860, "'cumulativeOffset' is a function.")
+        .addError(3974, "Unescaped '['.")
         .test(src, {
             sub: true,
             lastsemic: true,
             loopfunc: true,
             evil: true,
             eqnull: true,
-            laxbreak: true
+            laxbreak: true,
+            boss: true,
+            expr: true
         });
 };
 
