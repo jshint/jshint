@@ -23,3 +23,6 @@ for (var i = 0; i < 10; i++) {
 }
 
 foo()
+var a = 1
+var b = '1'
+var c = "1"
