@@ -287,3 +287,12 @@ exports.testJQuery = function () {
         .addError(9209, "Mixed spaces and tabs.")
         .test(src);
 };
+
+exports.argsInCatchReused = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/trycatch.js', 'utf8');
+    TestRun()
+        .addError(6, "'e' is already defined.")
+        .addError(12, "Do not assign to the exception parameter.")
+        .addError(23, "'e' is not defined.")
+        .test(src, { undef: true });
+};
