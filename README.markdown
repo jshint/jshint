@@ -60,6 +60,7 @@ Maintainer: [Anton Kovalyov](http://anton.kovalyov.net/) ([@valueof](http://twit
 Distinguished Contributors:
 
  * [Wolfgang Kluge](http://klugesoftware.de/) ([blog](http://gehirnwindung.de/))
+ * [Josh Perez](http://www.goatslacker.com/)
 
 Thank you!
 ----------
