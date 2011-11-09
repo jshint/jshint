@@ -199,7 +199,7 @@ exports.testMissingSpaces = function () {
         .addError(2, "Missing space after ')'.", { character: 18 })
         .addError(3, "Missing space after 'd'.", { character: 6 })
         .addError(4, "Missing space after ')'.", { character: 13 })
-        .addError(5, "Missing space after '1'.", { character: 11 })
+        .addError(5, "Missing space after '1'.", { character: 13 })
         .addError(7, "Missing space after '2'.", { character: 10 })
         .addError(7, "Missing space after '+'.", { character: 11 })
         .addError(8, "Missing space after '/'.", { character: 14 })

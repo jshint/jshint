@@ -2379,8 +2379,7 @@ loop:   for (;;) {
                     // Otherwise, complain about missing semicolon.
                     if (!option.lastsemic || nexttoken.id != '}' ||
                             nexttoken.line != token.line) {
-                        warningAt("Missing semicolon.", token.line, token.from +
-                            token.value.length);
+                        warningAt("Missing semicolon.", token.line, token.character);
                     }
                 }
             } else {

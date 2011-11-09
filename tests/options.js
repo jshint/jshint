@@ -201,6 +201,9 @@ exports.asi = function () {
         .addError(21, "Line breaking error 'break'.")
         .addError(21, "Missing semicolon.")
         .addError(25, "Missing semicolon.")
+        .addError(26, "Missing semicolon.", { character: 10 })
+        .addError(27, "Missing semicolon.", { character: 12 })
+        .addError(28, "Missing semicolon.", { character: 12 })
         .test(src);
 
     TestRun(2)
