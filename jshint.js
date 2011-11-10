@@ -3805,6 +3805,9 @@ loop:   for (;;) {
 
             if (nexttoken.id !== ';' && !nexttoken.reach) {
                 nonadjacent(token, nexttoken);
+                if (peek().value === "=") {
+                    warningAt("Avoid ambiguous code.", token.line, token.character + 1);
+                }
                 this.first = expression(0);
             }
         } else if (!option.asi) {
