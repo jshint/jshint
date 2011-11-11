@@ -1,0 +1,7 @@
+(function () {
+	/**
+	 * Hello
+	 * 
+	 * World :)
+	 */
+}());
