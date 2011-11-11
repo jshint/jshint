@@ -194,7 +194,7 @@
  Timer, Tips, Type, TypeError, Toggle, Try, "use strict", unescape, URI, URIError, URL,
  VBArray, WSH, WScript, XDomainRequest, Web, Window, XMLDOM, XMLHttpRequest, XPathEvaluator,
  XPathException, XPathExpression, XPathNamespace, XPathNSResolver, XPathResult, "\\", a,
- addEventListener, address, alert, apply, applicationCache, arguments, arity,
+ addEventListener, address, alert, alignment, apply, applicationCache, arguments, arity,
  asi, b, bitwise, block, blur, boolOptions, boss, browser, c, call, callee,
  caller, cases, charAt, charCodeAt, character, clearInterval, clearTimeout,
  close, closed, closure, comment, condition, confirm, console, constructor,
@@ -208,7 +208,7 @@
  hasOwnProperty, help, history, i, id, identifier, immed, implieds, importPackage, include,
  indent, indexOf, init, ins, instanceOf, isAlpha, isApplicationRunning, isArray,
  isDigit, isFinite, isNaN, iterator, java, join, jshint,
- JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastsemic, laxbreak,
+ JS, JSHINT, jsclass, json, jquery, jQuery, keys, label, labelled, last, lastsemic, laxbreak,
  latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
  log, loopfunc, m, match, maxerr, maxlen, member,message, meta, module, moveBy,
  moveTo, mootools, multistr, name, navigator, new, newcap, noarg, node, noempty, nomen,
@@ -222,8 +222,10 @@
  send, serialize, sessionStorage, setInterval, setTimeout, shift, slice, sort,spawn,
  split, stack, status, start, strict, sub, substr, supernew, shadow, supplant, sum,
  sync, test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing, type,
- typeOf, Uint16Array, Uint32Array, Uint8Array, undef, unused, urls, validthis, value, valueOf,
- var, version, WebSocket, white, window, Worker, wsh*/
+ THREE, threejs, typeOf,
+ Uint16Array, Uint32Array, Uint8Array, undef, unused, urls,
+ validthis, value, valueOf, var, version,
+ WebSocket, white, window, Worker, wsh*/
 
 /*global exports: false */
 
@@ -256,6 +258,7 @@ var JSHINT = (function () {
 
         // These are the JSHint boolean options.
         boolOptions = {
+            alignment   : true, // if spaces alignment sequences should be ignored
             asi         : true, // if automatic semicolon insertion should be tolerated
             bitwise     : true, // if bitwise operators should not be allowed
             boss        : true, // if advanced usage of assignments should be allowed
@@ -279,6 +282,7 @@ var JSHINT = (function () {
             immed       : true, // if immediate invocations must be wrapped in parens
             iterator    : true, // if the `__iterator__` property should be allowed
             jquery      : true, // if jQuery globals should be predefined
+            jsclass     : true, // if JS.Class globals should be predefined
             lastsemic   : true, // if semicolons may be ommitted for the trailing
                                 // statements inside of a one-line blocks.
             latedef     : true, // if the use before definition should not be tolerated
@@ -316,6 +320,7 @@ var JSHINT = (function () {
             sub         : true, // if all forms of subscript notation are tolerated
             supernew    : true, // if `new function () { ... };` and `new Object;`
                                 // should be tolerated
+            threejs     : true, // if Three.js globals should be predefined
             trailing    : true, // if trailing whitespace rules apply
             validthis   : true, // if 'this' inside a non-constructor function is valid.
                                 // This is a function scoped option only.
@@ -509,6 +514,11 @@ var JSHINT = (function () {
         implied,        // Implied globals
         inblock,
         indent,
+
+        jsclass = {
+            JS : false
+        },
+
         jsonmode,
 
         jquery = {
@@ -717,6 +727,11 @@ var JSHINT = (function () {
         syntax = {},
         tab,
         token,
+
+        threejs = {
+            THREE : false
+        },
+
         urls,
         useESNextSyntax,
         warnings,
@@ -916,6 +931,14 @@ var JSHINT = (function () {
             combine(predefined, wsh);
         }
 
+        if (option.threejs) {
+            combine(predefined, threejs);
+        }
+
+        if (option.jsclass) {
+            combine(predefined, jsclass);
+        }
+
         if (option.esnext) {
             useESNextSyntax();
         }
@@ -1006,7 +1029,7 @@ var JSHINT = (function () {
             character = 1;
             s = lines[line];
             line += 1;
-            at = s.search(/ \t|\t /);
+            at = s.search(option.alignment ? / \t/ : / \t|\t /);
 
             if (at >= 0)
                 warningAt("Mixed spaces and tabs.", line, at + 1);
