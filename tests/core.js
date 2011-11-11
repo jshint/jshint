@@ -368,6 +368,18 @@ exports.testPrototype = function () {
         });
 };
 
+exports.testThreejs = function () {
+	var src = 'var foo = new THREE.bar();';
+    TestRun()
+        .test(src, { threejs: true });
+};
+
+exports.testJSClass = function () {
+    var src = 'var foo = new JS.Class({});';
+    TestRun()
+        .test(src, { jsclass: true });
+};
+
 exports.backbone = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/backbone.js', 'utf8');
 
