@@ -1,7 +1,9 @@
 /*jshint boss: true, rhino: true */
 /*globals JSHINT*/
 
-load("jshint.js");
+var scriptDir = arguments[0];
+
+load(scriptDir + "/../jshint.js");
 
 (function (args) {
     var filenames = [],
@@ -55,7 +57,6 @@ load("jshint.js");
     }
 
     filenames.forEach(function (name) {
-
         var input = readFile(name);
 
         if (!input) {
@@ -74,4 +75,4 @@ load("jshint.js");
     });
 
     quit(retval);
-}(arguments));
+}(arguments.slice(1)));
