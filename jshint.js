@@ -166,7 +166,9 @@
  Debug, Draggable, Draggables, Droppables, Document, DomReady, DOMReady, Drag,
  E, Enumerator, Enumerable, Element, Elements, Error, Effect, EvalError, Event,
  Events, FadeAnimation, Field, Flash, Float32Array, Float64Array, Form,
- FormField, Frame, FormData, Function, Fx, GetObject, Group, Hash, HotKey,
+ FormField, Frame, FormData, Function, Fx, GetObject, greasemonkey, GM_addStyle,
+ GM_deleteValue, GM_getResourceText, GM_getResourceURL, GM_getValue, GM_listValues,
+ GM_log, GM_registerMenuCommand, GM_setValue, GM_xmlhttpRequest, Group, Hash, HotKey,
  HTMLElement, HTMLAnchorElement, HTMLBaseElement, HTMLBlockquoteElement,
  HTMLBodyElement, HTMLBRElement, HTMLButtonElement, HTMLCanvasElement, HTMLDirectoryElement,
  HTMLDivElement, HTMLDListElement, HTMLFieldSetElement,
@@ -222,8 +224,8 @@
  send, serialize, sessionStorage, setInterval, setTimeout, shift, slice, sort,spawn,
  split, stack, status, start, strict, sub, substr, supernew, shadow, supplant, sum,
  sync, test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing, type,
- typeOf, Uint16Array, Uint32Array, Uint8Array, undef, unused, urls, validthis, value, valueOf,
- var, version, WebSocket, white, window, Worker, wsh*/
+ typeOf, Uint16Array, Uint32Array, Uint8Array, undef, unsafeWindow, unused, urls, validthis, value,
+ valueOf, var, version, WebSocket, white, window, Worker, wsh*/
 
 /*global exports: false */
 
@@ -276,6 +278,7 @@ var JSHINT = (function () {
             funcscope   : true, // if only function scope should be used for scope tests
             globalstrict: true, // if global "use strict"; should be allowed (also
                                 // enables 'strict')
+            greasemonkey: true, // if GreaseMonkey globals should be predefined
             immed       : true, // if immediate invocations must be wrapped in parens
             iterator    : true, // if the `__iterator__` property should be allowed
             jquery      : true, // if jQuery globals should be predefined
@@ -506,6 +509,21 @@ var JSHINT = (function () {
         functions,      // All of the functions
 
         global,         // The global scope
+        
+        greasemonkey = {
+            GM_addStyle           : false,
+            GM_deleteValue        : false,
+            GM_getResourceText    : false,
+            GM_getResourceURL     : false,
+            GM_getValue           : false,
+            GM_listValues         : false,
+            GM_log                : false,
+            GM_registerMenuCommand: false,
+            GM_setValue           : false,
+            GM_xmlhttpRequest     : false,
+            unsafeWindow          : false
+        },
+        
         implied,        // Implied globals
         inblock,
         indent,
@@ -910,6 +928,10 @@ var JSHINT = (function () {
 
         if (option.mootools) {
             combine(predefined, mootools);
+        }
+        
+        if (option.greasemonkey) {
+            combine(predefined, greasemonkey);
         }
 
         if (option.wsh) {
