@@ -440,6 +440,25 @@ exports.mootools = function () {
     assert.globalsKnown(globals, { mootools: true });
 };
 
+exports.greasemonkey = function () {
+    var globals = [
+            'GM_addStyle'
+          , 'GM_deleteValue'
+          , 'GM_getResourceText'
+          , 'GM_getResourceURL'
+          , 'GM_getValue'
+          , 'GM_listValues'
+          , 'GM_log'
+          , 'GM_registerMenuCommand'
+          , 'GM_setValue'
+          , 'GM_xmlhttpRequest'
+          , 'unsafeWindow'
+        ];
+
+    assert.globalsImplied(globals);
+    assert.globalsKnown(globals, { greasemonkey: true });
+};
+
 exports.dojo = function () {
     var globals = [
         'dojo'
