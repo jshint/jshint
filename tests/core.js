@@ -375,3 +375,33 @@ exports.argsInCatchReused = function () {
         .addError(23, "'e' is not defined.")
         .test(src, { undef: true });
 };
+
+exports.latedefwundef = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/latedefundef.js', 'utf8');
+
+    // Assures that when `undef` is set to true, it'll report undefined variables
+    // and late definitions won't be reported as `latedef` is set to false.
+    TestRun()
+        .addError(28, "'hello' is not defined.")
+        .test(src, { latedef: false, undef: true });
+
+    // When we suppress `latedef` and `undef` then we get no warnings.
+    TestRun()
+        .test(src, { latedef: false, undef: false });
+
+    // If we warn on `latedef` but supress `undef` we only get the
+    // late definition warnings.
+    TestRun()
+        .addError(5, "'func2' was used before it was defined.")
+        .addError(11, "'foo' was used before it was defined.")
+        .addError(26, "'baz' was used before it was defined.")
+        .test(src, { latedef: true, undef: false });
+
+    // If we warn on both options we get all the warnings.
+    TestRun()
+        .addError(5, "'func2' was used before it was defined.")
+        .addError(11, "'foo' was used before it was defined.")
+        .addError(26, "'baz' was used before it was defined.")
+        .addError(28, "'hello' is not defined.")
+        .test(src, { latedef: true, undef: true });
+};
