@@ -10,13 +10,12 @@ foo();
 
 function foo() { }
 
-/*
+
 (function () {
     "use strict";
-    fn();
-    function fn() {}
+    fn1();
+    function fn1() {}
 }());
-*/
 
 
 function bar() {
@@ -25,4 +24,12 @@ function bar() {
 
 function baz() {}
 
+
 hello();
+
+
+(function () {
+    fn();
+    function fn() {}
+    world();
+}());

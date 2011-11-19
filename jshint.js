@@ -938,8 +938,8 @@ var JSHINT = (function () {
         };
     }
 
-    function isundef(m, t, a) {
-        return JSHINT.undefs.push([m, t, a]);
+    function isundef(scope, m, t, a) {
+        return JSHINT.undefs.push([scope, m, t, a]);
     }
 
     function warning(m, t, a, b, c, d) {
@@ -1674,7 +1674,6 @@ klass:                                  do {
         }
 
 // Define t in the current function in the current scope.
-
         if (is_own(funct, t) && !funct['(global)']) {
             if (funct[t] === true) {
                 if (option.latedef)
@@ -2648,7 +2647,7 @@ loop:   for (;;) {
                 // if we're inside of typeof or delete.
                 if (anonname != 'typeof' && anonname != 'delete' &&
                     option.undef && typeof predefined[v] !== 'boolean') {
-                    isundef("'{a}' is not defined.", token, v);
+                    isundef(funct, "'{a}' is not defined.", token, v);
                 }
                 note_implied(token);
             } else {
@@ -2681,10 +2680,9 @@ loop:   for (;;) {
                         // if the base object of a reference is null so no need to
                         // display warning if we're inside of typeof or delete.
                         if (anonname != 'typeof' && anonname != 'delete' && option.undef) {
-                            isundef("'{a}' is not defined.", token, v);
-                        } else {
-                            funct[v] = true;
+                            isundef(funct, "'{a}' is not defined.", token, v);
                         }
+                        funct[v] = true;
                         note_implied(token);
                     } else {
                         switch (s[v]) {
@@ -4039,11 +4037,14 @@ loop:   for (;;) {
             }
         }
         JSHINT.undefs = JSHINT.undefs.filter(function (err) {
-            var a = err[2];
-            return (!a || !funct[a]);
+            var scope = err[0],
+                args = err.slice(1),
+                a = args[2];
+
+            return (scope[a] !== 'unction' && funct[a] !== 'unction');
         });
         JSHINT.undefs.forEach(function (err) {
-            warning.apply(warning, err);
+            warning.apply(warning, err.slice(1));
         });
         return JSHINT.errors.length === 0;
     };

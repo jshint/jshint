@@ -383,6 +383,7 @@ exports.latedefwundef = function () {
     // and late definitions won't be reported as `latedef` is set to false.
     TestRun()
         .addError(28, "'hello' is not defined.")
+        .addError(34, "'world' is not defined.")
         .test(src, { latedef: false, undef: true });
 
     // When we suppress `latedef` and `undef` then we get no warnings.
@@ -394,14 +395,19 @@ exports.latedefwundef = function () {
     TestRun()
         .addError(5, "'func2' was used before it was defined.")
         .addError(11, "'foo' was used before it was defined.")
-        .addError(26, "'baz' was used before it was defined.")
+        .addError(17, "'fn1' was used before it was defined.")
+        .addError(25, "'baz' was used before it was defined.")
+        .addError(33, "'fn' was used before it was defined.")
         .test(src, { latedef: true, undef: false });
 
     // If we warn on both options we get all the warnings.
     TestRun()
         .addError(5, "'func2' was used before it was defined.")
         .addError(11, "'foo' was used before it was defined.")
-        .addError(26, "'baz' was used before it was defined.")
+        .addError(17, "'fn1' was used before it was defined.")
+        .addError(25, "'baz' was used before it was defined.")
         .addError(28, "'hello' is not defined.")
+        .addError(33, "'fn' was used before it was defined.")
+        .addError(34, "'world' is not defined.")
         .test(src, { latedef: true, undef: true });
 };
