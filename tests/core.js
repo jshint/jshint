@@ -236,8 +236,9 @@ exports.returnStatement = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/return.js', 'utf8');
 
     TestRun()
+        .addError(3, "Avoid ambiguous code.")
         .addError(38, "Line breaking error 'return'.")
-        .test(src, { maxerr: 1 });
+        .test(src, { maxerr: 2 });
 };
 
 exports.globalDeclarations = function () {
@@ -373,4 +374,44 @@ exports.argsInCatchReused = function () {
         .addError(12, "Do not assign to the exception parameter.")
         .addError(23, "'e' is not defined.")
         .test(src, { undef: true });
+};
+
+exports.latedefwundef = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/latedefundef.js', 'utf8');
+
+    // Assures that when `undef` is set to true, it'll report undefined variables
+    // and late definitions won't be reported as `latedef` is set to false.
+    TestRun()
+        .addError(29, "'hello' is not defined.")
+        .addError(35, "'world' is not defined.")
+        .test(src, { latedef: false, undef: true });
+
+    // When we suppress `latedef` and `undef` then we get no warnings.
+    TestRun()
+        .test(src, { latedef: false, undef: false });
+
+    // If we warn on `latedef` but supress `undef` we only get the
+    // late definition warnings.
+    TestRun()
+        .addError(5, "'func2' was used before it was defined.")
+        .addError(12, "'foo' was used before it was defined.")
+        .addError(18, "'fn1' was used before it was defined.")
+        .addError(26, "'baz' was used before it was defined.")
+        .addError(34, "'fn' was used before it was defined.")
+        .addError(41, "'q' was used before it was defined.")
+        .addError(46, "'h' was used before it was defined.")
+        .test(src, { latedef: true, undef: false });
+
+    // If we warn on both options we get all the warnings.
+    TestRun()
+        .addError(5, "'func2' was used before it was defined.")
+        .addError(12, "'foo' was used before it was defined.")
+        .addError(18, "'fn1' was used before it was defined.")
+        .addError(26, "'baz' was used before it was defined.")
+        .addError(29, "'hello' is not defined.")
+        .addError(34, "'fn' was used before it was defined.")
+        .addError(35, "'world' is not defined.")
+        .addError(41, "'q' was used before it was defined.")
+        .addError(46, "'h' was used before it was defined.")
+        .test(src, { latedef: true, undef: true });
 };
