@@ -51,3 +51,7 @@ var name2 = (function () { var x = 2;
 function inspectPrefiltersOrTransports(dataType/* internal */, inspected /* internal */) {
     return 2;
 }
+
+function nodblwarnings ( ) {
+    return 1;
+}
