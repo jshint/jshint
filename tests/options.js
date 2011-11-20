@@ -721,6 +721,8 @@ exports.white = function () {
         .addError(15, "Missing space after ':'.")
         .addError(18, "Unexpected space after '('.", { character: 9 })
         .addError(18, "Unexpected space after 'ex'.", { character: 12 })
+        .addError(55, "Unexpected space after 'nodblwarnings'.", { character: 23 })
+        .addError(55, "Unexpected space after '('.", { character: 25 })
         .test(src, { white: true });
 };
 
