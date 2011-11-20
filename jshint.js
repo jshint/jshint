@@ -202,7 +202,7 @@
  decodeURIComponent, defaultStatus, defineClass, deserialize, devel, document,
  dojo, dijit, dojox, define, edition, else, emit, encodeURI, encodeURIComponent,
  entityify, eqeqeq, eqnull, errors, es5, escape, esnext, eval, event, evidence, evil,
- ex, exception, exec, exps, expr, exports, FileReader, filter, first, floor, focus, forEach,
+ ex, exception, exec, exps, expr, exports, FileReader, first, floor, focus,
  forin, fragment, frames, from, fromCharCode, fud, funcscope, funct, function, functions,
  g, gc, getComputedStyle, getRow, GLOBAL, global, globals, globalstrict,
  hasOwnProperty, help, history, i, id, identifier, immed, implieds, importPackage, include,
@@ -4036,16 +4036,17 @@ loop:   for (;;) {
                 }, null);
             }
         }
-        JSHINT.undefs = JSHINT.undefs.filter(function (err) {
-            var scope = err[0],
-                args = err.slice(1),
-                a = args[2];
 
-            return (typeof scope[a] !== 'string' && typeof funct[a] !== 'string');
-        });
-        JSHINT.undefs.forEach(function (err) {
-            warning.apply(warning, err.slice(1));
-        });
+        for (i = 0; i < JSHINT.undefs.length; i += 1) {
+            k = JSHINT.undefs[i].slice(0);
+            scope = k.shift();
+            a = k[2];
+
+            if (typeof scope[a] !== 'string' && typeof funct[a] !== 'string') {
+                warning.apply(warning, k);
+            }
+        }
+
         return JSHINT.errors.length === 0;
     };
 
