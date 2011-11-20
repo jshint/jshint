@@ -236,9 +236,9 @@ exports.returnStatement = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/return.js', 'utf8');
 
     TestRun()
-        .addError(3, "Avoid ambiguous code.")
+        .addError(3, "Avoid ambiguous assignments in return statements.")
         .addError(38, "Line breaking error 'return'.")
-        .test(src, { maxerr: 2 });
+        .test(src, { maxerr: 2, ambiguousreturn: true });
 };
 
 exports.globalDeclarations = function () {

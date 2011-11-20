@@ -194,7 +194,7 @@
  Timer, Tips, Type, TypeError, Toggle, Try, "use strict", unescape, URI, URIError, URL,
  VBArray, WSH, WScript, XDomainRequest, Web, Window, XMLDOM, XMLHttpRequest, XPathEvaluator,
  XPathException, XPathExpression, XPathNamespace, XPathNSResolver, XPathResult, "\\", a,
- addEventListener, address, alert, apply, applicationCache, arguments, arity,
+ addEventListener, address, alert, ambiguousreturn, apply, applicationCache, arguments, arity,
  asi, b, bitwise, block, blur, boolOptions, boss, browser, c, call, callee,
  caller, cases, charAt, charCodeAt, character, clearInterval, clearTimeout,
  close, closed, closure, comment, condition, confirm, console, constructor,
@@ -3805,8 +3805,9 @@ loop:   for (;;) {
 
             if (nexttoken.id !== ';' && !nexttoken.reach) {
                 nonadjacent(token, nexttoken);
-                if (peek().value === "=") {
-                    warningAt("Avoid ambiguous code.", token.line, token.character + 1);
+                if (peek().value === "=" && option.ambiguousreturn) {
+                    warningAt("Avoid ambiguous assignments in return statements.",
+                              token.line, token.character + 1);
                 }
                 this.first = expression(0);
             }
