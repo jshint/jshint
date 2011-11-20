@@ -1,8 +1,9 @@
 function func1() {
-    func2();
+    h = func2();
 }
 
 function func2() {
+    return 2;
 }
 
 
@@ -33,3 +34,13 @@ hello();
     function fn() {}
     world();
 }());
+
+
+(function () {
+    q = 2;
+    var q;
+    return q;
+}());
+
+
+var h;

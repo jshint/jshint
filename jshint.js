@@ -4041,7 +4041,7 @@ loop:   for (;;) {
                 args = err.slice(1),
                 a = args[2];
 
-            return (scope[a] !== 'unction' && funct[a] !== 'unction');
+            return (typeof scope[a] !== 'string' && typeof funct[a] !== 'string');
         });
         JSHINT.undefs.forEach(function (err) {
             warning.apply(warning, err.slice(1));
