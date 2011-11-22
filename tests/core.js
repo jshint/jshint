@@ -238,7 +238,7 @@ exports.returnStatement = function () {
     TestRun()
         .addError(3, "Avoid ambiguous assignments in return statements.")
         .addError(38, "Line breaking error 'return'.")
-        .test(src, { maxerr: 2, ambiguousreturn: true });
+        .test(src, { maxerr: 2, vaguereturn: true });
 };
 
 exports.globalDeclarations = function () {
