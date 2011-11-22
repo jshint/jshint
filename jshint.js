@@ -1384,7 +1384,7 @@ var JSHINT = (function () {
                                     case '':
                                         errorAt("Unclosed regular expression.",
                                                 line, from);
-                                        return;
+                                        return it('(regexp)', c);
                                     case '/':
                                         if (depth > 0) {
                                             warningAt("Unescaped '{a}'.",
