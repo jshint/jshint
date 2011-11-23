@@ -51,7 +51,7 @@ var name2 = (function () { var x = 2;
 function inspectPrefiltersOrTransports(dataType/* internal */, inspected /* internal */) {
     return 2;
 }
-                        }());
+
 var a,b,
     c = 1< 2,
     d = 1 < 2,
