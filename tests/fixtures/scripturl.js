@@ -5,4 +5,7 @@ javascript: for(;;) {
         }
         break;
     }
+xyz: for(;;) {
+        break xyz;
+    }
 }

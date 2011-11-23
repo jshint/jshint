@@ -279,12 +279,17 @@ exports.undef = function () {
 
 /** Option `scripturl` allows the use of javascript-type URLs */
 exports.scripturl = function () {
-    var code = "var foo = { 'count': 12, 'href': 'javascript:' };",
+    var code = [
+            "var foo = { 'count': 12, 'href': 'javascript:' };",
+            "foo = 'javascript:' + 'xyz';"
+        ],
         src = fs.readFileSync(__dirname + '/fixtures/scripturl.js', 'utf8');
 
     // Make sure there is an error
     TestRun()
         .addError(1, "Script URL.")
+        .addError(2, "Script URL.") // 2 times?
+        .addError(2, "JavaScript URL.")
         .test(code);
 
     // Make sure the error goes away when javascript URLs are tolerated
@@ -416,12 +421,16 @@ exports.supernew = function () {
 /** Option `bitwise` disallows the use of bitwise operators. */
 exports.bitwise = function () {
     var ops = [ '&', '|', '^', '<<', '>>', '>>>' ];
-
+    var moreTests = [
+        'var c = ~a;',
+        'c &= 2;'
+    ];
+    
     // By default allow bitwise operators
     for (var i = 0, op; op = ops[i]; i += 1) {
         TestRun().test('var c = a ' + op + ' b;');
     }
-    TestRun().test('var c = ~a;');
+    TestRun().test(moreTests);
 
     for (i = 0, op = null; op = ops[i]; i += 1) {
         TestRun()
@@ -430,7 +439,8 @@ exports.bitwise = function () {
     }
     TestRun()
         .addError(1, "Unexpected '~'.")
-        .test('var c = ~a;', { bitwise: true });
+        .addError(2, "Unexpected use of '&='.")
+        .test(moreTests, { bitwise: true });
 };
 
 /** Option `debug` allows the use of debugger statements. */
@@ -463,13 +473,29 @@ exports.eqeqeq = function () {
 
 /** Option `evil` allows the use of eval. */
 exports.evil = function () {
-    var src = "eval('hey();');";
+    var src = [
+        "eval('hey();');",
+        "document.write('');",
+        "document.writeln('');",
+        "window.execScript('xyz');",
+        "new Function('xyz();');",
+        "setTimeout('xyz();', 2);",
+        "setInterval('xyz();', 2);",
+        "var t = document['eval']('xyz');"
+    ];
 
     TestRun()
         .addError(1, "eval is evil.")
-        .test(src);
+        .addError(2, "document.write can be a form of eval.")
+        .addError(3, "document.write can be a form of eval.")
+        .addError(4, "eval is evil.")
+        .addError(5, "The Function constructor is eval.")
+        .addError(6, "Implied eval is evil. Pass a function instead of a string.")
+        .addError(7, "Implied eval is evil. Pass a function instead of a string.")
+        .addError(8, "eval is evil.")
+        .test(src, { browser: true });
 
-    TestRun().test(src, { evil: true });
+    TestRun().test(src, { evil: true, browser: true });
 };
 
 /**
@@ -494,7 +520,9 @@ exports.immed = function () {
         .addError(3, "Wrap an immediate function invocation in parentheses " +
                      "to assist the reader in understanding that the expression " +
                      "is the result of a function, and not the function itself.")
-        .addError(7, 'Move the invocation into the parens that contain the function.')
+        .addError(7, "Move the invocation into the parens that contain the function.")
+        .addError(13, "Do not wrap function literals in parens unless they are to " +
+                      "be immediately invoked.")
         .test(src, { immed: true });
 };
 
@@ -515,6 +543,12 @@ exports.nomen = function () {
     // Normal names should pass all the time
     TestRun().test('var hey;');
     TestRun().test('var hey;', { nomen: true });
+    
+    // node globals
+    TestRun()
+        .addError(1, "Unexpected dangling '_' in '_x'.")
+        .test('var x = top._x + __dirname + __filename;', { node: true, nomen: true });
+    
 };
 
 /** Option `passfail` tells JSHint to stop at the first error. */
@@ -721,6 +755,12 @@ exports.white = function () {
         .addError(15, "Missing space after ':'.")
         .addError(18, "Unexpected space after '('.", { character: 9 })
         .addError(18, "Unexpected space after 'ex'.", { character: 12 })
+        .addError(48, "Missing space after ','.") // 2 times??
+        .addError(49, "Missing space after '1'.")
+        .addError(51, "Unexpected space before 'b'.")
+        .addError(51, "Unexpected space after 'a'.")
+        .addError(53, "Unexpected space before 'c'.")
+        .addError(55, "Expected 'var' to have an indentation at 1 instead at 2.")
         .test(src, { white: true });
 };
 

@@ -9,3 +9,7 @@ var b = (function () {
 var c = (function () {
     return;
 }());
+
+var d = (function () {
+    return;
+});
