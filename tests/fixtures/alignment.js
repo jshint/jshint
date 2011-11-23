@@ -1,7 +1,0 @@
-(function () {
-	/**
-	 * Hello
-	 * 
-	 * World :)
-	 */
-}());

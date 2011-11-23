@@ -135,20 +135,6 @@ exports.testNewArray = function () {
         .test('new Array();');
 };
 
-/** Test that JSHint allows alignment spaces */
-exports.testAlignments = function () {
-    var src = fs.readFileSync(__dirname + '/fixtures/alignment.js', 'utf8');
-    TestRun()
-        .test(src, { alignment: true });
-    // But it must never tolerate these spaces if the option is not set
-    TestRun()
-        .addError(3, "Mixed spaces and tabs.")
-        .addError(4, "Mixed spaces and tabs.")
-        .addError(5, "Mixed spaces and tabs.")
-        .addError(6, "Mixed spaces and tabs.")
-        .test(src);
-};
-
 /**
  * Test that JSHint allows `undefined` to be a function parameter.
  * It is a common pattern to protect against the case when somebody
