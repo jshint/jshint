@@ -219,7 +219,7 @@
  readFile, readUrl, regexdash, removeEventListener, replace, report, require,
  reserved, resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
  runCommand, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal,
- send, serialize, sessionStorage, setInterval, setTimeout, shift, slice, sort,spawn,
+ send, serialize, sessionStorage, setInterval, setTimeout, shift, slice, smarttabs, sort, spawn,
  split, stack, status, start, strict, sub, substr, supernew, shadow, supplant, sum,
  sync, test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing, type,
  typeOf, Uint16Array, Uint32Array, Uint8Array, undef, unused, urls, validthis, value, valueOf,
@@ -256,6 +256,7 @@ var JSHINT = (function () {
 
         // These are the JSHint boolean options.
         boolOptions = {
+            smarttabs   : true, // if spaces alignment sequences should be ignored when tab-mixed
             asi         : true, // if automatic semicolon insertion should be tolerated
             bitwise     : true, // if bitwise operators should not be allowed
             boss        : true, // if advanced usage of assignments should be allowed
@@ -1006,7 +1007,7 @@ var JSHINT = (function () {
             character = 1;
             s = lines[line];
             line += 1;
-            at = s.search(/ \t|\t /);
+            at = s.search(option.smarttabs ? / \t/ : / \t|\t /);
 
             if (at >= 0)
                 warningAt("Mixed spaces and tabs.", line, at + 1);
