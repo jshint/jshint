@@ -12,7 +12,7 @@ exports.unsafe = function () {
     var code = [
         'var a\u000a ="Here is a unsafe character";'
     ];
-
+    
     TestRun()
         .addError(1, "Unsafe character.")
         .test(code);
@@ -80,11 +80,6 @@ exports.regexp = function () {
       , 'var j = /[a-<<-3]./;'
       , 'var k = /]}/;'
       , 'var k = /?(*)(+)({)/;'
-      , ''
-      , ''
-      , ''
-      , ''
-      , ''
     ];
 
     TestRun()
@@ -120,4 +115,31 @@ exports.ownProperty = function () {
     TestRun()
         .addError(1, "'hasOwnProperty' is a really bad name.")
         .test(code);
+};
+
+exports.jsonMode = function () {
+    var code = [
+        '{',
+        '   a: 2,',
+        '   \'b\': "hallo\\"\\v\\x12\\\'world",',
+        '   "c\\"\\v\\x12": \'4\',',
+        '   "d": "4\\',
+        '   ",',
+        '   "e": 0x332,',
+        '   "x": 1',
+        '}'
+    ];
+
+    TestRun()
+        .addError(2, "Expected a string and instead saw a.")
+        .addError(3, "Strings must use doublequote.")
+        .addError(3, "Avoid \\v.")
+        .addError(3, "Avoid \\x-.")
+        .addError(3, "Avoid \\'.")
+        .addError(4, "Avoid \\v.")
+        .addError(4, "Avoid \\x-.")
+        .addError(4, "Strings must use doublequote.")
+        .addError(5, "Avoid EOL escapement.")
+        .addError(7, "Avoid 0x-. '0x332'.")
+        .test(code, {multistr: true});
 };
