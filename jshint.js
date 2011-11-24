@@ -4020,10 +4020,11 @@ loop:   for (;;) {
             advance('(end)');
         } catch (e) {
             if (e) {
+                var nt = nexttoken || {};
                 JSHINT.errors.push({
                     reason    : e.message,
-                    line      : e.line || nexttoken.line,
-                    character : e.character || nexttoken.from
+                    line      : e.line || nt.line,
+                    character : e.character || nt.from
                 }, null);
             }
         }
