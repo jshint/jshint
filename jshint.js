@@ -1162,16 +1162,20 @@ var JSHINT = (function () {
                         c = String.fromCharCode(i);
                     }
                     j = 0;
-                    for (;;) {
+unclosedString:     for (;;) {
                         while (j >= s.length) {
                             j = 0;
+                            
+                            var cl = line, cf = from;
+                            if (!nextLine()) {
+                                errorAt("Unclosed string.", cl, cf);
+                                break unclosedString;
+                            }
+                            
                             if (allowNewLine) {
                                 allowNewLine = false;
                             } else {
-                                warningAt("Unclosed string.", line, from);
-                            }
-                            if (!nextLine()) {
-                                errorAt("Unclosed string.", line, from);
+                                warningAt("Unclosed string.", cl, cf);
                             }
                         }
                         c = s.charAt(j);
