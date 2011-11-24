@@ -79,7 +79,13 @@ exports.regexp = function () {
       , 'var i = /[/-a1-/]/;'
       , 'var j = /[a-<<-3]./;'
       , 'var k = /]}/;'
-      , 'var k = /?(*)(+)({)/;'
+      , 'var l = /?(*)(+)({)/;'
+      , 'var m = /a{b}b{2,c}c{3,2}d{4,?}x{30,40}/;'
+      , 'var n = /a??b+?c*?d{3,4}? a?b+c*d{3,4}/;'
+      , 'var o = /a\\/*  [a-^-22-]/;'
+      , 'var p = /(?:(?=a|(?!b)))/;'
+      , 'var q = /=x=/;'
+      , 'var r = /dsdg;'
     ];
 
     TestRun()
@@ -104,6 +110,32 @@ exports.regexp = function () {
         .addError(14, "Unescaped '*'.")
         .addError(14, "Unescaped '+'.")
         .addError(14, "Unescaped '{'.")
+        .addError(15, "Expected a number and instead saw 'b'.")
+        .addError(15, "Expected '}' and instead saw 'c'.")
+        .addError(15, "Unescaped '}'.")
+        .addError(15, "Expected '}' and instead saw '?'.")
+        .addError(15, "'3' should not be greater than '2'.")
+        .addError(17, "Spaces are hard to count. Use {2}.")
+        .addError(17, "Unescaped '^'.")
+        .addError(17, "Unescaped '-'.")
+        .addError(19, "A regular expression literal can be confused with '/='.")
+        .addError(19, "Missing semicolon.") // ?
+        .addError(19, "Unclosed regular expression.") // line?
+        .test(code);
+};
+
+exports.strings = function () {
+    var code = [
+        'var a = "\u0012\\r";'
+      , 'var b = \'\\g\';'
+      , '' // 'var c = "a;' // TODO: Add this and line, jshint runs endless
+    ];
+
+    TestRun()
+        .addError(1, "Control character in string: .")
+        .addError(1, "Unsafe character.")
+        .addError(2, "Bad escapement.")
+        //.addError(3, "Unclosed string.")
         .test(code);
 };
 
@@ -119,15 +151,15 @@ exports.ownProperty = function () {
 
 exports.jsonMode = function () {
     var code = [
-        '{',
-        '   a: 2,',
-        '   \'b\': "hallo\\"\\v\\x12\\\'world",',
-        '   "c\\"\\v\\x12": \'4\',',
-        '   "d": "4\\',
-        '   ",',
-        '   "e": 0x332,',
-        '   "x": 1',
-        '}'
+        '{'
+      , '   a: 2,'
+      , '   \'b\': "hallo\\"\\v\\x12\\\'world",'
+      , '   "c\\"\\v\\x12": \'4\','
+      , '   "d": "4\\'
+      , '   ",'
+      , '   "e": 0x332,'
+      , '   "x": 0'
+      , '}'
     ];
 
     TestRun()
