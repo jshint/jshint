@@ -128,14 +128,16 @@ exports.strings = function () {
     var code = [
         'var a = "\u0012\\r";'
       , 'var b = \'\\g\';'
-      , '' // 'var c = "a;' // TODO: Add this and line, jshint runs endless
+      , 'var c = "\\u0022\\u0070\\u005C";'
+      , 'var x = "ax'
     ];
 
     TestRun()
         .addError(1, "Control character in string: .")
         .addError(1, "Unsafe character.")
         .addError(2, "Bad escapement.")
-        //.addError(3, "Unclosed string.")
+        .addError(3, "Unnecessary escapement.")
+        .addError(4, "Unclosed string.")
         .test(code);
 };
 
