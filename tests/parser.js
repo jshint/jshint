@@ -10,11 +10,122 @@ var JSHINT  = require('../jshint.js').JSHINT,
 
 exports.unsafe = function () {
     var code = [
-        'var a\u000a ="Here is a unsafe character";'
+        'var a\u000a = "Here is a unsafe character";'
     ];
     
     TestRun()
         .addError(1, "Unsafe character.")
+        .test(code);
+};
+
+exports.other = function () {
+    var code = [
+        '\\'
+      , '!'
+    ];
+    
+    TestRun()
+        .addError(1, "Unexpected '\\'.")
+        .addError(2, "Unexpected early end of program.")
+        .addError(2, "Expected an identifier and instead saw '(end)'.")
+        .test(code);
+};
+
+exports.confusingOps = function () {
+    var code = [
+        'var a = 3 - -3;'
+      , 'var b = 3 + +3;'
+      , 'a = a - --a;'
+      , 'a = b + ++b;'
+      , 'a = a-- - 3;' // this is not confusing?!
+      , 'a = a++ + 3;' // this is not confusing?!
+    ];
+    
+    TestRun()
+        .addError(1, "Confusing minusses.")
+        .addError(2, "Confusing plusses.")
+        .addError(3, "Confusing minusses.")
+        .addError(4, "Confusing plusses.")
+        .test(code);
+};
+
+
+exports.plusplus = function () {
+    var code = [
+        'var a = ++[2];'
+      , 'var b = --(2);'
+    ];
+    
+    TestRun()
+        .addError(1, "Unexpected use of '++'.")
+        .addError(2, "Unexpected use of '--'.")
+        .test(code, { plusplus: true });
+        
+    TestRun()
+        .addError(2, "Bad operand.")
+        .test(code, { plusplus: false });
+};
+
+exports.assignment = function () {
+    var code = [
+        'arguments.length = 2;'
+      , 'a() = 2;'
+    ];
+    
+    TestRun()
+        .addError(1, "Bad assignment.")
+        .addError(2, "Bad assignment.")
+        .addError(2, "Expected an assignment or function call and instead saw an expression.")
+        .addError(2, "Missing semicolon.")
+        .test(code, { plusplus: true });
+};
+
+exports.relations = function () {
+    var code = [
+        'var a = 2 === NaN;'
+      , 'var b = NaN == 2;'
+      , 'var c = !2 < 3;'
+      , 'var c = 2 < !3;'
+    ];
+    
+    TestRun()
+        .addError(1, "Use the isNaN function to compare with NaN.")
+        .addError(2, "Use the isNaN function to compare with NaN.")
+        .addError(3, "Confusing use of '!'.", {character : 9})
+        .addError(4, "Confusing use of '!'.", {character : 13})
+        .test(code);
+};
+
+exports.options = function () {
+    var code = [
+        '/*member a*/'
+      , '/*members b*/'
+      , 'var x; x.a.b.c();'
+      , '/*jshint +++ */'
+      , '/*jslint indent: -2 */'
+      , '/*jslint indent: 100.4 */'
+      , '/*jslint maxlen: 200.4 */'
+      , '/*jslint maxerr: 300.4 */'
+      , '/*jslint maxerr: 20 */'
+      , '/*member c:true */'
+      , '/*jshint d:no */'
+      , '/*globals xxx*/'
+      , 'xxx = 2;'
+    ];
+    
+    TestRun()
+        .addError(3, "Unexpected /*member 'c'.")
+        .addError(4, "Bad option.")
+        .addError(4, "Missing option value.")
+        .addError(5, "Expected a small integer and instead saw '-'.")
+        .addError(5, "Bad option.")
+        .addError(5, "Missing option value.")
+        .addError(6, "Expected a small integer and instead saw '100.4'.")
+        .addError(7, "Expected a small integer and instead saw '200.4'.")
+        .addError(8, "Expected a small integer and instead saw '300.4'.")
+        .addError(10, "Expected '*/' and instead saw ':'.")
+        .addError(11, "Bad option value.")
+        .addError(13, "Read only.")
         .test(code);
 };
 
@@ -34,18 +145,29 @@ exports.shebang = function () {
 };
 
 exports.numbers = function () {
+    /*jshint maxlen: 300*/
     var code = [
         'var a = 10e307;'
       , 'var b = 10e308;'
-      , 'var c = 0.03;'
+      , 'var c = 0.03 + 0.3 + 3.0 + 30.00;'
       , 'var d = 03;'
-      , 'var f = .3;'
+      , 'var e = .3;'
+      , 'var f = 0xAAg;'
+      , 'var g = 0033;'
+      , 'var h = 3.;'
+      , 'var i = 3.7.toString();'
     ];
 
     TestRun()
         .addError(2, "Bad number '10e308'.")
         .addError(4, "Don't use extra leading zeros '03'.")
         .addError(5, "A leading decimal point can be confused with a dot: '.3'.")
+        .addError(6, "Missing space after '0xAA'.")
+        .addError(6, "Missing semicolon.")
+        .addError(6, "Expected an assignment or function call and instead saw an expression.")
+        .addError(7, "Don't use extra leading zeros '0033'.")
+        .addError(8, "A trailing decimal point can be confused with a dot '3.'.")
+        .addError(9, "A dot following a number can be confused with a decimal point.")
         .test(code);
 };
 
@@ -84,8 +206,13 @@ exports.regexp = function () {
       , 'var n = /a??b+?c*?d{3,4}? a?b+c*d{3,4}/;'
       , 'var o = /a\\/*  [a-^-22-]/;'
       , 'var p = /(?:(?=a|(?!b)))/;'
-      , 'var q = /=x=/;'
-      , 'var r = /dsdg;'
+      , 'var q = /=;//;' // hack to not get other errors than "... confused with '/='".
+                         // The current parser recognizes this as /= and not as regex
+      , 'var r = /(/;'
+      , 'var s = /(((/;'
+      , 'var t = /x/* 2;'
+      , 'var u = /x/;'
+      , 'var v = /dsdg;'
     ];
 
     TestRun()
@@ -119,8 +246,10 @@ exports.regexp = function () {
         .addError(17, "Unescaped '^'.")
         .addError(17, "Unescaped '-'.")
         .addError(19, "A regular expression literal can be confused with '/='.")
-        .addError(19, "Missing semicolon.") // ?
-        .addError(19, "Unclosed regular expression.") // line?
+        .addError(20, "1 unterminated regular expression group(s).")
+        .addError(21, "3 unterminated regular expression group(s).")
+        .addError(22, "Confusing regular expression.")
+        .addError(24, "Unclosed regular expression.")
         .test(code);
 };
 
