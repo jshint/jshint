@@ -934,3 +934,14 @@ exports.esnext = function () {
         .addError(4, "Attempting to override 'foo' which is a constant")
         .test(code, { esnext: true });
 };
+
+/*
+ * Tests the `maxlen` option
+ */
+exports.maxlen = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/maxlen.js', 'utf8');
+
+    TestRun()
+        .addError(3, "Line too long.")
+        .test(src, { maxlen: 23 });
+};
