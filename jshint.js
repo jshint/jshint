@@ -654,7 +654,6 @@ var JSHINT = (function () {
         },
 
         scope,      // The current scope
-        src,
         stack,
 
         // standard contains the global names that are provided by the
@@ -1320,9 +1319,6 @@ unclosedString:     for (;;) {
     //      // comment
 
                         case '//':
-                            if (src) {
-                                warningAt("Unexpected comment.", line, character);
-                            }
                             s = '';
                             token.comment = true;
                             break;
@@ -1330,9 +1326,6 @@ unclosedString:     for (;;) {
     //      /* comment
 
                         case '/*':
-                            if (src) {
-                                warningAt("Unexpected comment.", line, character);
-                            }
                             for (;;) {
                                 i = s.search(lx);
                                 if (i >= 0) {
@@ -3986,7 +3979,6 @@ loop:   for (;;) {
         };
         functions = [funct];
         urls = [];
-        src = false;
         stack = null;
         member = {};
         membersOnly = null;
