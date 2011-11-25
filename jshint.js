@@ -2151,7 +2151,7 @@ loop:   for (;;) {
                 warning("Confusing use of '{a}'.", left, '!');
             }
             if (right.id === '!') {
-                warning("Confusing use of '{a}'.", left, '!');
+                warning("Confusing use of '{a}'.", right, '!');
             }
             this.left = left;
             this.right = right;
