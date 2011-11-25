@@ -1364,8 +1364,8 @@ unclosedString:     for (;;) {
     //      /
                         case '/':
                             if (token.id === '/=') {
-                                errorAt(
-"A regular expression literal can be confused with '/='.", line, from);
+                                errorAt("A regular expression literal can be confused with '/='.",
+                                    line, from);
                             }
                             if (prereg) {
                                 depth = 0;
@@ -1382,8 +1382,8 @@ unclosedString:     for (;;) {
                                         return;
                                     case '/':
                                         if (depth > 0) {
-                                            warningAt("Unescaped '{a}'.",
-                                                    line, from + l, '/');
+                                            warningAt("{a} unterminated regular expression " +
+                                                "group(s).", line, from + l, depth);
                                         }
                                         c = s.substr(0, l - 1);
                                         q = {
