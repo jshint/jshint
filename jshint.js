@@ -1270,6 +1270,7 @@ unclosedString:     for (;;) {
                         }
                         if (s) {
                             errorAt("Unexpected '{a}'.", line, character, s.substr(0, 1));
+                            s = '';
                         }
                     } else {
 
