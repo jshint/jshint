@@ -113,6 +113,11 @@ exports.latedefwundef = function () {
         .test(src, { latedef: true, undef: true });
 };
 
+exports.undefwstrict = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/undefstrict.js', 'utf8');
+    TestRun().test(src, { undef: false });
+};
+
 /**
  * The `proto` and `iterator` options allow you to prohibit the use of the
  * special `__proto__` and `__iterator__` properties, respectively.
