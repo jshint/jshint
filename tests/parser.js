@@ -12,7 +12,7 @@ exports.unsafe = function () {
     var code = [
         'var a\u000a = "Here is a unsafe character";'
     ];
-    
+
     TestRun()
         .addError(1, "Unsafe character.")
         .test(code);
@@ -23,7 +23,7 @@ exports.other = function () {
         '\\'
       , '!'
     ];
-    
+
     TestRun()
         .addError(1, "Unexpected '\\'.")
         .addError(2, "Unexpected early end of program.")
@@ -40,7 +40,7 @@ exports.confusingOps = function () {
       , 'a = a-- - 3;' // this is not confusing?!
       , 'a = a++ + 3;' // this is not confusing?!
     ];
-    
+
     TestRun()
         .addError(1, "Confusing minusses.")
         .addError(2, "Confusing plusses.")
@@ -55,12 +55,12 @@ exports.plusplus = function () {
         'var a = ++[2];'
       , 'var b = --(2);'
     ];
-    
+
     TestRun()
         .addError(1, "Unexpected use of '++'.")
         .addError(2, "Unexpected use of '--'.")
         .test(code, { plusplus: true });
-        
+
     TestRun()
         .addError(2, "Bad operand.")
         .test(code, { plusplus: false });
@@ -71,7 +71,7 @@ exports.assignment = function () {
         'arguments.length = 2;'
       , 'a() = 2;'
     ];
-    
+
     TestRun()
         .addError(1, "Bad assignment.")
         .addError(2, "Bad assignment.")
@@ -86,13 +86,23 @@ exports.relations = function () {
       , 'var b = NaN == 2;'
       , 'var c = !2 < 3;'
       , 'var c = 2 < !3;'
+      , 'var d = (!"x" in obj);'
+      , 'var e = (!a === b);'
+      , 'var f = (a === !"hi");'
+      , 'var g = (!2 === 1);'
+      , 'var h = (![1, 2, 3] === []);'
     ];
-    
+
     TestRun()
         .addError(1, "Use the isNaN function to compare with NaN.")
         .addError(2, "Use the isNaN function to compare with NaN.")
         .addError(3, "Confusing use of '!'.", {character : 9})
         .addError(4, "Confusing use of '!'.", {character : 13})
+        .addError(5, "Confusing use of '!'.", {character : 10})
+        .addError(6, "Confusing use of '!'.", {character : 10})
+        .addError(7, "Confusing use of '!'.", {character : 16})
+        .addError(8, "Confusing use of '!'.", {character : 10})
+        .addError(9, "Confusing use of '!'.", {character : 10})
         .test(code);
 };
 
@@ -112,7 +122,7 @@ exports.options = function () {
       , '/*globals xxx*/'
       , 'xxx = 2;'
     ];
-    
+
     TestRun()
         .addError(3, "Unexpected /*member 'c'.")
         .addError(4, "Bad option.")
