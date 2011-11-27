@@ -222,8 +222,8 @@
  send, serialize, sessionStorage, setInterval, setTimeout, shift, slice, sort,spawn,
  split, stack, status, start, strict, sub, substr, supernew, shadow, supplant, sum,
  sync, test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing, type,
- typeOf, Uint16Array, Uint32Array, Uint8Array, undef, unused, urls, validthis, value, valueOf,
- var, version, WebSocket, white, window, Worker, wsh*/
+ typeOf, Uint16Array, Uint32Array, Uint8Array, undef, undefs, unused, urls, validthis,
+ value, valueOf, var, version, WebSocket, white, window, Worker, wsh*/
 
 /*global exports: false */
 
@@ -935,6 +935,10 @@ var JSHINT = (function () {
             character: chr,
             message: message + " (" + percentage + "% scanned)."
         };
+    }
+
+    function isundef(scope, m, t, a) {
+        return JSHINT.undefs.push([scope, m, t, a]);
     }
 
     function warning(m, t, a, b, c, d) {
@@ -1668,7 +1672,6 @@ klass:                                  do {
         }
 
 // Define t in the current function in the current scope.
-
         if (is_own(funct, t) && !funct['(global)']) {
             if (funct[t] === true) {
                 if (option.latedef)
@@ -2642,7 +2645,7 @@ loop:   for (;;) {
                 // if we're inside of typeof or delete.
                 if (anonname != 'typeof' && anonname != 'delete' &&
                     option.undef && typeof predefined[v] !== 'boolean') {
-                    warning("'{a}' is not defined.", token, v);
+                    isundef(funct, "'{a}' is not defined.", token, v);
                 }
                 note_implied(token);
             } else {
@@ -2675,10 +2678,9 @@ loop:   for (;;) {
                         // if the base object of a reference is null so no need to
                         // display warning if we're inside of typeof or delete.
                         if (anonname != 'typeof' && anonname != 'delete' && option.undef) {
-                            warning("'{a}' is not defined.", token, v);
-                        } else {
-                            funct[v] = true;
+                            isundef(funct, "'{a}' is not defined.", token, v);
                         }
+                        funct[v] = true;
                         note_implied(token);
                     } else {
                         switch (s[v]) {
@@ -3942,6 +3944,7 @@ loop:   for (;;) {
     var itself = function (s, o, g) {
         var a, i, k;
         JSHINT.errors = [];
+        JSHINT.undefs = [];
         predefined = Object.create(standard);
         combine(predefined, g || {});
         if (o) {
@@ -4027,6 +4030,17 @@ loop:   for (;;) {
                 }, null);
             }
         }
+
+        for (i = 0; i < JSHINT.undefs.length; i += 1) {
+            k = JSHINT.undefs[i].slice(0);
+            scope = k.shift();
+            a = k[2];
+
+            if (typeof scope[a] !== 'string' && typeof funct[a] !== 'string') {
+                warning.apply(warning, k);
+            }
+        }
+
         return JSHINT.errors.length === 0;
     };
 
