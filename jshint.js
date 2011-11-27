@@ -1161,13 +1161,13 @@ var JSHINT = (function () {
 unclosedString:     for (;;) {
                         while (j >= s.length) {
                             j = 0;
-                            
+
                             var cl = line, cf = from;
                             if (!nextLine()) {
                                 errorAt("Unclosed string.", cl, cf);
                                 break unclosedString;
                             }
-                            
+
                             if (allowNewLine) {
                                 allowNewLine = false;
                             } else {
@@ -3148,7 +3148,6 @@ loop:   for (;;) {
         nospace();
         if (nexttoken.id === ')') {
             advance(')');
-            nospace(prevtoken, token);
             return;
         }
         for (;;) {
