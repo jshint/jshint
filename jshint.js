@@ -4029,7 +4029,7 @@ loop:   for (;;) {
                     reason    : e.message,
                     line      : e.line || nt.line,
                     character : e.character || nt.from
-                }, null);
+                });
             }
         }
 

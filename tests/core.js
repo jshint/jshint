@@ -374,3 +374,10 @@ exports.argsInCatchReused = function () {
         .addError(23, "'e' is not defined.")
         .test(src, { undef: true });
 };
+
+exports.testrawonerror = function () {
+    JSHINT(";", { maxerr: 1 });
+    var errors = JSHINT.errors;
+    var tme = errors.pop();
+    assert.equal(tme.raw, "Too many errors.");
+};
