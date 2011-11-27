@@ -222,8 +222,8 @@
  send, serialize, sessionStorage, setInterval, setTimeout, shift, slice, sort,spawn,
  split, stack, status, start, strict, sub, substr, supernew, shadow, supplant, sum,
  sync, test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing, type,
- typeOf, Uint16Array, Uint32Array, Uint8Array, undef, unused, urls, validthis, value, valueOf,
- var, version, WebSocket, white, window, Worker, wsh*/
+ typeOf, Uint16Array, Uint32Array, Uint8Array, undef, unused, urls, vaguereturn, validthis,
+ value, valueOf, var, version, WebSocket, white, window, Worker, wsh*/
 
 /*global exports: false */
 
@@ -317,6 +317,7 @@ var JSHINT = (function () {
             supernew    : true, // if `new function () { ... };` and `new Object;`
                                 // should be tolerated
             trailing    : true, // if trailing whitespace rules apply
+            vaguereturn : true, // if we should not allow assignments in return statements
             validthis   : true, // if 'this' inside a non-constructor function is valid.
                                 // This is a function scoped option only.
             white       : true, // if strict whitespace rules apply
@@ -3802,6 +3803,10 @@ loop:   for (;;) {
 
             if (nexttoken.id !== ';' && !nexttoken.reach) {
                 nonadjacent(token, nexttoken);
+                if (peek().value === "=" && option.vaguereturn) {
+                    warningAt("Avoid ambiguous assignments in return statements.",
+                              token.line, token.character + 1);
+                }
                 this.first = expression(0);
             }
         } else if (!option.asi) {
