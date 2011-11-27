@@ -425,7 +425,7 @@ exports.bitwise = function () {
         'var c = ~a;',
         'c &= 2;'
     ];
-    
+
     // By default allow bitwise operators
     for (var i = 0, op; op = ops[i]; i += 1) {
         TestRun().test('var c = a ' + op + ' b;');
@@ -543,12 +543,12 @@ exports.nomen = function () {
     // Normal names should pass all the time
     TestRun().test('var hey;');
     TestRun().test('var hey;', { nomen: true });
-    
+
     // node globals
     TestRun()
         .addError(1, "Unexpected dangling '_' in '_x'.")
         .test('var x = top._x + __dirname + __filename;', { node: true, nomen: true });
-    
+
 };
 
 /** Option `passfail` tells JSHint to stop at the first error. */
@@ -755,12 +755,14 @@ exports.white = function () {
         .addError(15, "Missing space after ':'.")
         .addError(18, "Unexpected space after '('.", { character: 9 })
         .addError(18, "Unexpected space after 'ex'.", { character: 12 })
-        .addError(55, "Missing space after ','.") // 2 times??
+        .addError(55, "Missing space after ','.") // 2 times?
         .addError(56, "Missing space after '1'.")
         .addError(58, "Unexpected space before 'b'.")
         .addError(58, "Unexpected space after 'a'.")
         .addError(60, "Unexpected space before 'c'.")
         .addError(62, "Expected 'var' to have an indentation at 1 instead at 2.")
+        .addError(64, "Unexpected space after 'nodblwarnings'.", { character: 23 })
+        .addError(64, "Unexpected space after '('.", { character: 25 })
         .test(src, { white: true });
 };
 
