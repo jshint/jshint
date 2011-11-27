@@ -2127,6 +2127,9 @@ loop:   for (;;) {
                 nobreaknonadjacent(prevtoken, token);
                 nonadjacent(token, nexttoken);
             }
+            if (s === "in" && left.id === "!") {
+                warning("Confusing use of '{a}'.", left, '!');
+            }
             if (typeof f === 'function') {
                 return f(left, this);
             } else {
