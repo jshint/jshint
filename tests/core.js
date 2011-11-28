@@ -375,3 +375,10 @@ exports.argsInCatchReused = function () {
         .addError(23, "'e' is not defined.")
         .test(src, { undef: true });
 };
+
+exports.testRawOnError = function () {
+    JSHINT(';', { maxerr: 1 });
+    assert.equal(JSHINT.errors[0].raw, 'Unnecessary semicolon.');
+    assert.equal(JSHINT.errors[1].raw, 'Too many errors.');
+    assert.equal(JSHINT.errors[2], null);
+};
