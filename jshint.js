@@ -1387,7 +1387,7 @@ unclosedString:     for (;;) {
                                     case '':
                                         errorAt("Unclosed regular expression.",
                                                 line, from);
-                                        return;
+                                        return quit('Stopping.', line, from);
                                     case '/':
                                         if (depth > 0) {
                                             warningAt("{a} unterminated regular expression " +
