@@ -236,8 +236,9 @@ exports.returnStatement = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/return.js', 'utf8');
 
     TestRun()
+        .addError(3, "Did you mean to return a conditional instead of an assignment?")
         .addError(38, "Line breaking error 'return'.")
-        .test(src, { maxerr: 1 });
+        .test(src, { maxerr: 2 });
 };
 
 exports.globalDeclarations = function () {
@@ -373,4 +374,11 @@ exports.argsInCatchReused = function () {
         .addError(12, "Do not assign to the exception parameter.")
         .addError(23, "'e' is not defined.")
         .test(src, { undef: true });
+};
+
+exports.testRawOnError = function () {
+    JSHINT(';', { maxerr: 1 });
+    assert.equal(JSHINT.errors[0].raw, 'Unnecessary semicolon.');
+    assert.equal(JSHINT.errors[1].raw, 'Too many errors.');
+    assert.equal(JSHINT.errors[2], null);
 };

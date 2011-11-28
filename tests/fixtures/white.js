@@ -4,9 +4,9 @@ function hello () {
 
 var bye = function() {
     if(hey){
-        // Next line has a trailing whitespace
-        return;  
-    }  
+        // Next two lines have a trailing whitespace
+        return; 
+    } 
 };
 
 try {
@@ -60,3 +60,7 @@ var a,b,
         c(
 );
  var z;
+
+function nodblwarnings ( ) {
+    return 1;
+}

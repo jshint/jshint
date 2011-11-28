@@ -73,6 +73,51 @@ exports.latedef = function () {
         .test(src, { latedef: true });
 };
 
+exports.latedefwundef = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/latedefundef.js', 'utf8');
+
+    // Assures that when `undef` is set to true, it'll report undefined variables
+    // and late definitions won't be reported as `latedef` is set to false.
+    TestRun()
+        .addError(29, "'hello' is not defined.")
+        .addError(35, "'world' is not defined.")
+        .test(src, { latedef: false, undef: true });
+
+    // When we suppress `latedef` and `undef` then we get no warnings.
+    TestRun()
+        .test(src, { latedef: false, undef: false });
+
+    // If we warn on `latedef` but supress `undef` we only get the
+    // late definition warnings.
+    TestRun()
+        .addError(5, "'func2' was used before it was defined.")
+        .addError(12, "'foo' was used before it was defined.")
+        .addError(18, "'fn1' was used before it was defined.")
+        .addError(26, "'baz' was used before it was defined.")
+        .addError(34, "'fn' was used before it was defined.")
+        .addError(41, "'q' was used before it was defined.")
+        .addError(46, "'h' was used before it was defined.")
+        .test(src, { latedef: true, undef: false });
+
+    // If we warn on both options we get all the warnings.
+    TestRun()
+        .addError(5, "'func2' was used before it was defined.")
+        .addError(12, "'foo' was used before it was defined.")
+        .addError(18, "'fn1' was used before it was defined.")
+        .addError(26, "'baz' was used before it was defined.")
+        .addError(29, "'hello' is not defined.")
+        .addError(34, "'fn' was used before it was defined.")
+        .addError(35, "'world' is not defined.")
+        .addError(41, "'q' was used before it was defined.")
+        .addError(46, "'h' was used before it was defined.")
+        .test(src, { latedef: true, undef: true });
+};
+
+exports.undefwstrict = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/undefstrict.js', 'utf8');
+    TestRun().test(src, { undef: false });
+};
+
 /**
  * The `proto` and `iterator` options allow you to prohibit the use of the
  * special `__proto__` and `__iterator__` properties, respectively.
@@ -425,7 +470,7 @@ exports.bitwise = function () {
         'var c = ~a;',
         'c &= 2;'
     ];
-    
+
     // By default allow bitwise operators
     for (var i = 0, op; op = ops[i]; i += 1) {
         TestRun().test('var c = a ' + op + ' b;');
@@ -543,12 +588,12 @@ exports.nomen = function () {
     // Normal names should pass all the time
     TestRun().test('var hey;');
     TestRun().test('var hey;', { nomen: true });
-    
+
     // node globals
     TestRun()
         .addError(1, "Unexpected dangling '_' in '_x'.")
         .test('var x = top._x + __dirname + __filename;', { node: true, nomen: true });
-    
+
 };
 
 /** Option `passfail` tells JSHint to stop at the first error. */
@@ -755,12 +800,14 @@ exports.white = function () {
         .addError(15, "Missing space after ':'.")
         .addError(18, "Unexpected space after '('.", { character: 9 })
         .addError(18, "Unexpected space after 'ex'.", { character: 12 })
-        .addError(55, "Missing space after ','.") // 2 times??
+        .addError(55, "Missing space after ','.") // 2 times?
         .addError(56, "Missing space after '1'.")
         .addError(58, "Unexpected space before 'b'.")
         .addError(58, "Unexpected space after 'a'.")
         .addError(60, "Unexpected space before 'c'.")
         .addError(62, "Expected 'var' to have an indentation at 1 instead at 2.")
+        .addError(64, "Unexpected space after 'nodblwarnings'.", { character: 23 })
+        .addError(64, "Unexpected space after '('.", { character: 25 })
         .test(src, { white: true });
 };
 
