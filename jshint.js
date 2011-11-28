@@ -3848,6 +3848,7 @@ loop:   for (;;) {
     reserve('protected');
     reserve('public');
     reserve('static');
+    reserve('native');
 
 
 // Parse JSON
