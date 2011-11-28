@@ -236,8 +236,9 @@ exports.returnStatement = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/return.js', 'utf8');
 
     TestRun()
+        .addError(3, "Did you mean to return a conditional instead of an assignment?")
         .addError(38, "Line breaking error 'return'.")
-        .test(src, { maxerr: 1 });
+        .test(src, { maxerr: 2 });
 };
 
 exports.globalDeclarations = function () {

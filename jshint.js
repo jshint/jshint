@@ -3807,6 +3807,10 @@ loop:   for (;;) {
 
             if (nexttoken.id !== ';' && !nexttoken.reach) {
                 nonadjacent(token, nexttoken);
+                if (peek().value === "=" && !option.boss) {
+                    warningAt("Did you mean to return a conditional instead of an assignment?",
+                              token.line, token.character + 1);
+                }
                 this.first = expression(0);
             }
         } else if (!option.asi) {
