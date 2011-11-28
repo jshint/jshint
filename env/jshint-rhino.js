@@ -1,8 +1,6 @@
 /*jshint boss: true, rhino: true */
 /*globals JSHINT*/
 
-load("jshint.js");
-
 (function (args) {
     var filenames = [],
         optstr, // arg1=val1,arg2=val2,...
