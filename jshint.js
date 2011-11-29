@@ -974,8 +974,8 @@ var JSHINT = (function () {
         return w;
     }
 
-    function warningAt(m, l, ch, a, b, c, d) {
-        return warning(null, m, {
+    function warningAt(opt, m, l, ch, a, b, c, d) {
+        return warning(opt, m, {
             line: l,
             from: ch
         }, a, b, c, d);
@@ -1014,21 +1014,21 @@ var JSHINT = (function () {
             at = s.search(/ \t|\t /);
 
             if (at >= 0)
-                warningAt("Mixed spaces and tabs.", line, at + 1);
+                warningAt(null, "Mixed spaces and tabs.", line, at + 1);
 
             s = s.replace(/\t/g, tab);
             at = s.search(cx);
 
             if (at >= 0)
-                warningAt("Unsafe character.", line, at);
+                warningAt(null, "Unsafe character.", line, at);
 
             if (option.maxlen && option.maxlen < s.length)
-                warningAt("Line too long.", line, s.length);
+                warningAt("maxlen", "Line too long.", line, s.length);
 
             // Check for trailing whitespaces
             tw = /\s+$/.test(s);
             if (option.trailing && tw && !/^\s+$/.test(s)) {
-                warningAt("Trailing whitespace.", line, tw);
+                warningAt("trailing", "Trailing whitespace.", line, tw);
             }
             return true;
         }
@@ -1048,22 +1048,22 @@ var JSHINT = (function () {
             t = Object.create(t);
             if (type === '(string)' || type === '(range)') {
                 if (!option.scripturl && jx.test(value)) {
-                    warningAt("Script URL.", line, from);
+                    warningAt("scripturl", "Script URL.", line, from);
                 }
             }
             if (type === '(identifier)') {
                 t.identifier = true;
                 if (value === '__proto__' && !option.proto) {
-                    warningAt("The '{a}' property is deprecated.",
+                    warningAt("proto", "The '{a}' property is deprecated.",
                         line, from, value);
                 } else if (value === '__iterator__' && !option.iterator) {
-                    warningAt("'{a}' is only available in JavaScript 1.7.",
+                    warningAt("iterator", "'{a}' is only available in JavaScript 1.7.",
                         line, from, value);
                 } else if (option.nomen && (value.charAt(0) === '_' ||
                          value.charAt(value.length - 1) === '_')) {
                     if (!option.node || token.id == '.' ||
                             (value != '__dirname' && value != '__filename')) {
-                        warningAt("Unexpected {a} in '{b}'.", line, from, "dangling '_'", value);
+                        warningAt("nomen", "Unexpected {a} in '{b}'.", line, from, "dangling '_'", value);
                     }
                 }
             }
@@ -1123,7 +1123,7 @@ var JSHINT = (function () {
                         character += 1;
                         return it('(range)', value);
                     case '\\':
-                        warningAt("Unexpected '{a}'.", line, character, c);
+                        warningAt(null, "Unexpected '{a}'.", line, character, c);
                     }
                     value += c;
                 }
@@ -1152,7 +1152,7 @@ var JSHINT = (function () {
                     var c, j, r = '', allowNewLine = false;
 
                     if (jsonmode && x !== '"') {
-                        warningAt("Strings must use doublequote.",
+                        warningAt(null, "Strings must use doublequote.",
                                 line, character);
                     }
 
@@ -1161,7 +1161,7 @@ var JSHINT = (function () {
                         j += n;
                         if (i >= 32 && i <= 126 &&
                                 i !== 34 && i !== 92 && i !== 39) {
-                            warningAt("Unnecessary escapement.", line, character);
+                            warningAt(null, "Unnecessary escapement.", line, character);
                         }
                         character += n;
                         c = String.fromCharCode(i);
@@ -1180,7 +1180,7 @@ unclosedString:     for (;;) {
                             if (allowNewLine) {
                                 allowNewLine = false;
                             } else {
-                                warningAt("Unclosed string.", cl, cf);
+                                warningAt(null, "Unclosed string.", cl, cf);
                             }
                         }
                         c = s.charAt(j);
@@ -1193,7 +1193,7 @@ unclosedString:     for (;;) {
                             if (c === '\n' || c === '\r') {
                                 break;
                             }
-                            warningAt("Control character in string: {a}.",
+                            warningAt(null, "Control character in string: {a}.",
                                     line, character + j, s.slice(0, j));
                         } else if (c === '\\') {
                             j += 1;
@@ -1206,7 +1206,7 @@ unclosedString:     for (;;) {
                                 break;
                             case '\'':
                                 if (jsonmode) {
-                                    warningAt("Avoid \\'.", line, character);
+                                    warningAt(null, "Avoid \\'.", line, character);
                                 }
                                 break;
                             case 'b':
@@ -1229,13 +1229,13 @@ unclosedString:     for (;;) {
                                 break;
                             case 'v':
                                 if (jsonmode) {
-                                    warningAt("Avoid \\v.", line, character);
+                                    warningAt(null, "Avoid \\v.", line, character);
                                 }
                                 c = '\v';
                                 break;
                             case 'x':
                                 if (jsonmode) {
-                                    warningAt("Avoid \\x-.", line, character);
+                                    warningAt(null, "Avoid \\x-.", line, character);
                                 }
                                 esc(2);
                                 break;
@@ -1246,17 +1246,17 @@ unclosedString:     for (;;) {
                                 allowNewLine = true;
                                 if (option.multistr) {
                                     if (jsonmode) {
-                                        warningAt("Avoid EOL escapement.", line, character);
+                                        warningAt("multistr", "Avoid EOL escapement.", line, character);
                                     }
                                     c = '';
                                     character -= 1;
                                     break;
                                 }
-                                warningAt("Bad escapement of EOL. Use option multistr if needed.",
+                                warningAt(null, "Bad escapement of EOL. Use option multistr if needed.",
                                     line, character);
                                 break;
                             default:
-                                warningAt("Bad escapement.", line, character);
+                                warningAt(null, "Bad escapement.", line, character);
                             }
                         }
                         r += c;
@@ -1292,27 +1292,27 @@ unclosedString:     for (;;) {
 
                         if (c.isDigit()) {
                             if (!isFinite(Number(t))) {
-                                warningAt("Bad number '{a}'.",
+                                warningAt(null, "Bad number '{a}'.",
                                     line, character, t);
                             }
                             if (s.substr(0, 1).isAlpha()) {
-                                warningAt("Missing space after '{a}'.",
+                                warningAt(null, "Missing space after '{a}'.",
                                         line, character, t);
                             }
                             if (c === '0') {
                                 d = t.substr(1, 1);
                                 if (d.isDigit()) {
                                     if (token.id !== '.') {
-                                        warningAt("Don't use extra leading zeros '{a}'.",
+                                        warningAt(null, "Don't use extra leading zeros '{a}'.",
                                             line, character, t);
                                     }
                                 } else if (jsonmode && (d === 'x' || d === 'X')) {
-                                    warningAt("Avoid 0x-. '{a}'.",
+                                    warningAt(null, "Avoid 0x-. '{a}'.",
                                             line, character, t);
                                 }
                             }
                             if (t.substr(t.length - 1) === '.') {
-                                warningAt(
+                                warningAt(null,
 "A trailing decimal point can be confused with a dot '{a}'.", line, character, t);
                             }
                             return it('(number)', t);
@@ -1390,7 +1390,7 @@ unclosedString:     for (;;) {
                                         return quit('Stopping.', line, from);
                                     case '/':
                                         if (depth > 0) {
-                                            warningAt("{a} unterminated regular expression " +
+                                            warningAt(null, "{a} unterminated regular expression " +
                                                 "group(s).", line, from + l, depth);
                                         }
                                         c = s.substr(0, l - 1);
@@ -1414,10 +1414,10 @@ unclosedString:     for (;;) {
                                     case '\\':
                                         c = s.charAt(l);
                                         if (c < ' ') {
-                                            warningAt(
+                                            warningAt(null,
 "Unexpected control character in regular expression.", line, from + l);
                                         } else if (c === '<') {
-                                            warningAt(
+                                            warningAt(null,
 "Unexpected escaped character '{a}' in regular expression.", line, from + l, c);
                                         }
                                         l += 1;
@@ -1434,7 +1434,7 @@ unclosedString:     for (;;) {
                                                 l += 1;
                                                 break;
                                             default:
-                                                warningAt(
+                                                warningAt(null,
 "Expected '{a}' and instead saw '{b}'.", line, from + l, ':', s.charAt(l));
                                             }
                                         } else {
@@ -1446,7 +1446,7 @@ unclosedString:     for (;;) {
                                         break;
                                     case ')':
                                         if (depth === 0) {
-                                            warningAt("Unescaped '{a}'.",
+                                            warningAt(null, "Unescaped '{a}'.",
                                                     line, from + l, ')');
                                         } else {
                                             depth -= 1;
@@ -1459,7 +1459,7 @@ unclosedString:     for (;;) {
                                             q += 1;
                                         }
                                         if (q > 1) {
-                                            warningAt(
+                                            warningAt(null,
 "Spaces are hard to count. Use {{a}}.", line, from + l, q);
                                         }
                                         break;
@@ -1468,7 +1468,7 @@ unclosedString:     for (;;) {
                                         if (c === '^') {
                                             l += 1;
                                             if (option.regexp) {
-                                                warningAt("Insecure '{a}'.",
+                                                warningAt("regexp", "Insecure '{a}'.",
                                                         line, from + l, c);
                                             } else if (s.charAt(l) === ']') {
                                                 errorAt("Unescaped '{a}'.",
@@ -1476,7 +1476,7 @@ unclosedString:     for (;;) {
                                             }
                                         }
                                         if (c === ']') {
-                                            warningAt("Empty class.", line,
+                                            warningAt(null, "Empty class.", line,
                                                     from + l - 1);
                                         }
                                         isLiteral = false;
@@ -1487,7 +1487,7 @@ klass:                                  do {
                                             switch (c) {
                                             case '[':
                                             case '^':
-                                                warningAt("Unescaped '{a}'.",
+                                                warningAt(null, "Unescaped '{a}'.",
                                                         line, from + l, c);
                                                 if (isInRange) {
                                                     isInRange = false;
@@ -1506,7 +1506,7 @@ klass:                                  do {
                                                 } else {
                                                     if (option.regexdash !== (l === 2 || (l === 3 &&
                                                         s.charAt(2) === '^'))) {
-                                                        warningAt("Unescaped '{a}'.",
+                                                        warningAt(null, "Unescaped '{a}'.",
                                                             line, from + l - 1, '-');
                                                     }
                                                     isLiteral = true;
@@ -1514,17 +1514,17 @@ klass:                                  do {
                                                 break;
                                             case ']':
                                                 if (isInRange && !option.regexdash) {
-                                                    warningAt("Unescaped '{a}'.",
+                                                    warningAt("regexdash", "Unescaped '{a}'.",
                                                             line, from + l - 1, '-');
                                                 }
                                                 break klass;
                                             case '\\':
                                                 c = s.charAt(l);
                                                 if (c < ' ') {
-                                                    warningAt(
+                                                    warningAt(null,
 "Unexpected control character in regular expression.", line, from + l);
                                                 } else if (c === '<') {
-                                                    warningAt(
+                                                    warningAt(null,
 "Unexpected escaped character '{a}' in regular expression.", line, from + l, c);
                                                 }
                                                 l += 1;
@@ -1532,7 +1532,7 @@ klass:                                  do {
                                                 // \w, \s and \d are never part of a character range
                                                 if (/[wsd]/i.test(c)) {
                                                     if (isInRange) {
-                                                        warningAt("Unescaped '{a}'.",
+                                                        warningAt(null, "Unescaped '{a}'.",
                                                             line, from + l, '-');
                                                         isInRange = false;
                                                     }
@@ -1544,7 +1544,7 @@ klass:                                  do {
                                                 }
                                                 break;
                                             case '/':
-                                                warningAt("Unescaped '{a}'.",
+                                                warningAt(null, "Unescaped '{a}'.",
                                                         line, from + l - 1, '/');
 
                                                 if (isInRange) {
@@ -1571,7 +1571,7 @@ klass:                                  do {
                                         break;
                                     case '.':
                                         if (option.regexp) {
-                                            warningAt("Insecure '{a}'.", line,
+                                            warningAt("regexp", "Insecure '{a}'.", line,
                                                     from + l, c);
                                         }
                                         break;
@@ -1581,7 +1581,7 @@ klass:                                  do {
                                     case '}':
                                     case '+':
                                     case '*':
-                                        warningAt("Unescaped '{a}'.", line,
+                                        warningAt(null, "Unescaped '{a}'.", line,
                                                 from + l, c);
                                     }
                                     if (b) {
@@ -1598,7 +1598,7 @@ klass:                                  do {
                                             l += 1;
                                             c = s.charAt(l);
                                             if (c < '0' || c > '9') {
-                                                warningAt(
+                                                warningAt(null,
 "Expected a number and instead saw '{a}'.", line, from + l, c);
                                             }
                                             l += 1;
@@ -1630,7 +1630,7 @@ klass:                                  do {
                                                 }
                                             }
                                             if (s.charAt(l) !== '}') {
-                                                warningAt(
+                                                warningAt(null,
 "Expected '{a}' and instead saw '{b}'.", line, from + l, '}', c);
                                             } else {
                                                 l += 1;
@@ -1639,7 +1639,7 @@ klass:                                  do {
                                                 l += 1;
                                             }
                                             if (low > high) {
-                                                warningAt(
+                                                warningAt(null,
 "'{a}' should not be greater than '{b}'.", line, from + l, low, high);
                                             }
                                         }
@@ -2390,7 +2390,7 @@ loop:   for (;;) {
                     // Otherwise, complain about missing semicolon.
                     if (!option.lastsemic || nexttoken.id != '}' ||
                             nexttoken.line != token.line) {
-                        warningAt("Missing semicolon.", token.line, token.character);
+                        warningAt("lastsemic", "Missing semicolon.", token.line, token.character);
                     }
                 }
             } else {
@@ -3820,7 +3820,7 @@ loop:   for (;;) {
             if (nexttoken.id !== ';' && !nexttoken.reach) {
                 nonadjacent(token, nexttoken);
                 if (peek().value === "=" && !option.boss) {
-                    warningAt("Did you mean to return a conditional instead of an assignment?",
+                    warningAt("boss", "Did you mean to return a conditional instead of an assignment?",
                               token.line, token.character + 1);
                 }
                 this.first = expression(0);
