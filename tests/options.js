@@ -563,16 +563,17 @@ exports.evil = function () {
  */
 exports.immed = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/immed.js', 'utf8');
+    var opt = { option: "immed" };
 
     TestRun().test(src);
 
     TestRun()
         .addError(3, "Wrap an immediate function invocation in parentheses " +
                      "to assist the reader in understanding that the expression " +
-                     "is the result of a function, and not the function itself.")
-        .addError(7, "Move the invocation into the parens that contain the function.")
+                     "is the result of a function, and not the function itself.", opt)
+        .addError(7, "Move the invocation into the parens that contain the function.", opt)
         .addError(13, "Do not wrap function literals in parens unless they are to " +
-                      "be immediately invoked.")
+                      "be immediately invoked.", opt)
         .test(src, { immed: true });
 };
 
@@ -596,7 +597,7 @@ exports.nomen = function () {
 
     // node globals
     TestRun()
-        .addError(1, "Unexpected dangling '_' in '_x'.")
+        .addError(1, "Unexpected dangling '_' in '_x'.", { option: "nomen" })
         .test('var x = top._x + __dirname + __filename;', { node: true, nomen: true });
 
 };
@@ -629,7 +630,7 @@ exports.onevar = function () {
 
     TestRun().test(src);
     TestRun()
-        .addError(10, "Too many var statements.")
+        .addError(10, "Too many var statements.", { option: "onevar" })
         .test(src, { onevar: true });
 };
 
@@ -644,7 +645,7 @@ exports.plusplus = function () {
 
     for (i = 0, op = null; op = ops[i]; i += 1) {
         TestRun()
-            .addError(1, "Unexpected use of '" + op + "'.")
+            .addError(1, "Unexpected use of '" + op + "'.", { option: "plusplus" })
             .test('var i = j' + op + ';', { plusplus: true });
 
         TestRun()
@@ -667,20 +668,21 @@ exports.plusplus = function () {
  */
 exports.newcap = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/newcap.js', 'utf8');
+    var opt = { option: "newcap" };
 
     TestRun().test(src); // By default, everything is fine
 
     // When newcap is true, enforce the conventions
     TestRun()
-        .addError(1, 'A constructor name should start with an uppercase letter.')
-        .addError(5, "Missing 'new' prefix when invoking a constructor.")
+        .addError(1, 'A constructor name should start with an uppercase letter.', opt)
+        .addError(5, "Missing 'new' prefix when invoking a constructor.", opt)
         .test(src, { newcap: true });
 };
 
 /** Option `sub` allows all forms of subscription. */
 exports.sub = function () {
     TestRun()
-        .addError(1, "['prop'] is better written in dot notation.")
+        .addError(1, "['prop'] is better written in dot notation.", { option: "sub" })
         .test("window.obj = obj['prop'];");
 
     TestRun().test("window.obj = obj['prop'];", { sub: true });
@@ -697,7 +699,7 @@ exports.strict = function () {
     TestRun().test(code1);
 
     TestRun()
-        .addError(1, 'Missing "use strict" statement.')
+        .addError(1, 'Missing "use strict" statement.', { option: "strict" })
         .test(code, { strict: true });
 
     TestRun().test(code1, { strict: true });
