@@ -1676,10 +1676,10 @@ klass:                                  do {
         if (is_own(funct, t) && !funct['(global)']) {
             if (funct[t] === true) {
                 if (option.latedef)
-                    warning(null, "'{a}' was used before it was defined.", nexttoken, t);
+                    warning("latedef", "'{a}' was used before it was defined.", nexttoken, t);
             } else {
                 if (!option.shadow && type !== "exception")
-                    warning(null, "'{a}' is already defined.", nexttoken, t);
+                    warning("shadow", "'{a}' is already defined.", nexttoken, t);
             }
         }
 
@@ -1688,7 +1688,7 @@ klass:                                  do {
             global[t] = funct;
             if (is_own(implied, t)) {
                 if (option.latedef)
-                    warning(null, "'{a}' was used before it was defined.", nexttoken, t);
+                    warning("latedef", "'{a}' was used before it was defined.", nexttoken, t);
                 delete implied[t];
             }
         } else {
@@ -1947,7 +1947,7 @@ loop:   for (;;) {
         if (option.white) {
             if (left.character !== right.from && left.line === right.line) {
                 left.from += (left.character - left.from);
-                warning(null, "Unexpected space after '{a}'.", left, left.value);
+                warning("white", "Unexpected space after '{a}'.", left, left.value);
             }
         }
     }
@@ -1956,7 +1956,7 @@ loop:   for (;;) {
         left = left || token;
         right = right || nexttoken;
         if (option.white && (left.character !== right.from || left.line !== right.line)) {
-            warning(null, "Unexpected space before '{a}'.", right, right.value);
+            warning("white", "Unexpected space before '{a}'.", right, right.value);
         }
     }
 
@@ -1976,7 +1976,7 @@ loop:   for (;;) {
             right = right || nexttoken;
             if (left.line === right.line && left.character === right.from) {
                 left.from += (left.character - left.from);
-                warning(null, "Missing space after '{a}'.",
+                warning("white", "Missing space after '{a}'.",
                         left, left.value);
             }
         }
@@ -1986,13 +1986,13 @@ loop:   for (;;) {
         left = left || token;
         right = right || nexttoken;
         if (!option.laxbreak && left.line !== right.line) {
-            warning(null, "Bad line breaking before '{a}'.", right, right.id);
+            warning("laxbreak", "Bad line breaking before '{a}'.", right, right.id);
         } else if (option.white) {
             left = left || token;
             right = right || nexttoken;
             if (left.character === right.from) {
                 left.from += (left.character - left.from);
-                warning(null, "Missing space after '{a}'.",
+                warning("white", "Missing space after '{a}'.",
                         left, left.value);
             }
         }
@@ -2003,7 +2003,7 @@ loop:   for (;;) {
         if (option.white && nexttoken.id !== '(end)') {
             i = indent + (bias || 0);
             if (nexttoken.from !== i) {
-                warning(null,
+                warning("white",
 "Expected '{a}' to have an indentation at {b} instead at {c}.",
                         nexttoken, nexttoken.value, i, nexttoken.from);
             }
@@ -2021,11 +2021,11 @@ loop:   for (;;) {
     function comma() {
         if (token.line !== nexttoken.line) {
             if (!option.laxbreak) {
-                warning(null, "Bad line breaking before '{a}'.", token, nexttoken.id);
+                warning("laxbreak", "Bad line breaking before '{a}'.", token, nexttoken.id);
             }
         } else if (!token.comment && token.character !== nexttoken.from && option.white) {
             token.from += (token.character - token.from);
-            warning(null, "Unexpected space after '{a}'.", token, token.value);
+            warning("white", "Unexpected space after '{a}'.", token, token.value);
         }
         advance(',');
         nonadjacent(token, nexttoken);
@@ -2085,7 +2085,7 @@ loop:   for (;;) {
             this.arity = 'unary';
             if (this.id === '++' || this.id === '--') {
                 if (option.plusplus) {
-                    warning(null, "Unexpected use of '{a}'.", this, this.id);
+                    warning("plusplus", "Unexpected use of '{a}'.", this, this.id);
                 } else if ((!this.right.identifier || this.right.reserved) &&
                         this.right.id !== '.' && this.right.id !== '[') {
                     warning(null, "Bad operand.", this);
@@ -2226,7 +2226,7 @@ loop:   for (;;) {
         reserveName(x);
         x.led = (typeof f === 'function') ? f : function (left) {
             if (option.bitwise) {
-                warning(null, "Unexpected use of '{a}'.", this, this.id);
+                warning("bitwise", "Unexpected use of '{a}'.", this, this.id);
             }
             this.left = left;
             this.right = expression(p);
@@ -2240,7 +2240,7 @@ loop:   for (;;) {
         symbol(s, 20).exps = true;
         return infix(s, function (left, that) {
             if (option.bitwise) {
-                warning(null, "Unexpected use of '{a}'.", that, that.id);
+                warning("bitwise", "Unexpected use of '{a}'.", that, that.id);
             }
             nonadjacent(prevtoken, token);
             nonadjacent(token, nexttoken);
@@ -2266,7 +2266,7 @@ loop:   for (;;) {
         var x = symbol(s, 150);
         x.led = function (left) {
             if (option.plusplus) {
-                warning(null, "Unexpected use of '{a}'.", this, this.id);
+                warning("plusplus", "Unexpected use of '{a}'.", this, this.id);
             } else if ((!left.identifier || left.reserved) &&
                     left.id !== '.' && left.id !== '[') {
                 warning(null, "Bad operand.", this);
@@ -2380,7 +2380,7 @@ loop:   for (;;) {
                         "Expected an assignment or function call and instead saw an expression.",
                         token);
             } else if (option.nonew && r.id === '(' && r.left.id === 'new') {
-                warning(null, "Do not use 'new' for side effects.");
+                warning("nonew", "Do not use 'new' for side effects.");
             }
 
             if (nexttoken.id !== ';') {
@@ -2525,7 +2525,7 @@ loop:   for (;;) {
 
                     if (option.strict && funct['(context)']['(global)']) {
                         if (!m["use strict"] && !directive["use strict"]) {
-                            warning(null, "Missing \"use strict\" statement.");
+                            warning("strict", "Missing \"use strict\" statement.");
                         }
                     }
                 }
@@ -2550,7 +2550,7 @@ loop:   for (;;) {
                   nexttoken, '{', nexttoken.value);
         } else {
             if (!stmt || option.curly)
-                warning(null, "Expected '{a}' and instead saw '{b}'.",
+                warning("curly", "Expected '{a}' and instead saw '{b}'.",
                         nexttoken, '{', nexttoken.value);
 
             noreach = true;
@@ -2564,7 +2564,7 @@ loop:   for (;;) {
         if (!ordinary || !option.funcscope) scope = s;
         inblock = b;
         if (ordinary && option.noempty && (!a || a.length === 0)) {
-            warning(null, "Empty block.");
+            warning("noempty", "Empty block.");
         }
         return a;
     }
@@ -2764,7 +2764,7 @@ loop:   for (;;) {
     reservevar('this', function (x) {
         if (directive['use strict'] && !option.validthis && ((funct['(statement)'] &&
                 funct['(name)'].charAt(0) > 'Z') || funct['(global)'])) {
-            warning(null, "Possible strict violation.", x);
+            warning("validthis", "Possible strict violation.", x);
         }
     });
     reservevar('true');
@@ -2800,7 +2800,7 @@ loop:   for (;;) {
         var eqnull = option.eqnull && (left.value == 'null' || right.value == 'null');
 
         if (!eqnull && option.eqeqeq)
-            warning(null, "Expected '{a}' and instead saw '{b}'.", this, '===', '==');
+            warning("eqeqeq", "Expected '{a}' and instead saw '{b}'.", this, '===', '==');
         else if (isPoorRelation(left))
             warning(null, "Use '{a}' to compare with '{b}'.", this, '===', left.value);
         else if (isPoorRelation(right))
@@ -2814,7 +2814,7 @@ loop:   for (;;) {
                 (left.value == 'null' || right.value == 'null');
 
         if (!eqnull && option.eqeqeq) {
-            warning(null, "Expected '{a}' and instead saw '{b}'.",
+            warning("eqeqeq", "Expected '{a}' and instead saw '{b}'.",
                     this, '!==', '!=');
         } else if (isPoorRelation(left)) {
             warning(null, "Use '{a}' to compare with '{b}'.",
@@ -2841,7 +2841,7 @@ loop:   for (;;) {
             left.value += right.value;
             left.character = right.character;
             if (!option.scripturl && jx.test(left.value)) {
-                warning(null, "JavaScript URL.", left);
+                warning("scripturl", "JavaScript URL.", left);
             }
             return left;
         }
@@ -2898,7 +2898,7 @@ loop:   for (;;) {
 
     prefix('~', function () {
         if (option.bitwise) {
-            warning(null, "Unexpected '{a}'.", this, '~');
+            warning("bitwise", "Unexpected '{a}'.", this, '~');
         }
         expression(150);
         return this;
@@ -2931,7 +2931,7 @@ loop:   for (;;) {
                     break;
                 case 'Function':
                     if (!option.evil) {
-                        warning(null, "The Function constructor is eval.");
+                        warning("evil", "The Function constructor is eval.");
                     }
                     break;
                 case 'Date':
@@ -2954,11 +2954,11 @@ loop:   for (;;) {
             }
         } else {
             if (!option.supernew)
-                warning(null, "Weird construction. Delete 'new'.", this);
+                warning("supernew", "Weird construction. Delete 'new'.", this);
         }
         adjacent(token, nexttoken);
         if (nexttoken.id !== '(' && !option.supernew) {
-            warning(null, "Missing '()' invoking a constructor.");
+            warning("supernew", "Missing '()' invoking a constructor.");
         }
         this.first = c;
         return this;
@@ -2978,15 +2978,15 @@ loop:   for (;;) {
         that.right = m;
         if (left && left.value === 'arguments' && (m === 'callee' || m === 'caller')) {
             if (option.noarg)
-                warning(null, "Avoid arguments.{a}.", left, m);
+                warning("noarg", "Avoid arguments.{a}.", left, m);
             else if (directive['use strict'])
                 error('Strict violation.');
         } else if (!option.evil && left && left.value === 'document' &&
                 (m === 'write' || m === 'writeln')) {
-            warning(null, "document.write can be a form of eval.", left);
+            warning("evil", "document.write can be a form of eval.", left);
         }
         if (!option.evil && (m === 'eval' || m === 'execScript')) {
-            warning(null, 'eval is evil.');
+            warning("evil", 'eval is evil.');
         }
         return that;
     }, 160, true);
@@ -2997,7 +2997,7 @@ loop:   for (;;) {
         }
         nospace();
         if (option.immed && !left.immed && left.id === 'function') {
-            warning(null, "Wrap an immediate function invocation in parentheses " +
+            warning("immed", "Wrap an immediate function invocation in parentheses " +
                 "to assist the reader in understanding that the expression " +
                 "is the result of a function, and not the function itself.");
         }
@@ -3012,7 +3012,7 @@ loop:   for (;;) {
                         if (left.value === 'Math') {
                             warning(null, "Math is not a function.", left);
                         } else if (option.newcap) {
-                            warning(null,
+                            warning("newcap",
 "Missing 'new' prefix when invoking a constructor.", left);
                         }
                     }
@@ -3066,10 +3066,10 @@ loop:   for (;;) {
         nospace(prevtoken, token);
         if (option.immed && v.id === 'function') {
             if (nexttoken.id === '(') {
-                warning(null,
+                warning("immed",
 "Move the invocation into the parens that contain the function.", nexttoken);
             } else {
-                warning(null,
+                warning("immed",
 "Do not wrap function literals in parens unless they are to be immediately invoked.",
                         this);
             }
@@ -3083,13 +3083,13 @@ loop:   for (;;) {
         var e = expression(0), s;
         if (e && e.type === '(string)') {
             if (!option.evil && (e.value === 'eval' || e.value === 'execScript')) {
-                warning(null, "eval is evil.", that);
+                warning("evil", "eval is evil.", that);
             }
             countMember(e.value);
             if (!option.sub && ix.test(e.value)) {
                 s = syntax[e.value];
                 if (!s || !s.reserved) {
-                    warning(null, "['{a}'] is better written in dot notation.",
+                    warning("sub", "['{a}'] is better written in dot notation.",
                             e, e.value);
                 }
             }
@@ -3244,7 +3244,7 @@ loop:   for (;;) {
                     adjacent(token, nexttoken);
                     f = doFunction();
                     if (!option.loopfunc && funct['(loopage)']) {
-                        warning(null, "Don't make functions within a loop.", t);
+                        warning("loopfunc", "Don't make functions within a loop.", t);
                     }
                     p = f['(params)'];
                     if (p) {
@@ -3315,10 +3315,10 @@ loop:   for (;;) {
                 nonadjacent(token, nexttoken);
                 id = identifier();
                 if (funct[id] === "const") {
-                    warning(null, "const '" + id + "' has already been declared");
+                    warning("esnext", "const '" + id + "' has already been declared");
                 }
                 if (funct['(global)'] && predefined[id] === false) {
-                    warning(null, "Redefinition of '{a}'.", token, id);
+                    warning("esnext", "Redefinition of '{a}'.", token, id);
                 }
                 addlabel(id, 'const');
                 if (prefix) {
@@ -3328,7 +3328,7 @@ loop:   for (;;) {
                 this.first.push(token);
 
                 if (nexttoken.id !== "=") {
-                    warning(null, "const " +
+                    warning("esnext", "const " +
                       "'{a}' is initialized to 'undefined'.", token, id);
                 }
 
@@ -3337,7 +3337,7 @@ loop:   for (;;) {
                     advance('=');
                     nonadjacent(token, nexttoken);
                     if (nexttoken.id === 'undefined') {
-                        warning(null, "It is not necessary to initialize " +
+                        warning("esnext", "It is not necessary to initialize " +
                           "'{a}' to 'undefined'.", token, id);
                     }
                     if (peek(0).id === '=' && nexttoken.identifier) {
@@ -3364,7 +3364,7 @@ loop:   for (;;) {
         var id, name, value;
 
         if (funct['(onevar)'] && option.onevar) {
-            warning(null, "Too many var statements.");
+            warning("onevar", "Too many var statements.");
         } else if (!funct['(global)']) {
             funct['(onevar)'] = true;
         }
@@ -3373,7 +3373,7 @@ loop:   for (;;) {
             nonadjacent(token, nexttoken);
             id = identifier();
             if (option.esnext && funct[id] === "const") {
-                warning(null, "const '" + id + "' has already been declared");
+                warning("esnext", "const '" + id + "' has already been declared");
             }
             if (funct['(global)'] && predefined[id] === false) {
                 warning(null, "Redefinition of '{a}'.", token, id);
@@ -3417,7 +3417,7 @@ loop:   for (;;) {
         }
         var i = identifier();
         if (option.esnext && funct[i] === "const") {
-            warning(null, "const '" + i + "' has already been declared");
+            warning("esnext", "const '" + i + "' has already been declared");
         }
         adjacent(token, nexttoken);
         addlabel(i, 'unction');
@@ -3438,7 +3438,7 @@ loop:   for (;;) {
         }
         doFunction(i);
         if (!option.loopfunc && funct['(loopage)']) {
-            warning(null, "Don't make functions within a loop.");
+            warning("loopfunc", "Don't make functions within a loop.");
         }
         return this;
     });
@@ -3451,7 +3451,7 @@ loop:   for (;;) {
         expression(20);
         if (nexttoken.id === '=') {
             if (!option.boss)
-                warning(null, "Expected a conditional expression and instead saw an assignment.");
+                warning("boss", "Expected a conditional expression and instead saw an assignment.");
             advance('=');
             expression(20);
         }
@@ -3514,7 +3514,7 @@ loop:   for (;;) {
         expression(20);
         if (nexttoken.id === '=') {
             if (!option.boss)
-                warning(null, "Expected a conditional expression and instead saw an assignment.");
+                warning("boss", "Expected a conditional expression and instead saw an assignment.");
             advance('=');
             expression(20);
         }
@@ -3598,7 +3598,7 @@ loop:   for (;;) {
                 if (this.cases.length === 1 || this.condition.id === 'true' ||
                         this.condition.id === 'false') {
                     if (!option.onecase)
-                        warning(null, "This 'switch' should be an 'if'.", this);
+                        warning("onecase", "This 'switch' should be an 'if'.", this);
                 }
                 funct['(breakage)'] -= 1;
                 funct['(verb)'] = undefined;
@@ -3637,7 +3637,7 @@ loop:   for (;;) {
 
     stmt('debugger', function () {
         if (!option.debug) {
-            warning(null, "All 'debugger' statements should be removed.");
+            warning("debug", "All 'debugger' statements should be removed.");
         }
         return this;
     }).exps = true;
@@ -3700,7 +3700,7 @@ loop:   for (;;) {
             s = block(true, true);
             if (option.forin && s && (s.length > 1 || typeof s[0] !== 'object' ||
                     s[0].value !== 'if')) {
-                warning(null,
+                warning("forin",
                     "The body of a for in should be wrapped in an if statement to filter " +
                     "unwanted properties from the prototype.", this);
             }
@@ -3728,7 +3728,7 @@ loop:   for (;;) {
                 expression(20);
                 if (nexttoken.id === '=') {
                     if (!option.boss)
-                        warning(null,
+                        warning("boss",
                             "Expected a conditional expression and instead saw an assignment.");
                     advance('=');
                     expression(20);
@@ -3889,7 +3889,8 @@ loop:   for (;;) {
                     } else if ((nexttoken.value === '__proto__' &&
                         !option.proto) || (nexttoken.value === '__iterator__' &&
                         !option.iterator)) {
-                        warning(null, "The '{a}' key may produce unexpected results.",
+                        warning(nexttoken.value.replace("__", ""),
+                            "The '{a}' key may produce unexpected results.",
                             nexttoken, nexttoken.value);
                     } else {
                         o[nexttoken.value] = true;
@@ -4033,7 +4034,7 @@ loop:   for (;;) {
             default:
                 directives();
                 if (directive["use strict"] && !option.globalstrict) {
-                    warning(null, "Use the function form of \"use strict\".", prevtoken);
+                    warning("globalstrict", "Use the function form of \"use strict\".", prevtoken);
                 }
 
                 statements();
