@@ -382,3 +382,11 @@ exports.testRawOnError = function () {
     assert.equal(JSHINT.errors[1].raw, 'Too many errors.');
     assert.equal(JSHINT.errors[2], null);
 };
+
+exports.yesEmptyStmt = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/emptystmt.js', 'utf8');
+
+    TestRun()
+        .addError(1, "Expected an identifier and instead saw ';'.")
+        .test(src, { curly: false, expr: true });
+};
