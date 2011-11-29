@@ -1057,8 +1057,8 @@ var JSHINT = (function () {
                         line, from, value);
                 } else if (option.nomen && (value.charAt(0) === '_' ||
                          value.charAt(value.length - 1) === '_')) {
-                    if (!option.node || token.id == '.' ||
-                            (value != '__dirname' && value != '__filename')) {
+                    if (!option.node || token.id === '.' ||
+                            (value !== '__dirname' && value !== '__filename')) {
                         warningAt("Unexpected {a} in '{b}'.", line, from, "dangling '_'", value);
                     }
                 }
@@ -1091,7 +1091,7 @@ var JSHINT = (function () {
 
                 // If the first line is a shebang (#!), make it a blank and move on.
                 // Shebangs are used by Node scripts.
-                if (lines[0] && lines[0].substr(0, 2) == '#!')
+                if (lines[0] && lines[0].substr(0, 2) === '#!')
                     lines[0] = '';
 
                 line = 0;
@@ -1765,7 +1765,7 @@ loop:   for (;;) {
                                 v, v.value);
                     }
                     obj.maxlen = b;
-                } else if (t.value == 'validthis') {
+                } else if (t.value === 'validthis') {
                     if (funct['(global)']) {
                         error("Option 'validthis' can't be used in a global scope.");
                     } else {
@@ -1917,9 +1917,9 @@ loop:   for (;;) {
                 }
             }
             while (rbp < nexttoken.lbp) {
-                isArray = token.value == 'Array';
+                isArray = token.value === 'Array';
                 advance();
-                if (isArray && token.id == '(' && nexttoken.id == ')')
+                if (isArray && token.id === '(' && nexttoken.id === ')')
                     warning("Use the array literal notation [].", token);
                 if (token.led) {
                     left = token.led(left);
@@ -2280,7 +2280,7 @@ loop:   for (;;) {
                 // `undefined` as a function param is a common pattern to protect
                 // against the case when somebody does `undefined = true` and
                 // help with minification. More info: https://gist.github.com/315916
-                if (!fnparam || token.value != 'undefined') {
+                if (!fnparam || token.value !== 'undefined') {
                     warning("Expected an identifier and instead saw '{a}' (a reserved word).",
                             token, token.id);
                 }
@@ -2380,8 +2380,8 @@ loop:   for (;;) {
                     // If this is the last statement in a block that ends on
                     // the same line *and* option lastsemic is on, ignore the warning.
                     // Otherwise, complain about missing semicolon.
-                    if (!option.lastsemic || nexttoken.id != '}' ||
-                            nexttoken.line != token.line) {
+                    if (!option.lastsemic || nexttoken.id !== '}' ||
+                            nexttoken.line !== token.line) {
                         warningAt("Missing semicolon.", token.line, token.character);
                     }
                 }
@@ -2643,7 +2643,7 @@ loop:   for (;;) {
                 // Operators typeof and delete do not raise runtime errors even if
                 // the base object of a reference is null so no need to display warning
                 // if we're inside of typeof or delete.
-                if (anonname != 'typeof' && anonname != 'delete' &&
+                if (anonname !== 'typeof' && anonname !== 'delete' &&
                     option.undef && typeof predefined[v] !== 'boolean') {
                     isundef(funct, "'{a}' is not defined.", token, v);
                 }
@@ -2677,7 +2677,7 @@ loop:   for (;;) {
                         // Operators typeof and delete do not raise runtime errors even
                         // if the base object of a reference is null so no need to
                         // display warning if we're inside of typeof or delete.
-                        if (anonname != 'typeof' && anonname != 'delete' && option.undef) {
+                        if (anonname !== 'typeof' && anonname !== 'delete' && option.undef) {
                             isundef(funct, "'{a}' is not defined.", token, v);
                         }
                         funct[v] = true;
@@ -2789,7 +2789,7 @@ loop:   for (;;) {
     bitwise('^', 'bitxor', 80);
     bitwise('&', 'bitand', 90);
     relation('==', function (left, right) {
-        var eqnull = option.eqnull && (left.value == 'null' || right.value == 'null');
+        var eqnull = option.eqnull && (left.value === 'null' || right.value === 'null');
 
         if (!eqnull && option.eqeqeq)
             warning("Expected '{a}' and instead saw '{b}'.", this, '===', '==');
@@ -2803,7 +2803,7 @@ loop:   for (;;) {
     relation('===');
     relation('!=', function (left, right) {
         var eqnull = option.eqnull &&
-                (left.value == 'null' || right.value == 'null');
+                (left.value === 'null' || right.value === 'null');
 
         if (!eqnull && option.eqeqeq) {
             warning("Expected '{a}' and instead saw '{b}'.",
@@ -4268,5 +4268,5 @@ loop:   for (;;) {
 }());
 
 // Make JSHINT a Node module, if possible.
-if (typeof exports == 'object' && exports)
+if (typeof exports === 'object' && exports)
     exports.JSHINT = JSHINT;
