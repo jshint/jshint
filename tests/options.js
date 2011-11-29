@@ -25,7 +25,7 @@ exports.shadow = function () {
 
     // Do not tolerate variable shadowing by default
     TestRun()
-        .addError(5, "'a' is already defined.")
+        .addError(5, "'a' is already defined.", { option: "shadow" })
         .addError(10, "'foo' is already defined.")
         .test(src);
 
@@ -56,7 +56,7 @@ exports.latedef = function () {
 
     // However, JSHint must complain if variable is actually missing
     TestRun()
-        .addError(1, "'fn' is not defined.")
+        .addError(1, "'fn' is not defined.", { option: "undef" })
         .test('fn();', { undef: true });
 
     // And it also must complain about the redefinition (see option `shadow`)
@@ -67,7 +67,7 @@ exports.latedef = function () {
 
     // When latedef is true, JSHint must not tolerate the use before definition
     TestRun()
-        .addError(2, "'fn' was used before it was defined.")
+        .addError(2, "'fn' was used before it was defined.", { option: "latedef" })
         .addError(6, "'fn1' was used before it was defined.")
         .addError(10, "'vr' was used before it was defined.")
         .test(src, { latedef: true });
@@ -79,7 +79,7 @@ exports.latedefwundef = function () {
     // Assures that when `undef` is set to true, it'll report undefined variables
     // and late definitions won't be reported as `latedef` is set to false.
     TestRun()
-        .addError(29, "'hello' is not defined.")
+        .addError(29, "'hello' is not defined.", { option: "undef" })
         .addError(35, "'world' is not defined.")
         .test(src, { latedef: false, undef: true });
 
@@ -96,7 +96,7 @@ exports.latedefwundef = function () {
         .addError(26, "'baz' was used before it was defined.")
         .addError(34, "'fn' was used before it was defined.")
         .addError(41, "'q' was used before it was defined.")
-        .addError(46, "'h' was used before it was defined.")
+        .addError(46, "'h' was used before it was defined.", { option: "latedef" })
         .test(src, { latedef: true, undef: false });
 
     // If we warn on both options we get all the warnings.
@@ -106,8 +106,8 @@ exports.latedefwundef = function () {
         .addError(18, "'fn1' was used before it was defined.")
         .addError(26, "'baz' was used before it was defined.")
         .addError(29, "'hello' is not defined.")
-        .addError(34, "'fn' was used before it was defined.")
-        .addError(35, "'world' is not defined.")
+        .addError(34, "'fn' was used before it was defined.", { option: "latedef" })
+        .addError(35, "'world' is not defined.", { option: "undef" })
         .addError(41, "'q' was used before it was defined.")
         .addError(46, "'h' was used before it was defined.")
         .test(src, { latedef: true, undef: true });
@@ -129,10 +129,10 @@ exports.testProtoAndIterator = function () {
     // JSHint should not allow the `__proto__` and
     // `__iterator__` properties by default
     TestRun()
-        .addError(7, "The '__proto__' property is deprecated.")
+        .addError(7, "The '__proto__' property is deprecated.", { option: "proto" })
         .addError(8, "The '__proto__' property is deprecated.")
         .addError(10, "The '__proto__' property is deprecated.")
-        .addError(27, "'__iterator__' is only available in JavaScript 1.7.")
+        .addError(27, "'__iterator__' is only available in JavaScript 1.7.", { option: "iterator" })
         .addError(33, "The '__proto__' property is deprecated.")
         .addError(37, "The '__proto__' property is deprecated.")
         .test(source);
@@ -169,7 +169,7 @@ exports.curly = function () {
 
     // Require all blocks to be wrapped with curly braces if curly is true
     TestRun()
-        .addError(2, "Expected '{' and instead saw 'return'.")
+        .addError(2, "Expected '{' and instead saw 'return'.", { option: "curly" })
         .addError(5, "Expected '{' and instead saw 'doSomething'.")
         .addError(8, "Expected '{' and instead saw 'doSomething'.")
         .test(src, { curly: true });
@@ -186,7 +186,7 @@ exports.noempty = function () {
 
     // Do not tolerate, when noempty is true
     TestRun()
-        .addError(1, 'Empty block.')
+        .addError(1, 'Empty block.', { option: "noempty" })
         .test(code, { noempty: true });
 };
 
@@ -206,7 +206,7 @@ exports.noarg = function () {
     // Do not tolerate both .callee and .caller when noarg is true
     TestRun()
         .addError(2, 'Avoid arguments.callee.')
-        .addError(6, 'Avoid arguments.caller.')
+        .addError(6, 'Avoid arguments.caller.', { option: "noarg" })
         .test(src, { noarg: true });
 };
 
@@ -219,7 +219,7 @@ exports.nonew = function () {
     TestRun().test(code1);
 
     TestRun()
-        .addError(1, "Do not use 'new' for side effects.")
+        .addError(1, "Do not use 'new' for side effects.", { option: "nonew" })
         .test(code, { nonew: true });
 };
 
@@ -245,7 +245,7 @@ exports.asi = function () {
         .addError(19, "Missing semicolon.")
         .addError(21, "Line breaking error 'break'.")
         .addError(21, "Missing semicolon.")
-        .addError(25, "Missing semicolon.")
+        .addError(25, "Missing semicolon.", { option: "asi" })
         .addError(26, "Missing semicolon.", { character: 10 })
         .addError(27, "Missing semicolon.", { character: 12 })
         .addError(28, "Missing semicolon.", { character: 12 })
@@ -260,17 +260,18 @@ exports.asi = function () {
   * if that statement is followed by the closing brace on the same line. */
 exports.lastsemic = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/lastsemic.js', 'utf8');
+    var opt = { option: "asi" };
 
     // without lastsemic
     TestRun()
         .addError(2, "Missing semicolon.") // missing semicolon in the middle of a block
         .addError(4, "Missing semicolon.") // missing semicolon in a one-liner function
-        .addError(5, "Missing semicolon.") // missing semicolon at the end of a block
+        .addError(5, "Missing semicolon.", opt) // missing semicolon at the end of a block
         .test(src);
 
     // with lastsemic
     TestRun()
-        .addError(2, "Missing semicolon.")
+        .addError(2, "Missing semicolon.", opt)
         .addError(5, "Missing semicolon.")
         .test(src, { lastsemic: true });
     // this line is valid now: [1, 2, 3].forEach(function(i) { print(i) });
@@ -317,7 +318,7 @@ exports.undef = function () {
 
     // Make sure it fails when undef is true
     TestRun()
-        .addError(1, "'undef' is not defined.")
+        .addError(1, "'undef' is not defined.", { option: "undef" })
         .addError(6, "'localUndef' is not defined.")
         .test(src, { undef: true });
 };
@@ -332,9 +333,9 @@ exports.scripturl = function () {
 
     // Make sure there is an error
     TestRun()
-        .addError(1, "Script URL.")
+        .addError(1, "Script URL.", { option: "scripturl" })
         .addError(2, "Script URL.") // 2 times?
-        .addError(2, "JavaScript URL.")
+        .addError(2, "JavaScript URL.", { option: "scripturl" })
         .test(code);
 
     // Make sure the error goes away when javascript URLs are tolerated
@@ -369,7 +370,7 @@ exports.forin = function () {
 
     // Make sure it fails when forin is true
     TestRun()
-        .addError(13, msg)
+        .addError(13, msg, { option: "forin" })
         .test(src, { forin: true });
 };
 
@@ -386,7 +387,7 @@ exports.loopfunc = function () {
 
     // By default, not functions are allowed inside loops
     TestRun()
-        .addError(2, "Don't make functions within a loop.")
+        .addError(2, "Don't make functions within a loop.", { option: "loopfunc" })
         .addError(6, "Don't make functions within a loop.")
         .addError(10, "Function declarations should not be placed in blocks. Use a function " +
                       "expression or move the statement to the top of the outer function.")
@@ -403,13 +404,14 @@ exports.loopfunc = function () {
 /** Option `boss` unlocks some useful but unsafe features of JavaScript. */
 exports.boss = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/boss.js', 'utf8');
+    var boss = { option: "boss" };
 
     // By default, warn about suspicious assignments
     TestRun()
-        .addError(1, 'Expected a conditional expression and instead saw an assignment.')
-        .addError(4, 'Expected a conditional expression and instead saw an assignment.')
-        .addError(7, 'Expected a conditional expression and instead saw an assignment.')
-        .addError(12, 'Expected a conditional expression and instead saw an assignment.')
+        .addError(1, 'Expected a conditional expression and instead saw an assignment.', boss)
+        .addError(4, 'Expected a conditional expression and instead saw an assignment.', boss)
+        .addError(7, 'Expected a conditional expression and instead saw an assignment.', boss)
+        .addError(12, 'Expected a conditional expression and instead saw an assignment.', boss)
         .test(src);
 
     // But if you are the boss, all is good
@@ -453,10 +455,11 @@ exports.eqnull = function () {
  */
 exports.supernew = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/supernew.js', 'utf8');
+    var opt = { option: "supernew" };
 
     TestRun()
-        .addError(1, "Weird construction. Delete 'new'.")
-        .addError(9, "Missing '()' invoking a constructor.")
+        .addError(1, "Weird construction. Delete 'new'.", opt)
+        .addError(9, "Missing '()' invoking a constructor.", opt)
         .addError(11, "Missing '()' invoking a constructor.")
         .test(src);
 
@@ -494,7 +497,8 @@ exports.debug = function () {
 
     // By default disallow debugger statements.
     TestRun()
-        .addError(1, "All 'debugger' statements should be removed.")
+        .addError(1, "All 'debugger' statements should be removed.",
+                  { option: "debug" })
         .test(code);
 
     // But allow them if debug is true.
@@ -510,7 +514,7 @@ exports.eqeqeq = function () {
         .test(src);
 
     TestRun()
-        .addError(2, "Expected '===' and instead saw '=='.")
+        .addError(2, "Expected '===' and instead saw '=='.", { option: "eqeqeq" })
         .addError(5, "Expected '!==' and instead saw '!='.")
         .addError(8, "Expected '===' and instead saw '=='.")
         .test(src, { eqeqeq: true });
@@ -528,14 +532,15 @@ exports.evil = function () {
         "setInterval('xyz();', 2);",
         "var t = document['eval']('xyz');"
     ];
+    var opt = { option: "evil" };
 
     TestRun()
-        .addError(1, "eval is evil.")
-        .addError(2, "document.write can be a form of eval.")
+        .addError(1, "eval is evil.", opt)
+        .addError(2, "document.write can be a form of eval.", opt)
         .addError(3, "document.write can be a form of eval.")
         .addError(4, "eval is evil.")
-        .addError(5, "The Function constructor is eval.")
-        .addError(6, "Implied eval is evil. Pass a function instead of a string.")
+        .addError(5, "The Function constructor is eval.", opt)
+        .addError(6, "Implied eval is evil. Pass a function instead of a string.", opt)
         .addError(7, "Implied eval is evil. Pass a function instead of a string.")
         .addError(8, "eval is evil.")
         .test(src, { browser: true });
@@ -558,16 +563,17 @@ exports.evil = function () {
  */
 exports.immed = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/immed.js', 'utf8');
+    var opt = { option: "immed" };
 
     TestRun().test(src);
 
     TestRun()
         .addError(3, "Wrap an immediate function invocation in parentheses " +
                      "to assist the reader in understanding that the expression " +
-                     "is the result of a function, and not the function itself.")
-        .addError(7, "Move the invocation into the parens that contain the function.")
+                     "is the result of a function, and not the function itself.", opt)
+        .addError(7, "Move the invocation into the parens that contain the function.", opt)
         .addError(13, "Do not wrap function literals in parens unless they are to " +
-                      "be immediately invoked.")
+                      "be immediately invoked.", opt)
         .test(src, { immed: true });
 };
 
@@ -591,7 +597,7 @@ exports.nomen = function () {
 
     // node globals
     TestRun()
-        .addError(1, "Unexpected dangling '_' in '_x'.")
+        .addError(1, "Unexpected dangling '_' in '_x'.", { option: "nomen" })
         .test('var x = top._x + __dirname + __filename;', { node: true, nomen: true });
 
 };
@@ -624,7 +630,7 @@ exports.onevar = function () {
 
     TestRun().test(src);
     TestRun()
-        .addError(10, "Too many var statements.")
+        .addError(10, "Too many var statements.", { option: "onevar" })
         .test(src, { onevar: true });
 };
 
@@ -639,7 +645,7 @@ exports.plusplus = function () {
 
     for (i = 0, op = null; op = ops[i]; i += 1) {
         TestRun()
-            .addError(1, "Unexpected use of '" + op + "'.")
+            .addError(1, "Unexpected use of '" + op + "'.", { option: "plusplus" })
             .test('var i = j' + op + ';', { plusplus: true });
 
         TestRun()
@@ -662,20 +668,21 @@ exports.plusplus = function () {
  */
 exports.newcap = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/newcap.js', 'utf8');
+    var opt = { option: "newcap" };
 
     TestRun().test(src); // By default, everything is fine
 
     // When newcap is true, enforce the conventions
     TestRun()
-        .addError(1, 'A constructor name should start with an uppercase letter.')
-        .addError(5, "Missing 'new' prefix when invoking a constructor.")
+        .addError(1, 'A constructor name should start with an uppercase letter.', opt)
+        .addError(5, "Missing 'new' prefix when invoking a constructor.", opt)
         .test(src, { newcap: true });
 };
 
 /** Option `sub` allows all forms of subscription. */
 exports.sub = function () {
     TestRun()
-        .addError(1, "['prop'] is better written in dot notation.")
+        .addError(1, "['prop'] is better written in dot notation.", { option: "sub" })
         .test("window.obj = obj['prop'];");
 
     TestRun().test("window.obj = obj['prop'];", { sub: true });
@@ -692,7 +699,7 @@ exports.strict = function () {
     TestRun().test(code1);
 
     TestRun()
-        .addError(1, 'Missing "use strict" statement.')
+        .addError(1, 'Missing "use strict" statement.', { option: "strict" })
         .test(code, { strict: true });
 
     TestRun().test(code1, { strict: true });
@@ -930,7 +937,8 @@ exports.strings = function () {
         .test(src, { multistr: true });
 
     TestRun()
-        .addError(3, "Bad escapement of EOL. Use option multistr if needed.")
+        .addError(3, "Bad escapement of EOL. Use option multistr if needed.",
+            { option: "multistr" })
         .addError(4, "Bad escapement of EOL. Use option multistr if needed.")
         .addError(9, "Unclosed string.")
         .addError(10, "Unclosed string.")
