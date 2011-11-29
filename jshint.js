@@ -213,8 +213,8 @@
  log, loopfunc, m, match, maxerr, maxlen, member,message, meta, module, moveBy,
  moveTo, mootools, multistr, name, navigator, new, newcap, noarg, node, noempty, nomen,
  nonew, nonstandard, nud, onbeforeunload, onblur, onerror, onevar, onecase, onfocus,
- onload, onresize, onunload, open, openDatabase, openURL, opener, opera, options, outer, param,
- parent, parseFloat, parseInt, passfail, plusplus, predef, print, process, prompt,
+ onload, onresize, onunload, open, openDatabase, openURL, opener, opera, option, options, outer,
+ param, parent, parseFloat, parseInt, passfail, plusplus, predef, print, process, prompt,
  proto, prototype, prototypejs, push, quit, range, raw, reach, reason, regexp,
  readFile, readUrl, regexdash, removeEventListener, replace, report, require,
  reserved, resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
@@ -939,7 +939,7 @@ var JSHINT = (function () {
     }
 
     function isundef(scope, m, t, a) {
-        return JSHINT.undefs.push([scope, m, t, a]);
+        return JSHINT.undefs.push([scope, null, m, t, a]);
     }
 
     function warning(opt, m, t, a, b, c, d) {
@@ -1827,7 +1827,8 @@ loop:   for (;;) {
         switch (token.id) {
         case '(number)':
             if (nexttoken.id === '.') {
-                warning(null, "A dot following a number can be confused with a decimal point.", token);
+                warning(null,
+                        "A dot following a number can be confused with a decimal point.", token);
             }
             break;
         case '-':
@@ -1851,7 +1852,8 @@ loop:   for (;;) {
                 if (nexttoken.id === '(end)') {
                     warning(null, "Unmatched '{a}'.", t, t.id);
                 } else {
-                    warning(null, "Expected '{a}' to match '{b}' from line {c} and instead saw '{d}'.",
+                    warning(null,
+                            "Expected '{a}' to match '{b}' from line {c} and instead saw '{d}'.",
                             nexttoken, id, t.id, t.line, nexttoken.value);
                 }
             } else if (nexttoken.type !== '(identifier)' ||
@@ -2192,7 +2194,8 @@ loop:   for (;;) {
             }
             if (left) {
                 if (option.esnext && funct[left.value] === 'const') {
-                    warning(null, "Attempting to override '{a}' which is a constant", left, left.value);
+                    warning("esnext",
+                            "Attempting to override '{a}' which is a constant", left, left.value);
                 }
                 if (left.id === '.' || left.id === '[') {
                     if (!left.left || left.left.value === 'arguments') {
@@ -2373,8 +2376,9 @@ loop:   for (;;) {
         // Look for the final semicolon.
         if (!t.block) {
             if (!option.expr && (!r || !r.exps)) {
-                warning(null, "Expected an assignment or function call and instead saw an expression.",
-                    token);
+                warning("expr",
+                        "Expected an assignment or function call and instead saw an expression.",
+                        token);
             } else if (option.nonew && r.id === '(' && r.left.id === 'new') {
                 warning(null, "Do not use 'new' for side effects.");
             }
@@ -2937,8 +2941,9 @@ loop:   for (;;) {
                     if (c.id !== 'function') {
                         i = c.value.substr(0, 1);
                         if (option.newcap && (i < 'A' || i > 'Z')) {
-                            warning(null, "A constructor name should start with an uppercase letter.",
-                                token);
+                            warning("newcap",
+                                    "A constructor name should start with an uppercase letter.",
+                                    token);
                         }
                     }
                 }
@@ -3243,7 +3248,8 @@ loop:   for (;;) {
                     }
                     p = f['(params)'];
                     if (p) {
-                        warning(null, "Unexpected parameter '{a}' in get {b} function.", t, p[0], i);
+                        warning(null,
+                                "Unexpected parameter '{a}' in get {b} function.", t, p[0], i);
                     }
                     adjacent(token, nexttoken);
                     advance(',');
@@ -3383,7 +3389,8 @@ loop:   for (;;) {
                 advance('=');
                 nonadjacent(token, nexttoken);
                 if (nexttoken.id === 'undefined') {
-                    warning(null, "It is not necessary to initialize '{a}' to 'undefined'.", token, id);
+                    warning(null,
+                        "It is not necessary to initialize '{a}' to 'undefined'.", token, id);
                 }
                 if (peek(0).id === '=' && nexttoken.identifier) {
                     error("Variable {a} was not declared correctly.",
@@ -3648,7 +3655,8 @@ loop:   for (;;) {
             expression(20);
             if (nexttoken.id === '=') {
                 if (!option.boss)
-                    warning(null, "Expected a conditional expression and instead saw an assignment.");
+                    warning("boss",
+                        "Expected a conditional expression and instead saw an assignment.");
                 advance('=');
                 expression(20);
             }
@@ -3692,8 +3700,9 @@ loop:   for (;;) {
             s = block(true, true);
             if (option.forin && s && (s.length > 1 || typeof s[0] !== 'object' ||
                     s[0].value !== 'if')) {
-                warning(null, "The body of a for in should be wrapped in an if statement to filter " +
-                        "unwanted properties from the prototype.", this);
+                warning(null,
+                    "The body of a for in should be wrapped in an if statement to filter " +
+                    "unwanted properties from the prototype.", this);
             }
             funct['(breakage)'] -= 1;
             funct['(loopage)'] -= 1;
@@ -3719,7 +3728,8 @@ loop:   for (;;) {
                 expression(20);
                 if (nexttoken.id === '=') {
                     if (!option.boss)
-                        warning(null, "Expected a conditional expression and instead saw an assignment.");
+                        warning(null,
+                            "Expected a conditional expression and instead saw an assignment.");
                     advance('=');
                     expression(20);
                 }
@@ -3804,7 +3814,8 @@ loop:   for (;;) {
     stmt('return', function () {
         if (this.line === nexttoken.line) {
             if (nexttoken.id === '(regexp)')
-                warning(null, "Wrap the /regexp/ literal in parens to disambiguate the slash operator.");
+                warning(null,
+                    "Wrap the /regexp/ literal in parens to disambiguate the slash operator.");
 
             if (nexttoken.id !== ';' && !nexttoken.reach) {
                 nonadjacent(token, nexttoken);
@@ -4043,7 +4054,7 @@ loop:   for (;;) {
         for (i = 0; i < JSHINT.undefs.length; i += 1) {
             k = JSHINT.undefs[i].slice(0);
             scope = k.shift();
-            a = k[2];
+            a = k[3];
 
             if (typeof scope[a] !== 'string' && typeof funct[a] !== 'string') {
                 warning.apply(warning, k);
