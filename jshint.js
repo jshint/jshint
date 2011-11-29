@@ -1063,7 +1063,8 @@ var JSHINT = (function () {
                          value.charAt(value.length - 1) === '_')) {
                     if (!option.node || token.id == '.' ||
                             (value != '__dirname' && value != '__filename')) {
-                        warningAt("nomen", "Unexpected {a} in '{b}'.", line, from, "dangling '_'", value);
+                        warningAt("nomen",
+                            "Unexpected {a} in '{b}'.", line, from, "dangling '_'", value);
                     }
                 }
             }
@@ -1246,13 +1247,15 @@ unclosedString:     for (;;) {
                                 allowNewLine = true;
                                 if (option.multistr) {
                                     if (jsonmode) {
-                                        warningAt("multistr", "Avoid EOL escapement.", line, character);
+                                        warningAt("multistr",
+                                            "Avoid EOL escapement.", line, character);
                                     }
                                     c = '';
                                     character -= 1;
                                     break;
                                 }
-                                warningAt(null, "Bad escapement of EOL. Use option multistr if needed.",
+                                warningAt(null,
+                                    "Bad escapement of EOL. Use option multistr if needed.",
                                     line, character);
                                 break;
                             default:
@@ -3820,7 +3823,8 @@ loop:   for (;;) {
             if (nexttoken.id !== ';' && !nexttoken.reach) {
                 nonadjacent(token, nexttoken);
                 if (peek().value === "=" && !option.boss) {
-                    warningAt("boss", "Did you mean to return a conditional instead of an assignment?",
+                    warningAt("boss",
+                              "Did you mean to return a conditional instead of an assignment?",
                               token.line, token.character + 1);
                 }
                 this.first = expression(0);
