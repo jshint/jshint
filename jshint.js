@@ -939,7 +939,7 @@ var JSHINT = (function () {
     }
 
     function isundef(scope, m, t, a) {
-        return JSHINT.undefs.push([scope, null, m, t, a]);
+        return JSHINT.undefs.push([scope, "undef", m, t, a]);
     }
 
     function warning(opt, m, t, a, b, c, d) {
@@ -1254,7 +1254,7 @@ unclosedString:     for (;;) {
                                     character -= 1;
                                     break;
                                 }
-                                warningAt(null,
+                                warningAt("multistr",
                                     "Bad escapement of EOL. Use option multistr if needed.",
                                     line, character);
                                 break;
@@ -2393,7 +2393,7 @@ loop:   for (;;) {
                     // Otherwise, complain about missing semicolon.
                     if (!option.lastsemic || nexttoken.id != '}' ||
                             nexttoken.line != token.line) {
-                        warningAt("lastsemic", "Missing semicolon.", token.line, token.character);
+                        warningAt("asi", "Missing semicolon.", token.line, token.character);
                     }
                 }
             } else {
@@ -3041,11 +3041,11 @@ loop:   for (;;) {
             if (!option.evil) {
                 if (left.value === 'eval' || left.value === 'Function' ||
                         left.value === 'execScript') {
-                    warning(null, "eval is evil.", left);
+                    warning("evil", "eval is evil.", left);
                 } else if (p[0] && p[0].id === '(string)' &&
                        (left.value === 'setTimeout' ||
                         left.value === 'setInterval')) {
-                    warning(null,
+                    warning("evil",
     "Implied eval is evil. Pass a function instead of a string.", left);
                 }
             }
