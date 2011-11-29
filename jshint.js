@@ -216,8 +216,8 @@
  readFile, readUrl, regexdash, removeEventListener, replace, report, require,
  reserved, resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
  runCommand, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal,
- send, serialize, sessionStorage, setInterval, setTimeout, shift, slice, sort,spawn,
- split, stack, status, start, strict, sub, substr, supernew, shadow, supplant, sum,
+ send, serialize, sessionStorage, setInterval, setTimeout, shift, slice, smarttabs, sort,
+ spawn, split, stack, status, start, strict, sub, substr, supernew, shadow, supplant, sum,
  sync, test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing, type,
  typeOf, Uint16Array, Uint32Array, Uint8Array, undef, undefs, unused, urls, validthis,
  value, valueOf, var, version, WebSocket, white, window, Worker, wsh*/
@@ -309,6 +309,8 @@ var JSHINT = (function () {
             undef       : true, // if variables should be declared before used
             scripturl   : true, // if script-targeted URLs should be tolerated
             shadow      : true, // if variable shadowing should be tolerated
+            smarttabs   : true, // if smarttabs should be tolerated
+                                // (http://www.emacswiki.org/emacs/SmartTabs)
             strict      : true, // require the "use strict"; pragma
             sub         : true, // if all forms of subscript notation are tolerated
             supernew    : true, // if `new function () { ... };` and `new Object;`
@@ -1007,7 +1009,13 @@ var JSHINT = (function () {
             character = 1;
             s = lines[line];
             line += 1;
-            at = s.search(/ \t|\t /);
+
+            // If smarttabs option is used check for spaces followed by tabs only.
+            // Otherwise check for any occurence of mixed tabs and spaces.
+            if (option.smarttabs)
+                at = s.search(/ \t/);
+            else
+                at = s.search(/ \t|\t /);
 
             if (at >= 0)
                 warningAt("Mixed spaces and tabs.", line, at + 1);

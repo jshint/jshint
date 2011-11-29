@@ -992,3 +992,16 @@ exports.maxlen = function () {
         .addError(3, "Line too long.")
         .test(src, { maxlen: 23 });
 };
+
+exports.smarttabs = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/smarttabs.js', 'utf8');
+
+    TestRun()
+        .addError(4, "Mixed spaces and tabs.")
+        .addError(5, "Mixed spaces and tabs.")
+        .test(src);
+
+    TestRun()
+        .addError(5, "Mixed spaces and tabs.")
+        .test(src, { smarttabs: true });
+};
