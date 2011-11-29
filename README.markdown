@@ -40,6 +40,9 @@ guide so just look around the code you are changing.
 Also, make sure that you write tests for new features and make sure that all tests pass before
 submitting a patch. Patches that break the build will be rejected.
 
+**FEATURE FREEZE**: Please note that we currently have a feature freeze on new environments and
+styling options. The only patches we accept at this time are for bug fixes.
+
 Tests
 -----
 
