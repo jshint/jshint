@@ -2343,11 +2343,8 @@ loop:   for (;;) {
     function statement(noindent) {
         var i = indent, r, s = scope, t = nexttoken;
 
-// We don't like the empty statement.
-
-        if (t.id === ';') {
-            warning("Unnecessary semicolon.", t);
-            advance(';');
+        if (t.id === ";") {
+            advance(";");
             return;
         }
 
