@@ -3220,7 +3220,7 @@ loop:   for (;;) {
 
     (function (x) {
         x.nud = function () {
-            var b, f, i, j, k, p, seen = {}, s,  t;
+            var b, f, i, j, k, p, seen = {}, t;
 
             b = token.line !== nexttoken.line;
             if (b) {
