@@ -3217,7 +3217,7 @@ loop:   for (;;) {
 
     (function (x) {
         x.nud = function () {
-            var b, f, i, j, p, seen = {}, t;
+            var b, f, i, j, p, seen = {}, t, lastGetter;
 
             b = token.line !== nexttoken.line;
             if (b) {
@@ -3242,6 +3242,7 @@ loop:   for (;;) {
                     if (!i) {
                         error("Missing property name.");
                     }
+                    lastGetter = i;
                     t = nexttoken;
                     adjacent(token, nexttoken);
                     f = doFunction();
@@ -3253,13 +3254,20 @@ loop:   for (;;) {
                         warning("Unexpected parameter '{a}' in get {b} function.", t, p[0], i);
                     }
                     adjacent(token, nexttoken);
-                    advance(',');
-                    indentation();
+                } else if (nexttoken.value === 'set' && peek().id !== ':') {
                     advance('set');
-                    j = property_name();
-                    if (i !== j) {
-                        error("Expected {a} and instead saw {b}.", token, i, j);
+                    if (!option.es5) {
+                        error("get/set are ES5 features.");
                     }
+                    i = property_name();
+                    if (!i) {
+                        error("Missing property name.");
+                    }
+                    if (i !== lastGetter) {
+                        error("Expected {a} and instead saw {b}.", token, lastGetter, i);
+                    }
+                    seen[i] = false;
+                    lastGetter = null;
                     t = nexttoken;
                     adjacent(token, nexttoken);
                     f = doFunction();
@@ -3269,6 +3277,7 @@ loop:   for (;;) {
                     }
                 } else {
                     i = property_name();
+                    lastGetter = null;
                     if (typeof i !== 'string') {
                         break;
                     }
