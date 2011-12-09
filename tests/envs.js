@@ -111,6 +111,7 @@ exports.couch = function () {
           , "log"
           , "exports"
           , "module"
+          , "provides"
         ];
 
     assert.globalsImplied(globals);
