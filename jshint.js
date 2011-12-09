@@ -204,7 +204,7 @@
  entityify, eqeqeq, eqnull, errors, es5, escape, esnext, eval, event, evidence, evil,
  ex, exception, exec, exps, expr, exports, FileReader, first, floor, focus,
  forin, fragment, frames, from, fromCharCode, fud, funcscope, funct, function, functions,
- g, gc, getComputedStyle, getRow, GLOBAL, global, globals, globalstrict,
+ g, gc, getComputedStyle, getRow, getter, GLOBAL, global, globals, globalstrict,
  hasOwnProperty, help, history, i, id, identifier, immed, implieds, importPackage, include,
  indent, indexOf, init, ins, instanceOf, isAlpha, isApplicationRunning, isArray,
  isDigit, isFinite, isNaN, iterator, java, join, jshint,
@@ -219,10 +219,10 @@
  readFile, readUrl, regexdash, removeEventListener, replace, report, require,
  reserved, resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
  runCommand, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal,
- send, serialize, sessionStorage, setInterval, setTimeout, shift, slice, smarttabs, sort,
- spawn, split, stack, status, start, strict, sub, substr, supernew, shadow, supplant, sum,
- sync, test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing, type,
- typeOf, Uint16Array, Uint32Array, Uint8Array, undef, undefs, unused, urls, validthis,
+ send, serialize, sessionStorage, setInterval, setTimeout, setter, setterToken, shift, slice,
+ smarttabs, sort, spawn, split, stack, status, start, strict, sub, substr, supernew, shadow,
+ supplant, sum, sync, test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing,
+ type, typeOf, Uint16Array, Uint32Array, Uint8Array, undef, undefs, unused, urls, validthis,
  value, valueOf, var, version, WebSocket, white, window, Worker, wsh*/
 
 /*global exports: false */
@@ -3216,6 +3216,22 @@ loop:   for (;;) {
     (function (x) {
         x.nud = function () {
             var b, f, i, j, p, seen = {}, t;
+            var prop, acc = {}; // Accessor methods
+
+            function saveSetter(name, token) {
+                if (!acc[name]) {
+                    acc[name] = {};
+                }
+                acc[name].setter = true;
+                acc[name].setterToken = token;
+            }
+
+            function saveGetter(name) {
+                if (!acc[name]) {
+                    acc[name] = {};
+                }
+                acc[name].getter = true;
+            }
 
             b = token.line !== nexttoken.line;
             if (b) {
@@ -3240,6 +3256,7 @@ loop:   for (;;) {
                     if (!i) {
                         error("Missing property name.");
                     }
+                    saveGetter(i);
                     t = nexttoken;
                     adjacent(token, nexttoken);
                     f = doFunction();
@@ -3251,13 +3268,17 @@ loop:   for (;;) {
                         warning("Unexpected parameter '{a}' in get {b} function.", t, p[0], i);
                     }
                     adjacent(token, nexttoken);
-                    advance(',');
-                    indentation();
+                } else if (nexttoken.value === 'set' && peek().id !== ':') {
                     advance('set');
-                    j = property_name();
-                    if (i !== j) {
-                        error("Expected {a} and instead saw {b}.", token, i, j);
+                    if (!option.es5) {
+                        error("get/set are ES5 features.");
                     }
+                    i = property_name();
+                    if (!i) {
+                        error("Missing property name.");
+                    }
+                    saveSetter(i, nexttoken);
+                    seen[i] = false;
                     t = nexttoken;
                     adjacent(token, nexttoken);
                     f = doFunction();
@@ -3295,6 +3316,15 @@ loop:   for (;;) {
                 indentation();
             }
             advance('}', this);
+
+            // Check for lonely setters if in the ES5 mode.
+            if (option.es5) {
+                for (prop in acc) {
+                    if (acc.hasOwnProperty(prop) && acc[prop].setter && !acc[prop].getter) {
+                        warning("Setter is defined without getter.", acc[prop].setterToken);
+                    }
+                }
+            }
             return this;
         };
         x.fud = function () {
