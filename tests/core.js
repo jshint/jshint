@@ -9,7 +9,7 @@ var JSHINT  = require('../jshint.js').JSHINT,
 exports.checkJSHint = function () {
     var res = JSHINT(fs.readFileSync(__dirname + "/../jshint.js", "utf8"), {
             bitwise: true,
-            eqeqeqe: true,
+            eqeqeq: true,
             forin: true,
             immed: true,
             latedef: true,
@@ -39,7 +39,7 @@ exports.checkRhino = function () {
     var src = fs.readFileSync(__dirname + "/../env/rhino.js", "utf8");
     TestRun("jshint-rhino").test(src, {
             bitwise: true,
-            eqeqeqe: true,
+            eqeqeq: true,
             forin: true,
             immed: true,
             latedef: true,
@@ -72,7 +72,7 @@ exports.checkTestFiles = function () {
         var src = fs.readFileSync(__dirname + '/../tests/' + name, 'utf8'),
             res = JSHINT(src, {
                 bitwise: true,
-                eqeqeqe: true,
+                eqeqeq: true,
                 forin: true,
                 immed: true,
                 latedef: true,
