@@ -380,6 +380,10 @@ exports.es5 = function () {
         .addError(3, "Extra comma.")
         .addError(8, "Extra comma.")
         .addError(15, "get/set are ES5 features.")
+        .addError(16, "get/set are ES5 features.")
+        .addError(20, "get/set are ES5 features.")
+        .addError(24, "get/set are ES5 features.")
+        .addError(25, "get/set are ES5 features.")
         .test(src);
     TestRun().test(src, { es5: true });
 

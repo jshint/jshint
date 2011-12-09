@@ -7,7 +7,7 @@
 var test = (function() {
     var func = function() {},
     innerTest = {
-        get func() { return func;},
+        get func() { return func; },
         set func(value) { func = value; }
     };
     innerTest = func;
