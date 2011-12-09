@@ -208,7 +208,7 @@
  hasOwnProperty, help, history, i, id, identifier, immed, implieds, importPackage, include,
  indent, indexOf, init, ins, instanceOf, isAlpha, isApplicationRunning, isArray,
  isDigit, isFinite, isNaN, iterator, java, join, jshint,
- JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastsemic, laxbreak,
+ JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastsemic, laxbreak, laxgetset,
  latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
  log, loopfunc, m, match, maxerr, maxlen, member,message, meta, module, moveBy,
  moveTo, mootools, multistr, name, navigator, new, newcap, noarg, node, noempty, nomen,
@@ -283,6 +283,9 @@ var JSHINT = (function () {
                                 // statements inside of a one-line blocks.
             latedef     : true, // if the use before definition should not be tolerated
             laxbreak    : true, // if line breaks should not be checked
+            laxgetset   : true, // if [gs]etters don't require both to be present and
+                                // the param to a setter can be called anything
+                                // setters and getters can come in any order in a file
             loopfunc    : true, // if functions should be allowed to be defined within
                                 // loops
             mootools    : true, // if MooTools globals should be predefined
@@ -3215,7 +3218,7 @@ loop:   for (;;) {
 
     (function (x) {
         x.nud = function () {
-            var b, f, i, j, p, seen = {}, t;
+            var b, f, i, j, k, p, seen = {}, t;
 
             b = token.line !== nexttoken.line;
             if (b) {
@@ -3236,9 +3239,11 @@ loop:   for (;;) {
                     if (!option.es5) {
                         error("get/set are ES5 features.");
                     }
-                    i = property_name();
+                    i = j = property_name();
                     if (!i) {
                         error("Missing property name.");
+                    } else if (i === k) {
+                        delete seen[i];
                     }
                     t = nexttoken;
                     adjacent(token, nexttoken);
@@ -3250,19 +3255,24 @@ loop:   for (;;) {
                     if (p) {
                         warning("Unexpected parameter '{a}' in get {b} function.", t, p[0], i);
                     }
-                    adjacent(token, nexttoken);
-                    advance(',');
-                    indentation();
+                } else if (nexttoken.value === 'set' && peek().id !== ":") {
                     advance('set');
-                    j = property_name();
-                    if (i !== j) {
+                    if (!option.es5) {
+                        error("get/set are ES5 features.");
+                    }
+                    i = k = property_name();
+                    if (!i) {
+                        error("Missing property name");
+                    } else if (i === j) {
+                        delete seen[i];
+                    } else if (!option.laxgetset) {
                         error("Expected {a} and instead saw {b}.", token, i, j);
                     }
                     t = nexttoken;
                     adjacent(token, nexttoken);
                     f = doFunction();
                     p = f['(params)'];
-                    if (!p || p.length !== 1 || p[0] !== 'value') {
+                    if (!p || p.length !== 1 || (!option.laxgetset && p[0] !== 'value')) {
                         warning("Expected (value) in set {a} function.", t, i);
                     }
                 } else {
