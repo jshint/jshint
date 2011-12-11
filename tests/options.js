@@ -894,3 +894,26 @@ exports.esnext = function () {
         .addError(4, "Attempting to override 'foo' which is a constant")
         .test(code, { esnext: true });
 };
+
+/*
+ * Tests the `laxcomma` option
+ */
+exports.laxcomma = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/laxcomma.js', 'utf8');
+
+    TestRun()
+        .addError(1, "Bad line breaking before ','.")
+        .addError(2, "Bad line breaking before ','.")
+        .addError(6, "Bad line breaking before ','.")
+        .addError(10, "Bad line breaking before '&&'.")
+        .test(src);
+
+    TestRun()
+        .addError(1, "Bad line breaking before ','.")
+        .addError(2, "Bad line breaking before ','.")
+        .addError(6, "Bad line breaking before ','.")
+        .test(src, { laxbreak: true });
+
+    TestRun().test(src, { laxbreak: true, laxcomma: true });
+};
+
