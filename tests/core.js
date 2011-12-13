@@ -64,37 +64,45 @@ exports.checkJSC = function () {
 
 /** All test files must pass JSHint check */
 exports.checkTestFiles = function () {
-    var files = fs.readdirSync(__dirname + '/../tests/').filter(function (e) {
-        return e.length > 2 && e.substr(e.length - 3, 3) === '.js';
-    });
-
+    var files = fs.readdirSync(__dirname + '/../tests/');
+    
     for (var i = 0, name; name = files[i]; i += 1) {
-        var src = fs.readFileSync(__dirname + '/../tests/' + name, 'utf8'),
-            res = JSHINT(src, {
-                bitwise: true,
-                eqeqeq: true,
-                forin: true,
-                immed: true,
-                latedef: true,
-                newcap: false,
-                noarg: true,
-                noempty: true,
-                nonew: true,
-                plusplus: true,
-                regexp: true,
-                undef: true,
-                strict: false,
-                trailing: true,
-                white: true
-            });
-
-        if (!res) {
-            console.log("file: " + name);
-            console.log(JSHINT.errors);
+        var p = __dirname + '/../tests/' + name;
+        var stat = fs.statSync(p);
+        
+        if (stat.isFile(p)) {
+            var src = fs.readFileSync(p, 'utf8'),
+                res = JSHINT(src, {
+                    bitwise: true,
+                    eqeqeq: true,
+                    forin: true,
+                    immed: true,
+                    latedef: true,
+                    newcap: false,
+                    noarg: true,
+                    noempty: true,
+                    nonew: true,
+                    plusplus: true,
+                    regexp: true,
+                    undef: true,
+                    strict: false,
+                    trailing: true,
+                    white: true,
+                    node: name.length < 3 || name.substr(name.length - 3) !== ".js"
+                });
+            
+            if (!res) {
+                console.log("file: " + name);
+                console.log(JSHINT.errors);
+            }
+            assert.ok(res);
+            
+            var implieds = JSHINT.data().implieds;
+            if (implieds) {
+                console.log("implieds: " + implieds);
+                assert.isUndefined(implieds);
+            }
         }
-
-        assert.ok(res);
-        assert.isUndefined(JSHINT.data().implieds);
     }
 };
 
