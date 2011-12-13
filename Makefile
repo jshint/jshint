@@ -11,6 +11,10 @@ test:
 	@echo "Running all tests"
 	@expresso tests/*.js
 
+cover:
+	@echo "Start coverage"
+	@tests/coveraje
+
 clean:
 	@echo "Cleaning"
 	@rm -f build/*.js && echo "Done"
