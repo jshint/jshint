@@ -834,6 +834,8 @@ exports.regexdash = function () {
       , 'var h = /[-z]/;'
       , 'var g = /[a-\\w]/;'
       , 'var h = /[\\d-z]/;'
+      , 'var i = /[^-ab]/;'
+      , 'var j = /[^ab-]/;'
     ];
 
     // Default behavior
@@ -848,6 +850,8 @@ exports.regexdash = function () {
         .addError(8, "Unescaped '-'.")
         .addError(9, "Unescaped '-'.")
         .addError(10, "Unescaped '-'.")
+        .addError(11, "Unescaped '-'.")
+        .addError(12, "Unescaped '-'.")
         .test(code);
 
     // Regex dash is on

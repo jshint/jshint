@@ -1510,7 +1510,7 @@ klass:                                  do {
                                                     isInRange = true;
                                                 } else {
                                                     if (option.regexdash !== (l === 2 || (l === 3 &&
-                                                        s.charAt(2) === '^'))) {
+                                                        s.charAt(1) === '^'))) {
                                                         warningAt("Unescaped '{a}'.",
                                                             line, from + l - 1, '-');
                                                     }
