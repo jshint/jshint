@@ -1,3 +1,5 @@
+all: rhino
+
 build_dir:
 	@mkdir -p "build"
 
