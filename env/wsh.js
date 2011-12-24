@@ -2,9 +2,18 @@
 /*global JSHINT: false */
 
 (function() {
-	function readFile(path) {
+	function readFile(path, charset) {
 		try {
-			return new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(path, 1).ReadAll();
+			var stream = WScript.CreateObject("ADODB.Stream");
+
+			stream.Charset = charset;
+			stream.Open();
+			stream.LoadFromFile(path);
+
+			var result = stream.ReadText();
+			stream.close();
+
+			return result;
 		} catch (ex) {
 			return null;
 		}
@@ -71,7 +80,7 @@
 
 	// load JSHint if the two scripts have not been concatenated
 	if (typeof JSHINT === "undefined") {
-		eval(readFile(scriptPath + "..\\jshint.js"));
+		eval(readFile(scriptPath + "..\\jshint.js"), 'utf-8');
 
 		if (typeof JSHINT === "undefined") {
 			WScript.StdOut.WriteLine("ERROR: Could not find 'jshint.js'.");
@@ -95,6 +104,10 @@
 		WScript.StdOut.WriteLine("arguments.  For example:");
 		WScript.StdOut.WriteLine("    cscript " + scriptName + " /jquery:true myscript.js");
 		WScript.StdOut.WriteLine("    cscript " + scriptName + " /global:QUnit:false,_:false,foo:true foo.js");
+		WScript.StdOut.WriteLine("");
+		WScript.StdOut.WriteLine("By default, we assume that your file is encoded if UTF-8. You can change that");
+		WScript.StdOut.WriteLine("by providing a custom charset option:");
+		WScript.StdOut.WriteLine("    cscript " + scriptName + " /charset:ascii myscript.js");
 
 		WScript.Quit(-1);
 	}
@@ -108,7 +121,7 @@
 			script = null;
 		}
 	} else {
-		script = readFile(script);
+		script = readFile(script, named('charset') || 'utf-8');
 	}
 
 	if (script === null) {
