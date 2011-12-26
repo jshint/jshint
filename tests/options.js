@@ -73,6 +73,51 @@ exports.latedef = function () {
         .test(src, { latedef: true });
 };
 
+exports.latedefwundef = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/latedefundef.js', 'utf8');
+
+    // Assures that when `undef` is set to true, it'll report undefined variables
+    // and late definitions won't be reported as `latedef` is set to false.
+    TestRun()
+        .addError(29, "'hello' is not defined.")
+        .addError(35, "'world' is not defined.")
+        .test(src, { latedef: false, undef: true });
+
+    // When we suppress `latedef` and `undef` then we get no warnings.
+    TestRun()
+        .test(src, { latedef: false, undef: false });
+
+    // If we warn on `latedef` but supress `undef` we only get the
+    // late definition warnings.
+    TestRun()
+        .addError(5, "'func2' was used before it was defined.")
+        .addError(12, "'foo' was used before it was defined.")
+        .addError(18, "'fn1' was used before it was defined.")
+        .addError(26, "'baz' was used before it was defined.")
+        .addError(34, "'fn' was used before it was defined.")
+        .addError(41, "'q' was used before it was defined.")
+        .addError(46, "'h' was used before it was defined.")
+        .test(src, { latedef: true, undef: false });
+
+    // If we warn on both options we get all the warnings.
+    TestRun()
+        .addError(5, "'func2' was used before it was defined.")
+        .addError(12, "'foo' was used before it was defined.")
+        .addError(18, "'fn1' was used before it was defined.")
+        .addError(26, "'baz' was used before it was defined.")
+        .addError(29, "'hello' is not defined.")
+        .addError(34, "'fn' was used before it was defined.")
+        .addError(35, "'world' is not defined.")
+        .addError(41, "'q' was used before it was defined.")
+        .addError(46, "'h' was used before it was defined.")
+        .test(src, { latedef: true, undef: true });
+};
+
+exports.undefwstrict = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/undefstrict.js', 'utf8');
+    TestRun().test(src, { undef: false });
+};
+
 /**
  * The `proto` and `iterator` options allow you to prohibit the use of the
  * special `__proto__` and `__iterator__` properties, respectively.
@@ -279,12 +324,17 @@ exports.undef = function () {
 
 /** Option `scripturl` allows the use of javascript-type URLs */
 exports.scripturl = function () {
-    var code = "var foo = { 'count': 12, 'href': 'javascript:' };",
+    var code = [
+            "var foo = { 'count': 12, 'href': 'javascript:' };",
+            "foo = 'javascript:' + 'xyz';"
+        ],
         src = fs.readFileSync(__dirname + '/fixtures/scripturl.js', 'utf8');
 
     // Make sure there is an error
     TestRun()
         .addError(1, "Script URL.")
+        .addError(2, "Script URL.") // 2 times?
+        .addError(2, "JavaScript URL.")
         .test(code);
 
     // Make sure the error goes away when javascript URLs are tolerated
@@ -416,12 +466,16 @@ exports.supernew = function () {
 /** Option `bitwise` disallows the use of bitwise operators. */
 exports.bitwise = function () {
     var ops = [ '&', '|', '^', '<<', '>>', '>>>' ];
+    var moreTests = [
+        'var c = ~a;',
+        'c &= 2;'
+    ];
 
     // By default allow bitwise operators
     for (var i = 0, op; op = ops[i]; i += 1) {
         TestRun().test('var c = a ' + op + ' b;');
     }
-    TestRun().test('var c = ~a;');
+    TestRun().test(moreTests);
 
     for (i = 0, op = null; op = ops[i]; i += 1) {
         TestRun()
@@ -430,7 +484,8 @@ exports.bitwise = function () {
     }
     TestRun()
         .addError(1, "Unexpected '~'.")
-        .test('var c = ~a;', { bitwise: true });
+        .addError(2, "Unexpected use of '&='.")
+        .test(moreTests, { bitwise: true });
 };
 
 /** Option `debug` allows the use of debugger statements. */
@@ -463,13 +518,29 @@ exports.eqeqeq = function () {
 
 /** Option `evil` allows the use of eval. */
 exports.evil = function () {
-    var src = "eval('hey();');";
+    var src = [
+        "eval('hey();');",
+        "document.write('');",
+        "document.writeln('');",
+        "window.execScript('xyz');",
+        "new Function('xyz();');",
+        "setTimeout('xyz();', 2);",
+        "setInterval('xyz();', 2);",
+        "var t = document['eval']('xyz');"
+    ];
 
     TestRun()
         .addError(1, "eval is evil.")
-        .test(src);
+        .addError(2, "document.write can be a form of eval.")
+        .addError(3, "document.write can be a form of eval.")
+        .addError(4, "eval is evil.")
+        .addError(5, "The Function constructor is eval.")
+        .addError(6, "Implied eval is evil. Pass a function instead of a string.")
+        .addError(7, "Implied eval is evil. Pass a function instead of a string.")
+        .addError(8, "eval is evil.")
+        .test(src, { browser: true });
 
-    TestRun().test(src, { evil: true });
+    TestRun().test(src, { evil: true, browser: true });
 };
 
 /**
@@ -494,7 +565,9 @@ exports.immed = function () {
         .addError(3, "Wrap an immediate function invocation in parentheses " +
                      "to assist the reader in understanding that the expression " +
                      "is the result of a function, and not the function itself.")
-        .addError(7, 'Move the invocation into the parens that contain the function.')
+        .addError(7, "Move the invocation into the parens that contain the function.")
+        .addError(13, "Do not wrap function literals in parens unless they are to " +
+                      "be immediately invoked.")
         .test(src, { immed: true });
 };
 
@@ -515,6 +588,12 @@ exports.nomen = function () {
     // Normal names should pass all the time
     TestRun().test('var hey;');
     TestRun().test('var hey;', { nomen: true });
+
+    // node globals
+    TestRun()
+        .addError(1, "Unexpected dangling '_' in '_x'.")
+        .test('var x = top._x + __dirname + __filename;', { node: true, nomen: true });
+
 };
 
 /** Option `passfail` tells JSHint to stop at the first error. */
@@ -721,6 +800,14 @@ exports.white = function () {
         .addError(15, "Missing space after ':'.")
         .addError(18, "Unexpected space after '('.", { character: 9 })
         .addError(18, "Unexpected space after 'ex'.", { character: 12 })
+        .addError(55, "Missing space after ','.") // 2 times?
+        .addError(56, "Missing space after '1'.")
+        .addError(58, "Unexpected space before 'b'.")
+        .addError(58, "Unexpected space after 'a'.")
+        .addError(60, "Unexpected space before 'c'.")
+        .addError(62, "Expected 'var' to have an indentation at 1 instead at 2.")
+        .addError(64, "Unexpected space after 'nodblwarnings'.", { character: 23 })
+        .addError(64, "Unexpected space after '('.", { character: 25 })
         .test(src, { white: true });
 };
 
@@ -747,6 +834,8 @@ exports.regexdash = function () {
       , 'var h = /[-z]/;'
       , 'var g = /[a-\\w]/;'
       , 'var h = /[\\d-z]/;'
+      , 'var i = /[^-ab]/;'
+      , 'var j = /[^ab-]/;'
     ];
 
     // Default behavior
@@ -761,6 +850,8 @@ exports.regexdash = function () {
         .addError(8, "Unescaped '-'.")
         .addError(9, "Unescaped '-'.")
         .addError(10, "Unescaped '-'.")
+        .addError(11, "Unescaped '-'.")
+        .addError(12, "Unescaped '-'.")
         .test(code);
 
     // Regex dash is on
@@ -893,4 +984,28 @@ exports.esnext = function () {
         .addError(3, "const 'myConst' has already been declared")
         .addError(4, "Attempting to override 'foo' which is a constant")
         .test(code, { esnext: true });
+};
+
+/*
+ * Tests the `maxlen` option
+ */
+exports.maxlen = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/maxlen.js', 'utf8');
+
+    TestRun()
+        .addError(3, "Line too long.")
+        .test(src, { maxlen: 23 });
+};
+
+exports.smarttabs = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/smarttabs.js', 'utf8');
+
+    TestRun()
+        .addError(4, "Mixed spaces and tabs.")
+        .addError(5, "Mixed spaces and tabs.")
+        .test(src);
+
+    TestRun()
+        .addError(5, "Mixed spaces and tabs.")
+        .test(src, { smarttabs: true });
 };

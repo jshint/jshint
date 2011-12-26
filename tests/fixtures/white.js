@@ -4,9 +4,9 @@ function hello () {
 
 var bye = function() {
     if(hey){
-        // Next line has a trailing whitespace
-        return;  
-    }  
+        // Next two lines have a trailing whitespace
+        return; 
+    } 
 };
 
 try {
@@ -35,7 +35,7 @@ function test2(a, b, c, d) {
   for (;;) return;
   while (a) return;
   while (a)
-    return;
+    return 2;
 }
 
 /*fix for indentation on single-line blocks*/
@@ -50,4 +50,17 @@ var name2 = (function () { var x = 2;
 // don't count towards `unexpected space` warnings.
 function inspectPrefiltersOrTransports(dataType/* internal */, inspected /* internal */) {
     return 2;
+}
+
+var a,b,
+    c = 1< 2,
+    d = 1 < 2,
+    e = a . b
+        .
+        c(
+);
+ var z;
+
+function nodblwarnings ( ) {
+    return 1;
 }
