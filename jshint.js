@@ -3277,9 +3277,6 @@ loop:   for (;;) {
                     if (!i) {
                         error("Missing property name.");
                     }
-                    if (acc[i] && acc[i].setter) {
-                        warning("Duplicate member '{a}'.", nexttoken, i);
-                    }
                     saveSetter(i, nexttoken);
                     seen[i] = false;
                     t = nexttoken;
