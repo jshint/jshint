@@ -4,9 +4,9 @@
 
 /*jshint boss: true, laxbreak: true, node: true, maxlen:100 */
 
-var JSHINT  = require('../jshint.js').JSHINT,
+var JSHINT  = require('../../jshint.js').JSHINT,
     fs      = require('fs'),
-    TestRun = require("./testhelper").setup.testRun;
+    TestRun = require("../helpers/testhelper").setup.testRun;
 
 exports.unsafe = function () {
     var code = [
