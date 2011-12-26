@@ -29,7 +29,7 @@ if (typeof(JSHINT) === 'undefined') {
                 arg = arg.split(',');
                 for (var i = 0, ii = arg.length; i < ii; i++) {
                     item = arg[i].split(':');
-                    opts[item[0]] = eval(item[1]);
+                    opts[item[0].replace(/(^\s*)|(\s*$)/g, '')] = eval(item[1]);
                 }
                 return opts;
             }
