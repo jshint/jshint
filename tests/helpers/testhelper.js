@@ -26,10 +26,10 @@
  *     options:        optional. the options for jshint
  */
 
-/*jshint eqnull: true*/
+/*jshint node: true, eqnull: true*/
 
 var assert = require('assert'),
-    JSHINT = require('../jshint.js').JSHINT;
+    JSHINT = require('../../jshint.js').JSHINT;
 
 if (exports.setup === undefined || exports.setup === null) {
     exports.setup = {};

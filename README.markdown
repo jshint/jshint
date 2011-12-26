@@ -51,9 +51,9 @@ expresso. You can install the latter with npm:
 
     npm install expresso
 
-After that, running tests is as easy as:
+After that, running the unit tests is as easy as:
 
-    expresso tests/*.js
+    expresso tests/unit/*.js
 
 Attribution
 -----------

@@ -5,10 +5,10 @@
 /*jshint boss: true, laxbreak: true, node: true */
 /*global wrap: true */
 
-var JSHINT  = require('../jshint.js').JSHINT,
+var JSHINT  = require('../../jshint.js').JSHINT,
     assert  = require('assert'),
     fs      = require('fs'),
-    TestRun = require("./testhelper").setup.testRun;
+    TestRun = require("../helpers/testhelper").setup.testRun;
 
 function wrap(globals) {
     return '(function () { return [ ' + globals.join(',') + ' ]; }());';
