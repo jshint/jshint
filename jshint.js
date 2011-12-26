@@ -125,7 +125,7 @@
      member: {
          STRING: NUMBER
      },
-     unuseds: [
+     unused: [
          {
              name: STRING,
              line: NUMBER
