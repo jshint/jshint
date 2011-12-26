@@ -376,24 +376,21 @@ exports.wsh = function () {
 exports.es5 = function () {
     var src = fs.readFileSync(__dirname + "/fixtures/es5.js", "utf8");
 
-    // Basic ES5 tests
     TestRun()
         .addError(3, "Extra comma.")
         .addError(8, "Extra comma.")
         .addError(15, "get/set are ES5 features.")
         .addError(16, "get/set are ES5 features.")
+        .addError(20, "get/set are ES5 features.")
+        .addError(22, "get/set are ES5 features.")
+        .addError(26, "get/set are ES5 features.")
+        .addError(30, "get/set are ES5 features.")
+        .addError(31, "get/set are ES5 features.")
+        .addError(36, "get/set are ES5 features.")
         .test(src);
 
     TestRun()
-        .test(src, { es5: true });
-
-    // Various getter and setter tests.
-    src = fs.readFileSync(__dirname + "/fixtures/es5.getset.js", "utf8");
-    TestRun()
-        .addError(21, "Setter is defined without getter.")
-        .addError(28, "Duplicate member 'x'.")
-        .addError(34, "Duplicate member 'x'.")
-        .addError(41, "Duplicate member 'x'.")
+        .addError(36, "Setter is defined without getter.")
         .test(src, { es5: true });
 
     // Make sure that JSHint parses getters/setters as function expressions
