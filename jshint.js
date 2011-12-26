@@ -195,7 +195,7 @@
  VBArray, WSH, WScript, XDomainRequest, Web, Window, XMLDOM, XMLHttpRequest, XPathEvaluator,
  XPathException, XPathExpression, XPathNamespace, XPathNSResolver, XPathResult, "\\", a,
  addEventListener, address, alert, apply, applicationCache, arguments, arity,
- asi, b, bitwise, block, blur, boolOptions, boss, browser, c, call, callee,
+ asi, b, basic, basicToken, bitwise, block, blur, boolOptions, boss, browser, c, call, callee,
  caller, cases, charAt, charCodeAt, character, clearInterval, clearTimeout,
  close, closed, closure, comment, condition, confirm, console, constructor,
  content, couch, create, css, curly, d, data, datalist, dd, debug, decodeURI,
@@ -204,7 +204,7 @@
  entityify, eqeqeq, eqnull, errors, es5, escape, esnext, eval, event, evidence, evil,
  ex, exception, exec, exps, expr, exports, FileReader, first, floor, focus,
  forin, fragment, frames, from, fromCharCode, fud, funcscope, funct, function, functions,
- g, gc, getComputedStyle, getRow, getter, GLOBAL, global, globals, globalstrict,
+ g, gc, getComputedStyle, getRow, getter, getterToken, GLOBAL, global, globals, globalstrict,
  hasOwnProperty, help, history, i, id, identifier, immed, implieds, importPackage, include,
  indent, indexOf, init, ins, instanceOf, isAlpha, isApplicationRunning, isArray,
  isDigit, isFinite, isNaN, iterator, java, join, jshint,
@@ -3215,22 +3215,41 @@ loop:   for (;;) {
 
     (function (x) {
         x.nud = function () {
-            var b, f, i, j, p, seen = {}, t;
-            var prop, acc = {}; // Accessor methods
+            var b, f, i, j, p, t;
+            var props = {}; // All properties, including accessors
+
+            function saveProperty(name, token) {
+                if (props[name] && is_own(props, name))
+                    warning("Duplicate member '{a}'.", nexttoken, i);
+                else
+                    props[name] = {};
+
+                props[name].basic = true;
+                props[name].basicToken = token;
+            }
 
             function saveSetter(name, token) {
-                if (!acc[name]) {
-                    acc[name] = {};
+                if (props[name] && is_own(props, name)) {
+                    if (props[name].basic || props[name].setter)
+                        warning("Duplicate member '{a}'.", nexttoken, i);
+                } else {
+                    props[name] = {};
                 }
-                acc[name].setter = true;
-                acc[name].setterToken = token;
+
+                props[name].setter = true;
+                props[name].setterToken = token;
             }
 
             function saveGetter(name) {
-                if (!acc[name]) {
-                    acc[name] = {};
+                if (props[name] && is_own(props, name)) {
+                    if (props[name].basic || props[name].getter)
+                        warning("Duplicate member '{a}'.", nexttoken, i);
+                } else {
+                    props[name] = {};
                 }
-                acc[name].getter = true;
+
+                props[name].getter = true;
+                props[name].getterToken = token;
             }
 
             b = token.line !== nexttoken.line;
@@ -3278,7 +3297,6 @@ loop:   for (;;) {
                         error("Missing property name.");
                     }
                     saveSetter(i, nexttoken);
-                    seen[i] = false;
                     t = nexttoken;
                     adjacent(token, nexttoken);
                     f = doFunction();
@@ -3288,6 +3306,7 @@ loop:   for (;;) {
                     }
                 } else {
                     i = property_name();
+                    saveProperty(i, nexttoken);
                     if (typeof i !== 'string') {
                         break;
                     }
@@ -3295,10 +3314,7 @@ loop:   for (;;) {
                     nonadjacent(token, nexttoken);
                     expression(10);
                 }
-                if (seen[i] === true) {
-                    warning("Duplicate member '{a}'.", nexttoken, i);
-                }
-                seen[i] = true;
+
                 countMember(i);
                 if (nexttoken.id === ',') {
                     comma();
@@ -3319,9 +3335,9 @@ loop:   for (;;) {
 
             // Check for lonely setters if in the ES5 mode.
             if (option.es5) {
-                for (prop in acc) {
-                    if (acc.hasOwnProperty(prop) && acc[prop].setter && !acc[prop].getter) {
-                        warning("Setter is defined without getter.", acc[prop].setterToken);
+                for (var name in props) {
+                    if (is_own(props, name) && props[name].setter && !props[name].getter) {
+                        warning("Setter is defined without getter.", props[name].setterToken);
                     }
                 }
             }

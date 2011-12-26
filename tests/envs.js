@@ -387,10 +387,25 @@ exports.es5 = function () {
         .addError(30, "get/set are ES5 features.")
         .addError(31, "get/set are ES5 features.")
         .addError(36, "get/set are ES5 features.")
+        .addError(41, "get/set are ES5 features.")
+        .addError(42, "get/set are ES5 features.")
+        .addError(43, "Duplicate member 'x'.")
+        .addError(47, "get/set are ES5 features.")
+        .addError(48, "get/set are ES5 features.")
+        .addError(48, "Duplicate member 'x'.")
+        .addError(52, "get/set are ES5 features.")
+        .addError(53, "get/set are ES5 features.")
+        .addError(54, "get/set are ES5 features.")
+        .addError(54, "Duplicate member 'x'.")
+        .addError(60, "get/set are ES5 features.")
+        .addError(61, "get/set are ES5 features.")
         .test(src);
 
     TestRun()
         .addError(36, "Setter is defined without getter.")
+        .addError(43, "Duplicate member 'x'.")
+        .addError(48, "Duplicate member 'x'.")
+        .addError(54, "Duplicate member 'x'.")
         .test(src, { es5: true });
 
     // Make sure that JSHint parses getters/setters as function expressions

@@ -35,4 +35,29 @@ var b = {
     var onlySetter = {
         set x(value) { _x = value; }
     };
+
+    // Check for duplicate members
+    var dup = {
+        get x() { return _x; },
+        set x(value) { _x = value; },
+        x: 'sup?'
+    };
+
+    var dup2 = {
+        get x() { return _x; },
+        get x() { return _x + 1; }
+    };
+
+    var dup3 = {
+        get x() { return _x; },
+        set x(value) { _x = value; },
+        set x(value) { _x = value - 1; }
+    };
+
+    // Regression test for a bug when a getter followed a setter produced a faulty
+    // Duplicate Member warning.
+    var setThenGet = {
+        set x(value) { _x = value; },
+        get x() { return _x; }
+    };
 }());
