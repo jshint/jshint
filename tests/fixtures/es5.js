@@ -54,6 +54,21 @@ var b = {
         set x(value) { _x = value - 1; }
     };
 
+    var parameters = {
+        get x(a) { return _x; },
+        get y(a, b) { return _x; },
+        get z() { return _x; },
+        
+        set x() { _x = 1; },
+        set y(a) { _x = a; },
+        set z(a, b) { _x = a; }
+    };
+    
+    var nameless = {
+        get () { return _x; },
+        set (value) { _x = value; }
+    };
+    
     // Regression test for a bug when a getter followed a setter produced a faulty
     // Duplicate Member warning.
     var setThenGet = {

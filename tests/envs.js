@@ -397,8 +397,22 @@ exports.es5 = function () {
         .addError(53, "get/set are ES5 features.")
         .addError(54, "get/set are ES5 features.")
         .addError(54, "Duplicate member 'x'.")
+        .addError(58, "get/set are ES5 features.")
+        .addError(58, "Unexpected parameter 'a' in get x function.")
+        .addError(59, "get/set are ES5 features.")
+        .addError(59, "Unexpected parameter 'a' in get y function.")
         .addError(60, "get/set are ES5 features.")
-        .addError(61, "get/set are ES5 features.")
+        .addError(62, "get/set are ES5 features.")
+        .addError(62, "Expected a single parameter in set x function.")
+        .addError(63, "get/set are ES5 features.")
+        .addError(64, "get/set are ES5 features.")
+        .addError(64, "Expected a single parameter in set z function.")
+        .addError(68, "get/set are ES5 features.")
+        .addError(69, "get/set are ES5 features.")
+        .addError(68, "Missing property name.")
+        .addError(69, "Missing property name.")
+        .addError(75, "get/set are ES5 features.")
+        .addError(76, "get/set are ES5 features.")
         .test(src);
 
     TestRun()
@@ -406,6 +420,12 @@ exports.es5 = function () {
         .addError(43, "Duplicate member 'x'.")
         .addError(48, "Duplicate member 'x'.")
         .addError(54, "Duplicate member 'x'.")
+        .addError(58, "Unexpected parameter 'a' in get x function.")
+        .addError(59, "Unexpected parameter 'a' in get y function.")
+        .addError(62, "Expected a single parameter in set x function.")
+        .addError(64, "Expected a single parameter in set z function.")
+        .addError(68, "Missing property name.")
+        .addError(69, "Missing property name.")
         .test(src, { es5: true });
 
     // Make sure that JSHint parses getters/setters as function expressions

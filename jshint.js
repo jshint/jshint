@@ -3276,9 +3276,6 @@ loop:   for (;;) {
                     t = nexttoken;
                     adjacent(token, nexttoken);
                     f = doFunction();
-                    if (!option.loopfunc && funct['(loopage)']) {
-                        warning("Don't make functions within a loop.", t);
-                    }
                     p = f['(params)'];
                     if (p) {
                         warning("Unexpected parameter '{a}' in get {b} function.", t, p[0], i);
@@ -3298,8 +3295,8 @@ loop:   for (;;) {
                     adjacent(token, nexttoken);
                     f = doFunction();
                     p = f['(params)'];
-                    if (!p || p.length !== 1 || p[0] !== 'value') {
-                        warning("Expected (value) in set {a} function.", t, i);
+                    if (!p || p.length !== 1) {
+                        warning("Expected a single parameter in set {a} function.", t, i);
                     }
                 } else {
                     i = property_name();
