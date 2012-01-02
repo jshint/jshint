@@ -45,13 +45,25 @@ if (typeof(JSHINT) === 'undefined') {
         quit();
     }
 
-    if (!JSHINT(input, opts)) {
+    var ret, aborted;
+    try {
+        ret = JSHINT(input, opts);
+    } catch (ex) {
+        ret = false;
+        aborted = ex;
+    }
+    
+    if (!ret) {
         for (var i = 0, err; err = JSHINT.errors[i]; i++) {
             print(err.reason + ' (line: ' + err.line + ', character: ' + err.character + ')');
             print('> ' + (err.evidence || '').replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"));
             print('');
         }
+        if (aborted) {
+            print(aborted.message + ' (line: ' + aborted.line + ', character: ' + aborted.character + ')');
+            print('> ');
+            print('');
+        }
     }
-
     quit();
 })(arguments);
