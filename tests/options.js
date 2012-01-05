@@ -320,10 +320,13 @@ exports.undef = function () {
         .addError(1, "'undef' is not defined.")
         .addError(5, "'undef' is not defined.")
         .addError(6, "'undef' is not defined.")
-        .addError(7, "'undef' is not defined.")
-        .addError(11, "'localUndef' is not defined.")
-        .addError(16, "'localUndef' is not defined.")
-        .addError(17, "'localUndef' is not defined.")
+        .addError(8, "'undef' is not defined.")
+        .addError(9, "'undef' is not defined.")
+        .addError(13, "'localUndef' is not defined.")
+        .addError(18, "'localUndef' is not defined.")
+        .addError(19, "'localUndef' is not defined.")
+        .addError(21, "'localUndef' is not defined.")
+        .addError(22, "'localUndef' is not defined.")
         .test(src, { undef: true });
 };
 
