@@ -2652,9 +2652,15 @@ loop:   for (;;) {
                 // Operators typeof and delete do not raise runtime errors even if
                 // the base object of a reference is null so no need to display warning
                 // if we're inside of typeof or delete.
-                if (anonname !== 'typeof' && anonname !== 'delete' &&
-                    option.undef && typeof predefined[v] !== 'boolean') {
-                    isundef(funct, "'{a}' is not defined.", token, v);
+                if (option.undef && typeof predefined[v] !== 'boolean') {
+                    // Attempting to subscript a null reference will throw an
+                    // error, even within the typeof and delete operators
+                    if (!(anonname === 'typeof' || anonname === 'delete') ||
+                        (nexttoken &&
+                            (nexttoken.value === '.' || nexttoken.value === '['))) {
+
+                        isundef(funct, "'{a}' is not defined.", token, v);
+                    }
                 }
                 note_implied(token);
             } else {
@@ -2686,8 +2692,15 @@ loop:   for (;;) {
                         // Operators typeof and delete do not raise runtime errors even
                         // if the base object of a reference is null so no need to
                         // display warning if we're inside of typeof or delete.
-                        if (anonname !== 'typeof' && anonname !== 'delete' && option.undef) {
-                            isundef(funct, "'{a}' is not defined.", token, v);
+                        if (option.undef) {
+                            // Attempting to subscript a null reference will throw an
+                            // error, even within the typeof and delete operators
+                            if (!(anonname === 'typeof' || anonname === 'delete') ||
+                                (nexttoken &&
+                                    (nexttoken.value === '.' || nexttoken.value === '['))) {
+
+                                isundef(funct, "'{a}' is not defined.", token, v);
+                            }
                         }
                         funct[v] = true;
                         note_implied(token);
