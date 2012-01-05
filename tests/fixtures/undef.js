@@ -3,7 +3,9 @@ if (typeof undef) {} // this line won't because typeof accepts a reference
                      // even when the base object of that reference is null
 
 if (typeof undef['attr' + 0]) {}
-if (typeof undef.attr) {}
+if (typeof undef.attr) {
+    delete undef.attr;
+}
 
 var fn = function () {
     localUndef();
