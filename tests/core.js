@@ -76,6 +76,7 @@ exports.checkTestFiles = function () {
                 forin: true,
                 immed: true,
                 latedef: true,
+                laxcomma: true,
                 newcap: false,
                 noarg: true,
                 noempty: true,
