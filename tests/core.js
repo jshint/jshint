@@ -399,3 +399,12 @@ exports.yesEmptyStmt = function () {
         .addError(17, "Unnecessary semicolon.")
         .test(src, { curly: false, expr: true });
 };
+
+exports.defensiveSemicolon = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/gh-226.js', 'utf8');
+
+    TestRun()
+        .addError(16, "Unnecessary semicolon.")
+        .addError(17, "Unnecessary semicolon.")
+        .test(src, { expr: true, laxbreak: true });
+};
