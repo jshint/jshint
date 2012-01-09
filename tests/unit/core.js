@@ -1,13 +1,13 @@
 /*jshint boss: true, laxbreak: true, node: true, devel: true */
 
-var JSHINT  = require('../jshint.js').JSHINT,
+var JSHINT  = require('../../jshint.js').JSHINT,
     assert  = require('assert'),
     fs      = require('fs'),
-    TestRun = require("./testhelper").setup.testRun;
+    TestRun = require("../helpers/testhelper").setup.testRun;
 
 /** JSHint must pass its own check */
 exports.checkJSHint = function () {
-    var res = JSHINT(fs.readFileSync(__dirname + "/../jshint.js", "utf8"), {
+    var res = JSHINT(fs.readFileSync(__dirname + "/../../jshint.js", "utf8"), {
             bitwise: true,
             eqeqeq: true,
             forin: true,
@@ -36,7 +36,7 @@ exports.checkJSHint = function () {
 
 /** Rhino wrapper must pass JSHint check */
 exports.checkRhino = function () {
-    var src = fs.readFileSync(__dirname + "/../env/rhino.js", "utf8");
+    var src = fs.readFileSync(__dirname + "/../../env/rhino.js", "utf8");
     TestRun("jshint-rhino").test(src, {
             bitwise: true,
             eqeqeq: true,
@@ -58,44 +58,70 @@ exports.checkRhino = function () {
 
 /* JavaScriptCore wrapper must pass JSHint check */
 exports.checkJSC = function () {
-    var src = fs.readFileSync(__dirname + "/../env/jsc.js", "utf8");
+    var src = fs.readFileSync(__dirname + "/../../env/jsc.js", "utf8");
     TestRun().test(src);
 };
 
 /** All test files must pass JSHint check */
 exports.checkTestFiles = function () {
-    var files = fs.readdirSync(__dirname + '/../tests/').filter(function (e) {
-        return e.length > 2 && e.substr(e.length - 3, 3) === '.js';
-    });
-
-    for (var i = 0, name; name = files[i]; i += 1) {
-        var src = fs.readFileSync(__dirname + '/../tests/' + name, 'utf8'),
-            res = JSHINT(src, {
-                bitwise: true,
-                eqeqeq: true,
-                forin: true,
-                immed: true,
-                latedef: true,
-                newcap: false,
-                noarg: true,
-                noempty: true,
-                nonew: true,
-                plusplus: true,
-                regexp: true,
-                undef: true,
-                strict: false,
-                trailing: true,
-                white: true
-            });
-
-        if (!res) {
-            console.log("file: " + name);
-            console.log(JSHINT.errors);
+    // test all files in /tests and all direct subfolders of /tests.
+    var root = __dirname + '/..';
+    var path = require("path");
+    
+    function testFiles(dir, isRoot) {
+        var filesAndFolders = fs.readdirSync(dir);
+        
+        for (var i = 0, l = filesAndFolders.length; i < l; i += 1) {
+            var name = filesAndFolders[i];
+            var p = path.join(dir, name);
+            var stat;
+            
+            try {
+                stat = fs.statSync(p);
+            } catch (ex) {
+                continue;
+            }
+            
+            if (stat.isFile(p)) {
+                var src = fs.readFileSync(p, 'utf8'),
+                    res = JSHINT(src, {
+                        bitwise: true,
+                        eqeqeq: true,
+                        forin: true,
+                        immed: true,
+                        latedef: true,
+                        newcap: false,
+                        noarg: true,
+                        noempty: true,
+                        nonew: true,
+                        plusplus: true,
+                        regexp: true,
+                        undef: true,
+                        strict: false,
+                        trailing: true,
+                        white: true
+                    });
+                
+                if (!res) {
+                    console.log("file: " + path.relative(root, p));
+                    console.log(JSHINT.errors);
+                }
+                assert.ok(res);
+                
+                var implieds = JSHINT.data().implieds;
+                if (implieds) {
+                    console.log("implieds: " + implieds);
+                    assert.isUndefined(implieds);
+                }
+            } else {
+                if (isRoot) {
+                    testFiles(p, false);
+                }
+            }
         }
-
-        assert.ok(res);
-        assert.isUndefined(JSHINT.data().implieds);
     }
+    
+    testFiles(root, true);
 };
 
 /**
@@ -255,104 +281,6 @@ exports.globalDeclarations = function () {
     ];
 
     TestRun().test(src.join('\n'));
-};
-
-exports.testJQuery = function () {
-    var src = fs.readFileSync(__dirname + '/fixtures/jquery-1.7.js', 'utf8');
-
-    TestRun()
-        .addError(2818, "Expected an assignment or function call and instead saw an expression.")
-        .addError(2822, "Expected an assignment or function call and instead saw an expression.")
-        .addError(4560, "Expected an assignment or function call and instead saw an expression.")
-        .addError(4702, "Mixed spaces and tabs.")
-        .addError(4712, "Expected a 'break' statement before 'case'.")
-        .addError(4715, "Mixed spaces and tabs.")
-        .addError(4843, "Expected an assignment or function call and instead saw an expression.")
-        .addError(6912, "Mixed spaces and tabs.")
-        .addError(6913, "Mixed spaces and tabs.")
-        .addError(6914, "Mixed spaces and tabs.")
-        .addError(6915, "Mixed spaces and tabs.")
-        .addError(6916, "Mixed spaces and tabs.")
-        .addError(6917, "Mixed spaces and tabs.")
-        .addError(6918, "Mixed spaces and tabs.")
-        .addError(6919, "Mixed spaces and tabs.")
-        .addError(6923, "Mixed spaces and tabs.")
-        .addError(6924, "Mixed spaces and tabs.")
-        .addError(6925, "Mixed spaces and tabs.")
-        .addError(6926, "Mixed spaces and tabs.")
-        .addError(8086, "Mixed spaces and tabs.")
-        .addError(8087, "Mixed spaces and tabs.")
-        .addError(8088, "Mixed spaces and tabs.")
-        .addError(8089, "Mixed spaces and tabs.")
-        .addError(8090, "Mixed spaces and tabs.")
-        .addError(9209, "Mixed spaces and tabs.")
-        .test(src);
-};
-
-exports.testPrototype = function () {
-    var src = fs.readFileSync(__dirname + '/fixtures/prototype-17.js', 'utf8');
-
-    TestRun()
-        .addError(22, "Missing semicolon.")
-        .addError(94, "Unnecessary semicolon.")
-        .addError(110, "Missing '()' invoking a constructor.")
-        .addError(253, "'i' is already defined.")
-        .addError(253, "'length' is already defined.")
-        .addError(260, "'i' is already defined.")
-        .addError(260, "'length' is already defined.")
-        .addError(261, "'key' is already defined.")
-        .addError(261, "'str' is already defined.")
-        .addError(319, "'isArray' is a function.")
-        .addError(392, "Missing semicolon.")
-        .addError(400, "Missing semicolon.")
-        .addError(409, "Missing semicolon.")
-        .addError(430, "Missing semicolon.")
-        .addError(451, "Missing semicolon.")
-        .addError(482, "Unescaped '^'.")
-        .addError(482, "Unescaped '['.")
-        .addError(563, "Missing semicolon.")
-        .addError(563, "Expected an identifier and instead saw ','.")
-        .addError(563, "Missing semicolon.")
-        .addError(633, "Use '!==' to compare with 'undefined'.")
-        .addError(737, "Use '===' to compare with ''.")
-        .addError(741, "Wrap the /regexp/ literal in parens to disambiguate the slash operator.")
-        .addError(799, "Unescaped '['.")
-        .addError(805, "Unescaped ']'.")
-        .addError(807, "Use '===' to compare with ''.")
-        .addError(1137, "Use '===' to compare with '0'.")
-        .addError(1215, "Missing semicolon.")
-        .addError(1224, "Unnecessary semicolon.")
-        .addError(1916, "Missing semicolon.")
-        .addError(2034, "Missing semicolon.")
-        .addError(2210, "Missing semicolon.")
-        .addError(2210, "Expected an identifier and instead saw ','.")
-        .addError(2210, "Missing semicolon.")
-        .addError(2222, "Missing semicolon.")
-        .addError(2222, "Expected an identifier and instead saw ','.")
-        .addError(2222, "Missing semicolon.")
-        .addError(2345, "Missing semicolon.")
-        .addError(2345, "Expected an identifier and instead saw ','.")
-        .addError(2345, "Missing semicolon.")
-        .addError(2662, "Missing semicolon.")
-        .addError(2735, "Missing semicolon.")
-        .addError(2924, "Missing semicolon.")
-        .addError(2987, "'tagName' used out of scope.")
-        .addError(2989, "'tagName' used out of scope.")
-        .addError(2989, "'tagName' used out of scope.")
-        .addError(2990, "'tagName' used out of scope.")
-        .addError(3844, "'positionedOffset' is a function.")
-        .addError(3860, "'cumulativeOffset' is a function.")
-        .addError(3974, "Unescaped '['.")
-        .test(src, {
-            sub: true,
-            lastsemic: true,
-            loopfunc: true,
-            evil: true,
-            eqnull: true,
-            laxbreak: true,
-            boss: true,
-            expr: true
-        });
 };
 
 exports.backbone = function () {
