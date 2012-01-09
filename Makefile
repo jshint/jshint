@@ -9,7 +9,12 @@ rhino: build_dir
 
 test:
 	@echo "Running all tests"
-	@expresso tests/*.js
+	@expresso tests/unit/*.js
+	@expresso tests/regression/*.js
+
+cover:
+	@echo "Start coverage"
+	@tests/helpers/coveraje.js
 
 clean:
 	@echo "Cleaning"
