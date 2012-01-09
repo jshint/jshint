@@ -67,21 +67,21 @@ exports.checkTestFiles = function () {
     // test all files in /tests and all direct subfolders of /tests.
     var root = __dirname + '/..';
     var path = require("path");
-    
+
     function testFiles(dir, isRoot) {
         var filesAndFolders = fs.readdirSync(dir);
-        
+
         for (var i = 0, l = filesAndFolders.length; i < l; i += 1) {
             var name = filesAndFolders[i];
             var p = path.join(dir, name);
             var stat;
-            
+
             try {
                 stat = fs.statSync(p);
             } catch (ex) {
                 continue;
             }
-            
+
             if (stat.isFile(p)) {
                 var src = fs.readFileSync(p, 'utf8'),
                     res = JSHINT(src, {
@@ -90,6 +90,7 @@ exports.checkTestFiles = function () {
                         forin: true,
                         immed: true,
                         latedef: true,
+                        laxcomma: true,
                         newcap: false,
                         noarg: true,
                         noempty: true,
@@ -101,13 +102,13 @@ exports.checkTestFiles = function () {
                         trailing: true,
                         white: true
                     });
-                
+
                 if (!res) {
                     console.log("file: " + path.relative(root, p));
                     console.log(JSHINT.errors);
                 }
                 assert.ok(res);
-                
+
                 var implieds = JSHINT.data().implieds;
                 if (implieds) {
                     console.log("implieds: " + implieds);
@@ -120,7 +121,7 @@ exports.checkTestFiles = function () {
             }
         }
     }
-    
+
     testFiles(root, true);
 };
 
