@@ -70,6 +70,7 @@ exports.latedef = function () {
         .addError(2, "'fn' was used before it was defined.")
         .addError(6, "'fn1' was used before it was defined.")
         .addError(10, "'vr' was used before it was defined.")
+        .addError(18, "Inner functions should be listed at the top of the outer function.")
         .test(src, { latedef: true });
 };
 

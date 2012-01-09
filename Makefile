@@ -8,8 +8,9 @@ rhino: build_dir
 		echo "Done"
 
 test:
-	@echo "Running all tests"
+	@echo "Running unit tests"
 	@expresso tests/unit/*.js
+	@echo "Running regression tests"
 	@expresso tests/regression/*.js
 
 cover:
