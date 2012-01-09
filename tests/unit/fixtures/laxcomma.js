@@ -10,3 +10,8 @@ function func() {
   && z;
 }
 
+function test() {
+    return someLongStatement === someOtherLongStatement
+        ? this.someNonTrivialLengthThing(someVar, someOtherVar)
+        : this.someOtherNonTrivialLengthThing(someVar, someOtherVar);
+}

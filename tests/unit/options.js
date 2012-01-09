@@ -1029,6 +1029,7 @@ exports.laxcomma = function () {
         .addError(2, "Bad line breaking before ','.")
         .addError(6, "Bad line breaking before ','.")
         .addError(10, "Bad line breaking before '&&'.")
+        .addError(15, "Bad line breaking before '?'.")
         .test(src);
 
     TestRun()
