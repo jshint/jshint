@@ -1025,6 +1025,7 @@ exports.smarttabs = function () {
 exports.laxcomma = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/laxcomma.js', 'utf8');
 
+    // All errors.
     TestRun()
         .addError(1, "Bad line breaking before ','.")
         .addError(2, "Bad line breaking before ','.")
@@ -1033,11 +1034,19 @@ exports.laxcomma = function () {
         .addError(15, "Bad line breaking before '?'.")
         .test(src);
 
+    // Allows bad line breaking, but not on commas.
     TestRun()
         .addError(1, "Bad line breaking before ','.")
         .addError(2, "Bad line breaking before ','.")
         .addError(6, "Bad line breaking before ','.")
         .test(src, { laxbreak: true });
 
+    // Allows comma-first style but warns on bad line breaking
+    TestRun()
+        .addError(10, "Bad line breaking before '&&'.")
+        .addError(15, "Bad line breaking before '?'.")
+        .test(src, { laxcomma: true });
+
+    // No errors if both laxbreak and laxcomma are turned on
     TestRun().test(src, { laxbreak: true, laxcomma: true });
 };
