@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /**
  * Helper for JSHint-tests.
  * Export itself as function in setup.testhelper to
