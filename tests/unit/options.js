@@ -1017,3 +1017,25 @@ exports.smarttabs = function () {
         .addError(5, "Mixed spaces and tabs.")
         .test(src, { smarttabs: true });
 };
+
+/*
+ * Tests the `laxcomma` option
+ */
+exports.laxcomma = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/laxcomma.js', 'utf8');
+
+    TestRun()
+        .addError(1, "Bad line breaking before ','.")
+        .addError(2, "Bad line breaking before ','.")
+        .addError(6, "Bad line breaking before ','.")
+        .addError(10, "Bad line breaking before '&&'.")
+        .test(src);
+
+    TestRun()
+        .addError(1, "Bad line breaking before ','.")
+        .addError(2, "Bad line breaking before ','.")
+        .addError(6, "Bad line breaking before ','.")
+        .test(src, { laxbreak: true });
+
+    TestRun().test(src, { laxbreak: true, laxcomma: true });
+};
