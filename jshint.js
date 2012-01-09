@@ -2330,6 +2330,9 @@ loop:   for (;;) {
             }
             if (t.id !== '(endline)') {
                 if (t.id === 'function') {
+                    if (!option.latedef) {
+                        break;
+                    }
                     warning(
 "Inner functions should be listed at the top of the outer function.", t);
                     break;
@@ -2415,7 +2418,10 @@ loop:   for (;;) {
 
         while (!nexttoken.reach && nexttoken.id !== '(end)') {
             if (nexttoken.id === ';') {
-                warning("Unnecessary semicolon.");
+                p = peek();
+                if (!p || p.id !== "(") {
+                    warning("Unnecessary semicolon.");
+                }
                 advance(';');
             } else {
                 a.push(statement(startLine === nexttoken.line));
@@ -4090,6 +4096,17 @@ loop:   for (;;) {
                 statements();
             }
             advance('(end)');
+
+            // Check queued 'x is not defined' instances to see if they're still undefined.
+            for (i = 0; i < JSHINT.undefs.length; i += 1) {
+                k = JSHINT.undefs[i].slice(0);
+                scope = k.shift();
+                a = k[2];
+
+                if (typeof scope[a] !== 'string' && typeof funct[a] !== 'string') {
+                    warning.apply(warning, k);
+                }
+            }
         } catch (e) {
             if (e) {
                 var nt = nexttoken || {};
@@ -4099,16 +4116,6 @@ loop:   for (;;) {
                     line      : e.line || nt.line,
                     character : e.character || nt.from
                 }, null);
-            }
-        }
-
-        for (i = 0; i < JSHINT.undefs.length; i += 1) {
-            k = JSHINT.undefs[i].slice(0);
-            scope = k.shift();
-            a = k[2];
-
-            if (typeof scope[a] !== 'string' && typeof funct[a] !== 'string') {
-                warning.apply(warning, k);
             }
         }
 

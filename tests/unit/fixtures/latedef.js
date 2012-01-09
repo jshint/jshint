@@ -9,3 +9,13 @@ function fn() {}
 if (!vr) {
     var vr = 'o_O';
 }
+
+function foo() {
+  return {
+    bar: function() {return bar();}
+  };
+
+  function bar() {
+    return 10;
+  }
+}

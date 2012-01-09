@@ -328,3 +328,27 @@ exports.yesEmptyStmt = function () {
         .addError(17, "Unnecessary semicolon.")
         .test(src, { curly: false, expr: true });
 };
+
+// Regression test for GH-394.
+exports.noExcOnTooManyUndefined = function () {
+    var code = 'a(); b();';
+
+    try {
+        JSHINT(code, {undef: true, maxerr: 1});
+    } catch (e) {
+        assert.ok(false, 'Exception was thrown');
+    }
+
+    TestRun()
+        .addError(1, "'a' is not defined.")
+        .test(code, { undef: true, maxerr: 1 });
+};
+
+exports.defensiveSemicolon = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/gh-226.js', 'utf8');
+
+    TestRun()
+        .addError(16, "Unnecessary semicolon.")
+        .addError(17, "Unnecessary semicolon.")
+        .test(src, { expr: true, laxbreak: true });
+};
