@@ -2,7 +2,7 @@
 # usage (run from any directory) :
 #   env/jsc.sh /path/to/script.js
 # or with jshint options:
-#   env/jsc.sh /path/to/script.js "{option1:true,option2:false,option3:25}"
+#   env/jsc.sh /path/to/script.js "option1:true,option2:false,option3:25"
 
 alias jsc="/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc"
 FILE="${1}"

@@ -1,7 +1,7 @@
 /*jshint boss:true, evil:true */
 
 // usage:
-//   jsc ${env_home}/jsc.js -- ${file} "$(cat ${file})" "{option1:true,option2:false} ${env_home}"
+//   jsc ${env_home}/jsc.js -- ${file} "$(cat ${file})" "option1:true,option2:false ${env_home}"
 var env_home = '';
 if (arguments.length > 3) {
   env_home = arguments[3].toString().replace(/\/env$/, '/');
