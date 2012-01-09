@@ -10,7 +10,7 @@ rhino: build_dir
 test:
 	@echo "Running unit tests"
 	@expresso tests/unit/*.js
-	@echo "Running regresison tests"
+	@echo "Running regression tests"
 	@expresso tests/regression/*.js
 
 cover:
