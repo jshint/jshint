@@ -342,3 +342,12 @@ exports.noExcOnTooManyUndefined = function () {
         .addError(1, "'a' is not defined.")
         .test(code, { undef: true, maxerr: 1 });
 };
+
+exports.defensiveSemicolon = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/gh-226.js', 'utf8');
+
+    TestRun()
+        .addError(16, "Unnecessary semicolon.")
+        .addError(17, "Unnecessary semicolon.")
+        .test(src, { expr: true, laxbreak: true });
+};
