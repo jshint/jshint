@@ -2028,6 +2028,10 @@ loop:   for (;;) {
     function comma() {
         if (token.line !== nexttoken.line) {
             if (!option.laxcomma) {
+                if (comma.first) {
+                    warning("Comma warnings can be turned off with 'laxcomma'");
+                    comma.first = false;
+                }
                 warning("Bad line breaking before '{a}'.", token, nexttoken.id);
             }
         } else if (!token.comment && token.character !== nexttoken.from && option.white) {
@@ -2037,6 +2041,8 @@ loop:   for (;;) {
         advance(',');
         nonadjacent(token, nexttoken);
     }
+
+    comma.first = true;
 
 
 // Functional constructors for making the symbols that will be inherited by
