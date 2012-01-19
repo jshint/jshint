@@ -284,18 +284,6 @@ exports.globalDeclarations = function () {
     TestRun().test(src.join('\n'));
 };
 
-exports.backbone = function () {
-    var src = fs.readFileSync(__dirname + '/fixtures/backbone.js', 'utf8');
-
-    TestRun()
-        .addError(669, "Unescaped '['.")
-        .addError(669, "Unescaped '^'.")
-        .addError(685, "Missing '()' invoking a constructor.")
-        .addError(764, "Use '===' to compare with '0'.")
-        .addError(859, "Use '!==' to compare with '0'.")
-        .test(src, { expr: true, eqnull: true, boss: true, regexdash: true });
-};
-
 exports.argsInCatchReused = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/trycatch.js', 'utf8');
     TestRun()
