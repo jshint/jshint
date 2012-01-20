@@ -5,7 +5,7 @@ var JSHINT  = require('../../jshint.js').JSHINT,
     fs      = require('fs'),
     TestRun = require("../helpers/testhelper").setup.testRun;
 
-exports.jQuery_1_7 = function () {
+exports["Backbone.js 0.5.3"] = function () {
     var src = fs.readFileSync(__dirname + '/libs/backbone.js', 'utf8');
 
     TestRun()
