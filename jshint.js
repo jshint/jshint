@@ -2665,12 +2665,12 @@ loop:   for (;;) {
                 // Operators typeof and delete do not raise runtime errors even if
                 // the base object of a reference is null so no need to display warning
                 // if we're inside of typeof or delete.
+
                 if (option.undef && typeof predefined[v] !== 'boolean') {
                     // Attempting to subscript a null reference will throw an
                     // error, even within the typeof and delete operators
                     if (!(anonname === 'typeof' || anonname === 'delete') ||
-                        (nexttoken &&
-                            (nexttoken.value === '.' || nexttoken.value === '['))) {
+                        (nexttoken && (nexttoken.value === '.' || nexttoken.value === '['))) {
 
                         isundef(funct, "'{a}' is not defined.", token, v);
                     }
@@ -4103,14 +4103,23 @@ loop:   for (;;) {
             }
             advance('(end)');
 
+            var isDefined = function (name, context) {
+                do {
+                    if (typeof context[name] === 'string')
+                        return true;
+
+                    context = context['(context)'];
+                } while (context);
+
+                return false;
+            };
+
             // Check queued 'x is not defined' instances to see if they're still undefined.
             for (i = 0; i < JSHINT.undefs.length; i += 1) {
                 k = JSHINT.undefs[i].slice(0);
-                scope = k.shift();
-                a = k[2];
 
-                if (typeof scope[a] !== 'string' && typeof funct[a] !== 'string') {
-                    warning.apply(warning, k);
+                if (!isDefined(k[2].value, k[0])) {
+                    warning.apply(warning, k.slice(1));
                 }
             }
         } catch (e) {

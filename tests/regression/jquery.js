@@ -34,5 +34,5 @@ exports.jQuery_1_7 = function () {
         .addError(8089, "Mixed spaces and tabs.")
         .addError(8090, "Mixed spaces and tabs.")
         .addError(9209, "Mixed spaces and tabs.")
-        .test(src);
+        .test(src, {}, { DOMParser: false, ActiveXObject: false, define: false });
 };
