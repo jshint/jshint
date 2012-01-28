@@ -208,7 +208,7 @@
  strictundef, hasOwnProperty, help, history, i, id, identifier, immed, implieds, importPackage,
  include, indent, indexOf, init, ins, instanceOf, isAlpha, isApplicationRunning, isArray,
  isDigit, isFinite, isNaN, iterator, java, join, jshint,
- JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastsemic, laxbreak, laxcomma,
+ JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastsemic, laxbreak, laxcomma, laxradix,
  latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
  log, loopfunc, m, match, maxerr, maxlen, member,message, meta, module, moveBy,
  moveTo, mootools, multistr, name, navigator, new, newcap, noarg, node, noempty, nomen,
@@ -286,6 +286,7 @@ var JSHINT = (function () {
             latedef     : true, // if the use before definition should not be tolerated
             laxbreak    : true, // if line breaks should not be checked
             laxcomma    : true, // if line breaks should not be checked around commas
+            laxradix    : false,// if should relax "missing radix param" warnings
             loopfunc    : true, // if functions should be allowed to be defined within
                                 // loops
             mootools    : true, // if MooTools globals should be predefined
@@ -3063,7 +3064,9 @@ loop:   for (;;) {
         nospace(prevtoken, token);
         if (typeof left === 'object') {
             if (left.value === 'parseInt' && n === 1) {
-                warning("Missing radix parameter.", left);
+                if (!option.laxradix) {
+                    warning("Missing radix parameter.", left);
+                }
             }
             if (!option.evil) {
                 if (left.value === 'eval' || left.value === 'Function' ||
