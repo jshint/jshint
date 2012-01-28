@@ -205,8 +205,8 @@
  ex, exception, exec, exps, expr, exports, FileReader, first, floor, focus,
  forin, fragment, frames, from, fromCharCode, fud, funcscope, funct, function, functions,
  g, gc, getComputedStyle, getRow, getter, getterToken, GLOBAL, global, globals, globalstrict,
- hasOwnProperty, help, history, i, id, identifier, immed, implieds, importPackage, include,
- indent, indexOf, init, ins, instanceOf, isAlpha, isApplicationRunning, isArray,
+ strictundef, hasOwnProperty, help, history, i, id, identifier, immed, implieds, importPackage,
+ include, indent, indexOf, init, ins, instanceOf, isAlpha, isApplicationRunning, isArray,
  isDigit, isFinite, isNaN, iterator, java, join, jshint,
  JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastsemic, laxbreak, laxcomma,
  latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
@@ -276,6 +276,8 @@ var JSHINT = (function () {
             funcscope   : true, // if only function scope should be used for scope tests
             globalstrict: true, // if global "use strict"; should be allowed (also
                                 // enables 'strict')
+            strictundef : false,// if global "use strict"; should allow using variables
+                                // before being declared
             immed       : true, // if immediate invocations must be wrapped in parens
             iterator    : true, // if the `__iterator__` property should be allowed
             jquery      : true, // if jQuery globals should be predefined
@@ -2666,7 +2668,7 @@ loop:   for (;;) {
                 // the base object of a reference is null so no need to display warning
                 // if we're inside of typeof or delete.
 
-                if (option.undef && typeof predefined[v] !== 'boolean') {
+                if (option.undef && !option.strictundef && typeof predefined[v] !== 'boolean') {
                     // Attempting to subscript a null reference will throw an
                     // error, even within the typeof and delete operators
                     if (!(anonname === 'typeof' || anonname === 'delete') ||
@@ -2706,7 +2708,7 @@ loop:   for (;;) {
                         // Operators typeof and delete do not raise runtime errors even
                         // if the base object of a reference is null so no need to
                         // display warning if we're inside of typeof or delete.
-                        if (option.undef) {
+                        if (option.undef && !option.strictundef) {
                             // Attempting to subscript a null reference will throw an
                             // error, even within the typeof and delete operators
                             if (!(anonname === 'typeof' || anonname === 'delete') ||
