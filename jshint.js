@@ -504,7 +504,7 @@ var JSHINT = (function () {
 
         functionicity = [
             'closure', 'exception', 'global', 'label',
-            'outer', 'unused', 'var'
+            'outer', 'unused', 'var', 'let'
         ],
 
         functions,      // All of the functions
@@ -1675,7 +1675,7 @@ klass:                                  do {
     }());
 
 
-    function addlabel(t, type) {
+    function addlabel(t, type, blockscope) {
 
         if (t === 'hasOwnProperty') {
             warning("'hasOwnProperty' is a really bad name.");
@@ -1687,7 +1687,7 @@ klass:                                  do {
                 if (option.latedef)
                     warning("'{a}' was used before it was defined.", nexttoken, t);
             } else {
-                if (!option.shadow && type !== "exception")
+                if (!option.shadow && type !== "exception" && !blockscope)
                     warning("'{a}' is already defined.", nexttoken, t);
             }
         }
@@ -2684,6 +2684,7 @@ loop:   for (;;) {
                 case 'closure':
                 case 'function':
                 case 'var':
+                case 'let':
                 case 'unused':
                     warning("'{a}' used out of scope.", token, v);
                     break;
@@ -2725,7 +2726,8 @@ loop:   for (;;) {
                             s[v] = 'closure';
                             funct[v] = s['(global)'] ? 'global' : 'outer';
                             break;
-                        case 'var':
+                        case 'var':    
+                        case 'let':
                         case 'unused':
                             s[v] = 'closure';
                             funct[v] = s['(global)'] ? 'global' : 'outer';
@@ -3475,6 +3477,53 @@ loop:   for (;;) {
     });
     varstatement.exps = true;
 
+    var letstatement = stmt('let', function (prefix) {
+        var id, name, value;
+
+        if (funct['(onevar)'] && option.onevar) {
+            warning("Too many let statements.");
+        } else if (!funct['(global)']) {
+            funct['(onevar)'] = true;
+        }
+        this.first = [];
+        for (;;) {
+            nonadjacent(token, nexttoken);
+            id = identifier();
+            if (option.esnext && funct[id] === "const") {
+                warning("const '" + id + "' has already been declared");
+            }
+            if (funct['(global)'] && predefined[id] === false) {
+                warning("Redefinition of '{a}'.", token, id);
+            }
+            addlabel(id, 'unused', 'let');
+            if (prefix) {
+                break;
+            }
+            name = token;
+            this.first.push(token);
+            if (nexttoken.id === '=') {
+                nonadjacent(token, nexttoken);
+                advance('=');
+                nonadjacent(token, nexttoken);
+                if (nexttoken.id === 'undefined') {
+                    warning("It is not necessary to initialize '{a}' to 'undefined'.", token, id);
+                }
+                if (peek(0).id === '=' && nexttoken.identifier) {
+                    error("Variable {a} was not declared correctly.",
+                            nexttoken, nexttoken.value);
+                }
+                value = expression(0);
+                name.first = value;
+            }
+            if (nexttoken.id !== ',') {
+                break;
+            }
+            comma();
+        }
+        return this;
+    });
+    letstatement.exps = true;
+
     blockstmt('function', function () {
         if (inblock) {
             warning("Function declarations should not be placed in blocks. " +
@@ -3743,10 +3792,13 @@ loop:   for (;;) {
         advance('(');
         nonadjacent(this, t);
         nospace();
-        if (peek(nexttoken.id === 'var' ? 1 : 0).id === 'in') {
+        if (peek((nexttoken.id === 'var' || nexttoken.id === 'let') ? 1 : 0).id === 'in') {
             if (nexttoken.id === 'var') {
                 advance('var');
                 varstatement.fud.call(varstatement, true);
+            } else if (nexttoken.id === 'let') {
+                advance('let');
+                letstatement.fud.call(letstatement, true);
             } else {
                 switch (funct[nexttoken.value]) {
                 case 'unused':
@@ -3777,6 +3829,9 @@ loop:   for (;;) {
                 if (nexttoken.id === 'var') {
                     advance('var');
                     varstatement.fud.call(varstatement);
+                } else if (nexttoken.id === 'let') {
+                    advance('let');
+                    letstatement.fud.call(letstatement);
                 } else {
                     for (;;) {
                         expression(0, 'for');
