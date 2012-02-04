@@ -69,4 +69,4 @@ Maintainer: Anton Kovalyov
 Thank you!
 ----------
 
-We really appreciate all kind of feedback and contributions. Thanks for using and supporing JSHint!
+We really appreciate all kind of feedback and contributions. Thanks for using and supporting JSHint!
