@@ -3088,7 +3088,8 @@ loop:   for (;;) {
         advance(')', this);
         nospace(prevtoken, token);
         if (option.immed && v.id === 'function') {
-            if (nexttoken.id === '(') {
+            if (nexttoken.id === '(' ||
+              (nexttoken.id === '.' && (peek().value === 'call' || peek().value === 'apply'))) {
                 warning(
 "Move the invocation into the parens that contain the function.", nexttoken);
             } else {
