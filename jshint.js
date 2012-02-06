@@ -2478,8 +2478,7 @@ loop:   for (;;) {
                     warning("Unnecessary directive \"{a}\".", token, token.value);
                 }
 
-                if (token.value === "use strict") {
-                    option.newcap = true;
+                if (token.value === "use strict") {                
                     option.undef = true;
                 }
 
