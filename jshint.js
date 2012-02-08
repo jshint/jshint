@@ -410,6 +410,7 @@ var JSHINT = (function () {
             length                   :  false,
             localStorage             :  false,
             location                 :  false,
+            MessageChannel           :  false,
             moveBy                   :  false,
             moveTo                   :  false,
             name                     :  false,
