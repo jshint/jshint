@@ -278,6 +278,7 @@ exports.browser = function () {
           , 'length'
           , 'localStorage'
           , 'location'
+          , 'MessageChannel'
           , 'moveBy'
           , 'moveTo'
           , 'name'
