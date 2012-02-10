@@ -26,9 +26,6 @@ exports.prototype_1_7 = function () {
         .addError(451, "Missing semicolon.")
         .addError(482, "Unescaped '^'.")
         .addError(482, "Unescaped '['.")
-        .addError(563, "Missing semicolon.")
-        .addError(563, "Expected an identifier and instead saw ','.")
-        .addError(563, "Missing semicolon.")
         .addError(633, "Use '!==' to compare with 'undefined'.")
         .addError(737, "Use '===' to compare with ''.")
         .addError(741, "Wrap the /regexp/ literal in parens to disambiguate the slash operator.")
@@ -40,15 +37,6 @@ exports.prototype_1_7 = function () {
         .addError(1224, "Unnecessary semicolon.")
         .addError(1916, "Missing semicolon.")
         .addError(2034, "Missing semicolon.")
-        .addError(2210, "Missing semicolon.")
-        .addError(2210, "Expected an identifier and instead saw ','.")
-        .addError(2210, "Missing semicolon.")
-        .addError(2222, "Missing semicolon.")
-        .addError(2222, "Expected an identifier and instead saw ','.")
-        .addError(2222, "Missing semicolon.")
-        .addError(2345, "Missing semicolon.")
-        .addError(2345, "Expected an identifier and instead saw ','.")
-        .addError(2345, "Missing semicolon.")
         .addError(2662, "Missing semicolon.")
         .addError(2735, "Missing semicolon.")
         .addError(2924, "Missing semicolon.")
@@ -59,6 +47,13 @@ exports.prototype_1_7 = function () {
         .addError(3844, "'positionedOffset' is a function.")
         .addError(3860, "'cumulativeOffset' is a function.")
         .addError(3974, "Unescaped '['.")
+        .addError(3987, "Variable context was not declared correctly.")
+        .addError(4000, "Expected ')' to match '(' from line 4000 and instead saw ','.")
+        .addError(4000, "Expected ')' to match '(' from line 4000 and instead saw 'm'.")
+        .addError(4000, "Expected an identifier and instead saw '='.")
+        .addError(4000, "Missing semicolon.")
+        .addError(4000, "Missing semicolon.")
+        .addError(4000, "Expected an identifier and instead saw ')'.")
         .test(src, {
             sub: true,
             lastsemic: true,
@@ -67,6 +62,7 @@ exports.prototype_1_7 = function () {
             eqnull: true,
             laxbreak: true,
             boss: true,
-            expr: true
+            expr: true,
+            maxerr: 9001
         });
 };
