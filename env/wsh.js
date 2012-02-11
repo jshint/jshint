@@ -178,17 +178,19 @@
 	var unnamed = WScript.Arguments.Unnamed;
 
 	if (unnamed.length !== 1) {
-		WScript.StdOut.WriteLine("    usage: cscript " + scriptName + " [options] <script>");
+		WScript.StdOut.WriteLine("    usage: cscript " + scriptName + " [options] <script | directory>");
 		WScript.StdOut.WriteLine("");
 		WScript.StdOut.WriteLine("Scans the specified script with JSHint and reports any errors encountered.  If");
 		WScript.StdOut.WriteLine("the script name is \"-\", it will be read from standard input instead.");
+		WScript.StdOut.WriteLine("If a directory is passed, all .js files in that directory and subdirectories");
+		WScript.StdOut.WriteLine("will be scanned.");
 		WScript.StdOut.WriteLine("");
 		WScript.StdOut.WriteLine("JSHint configuration options can be passed in via optional, Windows-style");
 		WScript.StdOut.WriteLine("arguments.  For example:");
 		WScript.StdOut.WriteLine("    cscript " + scriptName + " /jquery:true myscript.js");
 		WScript.StdOut.WriteLine("    cscript " + scriptName + " /global:QUnit:false,_:false,foo:true foo.js");
 		WScript.StdOut.WriteLine("");
-		WScript.StdOut.WriteLine("By default, we assume that your file is encoded if UTF-8. You can change that");
+		WScript.StdOut.WriteLine("By default, we assume that your file is encoded in UTF-8. You can change that");
 		WScript.StdOut.WriteLine("by providing a custom charset option:");
 		WScript.StdOut.WriteLine("    cscript " + scriptName + " /charset:ascii myscript.js");
 
