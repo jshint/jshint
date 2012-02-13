@@ -9,7 +9,8 @@
 var JSHINT  = require('../../jshint.js').JSHINT,
     fs      = require('fs'),
     TestRun = require('../helpers/testhelper').setup.testRun,
-    fixture = require('../helpers/fixture').fixture;
+    fixture = require('../helpers/fixture').fixture,
+    assert  = require('assert');
 
 /**
  * Option `shadow` allows you to re-define variables later in code.
@@ -118,6 +119,24 @@ exports['combination of latedef and undef'] = function () {
 exports.undefwstrict = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/undefstrict.js', 'utf8');
     TestRun().test(src, { undef: false });
+};
+
+// Regression test for GH-431
+exports["implied and unused should respect hoisting"] = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/gh431.js', 'utf8');
+    TestRun()
+        .addError(14, "'fun4' is not defined.")
+        .test(src, { undef: true });
+
+    JSHINT.flag = true;
+    JSHINT(src, { undef: true });
+    var report = JSHINT.data();
+
+    assert.eql(report.implieds.length, 1);
+    assert.eql(report.implieds[0].name, 'fun4');
+    assert.eql(report.implieds[0].line, [14]);
+
+    assert.eql(report.unused.length, 2);
 };
 
 /**
