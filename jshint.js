@@ -2598,6 +2598,7 @@ loop:   for (;;) {
         if (typeof a === 'function') {
             a = false;
         }
+
         if (!a) {
             a = [line];
             implied[name] = a;
@@ -4101,10 +4102,22 @@ loop:   for (;;) {
             }
             advance('(end)');
 
-            var isDefined = function (name, context) {
+            var markDefined = function (name, context) {
                 do {
-                    if (typeof context[name] === 'string')
+                    if (typeof context[name] === 'string') {
+                        // JSHINT marks unused variables as 'unused' and
+                        // unused function declaration as 'unction'. This
+                        // code changes such instances back 'var' and
+                        // 'closure' so that the code in JSHINT.data()
+                        // doesn't think they're unused.
+
+                        if (context[name] === 'unused')
+                            context[name] = 'var';
+                        else if (context[name] === 'unction')
+                            context[name] = 'closure';
+
                         return true;
+                    }
 
                     context = context['(context)'];
                 } while (context);
@@ -4112,11 +4125,29 @@ loop:   for (;;) {
                 return false;
             };
 
+            var clearImplied = function (name, line) {
+                if (!implied[name])
+                    return;
+
+                var newImplied = [];
+                for (var i = 0; i < implied[name].length; i += 1) {
+                    if (implied[name][i] !== line)
+                        newImplied.push(implied[name][i]);
+                }
+
+                if (newImplied.length === 0)
+                    delete implied[name];
+                else
+                    implied[name] = newImplied;
+            };
+
             // Check queued 'x is not defined' instances to see if they're still undefined.
             for (i = 0; i < JSHINT.undefs.length; i += 1) {
                 k = JSHINT.undefs[i].slice(0);
 
-                if (!isDefined(k[2].value, k[0])) {
+                if (markDefined(k[2].value, k[0])) {
+                    clearImplied(k[2].value, k[2].line);
+                } else {
                     warning.apply(warning, k.slice(1));
                 }
             }
@@ -4168,7 +4199,6 @@ loop:   for (;;) {
         if (globals.length > 0) {
             data.globals = globals;
         }
-
         for (i = 1; i < functions.length; i += 1) {
             f = functions[i];
             fu = {};
