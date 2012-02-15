@@ -411,6 +411,8 @@ var JSHINT = (function () {
             localStorage             :  false,
             location                 :  false,
             MessageChannel           :  false,
+            MessageEvent             :  false,
+            MessagePort              :  false,
             moveBy                   :  false,
             moveTo                   :  false,
             name                     :  false,
