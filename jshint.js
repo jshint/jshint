@@ -2391,6 +2391,10 @@ loop:   for (;;) {
                 warning("Do not use 'new' for side effects.");
             }
 
+            if (nexttoken.id === ',') {
+                return comma();
+            }
+
             if (nexttoken.id !== ';') {
                 if (!option.asi) {
                     // If this is the last statement in a block that ends on
