@@ -3595,7 +3595,24 @@ loop:   for (;;) {
         return this;
     }).labelled = true;
 
-    reserve('with');
+    blockstmt('with', function () {
+        var t = nexttoken;
+        if (directive['use strict']) {
+            error("'with' is not allowed in strict mode code.", token);
+        } else {
+            warning("'with' should not be used... Never.", token);
+        }
+        
+        advance('(');
+        nonadjacent(this, t);
+        nospace();
+        expression(0);
+        advance(')', t);
+        nospace(prevtoken, token);
+        block(true, true);
+        
+        return this;
+    });
 
     blockstmt('switch', function () {
         var t = nexttoken,

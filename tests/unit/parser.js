@@ -316,3 +316,16 @@ exports.jsonMode = function () {
         .addError(7, "Avoid 0x-. '0x332'.")
         .test(code, {multistr: true});
 };
+
+exports.withStatement = function () {
+    var src = fs.readFileSync(__dirname + "/fixtures/with.js", "utf8");
+
+    TestRun()
+        .addError(5, "'with' should not be used... Never.")
+        .addError(5, "Missing space after 'with'.")
+        .addError(5, "Unexpected space after '('.")
+        .addError(13, "'with' is not allowed in strict mode code.")
+        .addError(13, "Missing space after ')'.")
+        .addError(13, "Unexpected space after 'foo'.")
+        .test(src, {white: true});
+};
