@@ -1061,3 +1061,20 @@ exports.laxcomma = function () {
     // No errors if both laxbreak and laxcomma are turned on
     TestRun().test(src, { laxbreak: true, laxcomma: true });
 };
+
+/*
+ * Tests the `browser` option
+ */
+exports.browser = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/browser.js', 'utf8');
+
+	TestRun()
+		.addError(2, "'atob' is not defined.")
+		.addError(3, "'btoa' is not defined.")
+		.addError(6, "'DOMParser' is not defined.")
+		.addError(10, "'XMLSerializer' is not defined.")
+		.test(src, { undef: true });
+
+	TestRun().test(src, { browser: true, undef: true });
+
+};
