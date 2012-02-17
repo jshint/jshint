@@ -326,6 +326,6 @@ exports.withStatement = function () {
         .addError(5, "Unexpected space after '('.")
         .addError(13, "'with' is not allowed in strict mode code.")
         .addError(13, "Missing space after ')'.")
-        .addError(13, "Unexpected space after 'foo'.")
+        .addError(13, "Unexpected space after '2'.")
         .test(src, {white: true});
 };
