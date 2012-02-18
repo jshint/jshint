@@ -12,26 +12,26 @@ function repeatedloops() {
             x = i;
         }
     }
-    
+
     while (true) {
         var aa = true;
     }
     while (false) {
         aa = false;
     }
-    
+
     if (true) {
         var bb = true;
     }
     if (false) {
         bb = false;
     }
-    
+
     function xx2() {
         var cc = 3;
         bb = true;
     }
-    
+
     function xx3() {
         bb = true;
         cc = 4;
@@ -40,4 +40,23 @@ function repeatedloops() {
 
 function repeatedloops() {
     bb = 2;
+}
+
+function trycatchfinally() {
+    try {
+        var inTry = true;
+        inFinally = false;
+    } catch (e) {
+        inTry = false;
+        inFinally = false;
+    } finally {
+        var inFinally = true;
+        inTry = false;
+        e = null;
+    }
+
+    function xx() {
+        inTry = false;
+        inFinally = false;
+    }
 }

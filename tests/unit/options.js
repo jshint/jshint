@@ -994,11 +994,15 @@ exports.scope = function () {
         .addError(27, "'bb' used out of scope.")
         .addError(37, "'cc' is not defined.")
         .addError(42, "'bb' is not defined.")
+	.addError(50, "'inTry' used out of scope.")
+	.addError(54, "'inTry' used out of scope.")
+	.addError(55, "'e' is not defined.")
         .test(src);
 
     TestRun(2)
         .addError(37, "'cc' is not defined.")
         .addError(42, "'bb' is not defined.")
+	.addError(55, "'e' is not defined.")
         .test(src, { funcscope: true });
 };
 
