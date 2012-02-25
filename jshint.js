@@ -1240,6 +1240,9 @@ unclosedString:     for (;;) {
                             case 't':
                                 c = '\t';
                                 break;
+                            case '0':
+                                c = '\0';
+                                break;
                             case 'u':
                                 esc(4);
                                 break;
