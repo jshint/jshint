@@ -1146,7 +1146,7 @@ var JSHINT = (function () {
 
             // token -- this is called by advance to get the next token
             token: function () {
-                var b, c, captures, d, depth, high, i, l, low, q, t, isLiteral, isInRange;
+                var b, c, captures, d, depth, high, i, l, low, q, t, isLiteral, isInRange, n;
 
                 function match(x) {
                     var r = x.exec(s), r1;
@@ -1212,6 +1212,7 @@ unclosedString:     for (;;) {
                             j += 1;
                             character += 1;
                             c = s.charAt(j);
+                            n = s.charAt(j + 1);
                             switch (c) {
                             case '\\':
                             case '"':
@@ -1239,6 +1240,11 @@ unclosedString:     for (;;) {
                                 break;
                             case '0':
                                 c = '\0';
+                                if (n >= 0 && n <= 7 && option.strict) {
+                                    warningAt(
+                                    "Octal literals are not allowed in strict mode.",
+                                    line, character);
+                                }
                                 break;
                             case 'u':
                                 esc(4);
@@ -2486,6 +2492,7 @@ loop:   for (;;) {
                 }
 
                 if (token.value === "use strict") {
+                    option.strict = true;
                     option.newcap = true;
                     option.undef = true;
                 }
