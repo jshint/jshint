@@ -972,6 +972,7 @@ exports.strings = function () {
         .addError(9, "Unclosed string.")
         .addError(10, "Unclosed string.")
         .addError(15, "Unclosed string.")
+        .addError(23, "Octal literals are not allowed in strict mode.")
         .test(src, { multistr: true });
 
     TestRun()
@@ -981,6 +982,7 @@ exports.strings = function () {
         .addError(10, "Unclosed string.")
         .addError(14, "Bad escapement of EOL. Use option multistr if needed.")
         .addError(15, "Unclosed string.")
+        .addError(23, "Octal literals are not allowed in strict mode.")
         .test(src);
 };
 

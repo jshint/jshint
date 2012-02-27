@@ -16,3 +16,9 @@ test = "hallo world\
 this is a faulty multiline string in javascript";
 
 test = "\033\t";
+
+function octal_strictmode() {
+  "use strict";
+
+  var test = "\033\t";
+}
