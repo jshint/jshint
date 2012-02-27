@@ -1243,7 +1243,7 @@ unclosedString:     for (;;) {
                                 break;
                             case '0':
                                 c = '\0';
-                                if (n >= 0 && n <= 7 && option.strict) {
+                                if (n >= 0 && n <= 7 && directive["use strict"]) {
                                     warningAt(
                                     "Octal literals are not allowed in strict mode.",
                                     line, character);
@@ -2495,7 +2495,6 @@ loop:   for (;;) {
                 }
 
                 if (token.value === "use strict") {
-                    option.strict = true;
                     option.newcap = true;
                     option.undef = true;
                 }
