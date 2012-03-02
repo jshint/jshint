@@ -1243,6 +1243,9 @@ unclosedString:     for (;;) {
                                 break;
                             case '0':
                                 c = '\0';
+                                // Octal literals fail in strict mode
+                                // check if the number is between 00 and 07
+                                // where 'n' is the token next to 'c'
                                 if (n >= 0 && n <= 7 && directive["use strict"]) {
                                     warningAt(
                                     "Octal literals are not allowed in strict mode.",
