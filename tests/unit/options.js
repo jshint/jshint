@@ -1060,6 +1060,7 @@ exports.laxcomma = function () {
     // All errors.
     TestRun()
         .addError(1, "Bad line breaking before ','.")
+        .addError(2, "Comma warnings can be turned off with 'laxcomma'")
         .addError(2, "Bad line breaking before ','.")
         .addError(6, "Bad line breaking before ','.")
         .addError(10, "Bad line breaking before '&&'.")
@@ -1069,6 +1070,7 @@ exports.laxcomma = function () {
     // Allows bad line breaking, but not on commas.
     TestRun()
         .addError(1, "Bad line breaking before ','.")
+        .addError(2, "Comma warnings can be turned off with 'laxcomma'")
         .addError(2, "Bad line breaking before ','.")
         .addError(6, "Bad line breaking before ','.")
         .test(src, { laxbreak: true });

@@ -2058,8 +2058,6 @@ loop:   for (;;) {
         nonadjacent(token, nexttoken);
     }
 
-    comma.first = true;
-
 
 // Functional constructors for making the symbols that will be inherited by
 // tokens.
@@ -4105,6 +4103,9 @@ loop:   for (;;) {
 
         // combine the passed globals after we've assumed all our options
         combine(predefined, g || {});
+
+        //reset values
+        comma.first = true;
 
         try {
             advance();
