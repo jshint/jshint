@@ -19,6 +19,89 @@
 		}
 	}
 
+	function processScript(script) {
+		var currentScriptName;
+
+		if (script === "-") {
+			try {
+				script = WScript.StdIn.ReadAll();
+			} catch (ex) {
+				script = null;
+			}
+		} else {
+			currentScriptName = script;
+			script = readFile(script, named('charset') || 'utf-8');
+		}
+
+		if (script === null) {
+			WScript.StdOut.WriteLine("ERROR: Could not read target script.");
+
+			return 2;
+		}
+
+		JSHINT(script, options, globals);
+
+		var data = JSHINT.data();
+		var lines = [];
+
+		for (var formatter in formatters) {
+			if (data[formatter]) {
+				if (lines.length) lines.push("");
+
+				formatters[formatter](data[formatter], lines);
+			}
+		}
+
+		if (lines.length) {
+			if (currentScriptName) {
+				WScript.StdOut.WriteLine("[" + currentScriptName + "]");
+			}
+
+			for (var i = 0; i < lines.length; i++) {
+				WScript.StdOut.WriteLine(lines[i]);
+			}
+
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+
+	function processDirectory(path) {
+		var returnValue = 0;
+		var directory = fileSystem.GetFolder(path);
+
+		for (var filesEnumerator = new Enumerator(directory.Files); !filesEnumerator.atEnd(); filesEnumerator.moveNext()) {
+			var file = filesEnumerator.item();
+
+			// If this is a JS file
+			if (file.Name.toLowerCase().indexOf('.js', file.Name.length - 3) !== -1) {
+				var scriptReturnValue = processScript(file.Path);
+
+				if (scriptReturnValue !== 0) {
+					// Prettify things
+					WScript.StdOut.WriteBlankLines(1);
+				}
+
+				if (scriptReturnValue > returnValue) {
+					returnValue = scriptReturnValue;
+				}
+			}
+		}
+
+		for (var subDirectoriesEnumerator = new Enumerator(directory.Subfolders); !subDirectoriesEnumerator.atEnd(); subDirectoriesEnumerator.moveNext()) {
+			var subDirectory = subDirectoriesEnumerator.item();
+
+			var subDirectoryReturnValue = processDirectory(subDirectory.Path);
+
+			if (subDirectoryReturnValue > returnValue) {
+				returnValue = subDirectoryReturnValue;
+			}
+		}
+
+		return returnValue;
+	}
+
 	var formatters = {
 		errors: function(errors, lines) {
 			for (var i = 0; i < errors.length; i++) {
@@ -95,39 +178,23 @@
 	var unnamed = WScript.Arguments.Unnamed;
 
 	if (unnamed.length !== 1) {
-		WScript.StdOut.WriteLine("    usage: cscript " + scriptName + " [options] <script>");
+		WScript.StdOut.WriteLine("    usage: cscript " + scriptName + " [options] <script | directory>");
 		WScript.StdOut.WriteLine("");
 		WScript.StdOut.WriteLine("Scans the specified script with JSHint and reports any errors encountered.  If");
 		WScript.StdOut.WriteLine("the script name is \"-\", it will be read from standard input instead.");
+		WScript.StdOut.WriteLine("If a directory is passed, all .js files in that directory and subdirectories");
+		WScript.StdOut.WriteLine("will be scanned.");
 		WScript.StdOut.WriteLine("");
 		WScript.StdOut.WriteLine("JSHint configuration options can be passed in via optional, Windows-style");
 		WScript.StdOut.WriteLine("arguments.  For example:");
 		WScript.StdOut.WriteLine("    cscript " + scriptName + " /jquery:true myscript.js");
 		WScript.StdOut.WriteLine("    cscript " + scriptName + " /global:QUnit:false,_:false,foo:true foo.js");
 		WScript.StdOut.WriteLine("");
-		WScript.StdOut.WriteLine("By default, we assume that your file is encoded if UTF-8. You can change that");
+		WScript.StdOut.WriteLine("By default, we assume that your file is encoded in UTF-8. You can change that");
 		WScript.StdOut.WriteLine("by providing a custom charset option:");
 		WScript.StdOut.WriteLine("    cscript " + scriptName + " /charset:ascii myscript.js");
 
 		WScript.Quit(-1);
-	}
-
-	var script = unnamed(0);
-
-	if (script === "-") {
-		try {
-			script = WScript.StdIn.ReadAll();
-		} catch (ex) {
-			script = null;
-		}
-	} else {
-		script = readFile(script, named('charset') || 'utf-8');
-	}
-
-	if (script === null) {
-		WScript.StdOut.WriteLine("ERROR: Could not read target script.");
-
-		WScript.Quit(2);
 	}
 
 	for (var etor = new Enumerator(named); !etor.atEnd(); etor.moveNext()) {
@@ -156,26 +223,15 @@
 		}
 	}
 
-	JSHINT(script, options, globals);
+	var returnValue;
+	var script = unnamed(0);
+	var fileSystem = WScript.CreateObject("Scripting.FileSystemObject");
 
-	var data = JSHINT.data();
-	var lines = [];
-
-	for (var formatter in formatters) {
-		if (data[formatter]) {
-			if (lines.length) lines.push("");
-
-			formatters[formatter](data[formatter], lines);
-		}
-	}
-
-	if (lines.length) {
-		for (var i = 0; i < lines.length; i++) {
-			WScript.StdOut.WriteLine(lines[i]);
-		}
-
-		WScript.Quit(1);
+	if (fileSystem.FolderExists(script)) {
+		returnValue = processDirectory(script);
 	} else {
-		WScript.Quit(0);
+		returnValue = processScript(script);
 	}
+
+	WScript.Quit(returnValue);
 }());
