@@ -205,10 +205,10 @@
  ex, exception, exec, exps, expr, exports, FileReader, first, floor, focus,
  forin, fragment, frames, from, fromCharCode, fud, funcscope, funct, function, functions,
  g, gc, getComputedStyle, getRow, getter, getterToken, GLOBAL, global, globals, globalstrict,
- hasOwnProperty, help, history, i, id, identifier, immed, implieds, importPackage, include,
- indent, indexOf, init, ins, instanceOf, isAlpha, isApplicationRunning, isArray,
+ strictundef, hasOwnProperty, help, history, i, id, identifier, immed, implieds, importPackage,
+ include, indent, indexOf, init, ins, instanceOf, isAlpha, isApplicationRunning, isArray,
  isDigit, isFinite, isNaN, iterator, java, join, jshint,
- JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastsemic, laxbreak, laxcomma,
+ JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastsemic, laxbreak, laxcomma, laxradix,
  latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
  log, loopfunc, m, match, maxerr, maxlen, member,message, meta, module, moveBy,
  moveTo, mootools, multistr, name, navigator, new, newcap, noarg, node, noempty, nomen,
@@ -276,6 +276,8 @@ var JSHINT = (function () {
             funcscope   : true, // if only function scope should be used for scope tests
             globalstrict: true, // if global "use strict"; should be allowed (also
                                 // enables 'strict')
+            strictundef : false,// if global "use strict"; should allow using variables
+                                // before being declared
             immed       : true, // if immediate invocations must be wrapped in parens
             iterator    : true, // if the `__iterator__` property should be allowed
             jquery      : true, // if jQuery globals should be predefined
@@ -284,6 +286,7 @@ var JSHINT = (function () {
             latedef     : true, // if the use before definition should not be tolerated
             laxbreak    : true, // if line breaks should not be checked
             laxcomma    : true, // if line breaks should not be checked around commas
+            laxradix    : false,// if should relax "missing radix param" warnings
             loopfunc    : true, // if functions should be allowed to be defined within
                                 // loops
             mootools    : true, // if MooTools globals should be predefined
@@ -511,7 +514,7 @@ var JSHINT = (function () {
 
         functionicity = [
             'closure', 'exception', 'global', 'label',
-            'outer', 'unused', 'var'
+            'outer', 'unused', 'var', 'let'
         ],
 
         functions,      // All of the functions
@@ -1694,7 +1697,7 @@ klass:                                  do {
     }());
 
 
-    function addlabel(t, type) {
+    function addlabel(t, type, blockscope) {
 
         if (t === 'hasOwnProperty') {
             warning("'hasOwnProperty' is a really bad name.");
@@ -1706,7 +1709,7 @@ klass:                                  do {
                 if (option.latedef)
                     warning("'{a}' was used before it was defined.", nexttoken, t);
             } else {
-                if (!option.shadow && type !== "exception")
+                if (!option.shadow && type !== "exception" && !blockscope)
                     warning("'{a}' is already defined.", nexttoken, t);
             }
         }
@@ -2688,7 +2691,7 @@ loop:   for (;;) {
                 // the base object of a reference is null so no need to display warning
                 // if we're inside of typeof or delete.
 
-                if (option.undef && typeof predefined[v] !== 'boolean') {
+                if (option.undef && !option.strictundef && typeof predefined[v] !== 'boolean') {
                     // Attempting to subscript a null reference will throw an
                     // error, even within the typeof and delete operators
                     if (!(anonname === 'typeof' || anonname === 'delete') ||
@@ -2706,6 +2709,7 @@ loop:   for (;;) {
                 case 'closure':
                 case 'function':
                 case 'var':
+                case 'let':
                 case 'unused':
                     warning("'{a}' used out of scope.", token, v);
                     break;
@@ -2727,7 +2731,7 @@ loop:   for (;;) {
                         // Operators typeof and delete do not raise runtime errors even
                         // if the base object of a reference is null so no need to
                         // display warning if we're inside of typeof or delete.
-                        if (option.undef) {
+                        if (option.undef && !option.strictundef) {
                             // Attempting to subscript a null reference will throw an
                             // error, even within the typeof and delete operators
                             if (!(anonname === 'typeof' || anonname === 'delete') ||
@@ -2747,7 +2751,8 @@ loop:   for (;;) {
                             s[v] = 'closure';
                             funct[v] = s['(global)'] ? 'global' : 'outer';
                             break;
-                        case 'var':
+                        case 'var':    
+                        case 'let':
                         case 'unused':
                             s[v] = 'closure';
                             funct[v] = s['(global)'] ? 'global' : 'outer';
@@ -3081,7 +3086,9 @@ loop:   for (;;) {
         nospace(prevtoken, token);
         if (typeof left === 'object') {
             if (left.value === 'parseInt' && n === 1) {
-                warning("Missing radix parameter.", left);
+                if (!option.laxradix) {
+                    warning("Missing radix parameter.", left);
+                }
             }
             if (!option.evil) {
                 if (left.value === 'eval' || left.value === 'Function' ||
@@ -3498,6 +3505,53 @@ loop:   for (;;) {
     });
     varstatement.exps = true;
 
+    var letstatement = stmt('let', function (prefix) {
+        var id, name, value;
+
+        if (funct['(onevar)'] && option.onevar) {
+            warning("Too many let statements.");
+        } else if (!funct['(global)']) {
+            funct['(onevar)'] = true;
+        }
+        this.first = [];
+        for (;;) {
+            nonadjacent(token, nexttoken);
+            id = identifier();
+            if (option.esnext && funct[id] === "const") {
+                warning("const '" + id + "' has already been declared");
+            }
+            if (funct['(global)'] && predefined[id] === false) {
+                warning("Redefinition of '{a}'.", token, id);
+            }
+            addlabel(id, 'unused', 'let');
+            if (prefix) {
+                break;
+            }
+            name = token;
+            this.first.push(token);
+            if (nexttoken.id === '=') {
+                nonadjacent(token, nexttoken);
+                advance('=');
+                nonadjacent(token, nexttoken);
+                if (nexttoken.id === 'undefined') {
+                    warning("It is not necessary to initialize '{a}' to 'undefined'.", token, id);
+                }
+                if (peek(0).id === '=' && nexttoken.identifier) {
+                    error("Variable {a} was not declared correctly.",
+                            nexttoken, nexttoken.value);
+                }
+                value = expression(0);
+                name.first = value;
+            }
+            if (nexttoken.id !== ',') {
+                break;
+            }
+            comma();
+        }
+        return this;
+    });
+    letstatement.exps = true;
+
     blockstmt('function', function () {
         if (inblock) {
             warning("Function declarations should not be placed in blocks. " +
@@ -3766,10 +3820,13 @@ loop:   for (;;) {
         advance('(');
         nonadjacent(this, t);
         nospace();
-        if (peek(nexttoken.id === 'var' ? 1 : 0).id === 'in') {
+        if (peek((nexttoken.id === 'var' || nexttoken.id === 'let') ? 1 : 0).id === 'in') {
             if (nexttoken.id === 'var') {
                 advance('var');
                 varstatement.fud.call(varstatement, true);
+            } else if (nexttoken.id === 'let') {
+                advance('let');
+                letstatement.fud.call(letstatement, true);
             } else {
                 switch (funct[nexttoken.value]) {
                 case 'unused':
@@ -3800,6 +3857,9 @@ loop:   for (;;) {
                 if (nexttoken.id === 'var') {
                     advance('var');
                     varstatement.fud.call(varstatement);
+                } else if (nexttoken.id === 'let') {
+                    advance('let');
+                    letstatement.fud.call(letstatement);
                 } else {
                     for (;;) {
                         expression(0, 'for');
