@@ -71,7 +71,9 @@
 		var returnValue = 0;
 		var directory = fileSystem.GetFolder(path);
 
-		for (var filesEnumerator = new Enumerator(directory.Files); !filesEnumerator.atEnd(); filesEnumerator.moveNext()) {
+		for (var filesEnumerator = new Enumerator(directory.Files);
+				!filesEnumerator.atEnd();
+				 filesEnumerator.moveNext()) {
 			var file = filesEnumerator.item();
 
 			// If this is a JS file
@@ -89,9 +91,10 @@
 			}
 		}
 
-		for (var subDirectoriesEnumerator = new Enumerator(directory.Subfolders); !subDirectoriesEnumerator.atEnd(); subDirectoriesEnumerator.moveNext()) {
+		for (var subDirectoriesEnumerator = new Enumerator(directory.Subfolders);
+				!subDirectoriesEnumerator.atEnd();
+				 subDirectoriesEnumerator.moveNext()) {
 			var subDirectory = subDirectoriesEnumerator.item();
-
 			var subDirectoryReturnValue = processDirectory(subDirectory.Path);
 
 			if (subDirectoryReturnValue > returnValue) {
