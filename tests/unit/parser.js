@@ -317,6 +317,27 @@ exports.jsonMode = function () {
         .test(code, {multistr: true});
 };
 
+exports.comma = function () {
+    var src = fs.readFileSync(__dirname + "/fixtures/comma.js", "utf8");
+
+    // !!
+    // there are more errors in comma.js
+    // but comma-operator isn't finished, yet - so jshint currently breaks at line 8
+    TestRun()
+        .addError(6, 'Expected a conditional expression and instead saw an assignment.')
+        .addError(6, 'Expected \';\' and instead saw \',\'.')
+        .addError(6, 'Expected \')\' to match \'(\' from line 6 and instead saw \';\'.')
+        .addError(6, 'Missing semicolon.')
+        .addError(6, 'Expected an identifier and instead saw \')\'.')
+        .addError(6, 'Expected an assignment or function call and instead saw an expression.')
+        .addError(6, 'Missing semicolon.')
+        .addError(6, 'Expected to see a statement and instead saw a block.')
+        .addError(6, 'Expected an assignment or function call and instead saw an expression.')
+        .addError(6, 'Missing semicolon.')
+        .addError(8, 'Expected \'(end)\' and instead saw \'}\'.')
+        .test(src);
+};
+
 exports.withStatement = function () {
     var src = fs.readFileSync(__dirname + "/fixtures/with.js", "utf8");
 

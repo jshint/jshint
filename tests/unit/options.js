@@ -972,6 +972,7 @@ exports.strings = function () {
         .addError(9, "Unclosed string.")
         .addError(10, "Unclosed string.")
         .addError(15, "Unclosed string.")
+        .addError(23, "Octal literals are not allowed in strict mode.")
         .test(src, { multistr: true });
 
     TestRun()
@@ -981,6 +982,7 @@ exports.strings = function () {
         .addError(10, "Unclosed string.")
         .addError(14, "Bad escapement of EOL. Use option multistr if needed.")
         .addError(15, "Unclosed string.")
+        .addError(23, "Octal literals are not allowed in strict mode.")
         .test(src);
 };
 
@@ -1058,6 +1060,7 @@ exports.laxcomma = function () {
     // All errors.
     TestRun()
         .addError(1, "Bad line breaking before ','.")
+        .addError(2, "Comma warnings can be turned off with 'laxcomma'")
         .addError(2, "Bad line breaking before ','.")
         .addError(6, "Bad line breaking before ','.")
         .addError(10, "Bad line breaking before '&&'.")
@@ -1067,6 +1070,7 @@ exports.laxcomma = function () {
     // Allows bad line breaking, but not on commas.
     TestRun()
         .addError(1, "Bad line breaking before ','.")
+        .addError(2, "Comma warnings can be turned off with 'laxcomma'")
         .addError(2, "Bad line breaking before ','.")
         .addError(6, "Bad line breaking before ','.")
         .test(src, { laxbreak: true });
@@ -1079,4 +1083,21 @@ exports.laxcomma = function () {
 
     // No errors if both laxbreak and laxcomma are turned on
     TestRun().test(src, { laxbreak: true, laxcomma: true });
+};
+
+/*
+ * Tests the `browser` option
+ */
+exports.browser = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/browser.js', 'utf8');
+
+	TestRun()
+		.addError(2, "'atob' is not defined.")
+		.addError(3, "'btoa' is not defined.")
+		.addError(6, "'DOMParser' is not defined.")
+		.addError(10, "'XMLSerializer' is not defined.")
+		.test(src, { undef: true });
+
+	TestRun().test(src, { browser: true, undef: true });
+
 };

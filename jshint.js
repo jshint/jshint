@@ -163,7 +163,7 @@
  __filename, __dirname, ActiveXObject, Array, ArrayBuffer, ArrayBufferView, Audio,
  Autocompleter, Assets, Boolean, Builder, Buffer, Browser, COM, CScript, Canvas,
  CustomAnimation, Class, Control, Chain, Color, Cookie, Core, DataView, Date,
- Debug, Draggable, Draggables, Droppables, Document, DomReady, DOMReady, Drag,
+ Debug, Draggable, Draggables, Droppables, Document, DomReady, DOMReady, DOMParser, Drag,
  E, Enumerator, Enumerable, Element, Elements, Error, Effect, EvalError, Event,
  Events, FadeAnimation, Field, Flash, Float32Array, Float64Array, Form,
  FormField, Frame, FormData, Function, Fx, GetObject, Group, Hash, HotKey,
@@ -183,19 +183,19 @@
  HTMLTextAreaElement, HTMLTitleElement, HTMLUListElement, HTMLVideoElement,
  Iframe, IframeShim, Image, Int16Array, Int32Array, Int8Array,
  Insertion, InputValidator, JSON, Keyboard, Locale, LN10, LN2, LOG10E, LOG2E,
- MAX_VALUE, MIN_VALUE, Mask, Math, MenuItem, MoveAnimation, MooTools, Native,
- NEGATIVE_INFINITY, Number, Object, ObjectRange, Option, Options, OverText, PI,
- POSITIVE_INFINITY, PeriodicalExecuter, Point, Position, Prototype, RangeError,
- Rectangle, ReferenceError, RegExp, ResizeAnimation, Request, RotateAnimation,
+ MAX_VALUE, MIN_VALUE, Mask, Math, MenuItem, MessageChannel, MessageEvent, MessagePort,
+ MoveAnimation, MooTools, Native, NEGATIVE_INFINITY, Number, Object, ObjectRange, Option,
+ Options, OverText, PI, POSITIVE_INFINITY, PeriodicalExecuter, Point, Position, Prototype,
+ RangeError, Rectangle, ReferenceError, RegExp, ResizeAnimation, Request, RotateAnimation,
  SQRT1_2, SQRT2, ScrollBar, ScriptEngine, ScriptEngineBuildVersion,
  ScriptEngineMajorVersion, ScriptEngineMinorVersion, Scriptaculous, Scroller,
  Slick, Slider, Selector, SharedWorker, String, Style, SyntaxError, Sortable, Sortables,
  SortableObserver, Sound, Spinner, System, Swiff, Text, TextArea, Template,
  Timer, Tips, Type, TypeError, Toggle, Try, "use strict", unescape, URI, URIError, URL,
- VBArray, WSH, WScript, XDomainRequest, Web, Window, XMLDOM, XMLHttpRequest, XPathEvaluator,
- XPathException, XPathExpression, XPathNamespace, XPathNSResolver, XPathResult, "\\", a,
- addEventListener, address, alert, apply, applicationCache, arguments, arity,
- asi, b, basic, basicToken, bitwise, block, blur, boolOptions, boss, browser, c, call, callee,
+ VBArray, WSH, WScript, XDomainRequest, Web, Window, XMLDOM, XMLHttpRequest, XMLSerializer,
+ XPathEvaluator, XPathException, XPathExpression, XPathNamespace, XPathNSResolver, XPathResult,
+ "\\", a, addEventListener, address, alert, apply, applicationCache, arguments, arity, asi, atob,
+ b, basic, basicToken, bitwise, block, blur, boolOptions, boss, browser, btoa, c, call, callee,
  caller, cases, charAt, charCodeAt, character, clearInterval, clearTimeout,
  close, closed, closure, comment, condition, confirm, console, constructor,
  content, couch, create, css, curly, d, data, datalist, dd, debug, decodeURI,
@@ -335,12 +335,15 @@ var JSHINT = (function () {
             Audio                    :  false,
             addEventListener         :  false,
             applicationCache         :  false,
+            atob                     :  false,
             blur                     :  false,
+            btoa                     :  false,
             clearInterval            :  false,
             clearTimeout             :  false,
             close                    :  false,
             closed                   :  false,
             DataView                 :  false,
+            DOMParser                :  false,
             defaultStatus            :  false,
             document                 :  false,
             event                    :  false,
@@ -413,6 +416,9 @@ var JSHINT = (function () {
             length                   :  false,
             localStorage             :  false,
             location                 :  false,
+            MessageChannel           :  false,
+            MessageEvent             :  false,
+            MessagePort              :  false,
             moveBy                   :  false,
             moveTo                   :  false,
             name                     :  false,
@@ -450,6 +456,7 @@ var JSHINT = (function () {
             window                   :  false,
             Worker                   :  false,
             XMLHttpRequest           :  false,
+            XMLSerializer            :  false,
             XPathEvaluator           :  false,
             XPathException           :  false,
             XPathExpression          :  false,
@@ -1142,7 +1149,7 @@ var JSHINT = (function () {
 
             // token -- this is called by advance to get the next token
             token: function () {
-                var b, c, captures, d, depth, high, i, l, low, q, t, isLiteral, isInRange;
+                var b, c, captures, d, depth, high, i, l, low, q, t, isLiteral, isInRange, n;
 
                 function match(x) {
                     var r = x.exec(s), r1;
@@ -1208,6 +1215,7 @@ unclosedString:     for (;;) {
                             j += 1;
                             character += 1;
                             c = s.charAt(j);
+                            n = s.charAt(j + 1);
                             switch (c) {
                             case '\\':
                             case '"':
@@ -1232,6 +1240,17 @@ unclosedString:     for (;;) {
                                 break;
                             case 't':
                                 c = '\t';
+                                break;
+                            case '0':
+                                c = '\0';
+                                // Octal literals fail in strict mode
+                                // check if the number is between 00 and 07
+                                // where 'n' is the token next to 'c'
+                                if (n >= 0 && n <= 7 && directive["use strict"]) {
+                                    warningAt(
+                                    "Octal literals are not allowed in strict mode.",
+                                    line, character);
+                                }
                                 break;
                             case 'u':
                                 esc(4);
@@ -2042,8 +2061,6 @@ loop:   for (;;) {
         nonadjacent(token, nexttoken);
     }
 
-    comma.first = true;
-
 
 // Functional constructors for making the symbols that will be inherited by
 // tokens.
@@ -2392,6 +2409,10 @@ loop:   for (;;) {
                     token);
             } else if (option.nonew && r.id === '(' && r.left.id === 'new') {
                 warning("Do not use 'new' for side effects.");
+            }
+
+            if (nexttoken.id === ',') {
+                return comma();
             }
 
             if (nexttoken.id !== ';') {
@@ -4102,6 +4123,9 @@ loop:   for (;;) {
 
         // combine the passed globals after we've assumed all our options
         combine(predefined, g || {});
+
+        //reset values
+        comma.first = true;
 
         try {
             advance();
