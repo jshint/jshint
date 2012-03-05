@@ -88,6 +88,19 @@ exports.node = function () {
         .addError(2, "Unexpected dangling '_' in '__filename'.")
         .addError(3, "Unexpected dangling '_' in '__hello'.")
         .test(asProps, { node: true, nomen: true });
+
+    // Node environment assumes `globalstrict`
+    var globalStrict = [
+        '"use strict";',
+        'function test() { return; }'
+    ].join('\n');
+
+    TestRun()
+        .addError(1, 'Use the function form of "use strict".')
+        .test(globalStrict);
+
+    TestRun()
+        .test(globalStrict, { node: true });
 };
 
 /** Option `jquery` predefines jQuery globals */
