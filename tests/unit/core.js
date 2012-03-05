@@ -340,3 +340,13 @@ exports.defensiveSemicolon = function () {
         .addError(17, "Unnecessary semicolon.")
         .test(src, { expr: true, laxbreak: true });
 };
+
+// Test different variants of IIFE
+exports.iife = function () {
+    var iife = [
+        '(function () { return; }());',
+        '(function () { return; })();'
+    ];
+
+    TestRun().test(iife.join('\n'));
+};
