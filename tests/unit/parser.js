@@ -337,3 +337,24 @@ exports.comma = function () {
         .addError(8, 'Expected \'(end)\' and instead saw \'}\'.')
         .test(src);
 };
+
+exports.withStatement = function () {
+    var src = fs.readFileSync(__dirname + "/fixtures/with.js", "utf8");
+
+    TestRun()
+        .addError(5, "Don't use 'with'.")
+        .addError(5, "Missing space after 'with'.")
+        .addError(5, "Unexpected space after '('.")
+        .addError(13, "'with' is not allowed in strict mode.")
+        .addError(13, "Missing space after ')'.")
+        .addError(13, "Unexpected space after '2'.")
+        .test(src, {white: true});
+        
+    TestRun()
+        .addError(5, "Missing space after 'with'.")
+        .addError(5, "Unexpected space after '('.")
+        .addError(13, "'with' is not allowed in strict mode.")
+        .addError(13, "Missing space after ')'.")
+        .addError(13, "Unexpected space after '2'.")
+        .test(src, {white: true, withstmt: true});
+};
