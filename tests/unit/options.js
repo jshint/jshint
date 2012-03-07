@@ -273,7 +273,7 @@ exports.asi = function () {
         .test(src);
 
     TestRun(2)
-        .addError(2, "Missing semicolon.") // throw on "use strict", even option asi is used
+        // do not throw on "use strict", if option asi is used
         .test(src, { asi: true });
 };
 

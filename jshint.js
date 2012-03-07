@@ -2484,7 +2484,9 @@ loop:   for (;;) {
                             pn.id !== "}") {
                             break;
                         }
-                        warning("Missing semicolon.", nexttoken);
+                        if (!option.asi) {
+                            warning("Missing semicolon.", nexttoken);
+                        }
                     } else {
                         p = pn;
                     }
