@@ -897,6 +897,7 @@ var JSHINT = (function () {
 
         if (option.node) {
             combine(predefined, node);
+            option.globalstrict = true;
         }
 
         if (option.devel) {
