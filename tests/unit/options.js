@@ -858,8 +858,8 @@ exports.trailing = function () {
     TestRun().test(src);
 
     TestRun()
-        .addError(8, "Trailing whitespace.")
-        .addError(9, "Trailing whitespace.")
+        .addError(8, "Trailing whitespace.", { character: 16 })
+        .addError(9, "Trailing whitespace.", { character: 6 })
         .test(src, { trailing: true });
 };
 
