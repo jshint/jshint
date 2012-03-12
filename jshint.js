@@ -1041,9 +1041,9 @@ var JSHINT = (function () {
                 warningAt("Line too long.", line, s.length);
 
             // Check for trailing whitespaces
-            tw = /\s+$/.test(s);
-            if (option.trailing && tw && !/^\s+$/.test(s)) {
-                warningAt("Trailing whitespace.", line, tw);
+            tw = option.trailing && s.match(/^(.*?)\s+$/);
+            if (tw && !/^\s+$/.test(s)) {
+                warningAt("Trailing whitespace.", line, tw[1].length + 1);
             }
             return true;
         }
