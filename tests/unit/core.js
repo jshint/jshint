@@ -162,6 +162,23 @@ exports.testNewArray = function () {
         .test('new Array();');
 };
 
+/** Test that JSHint recognizes `new Object(<expr>)` as a valid expression */
+exports.testNewObject = function () {
+    var code  = 'Object(1);',
+        code1 = 'new Object(1);';
+
+    TestRun().test(code);
+    TestRun().test(code1);
+
+    TestRun()
+        .addError(1, "Use the object literal notation {}.")
+        .test('Object();');
+
+    TestRun()
+        .addError(1, "Use the object literal notation {}.")
+        .test('new Object();');
+};
+
 /**
  * Test that JSHint allows `undefined` to be a function parameter.
  * It is a common pattern to protect against the case when somebody
