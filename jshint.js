@@ -1793,7 +1793,7 @@ loop:   for (;;) {
                             t, '*/', ':');
                 }
 
-                if (o === '/*jshint' || o === '/*jslint') {
+                if (o === '/*jshint') {
                     checkOption(t.value, t);
                 }
 
