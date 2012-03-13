@@ -134,6 +134,7 @@ exports.options = function () {
         .addError(7, "Expected a small integer and instead saw '200.4'.")
         .addError(8, "Expected a small integer and instead saw '300.4'.")
         .addError(10, "Expected '*/' and instead saw ':'.")
+        .addError(11, "Bad option: 'd'.")
         .addError(11, "Bad option value.")
         .addError(13, "Read only.")
         .test(code);

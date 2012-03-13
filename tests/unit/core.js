@@ -367,3 +367,11 @@ exports.iife = function () {
 
     TestRun().test(iife.join('\n'));
 };
+
+// Tests invalid options when they're passed as function arguments
+// For code that tests /*jshint ... */ see parser.js
+exports.invalidOptions = function () {
+    TestRun()
+        .addError(0, "Bad option: 'invalid'.")
+        .test("function test() {}", { devel: true, invalid: true });
+};

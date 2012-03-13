@@ -325,6 +325,16 @@ var JSHINT = (function () {
                                 // should be predefined
         },
 
+        // These are the JSHint options that can take any value
+        // (we use this object to detect invalid options)
+        valOptions = {
+            maxlen: false,
+            indent: false,
+            maxerr: false,
+            predef: false
+        },
+
+
         // browser contains a set of global names which are commonly provided by a
         // web browser environment.
         browser = {
@@ -782,6 +792,12 @@ var JSHINT = (function () {
 // is named 'hasOwnProperty'. So we have to use this more convoluted form.
 
         return Object.prototype.hasOwnProperty.call(object, name);
+    }
+
+    function checkOption(name, t) {
+        if (valOptions[name] === undefined && boolOptions[name] === undefined) {
+            warning("Bad option: '" + name + "'.", t);
+        }
     }
 
 // Provide critical ES5 functions to ES3.
@@ -1726,6 +1742,7 @@ klass:                                  do {
 
     function doOption() {
         var b, obj, filter, o = nexttoken.value, t, v;
+
         switch (o) {
         case '*/':
             error("Unbegun comment.");
@@ -1749,6 +1766,7 @@ klass:                                  do {
         default:
             error("What?");
         }
+
         t = lex.token();
 loop:   for (;;) {
             for (;;) {
@@ -1764,13 +1782,20 @@ loop:   for (;;) {
                     o !== '/*members') {
                 error("Bad option.", t);
             }
+
             v = lex.token();
             if (v.id === ':') {
                 v = lex.token();
+
                 if (obj === membersOnly) {
                     error("Expected '{a}' and instead saw '{b}'.",
                             t, '*/', ':');
                 }
+
+                if (o === '/*jshint') {
+                    checkOption(t.value, t);
+                }
+
                 if (t.value === 'indent' && (o === '/*jshint' || o === '/*jslint')) {
                     b = +v.value;
                     if (typeof b !== 'number' || !isFinite(b) || b <= 0 ||
@@ -4118,6 +4143,14 @@ loop:   for (;;) {
         directive = {};
 
         prevtoken = token = nexttoken = syntax['(begin)'];
+
+        // Check options
+        for (var name in o) {
+            if (is_own(o, name)) {
+                checkOption(name, token);
+            }
+        }
+
         assume();
 
         // combine the passed globals after we've assumed all our options
