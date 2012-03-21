@@ -222,7 +222,7 @@
  send, serialize, sessionStorage, setInterval, setTimeout, setter, setterToken, shift, slice,
  smarttabs, sort, spawn, split, stack, status, start, strict, sub, substr, supernew, shadow,
  supplant, sum, sync, test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing,
- type, typeOf, Uint16Array, Uint32Array, Uint8Array, undef, undefs, unused, urls, validthis,
+ type, typeOf, Uint16Array, Uint32Array, Uint8Array, undef, undefs, unsafe, unused, urls, validthis,
  value, valueOf, var, version, WebSocket, withstmt, white, window, Worker, wsh*/
 
 /*global exports: false */
@@ -320,6 +320,7 @@ var JSHINT = (function () {
             supernew    : true, // if `new function () { ... };` and `new Object;`
                                 // should be tolerated
             trailing    : true, // if trailing whitespace rules apply
+            unsafe      : true, // if "unsafe" characters should be allowed
             validthis   : true, // if 'this' inside a non-constructor function is valid.
                                 // This is a function scoped option only.
             withstmt    : true, // if with statements should be allowed
@@ -1051,10 +1052,13 @@ var JSHINT = (function () {
                 warningAt("Mixed spaces and tabs.", line, at + 1);
 
             s = s.replace(/\t/g, tab);
-            at = s.search(cx);
 
-            if (at >= 0)
-                warningAt("Unsafe character.", line, at);
+            if (!option.unsafe) {
+                at = s.search(cx);
+
+                if (at >= 0)
+                    warningAt("Unsafe character.", line, at);
+            }
 
             if (option.maxlen && option.maxlen < s.length)
                 warningAt("Line too long.", line, s.length);
