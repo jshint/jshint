@@ -5,10 +5,10 @@
 /*jshint boss: true, laxbreak: true, node: true */
 /*global wrap: true */
 
-var JSHINT  = require('../jshint.js').JSHINT,
+var JSHINT  = require('../../jshint.js').JSHINT,
     assert  = require('assert'),
     fs      = require('fs'),
-    TestRun = require("./testhelper").setup.testRun;
+    TestRun = require("../helpers/testhelper").setup.testRun;
 
 function wrap(globals) {
     return '(function () { return [ ' + globals.join(',') + ' ]; }());';
@@ -88,6 +88,19 @@ exports.node = function () {
         .addError(2, "Unexpected dangling '_' in '__filename'.")
         .addError(3, "Unexpected dangling '_' in '__hello'.")
         .test(asProps, { node: true, nomen: true });
+
+    // Node environment assumes `globalstrict`
+    var globalStrict = [
+        '"use strict";',
+        'function test() { return; }'
+    ].join('\n');
+
+    TestRun()
+        .addError(1, 'Use the function form of "use strict".')
+        .test(globalStrict);
+
+    TestRun()
+        .test(globalStrict, { node: true });
 };
 
 /** Option `jquery` predefines jQuery globals */
@@ -111,6 +124,7 @@ exports.couch = function () {
           , "log"
           , "exports"
           , "module"
+          , "provides"
         ];
 
     assert.globalsImplied(globals);
@@ -277,6 +291,9 @@ exports.browser = function () {
           , 'length'
           , 'localStorage'
           , 'location'
+          , 'MessageChannel'
+          , 'MessageEvent'
+          , 'MessagePort'
           , 'moveBy'
           , 'moveTo'
           , 'name'
@@ -379,8 +396,53 @@ exports.es5 = function () {
         .addError(3, "Extra comma.")
         .addError(8, "Extra comma.")
         .addError(15, "get/set are ES5 features.")
+        .addError(16, "get/set are ES5 features.")
+        .addError(20, "get/set are ES5 features.")
+        .addError(22, "get/set are ES5 features.")
+        .addError(26, "get/set are ES5 features.")
+        .addError(30, "get/set are ES5 features.")
+        .addError(31, "get/set are ES5 features.")
+        .addError(36, "get/set are ES5 features.")
+        .addError(41, "get/set are ES5 features.")
+        .addError(42, "get/set are ES5 features.")
+        .addError(43, "Duplicate member 'x'.")
+        .addError(47, "get/set are ES5 features.")
+        .addError(48, "get/set are ES5 features.")
+        .addError(48, "Duplicate member 'x'.")
+        .addError(52, "get/set are ES5 features.")
+        .addError(53, "get/set are ES5 features.")
+        .addError(54, "get/set are ES5 features.")
+        .addError(54, "Duplicate member 'x'.")
+        .addError(58, "get/set are ES5 features.")
+        .addError(58, "Unexpected parameter 'a' in get x function.")
+        .addError(59, "get/set are ES5 features.")
+        .addError(59, "Unexpected parameter 'a' in get y function.")
+        .addError(60, "get/set are ES5 features.")
+        .addError(62, "get/set are ES5 features.")
+        .addError(62, "Expected a single parameter in set x function.")
+        .addError(63, "get/set are ES5 features.")
+        .addError(64, "get/set are ES5 features.")
+        .addError(64, "Expected a single parameter in set z function.")
+        .addError(68, "get/set are ES5 features.")
+        .addError(69, "get/set are ES5 features.")
+        .addError(68, "Missing property name.")
+        .addError(69, "Missing property name.")
+        .addError(75, "get/set are ES5 features.")
+        .addError(76, "get/set are ES5 features.")
         .test(src);
-    TestRun().test(src, { es5: true });
+
+    TestRun()
+        .addError(36, "Setter is defined without getter.")
+        .addError(43, "Duplicate member 'x'.")
+        .addError(48, "Duplicate member 'x'.")
+        .addError(54, "Duplicate member 'x'.")
+        .addError(58, "Unexpected parameter 'a' in get x function.")
+        .addError(59, "Unexpected parameter 'a' in get y function.")
+        .addError(62, "Expected a single parameter in set x function.")
+        .addError(64, "Expected a single parameter in set z function.")
+        .addError(68, "Missing property name.")
+        .addError(69, "Missing property name.")
+        .test(src, { es5: true });
 
     // Make sure that JSHint parses getters/setters as function expressions
     // (https://github.com/jshint/jshint/issues/96)

@@ -4,9 +4,9 @@
 
 /*jshint boss: true, laxbreak: true, node: true, maxlen:100 */
 
-var JSHINT  = require('../jshint.js').JSHINT,
+var JSHINT  = require('../../jshint.js').JSHINT,
     fs      = require('fs'),
-    TestRun = require("./testhelper").setup.testRun;
+    TestRun = require("../helpers/testhelper").setup.testRun;
 
 exports.unsafe = function () {
     var code = [
@@ -134,6 +134,7 @@ exports.options = function () {
         .addError(7, "Expected a small integer and instead saw '200.4'.")
         .addError(8, "Expected a small integer and instead saw '300.4'.")
         .addError(10, "Expected '*/' and instead saw ':'.")
+        .addError(11, "Bad option: 'd'.")
         .addError(11, "Bad option value.")
         .addError(13, "Read only.")
         .test(code);
@@ -315,4 +316,46 @@ exports.jsonMode = function () {
         .addError(5, "Avoid EOL escapement.")
         .addError(7, "Avoid 0x-. '0x332'.")
         .test(code, {multistr: true});
+};
+
+exports.comma = function () {
+    var src = fs.readFileSync(__dirname + "/fixtures/comma.js", "utf8");
+
+    // !!
+    // there are more errors in comma.js
+    // but comma-operator isn't finished, yet - so jshint currently breaks at line 8
+    TestRun()
+        .addError(6, 'Expected a conditional expression and instead saw an assignment.')
+        .addError(6, 'Expected \';\' and instead saw \',\'.')
+        .addError(6, 'Expected \')\' to match \'(\' from line 6 and instead saw \';\'.')
+        .addError(6, 'Missing semicolon.')
+        .addError(6, 'Expected an identifier and instead saw \')\'.')
+        .addError(6, 'Expected an assignment or function call and instead saw an expression.')
+        .addError(6, 'Missing semicolon.')
+        .addError(6, 'Expected to see a statement and instead saw a block.')
+        .addError(6, 'Expected an assignment or function call and instead saw an expression.')
+        .addError(6, 'Missing semicolon.')
+        .addError(8, 'Expected \'(end)\' and instead saw \'}\'.')
+        .test(src);
+};
+
+exports.withStatement = function () {
+    var src = fs.readFileSync(__dirname + "/fixtures/with.js", "utf8");
+
+    TestRun()
+        .addError(5, "Don't use 'with'.")
+        .addError(5, "Missing space after 'with'.")
+        .addError(5, "Unexpected space after '('.")
+        .addError(13, "'with' is not allowed in strict mode.")
+        .addError(13, "Missing space after ')'.")
+        .addError(13, "Unexpected space after '2'.")
+        .test(src, {white: true});
+
+    TestRun()
+        .addError(5, "Missing space after 'with'.")
+        .addError(5, "Unexpected space after '('.")
+        .addError(13, "'with' is not allowed in strict mode.")
+        .addError(13, "Missing space after ')'.")
+        .addError(13, "Unexpected space after '2'.")
+        .test(src, {white: true, withstmt: true});
 };

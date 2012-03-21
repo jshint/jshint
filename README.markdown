@@ -40,6 +40,9 @@ guide so just look around the code you are changing.
 Also, make sure that you write tests for new features and make sure that all tests pass before
 submitting a patch. Patches that break the build will be rejected.
 
+**FEATURE FREEZE**: Please note that we currently have a feature freeze on new environments and
+styling options. The only patches we accept at this time are for bug fixes.
+
 Tests
 -----
 
@@ -48,21 +51,22 @@ expresso. You can install the latter with npm:
 
     npm install expresso
 
-After that, running tests is as easy as:
+After that, running the unit tests is as easy as:
 
-    expresso tests/*.js
+    expresso tests/unit/*.js
 
 Attribution
 -----------
 
-Maintainer: [Anton Kovalyov](http://anton.kovalyov.net/) ([@valueof](http://twitter.com/valueof))
+Core Team members:
 
-Distinguished Contributors:
-
+ * [Anton Kovalyov](http://anton.kovalyov.net/) ([@valueof](http://twitter.com/valueof))
  * [Wolfgang Kluge](http://klugesoftware.de/) ([blog](http://gehirnwindung.de/))
- * [Josh Perez](http://www.goatslacker.com/)
+ * [Josh Perez](http://www.goatslacker.com/) ([@goatslacker](http://twitter.com/goatslacker))
+
+Maintainer: Anton Kovalyov
 
 Thank you!
 ----------
 
-We really appreciate all kind of feedback and contributions. Thanks for using and supporing JSHint!
+We really appreciate all kind of feedback and contributions. Thanks for using and supporting JSHint!
