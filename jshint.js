@@ -4088,7 +4088,10 @@ loop:   for (;;) {
 // The actual JSHINT function itself.
 
     var itself = function (s, o, g) {
-        var a, i, k;
+        var a, i, k, x,
+            optionKeys,
+            newOptionObj = {};
+
         JSHINT.errors = [];
         JSHINT.undefs = [];
         predefined = Object.create(standard);
@@ -4107,10 +4110,14 @@ loop:   for (;;) {
                     }
                 }
             }
-            option = o;
-        } else {
-            option = {};
+            optionKeys = Object.keys(o);
+            for (x = 0; x < optionKeys.length; x++) {
+                newOptionObj[optionKeys[x]] = o[optionKeys[x]];
+            }
         }
+
+        option = newOptionObj;
+
         option.indent = option.indent || 4;
         option.maxerr = option.maxerr || 50;
 
