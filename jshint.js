@@ -337,6 +337,19 @@ var JSHINT = (function () {
             predef: false
         },
 
+        // These are JSHint boolean options which are shared with JSLint
+        // where the definition in JSHint is opposite JSLint
+        invertedOptions = {
+            bitwise     : true,
+            forin       : true,
+            newcap      : true,
+            nomen       : true,
+            plusplus    : true,
+            regexp      : true,
+            undef       : true,
+            white       : true
+        },
+
 
         // browser contains a set of global names which are commonly provided by a
         // web browser environment.
@@ -1833,10 +1846,12 @@ loop:   for (;;) {
                         else
                             error("Bad option value.", v);
                     }
-                } else if (v.value === 'true') {
-                    obj[t.value] = true;
-                } else if (v.value === 'false') {
-                    obj[t.value] = false;
+                } else if (v.value === 'true' || v.value === 'false') {
+                    obj[t.value] = v.value === 'true';
+                    if (o === '/*jslint' &&
+                            invertedOptions[t.value] !== undefined) {
+                        obj[t.value] = !obj[t.value];
+                    }
                 } else {
                     error("Bad option value.", v);
                 }
