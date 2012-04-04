@@ -269,6 +269,11 @@ exports.jslintOptions = function () {
     TestRun().test(src);
 };
 
+exports.jslintInverted = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/jslintInverted.js', 'utf8');
+    TestRun().test(src);
+};
+
 exports.caseExpressions = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/caseExpressions.js', 'utf8');
     TestRun()
