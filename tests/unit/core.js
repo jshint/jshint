@@ -7,23 +7,7 @@ var JSHINT  = require('../../jshint.js').JSHINT,
 
 /** JSHint must pass its own check */
 exports.checkJSHint = function () {
-    var res = JSHINT(fs.readFileSync(__dirname + "/../../jshint.js", "utf8"), {
-            bitwise: true,
-            eqeqeq: true,
-            forin: true,
-            immed: true,
-            latedef: true,
-            newcap: true,
-            noarg: true,
-            noempty: true,
-            nonew: true,
-            plusplus: true,
-            regexp: true,
-            undef: true,
-            strict: true,
-            trailing: true,
-            white: true
-        });
+    var res = JSHINT(fs.readFileSync(__dirname + "/../../jshint.js", "utf8"), {});
 
     if (!res) {
         console.log("file: jshint.js");
@@ -37,23 +21,7 @@ exports.checkJSHint = function () {
 /** Rhino wrapper must pass JSHint check */
 exports.checkRhino = function () {
     var src = fs.readFileSync(__dirname + "/../../env/rhino.js", "utf8");
-    TestRun("jshint-rhino").test(src, {
-            bitwise: true,
-            eqeqeq: true,
-            forin: true,
-            immed: true,
-            latedef: true,
-            newcap: true,
-            noarg: true,
-            noempty: true,
-            nonew: true,
-            plusplus: true,
-            regexp: true,
-            undef: true,
-            strict: false,
-            trailing: true,
-            white: true
-        });
+    TestRun("jshint-rhino").test(src);
 };
 
 /* JavaScriptCore wrapper must pass JSHint check */
