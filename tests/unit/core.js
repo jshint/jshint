@@ -237,6 +237,18 @@ exports.jslintOptions = function () {
     TestRun().test(src);
 };
 
+exports.jslintInverted = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/jslintInverted.js', 'utf8');
+    TestRun().test(src);
+};
+
+exports.jslintRenamed = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/jslintRenamed.js', 'utf8');
+    TestRun()
+        .addError(4, "Expected '===' and instead saw '=='.")
+        .test(src);
+};
+
 exports.caseExpressions = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/caseExpressions.js', 'utf8');
     TestRun()
