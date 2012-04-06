@@ -303,6 +303,7 @@ var JSHINT = (function () {
             onecase     : true, // if one case switch statements should be allowed
             passfail    : true, // if the scan should stop on first error
             plusplus    : true, // if increment/decrement should not be allowed
+            poorrelation: true, // if poor relations should be allowed
             proto       : true, // if the `__proto__` property should be allowed
             prototypejs : true, // if Prototype and Scriptaculous globals should be
                                 // predefined
@@ -2880,10 +2881,12 @@ loop:   for (;;) {
 
         if (!eqnull && option.eqeqeq)
             warning("Expected '{a}' and instead saw '{b}'.", this, '===', '==');
-        else if (isPoorRelation(left))
-            warning("Use '{a}' to compare with '{b}'.", this, '===', left.value);
-        else if (isPoorRelation(right))
-            warning("Use '{a}' to compare with '{b}'.", this, '===', right.value);
+        else if (!option.poorrelation) {
+            if (isPoorRelation(left))
+                warning("Use '{a}' to compare with '{b}'.", this, '===', left.value);
+            else if (isPoorRelation(right))
+                warning("Use '{a}' to compare with '{b}'.", this, '===', right.value);
+        }
 
         return this;
     });
@@ -2895,12 +2898,14 @@ loop:   for (;;) {
         if (!eqnull && option.eqeqeq) {
             warning("Expected '{a}' and instead saw '{b}'.",
                     this, '!==', '!=');
-        } else if (isPoorRelation(left)) {
-            warning("Use '{a}' to compare with '{b}'.",
-                    this, '!==', left.value);
-        } else if (isPoorRelation(right)) {
-            warning("Use '{a}' to compare with '{b}'.",
-                    this, '!==', right.value);
+        } else if (!option.poorrelation) {
+            if (isPoorRelation(left)) {
+                warning("Use '{a}' to compare with '{b}'.",
+                        this, '!==', left.value);
+            } else if (isPoorRelation(right)) {
+                warning("Use '{a}' to compare with '{b}'.",
+                        this, '!==', right.value);
+            }
         }
         return this;
     });
