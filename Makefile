@@ -3,9 +3,10 @@ build_dir:
 
 rhino: build_dir
 	@echo "Building JSHint for Rhino"
-	@cat "jshint.js" > "build/jshint-rhino.js" && \
-		cat "env/rhino.js" >> "build/jshint-rhino.js" && \
-		echo "Done"
+	@echo "#!/usr/bin/env rhino" > "build/jshint-rhino.js"
+	@cat "jshint.js" "env/rhino.js" >> "build/jshint-rhino.js"
+	-@chmod +x "build/jshint-rhino.js"
+	@echo "Done"
 
 test:
 	@echo "Running unit tests"
