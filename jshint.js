@@ -2232,7 +2232,7 @@ loop:   for (;;) {
 
 
     function isPoorRelation(node) {
-        return node &&
+        return !option.poorrelation && node &&
               ((node.type === '(number)' && +node.value === 0) ||
                (node.type === '(string)' && node.value === '') ||
                (node.type === 'null' && !option.eqnull) ||
@@ -2881,12 +2881,10 @@ loop:   for (;;) {
 
         if (!eqnull && option.eqeqeq)
             warning("Expected '{a}' and instead saw '{b}'.", this, '===', '==');
-        else if (!option.poorrelation) {
-            if (isPoorRelation(left))
-                warning("Use '{a}' to compare with '{b}'.", this, '===', left.value);
-            else if (isPoorRelation(right))
-                warning("Use '{a}' to compare with '{b}'.", this, '===', right.value);
-        }
+        else if (isPoorRelation(left))
+            warning("Use '{a}' to compare with '{b}'.", this, '===', left.value);
+        else if (isPoorRelation(right))
+            warning("Use '{a}' to compare with '{b}'.", this, '===', right.value);
 
         return this;
     });
@@ -2898,14 +2896,12 @@ loop:   for (;;) {
         if (!eqnull && option.eqeqeq) {
             warning("Expected '{a}' and instead saw '{b}'.",
                     this, '!==', '!=');
-        } else if (!option.poorrelation) {
-            if (isPoorRelation(left)) {
-                warning("Use '{a}' to compare with '{b}'.",
-                        this, '!==', left.value);
-            } else if (isPoorRelation(right)) {
-                warning("Use '{a}' to compare with '{b}'.",
-                        this, '!==', right.value);
-            }
+        } else if (isPoorRelation(left)) {
+            warning("Use '{a}' to compare with '{b}'.",
+                    this, '!==', left.value);
+        } else if (isPoorRelation(right)) {
+            warning("Use '{a}' to compare with '{b}'.",
+                    this, '!==', right.value);
         }
         return this;
     });
