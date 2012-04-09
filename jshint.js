@@ -3707,7 +3707,9 @@ loop:   for (;;) {
         t = nexttoken;
         advance('{');
         nonadjacent(token, nexttoken);
-        indent += option.indent;
+        if (!option.indentswitch) {
+            indent += option.indent;
+        }
         this.cases = [];
         for (;;) {
             switch (nexttoken.id) {
@@ -3730,7 +3732,9 @@ loop:   for (;;) {
                             token);
                     }
                 }
-                indentation(-option.indent);
+                if (!option.indentswitch) {
+                    indentation(-option.indent);
+                }
                 advance('case');
                 this.cases.push(expression(20));
                 g = true;
@@ -3751,13 +3755,17 @@ loop:   for (;;) {
                             token);
                     }
                 }
-                indentation(-option.indent);
+                if (!option.indentswitch) {
+                    indentation(-option.indent);
+                }
                 advance('default');
                 g = true;
                 advance(':');
                 break;
             case '}':
-                indent -= option.indent;
+                if (!option.indentswitch) {
+                    indent -= option.indent;
+                }
                 indentation();
                 advance('}', t);
                 if (this.cases.length === 1 || this.condition.id === 'true' ||
