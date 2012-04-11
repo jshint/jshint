@@ -29,16 +29,20 @@
     if (optstr) {
         optstr.split(',').forEach(function (arg) {
             var o = arg.split('=');
-            opts[o[0]] = (function (ov) {
-                switch (ov) {
-                case 'true':
-                    return true;
-                case 'false':
-                    return false;
-                default:
-                    return ov;
-                }
-            }(o[1]));
+            if (o[0] === 'indent') {
+                opts[o[0]] = parseInt(o[1], 10);
+            } else {
+                opts[o[0]] = (function (ov) {
+                    switch (ov) {
+                    case 'true':
+                        return true;
+                    case 'false':
+                        return false;
+                    default:
+                        return ov;
+                    }
+                }(o[1]));
+            }
         });
     }
 
