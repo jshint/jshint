@@ -223,7 +223,7 @@
  smarttabs, sort, spawn, split, stack, status, start, strict, sub, substr, supernew, shadow,
  supplant, sum, sync, test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing,
  type, typeOf, Uint16Array, Uint32Array, Uint8Array, undef, undefs, unused, urls, validthis,
- value, valueOf, var, vars, version, WebSocket, withstmt, white, window, windows, Worker, wsh*/
+ value, valueOf, var, vars, version, WebSocket, withstmt, white, window, windows, Worker, wsh, wakanda*/
 
 /*global exports: false */
 
@@ -322,10 +322,14 @@ var JSHINT = (function () {
             trailing    : true, // if trailing whitespace rules apply
             validthis   : true, // if 'this' inside a non-constructor function is valid.
                                 // This is a function scoped option only.
+            wakanda     : true, // if the Wakanda environment globals should be
+                                // predefined
             withstmt    : true, // if with statements should be allowed
             white       : true, // if strict whitespace rules apply
             wsh         : true  // if the Windows Scripting Host environment globals
                                 // should be predefined
+            wakanda     : true  // if the Wakanda Host environment globals should be
+                                // predefined
         },
 
         // These are the JSHint options that can take any value
@@ -767,6 +771,99 @@ var JSHINT = (function () {
         useESNextSyntax,
         warnings,
 
+        wakanda = {
+            BinaryStream:                  false,
+            Blob:                          false,
+            Buffer:                        false,
+            EndPoint:                      false,
+            File:                          false,
+            Folder:                        false,
+            JSONToXml:                     false,
+            Module:                        false,
+            Mutex:                         false,
+            ProgressIndicator:             false,
+            RestDirectoryAccess:           false,
+            SharedWorker:                  false,
+            SyncEvent:                     false,
+            SystemWorker:                  false,
+            TextStream:                    false,
+            Worker:                        false,
+            XmlToJSON:                     false,
+            _syntaxTester:                 false,
+            addHttpRequestHandler:         false,
+            administrator:                 false,
+            application:                   false,
+            clearInterval:                 false,
+            clearTimeout:                  false,
+            close:                         false,
+            compactDataStore:              false,
+            console:                       false,
+            createDataStore:               false,
+            dataService:                   false,
+            currentSession:                false,
+            currentUser:                   false,
+            dateToIso:                     false,
+            db:                            false,
+            directory:                     false,
+            displayNotification:           false,
+            ds:                            false,
+            exitWait:                      false,
+            fileService:                   false,
+            garbageCollect:                false,
+            generateUUID:                  false,
+            getDataStore:                  false,
+            getFolder:                     false,
+            getItemsWithRole:              false,
+            getProgressIndicator:          false,
+            getSettingFile:                false,
+            getURLPath:                    false,
+            getURLQuery:                   false,
+            getWalibFolder:                false,
+            guidedModel:                   false,
+            httpServer:                    false,
+            include:                       false,
+            internal:                      false,
+            isoToDate:                     false,
+            jscprint:                      false,
+            loadImage:                     false,
+            loadText:                      false,
+            loginByKey:                    false,
+            loginByPassword:               false,
+            logout:                        false,
+            methods:                       false,
+            name:                          false,
+            oldSessionStorage:             false,
+            open4DBase:                    false,
+            openDataStore:                 false,
+            os:                            false,
+            pattern:                       false,
+            process:                       false,
+            removeHttpRequestHandler:      false,
+            repairDataStore:               false,
+            require:                       false,
+            requireNative:                 false,
+            rpcService:                    false,
+            saveText:                      false,
+            sessionStorage:                false,
+            setCurrentUser:                false,
+            setInterval:                   false,
+            setTimeout:                    false,
+            settings:                      false,
+            solution:                      false,
+            storage:                       false,
+            trace:                         false,
+            verifyDataStore:               false,
+            wait:                          false,
+            webAppService:                 false,
+            permissions:                   false,
+            requestFileSystem:             false, // HTML5 File:FileSystem API - might be also in browser list
+            resolveLocalFileSystemURL:     false, // HTML5 File:FileSystem API - might be also in browser list
+            requestFileSystemSync:         false, // HTML5 File:FileSystem API - might be also in browser list
+            resolveLocalFileSystemSyncURL: false, // HTML5 File:FileSystem API - might be also in browser list
+            RestImpExpAccess:              false,
+            rpcCatalog:                    false
+        },
+
         wsh = {
             ActiveXObject             : true,
             Enumerator                : true,
@@ -967,6 +1064,10 @@ var JSHINT = (function () {
 
         if (option.wsh) {
             combine(predefined, wsh);
+        }
+
+        if (option.wakanda) {
+            combine(predefined, wakanda);
         }
 
         if (option.esnext) {
