@@ -220,22 +220,22 @@
  maxerr, maxlen, member,message, meta, methods, module, moveBy, moveTo, mootools,
  multistr, name, navigator, new, newcap, noarg, node, noempty, nomen, nonew, nonstandard,
  nud, oldSessionStorage, onbeforeunload, onblur, onerror, onevar, onecase, onfocus,
- onload, onresize, onunload, open, open4DBase, openDatabase, openDataStore, openURL,
- opener, opera, options, outer, os, param, parent, parseFloat, parseInt, passfail,
- pattern, permissions, plusplus, predef, print, process, prompt, proto, prototype,
- prototypejs, provides, push, quit, range, raw, reach, reason, regexp, readFile, readUrl,
- regexdash, removeEventListener, removeHttpRequestHandler, repairDataStore, replace,
- report, requestFileSystem, requestFileSystemSync, require, requireNative, reserved,
- resizeBy, resizeTo, resolveLocalFileSystemURL, resolveLocalFileSystemSyncURL,
+ onload, onmessage, onresize, onunload, open, open4DBase, openDatabase, openDataStore,
+ openURL, opener, opera, options, outer, os, param, parent, parseFloat, parseInt, passfail,
+ pattern, permissions, plusplus, postMessage, predef, print, process, prompt, proto,
+ prototype, prototypejs, provides, push, quit, range, raw, reach, reason, regexp, readFile,
+ readUrl, regexdash, removeEventListener, removeHttpRequestHandler, repairDataStore,
+ replace, report, requestFileSystem, requestFileSystemSync, require, requireNative,
+ reserved, resizeBy, resizeTo, resolveLocalFileSystemURL, resolveLocalFileSystemSyncURL,
  resolvePath, resumeUpdates, respond, rhino, right, rpcCatalog, rpcService, runCommand,
- saveText, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal, send,
- serialize, sessionStorage, setCurrentUser, setInterval, setTimeout, setter, setterToken,
- settings, shift, slice, smarttabs, solution, sort, spawn, split, stack, status, start,
- storage, strict, sub, substr, supernew, shadow, supplant, sum, sync, test, toLowerCase,
- toString, toUpperCase, toint32, token, top, trace, trailing, type, typeOf, Uint16Array,
- Uint32Array, Uint8Array, undef, undefs, unused, urls, validthis, value, valueOf, var,
- vars, verifyDataStore, version, wait, webAppService, withstmt, white, window, windows,
- wsh, wakanda*/
+ saveText, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal, self,
+ send, serialize, sessionStorage, setCurrentUser, setInterval, setTimeout, setter,
+ setterToken, settings, shift, slice, smarttabs, solution, sort, spawn, split, stack, status,
+ start, storage, strict, sub, substr, supernew, shadow, supplant, sum, sync, test,
+ toLowerCase, toString, toUpperCase, toint32, token, top, trace, trailing, type, typeOf,
+ Uint16Array, Uint32Array, Uint8Array, undef, undefs, unused, urls, validthis, value,
+ valueOf, var, vars, verifyDataStore, version, wait, webAppService, withstmt, white, window,
+ windows, wsh, wakanda*/
 
 /*global exports: false */
 
@@ -838,17 +838,20 @@ var JSHINT = (function () {
             jscprint                      : false,
             loadImage                     : false,
             loadText                      : false,
+            location                      : false, // in Worker context
             loginByKey                    : false,
             loginByPassword               : false,
             logout                        : false,
             methods                       : false,
             name                          : false,
             oldSessionStorage             : false,
+            onmessage                     : false, // in Worker context
             open4DBase                    : false,
             openDataStore                 : false,
             os                            : false,
             pattern                       : false,
             permissions                   : false,
+            postMessage                   : false, // in Worker context
             process                       : false,
             removeHttpRequestHandler      : false,
             repairDataStore               : false,
@@ -865,6 +868,7 @@ var JSHINT = (function () {
             resolveLocalFileSystemURL     : false, // HTML5 File:FileSystem API
                                                    // might be also in browser list
             saveText                      : false,
+            self                          : false, // in Worker context
             sessionStorage                : false,
             setCurrentUser                : false,
             setInterval                   : false,
