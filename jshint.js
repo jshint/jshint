@@ -3163,6 +3163,14 @@ loop:   for (;;) {
                     warning(
     "Implied eval is evil. Pass a function instead of a string.", left);
                     internal(left, p[0].value);
+                } else if (p[0] && p[0].id === '(string)' &&
+                       left.value === '.' &&
+                       left.left.value === 'window' && 
+                       (left.right === 'setTimeout' ||
+                        left.right === 'setInterval')) {
+                    warning(
+    "Implied eval is evil. Pass a function instead of a string.", left);
+                    internal(left, p[0].value);
                 }
             }
             if (!left.identifier && left.id !== '.' && left.id !== '[' &&
