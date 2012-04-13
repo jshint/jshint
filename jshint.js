@@ -200,13 +200,13 @@
  close, closed, closure, comment, condition, confirm, console, constructor,
  content, couch, create, css, curly, d, data, datalist, dd, debug, decodeURI,
  decodeURIComponent, defaultStatus, defineClass, deserialize, devel, document,
- dojo, dijit, dojox, define, else, emit, encodeURI, encodeURIComponent,
+ dojo, dijit, dojox, define, elem, else, emit, encodeURI, encodeURIComponent,
  entityify, eqeq, eqeqeq, eqnull, errors, es5, escape, esnext, eval, event, evidence, evil,
  ex, exception, exec, exps, expr, exports, FileReader, first, floor, focus,
  forin, fragment, frames, from, fromCharCode, fud, funcscope, funct, function, functions,
  g, gc, getComputedStyle, getRow, getter, getterToken, GLOBAL, global, globals, globalstrict,
  hasOwnProperty, help, history, i, id, identifier, immed, implieds, importPackage, include,
- indent, indexOf, init, ins, instanceOf, isAlpha, isApplicationRunning, isArray,
+ indent, indexOf, init, ins, internals, instanceOf, isAlpha, isApplicationRunning, isArray,
  isDigit, isFinite, isNaN, iterator, java, join, jshint,
  JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastsemic, laxbreak, laxcomma,
  latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
@@ -218,7 +218,7 @@
  proto, prototype, prototypejs, provides, push, quit, range, raw, reach, reason, regexp,
  readFile, readUrl, regexdash, removeEventListener, replace, report, require,
  reserved, resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
- runCommand, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal,
+ runCommand, scope, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal,
  send, serialize, sessionStorage, setInterval, setTimeout, setter, setterToken, shift, slice,
  smarttabs, sort, spawn, split, stack, status, start, strict, sub, substr, supernew, shadow,
  supplant, sum, sync, test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing,
@@ -4153,11 +4153,11 @@ loop:   for (;;) {
         if (typeof(n) === 'undefined') {
             JSHINT.errors = [];
             JSHINT.undefs = [];
+            JSHINT.internals = [];
             JSHINT.scope = '(main)';
         } else {
             JSHINT.scope = n;
         }
-        JSHINT.internals = [];
         predefined = Object.create(standard);
         combine(predefined, g || {});
         if (o) {
@@ -4311,9 +4311,11 @@ loop:   for (;;) {
         }
 
         // Loop over the listed "internals", and check them too
-        for (i = 0; i < JSHINT.internals.length; i += 1) {
-            k = JSHINT.internals[i];
-            itself(k.value, o, g, k.elem);
+        if (typeof(n) === 'undefined') {
+            for (i = 0; i < JSHINT.internals.length; i += 1) {
+                k = JSHINT.internals[i];
+                itself(k.value, o, g, k.elem);
+            }
         }
 
         return JSHINT.errors.length === 0;
