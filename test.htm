@@ -43,3 +43,23 @@ for (i = 0; i < JSHINT.errors.length; i += 1) {
 }
 </script>
 
+
+<script>
+console.log('---   TEST  window.setTimeout  success');
+JSHINT("window.setTimeout('evil_yet_valid();', 1000);");
+var i, k;
+for (i = 0; i < JSHINT.errors.length; i += 1) {
+    k = JSHINT.errors[i];
+    console.log(k);
+}
+</script>
+
+<script>
+console.log('---   TEST  window.setTimeout  fail');
+JSHINT("window.setTimeout('evil_and_invalid(', 1000);");
+var i, k;
+for (i = 0; i < JSHINT.errors.length; i += 1) {
+    k = JSHINT.errors[i];
+    console.log(k);
+}
+</script>
