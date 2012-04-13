@@ -1007,6 +1007,7 @@ var JSHINT = (function () {
             evidence: lines[l - 1] || '',
             line: l,
             character: ch,
+            scope: JSHINT.scope,
             a: a,
             b: b,
             c: c,
@@ -1042,6 +1043,17 @@ var JSHINT = (function () {
         }, a, b, c, d);
     }
 
+    // Tracking of "internal" scripts, like eval containing a static string
+    function internal(m, s) {
+        var i;
+        i = {
+            id: '(internal)',
+            elem: m,
+            value: s
+        };
+        JSHINT.internals.push(i);
+        return i;
+    }
 
 
 // lexical analysis and token construction
@@ -3142,11 +3154,15 @@ loop:   for (;;) {
                 if (left.value === 'eval' || left.value === 'Function' ||
                         left.value === 'execScript') {
                     warning("eval is evil.", left);
+                    if (p[0] && p[0].id === '(string)') {
+                        internal(left, p[0].value);
+                    }
                 } else if (p[0] && p[0].id === '(string)' &&
                        (left.value === 'setTimeout' ||
                         left.value === 'setInterval')) {
                     warning(
     "Implied eval is evil. Pass a function instead of a string.", left);
+                    internal(left, p[0].value);
                 }
             }
             if (!left.identifier && left.id !== '.' && left.id !== '[' &&
@@ -4118,13 +4134,19 @@ loop:   for (;;) {
 
 // The actual JSHINT function itself.
 
-    var itself = function (s, o, g) {
+    var itself = function (s, o, g, n) {
         var a, i, k, x,
             optionKeys,
             newOptionObj = {};
 
-        JSHINT.errors = [];
-        JSHINT.undefs = [];
+        if (typeof(n) === 'undefined') {
+            JSHINT.errors = [];
+            JSHINT.undefs = [];
+            JSHINT.scope = '(main)';
+        } else {
+            JSHINT.scope = n;
+        }
+        JSHINT.internals = [];
         predefined = Object.create(standard);
         combine(predefined, g || {});
         if (o) {
@@ -4275,6 +4297,12 @@ loop:   for (;;) {
                     character : e.character || nt.from
                 }, null);
             }
+        }
+
+        // Loop over the listed "internals", and check them too
+        for (i = 0; i < JSHINT.internals.length; i += 1) {
+            k = JSHINT.internals[i];
+            itself(k.value, o, g, k.elem);
         }
 
         return JSHINT.errors.length === 0;

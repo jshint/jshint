@@ -1,0 +1,45 @@
+<script src="jshint.js"></script>
+
+
+<script>
+console.log('---   TEST  eval  success');
+JSHINT("eval('evil_yet_valid();');");
+var i, k;
+for (i = 0; i < JSHINT.errors.length; i += 1) {
+    k = JSHINT.errors[i];
+    console.log(k);
+}
+</script>
+
+<script>
+console.log('---   TEST  eval  fail');
+JSHINT("eval('evil_and_invalid(');");
+var i, k;
+for (i = 0; i < JSHINT.errors.length; i += 1) {
+    k = JSHINT.errors[i];
+    console.log(k);
+}
+</script>
+
+
+
+<script>
+console.log('---   TEST  setTimeout  success');
+JSHINT("setTimeout('evil_yet_valid();', 1000);");
+var i, k;
+for (i = 0; i < JSHINT.errors.length; i += 1) {
+    k = JSHINT.errors[i];
+    console.log(k);
+}
+</script>
+
+<script>
+console.log('---   TEST  setTimeout  fail');
+JSHINT("setTimeout('evil_and_invalid(', 1000);");
+var i, k;
+for (i = 0; i < JSHINT.errors.length; i += 1) {
+    k = JSHINT.errors[i];
+    console.log(k);
+}
+</script>
+
