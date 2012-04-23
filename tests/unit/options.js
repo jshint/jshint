@@ -170,6 +170,27 @@ exports.testProtoAndIterator = function () {
 };
 
 /**
+ * The `camelcase` option allows you to enforce use of the camel case convention.
+ */
+exports.testCamelcase = function () {
+    var source = fs.readFileSync(__dirname + '/fixtures/camelcase.js', 'utf8');
+
+    // By default, tolerate arbitrary identifiers
+    TestRun()
+        .test(source);
+
+    // Require identifiers in camel case if camelcase is true
+    TestRun()
+        .addError(5, "Identifier 'Foo_bar' is not in camel case.")
+        .addError(5, "Identifier 'test_me' is not in camel case.")
+        .addError(6, "Identifier 'test_me' is not in camel case.")
+        .addError(6, "Identifier 'test_me' is not in camel case.")
+        .addError(13, "Identifier 'test_1' is not in camel case.")
+        .test(source, { camelcase: true });
+
+};
+
+/**
  * Option `curly` allows you to enforce the use of curly braces around
  * control blocks. JavaScript allows one-line blocks to go without curly
  * braces but some people like to always use curly bracse. This option is
