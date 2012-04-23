@@ -212,7 +212,7 @@
  nonew, nonstandard, nud, onbeforeunload, onblur, onerror, onevar, onecase, onfocus,
  onload, onresize, onunload, open, openDatabase, openURL, opener, opera, options, outer, param,
  parent, parseFloat, parseInt, passfail, plusplus, predef, print, process, prompt,
- proto, prototype, prototypejs, provides, push, quit, range, raw, reach, reason, regexp,
+ proto, prototype, prototypejs, provides, push, quit, quotmark, range, raw, reach, reason, regexp,
  readFile, readUrl, regexdash, removeEventListener, replace, report, require,
  reserved, resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
  runCommand, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal,
@@ -331,7 +331,8 @@ var JSHINT = (function () {
             maxlen: false,
             indent: false,
             maxerr: false,
-            predef: false
+            predef: false,
+            quotmark: false //'single'|'double'|true
         },
 
         // These are JSHint boolean options which are shared with JSLint
@@ -677,6 +678,8 @@ var JSHINT = (function () {
             Sound             : false,
             Scriptaculous     : false
         },
+
+        quotmark,
 
         rhino = {
             defineClass  : false,
@@ -1210,6 +1213,22 @@ var JSHINT = (function () {
                     if (jsonmode && x !== '"') {
                         warningAt("Strings must use doublequote.",
                                 line, character);
+                    }
+
+                    if (option.quotmark) {
+                        if (option.quotmark === 'single' && x !== "'") {
+                            warningAt("Strings must use singlequote.",
+                                    line, character);
+                        } else if (option.quotmark === 'double' && x !== '"') {
+                            warningAt("Strings must use doublequote.",
+                                    line, character);
+                        } else if (option.quotmark === true) {
+                            quotmark = quotmark || x;
+                            if (quotmark !== x) {
+                                warningAt("Mixed double and single quotes.",
+                                        line, character);
+                            }
+                        }
                     }
 
                     function esc(n) {
@@ -4196,6 +4215,7 @@ loop:   for (;;) {
 
         //reset values
         comma.first = true;
+        quotmark = undefined;
 
         try {
             advance();
