@@ -130,6 +130,36 @@ exports.testNewArray = function () {
         .test('new Array();');
 };
 
+/** Test that JSHint recognizes `new foo.Array(<expr>)` as a valid expression #527 **/
+exports.testNewNonNativeArray = function () {
+    var code  = 'new foo.Array();',
+        code1 = 'new foo.Array(1);',
+        code2 = 'new foo.Array(v + 1);',
+        code3 = 'new foo.Array("hello", "there", "chaps");',
+        code4 = 'foo.Array();',
+        code5 = 'foo.Array(1 + 1);',
+        code6 = 'foo.Array("hello", "there", "chaps");';
+
+    TestRun().test(code);
+    TestRun().test(code1);
+    TestRun().test(code2);
+    TestRun().test(code3);
+    TestRun().test(code4);
+    TestRun().test(code5);
+    TestRun().test(code6);
+};
+
+exports.testNonNativeArray = function () {
+    var code1 = 'foo.Array();',
+        code2 = 'foo.Array(v + 1);',
+        code3 = 'foo.Array("hello", "there", "chaps");';
+
+    TestRun().test(code1);
+    TestRun().test(code2);
+    TestRun().test(code3);
+};
+
+
 /** Test that JSHint recognizes `new Object(<expr>)` as a valid expression */
 exports.testNewObject = function () {
     var code  = 'Object(1);',
@@ -146,6 +176,20 @@ exports.testNewObject = function () {
         .addError(1, "Use the object literal notation {}.")
         .test('new Object();');
 };
+
+/** Test that JSHint recognizes `new foo.Object(<expr>)` as a valid expression #527 **/
+exports.testNewNonNativeObject = function () {
+    var code  = 'new foo.Object();',
+        code1 = 'new foo.Object(1);',
+        code2 = 'foo.Object();',
+        code3 = 'foo.Object(1);';
+
+    TestRun().test(code);
+    TestRun().test(code1);
+    TestRun().test(code2);
+    TestRun().test(code3);
+};
+
 
 /**
  * Test that JSHint allows `undefined` to be a function parameter.
