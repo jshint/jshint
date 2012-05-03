@@ -4236,7 +4236,7 @@ loop:   for (;;) {
 
                 statements();
             }
-            advance('(end)');
+            advance((nexttoken && nexttoken.value !== '.')  ? '(end)' : undefined);
 
             var markDefined = function (name, context) {
                 do {

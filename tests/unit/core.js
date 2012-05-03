@@ -393,3 +393,9 @@ exports.invalidOptions = function () {
         .addError(0, "Bad option: 'invalid'.")
         .test("function test() {}", { devel: true, invalid: true });
 };
+
+exports.multilineArray = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/gh-334.js', 'utf8');
+
+    TestRun().test(src);
+};
