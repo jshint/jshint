@@ -455,6 +455,8 @@ var JSHINT = (function () {
             moveBy                   :  false,
             moveTo                   :  false,
             name                     :  false,
+            Node                     :  false,
+            NodeFilter               :  false,
             navigator                :  false,
             onbeforeunload           :  true,
             onblur                   :  true,
