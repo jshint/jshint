@@ -1067,10 +1067,11 @@ var JSHINT = (function () {
 
             // If smarttabs option is used check for spaces followed by tabs only.
             // Otherwise check for any occurence of mixed tabs and spaces.
+            // Tabs and one space followed by block comment is allowed.
             if (option.smarttabs)
                 at = s.search(/ \t/);
             else
-                at = s.search(/ \t|\t /);
+                at = s.search(/ \t|\t [^\*]/);
 
             if (at >= 0)
                 warningAt("Mixed spaces and tabs.", line, at + 1);
