@@ -5,3 +5,6 @@ function hello() {
   		console.log("hey");
 	}
 }
+	/**
+	 * Allowed space after tab before block comment
+	 */
