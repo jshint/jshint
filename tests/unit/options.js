@@ -1007,6 +1007,37 @@ exports.strings = function () {
         .test(src);
 };
 
+/*
+ * Test the `quotmark` option
+ *   quotmark    quotation mark or true (=ensure consistency)
+ */
+exports.quotes = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/quotes.js', 'utf8');
+    var src2 = fs.readFileSync(__dirname + '/fixtures/quotes2.js', 'utf8');
+
+    TestRun()
+        .test(src);
+
+    TestRun()
+        .addError(3, "Mixed double and single quotes.")
+        .test(src, { quotmark: true });
+
+    TestRun()
+        .addError(3, "Strings must use singlequote.")
+        .test(src, { quotmark: 'single' });
+
+    TestRun()
+        .addError(2, "Strings must use doublequote.")
+        .test(src, { quotmark: 'double' });
+
+    // test multiple runs (must have the same result)
+    var run = TestRun();
+    run.addError(3, "Mixed double and single quotes.")
+        .test(src, { quotmark: true });
+    run.addError(3, "Mixed double and single quotes.")
+        .test(src2, { quotmark: true });
+};
+
 exports.scope = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/scope.js', 'utf8');
 
