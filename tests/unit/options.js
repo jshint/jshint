@@ -1148,6 +1148,8 @@ exports.browser = function () {
 		.addError(3, "'btoa' is not defined.")
 		.addError(6, "'DOMParser' is not defined.")
 		.addError(10, "'XMLSerializer' is not defined.")
+		.addError(14, "'NodeFilter' is not defined.")
+		.addError(15, "'Node' is not defined.")
 		.test(src, { undef: true });
 
 	TestRun().test(src, { browser: true, undef: true });

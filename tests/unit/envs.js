@@ -297,6 +297,8 @@ exports.browser = function () {
           , 'moveBy'
           , 'moveTo'
           , 'name'
+          , 'Node'
+          , 'NodeFilter'
           , 'navigator'
           , 'onbeforeunload'
           , 'onblur'
