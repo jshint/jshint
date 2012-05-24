@@ -1155,3 +1155,20 @@ exports.browser = function () {
 	TestRun().test(src, { browser: true, undef: true });
 
 };
+
+/*
+ * Tests the `indentswitch` option
+ */
+exports.indentswitch = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/indentswitch.js', 'utf8');
+
+    TestRun().test(src, { white: true, indentswitch: true });
+    TestRun()
+        .addError(2, "Expected 'case' to have an indentation at 1 instead at 5.")
+        .addError(3, "Expected 'var' to have an indentation at 5 instead at 9.")
+        .addError(4, "Expected 'break' to have an indentation at 5 instead at 9.")
+        .addError(5, "Expected 'case' to have an indentation at 1 instead at 5.")
+        .addError(6, "Expected 'var' to have an indentation at 5 instead at 9.")
+        .addError(7, "Expected 'break' to have an indentation at 5 instead at 9.")
+        .test(src, { white: true });
+};
