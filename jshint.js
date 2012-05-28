@@ -2628,7 +2628,7 @@ loop:   for (;;) {
      * Parses a single block. A block is a sequence of statements wrapped in
      * braces.
      *
-     * ordinary - true for everything but function bodies and try blocks.
+     * ordinary - true for everything but function bodies and catch blocks.
      * stmt     - true if block can be a single statement (e.g. in if/for/while).
      * isfunc   - true if block is a function body
      */
@@ -3667,7 +3667,7 @@ loop:   for (;;) {
     blockstmt('try', function () {
         var b, e, s;
 
-        block(false);
+        block(true);
         if (nexttoken.id === 'catch') {
             advance('catch');
             nonadjacent(token, nexttoken);
@@ -3689,7 +3689,7 @@ loop:   for (;;) {
         }
         if (nexttoken.id === 'finally') {
             advance('finally');
-            block(false);
+            block(true);
             return;
         } else if (!b) {
             error("Expected '{a}' and instead saw '{b}'.",
