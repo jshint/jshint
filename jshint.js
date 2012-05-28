@@ -3166,6 +3166,8 @@ loop:   for (;;) {
                     warning(
     "Implied eval is evil. Pass a function instead of a string.", left);
                     internal(left, p[0].value);
+
+                // window.setTimeout/setInterval
                 } else if (p[0] && p[0].id === '(string)' &&
                        left.value === '.' &&
                        left.left.value === 'window' && 
