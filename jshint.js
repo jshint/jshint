@@ -200,13 +200,13 @@
  close, closed, closure, comment, condition, confirm, console, constructor,
  content, couch, create, css, curly, d, data, datalist, dd, debug, decodeURI,
  decodeURIComponent, defaultStatus, defineClass, deserialize, devel, document,
- dojo, dijit, dojox, define, else, emit, encodeURI, encodeURIComponent,
+ dojo, dijit, dojox, define, elem, else, emit, encodeURI, encodeURIComponent,
  entityify, eqeq, eqeqeq, eqnull, errors, es5, escape, esnext, eval, event, evidence, evil,
  ex, exception, exec, exps, expr, exports, FileReader, first, floor, focus,
  forin, fragment, frames, from, fromCharCode, fud, funcscope, funct, function, functions,
  g, gc, getComputedStyle, getRow, getter, getterToken, GLOBAL, global, globals, globalstrict,
  hasOwnProperty, help, history, i, id, identifier, immed, implieds, importPackage, include,
- indent, indexOf, init, ins, instanceOf, isAlpha, isApplicationRunning, isArray,
+ indent, indexOf, init, ins, internals, instanceOf, isAlpha, isApplicationRunning, isArray,
  isDigit, isFinite, isNaN, iterator, java, join, jshint,
  JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastsemic, laxbreak, laxcomma,
  latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
@@ -218,7 +218,7 @@
  proto, prototype, prototypejs, provides, push, quit, quotmark, range, raw, reach, reason, regexp,
  readFile, readUrl, regexdash, removeEventListener, replace, report, require,
  reserved, resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
- runCommand, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal,
+ runCommand, scope, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal,
  send, serialize, sessionStorage, setInterval, setTimeout, setter, setterToken, shift, slice,
  smarttabs, sort, spawn, split, stack, status, start, strict, sub, substr, supernew, shadow,
  supplant, sum, sync, test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing,
@@ -1016,6 +1016,7 @@ var JSHINT = (function () {
             evidence: lines[l - 1] || '',
             line: l,
             character: ch,
+            scope: JSHINT.scope,
             a: a,
             b: b,
             c: c,
@@ -1051,6 +1052,17 @@ var JSHINT = (function () {
         }, a, b, c, d);
     }
 
+    // Tracking of "internal" scripts, like eval containing a static string
+    function addInternalSrc(elem, src) {
+        var i;
+        i = {
+            id: '(internal)',
+            elem: elem,
+            value: src
+        };
+        JSHINT.internals.push(i);
+        return i;
+    }
 
 
 // lexical analysis and token construction
@@ -3191,11 +3203,25 @@ loop:   for (;;) {
                 if (left.value === 'eval' || left.value === 'Function' ||
                         left.value === 'execScript') {
                     warning("eval is evil.", left);
+                    if (p[0] && p[0].id === '(string)') {
+                        addInternalSrc(left, p[0].value);
+                    }
                 } else if (p[0] && p[0].id === '(string)' &&
                        (left.value === 'setTimeout' ||
                         left.value === 'setInterval')) {
                     warning(
     "Implied eval is evil. Pass a function instead of a string.", left);
+                    addInternalSrc(left, p[0].value);
+
+                // window.setTimeout/setInterval
+                } else if (p[0] && p[0].id === '(string)' &&
+                       left.value === '.' &&
+                       left.left.value === 'window' && 
+                       (left.right === 'setTimeout' ||
+                        left.right === 'setInterval')) {
+                    warning(
+    "Implied eval is evil. Pass a function instead of a string.", left);
+                    addInternalSrc(left, p[0].value);
                 }
             }
             if (!left.identifier && left.id !== '.' && left.id !== '[' &&
@@ -4167,13 +4193,19 @@ loop:   for (;;) {
 
 // The actual JSHINT function itself.
 
-    var itself = function (s, o, g) {
+    var itself = function (s, o, g, n) {
         var a, i, k, x,
             optionKeys,
             newOptionObj = {};
 
-        JSHINT.errors = [];
-        JSHINT.undefs = [];
+        if (typeof(n) === 'undefined') {
+            JSHINT.errors = [];
+            JSHINT.undefs = [];
+            JSHINT.internals = [];
+            JSHINT.scope = '(main)';
+        } else {
+            JSHINT.scope = n;
+        }
         predefined = Object.create(standard);
         combine(predefined, g || {});
         if (o) {
@@ -4324,6 +4356,14 @@ loop:   for (;;) {
                     line      : e.line || nt.line,
                     character : e.character || nt.from
                 }, null);
+            }
+        }
+
+        // Loop over the listed "internals", and check them too
+        if (typeof(n) === 'undefined') {
+            for (i = 0; i < JSHINT.internals.length; i += 1) {
+                k = JSHINT.internals[i];
+                itself(k.value, o, g, k.elem);
             }
         }
 

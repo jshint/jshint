@@ -352,6 +352,30 @@ exports.yesEmptyStmt = function () {
         .test(src, { curly: false, expr: true });
 };
 
+exports.insideEval = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/insideEval.js', 'utf8');
+
+    TestRun()
+        .addError(1, "eval is evil.")
+        .addError(3, "eval is evil.")
+        .addError(5, "eval is evil.")
+        .addError(7, "eval is evil.")
+        .addError(9, "eval is evil.")
+        .addError(11, "Implied eval is evil. Pass a function instead of a string.")
+        .addError(13, "Implied eval is evil. Pass a function instead of a string.")
+        .addError(15, "Implied eval is evil. Pass a function instead of a string.")
+        .addError(17, "Implied eval is evil. Pass a function instead of a string.")
+        
+        // The "TestRun" class (and these errors) probably needs some
+        // facility for checking the expected scope of the error
+        .addError(1, "Unexpected early end of program.")
+        .addError(1, "Expected an identifier and instead saw '(end)'.")
+        .addError(1, "Expected ')' and instead saw ''.")
+        .addError(1, "Missing semicolon.")
+        
+        .test(src, { evil: false });
+};
+
 // Regression test for GH-394.
 exports.noExcOnTooManyUndefined = function () {
     var code = 'a(); b();';
