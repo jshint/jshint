@@ -128,7 +128,7 @@
      member: {
          STRING: NUMBER
      },
-     unuseds: [
+     unused: [
          {
              name: STRING,
              line: NUMBER
@@ -163,7 +163,7 @@
  __filename, __dirname, ActiveXObject, Array, ArrayBuffer, ArrayBufferView, Audio,
  Autocompleter, Assets, Boolean, Builder, Buffer, Browser, COM, CScript, Canvas,
  CustomAnimation, Class, Control, Chain, Color, Cookie, Core, DataView, Date,
- Debug, Draggable, Draggables, Droppables, Document, DomReady, DOMReady, Drag,
+ Debug, Draggable, Draggables, Droppables, Document, DomReady, DOMReady, DOMParser, Drag,
  E, Enumerator, Enumerable, Element, Elements, Error, Effect, EvalError, Event,
  Events, FadeAnimation, Field, Flash, Float32Array, Float64Array, Form,
  FormField, Frame, FormData, Function, Fx, GetObject, Group, Hash, HotKey,
@@ -183,39 +183,39 @@
  HTMLTextAreaElement, HTMLTitleElement, HTMLUListElement, HTMLVideoElement,
  Iframe, IframeShim, Image, Int16Array, Int32Array, Int8Array,
  Insertion, InputValidator, JSON, Keyboard, Locale, LN10, LN2, LOG10E, LOG2E,
- MAX_VALUE, MIN_VALUE, Mask, Math, MenuItem, MoveAnimation, MooTools, Native,
- NEGATIVE_INFINITY, Number, Object, ObjectRange, Option, Options, OverText, PI,
- POSITIVE_INFINITY, PeriodicalExecuter, Point, Position, Prototype, RangeError,
- Rectangle, ReferenceError, RegExp, ResizeAnimation, Request, RotateAnimation,
+ MAX_VALUE, MIN_VALUE, Mask, Math, MenuItem, MessageChannel, MessageEvent, MessagePort,
+ MoveAnimation, MooTools, Native, NEGATIVE_INFINITY, Number, Object, ObjectRange, Option,
+ Options, OverText, PI, POSITIVE_INFINITY, PeriodicalExecuter, Point, Position, Prototype,
+ RangeError, Rectangle, ReferenceError, RegExp, ResizeAnimation, Request, RotateAnimation,
  SQRT1_2, SQRT2, ScrollBar, ScriptEngine, ScriptEngineBuildVersion,
  ScriptEngineMajorVersion, ScriptEngineMinorVersion, Scriptaculous, Scroller,
  Slick, Slider, Selector, SharedWorker, String, Style, SyntaxError, Sortable, Sortables,
  SortableObserver, Sound, Spinner, System, Swiff, Text, TextArea, Template,
  Timer, Tips, Type, TypeError, Toggle, Try, "use strict", unescape, URI, URIError, URL,
- VBArray, WSH, WScript, XDomainRequest, Web, Window, XMLDOM, XMLHttpRequest, XPathEvaluator,
- XPathException, XPathExpression, XPathNamespace, XPathNSResolver, XPathResult, "\\", a,
- addEventListener, address, alert, apply, applicationCache, arguments, arity,
- asi, b, bitwise, block, blur, boolOptions, boss, browser, c, call, callee,
- caller, cases, charAt, charCodeAt, character, clearInterval, clearTimeout,
+ VBArray, WSH, WScript, XDomainRequest, Web, Window, XMLDOM, XMLHttpRequest, XMLSerializer,
+ XPathEvaluator, XPathException, XPathExpression, XPathNamespace, XPathNSResolver, XPathResult,
+ "\\", a, addEventListener, address, alert, apply, applicationCache, arguments, arity, asi, atob,
+ b, basic, basicToken, bitwise, block, blur, boolOptions, boss, browser, btoa, c, call, callee,
+ caller, camelcase, cases, charAt, charCodeAt, character, clearInterval, clearTimeout,
  close, closed, closure, comment, condition, confirm, console, constructor,
  content, couch, create, css, curly, d, data, datalist, dd, debug, decodeURI,
  decodeURIComponent, defaultStatus, defineClass, deserialize, devel, document,
- dojo, dijit, dojox, define, edition, else, emit, encodeURI, encodeURIComponent,
- entityify, eqeqeq, eqnull, errors, es5, escape, esnext, eval, event, evidence, evil,
+ dojo, dijit, dojox, define, else, emit, encodeURI, encodeURIComponent,
+ entityify, eqeq, eqeqeq, eqnull, errors, es5, escape, esnext, eval, event, evidence, evil,
  ex, exception, exec, exps, expr, exports, FileReader, first, floor, focus,
  forin, fragment, frames, from, fromCharCode, fud, funcscope, funct, function, functions,
- g, gc, getComputedStyle, getRow, getter, GLOBAL, global, globals, globalstrict,
+ g, gc, getComputedStyle, getRow, getter, getterToken, GLOBAL, global, globals, globalstrict,
  hasOwnProperty, help, history, i, id, identifier, immed, implieds, importPackage, include,
  indent, indexOf, init, ins, instanceOf, isAlpha, isApplicationRunning, isArray,
  isDigit, isFinite, isNaN, iterator, java, join, jshint,
- JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastsemic, laxbreak,
+ JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastsemic, laxbreak, laxcomma,
  latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
  log, loopfunc, m, match, maxerr, maxlen, member,message, meta, module, moveBy,
  moveTo, mootools, multistr, name, navigator, new, newcap, noarg, node, noempty, nomen,
  nonew, nonstandard, nud, onbeforeunload, onblur, onerror, onevar, onecase, onfocus,
  onload, onresize, onunload, open, openDatabase, openURL, opener, opera, options, outer, param,
  parent, parseFloat, parseInt, passfail, plusplus, predef, print, process, prompt,
- proto, prototype, prototypejs, provides, push, quit, range, raw, reach, reason, regexp,
+ proto, prototype, prototypejs, provides, push, quit, quotmark, range, raw, reach, reason, regexp,
  readFile, readUrl, regexdash, removeEventListener, replace, report, require,
  reserved, resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
  runCommand, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal,
@@ -223,7 +223,7 @@
  smarttabs, sort, spawn, split, stack, status, start, strict, sub, substr, supernew, shadow,
  supplant, sum, sync, test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing,
  type, typeOf, Uint16Array, Uint32Array, Uint8Array, undef, undefs, unused, urls, validthis,
- value, valueOf, var, version, WebSocket, white, window, Worker, wsh*/
+ value, valueOf, var, vars, version, WebSocket, withstmt, white, window, windows, Worker, wsh*/
 
 /*global exports: false */
 
@@ -260,6 +260,7 @@ var JSHINT = (function () {
             bitwise     : true, // if bitwise operators should not be allowed
             boss        : true, // if advanced usage of assignments should be allowed
             browser     : true, // if the standard browser globals should be predefined
+            camelcase   : true, // if identifiers should be required in camel case
             couch       : true, // if CouchDB globals should be predefined
             curly       : true, // if curly braces around all blocks should be required
             debug       : true, // if debugger statements should be allowed
@@ -283,6 +284,7 @@ var JSHINT = (function () {
                                 // statements inside of a one-line blocks.
             latedef     : true, // if the use before definition should not be tolerated
             laxbreak    : true, // if line breaks should not be checked
+            laxcomma    : true, // if line breaks should not be checked around commas
             loopfunc    : true, // if functions should be allowed to be defined within
                                 // loops
             mootools    : true, // if MooTools globals should be predefined
@@ -321,10 +323,47 @@ var JSHINT = (function () {
             trailing    : true, // if trailing whitespace rules apply
             validthis   : true, // if 'this' inside a non-constructor function is valid.
                                 // This is a function scoped option only.
+            withstmt    : true, // if with statements should be allowed
             white       : true, // if strict whitespace rules apply
             wsh         : true  // if the Windows Scripting Host environment globals
                                 // should be predefined
         },
+
+        // These are the JSHint options that can take any value
+        // (we use this object to detect invalid options)
+        valOptions = {
+            maxlen: false,
+            indent: false,
+            maxerr: false,
+            predef: false,
+            quotmark: false //'single'|'double'|true
+        },
+
+        // These are JSHint boolean options which are shared with JSLint
+        // where the definition in JSHint is opposite JSLint
+        invertedOptions = {
+            bitwise     : true,
+            forin       : true,
+            newcap      : true,
+            nomen       : true,
+            plusplus    : true,
+            regexp      : true,
+            undef       : true,
+            white       : true,
+
+            // Inverted and renamed, use JSHint name here
+            eqeqeq      : true,
+            onevar      : true
+        },
+
+        // These are JSHint boolean options which are shared with JSLint
+        // where the name has been changed but the effect is unchanged
+        renamedOptions = {
+            eqeq        : "eqeqeq",
+            vars        : "onevar",
+            windows     : "wsh"
+        },
+
 
         // browser contains a set of global names which are commonly provided by a
         // web browser environment.
@@ -334,12 +373,15 @@ var JSHINT = (function () {
             Audio                    :  false,
             addEventListener         :  false,
             applicationCache         :  false,
+            atob                     :  false,
             blur                     :  false,
+            btoa                     :  false,
             clearInterval            :  false,
             clearTimeout             :  false,
             close                    :  false,
             closed                   :  false,
             DataView                 :  false,
+            DOMParser                :  false,
             defaultStatus            :  false,
             document                 :  false,
             event                    :  false,
@@ -412,9 +454,14 @@ var JSHINT = (function () {
             length                   :  false,
             localStorage             :  false,
             location                 :  false,
+            MessageChannel           :  false,
+            MessageEvent             :  false,
+            MessagePort              :  false,
             moveBy                   :  false,
             moveTo                   :  false,
             name                     :  false,
+            Node                     :  false,
+            NodeFilter               :  false,
             navigator                :  false,
             onbeforeunload           :  true,
             onblur                   :  true,
@@ -449,6 +496,7 @@ var JSHINT = (function () {
             window                   :  false,
             Worker                   :  false,
             XMLHttpRequest           :  false,
+            XMLSerializer            :  false,
             XPathEvaluator           :  false,
             XPathException           :  false,
             XPathExpression          :  false,
@@ -637,6 +685,8 @@ var JSHINT = (function () {
             Scriptaculous     : false
         },
 
+        quotmark,
+
         rhino = {
             defineClass  : false,
             deserialize  : false,
@@ -778,6 +828,12 @@ var JSHINT = (function () {
         return Object.prototype.hasOwnProperty.call(object, name);
     }
 
+    function checkOption(name, t) {
+        if (valOptions[name] === undefined && boolOptions[name] === undefined) {
+            warning("Bad option: '" + name + "'.", t);
+        }
+    }
+
 // Provide critical ES5 functions to ES3.
 
     if (typeof Array.isArray !== 'function') {
@@ -888,6 +944,7 @@ var JSHINT = (function () {
 
         if (option.node) {
             combine(predefined, node);
+            option.globalstrict = true;
         }
 
         if (option.devel) {
@@ -1016,10 +1073,11 @@ var JSHINT = (function () {
 
             // If smarttabs option is used check for spaces followed by tabs only.
             // Otherwise check for any occurence of mixed tabs and spaces.
+            // Tabs and one space followed by block comment is allowed.
             if (option.smarttabs)
                 at = s.search(/ \t/);
             else
-                at = s.search(/ \t|\t /);
+                at = s.search(/ \t|\t [^\*]/);
 
             if (at >= 0)
                 warningAt("Mixed spaces and tabs.", line, at + 1);
@@ -1034,9 +1092,9 @@ var JSHINT = (function () {
                 warningAt("Line too long.", line, s.length);
 
             // Check for trailing whitespaces
-            tw = /\s+$/.test(s);
-            if (option.trailing && tw && !/^\s+$/.test(s)) {
-                warningAt("Trailing whitespace.", line, tw);
+            tw = option.trailing && s.match(/^(.*?)\s+$/);
+            if (tw && !/^\s+$/.test(s)) {
+                warningAt("Trailing whitespace.", line, tw[1].length + 1);
             }
             return true;
         }
@@ -1073,6 +1131,10 @@ var JSHINT = (function () {
                             (value !== '__dirname' && value !== '__filename')) {
                         warningAt("Unexpected {a} in '{b}'.", line, from, "dangling '_'", value);
                     }
+                } else if (option.camelcase && value.indexOf('_') > -1 &&
+                        !value.match(/^[A-Z0-9_]*$/)) {
+                    warningAt("Identifier '{a}' is not in camel case.",
+                        line, from, value);
                 }
             }
             t.value = value;
@@ -1141,7 +1203,7 @@ var JSHINT = (function () {
 
             // token -- this is called by advance to get the next token
             token: function () {
-                var b, c, captures, d, depth, high, i, l, low, q, t, isLiteral, isInRange;
+                var b, c, captures, d, depth, high, i, l, low, q, t, isLiteral, isInRange, n;
 
                 function match(x) {
                     var r = x.exec(s), r1;
@@ -1162,6 +1224,22 @@ var JSHINT = (function () {
                     if (jsonmode && x !== '"') {
                         warningAt("Strings must use doublequote.",
                                 line, character);
+                    }
+
+                    if (option.quotmark) {
+                        if (option.quotmark === 'single' && x !== "'") {
+                            warningAt("Strings must use singlequote.",
+                                    line, character);
+                        } else if (option.quotmark === 'double' && x !== '"') {
+                            warningAt("Strings must use doublequote.",
+                                    line, character);
+                        } else if (option.quotmark === true) {
+                            quotmark = quotmark || x;
+                            if (quotmark !== x) {
+                                warningAt("Mixed double and single quotes.",
+                                        line, character);
+                            }
+                        }
                     }
 
                     function esc(n) {
@@ -1207,6 +1285,7 @@ unclosedString:     for (;;) {
                             j += 1;
                             character += 1;
                             c = s.charAt(j);
+                            n = s.charAt(j + 1);
                             switch (c) {
                             case '\\':
                             case '"':
@@ -1231,6 +1310,17 @@ unclosedString:     for (;;) {
                                 break;
                             case 't':
                                 c = '\t';
+                                break;
+                            case '0':
+                                c = '\0';
+                                // Octal literals fail in strict mode
+                                // check if the number is between 00 and 07
+                                // where 'n' is the token next to 'c'
+                                if (n >= 0 && n <= 7 && directive["use strict"]) {
+                                    warningAt(
+                                    "Octal literals are not allowed in strict mode.",
+                                    line, character);
+                                }
                                 break;
                             case 'u':
                                 esc(4);
@@ -1706,7 +1796,8 @@ klass:                                  do {
 
 
     function doOption() {
-        var b, obj, filter, o = nexttoken.value, t, v;
+        var b, obj, filter, o = nexttoken.value, t, tn, v;
+
         switch (o) {
         case '*/':
             error("Unbegun comment.");
@@ -1730,6 +1821,7 @@ klass:                                  do {
         default:
             error("What?");
         }
+
         t = lex.token();
 loop:   for (;;) {
             for (;;) {
@@ -1745,13 +1837,20 @@ loop:   for (;;) {
                     o !== '/*members') {
                 error("Bad option.", t);
             }
+
             v = lex.token();
             if (v.id === ':') {
                 v = lex.token();
+
                 if (obj === membersOnly) {
                     error("Expected '{a}' and instead saw '{b}'.",
                             t, '*/', ':');
                 }
+
+                if (o === '/*jshint') {
+                    checkOption(t.value, t);
+                }
+
                 if (t.value === 'indent' && (o === '/*jshint' || o === '/*jslint')) {
                     b = +v.value;
                     if (typeof b !== 'number' || !isFinite(b) || b <= 0 ||
@@ -1786,10 +1885,16 @@ loop:   for (;;) {
                         else
                             error("Bad option value.", v);
                     }
-                } else if (v.value === 'true') {
-                    obj[t.value] = true;
-                } else if (v.value === 'false') {
-                    obj[t.value] = false;
+                } else if (v.value === 'true' || v.value === 'false') {
+                    if (o === '/*jslint') {
+                        tn = renamedOptions[t.value] || t.value;
+                        obj[tn] = v.value === 'true';
+                        if (invertedOptions[tn] !== undefined) {
+                            obj[tn] = !obj[tn];
+                        }
+                    } else {
+                        obj[t.value] = v.value === 'true';
+                    }
                 } else {
                     error("Bad option value.", v);
                 }
@@ -1902,7 +2007,7 @@ loop:   for (;;) {
 // They are elements of the parsing method called Top Down Operator Precedence.
 
     function expression(rbp, initial) {
-        var left, isArray = false;
+        var left, isArray = false, isObject = false;
 
         if (nexttoken.id === '(end)')
             error("Unexpected early end of program.", token);
@@ -1930,9 +2035,31 @@ loop:   for (;;) {
             }
             while (rbp < nexttoken.lbp) {
                 isArray = token.value === 'Array';
+                isObject = token.value === 'Object';
+
+                // #527, new Foo.Array(), Foo.Array(), new Foo.Object(), Foo.Object()
+                // Line breaks in IfStatement heads exist to satisfy the checkJSHint
+                // "Line too long." error.
+                if (left && (left.value || (left.first && left.first.value))) {
+                    // If the left.value is not "new", or the left.first.value is a "."
+                    // then safely assume that this is not "new Array()" and possibly
+                    // not "new Object()"...
+                    if (left.value !== 'new' ||
+                      (left.first && left.first.value && left.first.value === '.')) {
+                        isArray = false;
+                        // ...In the case of Object, if the left.value and token.value
+                        // are not equal, then safely assume that this not "new Object()"
+                        if (left.value !== token.value) {
+                            isObject = false;
+                        }
+                    }
+                }
+
                 advance();
                 if (isArray && token.id === '(' && nexttoken.id === ')')
                     warning("Use the array literal notation [].", token);
+                if (isObject && token.id === '(' && nexttoken.id === ')')
+                    warning("Use the object literal notation {}.", token);
                 if (token.led) {
                     left = token.led(left);
                 } else {
@@ -2026,7 +2153,11 @@ loop:   for (;;) {
 
     function comma() {
         if (token.line !== nexttoken.line) {
-            if (!option.laxbreak) {
+            if (!option.laxcomma) {
+                if (comma.first) {
+                    warning("Comma warnings can be turned off with 'laxcomma'");
+                    comma.first = false;
+                }
                 warning("Bad line breaking before '{a}'.", token, nexttoken.id);
             }
         } else if (!token.comment && token.character !== nexttoken.from && option.white) {
@@ -2329,6 +2460,9 @@ loop:   for (;;) {
             }
             if (t.id !== '(endline)') {
                 if (t.id === 'function') {
+                    if (!option.latedef) {
+                        break;
+                    }
                     warning(
 "Inner functions should be listed at the top of the outer function.", t);
                     break;
@@ -2384,6 +2518,10 @@ loop:   for (;;) {
                 warning("Do not use 'new' for side effects.");
             }
 
+            if (nexttoken.id === ',') {
+                return comma();
+            }
+
             if (nexttoken.id !== ';') {
                 if (!option.asi) {
                     // If this is the last statement in a block that ends on
@@ -2414,7 +2552,10 @@ loop:   for (;;) {
 
         while (!nexttoken.reach && nexttoken.id !== '(end)') {
             if (nexttoken.id === ';') {
-                warning("Unnecessary semicolon.");
+                p = peek();
+                if (!p || p.id !== "(") {
+                    warning("Unnecessary semicolon.");
+                }
                 advance(';');
             } else {
                 a.push(statement(startLine === nexttoken.line));
@@ -2588,6 +2729,7 @@ loop:   for (;;) {
         if (typeof a === 'function') {
             a = false;
         }
+
         if (!a) {
             a = [line];
             implied[name] = a;
@@ -2652,9 +2794,15 @@ loop:   for (;;) {
                 // Operators typeof and delete do not raise runtime errors even if
                 // the base object of a reference is null so no need to display warning
                 // if we're inside of typeof or delete.
-                if (anonname !== 'typeof' && anonname !== 'delete' &&
-                    option.undef && typeof predefined[v] !== 'boolean') {
-                    isundef(funct, "'{a}' is not defined.", token, v);
+
+                if (option.undef && typeof predefined[v] !== 'boolean') {
+                    // Attempting to subscript a null reference will throw an
+                    // error, even within the typeof and delete operators
+                    if (!(anonname === 'typeof' || anonname === 'delete') ||
+                        (nexttoken && (nexttoken.value === '.' || nexttoken.value === '['))) {
+
+                        isundef(funct, "'{a}' is not defined.", token, v);
+                    }
                 }
                 note_implied(token);
             } else {
@@ -2686,8 +2834,15 @@ loop:   for (;;) {
                         // Operators typeof and delete do not raise runtime errors even
                         // if the base object of a reference is null so no need to
                         // display warning if we're inside of typeof or delete.
-                        if (anonname !== 'typeof' && anonname !== 'delete' && option.undef) {
-                            isundef(funct, "'{a}' is not defined.", token, v);
+                        if (option.undef) {
+                            // Attempting to subscript a null reference will throw an
+                            // error, even within the typeof and delete operators
+                            if (!(anonname === 'typeof' || anonname === 'delete') ||
+                                (nexttoken &&
+                                    (nexttoken.value === '.' || nexttoken.value === '['))) {
+
+                                isundef(funct, "'{a}' is not defined.", token, v);
+                            }
                         }
                         funct[v] = true;
                         note_implied(token);
@@ -2920,9 +3075,6 @@ loop:   for (;;) {
             if (c.identifier) {
                 c['new'] = true;
                 switch (c.value) {
-                case 'Object':
-                    warning("Use the object literal notation {}.", token);
-                    break;
                 case 'Number':
                 case 'String':
                 case 'Boolean':
@@ -3065,7 +3217,8 @@ loop:   for (;;) {
         advance(')', this);
         nospace(prevtoken, token);
         if (option.immed && v.id === 'function') {
-            if (nexttoken.id === '(') {
+            if (nexttoken.id === '(' ||
+              (nexttoken.id === '.' && (peek().value === 'call' || peek().value === 'apply'))) {
                 warning(
 "Move the invocation into the parens that contain the function.", nexttoken);
             } else {
@@ -3215,22 +3368,41 @@ loop:   for (;;) {
 
     (function (x) {
         x.nud = function () {
-            var b, f, i, j, p, seen = {}, t;
-            var prop, acc = {}; // Accessor methods
+            var b, f, i, j, p, t;
+            var props = {}; // All properties, including accessors
+
+            function saveProperty(name, token) {
+                if (props[name] && is_own(props, name))
+                    warning("Duplicate member '{a}'.", nexttoken, i);
+                else
+                    props[name] = {};
+
+                props[name].basic = true;
+                props[name].basicToken = token;
+            }
 
             function saveSetter(name, token) {
-                if (!acc[name]) {
-                    acc[name] = {};
+                if (props[name] && is_own(props, name)) {
+                    if (props[name].basic || props[name].setter)
+                        warning("Duplicate member '{a}'.", nexttoken, i);
+                } else {
+                    props[name] = {};
                 }
-                acc[name].setter = true;
-                acc[name].setterToken = token;
+
+                props[name].setter = true;
+                props[name].setterToken = token;
             }
 
             function saveGetter(name) {
-                if (!acc[name]) {
-                    acc[name] = {};
+                if (props[name] && is_own(props, name)) {
+                    if (props[name].basic || props[name].getter)
+                        warning("Duplicate member '{a}'.", nexttoken, i);
+                } else {
+                    props[name] = {};
                 }
-                acc[name].getter = true;
+
+                props[name].getter = true;
+                props[name].getterToken = token;
             }
 
             b = token.line !== nexttoken.line;
@@ -3260,9 +3432,6 @@ loop:   for (;;) {
                     t = nexttoken;
                     adjacent(token, nexttoken);
                     f = doFunction();
-                    if (!option.loopfunc && funct['(loopage)']) {
-                        warning("Don't make functions within a loop.", t);
-                    }
                     p = f['(params)'];
                     if (p) {
                         warning("Unexpected parameter '{a}' in get {b} function.", t, p[0], i);
@@ -3277,20 +3446,17 @@ loop:   for (;;) {
                     if (!i) {
                         error("Missing property name.");
                     }
-                    if (acc[i] && acc[i].setter) {
-                        warning("Duplicate member '{a}'.", nexttoken, i);
-                    }
                     saveSetter(i, nexttoken);
-                    seen[i] = false;
                     t = nexttoken;
                     adjacent(token, nexttoken);
                     f = doFunction();
                     p = f['(params)'];
-                    if (!p || p.length !== 1 || p[0] !== 'value') {
-                        warning("Expected (value) in set {a} function.", t, i);
+                    if (!p || p.length !== 1) {
+                        warning("Expected a single parameter in set {a} function.", t, i);
                     }
                 } else {
                     i = property_name();
+                    saveProperty(i, nexttoken);
                     if (typeof i !== 'string') {
                         break;
                     }
@@ -3298,10 +3464,7 @@ loop:   for (;;) {
                     nonadjacent(token, nexttoken);
                     expression(10);
                 }
-                if (seen[i] === true) {
-                    warning("Duplicate member '{a}'.", nexttoken, i);
-                }
-                seen[i] = true;
+
                 countMember(i);
                 if (nexttoken.id === ',') {
                     comma();
@@ -3322,9 +3485,9 @@ loop:   for (;;) {
 
             // Check for lonely setters if in the ES5 mode.
             if (option.es5) {
-                for (prop in acc) {
-                    if (acc.hasOwnProperty(prop) && acc[prop].setter && !acc[prop].getter) {
-                        warning("Setter is defined without getter.", acc[prop].setterToken);
+                for (var name in props) {
+                    if (is_own(props, name) && props[name].setter && !props[name].getter) {
+                        warning("Setter is defined without getter.", props[name].setterToken);
                     }
                 }
             }
@@ -3557,7 +3720,24 @@ loop:   for (;;) {
         return this;
     }).labelled = true;
 
-    reserve('with');
+    blockstmt('with', function () {
+        var t = nexttoken;
+        if (directive['use strict']) {
+            error("'with' is not allowed in strict mode.", token);
+        } else if (!option.withstmt) {
+            warning("Don't use 'with'.", token);
+        }
+
+        advance('(');
+        nonadjacent(this, t);
+        nospace();
+        expression(0);
+        advance(')', t);
+        nospace(prevtoken, token);
+        block(true, true);
+
+        return this;
+    });
 
     blockstmt('switch', function () {
         var t = nexttoken,
@@ -3988,7 +4168,10 @@ loop:   for (;;) {
 // The actual JSHINT function itself.
 
     var itself = function (s, o, g) {
-        var a, i, k;
+        var a, i, k, x,
+            optionKeys,
+            newOptionObj = {};
+
         JSHINT.errors = [];
         JSHINT.undefs = [];
         predefined = Object.create(standard);
@@ -4007,10 +4190,14 @@ loop:   for (;;) {
                     }
                 }
             }
-            option = o;
-        } else {
-            option = {};
+            optionKeys = Object.keys(o);
+            for (x = 0; x < optionKeys.length; x++) {
+                newOptionObj[optionKeys[x]] = o[optionKeys[x]];
+            }
         }
+
+        option = newOptionObj;
+
         option.indent = option.indent || 4;
         option.maxerr = option.maxerr || 50;
 
@@ -4043,10 +4230,22 @@ loop:   for (;;) {
         directive = {};
 
         prevtoken = token = nexttoken = syntax['(begin)'];
+
+        // Check options
+        for (var name in o) {
+            if (is_own(o, name)) {
+                checkOption(name, token);
+            }
+        }
+
         assume();
 
         // combine the passed globals after we've assumed all our options
         combine(predefined, g || {});
+
+        //reset values
+        comma.first = true;
+        quotmark = undefined;
 
         try {
             advance();
@@ -4065,7 +4264,57 @@ loop:   for (;;) {
 
                 statements();
             }
-            advance('(end)');
+            advance((nexttoken && nexttoken.value !== '.')  ? '(end)' : undefined);
+
+            var markDefined = function (name, context) {
+                do {
+                    if (typeof context[name] === 'string') {
+                        // JSHINT marks unused variables as 'unused' and
+                        // unused function declaration as 'unction'. This
+                        // code changes such instances back 'var' and
+                        // 'closure' so that the code in JSHINT.data()
+                        // doesn't think they're unused.
+
+                        if (context[name] === 'unused')
+                            context[name] = 'var';
+                        else if (context[name] === 'unction')
+                            context[name] = 'closure';
+
+                        return true;
+                    }
+
+                    context = context['(context)'];
+                } while (context);
+
+                return false;
+            };
+
+            var clearImplied = function (name, line) {
+                if (!implied[name])
+                    return;
+
+                var newImplied = [];
+                for (var i = 0; i < implied[name].length; i += 1) {
+                    if (implied[name][i] !== line)
+                        newImplied.push(implied[name][i]);
+                }
+
+                if (newImplied.length === 0)
+                    delete implied[name];
+                else
+                    implied[name] = newImplied;
+            };
+
+            // Check queued 'x is not defined' instances to see if they're still undefined.
+            for (i = 0; i < JSHINT.undefs.length; i += 1) {
+                k = JSHINT.undefs[i].slice(0);
+
+                if (markDefined(k[2].value, k[0])) {
+                    clearImplied(k[2].value, k[2].line);
+                } else {
+                    warning.apply(warning, k.slice(1));
+                }
+            }
         } catch (e) {
             if (e) {
                 var nt = nexttoken || {};
@@ -4075,16 +4324,6 @@ loop:   for (;;) {
                     line      : e.line || nt.line,
                     character : e.character || nt.from
                 }, null);
-            }
-        }
-
-        for (i = 0; i < JSHINT.undefs.length; i += 1) {
-            k = JSHINT.undefs[i].slice(0);
-            scope = k.shift();
-            a = k[2];
-
-            if (typeof scope[a] !== 'string' && typeof funct[a] !== 'string') {
-                warning.apply(warning, k);
             }
         }
 
@@ -4124,7 +4363,6 @@ loop:   for (;;) {
         if (globals.length > 0) {
             data.globals = globals;
         }
-
         for (i = 1; i < functions.length; i += 1) {
             f = functions[i];
             fu = {};
@@ -4304,7 +4542,6 @@ loop:   for (;;) {
     };
 
     itself.jshint = itself;
-    itself.edition = '2011-04-16';
 
     return itself;
 }());

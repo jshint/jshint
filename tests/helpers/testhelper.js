@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /**
  * Helper for JSHint-tests.
  * Export itself as function in setup.testhelper to
@@ -26,18 +25,20 @@
  *     options:        optional. the options for jshint
  */
 
+/*jshint node: true, eqnull: true*/
+
 var assert = require('assert'),
-    JSHINT = require('../jshint.js').JSHINT;
+    JSHINT = require('../../jshint.js').JSHINT;
 
 if (exports.setup === undefined || exports.setup === null) {
     exports.setup = {};
 }
 
-exports.setup.testRun = function (name){
+exports.setup.testRun = function (name) {
     var initCounter = 0, runCounter = 0, seq = 0, checked = [], definedErrors = [];
 
     var helperObj = {
-        addError: function(line, message, extras){
+        addError: function (line, message, extras) {
             definedErrors.push({
                 line: line,
                 message: message,
@@ -47,24 +48,24 @@ exports.setup.testRun = function (name){
             return helperObj;
         },
 
-        test: function(source, options, globals) {
+        test: function (source, options, globals) {
             var ret = !!JSHINT(source, options, globals);
-            var errors = JSHINT.errors.filter( function(er){
+            var errors = JSHINT.errors.filter(function (er) {
                 return er && er.id === "(error)";
-            } );
+            });
 
             if (errors.length === 0 && definedErrors.length === 0) {
                 return;
             }
 
             // filter all thrown errors
-            var undefinedErrors = errors.filter( function(er) {
-                return !definedErrors.some( function(def) {
+            var undefinedErrors = errors.filter(function (er) {
+                return !definedErrors.some(function (def) {
                     var result = def.line === er.line &&
                         def.message === er.reason;
 
                     if (!result) {
-                      return result;
+                        return result;
                     }
 
                     if (def.extras) {
@@ -79,27 +80,27 @@ exports.setup.testRun = function (name){
                         }
                     }
                     return result;
-                } );
-            } );
+                });
+            });
 
             // filter all defined errors
-            var unthrownErrors = definedErrors.filter( function(def) {
-                return !errors.some( function(er) {
+            var unthrownErrors = definedErrors.filter(function (def) {
+                return !errors.some(function (er) {
                     return def.line === er.line &&
                         def.message === er.reason;
-                } );
-            } );
+                });
+            });
 
             // elements that only differs in line number
-            var wrongLineNumbers = undefinedErrors.map( function(er) {
-                var lines = unthrownErrors.filter( function(def) {
+            var wrongLineNumbers = undefinedErrors.map(function (er) {
+                var lines = unthrownErrors.filter(function (def) {
                     return def.line !== er.line &&
                         def.message === er.reason;
-                } ).map( function(def) {
+                }).map(function (def) {
                     return def.line;
-                } );
+                });
 
-                if (lines.length){
+                if (lines.length) {
                     return {
                         line: er.line,
                         message: er.reason,
@@ -107,38 +108,38 @@ exports.setup.testRun = function (name){
                     };
                 }
                 return null;
-            } ).filter( function(er) {
+            }).filter(function (er) {
                 return !!er;
-            } );
+            });
 
             // remove undefined errors, if there is a definition with wrong line number
-            undefinedErrors = undefinedErrors.filter( function(er) {
-                return !wrongLineNumbers.some( function(def) {
+            undefinedErrors = undefinedErrors.filter(function (er) {
+                return !wrongLineNumbers.some(function (def) {
                     return def.message === er.reason;
                 });
-            } );
-            unthrownErrors = unthrownErrors.filter( function(er) {
-                return !wrongLineNumbers.some( function(def) {
+            });
+            unthrownErrors = unthrownErrors.filter(function (er) {
+                return !wrongLineNumbers.some(function (def) {
                     return def.message === er.message;
                 });
-            } );
+            });
 
             assert.ok(
                 undefinedErrors.length === 0 && unthrownErrors.length === 0 && wrongLineNumbers.length === 0,
 
                 (name == null ? "" : "\n      TestRun: [bold]{" + name + "}") +
-                unthrownErrors.map( function(el, idx) {
+                unthrownErrors.map(function (el, idx) {
                     return (idx === 0 ? "\n      [yellow]{Errors defined, but not thrown by JSHINT}\n" : "") +
                         "          [bold]{Line " + el.line + ", Char " + el.character + "} " + el.message;
-                } ).join("\n") +
-                undefinedErrors.map( function(el, idx) {
+                }).join("\n") +
+                undefinedErrors.map(function (el, idx) {
                     return (idx === 0 ? "\n      [yellow]{Errors thrown by JSHINT, but not defined in test run}\n" : "") +
                         "          [bold]{Line " + el.line + ", Char " + el.character + "} " + el.reason;
-                } ).join("\n") +
-                wrongLineNumbers.map( function(el, idx) {
+                }).join("\n") +
+                wrongLineNumbers.map(function (el, idx) {
                     return (idx === 0 ? "\n      [yellow]{Errors with wrong line number}\n" : "") +
                         "          [bold]{Line " + el.line + "} " + el.message + " [red]{not in line(s)} [bold]{" + el.definedIn.join(", ") + "}";
-                } ).join("\n") + "\n"
+                }).join("\n") + "\n"
             );
         }
     };

@@ -6,9 +6,11 @@
 
 /*jshint boss: true, laxbreak: true, node: true, maxlen:100 */
 
-var JSHINT  = require('../jshint.js').JSHINT,
+var JSHINT  = require('../../jshint.js').JSHINT,
     fs      = require('fs'),
-    TestRun = require("./testhelper").setup.testRun;
+    TestRun = require('../helpers/testhelper').setup.testRun,
+    fixture = require('../helpers/fixture').fixture,
+    assert  = require('assert');
 
 /**
  * Option `shadow` allows you to re-define variables later in code.
@@ -70,11 +72,12 @@ exports.latedef = function () {
         .addError(2, "'fn' was used before it was defined.")
         .addError(6, "'fn1' was used before it was defined.")
         .addError(10, "'vr' was used before it was defined.")
+        .addError(18, "Inner functions should be listed at the top of the outer function.")
         .test(src, { latedef: true });
 };
 
-exports.latedefwundef = function () {
-    var src = fs.readFileSync(__dirname + '/fixtures/latedefundef.js', 'utf8');
+exports['combination of latedef and undef'] = function () {
+    var src = fixture('latedefundef.js');
 
     // Assures that when `undef` is set to true, it'll report undefined variables
     // and late definitions won't be reported as `latedef` is set to false.
@@ -118,6 +121,24 @@ exports.undefwstrict = function () {
     TestRun().test(src, { undef: false });
 };
 
+// Regression test for GH-431
+exports["implied and unused should respect hoisting"] = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/gh431.js', 'utf8');
+    TestRun()
+        .addError(14, "'fun4' is not defined.")
+        .test(src, { undef: true });
+
+    JSHINT.flag = true;
+    JSHINT(src, { undef: true });
+    var report = JSHINT.data();
+
+    assert.eql(report.implieds.length, 1);
+    assert.eql(report.implieds[0].name, 'fun4');
+    assert.eql(report.implieds[0].line, [14]);
+
+    assert.eql(report.unused.length, 2);
+};
+
 /**
  * The `proto` and `iterator` options allow you to prohibit the use of the
  * special `__proto__` and `__iterator__` properties, respectively.
@@ -146,6 +167,27 @@ exports.testProtoAndIterator = function () {
     // options are on
     TestRun("source").test(source, { proto: true, iterator: true });
     TestRun("json").test(json, { proto: true, iterator: true });
+};
+
+/**
+ * The `camelcase` option allows you to enforce use of the camel case convention.
+ */
+exports.testCamelcase = function () {
+    var source = fs.readFileSync(__dirname + '/fixtures/camelcase.js', 'utf8');
+
+    // By default, tolerate arbitrary identifiers
+    TestRun()
+        .test(source);
+
+    // Require identifiers in camel case if camelcase is true
+    TestRun()
+        .addError(5, "Identifier 'Foo_bar' is not in camel case.")
+        .addError(5, "Identifier 'test_me' is not in camel case.")
+        .addError(6, "Identifier 'test_me' is not in camel case.")
+        .addError(6, "Identifier 'test_me' is not in camel case.")
+        .addError(13, "Identifier 'test_1' is not in camel case.")
+        .test(source, { camelcase: true });
+
 };
 
 /**
@@ -308,7 +350,7 @@ exports.expr = function () {
     }
 };
 
-/** Option `undef` requires you to always define variables you use */
+// Option `undef` requires you to always define variables you use.
 exports.undef = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/undef.js', 'utf8');
 
@@ -318,8 +360,25 @@ exports.undef = function () {
     // Make sure it fails when undef is true
     TestRun()
         .addError(1, "'undef' is not defined.")
-        .addError(6, "'localUndef' is not defined.")
+        .addError(5, "'undef' is not defined.")
+        .addError(6, "'undef' is not defined.")
+        .addError(8, "'undef' is not defined.")
+        .addError(9, "'undef' is not defined.")
+        .addError(13, "'localUndef' is not defined.")
+        .addError(18, "'localUndef' is not defined.")
+        .addError(19, "'localUndef' is not defined.")
+        .addError(21, "'localUndef' is not defined.")
+        .addError(22, "'localUndef' is not defined.")
         .test(src, { undef: true });
+};
+
+// Regression test for `undef` to make sure that ...
+exports['undef in a function scope'] = function () {
+    var src = fixture('undef_func.js');
+
+    // Make sure that the lint is clean with and without undef.
+    TestRun().test(src);
+    TestRun().test(src, { undef: true });
 };
 
 /** Option `scripturl` allows the use of javascript-type URLs */
@@ -568,6 +627,8 @@ exports.immed = function () {
         .addError(7, "Move the invocation into the parens that contain the function.")
         .addError(13, "Do not wrap function literals in parens unless they are to " +
                       "be immediately invoked.")
+        .addError(19, "Move the invocation into the parens that contain the function.")
+        .addError(23, "Move the invocation into the parens that contain the function.")
         .test(src, { immed: true });
 };
 
@@ -763,6 +824,7 @@ exports.laxbreak = function () {
 
     TestRun()
         .addError(2, "Bad line breaking before ','.")
+        .addError(3, "Comma warnings can be turned off with 'laxcomma'")
         .addError(12, "Bad line breaking before ','.")
         .test(src);
 
@@ -817,8 +879,8 @@ exports.trailing = function () {
     TestRun().test(src);
 
     TestRun()
-        .addError(8, "Trailing whitespace.")
-        .addError(9, "Trailing whitespace.")
+        .addError(8, "Trailing whitespace.", { character: 16 })
+        .addError(9, "Trailing whitespace.", { character: 6 })
         .test(src, { trailing: true });
 };
 
@@ -931,6 +993,7 @@ exports.strings = function () {
         .addError(9, "Unclosed string.")
         .addError(10, "Unclosed string.")
         .addError(15, "Unclosed string.")
+        .addError(23, "Octal literals are not allowed in strict mode.")
         .test(src, { multistr: true });
 
     TestRun()
@@ -940,7 +1003,39 @@ exports.strings = function () {
         .addError(10, "Unclosed string.")
         .addError(14, "Bad escapement of EOL. Use option multistr if needed.")
         .addError(15, "Unclosed string.")
+        .addError(23, "Octal literals are not allowed in strict mode.")
         .test(src);
+};
+
+/*
+ * Test the `quotmark` option
+ *   quotmark    quotation mark or true (=ensure consistency)
+ */
+exports.quotes = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/quotes.js', 'utf8');
+    var src2 = fs.readFileSync(__dirname + '/fixtures/quotes2.js', 'utf8');
+
+    TestRun()
+        .test(src);
+
+    TestRun()
+        .addError(3, "Mixed double and single quotes.")
+        .test(src, { quotmark: true });
+
+    TestRun()
+        .addError(3, "Strings must use singlequote.")
+        .test(src, { quotmark: 'single' });
+
+    TestRun()
+        .addError(2, "Strings must use doublequote.")
+        .test(src, { quotmark: 'double' });
+
+    // test multiple runs (must have the same result)
+    var run = TestRun();
+    run.addError(3, "Mixed double and single quotes.")
+        .test(src, { quotmark: true });
+    run.addError(3, "Mixed double and single quotes.")
+        .test(src2, { quotmark: true });
 };
 
 exports.scope = function () {
@@ -951,8 +1046,6 @@ exports.scope = function () {
         .addError(12, "'x' used out of scope.")
         .addError(20, "'aa' used out of scope.")
         .addError(27, "'bb' used out of scope.")
-        .addError(32, "'bb' is not defined.")
-        .addError(36, "'bb' is not defined.")
         .addError(37, "'cc' is not defined.")
         .addError(42, "'bb' is not defined.")
         .test(src);
@@ -1008,4 +1101,57 @@ exports.smarttabs = function () {
     TestRun()
         .addError(5, "Mixed spaces and tabs.")
         .test(src, { smarttabs: true });
+};
+
+/*
+ * Tests the `laxcomma` option
+ */
+exports.laxcomma = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/laxcomma.js', 'utf8');
+
+    // All errors.
+    TestRun()
+        .addError(1, "Bad line breaking before ','.")
+        .addError(2, "Comma warnings can be turned off with 'laxcomma'")
+        .addError(2, "Bad line breaking before ','.")
+        .addError(6, "Bad line breaking before ','.")
+        .addError(10, "Bad line breaking before '&&'.")
+        .addError(15, "Bad line breaking before '?'.")
+        .test(src);
+
+    // Allows bad line breaking, but not on commas.
+    TestRun()
+        .addError(1, "Bad line breaking before ','.")
+        .addError(2, "Comma warnings can be turned off with 'laxcomma'")
+        .addError(2, "Bad line breaking before ','.")
+        .addError(6, "Bad line breaking before ','.")
+        .test(src, { laxbreak: true });
+
+    // Allows comma-first style but warns on bad line breaking
+    TestRun()
+        .addError(10, "Bad line breaking before '&&'.")
+        .addError(15, "Bad line breaking before '?'.")
+        .test(src, { laxcomma: true });
+
+    // No errors if both laxbreak and laxcomma are turned on
+    TestRun().test(src, { laxbreak: true, laxcomma: true });
+};
+
+/*
+ * Tests the `browser` option
+ */
+exports.browser = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/browser.js', 'utf8');
+
+	TestRun()
+		.addError(2, "'atob' is not defined.")
+		.addError(3, "'btoa' is not defined.")
+		.addError(6, "'DOMParser' is not defined.")
+		.addError(10, "'XMLSerializer' is not defined.")
+		.addError(14, "'NodeFilter' is not defined.")
+		.addError(15, "'Node' is not defined.")
+		.test(src, { undef: true });
+
+	TestRun().test(src, { browser: true, undef: true });
+
 };
