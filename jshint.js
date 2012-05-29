@@ -1044,12 +1044,12 @@ var JSHINT = (function () {
     }
 
     // Tracking of "internal" scripts, like eval containing a static string
-    function internal(m, s) {
+    function addInternalSrc(elem, src) {
         var i;
         i = {
             id: '(internal)',
-            elem: m,
-            value: s
+            elem: elem,
+            value: src
         };
         JSHINT.internals.push(i);
         return i;
@@ -3155,14 +3155,14 @@ loop:   for (;;) {
                         left.value === 'execScript') {
                     warning("eval is evil.", left);
                     if (p[0] && p[0].id === '(string)') {
-                        internal(left, p[0].value);
+                        addInternalSrc(left, p[0].value);
                     }
                 } else if (p[0] && p[0].id === '(string)' &&
                        (left.value === 'setTimeout' ||
                         left.value === 'setInterval')) {
                     warning(
     "Implied eval is evil. Pass a function instead of a string.", left);
-                    internal(left, p[0].value);
+                    addInternalSrc(left, p[0].value);
 
                 // window.setTimeout/setInterval
                 } else if (p[0] && p[0].id === '(string)' &&
@@ -3172,7 +3172,7 @@ loop:   for (;;) {
                         left.right === 'setInterval')) {
                     warning(
     "Implied eval is evil. Pass a function instead of a string.", left);
-                    internal(left, p[0].value);
+                    addInternalSrc(left, p[0].value);
                 }
             }
             if (!left.identifier && left.id !== '.' && left.id !== '[' &&
