@@ -208,7 +208,7 @@
  hasOwnProperty, help, history, i, id, identifier, immed, implieds, importPackage, include,
  indent, indexOf, init, ins, instanceOf, isAlpha, isApplicationRunning, isArray,
  isDigit, isFinite, isNaN, iterator, java, join, jshint,
- JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastsemic, laxbreak, laxcomma,
+ JSHINT, json, jquery, jQuery, keys, knockout, ko, label, labelled, last, lastsemic, laxbreak, laxcomma,
  latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
  log, loopfunc, m, match, maxerr, maxlen, member,message, meta, module, moveBy,
  moveTo, mootools, multistr, name, navigator, new, newcap, noarg, node, noempty, nomen,
@@ -280,6 +280,7 @@ var JSHINT = (function () {
             immed       : true, // if immediate invocations must be wrapped in parens
             iterator    : true, // if the `__iterator__` property should be allowed
             jquery      : true, // if jQuery globals should be predefined
+            knockout    : true, // if knockout globals should be predefined
             lastsemic   : true, // if semicolons may be ommitted for the trailing
                                 // statements inside of a one-line blocks.
             latedef     : true, // if the use before definition should not be tolerated
@@ -565,6 +566,10 @@ var JSHINT = (function () {
         jquery = {
             '$'    : false,
             jQuery : false
+        },
+        
+        knockout {
+            ko     : false
         },
 
         lines,
@@ -965,6 +970,10 @@ var JSHINT = (function () {
 
         if (option.jquery) {
             combine(predefined, jquery);
+        }
+        
+        if (option.knockout) {
+            combine(predefined, knockout);
         }
 
         if (option.mootools) {
