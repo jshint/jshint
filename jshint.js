@@ -568,7 +568,7 @@ var JSHINT = (function () {
             jQuery : false
         },
         
-        knockout {
+        knockout = {
             ko     : false
         },
 
