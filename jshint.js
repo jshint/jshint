@@ -153,8 +153,8 @@
 */
 
 /*members "\b", "\t", "\n", "\f", "\r", "!=", "!==", "\"", "%", "(begin)",
- "(breakage)", "(context)", "(error)", "(global)", "(identifier)", "(last)",
- "(line)", "(loopage)", "(name)", "(onevar)", "(params)", "(scope)",
+ "(breakage)", "(character)", "(context)", "(error)", "(global)", "(identifier)", "(last)",
+ "(lastcharacter)", "(line)", "(loopage)", "(name)", "(onevar)", "(params)", "(scope)",
  "(statement)", "(verb)", "*", "+", "++", "-", "--", "\/", "<", "<=", "==",
  "===", ">", ">=", $, $$, $A, $F, $H, $R, $break, $continue, $w, Abstract, Ajax,
  __filename, __dirname, ActiveXObject, Array, ArrayBuffer, ArrayBufferView, Audio,
@@ -205,8 +205,8 @@
  hasOwnProperty, help, history, i, id, identifier, immed, implieds, importPackage, include,
  indent, indexOf, init, ins, instanceOf, isAlpha, isApplicationRunning, isArray,
  isDigit, isFinite, isNaN, iterator, java, join, jshint,
- JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastsemic, laxbreak, laxcomma,
- latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
+ JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastcharacter, lastsemic, laxbreak, 
+ laxcomma, latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
  log, loopfunc, m, match, maxerr, maxlen, member,message, meta, module, moveBy,
  moveTo, mootools, multistr, name, navigator, new, newcap, noarg, node, noempty, nomen,
  nonew, nonstandard, nud, onbeforeunload, onblur, onerror, onevar, onecase, onfocus,
@@ -3340,6 +3340,7 @@ loop:   for (;;) {
         funct = {
             '(name)'     : i || '"' + anonname + '"',
             '(line)'     : nexttoken.line,
+            '(character)': nexttoken.character,
             '(context)'  : funct,
             '(breakage)' : 0,
             '(loopage)'  : 0,
@@ -3358,6 +3359,7 @@ loop:   for (;;) {
         scope = oldScope;
         option = oldOption;
         funct['(last)'] = token.line;
+        funct['(lastcharacter)'] = token.character;
         funct = funct['(context)'];
         return f;
     }
@@ -4392,7 +4394,9 @@ loop:   for (;;) {
             fu.name = f['(name)'];
             fu.param = f['(params)'];
             fu.line = f['(line)'];
+            fu.character = f['(character)'];
             fu.last = f['(last)'];
+            fu.lastcharacter = f['(lastcharacter)'];
             data.functions.push(fu);
         }
 
