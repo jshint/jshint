@@ -96,7 +96,9 @@
      functions: [
          name: STRING,
          line: NUMBER,
+         character: NUMBER,
          last: NUMBER,
+         lastcharacter: NUMBER,
          param: [
              STRING
          ],
