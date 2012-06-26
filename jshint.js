@@ -197,8 +197,8 @@
  VBArray, WSH, WScript, XDomainRequest, Web, Window, XMLDOM, XMLHttpRequest, XMLSerializer,
  XPathEvaluator, XPathException, XPathExpression, XPathNamespace, XPathNSResolver, XPathResult,
  "\\", a, addEventListener, address, alert, apply, applicationCache, arguments, arity, asi, atob,
- b, basic, basicToken, bitwise, block, blur, boolOptions, boss, browser, btoa, c, call, callee,
- caller, camelcase, cases, charAt, charCodeAt, character, clearInterval, clearTimeout,
+ b, basic, basicToken, bitwise, blacklist, block, blur, boolOptions, boss, browser, btoa, c, call,
+ callee, caller, camelcase, cases, charAt, charCodeAt, character, clearInterval, clearTimeout,
  close, closed, closure, comment, condition, confirm, console, constructor,
  content, couch, create, css, curly, d, data, datalist, dd, debug, decodeURI,
  decodeURIComponent, defaultStatus, defineClass, deserialize, devel, document,
@@ -334,6 +334,7 @@ var JSHINT = (function () {
         // These are the JSHint options that can take any value
         // (we use this object to detect invalid options)
         valOptions = {
+            blacklist: false,
             maxlen: false,
             indent: false,
             maxerr: false,
@@ -925,7 +926,7 @@ var JSHINT = (function () {
     function combine(t, o) {
         var n;
         for (n in o) {
-            if (is_own(o, n)) {
+            if (is_own(o, n) && !is_own(JSHINT.blacklist, n)) {
                 t[n] = o[n];
             }
         }
@@ -4199,6 +4200,7 @@ loop:   for (;;) {
                 newOptionObj[optionKeys[x]] = o[optionKeys[x]];
             }
         }
+        JSHINT.blacklist = newOptionObj.blacklist || {};
 
         option = newOptionObj;
 
