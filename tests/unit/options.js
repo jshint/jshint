@@ -1158,6 +1158,15 @@ exports.browser = function () {
 
 exports.blacklist = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/browser.js', 'utf8');
+    var code = [
+        '/*jshint browser: true */',
+        '/*blacklist event btoa foo */',
+        '/*global foo bar */',
+        'var a = event.hello();',
+        'var c = foo();',
+        'var b = btoa(1);',
+        'var d = bar();'
+    ];
 
     // make sure everything is ok
     TestRun().test(src, { undef: true, browser: true });
@@ -1174,4 +1183,10 @@ exports.blacklist = function () {
                 'NodeFilter': 'NodeFilter'
             }
         });
+
+    TestRun()
+        .addError(4, "'event' is not defined.")
+        .addError(5, "'foo' is not defined.")
+        .addError(6, "'btoa' is not defined.")
+        .test(code, { undef: true });
 };
