@@ -361,12 +361,16 @@ exports.withStatement = function () {
 exports.functionCharaterLocation = function () {
     var i;
     var src = fs.readFileSync(__dirname + "/fixtures/nestedFunctions.js", "utf8");
-    var locations = JSON.parse(fs.readFileSync(__dirname + "/fixtures/nestedFunctions-locations.js", "utf8"));
+    var locations = JSON.parse(
+        fs.readFileSync(
+            __dirname + "/fixtures/nestedFunctions-locations.js", "utf8"
+        )
+    );
     JSHINT(src);
     var report = JSHINT.data().functions;
-    
+
     assert.equal(locations.length, report.length);
-    for (i = 0; i < locations.length; i++) {
+    for (i = 0; i < locations.length; i += 1) {
         assert.equal(locations[i].name, report[i].name);
         assert.equal(locations[i].line, report[i].line);
         assert.equal(locations[i].character, report[i].character);
