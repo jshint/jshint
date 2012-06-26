@@ -1155,3 +1155,23 @@ exports.browser = function () {
 	TestRun().test(src, { browser: true, undef: true });
 
 };
+
+exports.blacklist = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/browser.js', 'utf8');
+
+    // make sure everything is ok
+    TestRun().test(src, { undef: true, browser: true });
+
+    // disallow Node and NodeFilter
+    TestRun()
+        .addError(14, "'NodeFilter' is not defined.")
+        .addError(15, "'Node' is not defined.")
+        .test(src, {
+            undef: true,
+            browser: true,
+            blacklist: {
+                'Node': 'Node',
+                'NodeFilter': 'NodeFilter'
+            }
+        });
+};
