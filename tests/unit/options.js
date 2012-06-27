@@ -1155,3 +1155,34 @@ exports.browser = function () {
 	TestRun().test(src, { browser: true, undef: true });
 
 };
+
+exports.blacklist = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/browser.js', 'utf8');
+    var code = [
+        '/*jshint browser: true */',
+        '/*global -event bar -btoa */',
+        'var a = event.hello();',
+        'var c = foo();',
+        'var b = btoa(1);',
+        'var d = bar();'
+    ];
+
+    // make sure everything is ok
+    TestRun().test(src, { undef: true, browser: true });
+
+    // disallow Node and NodeFilter
+//    TestRun()
+//        .addError(14, "'NodeFilter' is not defined.")
+//        .addError(15, "'Node' is not defined.")
+//        .test(src, {
+//            undef: true,
+//            browser: true,
+//            predef: ['-Node', '-NodeFilter']
+//        });
+
+    TestRun()
+        .addError(3, "'event' is not defined.")
+        .addError(4, "'foo' is not defined.")
+        .addError(5, "'btoa' is not defined.")
+        .test(code, { undef: true });
+};
