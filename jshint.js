@@ -1066,7 +1066,7 @@ var JSHINT = (function () {
             var at,
                 tw; // trailing whitespace check
 
-            if (line >= lines.length)
+            if (lines != null && line >= lines.length)
                 return false;
 
             character = 1;
@@ -1156,6 +1156,10 @@ var JSHINT = (function () {
         // Public lex methods
         return {
             init: function (source) {
+                if (source == null) {
+                    return;
+                }
+                
                 if (typeof source === 'string') {
                     lines = source
                         .replace(/\r\n/g, '\n')
