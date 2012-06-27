@@ -4202,16 +4202,18 @@ loop:   for (;;) {
         if (o) {
             a = o.predef;
             if (a) {
-                if (Array.isArray(a)) {
-                    for (i = 0; i < a.length; i += 1) {
-                        predefined[a[i]] = true;
-                    }
-                } else if (typeof a === 'object') {
-                    k = Object.keys(a);
-                    for (i = 0; i < k.length; i += 1) {
-                        predefined[k[i]] = !!a[k[i]];
-                    }
+                if (!Array.isArray(a) && typeof a === 'object') {
+                    a = Object.keys(a);
                 }
+                a.forEach(function (item) {
+                    var slice;
+                    if (item[0] === '-') {
+                        slice = item.slice(1);
+                        JSHINT.blacklist[slice] = slice;
+                    } else {
+                        predefined[item] = true;
+                    }
+                });
             }
             optionKeys = Object.keys(o);
             for (x = 0; x < optionKeys.length; x++) {

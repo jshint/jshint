@@ -1170,15 +1170,23 @@ exports.blacklist = function () {
     // make sure everything is ok
     TestRun().test(src, { undef: true, browser: true });
 
-    // disallow Node and NodeFilter
-//    TestRun()
-//        .addError(14, "'NodeFilter' is not defined.")
-//        .addError(15, "'Node' is not defined.")
-//        .test(src, {
-//            undef: true,
-//            browser: true,
-//            predef: ['-Node', '-NodeFilter']
-//        });
+    // disallow Node in a predef Object
+    TestRun()
+        .addError(15, "'Node' is not defined.")
+        .test(src, {
+            undef: true,
+            browser: true,
+            predef: { '-Node': false }
+        });
+    // disallow Node and NodeFilter in a predef Array
+    TestRun()
+        .addError(14, "'NodeFilter' is not defined.")
+        .addError(15, "'Node' is not defined.")
+        .test(src, {
+            undef: true,
+            browser: true,
+            predef: ['-Node', '-NodeFilter']
+        });
 
     TestRun()
         .addError(3, "'event' is not defined.")
