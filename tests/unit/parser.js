@@ -6,6 +6,7 @@
 
 var JSHINT  = require('../../jshint.js').JSHINT,
     fs      = require('fs'),
+    assert  = require('assert'),
     TestRun = require("../helpers/testhelper").setup.testRun;
 
 exports.unsafe = function () {
@@ -358,4 +359,25 @@ exports.withStatement = function () {
         .addError(13, "Missing space after ')'.")
         .addError(13, "Unexpected space after '2'.")
         .test(src, {white: true, withstmt: true});
+};
+
+exports.functionCharaterLocation = function () {
+    var i;
+    var src = fs.readFileSync(__dirname + "/fixtures/nestedFunctions.js", "utf8");
+    var locations = JSON.parse(
+        fs.readFileSync(
+            __dirname + "/fixtures/nestedFunctions-locations.js", "utf8"
+        )
+    );
+    JSHINT(src);
+    var report = JSHINT.data().functions;
+
+    assert.equal(locations.length, report.length);
+    for (i = 0; i < locations.length; i += 1) {
+        assert.equal(locations[i].name, report[i].name);
+        assert.equal(locations[i].line, report[i].line);
+        assert.equal(locations[i].character, report[i].character);
+        assert.equal(locations[i].last, report[i].last);
+        assert.equal(locations[i].lastcharacter, report[i].lastcharacter);
+    }
 };
