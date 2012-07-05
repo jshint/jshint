@@ -183,7 +183,7 @@
  HtmlTable, HTMLTableCaptionElement, HTMLTableCellElement, HTMLTableColElement,
  HTMLTableElement, HTMLTableRowElement, HTMLTableSectionElement,
  HTMLTextAreaElement, HTMLTitleElement, HTMLUListElement, HTMLVideoElement,
- Iframe, IframeShim, Image, Int16Array, Int32Array, Int8Array,
+ Iframe, IframeShim, Image, importScripts, Int16Array, Int32Array, Int8Array,
  Insertion, InputValidator, JSON, Keyboard, Locale, LN10, LN2, LOG10E, LOG2E,
  MAX_VALUE, MIN_VALUE, Mask, Math, MenuItem, MessageChannel, MessageEvent, MessagePort,
  MoveAnimation, MooTools, Native, NEGATIVE_INFINITY, Node, NodeFilter, Number, Object, ObjectRange,
@@ -210,22 +210,23 @@
  hasOwnProperty, help, history, i, id, identifier, immed, implieds, importPackage, include,
  indent, indexOf, init, ins, instanceOf, isAlpha, isApplicationRunning, isArray,
  isDigit, isFinite, isNaN, iterator, java, join, jshint,
- JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastcharacter, lastsemic, laxbreak, 
+ JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastcharacter, lastsemic, laxbreak,
  laxcomma, latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
  log, loopfunc, m, match, maxerr, maxlen, member,message, meta, module, moveBy,
  moveTo, mootools, multistr, name, navigator, new, newcap, noarg, node, noempty, nomen,
  nonew, nonstandard, nud, onbeforeunload, onblur, onerror, onevar, onecase, onfocus,
  onload, onresize, onunload, open, openDatabase, openURL, opener, opera, options, outer, param,
- parent, parseFloat, parseInt, passfail, plusplus, predef, print, process, prompt,
+ parent, parseFloat, parseInt, passfail, plusplus, postMessage, predef, print, process, prompt,
  proto, prototype, prototypejs, provides, push, quit, quotmark, range, raw, reach, reason, regexp,
  readFile, readUrl, regexdash, removeEventListener, replace, report, require,
  reserved, resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
- runCommand, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal,
+ runCommand, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal, self,
  send, serialize, sessionStorage, setInterval, setTimeout, setter, setterToken, shift, slice,
  smarttabs, sort, spawn, split, stack, status, start, strict, sub, substr, supernew, shadow,
  supplant, sum, sync, test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing,
  type, typeOf, Uint16Array, Uint32Array, Uint8Array, undef, undefs, unused, urls, validthis,
- value, valueOf, var, vars, version, WebSocket, withstmt, white, window, windows, Worker, wsh*/
+ value, valueOf, var, vars, version, WebSocket, withstmt, white, window, windows, Worker, worker,
+ wsh*/
 
 /*global exports: false */
 
@@ -327,6 +328,7 @@ var JSHINT = (function () {
                                 // This is a function scoped option only.
             withstmt    : true, // if with statements should be allowed
             white       : true, // if strict whitespace rules apply
+            worker      : true, // if Web Worker script symbols should be allowed
             wsh         : true  // if the Windows Scripting Host environment globals
                                 // should be predefined
         },
@@ -775,6 +777,12 @@ var JSHINT = (function () {
         useESNextSyntax,
         warnings,
 
+        worker = {
+            importScripts       : true,
+            postMessage         : true,
+            self                : true
+        },
+
         wsh = {
             ActiveXObject             : true,
             Enumerator                : true,
@@ -971,6 +979,10 @@ var JSHINT = (function () {
 
         if (option.mootools) {
             combine(predefined, mootools);
+        }
+
+        if (option.worker) {
+            combine(predefined, worker);
         }
 
         if (option.wsh) {

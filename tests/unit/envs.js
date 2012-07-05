@@ -565,3 +565,14 @@ exports.standard = function () {
 
     assert.globalsKnown(globals); // You don't need any option to recognize standard globals
 };
+
+exports.worker = function () {
+    var globals = [
+        'importScripts'
+      , 'postMessage'
+      , 'self'
+    ];
+
+    assert.globalsImplied(globals);
+    assert.globalsKnown(globals, { worker: true });
+};
