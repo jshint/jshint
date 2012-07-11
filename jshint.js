@@ -52,8 +52,8 @@
  JSHINT.errors is an array of objects containing these members:
 
  {
-     line      : The line (relative to 0) at which the lint was found
-     character : The character (relative to 0) at which the lint was found
+     line      : The line (relative to 1) at which the lint was found
+     character : The character (relative to 1) at which the lint was found
      reason    : The problem
      evidence  : The text line in which the problem occurred
      raw       : The raw message before the details were inserted
@@ -183,7 +183,8 @@
  Iframe, IframeShim, Image, importScripts, Int16Array, Int32Array, Int8Array,
  Insertion, InputValidator, JSON, Keyboard, Locale, LN10, LN2, LOG10E, LOG2E,
  MAX_VALUE, MIN_VALUE, Mask, Math, MenuItem, MessageChannel, MessageEvent, MessagePort,
- MoveAnimation, MooTools, Native, NEGATIVE_INFINITY, Node, NodeFilter, Number, Object, ObjectRange,
+ MoveAnimation, MooTools, MutationObserver, Native, NEGATIVE_INFINITY, Node, NodeFilter,
+ Number, Object, ObjectRange,
  Option, Options, OverText, PI, POSITIVE_INFINITY, PeriodicalExecuter, Point, Position, Prototype,
  RangeError, Rectangle, ReferenceError, RegExp, ResizeAnimation, Request, RotateAnimation,
  SQRT1_2, SQRT2, ScrollBar, ScriptEngine, ScriptEngineBuildVersion,
@@ -460,6 +461,7 @@ var JSHINT = (function () {
             MessagePort              :  false,
             moveBy                   :  false,
             moveTo                   :  false,
+            MutationObserver         :  false,
             name                     :  false,
             Node                     :  false,
             NodeFilter               :  false,
@@ -4562,5 +4564,6 @@ loop:   for (;;) {
 }());
 
 // Make JSHINT a Node module, if possible.
-if (typeof exports === 'object' && exports)
+if (typeof exports === 'object' && exports){
     exports.JSHINT = JSHINT;
+}
