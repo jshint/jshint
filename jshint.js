@@ -4564,6 +4564,6 @@ loop:   for (;;) {
 }());
 
 // Make JSHINT a Node module, if possible.
-if (typeof exports === 'object' && exports){
+if (typeof exports === 'object' && exports) {
     exports.JSHINT = JSHINT;
 }
