@@ -296,6 +296,7 @@ exports.browser = function () {
           , 'MessagePort'
           , 'moveBy'
           , 'moveTo'
+          , 'MutationObserver'
           , 'name'
           , 'Node'
           , 'NodeFilter'

@@ -13,3 +13,6 @@ var dom_str = xs.serializeToString(dom);
 // node
 var filterAccept = NodeFilter.FILTER_ACCEPT;
 var elementNode = Node.ELEMENT_NODE;
+
+// MutationObserver
+var mutationObserver = new MutationObserver(/* callback */);
