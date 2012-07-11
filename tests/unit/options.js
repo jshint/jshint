@@ -1150,6 +1150,7 @@ exports.browser = function () {
 		.addError(10, "'XMLSerializer' is not defined.")
 		.addError(14, "'NodeFilter' is not defined.")
 		.addError(15, "'Node' is not defined.")
+		.addError(18, "'MutationObserver' is not defined.")
 		.test(src, { undef: true });
 
 	TestRun().test(src, { browser: true, undef: true });
