@@ -1156,3 +1156,62 @@ exports.browser = function () {
 	TestRun().test(src, { browser: true, undef: true });
 
 };
+
+/*
+ * Tests the `maxstatementsperfunction` option
+ */
+exports.maxstatementsperfunction = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/max-statements-per-function.js', 'utf8');
+
+    TestRun()
+        .addError(1, "Too many statements per function (8).")
+        .test(src, { maxstatementsperfunction: 7 });
+
+    TestRun()
+        .test(src, { maxstatementsperfunction: 8 });
+
+    TestRun()
+        .test(src, {});
+};
+
+/*
+ * Tests the `maxnestedblockdepthperfunction` option
+ */
+exports.maxnestedblockdepthperfunction = function () {
+    var fixture = '/fixtures/max-nested-block-depth-per-function.js';
+    var src = fs.readFileSync(__dirname + fixture, 'utf8');
+
+    TestRun()
+        .addError(5, "Blocks are nested too deeply (2).")
+        .addError(14, "Blocks are nested too deeply (2).")
+        .test(src, { maxnestedblockdepthperfunction: 1 });
+
+    TestRun()
+        .addError(9, "Blocks are nested too deeply (3).")
+        .test(src, { maxnestedblockdepthperfunction: 2 });
+
+    TestRun()
+        .test(src, { maxnestedblockdepthperfunction: 3 });
+
+    TestRun()
+        .test(src, {});
+};
+
+/*
+ * Tests the `maxparametersperfunction` option
+ */
+exports.maxparametersperfunction = function () {
+    var fixture = '/fixtures/max-parameters-per-function.js';
+    var src = fs.readFileSync(__dirname + fixture, 'utf8');
+
+    TestRun()
+        .addError(1, "Too many parameters per function (3).")
+        .test(src, { maxparametersperfunction: 2 });
+
+    TestRun()
+        .test(src, { maxparametersperfunction: 3 });
+
+
+    TestRun()
+        .test(src, {});
+};

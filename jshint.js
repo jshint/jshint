@@ -156,7 +156,8 @@
 
 /*members "\b", "\t", "\n", "\f", "\r", "!=", "!==", "\"", "%", "(begin)",
  "(breakage)", "(character)", "(context)", "(error)", "(global)", "(identifier)", "(last)",
- "(lastcharacter)", "(line)", "(loopage)", "(name)", "(onevar)", "(params)", "(scope)",
+ "(lastcharacter)", "(line)", "(loopage)", "(metrics)",
+ "(name)", "(onevar)", "(params)", "(scope)",
  "(statement)", "(verb)", "*", "+", "++", "-", "--", "\/", "<", "<=", "==",
  "===", ">", ">=", $, $$, $A, $F, $H, $R, $break, $continue, $w, Abstract, Ajax,
  __filename, __dirname, ActiveXObject, Array, ArrayBuffer, ArrayBufferView, Audio,
@@ -210,8 +211,11 @@
  isDigit, isFinite, isNaN, iterator, java, join, jshint,
  JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastcharacter, lastsemic, laxbreak,
  laxcomma, latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
- log, loopfunc, m, match, maxerr, maxlen, member,message, meta, module, moveBy,
- moveTo, mootools, multistr, name, navigator, new, newcap, noarg, node, noempty, nomen,
+ log, loopfunc, m, match, maxerr, maxlen, maxnestedblockdepthperfunction, maxstatementsperfunction,
+ maxparametersperfunction,
+ member,message, meta, module, moveBy,
+ moveTo, mootools, multistr, name, navigator,nestedBlockDepth,
+ new, newcap, noarg, node, noempty, nomen,
  nonew, nonstandard, nud, onbeforeunload, onblur, onerror, onevar, onecase, onfocus,
  onload, onresize, onunload, open, openDatabase, openURL, opener, opera, options, outer, param,
  parent, parseFloat, parseInt, passfail, plusplus, postMessage, predef, print, process, prompt,
@@ -220,10 +224,13 @@
  reserved, resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
  runCommand, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal, self,
  send, serialize, sessionStorage, setInterval, setTimeout, setter, setterToken, shift, slice,
- smarttabs, sort, spawn, split, stack, status, start, strict, sub, substr, supernew, shadow,
+ smarttabs, sort, spawn, split, stack, status, start,statementCount , strict, sub, substr,
+ supernew, shadow,
  supplant, sum, sync, test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing,
  type, typeOf, Uint16Array, Uint32Array, Uint8Array, undef, undefs, unused, urls, validthis,
- value, valueOf, var, vars, version, WebSocket, withstmt, white, window, windows, Worker, worker,
+ value, valueOf, var, vars, verifyMaxStatementsPerFunction, verifyMaxNestedBlockDepthPerFunction,
+ verifyMaxParametersPerFunction,
+ version, WebSocket, withstmt, white, window, windows, Worker, worker,
  wsh*/
 
 /*global exports: false */
@@ -338,7 +345,10 @@ var JSHINT = (function () {
             indent: false,
             maxerr: false,
             predef: false,
-            quotmark: false //'single'|'double'|true
+            quotmark: false, //'single'|'double'|true
+            maxstatementsperfunction: false, // int
+            maxnestedblockdepthperfunction: false, // int
+            maxparametersperfunction: false //int
         },
 
         // These are JSHint boolean options which are shared with JSLint
@@ -2660,6 +2670,10 @@ loop:   for (;;) {
         nonadjacent(token, nexttoken);
         t = nexttoken;
 
+        var metrics = funct['(metrics)'];
+        metrics.nestedBlockDepth += 1;
+        metrics.verifyMaxNestedBlockDepthPerFunction();
+
         if (nexttoken.id === '{') {
             advance('{');
             line = token.line;
@@ -2686,6 +2700,8 @@ loop:   for (;;) {
                 }
 
                 a = statements(line);
+
+                metrics.statementCount += a.length;
 
                 if (isfunc) {
                     directive = m;
@@ -2721,6 +2737,7 @@ loop:   for (;;) {
         if (ordinary && option.noempty && (!a || a.length === 0)) {
             warning("Empty block.");
         }
+        metrics.nestedBlockDepth -= 1;
         return a;
     }
 
@@ -3360,6 +3377,7 @@ loop:   for (;;) {
             '(context)'  : funct,
             '(breakage)' : 0,
             '(loopage)'  : 0,
+            '(metrics)'  : createMetrics(nexttoken),
             '(scope)'    : scope,
             '(statement)': statement
         };
@@ -3370,14 +3388,46 @@ loop:   for (;;) {
             addlabel(i, 'function');
         }
         funct['(params)'] = functionparams();
+        funct['(metrics)'].verifyMaxParametersPerFunction(funct['(params)']);
 
         block(false, false, true);
+
+        funct['(metrics)'].verifyMaxStatementsPerFunction();
+
         scope = oldScope;
         option = oldOption;
         funct['(last)'] = token.line;
         funct['(lastcharacter)'] = token.character;
         funct = funct['(context)'];
         return f;
+    }
+
+    function createMetrics(functionStartToken) {
+        return {
+            statementCount: 0,
+            nestedBlockDepth: -1,
+            verifyMaxStatementsPerFunction: function () {
+                if (option.maxstatementsperfunction &&
+                    this.statementCount > option.maxstatementsperfunction) {
+                    var message = "Too many statements per function (" + this.statementCount + ").";
+                    warning(message, functionStartToken);
+                }
+            },
+            verifyMaxParametersPerFunction: function (parameters) {
+                if (option.maxparametersperfunction &&
+                    parameters.length > option.maxparametersperfunction) {
+                    var message = "Too many parameters per function (" + parameters.length + ").";
+                    warning(message, functionStartToken);
+                }
+            },
+            verifyMaxNestedBlockDepthPerFunction: function () {
+                if (option.maxnestedblockdepthperfunction &&
+                    this.nestedBlockDepth === option.maxnestedblockdepthperfunction + 1) {
+                    var message = "Blocks are nested too deeply (" + this.nestedBlockDepth + ").";
+                    warning(message);
+                }
+            }
+        };
     }
 
 
@@ -4228,7 +4278,8 @@ loop:   for (;;) {
             '(name)': '(global)',
             '(scope)': scope,
             '(breakage)': 0,
-            '(loopage)': 0
+            '(loopage)': 0,
+            '(metrics)'  : createMetrics(nexttoken)
         };
         functions = [funct];
         urls = [];
