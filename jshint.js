@@ -202,7 +202,8 @@
  b, basic, basicToken, bitwise, block, blur, boolOptions, boss, browser, btoa, c, call, callee,
  caller, camelcase, cases, charAt, charCodeAt, character, clearInterval, clearTimeout,
  close, closed, closure, comment, condition, confirm, console, constructor,
- content, couch, create, css, curly, d, data, datalist, dd, debug, decodeURI,
+ content, couch, create, css, curly, cyclomaticComplexityCount,
+ d, data, datalist, dd, debug, decodeURI,
  decodeURIComponent, defaultStatus, defineClass, deserialize, devel, document,
  dojo, dijit, dojox, define, else, emit, encodeURI, encodeURIComponent,
  entityify, eqeq, eqeqeq, eqnull, errors, es5, escape, esnext, eval, event, evidence, evil,
@@ -215,7 +216,7 @@
  JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastcharacter, lastsemic, laxbreak,
  laxcomma, latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
  log, loopfunc, m, match, maxerr, maxlen, maxnestedblockdepthperfunction, maxstatementsperfunction,
- maxparametersperfunction,
+ maxparametersperfunction, maxcyclomaticcomplexitysperfunction
  member,message, meta, module, moveBy,
  moveTo, mootools, multistr, name, navigator,nestedBlockDepth,
  new, newcap, noarg, node, noempty, nomen,
@@ -227,12 +228,12 @@
  reserved, resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
  runCommand, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal, self,
  send, serialize, sessionStorage, setInterval, setTimeout, setter, setterToken, shift, slice,
- smarttabs, sort, spawn, split, stack, status, start,statementCount , strict, sub, substr,
- supernew, shadow,
+ smarttabs, sort, spawn, split, stack, status, start,statementCount,
+ strict, sub, substr,supernew, shadow,
  supplant, sum, sync, test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing,
  type, typeOf, Uint16Array, Uint32Array, Uint8Array, undef, undefs, unused, urls, validthis,
  value, valueOf, var, vars, verifyMaxStatementsPerFunction, verifyMaxNestedBlockDepthPerFunction,
- verifyMaxParametersPerFunction,
+ verifyMaxParametersPerFunction, verifyMaxCyclomaticComplexityPerFunction
  version, WebSocket, withstmt, white, window, windows, Worker, worker,
  wsh*/
 
@@ -351,7 +352,8 @@ var JSHINT = (function () {
             quotmark: false, //'single'|'double'|true
             maxstatementsperfunction: false, // int
             maxnestedblockdepthperfunction: false, // int
-            maxparametersperfunction: false //int
+            maxparametersperfunction: false, //int
+            maxcyclomaticcomplexitysperfunction: false //int
         },
 
         // These are JSHint boolean options which are shared with JSLint
@@ -3396,6 +3398,7 @@ loop:   for (;;) {
         block(false, false, true);
 
         funct['(metrics)'].verifyMaxStatementsPerFunction();
+        funct['(metrics)'].verifyMaxCyclomaticComplexityPerFunction();
 
         scope = oldScope;
         option = oldOption;
@@ -3409,6 +3412,7 @@ loop:   for (;;) {
         return {
             statementCount: 0,
             nestedBlockDepth: -1,
+            cyclomaticComplexityCount: 1,
             verifyMaxStatementsPerFunction: function () {
                 if (option.maxstatementsperfunction &&
                     this.statementCount > option.maxstatementsperfunction) {
@@ -3425,12 +3429,25 @@ loop:   for (;;) {
             },
             verifyMaxNestedBlockDepthPerFunction: function () {
                 if (option.maxnestedblockdepthperfunction &&
+                    this.nestedBlockDepth > 0 &&
                     this.nestedBlockDepth === option.maxnestedblockdepthperfunction + 1) {
                     var message = "Blocks are nested too deeply (" + this.nestedBlockDepth + ").";
                     warning(message);
                 }
+            },
+            verifyMaxCyclomaticComplexityPerFunction: function () {
+                var max = option.maxcyclomaticcomplexitysperfunction;
+                var cc = this.cyclomaticComplexityCount;
+                if (max && cc > max) {
+                    var message = "Cyclomatic complexity is to high per function (" + cc + ").";
+                    warning(message, functionStartToken);
+                }
             }
         };
+    }
+
+    function increaseCyclomaticComplexityCount() {
+        funct['(metrics)'].cyclomaticComplexityCount += 1;
     }
 
 
@@ -3707,6 +3724,7 @@ loop:   for (;;) {
 
     blockstmt('if', function () {
         var t = nexttoken;
+        increaseCyclomaticComplexityCount();
         advance('(');
         nonadjacent(this, t);
         nospace();
@@ -3737,6 +3755,7 @@ loop:   for (;;) {
 
         block(false);
         if (nexttoken.id === 'catch') {
+            increaseCyclomaticComplexityCount();
             advance('catch');
             nonadjacent(token, nexttoken);
             advance('(');
@@ -3770,6 +3789,7 @@ loop:   for (;;) {
         var t = nexttoken;
         funct['(breakage)'] += 1;
         funct['(loopage)'] += 1;
+        increaseCyclomaticComplexityCount();
         advance('(');
         nonadjacent(this, t);
         nospace();
@@ -3847,6 +3867,7 @@ loop:   for (;;) {
                 indentation(-option.indent);
                 advance('case');
                 this.cases.push(expression(20));
+                increaseCyclomaticComplexityCount();
                 g = true;
                 advance(':');
                 funct['(verb)'] = 'case';
@@ -3925,6 +3946,7 @@ loop:   for (;;) {
         var x = stmt('do', function () {
             funct['(breakage)'] += 1;
             funct['(loopage)'] += 1;
+            increaseCyclomaticComplexityCount();
             this.first = block(true);
             advance('while');
             var t = nexttoken;
@@ -3952,6 +3974,7 @@ loop:   for (;;) {
         var s, t = nexttoken;
         funct['(breakage)'] += 1;
         funct['(loopage)'] += 1;
+        increaseCyclomaticComplexityCount();
         advance('(');
         nonadjacent(this, t);
         nospace();
