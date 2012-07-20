@@ -1217,9 +1217,9 @@ exports.maxparametersperfunction = function () {
 };
 
 /*
- * Tests the `maxcyclomaticcomplexitysperfunction` option
+ * Tests the `maxcyclomaticcomplexityperfunction` option
  */
-exports.maxcyclomaticcomplexitysperfunction = function () {
+exports.maxcyclomaticcomplexityperfunction = function () {
     var fixture = '/fixtures/max-cyclomatic-complexity-per-function.js';
     var src = fs.readFileSync(__dirname + fixture, 'utf8');
 
@@ -1228,10 +1228,10 @@ exports.maxcyclomaticcomplexitysperfunction = function () {
         .addError(15, "Cyclomatic complexity is to high per function (2).")
         .addError(25, "Cyclomatic complexity is to high per function (2).")
         .addError(47, "Cyclomatic complexity is to high per function (8).")
-        .test(src, { maxcyclomaticcomplexitysperfunction: 1 });
+        .test(src, { maxcyclomaticcomplexityperfunction: 1 });
 
     TestRun()
-        .test(src, { maxcyclomaticcomplexitysperfunction: 8 });
+        .test(src, { maxcyclomaticcomplexityperfunction: 8 });
 
 
     TestRun()

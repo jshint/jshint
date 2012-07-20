@@ -213,7 +213,7 @@
  JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastcharacter, lastsemic, laxbreak,
  laxcomma, latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
  log, loopfunc, m, match, maxerr, maxlen, maxnestedblockdepthperfunction, maxstatementsperfunction,
- maxparametersperfunction, maxcyclomaticcomplexitysperfunction
+ maxparametersperfunction, maxcyclomaticcomplexityperfunction
  member,message, meta, module, moveBy,
  moveTo, mootools, multistr, name, navigator,nestedBlockDepth,
  new, newcap, noarg, node, noempty, nomen,
@@ -350,7 +350,7 @@ var JSHINT = (function () {
             maxstatementsperfunction: false, // int
             maxnestedblockdepthperfunction: false, // int
             maxparametersperfunction: false, //int
-            maxcyclomaticcomplexitysperfunction: false //int
+            maxcyclomaticcomplexityperfunction: false //int
         },
 
         // These are JSHint boolean options which are shared with JSLint
@@ -3433,7 +3433,7 @@ loop:   for (;;) {
                 }
             },
             verifyMaxCyclomaticComplexityPerFunction: function () {
-                var max = option.maxcyclomaticcomplexitysperfunction;
+                var max = option.maxcyclomaticcomplexityperfunction;
                 var cc = this.cyclomaticComplexityCount;
                 if (max && cc > max) {
                     var message = "Cyclomatic complexity is to high per function (" + cc + ").";
