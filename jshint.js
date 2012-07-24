@@ -833,10 +833,8 @@ var JSHINT = (function () {
     function F() {}     // Used by Object.create
 
     function is_own(object, name) {
-
-// The object.hasOwnProperty method fails when the property under consideration
-// is named 'hasOwnProperty'. So we have to use this more convoluted form.
-
+        // The object.hasOwnProperty method fails when the property under consideration
+        // is named 'hasOwnProperty'. So we have to use this more convoluted form.
         return Object.prototype.hasOwnProperty.call(object, name);
     }
 
@@ -846,7 +844,11 @@ var JSHINT = (function () {
         }
     }
 
-// Provide critical ES5 functions to ES3.
+    function isString(obj) {
+        return Object.prototype.toString.call(obj) === '[object String]';
+    }
+
+    // Provide critical ES5 functions to ES3.
 
     if (typeof Array.isArray !== 'function') {
         Array.isArray = function (o) {
@@ -873,7 +875,7 @@ var JSHINT = (function () {
         };
     }
 
-// Non standard methods
+    // Non standard methods
 
     if (typeof String.prototype.entityify !== 'function') {
         String.prototype.entityify = function () {
@@ -4183,9 +4185,9 @@ loop:   for (;;) {
     }
 
 
-// The actual JSHINT function itself.
-
+    // The actual JSHINT function itself.
     var itself = function (s, o, g) {
+        /*global console */
         var a, i, k, x,
             optionKeys,
             newOptionObj = {};
@@ -4194,6 +4196,22 @@ loop:   for (;;) {
         JSHINT.undefs = [];
         predefined = Object.create(standard);
         combine(predefined, g || {});
+
+        if (!isString(s) && !Array.isArray(s)) {
+            errorAt("Input is neither a string nor an array of strings.", 0);
+            return false;
+        }
+
+        if (isString(s) && /^\s*$/g.test(s)) {
+            errorAt("Input is an empty string.", 0);
+            return false;
+        }
+
+        if (s.length === 0) {
+            errorAt("Input is an empty array.", 0);
+            return false;
+        }
+
         if (o) {
             a = o.predef;
             if (a) {
