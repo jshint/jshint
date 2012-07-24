@@ -399,3 +399,25 @@ exports.multilineArray = function () {
 
     TestRun().test(src);
 };
+
+exports.testInvalidSource = function () {
+    TestRun()
+        .addError(0, "Input is neither a string nor an array of strings.")
+        .test(undefined);
+
+    TestRun()
+        .addError(0, "Input is neither a string nor an array of strings.")
+        .test(null);
+
+    TestRun()
+        .addError(0, "Input is neither a string nor an array of strings.")
+        .test({});
+
+    TestRun()
+        .addError(0, "Input is an empty string.")
+        .test("");
+
+    TestRun()
+        .addError(0, "Input is an empty array.")
+        .test([]);
+};
