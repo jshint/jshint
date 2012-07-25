@@ -1143,7 +1143,7 @@ var JSHINT = (function () {
                 } else if (value === '__iterator__' && !option.iterator) {
                     warningAt("'{a}' is only available in JavaScript 1.7.",
                         line, from, value);
-                } else if (option.nomen && (value.charAt(0) === '_' ||
+                } else if (option.nomen && value !== "_" && (value.charAt(0) === '_' ||
                          value.charAt(value.length - 1) === '_')) {
                     if (!option.node || token.id === '.' ||
                             (value !== '__dirname' && value !== '__filename')) {
