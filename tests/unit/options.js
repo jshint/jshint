@@ -1156,3 +1156,20 @@ exports.browser = function () {
 	TestRun().test(src, { browser: true, undef: true });
 
 };
+
+exports.unnecessarysemicolon = function () {
+    var code = [
+        "function foo() {",
+        "    var a;;",
+        "}"
+    ];
+
+    TestRun()
+        .addError(2, "Unnecessary semicolon.")
+        .test(code);
+
+    TestRun()
+        .addError(2, "Unnecessary semicolon.")
+        .test(code, { white: true });
+
+};
