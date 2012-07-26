@@ -215,8 +215,8 @@
  isDigit, isFinite, isNaN, iterator, java, join, jshint,
  JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastcharacter, lastsemic, laxbreak,
  laxcomma, latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
- log, loopfunc, m, match, maxerr, maxlen, maxnestedblockdepthperfunction, maxstatementsperfunction,
- maxparametersperfunction, maxcyclomaticcomplexityperfunction
+ log, loopfunc, m, match, maxerr, maxlen, maxnestedblockdepth, maxstatements,
+ maxparameters, maxcyclomaticcomplexity
  member,message, meta, module, moveBy,
  moveTo, mootools, multistr, name, navigator,nestedBlockDepth,
  new, newcap, noarg, node, noempty, nomen,
@@ -350,10 +350,10 @@ var JSHINT = (function () {
             maxerr: false,
             predef: false,
             quotmark: false, //'single'|'double'|true
-            maxstatementsperfunction: false, // int
-            maxnestedblockdepthperfunction: false, // int
-            maxparametersperfunction: false, //int
-            maxcyclomaticcomplexityperfunction: false //int
+            maxstatements: false, // {int} max per function
+            maxnestedblockdepth: false, // {int} max per function
+            maxparameters: false, // {int} max per function
+            maxcyclomaticcomplexity: false // {int} max per function
         },
 
         // These are JSHint boolean options which are shared with JSLint
@@ -3414,29 +3414,29 @@ loop:   for (;;) {
             nestedBlockDepth: -1,
             cyclomaticComplexityCount: 1,
             verifyMaxStatementsPerFunction: function () {
-                if (option.maxstatementsperfunction &&
-                    this.statementCount > option.maxstatementsperfunction) {
+                if (option.maxstatements &&
+                    this.statementCount > option.maxstatements) {
                     var message = "Too many statements per function (" + this.statementCount + ").";
                     warning(message, functionStartToken);
                 }
             },
             verifyMaxParametersPerFunction: function (parameters) {
-                if (option.maxparametersperfunction &&
-                    parameters.length > option.maxparametersperfunction) {
+                if (option.maxparameters &&
+                    parameters.length > option.maxparameters) {
                     var message = "Too many parameters per function (" + parameters.length + ").";
                     warning(message, functionStartToken);
                 }
             },
             verifyMaxNestedBlockDepthPerFunction: function () {
-                if (option.maxnestedblockdepthperfunction &&
+                if (option.maxnestedblockdepth &&
                     this.nestedBlockDepth > 0 &&
-                    this.nestedBlockDepth === option.maxnestedblockdepthperfunction + 1) {
+                    this.nestedBlockDepth === option.maxnestedblockdepth + 1) {
                     var message = "Blocks are nested too deeply (" + this.nestedBlockDepth + ").";
                     warning(message);
                 }
             },
             verifyMaxCyclomaticComplexityPerFunction: function () {
-                var max = option.maxcyclomaticcomplexityperfunction;
+                var max = option.maxcyclomaticcomplexity;
                 var cc = this.cyclomaticComplexityCount;
                 if (max && cc > max) {
                     var message = "Cyclomatic complexity is to high per function (" + cc + ").";

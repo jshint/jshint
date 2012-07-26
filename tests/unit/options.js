@@ -1158,58 +1158,58 @@ exports.browser = function () {
 };
 
 /*
- * Tests the `maxstatementsperfunction` option
+ * Tests the `maxstatements` option
  */
-exports.maxstatementsperfunction = function () {
+exports.maxstatements = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/max-statements-per-function.js', 'utf8');
 
     TestRun()
         .addError(1, "Too many statements per function (8).")
-        .test(src, { maxstatementsperfunction: 7 });
+        .test(src, { maxstatements: 7 });
 
     TestRun()
-        .test(src, { maxstatementsperfunction: 8 });
+        .test(src, { maxstatements: 8 });
 
     TestRun()
         .test(src, {});
 };
 
 /*
- * Tests the `maxnestedblockdepthperfunction` option
+ * Tests the `maxnestedblockdepth` option
  */
-exports.maxnestedblockdepthperfunction = function () {
+exports.maxnestedblockdepth = function () {
     var fixture = '/fixtures/max-nested-block-depth-per-function.js';
     var src = fs.readFileSync(__dirname + fixture, 'utf8');
 
     TestRun()
         .addError(5, "Blocks are nested too deeply (2).")
         .addError(14, "Blocks are nested too deeply (2).")
-        .test(src, { maxnestedblockdepthperfunction: 1 });
+        .test(src, { maxnestedblockdepth: 1 });
 
     TestRun()
         .addError(9, "Blocks are nested too deeply (3).")
-        .test(src, { maxnestedblockdepthperfunction: 2 });
+        .test(src, { maxnestedblockdepth: 2 });
 
     TestRun()
-        .test(src, { maxnestedblockdepthperfunction: 3 });
+        .test(src, { maxnestedblockdepth: 3 });
 
     TestRun()
         .test(src, {});
 };
 
 /*
- * Tests the `maxparametersperfunction` option
+ * Tests the `maxparameters` option
  */
-exports.maxparametersperfunction = function () {
+exports.maxparameters = function () {
     var fixture = '/fixtures/max-parameters-per-function.js';
     var src = fs.readFileSync(__dirname + fixture, 'utf8');
 
     TestRun()
         .addError(1, "Too many parameters per function (3).")
-        .test(src, { maxparametersperfunction: 2 });
+        .test(src, { maxparameters: 2 });
 
     TestRun()
-        .test(src, { maxparametersperfunction: 3 });
+        .test(src, { maxparameters: 3 });
 
 
     TestRun()
@@ -1217,9 +1217,9 @@ exports.maxparametersperfunction = function () {
 };
 
 /*
- * Tests the `maxcyclomaticcomplexityperfunction` option
+ * Tests the `maxcyclomaticcomplexity` option
  */
-exports.maxcyclomaticcomplexityperfunction = function () {
+exports.maxcyclomaticcomplexity = function () {
     var fixture = '/fixtures/max-cyclomatic-complexity-per-function.js';
     var src = fs.readFileSync(__dirname + fixture, 'utf8');
 
@@ -1228,10 +1228,10 @@ exports.maxcyclomaticcomplexityperfunction = function () {
         .addError(15, "Cyclomatic complexity is to high per function (2).")
         .addError(25, "Cyclomatic complexity is to high per function (2).")
         .addError(47, "Cyclomatic complexity is to high per function (8).")
-        .test(src, { maxcyclomaticcomplexityperfunction: 1 });
+        .test(src, { maxcyclomaticcomplexity: 1 });
 
     TestRun()
-        .test(src, { maxcyclomaticcomplexityperfunction: 8 });
+        .test(src, { maxcyclomaticcomplexity: 8 });
 
 
     TestRun()
