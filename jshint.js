@@ -632,7 +632,7 @@ var JSHINT = (function () {
             __dirname     : false,
             Buffer        : false,
             console       : false,
-            exports       : false,
+            exports       : true,  // In Node it is ok to exports = module.exports = foo();
             GLOBAL        : false,
             global        : false,
             module        : false,
