@@ -101,6 +101,17 @@ exports.node = function () {
 
     TestRun()
         .test(globalStrict, { node: true });
+
+    // Make sure that we can do fancy Node export
+
+    var overwrites = [
+        "Buffer = {};",
+        "exports = module.exports = {};"
+    ];
+
+    TestRun()
+        .addError(1, 'Read only.')
+        .test(overwrites, { node: true });
 };
 
 /** Option `jquery` predefines jQuery globals */
