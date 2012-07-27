@@ -2149,6 +2149,9 @@ loop:   for (;;) {
         if (option.white) {
             left = left || token;
             right = right || nexttoken;
+            if (left.value === ";" && right.value === ";") {
+                return;
+            }
             if (left.line === right.line && left.character === right.from) {
                 left.from += (left.character - left.from);
                 warning("Missing space after '{a}'.",
