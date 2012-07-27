@@ -650,11 +650,16 @@ exports.nomen = function () {
     TestRun().test('var hey;');
     TestRun().test('var hey;', { nomen: true });
 
-    // node globals
+    // Node globals
     TestRun()
         .addError(1, "Unexpected dangling '_' in '_x'.")
         .test('var x = top._x + __dirname + __filename;', { node: true, nomen: true });
 
+    // Underscore.js global should be fine
+    TestRun().test("_.defer();", { nomen: true });
+    TestRun()
+        .addError(1, "Unexpected dangling '_' in '__'.")
+        .test("var __;", { nomen: true });
 };
 
 /** Option `passfail` tells JSHint to stop at the first error. */
