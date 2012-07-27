@@ -1149,7 +1149,7 @@ var JSHINT = (function () {
                             (value !== '__dirname' && value !== '__filename')) {
                         warningAt("Unexpected {a} in '{b}'.", line, from, "dangling '_'", value);
                     }
-                } else if (option.camelcase && value.indexOf('_') > -1 &&
+                } else if (option.camelcase && value.replace(/^_+/, '').indexOf('_') > -1 &&
                         !value.match(/^[A-Z0-9_]*$/)) {
                     warningAt("Identifier '{a}' is not in camel case.",
                         line, from, value);

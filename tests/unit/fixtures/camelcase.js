@@ -11,3 +11,7 @@ function Foo() {
 }
 
 var TEST_1, test1, test_1;
+
+function _FooBar(_testMe) {
+  this.___testMe = _testMe;
+}
