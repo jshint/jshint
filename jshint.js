@@ -1118,6 +1118,42 @@ var JSHINT = (function () {
 
         function it(type, value) {
             var i, t;
+
+            function checkName(name) {
+                if (!option.proto && name === '__proto__') {
+                    warningAt("The '{a}' property is deprecated.", line, from, name);
+                    return;
+                }
+
+                if (!option.iterator && name === '__iterator__') {
+                    warningAt("'{a}' is only available in JavaScript 1.7.", line, from, name);
+                    return;
+                }
+
+                // Check for dangling underscores unless we're in Node
+                // environment and this identifier represents built-in
+                // Node globals with underscores.
+
+                var hasDangling = /^(_+.*|.*_+)$/.test(name);
+
+                if (option.nomen && hasDangling && name !== "_") {
+                    if (option.node && token.id !== "." && /^(__dirname|__filename)$/.test(name))
+                        return;
+
+                    warningAt("Unexpected {a} in '{b}'.", line, from, "dangling '_'", name);
+                    return;
+                }
+
+                // Check for non-camelcase names. Names like MY_VAR and
+                // _myVar are okay though.
+
+                if (option.camelcase) {
+                    if (name.replace(/^_+/, "").indexOf("_") > -1 && !name.match(/^[A-Z0-9_]*$/)) {
+                        warningAt("Identifier '{a}' is not in camel case.", line, from, value);
+                    }
+                }
+            }
+
             if (type === '(color)' || type === '(range)') {
                 t = {type: type};
             } else if (type === '(punctuator)' ||
@@ -1126,32 +1162,20 @@ var JSHINT = (function () {
             } else {
                 t = syntax[type];
             }
+
             t = Object.create(t);
+
             if (type === '(string)' || type === '(range)') {
                 if (!option.scripturl && jx.test(value)) {
                     warningAt("Script URL.", line, from);
                 }
             }
+
             if (type === '(identifier)') {
                 t.identifier = true;
-                if (value === '__proto__' && !option.proto) {
-                    warningAt("The '{a}' property is deprecated.",
-                        line, from, value);
-                } else if (value === '__iterator__' && !option.iterator) {
-                    warningAt("'{a}' is only available in JavaScript 1.7.",
-                        line, from, value);
-                } else if (option.nomen && (value.charAt(0) === '_' ||
-                         value.charAt(value.length - 1) === '_')) {
-                    if (!option.node || token.id === '.' ||
-                            (value !== '__dirname' && value !== '__filename')) {
-                        warningAt("Unexpected {a} in '{b}'.", line, from, "dangling '_'", value);
-                    }
-                } else if (option.camelcase && value.indexOf('_') > -1 &&
-                        !value.match(/^[A-Z0-9_]*$/)) {
-                    warningAt("Identifier '{a}' is not in camel case.",
-                        line, from, value);
-                }
+                checkName(value);
             }
+
             t.value = value;
             t.line = line;
             t.character = character;
