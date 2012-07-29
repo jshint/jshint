@@ -3155,7 +3155,8 @@ loop:   for (;;) {
         }
         adjacent(token, nexttoken);
         if (nexttoken.id !== '(' && !option.supernew) {
-            warning("Missing '()' invoking a constructor.");
+            warning("Missing '()' invoking a constructor.",
+                token, token.value);
         }
         this.first = c;
         return this;
