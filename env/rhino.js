@@ -5,7 +5,7 @@
     var filenames = [],
         optstr, // arg1=val1,arg2=val2,...
         predef, // global1=override,global2,global3,...
-        opts   = { rhino: true },
+        opts   = {},
         retval = 0;
 
     args.forEach(function (arg) {
