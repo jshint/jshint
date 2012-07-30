@@ -1447,8 +1447,15 @@ unclosedString:     for (;;) {
                             if (s.substr(i, 1) === '/') {
                                 errorAt("Nested comment.", line, character);
                             }
-                            s = s.substr(i + 2);
                             token.comment = true;
+                            var i = s.indexOf("/*");
+                            var j = s.indexOf("*/");
+                            if (i !== -1) {
+                                s = s.substr(i);
+                            }
+                            else if(j) {
+                                s = s.substr(j);
+                            }
                             break;
 
     //      /*members /*jshint /*global
@@ -1459,6 +1466,9 @@ unclosedString:     for (;;) {
                         case '/*jslint':
                         case '/*global':
                         case '*/':
+                            if(token.comment) {
+                                break;
+                            }
                             return {
                                 value: t,
                                 type: 'special',
