@@ -201,7 +201,7 @@
  content, couch, create, css, curly, d, data, datalist, dd, debug, decodeURI,
  decodeURIComponent, defaultStatus, defineClass, deserialize, devel, document,
  dojo, dijit, dojox, define, else, emit, encodeURI, encodeURIComponent,
- entityify, eqeq, eqeqeq, eqnull, errors, es5, escape, esnext, eval, event, evidence, evil,
+ eqeq, eqeqeq, eqnull, errors, es5, escape, esnext, eval, event, evidence, evil,
  ex, exception, exec, exps, expr, exports, FileReader, first, floor, focus,
  forin, fragment, frames, from, fromCharCode, fud, funcscope, funct, function, functions,
  g, gc, getComputedStyle, getRow, getter, getterToken, GLOBAL, global, globals, globalstrict,
@@ -874,62 +874,21 @@ var JSHINT = (function () {
 
     // Non standard methods
 
-    if (typeof String.prototype.entityify !== 'function') {
-        String.prototype.entityify = function () {
-            return this
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;');
-        };
+    function isAlpha(str) {
+        return (str >= 'a' && str <= 'z\uffff') ||
+            (str >= 'A' && str <= 'Z\uffff');
     }
 
-    if (typeof String.prototype.isAlpha !== 'function') {
-        String.prototype.isAlpha = function () {
-            return (this >= 'a' && this <= 'z\uffff') ||
-                (this >= 'A' && this <= 'Z\uffff');
-        };
+    function isDigit(str) {
+        return (str >= '0' && str <= '9');
     }
 
-    if (typeof String.prototype.isDigit !== 'function') {
-        String.prototype.isDigit = function () {
-            return (this >= '0' && this <= '9');
-        };
+    function supplant(str, data) {
+        return str.replace(/\{([^{}]*)\}/g, function (a, b) {
+            var r = data[b];
+            return typeof r === 'string' || typeof r === 'number' ? r : a;
+        });
     }
-
-    if (typeof String.prototype.supplant !== 'function') {
-        String.prototype.supplant = function (o) {
-            return this.replace(/\{([^{}]*)\}/g, function (a, b) {
-                var r = o[b];
-                return typeof r === 'string' || typeof r === 'number' ? r : a;
-            });
-        };
-    }
-
-    if (typeof String.prototype.name !== 'function') {
-        String.prototype.name = function () {
-
-// If the string looks like an identifier, then we can return it as is.
-// If the string contains no control characters, no quote characters, and no
-// backslash characters, then we can simply slap some quotes around it.
-// Otherwise we must also replace the offending characters with safe
-// sequences.
-
-            if (ix.test(this)) {
-                return this;
-            }
-            if (nx.test(this)) {
-                return '"' + this.replace(nxg, function (a) {
-                    var c = escapes[a];
-                    if (c) {
-                        return c;
-                    }
-                    return '\\u' + ('0000' + a.charCodeAt().toString(16)).slice(-4);
-                }) + '"';
-            }
-            return '"' + this + '"';
-        };
-    }
-
 
     function combine(t, o) {
         var n;
@@ -1036,7 +995,7 @@ var JSHINT = (function () {
             c: c,
             d: d
         };
-        w.reason = m.supplant(w);
+        w.reason = supplant(m, w);
         JSHINT.errors.push(w);
         if (option.passfail) {
             quit('Stopping. ', l, ch);
@@ -1421,24 +1380,24 @@ unclosedString:     for (;;) {
 
     //      identifier
 
-                        if (c.isAlpha() || c === '_' || c === '$') {
+                        if (isAlpha(c) || c === '_' || c === '$') {
                             return it('(identifier)', t);
                         }
 
     //      number
 
-                        if (c.isDigit()) {
+                        if (isDigit(c)) {
                             if (!isFinite(Number(t))) {
                                 warningAt("Bad number '{a}'.",
                                     line, character, t);
                             }
-                            if (s.substr(0, 1).isAlpha()) {
+                            if (isAlpha(s.substr(0, 1))) {
                                 warningAt("Missing space after '{a}'.",
                                         line, character, t);
                             }
                             if (c === '0') {
                                 d = t.substr(1, 1);
-                                if (d.isDigit()) {
+                                if (isDigit(d)) {
                                     if (token.id !== '.') {
                                         warningAt("Don't use extra leading zeros '{a}'.",
                                             line, character, t);
