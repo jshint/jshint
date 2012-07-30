@@ -1,5 +1,7 @@
 (function () {
     /*jshint quotmark:double */
+    /*members '\b' */
+    /* This is a comment with a 'single' quoted text. */
 
     var test1 = 'hello';
     var test2 = "hello";
