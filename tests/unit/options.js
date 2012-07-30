@@ -1045,6 +1045,16 @@ exports.quotes = function () {
         .test(src2, { quotmark: true });
 };
 
+// Test the `quotmark` option when defined as a JSHint comment.
+exports.quotesInline = function () {
+    TestRun()
+        .addError(4, "Strings must use doublequote.")
+        .addError(12, "Strings must use singlequote.")
+        .addError(19, "Mixed double and single quotes.")
+        .addError(30, "Bad option value.")
+        .test(fs.readFileSync(__dirname + "/fixtures/quotes3.js", "utf8"));
+};
+
 exports.scope = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/scope.js', 'utf8');
 

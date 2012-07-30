@@ -154,7 +154,7 @@
 
 /*jshint
  evil: true, nomen: false, onevar: false, regexp: false, strict: true, boss: true,
- undef: true, maxlen: 100, indent:4
+ undef: true, maxlen: 100, indent: 4
 */
 
 /*members "\b", "\t", "\n", "\f", "\r", "!=", "!==", "\"", "%", "(begin)",
@@ -1885,6 +1885,21 @@ loop:   for (;;) {
                             obj[t.value] = v.value === 'true';
                         else
                             error("Bad option value.", v);
+                    }
+                } else if (t.value === "quotmark" && (o === "/*jshint")) {
+                    switch (v.value) {
+                    case "true":
+                        obj.quotmark = true;
+                        break;
+                    case "false":
+                        obj.quotmark = false;
+                        break;
+                    case "double":
+                    case "single":
+                        obj.quotmark = v.value;
+                        break;
+                    default:
+                        error("Bad option value.", v);
                     }
                 } else if (v.value === 'true' || v.value === 'false') {
                     if (o === '/*jslint') {
