@@ -224,10 +224,10 @@
  runCommand, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal, self,
  send, serialize, sessionStorage, setInterval, setTimeout, setter, setterToken, shift, slice,
  smarttabs, sort, spawn, split, stack, status, start, strict, sub, substr, supernew, shadow,
- supplant, sum, sync, test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing,
- type, typeOf, Uint16Array, Uint32Array, Uint8Array, undef, undefs, unused, urls, validthis,
- value, valueOf, var, vars, version, WebSocket, withstmt, white, window, windows, Worker, worker,
- wsh*/
+ supplant, sum, swindent, sync, test, toLowerCase, toString, toUpperCase, toint32, token, top,
+ trailing, type, typeOf, Uint16Array, Uint32Array, Uint8Array, undef, undefs, unused, urls,
+ validthis, value, valueOf, var, vars, version, WebSocket, withstmt, white, window, windows,
+ Worker, worker, wsh*/
 
 /*global exports: false */
 
@@ -324,6 +324,8 @@ var JSHINT = (function () {
             sub         : true, // if all forms of subscript notation are tolerated
             supernew    : true, // if `new function () { ... };` and `new Object;`
                                 // should be tolerated
+            swindent    : true, // if all of the lines within a switch statement
+                                // should be indented an extra level
             trailing    : true, // if trailing whitespace rules apply
             validthis   : true, // if 'this' inside a non-constructor function is valid.
                                 // This is a function scoped option only.
@@ -3761,6 +3763,9 @@ loop:   for (;;) {
         advance('{');
         nonadjacent(token, nexttoken);
         indent += option.indent;
+        if (option.swindent) {
+            indent += option.indent;
+        }
         this.cases = [];
         for (;;) {
             switch (nexttoken.id) {
@@ -3810,6 +3815,9 @@ loop:   for (;;) {
                 advance(':');
                 break;
             case '}':
+                if (option.swindent) {
+                    indent -= option.indent;
+                }
                 indent -= option.indent;
                 indentation();
                 advance('}', t);
