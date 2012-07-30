@@ -1795,6 +1795,7 @@ klass:                                  do {
 
     function doOption() {
         var b, obj, filter, o = nexttoken.value, t, tn, v;
+        var quotmarkValue = option.quotmark;
 
         switch (o) {
         case '*/':
@@ -1807,6 +1808,7 @@ klass:                                  do {
                 membersOnly = {};
             }
             obj = membersOnly;
+            option.quotmark = false;
             break;
         case '/*jshint':
         case '/*jslint':
@@ -1841,8 +1843,7 @@ loop:   for (;;) {
                 v = lex.token();
 
                 if (obj === membersOnly) {
-                    error("Expected '{a}' and instead saw '{b}'.",
-                            t, '*/', ':');
+                    error("Expected '{a}' and instead saw '{b}'.", t, '*/', ':');
                 }
 
                 if (o === '/*jshint') {
@@ -1920,6 +1921,11 @@ loop:   for (;;) {
                 t = v;
             }
         }
+
+        if (o === '/*members') {
+            option.quotmark = quotmarkValue;
+        }
+
         if (filter) {
             assume();
         }
