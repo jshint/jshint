@@ -515,8 +515,10 @@ exports.supernew = function () {
 
     TestRun()
         .addError(1, "Weird construction. Delete 'new'.")
-        .addError(9, "Missing '()' invoking a constructor.")
-        .addError(11, "Missing '()' invoking a constructor.")
+        .addError(9, "Missing '()' invoking a constructor.", { character: 1 })
+        .addError(11, "Missing '()' invoking a constructor.", {
+            character: 13
+        })
         .test(src);
 
     TestRun().test(src, { supernew: true });
