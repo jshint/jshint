@@ -1175,41 +1175,41 @@ exports.maxstatements = function () {
 };
 
 /*
- * Tests the `maxnestedblockdepth` option
+ * Tests the `maxdepth` option
  */
-exports.maxnestedblockdepth = function () {
+exports.maxdepth = function () {
     var fixture = '/fixtures/max-nested-block-depth-per-function.js';
     var src = fs.readFileSync(__dirname + fixture, 'utf8');
 
     TestRun()
         .addError(5, "Blocks are nested too deeply (2).")
         .addError(14, "Blocks are nested too deeply (2).")
-        .test(src, { maxnestedblockdepth: 1 });
+        .test(src, { maxdepth: 1 });
 
     TestRun()
         .addError(9, "Blocks are nested too deeply (3).")
-        .test(src, { maxnestedblockdepth: 2 });
+        .test(src, { maxdepth: 2 });
 
     TestRun()
-        .test(src, { maxnestedblockdepth: 3 });
+        .test(src, { maxdepth: 3 });
 
     TestRun()
         .test(src, {});
 };
 
 /*
- * Tests the `maxparameters` option
+ * Tests the `maxparams` option
  */
-exports.maxparameters = function () {
+exports.maxparams = function () {
     var fixture = '/fixtures/max-parameters-per-function.js';
     var src = fs.readFileSync(__dirname + fixture, 'utf8');
 
     TestRun()
         .addError(1, "Too many parameters per function (3).")
-        .test(src, { maxparameters: 2 });
+        .test(src, { maxparams: 2 });
 
     TestRun()
-        .test(src, { maxparameters: 3 });
+        .test(src, { maxparams: 3 });
 
 
     TestRun()
@@ -1217,9 +1217,9 @@ exports.maxparameters = function () {
 };
 
 /*
- * Tests the `maxcyclomaticcomplexity` option
+ * Tests the `maxcomplexity` option
  */
-exports.maxcyclomaticcomplexity = function () {
+exports.maxcomplexity = function () {
     var fixture = '/fixtures/max-cyclomatic-complexity-per-function.js';
     var src = fs.readFileSync(__dirname + fixture, 'utf8');
 
@@ -1228,10 +1228,10 @@ exports.maxcyclomaticcomplexity = function () {
         .addError(15, "Cyclomatic complexity is to high per function (2).")
         .addError(25, "Cyclomatic complexity is to high per function (2).")
         .addError(47, "Cyclomatic complexity is to high per function (8).")
-        .test(src, { maxcyclomaticcomplexity: 1 });
+        .test(src, { maxcomplexity: 1 });
 
     TestRun()
-        .test(src, { maxcyclomaticcomplexity: 8 });
+        .test(src, { maxcomplexity: 8 });
 
 
     TestRun()

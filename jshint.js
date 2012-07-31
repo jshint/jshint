@@ -212,8 +212,8 @@
  isDigit, isFinite, isNaN, iterator, java, join, jshint,
  JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastcharacter, lastsemic, laxbreak,
  laxcomma, latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
- log, loopfunc, m, match, maxerr, maxlen, maxnestedblockdepth, maxstatements,
- maxparameters, maxcyclomaticcomplexity
+ log, loopfunc, m, match, maxerr, maxlen, maxdepth, maxstatements,
+ maxparams, maxcomplexity
  member,message, meta, module, moveBy,
  moveTo, mootools, multistr, name, navigator,nestedBlockDepth,
  new, newcap, noarg, node, noempty, nomen,
@@ -347,10 +347,10 @@ var JSHINT = (function () {
             maxerr: false,
             predef: false,
             quotmark: false, //'single'|'double'|true
-            maxstatements: false, // {int} max per function
-            maxnestedblockdepth: false, // {int} max per function
-            maxparameters: false, // {int} max per function
-            maxcyclomaticcomplexity: false // {int} max per function
+            maxstatements: false, // {int} max statements per function
+            maxdepth: false, // {int} max nested block depth per function
+            maxparams: false, // {int} max params per function
+            maxcomplexity: false // {int} max cyclomatic complexity per function
         },
 
         // These are JSHint boolean options which are shared with JSLint
@@ -3418,22 +3418,22 @@ loop:   for (;;) {
                 }
             },
             verifyMaxParametersPerFunction: function (parameters) {
-                if (option.maxparameters &&
-                    parameters.length > option.maxparameters) {
+                if (option.maxparams &&
+                    parameters.length > option.maxparams) {
                     var message = "Too many parameters per function (" + parameters.length + ").";
                     warning(message, functionStartToken);
                 }
             },
             verifyMaxNestedBlockDepthPerFunction: function () {
-                if (option.maxnestedblockdepth &&
+                if (option.maxdepth &&
                     this.nestedBlockDepth > 0 &&
-                    this.nestedBlockDepth === option.maxnestedblockdepth + 1) {
+                    this.nestedBlockDepth === option.maxdepth + 1) {
                     var message = "Blocks are nested too deeply (" + this.nestedBlockDepth + ").";
                     warning(message);
                 }
             },
             verifyMaxCyclomaticComplexityPerFunction: function () {
-                var max = option.maxcyclomaticcomplexity;
+                var max = option.maxcomplexity;
                 var cc = this.cyclomaticComplexityCount;
                 if (max && cc > max) {
                     var message = "Cyclomatic complexity is to high per function (" + cc + ").";
