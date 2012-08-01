@@ -157,7 +157,7 @@
 /*members "\b", "\t", "\n", "\f", "\r", "!=", "!==", "\"", "%", "(begin)",
  "(breakage)", "(character)", "(context)", "(error)", "(global)", "(identifier)", "(last)",
  "(lastcharacter)", "(line)", "(loopage)", "(name)", "(onevar)", "(params)", "(scope)",
- "(statement)", "(verb)", "*", "+", "++", "-", "--", "\/", "<", "<=", "==",
+ "(statement)", "(verb)", "(tokens)", "*", "+", "++", "-", "--", "\/", "<", "<=", "==",
  "===", ">", ">=", $, $$, $A, $F, $H, $R, $break, $continue, $w, Abstract, Ajax,
  __filename, __dirname, ActiveXObject, Array, ArrayBuffer, ArrayBufferView, Audio,
  Autocompleter, Assets, Boolean, Builder, Buffer, Browser, COM, CScript, Canvas,
@@ -194,15 +194,15 @@
  Timer, Tips, Type, TypeError, Toggle, Try, "use strict", unescape, URI, URIError, URL,
  VBArray, WSH, WScript, XDomainRequest, Web, Window, XMLDOM, XMLHttpRequest, XMLSerializer,
  XPathEvaluator, XPathException, XPathExpression, XPathNamespace, XPathNSResolver, XPathResult,
- "\\", a, addEventListener, address, alert, apply, applicationCache, arguments, arity, asi, atob,
- b, basic, basicToken, bitwise, block, blur, boolOptions, boss, browser, btoa, c, call, callee,
- caller, camelcase, cases, charAt, charCodeAt, character, clearInterval, clearTimeout,
- close, closed, closure, comment, condition, confirm, console, constructor,
+ "\\", a, addEventListener, address, alert, apply, applicationCache, arguments, arity,
+ asi, atob, b, basic, basicToken, bitwise, block, blur, boolOptions, boss, browser, btoa, c,
+ call, callee, caller, camelcase, cases, charAt, charCodeAt, character, clearInterval,
+ clearTimeout, close, closed, closure, comment, condition, confirm, console, constructor,
  content, couch, create, css, curly, d, data, datalist, dd, debug, decodeURI,
  decodeURIComponent, defaultStatus, defineClass, deserialize, devel, document,
  dojo, dijit, dojox, define, else, emit, encodeURI, encodeURIComponent,
  eqeq, eqeqeq, eqnull, errors, es5, escape, esnext, eval, event, evidence, evil,
- ex, exception, exec, exps, expr, exports, FileReader, first, floor, focus,
+ ex, exception, exec, exps, expr, exports, FileReader, first, floor, focus, forEach,
  forin, fragment, frames, from, fromCharCode, fud, funcscope, funct, function, functions,
  g, gc, getComputedStyle, getRow, getter, getterToken, GLOBAL, global, globals, globalstrict,
  hasOwnProperty, help, history, i, id, identifier, immed, implieds, importPackage, include,
@@ -221,10 +221,10 @@
  runCommand, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal, self,
  send, serialize, sessionStorage, setInterval, setTimeout, setter, setterToken, shift, slice,
  smarttabs, sort, spawn, split, stack, status, start, strict, sub, substr, supernew, shadow,
- supplant, sum, sync, test, toLowerCase, toString, toUpperCase, toint32, token, top, trailing,
- type, typeOf, Uint16Array, Uint32Array, Uint8Array, undef, undefs, unused, urls, validthis,
- value, valueOf, var, vars, version, WebSocket, withstmt, white, window, windows, Worker, worker,
- wsh*/
+ supplant, sum, sync, test, toLowerCase, toString, toUpperCase, toint32, token, tokens, top,
+ trailing, type, typeOf, Uint16Array, Uint32Array, Uint8Array, undef, undefs, unused,
+ urls, validthis, value, valueOf, var, vars, version, WebSocket, withstmt, white, window, windows,
+ Worker, worker, wsh*/
 
 /*global exports: false */
 
@@ -313,6 +313,7 @@ var JSHINT = (function () {
             regexp      : true, // if the . should not be allowed in regexp literals
             rhino       : true, // if the Rhino environment globals should be predefined
             undef       : true, // if variables should be declared before used
+            unused      : true, // if variables should be always used
             scripturl   : true, // if script-targeted URLs should be tolerated
             shadow      : true, // if variable shadowing should be tolerated
             smarttabs   : true, // if smarttabs should be tolerated
@@ -850,6 +851,16 @@ var JSHINT = (function () {
     if (typeof Array.isArray !== "function") {
         Array.isArray = function (o) {
             return Object.prototype.toString.apply(o) === "[object Array]";
+        };
+    }
+
+    if (!Array.prototype.forEach) {
+        Array.prototype.forEach = function (fn, scope) {
+            var len = this.length;
+
+            for (var i = 0; i < len; i++) {
+                fn.call(scope || this, this[i], i, this);
+            }
         };
     }
 
@@ -1762,13 +1773,13 @@ klass:                                  do {
     }());
 
 
-    function addlabel(t, type) {
+    function addlabel(t, type, token) {
 
         if (t === "hasOwnProperty") {
             warning("'hasOwnProperty' is a really bad name.");
         }
 
-// Define t in the current function in the current scope.
+        // Define t in the current function in the current scope.
         if (is_own(funct, t) && !funct["(global)"]) {
             if (funct[t] === true) {
                 if (option.latedef)
@@ -1780,6 +1791,11 @@ klass:                                  do {
         }
 
         funct[t] = type;
+
+        if (token) {
+            funct["(tokens)"][t] = token;
+        }
+
         if (funct["(global)"]) {
             global[t] = funct;
             if (is_own(implied, t)) {
@@ -2826,6 +2842,7 @@ loop:   for (;;) {
                         isundef(funct, "'{a}' is not defined.", token, v);
                     }
                 }
+
                 note_implied(token);
             } else {
                 // If the name is already defined in the current
@@ -2882,7 +2899,6 @@ loop:   for (;;) {
                             funct[v] = s["(global)"] ? "global" : "outer";
                             break;
                         case "closure":
-                        case "parameter":
                             funct[v] = s["(global)"] ? "global" : "outer";
                             break;
                         case "label":
@@ -3343,7 +3359,7 @@ loop:   for (;;) {
         for (;;) {
             i = identifier(true);
             p.push(i);
-            addlabel(i, "parameter");
+            addlabel(i, "unused", token);
             if (nexttoken.id === ",") {
                 comma();
             } else {
@@ -3371,7 +3387,8 @@ loop:   for (;;) {
             "(breakage)" : 0,
             "(loopage)"  : 0,
             "(scope)"    : scope,
-            "(statement)": statement
+            "(statement)": statement,
+            "(tokens)"   : {}
         };
         f = funct;
         token.funct = funct;
@@ -3588,22 +3605,30 @@ loop:   for (;;) {
         } else if (!funct["(global)"]) {
             funct["(onevar)"] = true;
         }
+
         this.first = [];
+
         for (;;) {
             nonadjacent(token, nexttoken);
             id = identifier();
+
             if (option.esnext && funct[id] === "const") {
                 warning("const '" + id + "' has already been declared");
             }
+
             if (funct["(global)"] && predefined[id] === false) {
                 warning("Redefinition of '{a}'.", token, id);
             }
-            addlabel(id, "unused");
+
+            addlabel(id, "unused", token);
+
             if (prefix) {
                 break;
             }
+
             name = token;
             this.first.push(token);
+
             if (nexttoken.id === "=") {
                 nonadjacent(token, nexttoken);
                 advance("=");
@@ -3639,7 +3664,8 @@ loop:   for (;;) {
             warning("const '" + i + "' has already been declared");
         }
         adjacent(token, nexttoken);
-        addlabel(i, "unction");
+        addlabel(i, "unction", token);
+
         doFunction(i, true);
         if (nexttoken.id === "(" && nexttoken.line === token.line) {
             error(
@@ -4199,6 +4225,7 @@ loop:   for (;;) {
 
         JSHINT.errors = [];
         JSHINT.undefs = [];
+
         predefined = Object.create(standard);
         combine(predefined, g || {});
 
@@ -4254,7 +4281,8 @@ loop:   for (;;) {
             "(name)": "(global)",
             "(scope)": scope,
             "(breakage)": 0,
-            "(loopage)": 0
+            "(loopage)": 0,
+            "(tokens)": {}
         };
         functions = [funct];
         urls = [];
@@ -4346,6 +4374,25 @@ loop:   for (;;) {
                     implied[name] = newImplied;
             };
 
+            var checkUnused = function (func, key) {
+                var type = func[key];
+                var token = func["(tokens)"][key];
+
+                if (key.charAt(0) === "(")
+                    return;
+
+                // 'undefined' is a special case for (function (window, undefined) { ... })();
+                // patterns.
+
+                if (key === "undefined")
+                    return;
+
+                if (type !== "unused" && type !== "unction")
+                    return;
+
+                warningAt("'{a}' is defined but never used.", token.line, token.character, key);
+            };
+
             // Check queued 'x is not defined' instances to see if they're still undefined.
             for (i = 0; i < JSHINT.undefs.length; i += 1) {
                 k = JSHINT.undefs[i].slice(0);
@@ -4355,6 +4402,16 @@ loop:   for (;;) {
                 } else {
                     warning.apply(warning, k.slice(1));
                 }
+            }
+
+            if (option.unused) {
+                functions.forEach(function (func) {
+                    for (var key in func) {
+                        if (is_own(func, key)) {
+                            checkUnused(func, key);
+                        }
+                    }
+                });
             }
         } catch (e) {
             if (e) {
@@ -4373,9 +4430,15 @@ loop:   for (;;) {
 
     // Data summary.
     itself.data = function () {
+        var data = {
+            functions: [],
+            options: option
+        };
+        var implieds = [];
+        var members = [];
+        var unused = [];
+        var fu, f, i, j, n, v, globals;
 
-        var data = { functions: [], options: option }, fu, globals, implieds = [], f, i, j,
-            members = [], n, unused = [], v;
         if (itself.errors.length) {
             data.errors = itself.errors;
         }
@@ -4392,6 +4455,7 @@ loop:   for (;;) {
                 });
             }
         }
+
         if (implieds.length > 0) {
             data.implieds = implieds;
         }
@@ -4404,20 +4468,26 @@ loop:   for (;;) {
         if (globals.length > 0) {
             data.globals = globals;
         }
+
         for (i = 1; i < functions.length; i += 1) {
             f = functions[i];
             fu = {};
+
             for (j = 0; j < functionicity.length; j += 1) {
                 fu[functionicity[j]] = [];
             }
+
             for (n in f) {
                 if (is_own(f, n) && n.charAt(0) !== "(") {
                     v = f[n];
+
                     if (v === "unction") {
                         v = "unused";
                     }
+
                     if (Array.isArray(fu[v])) {
                         fu[v].push(n);
+
                         if (v === "unused") {
                             unused.push({
                                 name: n,
@@ -4428,11 +4498,13 @@ loop:   for (;;) {
                     }
                 }
             }
+
             for (j = 0; j < functionicity.length; j += 1) {
                 if (fu[functionicity[j]].length === 0) {
                     delete fu[functionicity[j]];
                 }
             }
+
             fu.name = f["(name)"];
             fu.param = f["(params)"];
             fu.line = f["(line)"];

@@ -372,6 +372,19 @@ exports.undef = function () {
         .test(src, { undef: true });
 };
 
+exports.unused = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/unused.js', 'utf8');
+
+    TestRun().test(src);
+
+    TestRun()
+        .addError(1, "'a' is defined but never used.")
+        .addError(6, "'f' is defined but never used.")
+        .addError(7, "'c' is defined but never used.")
+        .addError(15, "'foo' is defined but never used.")
+        .test(src, { unused: true });
+};
+
 // Regression test for `undef` to make sure that ...
 exports['undef in a function scope'] = function () {
     var src = fixture('undef_func.js');
