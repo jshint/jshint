@@ -373,7 +373,10 @@ exports.withStatement = function () {
 exports.blocks = function () {
     var src = fs.readFileSync(__dirname + "/fixtures/blocks.js", "utf8");
 
-    TestRun().test(src);
+    TestRun()
+        .addError(29, 'Unmatched \'{\'.')
+        .addError(31, 'Unmatched \'{\'.')
+        .test(src);
 };
 
 exports.functionCharaterLocation = function () {

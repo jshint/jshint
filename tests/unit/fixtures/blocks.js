@@ -19,8 +19,13 @@ a = 1;
         default: b = 2; break;
     }
 }
+
 c = 3;
 
 labeledBlock: {
     c += a + b;
 }
+
+badBlock: {
+    a = 0;
+    {
