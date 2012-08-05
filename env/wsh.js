@@ -1,4 +1,4 @@
-/*jshint evil: true, shadow: true, wsh: true */
+/*jshint evil: true, shadow: true, wsh: true, undef: true, unused: true */
 /*global JSHINT: false */
 
 (function() {

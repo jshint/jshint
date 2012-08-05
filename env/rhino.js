@@ -1,5 +1,5 @@
-/*jshint boss: true, rhino: true */
-/*globals JSHINT*/
+/*jshint boss: true, rhino: true, unused: true, undef: true */
+/*global JSHINT*/
 
 (function (args) {
     var filenames = [],

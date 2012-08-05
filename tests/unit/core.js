@@ -115,6 +115,14 @@ exports.testCustomGlobals = function () {
         assert.ok(g in dict);
 };
 
+exports.testUnusedDefinedGlobals = function () {
+    var src = fs.readFileSync(__dirname + "/fixtures/unusedglobals.js", "utf8");
+
+    TestRun()
+        .addError(2, "'bar' is defined but never used.")
+        .test(src, { unused: true });
+};
+
 /** Test that JSHint recognizes `new Array(<expr>)` as a valid expression */
 exports.testNewArray = function () {
     var code  = 'new Array(1);',
