@@ -261,7 +261,9 @@ exports.nonew = function () {
     TestRun().test(code1);
 
     TestRun()
-        .addError(1, "Do not use 'new' for side effects.")
+        .addError(1, "Do not use 'new' for side effects.", {
+            character: 1
+        })
         .test(code, { nonew: true });
 };
 
