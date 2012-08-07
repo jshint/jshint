@@ -2539,7 +2539,7 @@ loop:   for (;;) {
                 warning("Expected an assignment or function call and instead saw an expression.",
                     token);
             } else if (option.nonew && r.id === "(" && r.left.id === "new") {
-                warning("Do not use 'new' for side effects.");
+                warning("Do not use 'new' for side effects.", t);
             }
 
             if (nexttoken.id === ",") {
