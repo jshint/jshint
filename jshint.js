@@ -3210,7 +3210,7 @@ loop:   for (;;) {
         nospace(prevtoken, token);
         if (typeof left === "object") {
             if (left.value === "parseInt" && n === 1) {
-                warning("Missing radix parameter.", left);
+                warning("Missing radix parameter.", token);
             }
             if (!option.evil) {
                 if (left.value === "eval" || left.value === "Function" ||
