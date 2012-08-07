@@ -429,3 +429,13 @@ exports.testInvalidSource = function () {
         .addError(0, "Input is an empty array.")
         .test([]);
 };
+
+exports.testConstructor = function () {
+    var code = "new Number(5);";
+
+    TestRun()
+        .addError(1, "Do not use Number as a constructor.", {
+            character: 1
+        })
+        .test(code);
+};
