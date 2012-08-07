@@ -3107,7 +3107,7 @@ loop:   for (;;) {
                 case "Boolean":
                 case "Math":
                 case "JSON":
-                    warning("Do not use {a} as a constructor.", token, c.value);
+                    warning("Do not use {a} as a constructor.", prevtoken, c.value);
                     break;
                 case "Function":
                     if (!option.evil) {
