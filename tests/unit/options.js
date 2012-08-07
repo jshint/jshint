@@ -756,7 +756,9 @@ exports.newcap = function () {
 /** Option `sub` allows all forms of subscription. */
 exports.sub = function () {
     TestRun()
-        .addError(1, "['prop'] is better written in dot notation.")
+        .addError(1, "['prop'] is better written in dot notation.", {
+            character: 17
+        })
         .test("window.obj = obj['prop'];");
 
     TestRun().test("window.obj = obj['prop'];", { sub: true });
