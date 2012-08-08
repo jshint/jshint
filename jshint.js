@@ -66,15 +66,6 @@
  If a fatal error was found, a null will be the last element of the
  JSHINT.errors array.
 
- You can request a Function Report, which shows all of the functions
- and the parameters and vars that they use. This can be used to find
- implied global variables and other problems. The report is in HTML and
- can be inserted in an HTML <body>.
-
-     var myReport = JSHINT.report(limited);
-
- If limited is true, then the report will be limited to only errors.
-
  You can request a data structure which contains JSHint's results.
 
      var myData = JSHINT.data();
