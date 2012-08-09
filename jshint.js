@@ -28,7 +28,7 @@
  *   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *   DEALINGS IN THE SOFTWARE.
  *
- * JSHint was forked from the 2010-12-16 edition of JSLint.
+ * JSHint was forked from 2010-12-16 edition of JSLint.
  *
  */
 
@@ -68,6 +68,15 @@
 
  If a fatal error was found, a null will be the last element of the
  JSHINT.errors array.
+
+ You can request a Function Report, which shows all of the functions
+ and the parameters and vars that they use. This can be used to find
+ implied global variables and other problems. The report is in HTML and
+ can be inserted in an HTML <body>.
+
+     var myReport = JSHINT.report(limited);
+
+ If limited is true, then the report will be limited to only errors.
 
  You can request a data structure which contains JSHint's results.
 
@@ -4357,6 +4366,8 @@ loop:   for (;;) {
             var checkUnused = function (func, key) {
                 var type = func[key];
                 var token = func["(tokens)"][key];
+                var params = func['(params)'];
+                var p = 0;
 
                 if (key.charAt(0) === "(")
                     return;
@@ -4370,7 +4381,16 @@ loop:   for (;;) {
                 if (type !== "unused" && type !== "unction")
                     return;
 
-                warningAt("'{a}' is defined but never used.", token.line, token.character, key);
+                // ignore function parameters
+                if (option.unused === "paramsignore") {
+                    for (p = 0; p < params.length; p++) {
+                        if (key === params[p]) {
+                            return;
+                        }
+                    }
+                }
+
+                warningAt("1.: '{a}' is defined but never used.", token.line, token.character, key);
             };
 
             // Check queued 'x is not defined' instances to see if they're still undefined.
@@ -4396,7 +4416,7 @@ loop:   for (;;) {
                 for (var key in declared) {
                     if (is_own(declared, key)) {
                         if (!is_own(global, key)) {
-                            warningAt("'{a}' is defined but never used.",
+                            warningAt("2.: '{a}' is defined but never used.",
                                 declared[key].line, declared[key].character, key);
                         }
                     }
