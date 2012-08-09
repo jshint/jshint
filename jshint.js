@@ -4382,7 +4382,7 @@ loop:   for (;;) {
                     return;
 
                 // ignore function parameters
-                if (option.unused === "paramsignore") {
+                if (option.unused === "paramsignore" && params) {
                     for (p = 0; p < params.length; p++) {
                         if (key === params[p]) {
                             return;
