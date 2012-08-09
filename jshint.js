@@ -4390,7 +4390,7 @@ loop:   for (;;) {
                     }
                 }
 
-                warningAt("1.: '{a}' is defined but never used.", token.line, token.character, key);
+                warningAt("'{a}' is defined but never used.", token.line, token.character, key);
             };
 
             // Check queued 'x is not defined' instances to see if they're still undefined.
@@ -4416,7 +4416,7 @@ loop:   for (;;) {
                 for (var key in declared) {
                     if (is_own(declared, key)) {
                         if (!is_own(global, key)) {
-                            warningAt("2.: '{a}' is defined but never used.",
+                            warningAt("'{a}' is defined but never used.",
                                 declared[key].line, declared[key].character, key);
                         }
                     }
