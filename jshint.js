@@ -2071,6 +2071,13 @@ loop:   for (;;) {
                     }
                 }
 
+                // if asi is on warn about lines starting with [(/
+                if (option.asi && nexttoken.line !== token.line) {
+                    if (nexttoken.id === "[" || nexttoken.id === "(" || nexttoken.id === "/") {
+                        warningAt("Bad line start.", nexttoken.line, nexttoken.character);
+                    }
+                }
+
                 advance();
                 if (isArray && token.id === "(" && nexttoken.id === ")")
                     warning("Use the array literal notation [].", token);
@@ -2617,7 +2624,9 @@ loop:   for (;;) {
                     }
                 } else if (p.id === "}") {
                     // directive with no other statements, warn about missing semicolon
-                    warning("Missing semicolon.", p);
+                    if (!option.asi) {
+                        warning("Missing semicolon.", p);
+                    }
                 } else if (p.id !== ";") {
                     break;
                 }

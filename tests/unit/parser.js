@@ -393,5 +393,6 @@ exports.asi = function () {
     
     TestRun()
         .addError(2, "Missing semicolon.")
+        .addError(4, "Bad line start.")
         .test(code, { asi: true, expr: true });
 };
