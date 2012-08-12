@@ -2541,12 +2541,16 @@ loop:   for (;;) {
             }
 
             if (nexttoken.id !== ";") {
-                if (!option.asi) {
+                if (nexttoken.line === token.line && nexttoken.id !== "(end)" &&
+                    nexttoken.id !== "}") {
+                    warningAt("Missing semicolon.",
+                        token.line, token.character, token.character);
+                } else if (!option.asi) {
                     // If this is the last statement in a block that ends on
                     // the same line *and* option lastsemic is on, ignore the warning.
                     // Otherwise, complain about missing semicolon.
-                    if (!option.lastsemic || nexttoken.id !== "}" ||
-                            nexttoken.line !== token.line) {
+                    if (!(option.lastsemic && nexttoken.id === "}" &&
+                            nexttoken.line === token.line)) {
                         warningAt("Missing semicolon.", token.line, token.character);
                     }
                 }

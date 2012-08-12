@@ -381,3 +381,17 @@ exports.functionCharaterLocation = function () {
         assert.equal(locations[i].lastcharacter, report[i].lastcharacter);
     }
 };
+
+exports.asi = function () {
+    var code = [
+        'var a = 10'
+      , 'b  c'
+      , 'd'
+      , '()'
+      , 'e'
+    ];
+    
+    TestRun()
+        .addError(2, "Missing semicolon.")
+        .test(code, { asi: true, expr: true });
+};
