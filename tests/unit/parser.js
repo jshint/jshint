@@ -326,7 +326,7 @@ exports.comma = function () {
     // there are more errors in comma.js
     // but comma-operator isn't finished, yet - so jshint currently breaks at line 8
     TestRun()
-        .addError(6, 'Expected a conditional expression and instead saw an assignment.')
+        .addError(6, 'Assignment in conditional expression.')
         .addError(6, 'Expected \';\' and instead saw \',\'.')
         .addError(6, 'Expected \')\' to match \'(\' from line 6 and instead saw \';\'.')
         .addError(6, 'Missing semicolon.')

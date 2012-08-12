@@ -478,10 +478,10 @@ exports.boss = function () {
 
     // By default, warn about suspicious assignments
     TestRun()
-        .addError(1, 'Expected a conditional expression and instead saw an assignment.')
-        .addError(4, 'Expected a conditional expression and instead saw an assignment.')
-        .addError(7, 'Expected a conditional expression and instead saw an assignment.')
-        .addError(12, 'Expected a conditional expression and instead saw an assignment.')
+        .addError(1, 'Assignment in conditional expression.')
+        .addError(4, 'Assignment in conditional expression.')
+        .addError(7, 'Assignment in conditional expression.')
+        .addError(12, 'Assignment in conditional expression.')
         .test(src);
 
     // But if you are the boss, all is good

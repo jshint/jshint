@@ -3676,7 +3676,7 @@ loop:   for (;;) {
         expression(20);
         if (nexttoken.id === "=") {
             if (!option.boss)
-                warning("Expected a conditional expression and instead saw an assignment.");
+                warning("Assignment in conditional expression.");
             advance("=");
             expression(20);
         }
@@ -3739,7 +3739,7 @@ loop:   for (;;) {
         expression(20);
         if (nexttoken.id === "=") {
             if (!option.boss)
-                warning("Expected a conditional expression and instead saw an assignment.");
+                warning("Assignment in conditional expression.");
             advance("=");
             expression(20);
         }
@@ -3897,7 +3897,7 @@ loop:   for (;;) {
             expression(20);
             if (nexttoken.id === "=") {
                 if (!option.boss)
-                    warning("Expected a conditional expression and instead saw an assignment.");
+                    warning("Assignment in conditional expression.");
                 advance("=");
                 expression(20);
             }
@@ -3968,7 +3968,7 @@ loop:   for (;;) {
                 expression(20);
                 if (nexttoken.id === "=") {
                     if (!option.boss)
-                        warning("Expected a conditional expression and instead saw an assignment.");
+                        warning("Assignment in conditional expression.");
                     advance("=");
                     expression(20);
                 }
