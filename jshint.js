@@ -2550,7 +2550,7 @@ loop:   for (;;) {
             if (nexttoken.id !== ";") {
                 if (nexttoken.line === token.line && nexttoken.id !== "(end)" &&
                     nexttoken.id !== "}") {
-                    warningAt("Missing semicolon.",
+                    warningAt("Missing semicolon or operator.",
                         token.line, token.character, token.character);
                 } else if (!option.asi) {
                     // If this is the last statement in a block that ends on

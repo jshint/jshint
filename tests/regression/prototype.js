@@ -51,8 +51,8 @@ exports.prototype_1_7 = function () {
         .addError(4000, "Expected ')' to match '(' from line 4000 and instead saw ','.")
         .addError(4000, "Expected ')' to match '(' from line 4000 and instead saw 'm'.")
         .addError(4000, "Expected an identifier and instead saw '='.")
-        .addError(4000, "Missing semicolon.")
-        .addError(4000, "Missing semicolon.")
+        .addError(4000, "Missing semicolon or operator.")
+        .addError(4000, "Missing semicolon or operator.")
         .addError(4000, "Expected an identifier and instead saw ')'.")
         .test(src, {
             sub: true,
