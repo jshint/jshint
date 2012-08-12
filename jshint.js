@@ -556,7 +556,7 @@ var JSHINT = (function () {
             jQuery : false
         },
 
-        lines,
+        lines = [],
         lookahead,
         member,
         membersOnly,
