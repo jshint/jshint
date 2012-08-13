@@ -2533,7 +2533,7 @@ loop:   for (;;) {
                 warning("Expected an assignment or function call and instead saw an expression.",
                     token);
             } else if (option.nonew && r.id === "(" && r.left.id === "new") {
-                warning("Do not use 'new' for side effects.");
+                warning("Do not use 'new' for side effects.", t);
             }
 
             if (nexttoken.id === ",") {
@@ -3098,7 +3098,7 @@ loop:   for (;;) {
                 case "Boolean":
                 case "Math":
                 case "JSON":
-                    warning("Do not use {a} as a constructor.", token, c.value);
+                    warning("Do not use {a} as a constructor.", prevtoken, c.value);
                     break;
                 case "Function":
                     if (!option.evil) {
@@ -3204,7 +3204,7 @@ loop:   for (;;) {
         nospace(prevtoken, token);
         if (typeof left === "object") {
             if (left.value === "parseInt" && n === 1) {
-                warning("Missing radix parameter.", left);
+                warning("Missing radix parameter.", token);
             }
             if (!option.evil) {
                 if (left.value === "eval" || left.value === "Function" ||
@@ -3262,7 +3262,7 @@ loop:   for (;;) {
                 s = syntax[e.value];
                 if (!s || !s.reserved) {
                     warning("['{a}'] is better written in dot notation.",
-                            e, e.value);
+                            prevtoken, e.value);
                 }
             }
         }
