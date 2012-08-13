@@ -429,3 +429,23 @@ exports.testInvalidSource = function () {
         .addError(0, "Input is an empty array.")
         .test([]);
 };
+
+exports.testConstructor = function () {
+    var code = "new Number(5);";
+
+    TestRun()
+        .addError(1, "Do not use Number as a constructor.", {
+            character: 1
+        })
+        .test(code);
+};
+
+exports.missingRadix = function () {
+    var code = "parseInt(20);";
+
+    TestRun()
+        .addError(1, "Missing radix parameter.", {
+            character: 12
+        })
+        .test(code);
+};
