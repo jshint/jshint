@@ -261,7 +261,9 @@ exports.nonew = function () {
     TestRun().test(code1);
 
     TestRun()
-        .addError(1, "Do not use 'new' for side effects.")
+        .addError(1, "Do not use 'new' for side effects.", {
+            character: 1
+        })
         .test(code, { nonew: true });
 };
 
@@ -756,7 +758,9 @@ exports.newcap = function () {
 /** Option `sub` allows all forms of subscription. */
 exports.sub = function () {
     TestRun()
-        .addError(1, "['prop'] is better written in dot notation.")
+        .addError(1, "['prop'] is better written in dot notation.", {
+            character: 17
+        })
         .test("window.obj = obj['prop'];");
 
     TestRun().test("window.obj = obj['prop'];", { sub: true });

@@ -1,4 +1,5 @@
-/*jshint boss:true, evil:true */
+/*jshint boss:true, evil:true, unused:true, undef:true */
+/*global load, print, quit, JSHINT */
 
 // usage:
 //   jsc ${env_home}/jsc.js -- ${file} "$(cat ${file})" "option1:true,option2:false ${env_home}"
@@ -14,8 +15,7 @@ if (typeof(JSHINT) === 'undefined') {
 }
 
 (function(args){
-    var home  = args[3],
-        name  = args[0],
+    var name  = args[0],
         input = args[1],
         opts  = (function(arg){
             var opts = {};

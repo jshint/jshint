@@ -120,7 +120,7 @@ exports.options = function () {
       , '/*jslint maxerr: 20 */'
       , '/*member c:true */'
       , '/*jshint d:no */'
-      , '/*globals xxx*/'
+      , '/*global xxx*/'
       , 'xxx = 2;'
     ];
 

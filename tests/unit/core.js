@@ -115,6 +115,14 @@ exports.testCustomGlobals = function () {
         assert.ok(g in dict);
 };
 
+exports.testUnusedDefinedGlobals = function () {
+    var src = fs.readFileSync(__dirname + "/fixtures/unusedglobals.js", "utf8");
+
+    TestRun()
+        .addError(2, "'bar' is defined but never used.")
+        .test(src, { unused: true });
+};
+
 /** Test that JSHint recognizes `new Array(<expr>)` as a valid expression */
 exports.testNewArray = function () {
     var code  = 'new Array(1);',
@@ -420,4 +428,24 @@ exports.testInvalidSource = function () {
     TestRun()
         .addError(0, "Input is an empty array.")
         .test([]);
+};
+
+exports.testConstructor = function () {
+    var code = "new Number(5);";
+
+    TestRun()
+        .addError(1, "Do not use Number as a constructor.", {
+            character: 1
+        })
+        .test(code);
+};
+
+exports.missingRadix = function () {
+    var code = "parseInt(20);";
+
+    TestRun()
+        .addError(1, "Missing radix parameter.", {
+            character: 12
+        })
+        .test(code);
 };

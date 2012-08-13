@@ -28,7 +28,7 @@
  *   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *   DEALINGS IN THE SOFTWARE.
  *
- * JSHint was forked from 2010-12-16 edition of JSLint.
+ * JSHint was forked from the 2010-12-16 edition of JSLint.
  *
  */
 
@@ -68,15 +68,6 @@
 
  If a fatal error was found, a null will be the last element of the
  JSHINT.errors array.
-
- You can request a Function Report, which shows all of the functions
- and the parameters and vars that they use. This can be used to find
- implied global variables and other problems. The report is in HTML and
- can be inserted in an HTML <body>.
-
-     var myReport = JSHINT.report(limited);
-
- If limited is true, then the report will be limited to only errors.
 
  You can request a data structure which contains JSHint's results.
 
@@ -154,7 +145,7 @@
 
 /*jshint
  evil: true, nomen: false, onevar: false, regexp: false, strict: true, boss: true,
- undef: true, maxlen: 100, indent: 4, quotmark: double
+ undef: true, maxlen: 100, indent: 4, quotmark: double, unused: true
 */
 
 /*members "\b", "\t", "\n", "\f", "\r", "!=", "!==", "\"", "%", "(begin)",
@@ -526,6 +517,8 @@ var JSHINT = (function () {
             provides  : false
         },
 
+        declared, // Globals that were declared using /*global ... */ syntax.
+
         devel = {
             alert   : false,
             confirm : false,
@@ -541,17 +534,6 @@ var JSHINT = (function () {
             dojox     : false,
             define    : false,
             "require" : false
-        },
-
-        escapes = {
-            "\b": "\\b",
-            "\t": "\\t",
-            "\n": "\\n",
-            "\f": "\\f",
-            "\r": "\\r",
-            "\"": "\\\"",
-            "/" : "\\/",
-            "\\": "\\\\"
         },
 
         funct,          // The current function
@@ -755,21 +737,6 @@ var JSHINT = (function () {
         nonstandard = {
             escape              : false,
             unescape            : false
-        },
-
-        standard_member = {
-            E                   : true,
-            LN2                 : true,
-            LN10                : true,
-            LOG2E               : true,
-            LOG10E              : true,
-            MAX_VALUE           : true,
-            MIN_VALUE           : true,
-            NEGATIVE_INFINITY   : true,
-            PI                  : true,
-            POSITIVE_INFINITY   : true,
-            SQRT1_2             : true,
-            SQRT2               : true
         },
 
         directive,
@@ -1029,7 +996,7 @@ var JSHINT = (function () {
     }
 
     function error(m, t, a, b, c, d) {
-        var w = warning(m, t, a, b, c, d);
+        warning(m, t, a, b, c, d);
     }
 
     function errorAt(m, l, ch, a, b, c, d) {
@@ -1813,8 +1780,11 @@ klass:                                  do {
 
 
     function doOption() {
-        var b, obj, filter, o = nexttoken.value, t, tn, v;
+        var nt = nexttoken;
+        var o  = nt.value;
         var quotmarkValue = option.quotmark;
+        var predef = {};
+        var b, obj, filter, t, tn, v;
 
         switch (o) {
         case "*/":
@@ -1835,7 +1805,7 @@ klass:                                  do {
             filter = boolOptions;
             break;
         case "/*global":
-            obj = predefined;
+            obj = predef;
             break;
         default:
             error("What?");
@@ -1943,6 +1913,14 @@ loop:   for (;;) {
 
         if (o === "/*members") {
             option.quotmark = quotmarkValue;
+        }
+
+        combine(predefined, predef);
+
+        for (var key in predef) {
+            if (is_own(predef, key)) {
+                declared[key] = nt;
+            }
         }
 
         if (filter) {
@@ -2359,10 +2337,9 @@ loop:   for (;;) {
     }
 
 
-    function assignop(s, f) {
+    function assignop(s) {
         symbol(s, 20).exps = true;
         return infix(s, function (left, that) {
-            var l;
             that.left = left;
             if (predefined[left.value] === false &&
                     scope[left.value]["(global)"] === true) {
@@ -2439,7 +2416,7 @@ loop:   for (;;) {
     }
 
 
-    function suffix(s, f) {
+    function suffix(s) {
         var x = symbol(s, 150);
         x.led = function (left) {
             if (option.plusplus) {
@@ -2562,7 +2539,7 @@ loop:   for (;;) {
                 warning("Expected an assignment or function call and instead saw an expression.",
                     token);
             } else if (option.nonew && r.id === "(" && r.left.id === "new") {
-                warning("Do not use 'new' for side effects.");
+                warning("Do not use 'new' for side effects.", t);
             }
 
             if (nexttoken.id === ",") {
@@ -2595,7 +2572,7 @@ loop:   for (;;) {
 
 
     function statements(startLine) {
-        var a = [], f, p;
+        var a = [], p;
 
         while (!nexttoken.reach && nexttoken.id !== "(end)") {
             if (nexttoken.id === ";") {
@@ -3127,7 +3104,7 @@ loop:   for (;;) {
                 case "Boolean":
                 case "Math":
                 case "JSON":
-                    warning("Do not use {a} as a constructor.", token, c.value);
+                    warning("Do not use {a} as a constructor.", prevtoken, c.value);
                     break;
                 case "Function":
                     if (!option.evil) {
@@ -3233,7 +3210,7 @@ loop:   for (;;) {
         nospace(prevtoken, token);
         if (typeof left === "object") {
             if (left.value === "parseInt" && n === 1) {
-                warning("Missing radix parameter.", left);
+                warning("Missing radix parameter.", token);
             }
             if (!option.evil) {
                 if (left.value === "eval" || left.value === "Function" ||
@@ -3291,7 +3268,7 @@ loop:   for (;;) {
                 s = syntax[e.value];
                 if (!s || !s.reserved) {
                     warning("['{a}'] is better written in dot notation.",
-                            e, e.value);
+                            prevtoken, e.value);
                 }
             }
         }
@@ -3419,7 +3396,7 @@ loop:   for (;;) {
 
     (function (x) {
         x.nud = function () {
-            var b, f, i, j, p, t;
+            var b, f, i, p, t;
             var props = {}; // All properties, including accessors
 
             function saveProperty(name, token) {
@@ -4227,7 +4204,6 @@ loop:   for (;;) {
 
     // The actual JSHINT function itself.
     var itself = function (s, o, g) {
-        /*global console */
         var a, i, k, x,
             optionKeys,
             newOptionObj = {};
@@ -4236,6 +4212,7 @@ loop:   for (;;) {
         JSHINT.undefs = [];
 
         predefined = Object.create(standard);
+        declared = Object.create(null);
         combine(predefined, g || {});
 
         if (!isString(s) && !Array.isArray(s)) {
@@ -4421,6 +4398,15 @@ loop:   for (;;) {
                         }
                     }
                 });
+
+                for (var key in declared) {
+                    if (is_own(declared, key)) {
+                        if (!is_own(global, key)) {
+                            warningAt("'{a}' is defined but never used.",
+                                declared[key].line, declared[key].character, key);
+                        }
+                    }
+                }
             }
         } catch (e) {
             if (e) {
