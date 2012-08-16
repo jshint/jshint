@@ -208,7 +208,7 @@
  moveTo, mootools, multistr, name, navigator, new, newcap, noarg, node, noempty, nomen,
  nonew, nonstandard, nud, onbeforeunload, onblur, onerror, onevar, onecase, onfocus,
  onload, onresize, onunload, open, openDatabase, openURL, opener, opera, options, outer, param,
- parent, parseFloat, parseInt, passfail, plusplus, postMessage, predef, print, process, prompt,
+ parent, parseFloat, parseInt, passfail, plusplus, postMessage, pop, predef, print, process, prompt,
  proto, prototype, prototypejs, provides, push, quit, quotmark, range, raw, reach, reason, regexp,
  readFile, readUrl, regexdash, removeEventListener, replace, report, require,
  reserved, resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
@@ -1745,7 +1745,6 @@ klass:                                  do {
 
 
     function addlabel(t, type, token) {
-
         if (t === "hasOwnProperty") {
             warning("'hasOwnProperty' is a really bad name.");
         }
@@ -2340,18 +2339,22 @@ loop:   for (;;) {
 
     function assignop(s) {
         symbol(s, 20).exps = true;
+
         return infix(s, function (left, that) {
             that.left = left;
+
             if (predefined[left.value] === false &&
                     scope[left.value]["(global)"] === true) {
                 warning("Read only.", left);
             } else if (left["function"]) {
                 warning("'{a}' is a function.", left, left.value);
             }
+
             if (left) {
                 if (option.esnext && funct[left.value] === "const") {
                     warning("Attempting to override '{a}' which is a constant", left, left.value);
                 }
+
                 if (left.id === "." || left.id === "[") {
                     if (!left.left || left.left.value === "arguments") {
                         warning("Bad assignment.", that);
@@ -2365,12 +2368,14 @@ loop:   for (;;) {
                     that.right = expression(19);
                     return that;
                 }
+
                 if (left === syntax["function"]) {
                     warning(
 "Expected an identifier in an assignment and instead saw a function invocation.",
                                 token);
                 }
             }
+
             error("Bad assignment.", that);
         }, 20);
     }
@@ -3330,23 +3335,28 @@ loop:   for (;;) {
 
 
     function functionparams() {
-        var i, t = nexttoken, p = [];
+        var next   = nexttoken;
+        var params = [];
+        var ident;
+
         advance("(");
         nospace();
+
         if (nexttoken.id === ")") {
             advance(")");
             return;
         }
+
         for (;;) {
-            i = identifier(true);
-            p.push(i);
-            addlabel(i, "unused", token);
+            ident = identifier(true);
+            params.push(ident);
+            addlabel(ident, "unused", token);
             if (nexttoken.id === ",") {
                 comma();
             } else {
-                advance(")", t);
+                advance(")", next);
                 nospace(prevtoken, token);
-                return p;
+                return params;
             }
         }
     }
@@ -4359,6 +4369,20 @@ loop:   for (;;) {
                     implied[name] = newImplied;
             };
 
+            var warnUnused = function (name, token) {
+                var line = token.line;
+                var chr  = token.character;
+
+                if (option.unused)
+                    warningAt("'{a}' is defined but never used.", line, chr, name);
+
+                unuseds.push({
+                    name: name,
+                    line: line,
+                    character: chr
+                });
+            };
+
             var checkUnused = function (func, key) {
                 var type = func[key];
                 var token = func["(tokens)"][key];
@@ -4366,23 +4390,14 @@ loop:   for (;;) {
                 if (key.charAt(0) === "(")
                     return;
 
-                // 'undefined' is a special case for (function (window, undefined) { ... })();
-                // patterns.
-
-                if (key === "undefined")
-                    return;
-
                 if (type !== "unused" && type !== "unction")
                     return;
 
-                if (option.unused)
-                    warningAt("'{a}' is defined but never used.", token.line, token.character, key);
+                // Params are checked separately from other variables.
+                if (func["(params)"] && func["(params)"].indexOf(key) !== -1)
+                    return;
 
-                unuseds.push({
-                    name: key,
-                    line: token.line,
-                    character: token.character
-                });
+                warnUnused(key, token);
             };
 
             // Check queued 'x is not defined' instances to see if they're still undefined.
@@ -4402,22 +4417,34 @@ loop:   for (;;) {
                         checkUnused(func, key);
                     }
                 }
+
+                if (!func["(params)"])
+                    return;
+
+                var params = func["(params)"].slice();
+                var param  = params.pop();
+                var type;
+
+                while (param) {
+                    type = func[param];
+
+                    // 'undefined' is a special case for (function (window, undefined) { ... })();
+                    // patterns.
+
+                    if (param === "undefined")
+                        return;
+
+                    if (type !== "unused" && type !== "unction")
+                        return;
+
+                    warnUnused(param, func["(tokens)"][param]);
+                    param = params.pop();
+                }
             });
 
             for (var key in declared) {
-                if (is_own(declared, key)) {
-                    if (!is_own(global, key)) {
-                        if (option.unused) {
-                            warningAt("'{a}' is defined but never used.",
-                                declared[key].line, declared[key].character, key);
-                        }
-
-                        unuseds.push({
-                            name: key,
-                            line: declared[key].line,
-                            character: declared[key].character
-                        });
-                    }
+                if (is_own(declared, key) && !is_own(global, key)) {
+                    warnUnused(key, declared[key]);
                 }
             }
         } catch (e) {
