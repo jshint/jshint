@@ -4206,21 +4206,6 @@ loop:   for (;;) {
         declared = Object.create(null);
         combine(predefined, g || {});
 
-        if (!isString(s) && !Array.isArray(s)) {
-            errorAt("Input is neither a string nor an array of strings.", 0);
-            return false;
-        }
-
-        if (isString(s) && /^\s*$/g.test(s)) {
-            errorAt("Input is an empty string.", 0);
-            return false;
-        }
-
-        if (s.length === 0) {
-            errorAt("Input is an empty array.", 0);
-            return false;
-        }
-
         if (o) {
             a = o.predef;
             if (a) {
@@ -4271,7 +4256,25 @@ loop:   for (;;) {
         lookahead = [];
         jsonmode = false;
         warnings = 0;
+        lines = [];
+
+        if (!isString(s) && !Array.isArray(s)) {
+            errorAt("Input is neither a string nor an array of strings.", 0);
+            return false;
+        }
+
+        if (isString(s) && /^\s*$/g.test(s)) {
+            errorAt("Input is an empty string.", 0);
+            return false;
+        }
+
+        if (s.length === 0) {
+            errorAt("Input is an empty array.", 0);
+            return false;
+        }
+
         lex.init(s);
+
         prereg = true;
         directive = {};
 
