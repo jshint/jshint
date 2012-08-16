@@ -3242,16 +3242,14 @@ loop:   for (;;) {
         advance(")", this);
         nospace(prevtoken, token);
         if (option.immed && v.id === "function") {
-            if (nexttoken.id === "(" ||
-              (nexttoken.id === "." && (peek().value === "call" || peek().value === "apply"))) {
-                warning(
-"Move the invocation into the parens that contain the function.", nexttoken);
-            } else {
+            if (nexttoken.id !== "(" &&
+              (nexttoken.id !== "." || (peek().value !== "call" && peek().value !== "apply"))) {
                 warning(
 "Do not wrap function literals in parens unless they are to be immediately invoked.",
                         this);
             }
         }
+
         return v;
     });
 

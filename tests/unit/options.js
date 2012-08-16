@@ -650,11 +650,8 @@ exports.immed = function () {
         .addError(3, "Wrap an immediate function invocation in parentheses " +
                      "to assist the reader in understanding that the expression " +
                      "is the result of a function, and not the function itself.")
-        .addError(7, "Move the invocation into the parens that contain the function.")
         .addError(13, "Do not wrap function literals in parens unless they are to " +
                       "be immediately invoked.")
-        .addError(19, "Move the invocation into the parens that contain the function.")
-        .addError(23, "Move the invocation into the parens that contain the function.")
         .test(src, { immed: true });
 };
 
