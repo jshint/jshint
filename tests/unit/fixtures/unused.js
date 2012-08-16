@@ -12,6 +12,7 @@ function main(e, f) {
 
 main(b);
 
-function foo() {
+function foo(err, cb) {
     main();
+    cb();
 }
