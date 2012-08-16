@@ -743,6 +743,7 @@ var JSHINT = (function () {
         syntax = {},
         tab,
         token,
+        unuseds,
         urls,
         useESNextSyntax,
         warnings,
@@ -4260,6 +4261,7 @@ loop:   for (;;) {
         jsonmode = false;
         warnings = 0;
         lines = [];
+        unuseds = [];
 
         if (!isString(s) && !Array.isArray(s)) {
             errorAt("Input is neither a string nor an array of strings.", 0);
@@ -4373,7 +4375,14 @@ loop:   for (;;) {
                 if (type !== "unused" && type !== "unction")
                     return;
 
-                warningAt("'{a}' is defined but never used.", token.line, token.character, key);
+                if (option.unused)
+                    warningAt("'{a}' is defined but never used.", token.line, token.character, key);
+
+                unuseds.push({
+                    name: key,
+                    line: token.line,
+                    character: token.character
+                });
             };
 
             // Check queued 'x is not defined' instances to see if they're still undefined.
@@ -4387,21 +4396,27 @@ loop:   for (;;) {
                 }
             }
 
-            if (option.unused) {
-                functions.forEach(function (func) {
-                    for (var key in func) {
-                        if (is_own(func, key)) {
-                            checkUnused(func, key);
-                        }
+            functions.forEach(function (func) {
+                for (var key in func) {
+                    if (is_own(func, key)) {
+                        checkUnused(func, key);
                     }
-                });
+                }
+            });
 
-                for (var key in declared) {
-                    if (is_own(declared, key)) {
-                        if (!is_own(global, key)) {
+            for (var key in declared) {
+                if (is_own(declared, key)) {
+                    if (!is_own(global, key)) {
+                        if (option.unused) {
                             warningAt("'{a}' is defined but never used.",
                                 declared[key].line, declared[key].character, key);
                         }
+
+                        unuseds.push({
+                            name: key,
+                            line: declared[key].line,
+                            character: declared[key].character
+                        });
                     }
                 }
             }
@@ -4428,8 +4443,7 @@ loop:   for (;;) {
         };
         var implieds = [];
         var members = [];
-        var unused = [];
-        var fu, f, i, j, n, v, globals;
+        var fu, f, i, j, n, globals;
 
         if (itself.errors.length) {
             data.errors = itself.errors;
@@ -4469,28 +4483,6 @@ loop:   for (;;) {
                 fu[functionicity[j]] = [];
             }
 
-            for (n in f) {
-                if (is_own(f, n) && n.charAt(0) !== "(") {
-                    v = f[n];
-
-                    if (v === "unction") {
-                        v = "unused";
-                    }
-
-                    if (Array.isArray(fu[v])) {
-                        fu[v].push(n);
-
-                        if (v === "unused") {
-                            unused.push({
-                                name: n,
-                                line: f["(line)"],
-                                "function": f["(name)"]
-                            });
-                        }
-                    }
-                }
-            }
-
             for (j = 0; j < functionicity.length; j += 1) {
                 if (fu[functionicity[j]].length === 0) {
                     delete fu[functionicity[j]];
@@ -4506,8 +4498,8 @@ loop:   for (;;) {
             data.functions.push(fu);
         }
 
-        if (unused.length > 0) {
-            data.unused = unused;
+        if (unuseds.length > 0) {
+            data.unused = unuseds;
         }
 
         members = [];

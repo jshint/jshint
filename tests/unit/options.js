@@ -136,7 +136,7 @@ exports["implied and unused should respect hoisting"] = function () {
     assert.eql(report.implieds[0].name, 'fun4');
     assert.eql(report.implieds[0].line, [14]);
 
-    assert.eql(report.unused.length, 2);
+    assert.eql(report.unused.length, 3);
 };
 
 /**
@@ -385,6 +385,15 @@ exports.unused = function () {
         .addError(7, "'c' is defined but never used.")
         .addError(15, "'foo' is defined but never used.")
         .test(src, { unused: true });
+
+    assert.ok(!JSHINT(src, { unused: true }));
+
+    var unused = JSHINT.data().unused;
+    assert.eql(4, unused.length);
+    assert.ok(unused.some(function (err) { return err.line === 1 && err.name === "a"; }));
+    assert.ok(unused.some(function (err) { return err.line === 6 && err.name === "f"; }));
+    assert.ok(unused.some(function (err) { return err.line === 7 && err.name === "c"; }));
+    assert.ok(unused.some(function (err) { return err.line === 15 && err.name === "foo"; }));
 };
 
 // Regression test for `undef` to make sure that ...
