@@ -149,9 +149,10 @@
 */
 
 /*members "\b", "\t", "\n", "\f", "\r", "!=", "!==", "\"", "%", "(begin)",
- "(breakage)", "(character)", "(context)", "(error)", "(global)", "(identifier)", "(last)",
- "(lastcharacter)", "(line)", "(loopage)", "(name)", "(onevar)", "(params)", "(scope)",
- "(statement)", "(verb)", "(tokens)", "*", "+", "++", "-", "--", "\/", "<", "<=", "==",
+ "(breakage)", "(character)", "(context)", "(error)", "(explicitNewcap)", "(global)",
+ "(identifier)", "(last)", "(lastcharacter)", "(line)", "(loopage)", "(name)",
+ "(onevar)", "(params)", "(scope)", "(statement)", "(verb)", "(tokens)",
+ "*", "+", "++", "-", "--", "\/", "<", "<=", "==",
  "===", ">", ">=", $, $$, $A, $F, $H, $R, $break, $continue, $w, Abstract, Ajax,
  __filename, __dirname, ActiveXObject, Array, ArrayBuffer, ArrayBufferView, Audio,
  Autocompleter, Assets, Boolean, Builder, Buffer, Browser, COM, CScript, Canvas,
@@ -1898,6 +1899,9 @@ loop:   for (;;) {
                     } else {
                         obj[t.value] = v.value === "true";
                     }
+
+                    if (t.value === "newcap")
+                        obj["(explicitNewcap)"] = true;
                 } else {
                     error("Bad option value.", v);
                 }
@@ -2631,7 +2635,8 @@ loop:   for (;;) {
                 }
 
                 if (token.value === "use strict") {
-                    option.newcap = true;
+                    if (!option["(explicitNewcap)"])
+                        option.newcap = true;
                     option.undef = true;
                 }
 
@@ -4235,6 +4240,9 @@ loop:   for (;;) {
             optionKeys = Object.keys(o);
             for (x = 0; x < optionKeys.length; x++) {
                 newOptionObj[optionKeys[x]] = o[optionKeys[x]];
+
+                if (optionKeys[x] === "newcap" && o[optionKeys[x]] === false)
+                    newOptionObj["(explicitNewcap)"] = true;
             }
         }
 
