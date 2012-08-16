@@ -778,6 +778,7 @@ exports.strict = function () {
     var code1 = '(function () { "use strict"; return; }());';
     var src = fs.readFileSync(__dirname + '/fixtures/strict_violations.js', 'utf8');
     var src2 = fs.readFileSync(__dirname + '/fixtures/strict_incorrect.js', 'utf8');
+    var src3 = fs.readFileSync(__dirname + '/fixtures/strict_newcap.js', 'utf8');
 
     TestRun().test(code);
     TestRun().test(code1);
@@ -801,6 +802,10 @@ exports.strict = function () {
         .addError(28, 'Expected an assignment or function call and instead saw an expression.')
         .addError(53, 'Expected an assignment or function call and instead saw an expression.')
         .test(src2, { strict: false });
+
+    TestRun()
+        .addError(7, "A constructor name should start with an uppercase letter.")
+        .test(src3, {});
 };
 
 /** Option `globalstrict` allows you to use global "use strict"; */
