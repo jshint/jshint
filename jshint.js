@@ -190,10 +190,10 @@
  VBArray, WSH, WScript, XDomainRequest, Web, Window, XMLDOM, XMLHttpRequest, XMLSerializer,
  XPathEvaluator, XPathException, XPathExpression, XPathNamespace, XPathNSResolver, XPathResult,
  "\\", a, addEventListener, address, alert, apply, applicationCache, arguments, arity,
- asi, atob, b, basic, basicToken, bitwise, block, blur, boolOptions, boss, browser, btoa, c,
- call, callee, caller, camelcase, cases, charAt, charCodeAt, character, clearInterval,
- clearTimeout, close, closed, closure, comment, condition, confirm, console, constructor,
- content, couch, create, css, curly, d, data, datalist, dd, debug, decodeURI,
+ asi, atob, b, basic, basicToken, bitwise, blacklist, block, blur, boolOptions, boss,
+ browser, btoa, c, call, callee, caller, camelcase, cases, charAt, charCodeAt, character,
+ clearInterval, clearTimeout, close, closed, closure, comment, condition, confirm, console,
+ constructor, content, couch, create, css, curly, d, data, datalist, dd, debug, decodeURI,
  decodeURIComponent, defaultStatus, defineClass, deserialize, devel, document,
  dojo, dijit, dojox, define, else, emit, encodeURI, encodeURIComponent,
  eqeq, eqeqeq, eqnull, errors, es5, escape, esnext, eval, event, evidence, evil,
@@ -876,10 +876,16 @@ var JSHINT = (function () {
     function combine(t, o) {
         var n;
         for (n in o) {
-            if (is_own(o, n)) {
+            if (is_own(o, n) && !is_own(JSHINT.blacklist, n)) {
                 t[n] = o[n];
             }
         }
+    }
+
+    function updatePredefined() {
+        Object.keys(JSHINT.blacklist).forEach(function (key) {
+            delete predefined[key];
+        });
     }
 
     function assume() {
@@ -1785,7 +1791,7 @@ klass:                                  do {
         var o  = nt.value;
         var quotmarkValue = option.quotmark;
         var predef = {};
-        var b, obj, filter, t, tn, v;
+        var b, obj, filter, t, tn, v, minus;
 
         switch (o) {
         case "*/":
@@ -1814,6 +1820,7 @@ klass:                                  do {
 
         t = lex.token();
 loop:   for (;;) {
+            minus = false;
             for (;;) {
                 if (t.type === "special" && t.value === "*/") {
                     break loop;
@@ -1823,8 +1830,13 @@ loop:   for (;;) {
                 }
                 t = lex.token();
             }
-            if (t.type !== "(string)" && t.type !== "(identifier)" &&
-                    o !== "/*members") {
+
+            if (o === "/*global" && t.value === "-") {
+                minus = true;
+                t = lex.token();
+            }
+
+            if (t.type !== "(string)" && t.type !== "(identifier)" && o !== "/*members") {
                 error("Bad option.", t);
             }
 
@@ -1910,7 +1922,14 @@ loop:   for (;;) {
                 if (o === "/*jshint" || o === "/*jslint") {
                     error("Missing option value.", t);
                 }
+
                 obj[t.value] = false;
+
+                if (o === "/*global" && minus === true) {
+                    JSHINT.blacklist[t.value] = t.value;
+                    updatePredefined();
+                }
+
                 t = v;
             }
         }
@@ -4218,6 +4237,7 @@ loop:   for (;;) {
 
         JSHINT.errors = [];
         JSHINT.undefs = [];
+        JSHINT.blacklist = {};
 
         predefined = Object.create(standard);
         declared = Object.create(null);
@@ -4226,16 +4246,18 @@ loop:   for (;;) {
         if (o) {
             a = o.predef;
             if (a) {
-                if (Array.isArray(a)) {
-                    for (i = 0; i < a.length; i += 1) {
-                        predefined[a[i]] = true;
-                    }
-                } else if (typeof a === "object") {
-                    k = Object.keys(a);
-                    for (i = 0; i < k.length; i += 1) {
-                        predefined[k[i]] = !!a[k[i]];
-                    }
+                if (!Array.isArray(a) && typeof a === "object") {
+                    a = Object.keys(a);
                 }
+                a.forEach(function (item) {
+                    var slice;
+                    if (item[0] === "-") {
+                        slice = item.slice(1);
+                        JSHINT.blacklist[slice] = slice;
+                    } else {
+                        predefined[item] = true;
+                    }
+                });
             }
             optionKeys = Object.keys(o);
             for (x = 0; x < optionKeys.length; x++) {
