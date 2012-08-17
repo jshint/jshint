@@ -2537,7 +2537,7 @@ loop:   for (;;) {
             advance(":");
             scope = Object.create(s);
             addlabel(t.value, "label");
-            if (!nexttoken.labelled) {
+            if (!nexttoken.labelled && nexttoken.value !== "{") {
                 warning("Label '{a}' on {b} statement.",
                         nexttoken, t.value, nexttoken.value);
             }
@@ -2547,6 +2547,12 @@ loop:   for (;;) {
             }
             nexttoken.label = t.value;
             t = nexttoken;
+        }
+
+// Is it a lonely block?
+        if (t.id === "{") {
+            block(true, true);
+            return;
         }
 
 // Parse the statement.
