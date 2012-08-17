@@ -77,7 +77,7 @@ exports.assignment = function () {
         .addError(1, "Bad assignment.")
         .addError(2, "Bad assignment.")
         .addError(2, "Expected an assignment or function call and instead saw an expression.")
-        .addError(2, "Missing semicolon.")
+        .addError(2, "Missing semicolon or operator.")
         .test(code, { plusplus: true });
 };
 
@@ -152,6 +152,7 @@ exports.shebang = function () {
         .addError(3, "Expected an identifier and instead saw '#'.")
         .addError(3, "Expected an operator and instead saw '!'.")
         .addError(3, "Expected an assignment or function call and instead saw an expression.")
+        .addError(3, "Missing semicolon or operator.")
         .addError(3, "Missing semicolon.")
         .test(code);
 };
@@ -175,7 +176,7 @@ exports.numbers = function () {
         .addError(4, "Don't use extra leading zeros '03'.")
         .addError(5, "A leading decimal point can be confused with a dot: '.3'.")
         .addError(6, "Missing space after '0xAA'.")
-        .addError(6, "Missing semicolon.")
+        .addError(6, "Missing semicolon or operator.")
         .addError(6, "Expected an assignment or function call and instead saw an expression.")
         .addError(7, "Don't use extra leading zeros '0033'.")
         .addError(8, "A trailing decimal point can be confused with a dot '3.'.")
@@ -326,13 +327,13 @@ exports.comma = function () {
     // there are more errors in comma.js
     // but comma-operator isn't finished, yet - so jshint currently breaks at line 8
     TestRun()
-        .addError(6, 'Expected a conditional expression and instead saw an assignment.')
+        .addError(6, 'Assignment in conditional expression.')
         .addError(6, 'Expected \';\' and instead saw \',\'.')
         .addError(6, 'Expected \')\' to match \'(\' from line 6 and instead saw \';\'.')
-        .addError(6, 'Missing semicolon.')
+        .addError(6, 'Missing semicolon or operator.')
         .addError(6, 'Expected an identifier and instead saw \')\'.')
         .addError(6, 'Expected an assignment or function call and instead saw an expression.')
-        .addError(6, 'Missing semicolon.')
+        .addError(6, 'Missing semicolon or operator.')
         .addError(6, 'Expected to see a statement and instead saw a block.')
         .addError(6, 'Expected an assignment or function call and instead saw an expression.')
         .addError(6, 'Missing semicolon.')
@@ -380,4 +381,19 @@ exports.functionCharaterLocation = function () {
         assert.equal(locations[i].last, report[i].last);
         assert.equal(locations[i].lastcharacter, report[i].lastcharacter);
     }
+};
+
+exports.asi = function () {
+    var code = [
+        'var a = 10'
+      , 'b  c'
+      , 'd'
+      , '()'
+      , 'e'
+    ];
+    
+    TestRun()
+        .addError(2, "Missing semicolon or operator.")
+        .addError(4, "Bad line start.")
+        .test(code, { asi: true, expr: true });
 };

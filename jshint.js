@@ -557,7 +557,7 @@ var JSHINT = (function () {
             jQuery : false
         },
 
-        lines,
+        lines = [],
         lookahead,
         member,
         membersOnly,
@@ -2094,6 +2094,13 @@ loop:   for (;;) {
                     }
                 }
 
+                // if asi is on warn about lines starting with [(/
+                if (option.asi && nexttoken.line !== token.line) {
+                    if (nexttoken.id === "[" || nexttoken.id === "(" || nexttoken.id === "/") {
+                        warningAt("Bad line start.", nexttoken.line, nexttoken.character);
+                    }
+                }
+
                 advance();
                 if (isArray && token.id === "(" && nexttoken.id === ")")
                     warning("Use the array literal notation [].", token);
@@ -2570,12 +2577,16 @@ loop:   for (;;) {
             }
 
             if (nexttoken.id !== ";") {
-                if (!option.asi) {
+                if (nexttoken.line === token.line && nexttoken.id !== "(end)" &&
+                    nexttoken.id !== "}") {
+                    warningAt("Missing semicolon or operator.",
+                        token.line, token.character, token.character);
+                } else if (!option.asi) {
                     // If this is the last statement in a block that ends on
                     // the same line *and* option lastsemic is on, ignore the warning.
                     // Otherwise, complain about missing semicolon.
-                    if (!option.lastsemic || nexttoken.id !== "}" ||
-                            nexttoken.line !== token.line) {
+                    if (!(option.lastsemic && nexttoken.id === "}" &&
+                            nexttoken.line === token.line)) {
                         warningAt("Missing semicolon.", token.line, token.character);
                     }
                 }
@@ -2642,7 +2653,9 @@ loop:   for (;;) {
                     }
                 } else if (p.id === "}") {
                     // directive with no other statements, warn about missing semicolon
-                    warning("Missing semicolon.", p);
+                    if (!option.asi) {
+                        warning("Missing semicolon.", p);
+                    }
                 } else if (p.id !== ";") {
                     break;
                 }
@@ -3709,7 +3722,7 @@ loop:   for (;;) {
         expression(20);
         if (nexttoken.id === "=") {
             if (!option.boss)
-                warning("Expected a conditional expression and instead saw an assignment.");
+                warning("Assignment in conditional expression.");
             advance("=");
             expression(20);
         }
@@ -3772,7 +3785,7 @@ loop:   for (;;) {
         expression(20);
         if (nexttoken.id === "=") {
             if (!option.boss)
-                warning("Expected a conditional expression and instead saw an assignment.");
+                warning("Assignment in conditional expression.");
             advance("=");
             expression(20);
         }
@@ -3930,7 +3943,7 @@ loop:   for (;;) {
             expression(20);
             if (nexttoken.id === "=") {
                 if (!option.boss)
-                    warning("Expected a conditional expression and instead saw an assignment.");
+                    warning("Assignment in conditional expression.");
                 advance("=");
                 expression(20);
             }
@@ -4001,7 +4014,7 @@ loop:   for (;;) {
                 expression(20);
                 if (nexttoken.id === "=") {
                     if (!option.boss)
-                        warning("Expected a conditional expression and instead saw an assignment.");
+                        warning("Assignment in conditional expression.");
                     advance("=");
                     expression(20);
                 }
