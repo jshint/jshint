@@ -2530,26 +2530,34 @@ loop:   for (;;) {
             return;
         }
 
-// Is this a labelled statement?
+        // Is this a labelled statement?
 
         if (t.identifier && !t.reserved && peek().id === ":") {
             advance();
             advance(":");
             scope = Object.create(s);
             addlabel(t.value, "label");
-            if (!nexttoken.labelled) {
-                warning("Label '{a}' on {b} statement.",
-                        nexttoken, t.value, nexttoken.value);
+
+            if (!nexttoken.labelled && nexttoken.value !== "{") {
+                warning("Label '{a}' on {b} statement.", nexttoken, t.value, nexttoken.value);
             }
+
             if (jx.test(t.value + ":")) {
-                warning("Label '{a}' looks like a javascript url.",
-                        t, t.value);
+                warning("Label '{a}' looks like a javascript url.", t, t.value);
             }
+
             nexttoken.label = t.value;
             t = nexttoken;
         }
 
-// Parse the statement.
+        // Is it a lonely block?
+
+        if (t.id === "{") {
+            block(true, true);
+            return;
+        }
+
+        // Parse the statement.
 
         if (!noindent) {
             indentation();
@@ -2557,6 +2565,7 @@ loop:   for (;;) {
         r = expression(0, true);
 
         // Look for the final semicolon.
+
         if (!t.block) {
             if (!option.expr && (!r || !r.exps)) {
                 warning("Expected an assignment or function call and instead saw an expression.",

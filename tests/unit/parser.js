@@ -333,10 +333,19 @@ exports.comma = function () {
         .addError(6, 'Expected an identifier and instead saw \')\'.')
         .addError(6, 'Expected an assignment or function call and instead saw an expression.')
         .addError(6, 'Missing semicolon.')
-        .addError(6, 'Expected to see a statement and instead saw a block.')
         .addError(6, 'Expected an assignment or function call and instead saw an expression.')
         .addError(6, 'Missing semicolon.')
-        .addError(8, 'Expected \'(end)\' and instead saw \'}\'.')
+        .addError(15, 'Expected an assignment or function call and instead saw an expression.')
+        .addError(15, 'Missing semicolon.')
+        .addError(20, 'Expected \')\' to match \'(\' from line 20 and instead saw \',\'.')
+        .addError(20, 'Expected an assignment or function call and instead saw an expression.')
+        .addError(20, 'Missing semicolon.')
+        .addError(20, 'Expected an identifier and instead saw \')\'.')
+        .addError(30, 'Expected \')\' to match \'(\' from line 30 and instead saw \',\'.')
+        .addError(30, 'Expected \')\' and instead saw \'args\'.')
+        .addError(30, 'Expected an assignment or function call and instead saw an expression.')
+        .addError(30, 'Missing semicolon.')
+        .addError(30, 'Expected an identifier and instead saw \')\'.')
         .test(src);
 };
 
@@ -359,6 +368,15 @@ exports.withStatement = function () {
         .addError(13, "Missing space after ')'.")
         .addError(13, "Unexpected space after '2'.")
         .test(src, {white: true, withstmt: true});
+};
+
+exports.blocks = function () {
+    var src = fs.readFileSync(__dirname + "/fixtures/blocks.js", "utf8");
+
+    TestRun()
+        .addError(29, 'Unmatched \'{\'.')
+        .addError(31, 'Unmatched \'{\'.')
+        .test(src);
 };
 
 exports.functionCharaterLocation = function () {
