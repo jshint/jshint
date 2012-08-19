@@ -785,7 +785,7 @@ var JSHINT = (function () {
         nxg = /[\u0000-\u001f&<"\/\\\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
 
         // star slash
-        lx = /\*\/|\/\*/;
+        lx = /\*\//;
 
         // identifier
         ix = /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/;
@@ -1425,10 +1425,6 @@ unclosedString:     for (;;) {
                                 if (!nextLine()) {
                                     errorAt("Unclosed comment.", line, character);
                                 }
-                            }
-                            character += i + 2;
-                            if (s.substr(i, 1) === "/") {
-                                errorAt("Nested comment.", line, character);
                             }
                             s = s.substr(i + 2);
                             token.comment = true;
