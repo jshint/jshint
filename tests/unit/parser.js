@@ -192,10 +192,13 @@ exports.comments = function () {
     ];
 
     TestRun()
-        .addError(2, "Nested comment.")
-        .addError(2, "Unbegun comment.")
+        .addError(3, "Unbegun comment.")
         .addError(4, "Unclosed comment.")
         .test(code);
+
+    var src = "/* this is a comment /* with nested slash-start */";
+    TestRun().test(src);
+    TestRun().test(fs.readFileSync(__dirname + "/fixtures/gruntComment.js", "utf8"));
 };
 
 exports.regexp = function () {
