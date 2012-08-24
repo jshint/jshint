@@ -283,6 +283,7 @@ var JSHINT = (function () {
             laxcomma    : true, // if line breaks should not be checked around commas
             loopfunc    : true, // if functions should be allowed to be defined within
                                 // loops
+            mocha       : true, // if mocha globals should be predefined
             mootools    : true, // if MooTools globals should be predefined
             multistr    : true, // allow multiline strings
             newcap      : true, // if constructor names must be capitalized
@@ -561,6 +562,15 @@ var JSHINT = (function () {
         lookahead,
         member,
         membersOnly,
+
+        mocha = {
+            after           : false,
+            afterEach       : false,
+            before          : false,
+            beforeEach      : false,
+            describe        : false,
+            it              : false
+        },
 
         mootools = {
             "$"             : false,
@@ -962,6 +972,10 @@ var JSHINT = (function () {
 
         if (option.jquery) {
             combine(predefined, jquery);
+        }
+
+        if (option.mocha) {
+            combine(predefined, mocha);
         }
 
         if (option.mootools) {
