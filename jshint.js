@@ -214,10 +214,10 @@
  readFile, readUrl, regexdash, removeEventListener, replace, report, require,
  reserved, resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
  runCommand, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal, self,
- send, serialize, sessionStorage, setInterval, setTimeout, setter, setterToken, shift, slice,
- smarttabs, sort, spawn, split, stack, status, start, strict, sub, substr, supernew, shadow,
- supplant, sum, sync, test, toLowerCase, toString, toUpperCase, toint32, token, tokens, top,
- trailing, type, typeOf, Uint16Array, Uint32Array, Uint8Array, undef, undefs, unused,
+ send, serialize, sessionStorage, setup, setInterval, setTimeout, setter, setterToken, shift, slice,
+ smarttabs, sort, spawn, split, stack, status, start, strict, sub, substr, suite, supernew, shadow,
+ supplant, sum, sync, teardown, test, toLowerCase, toString, toUpperCase, toint32, token, tokens,
+ top, trailing, type, typeOf, Uint16Array, Uint32Array, Uint8Array, undef, undefs, unused,
  urls, validthis, value, valueOf, var, vars, version, WebSocket, withstmt, white, window, windows,
  Worker, worker, wsh*/
 
@@ -569,7 +569,11 @@ var JSHINT = (function () {
             before          : false,
             beforeEach      : false,
             describe        : false,
-            it              : false
+            it              : false,
+            setup           : false,
+            suite           : false,
+            teardown        : false,
+            test            : false
         },
 
         mootools = {
