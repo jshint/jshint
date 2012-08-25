@@ -189,12 +189,12 @@
  Timer, Tips, Type, TypeError, Toggle, Try, "use strict", unescape, URI, URIError, URL,
  VBArray, WeakMap, WSH, WScript, XDomainRequest, Web, Window, XMLDOM, XMLHttpRequest, XMLSerializer,
  XPathEvaluator, XPathException, XPathExpression, XPathNamespace, XPathNSResolver, XPathResult,
- "\\", a, abs, addEventListener, address, alert, apply, applicationCache, arguments, arity,
- asi, atob, b, basic, basicToken, bitwise, blacklist, block, blur, boolOptions, boss,
- browser, btoa, c, call, callee, caller, camelcase, cases, charAt, charCodeAt, character,
- clearInterval, clearTimeout, close, closed, closure, comment, condition, confirm, console,
- constructor, content, couch, create, css, curly, d, data, datalist, dd, debug, decodeURI,
- decodeURIComponent, defaultStatus, defineClass, deserialize, devel, document,
+ "\\", a, abs, addEventListener, address, after, afterEach, alert, apply, applicationCache,
+ arguments, arity,  asi, atob, b, basic, basicToken, before, beforeEach, bitwise, blacklist, block,
+ blur, boolOptions, boss,  browser, btoa, c, call, callee, caller, camelcase, cases, charAt,
+ charCodeAt, character, clearInterval, clearTimeout, close, closed, closure, comment, condition,
+ confirm, console,  constructor, content, couch, create, css, curly, d, data, datalist, dd, debug,
+ decodeURI, decodeURIComponent, defaultStatus, defineClass, describe, deserialize, devel, document,
  dojo, dijit, dojox, define, else, emit, encodeURI, encodeURIComponent,
  eqeq, eqeqeq, eqnull, errors, es5, escape, esnext, eval, event, evidence, evil,
  ex, exception, exec, exps, expr, exports, FileReader, first, floor, focus, forEach,
@@ -202,11 +202,11 @@
  g, gc, getComputedStyle, getRow, getter, getterToken, GLOBAL, global, globals, globalstrict,
  hasOwnProperty, help, history, i, id, identifier, immed, implieds, importPackage, include,
  indent, indexOf, init, ins, instanceOf, isAlpha, isApplicationRunning, isArray,
- isDigit, isFinite, isNaN, iterator, java, join, jshint,
+ isDigit, isFinite, isNaN, it, iterator, java, join, jshint,
  JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastcharacter, lastsemic, laxbreak,
  laxcomma, latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
  log, loopfunc, m, match, max, maxerr, maxlen, member,message, meta, module, moveBy,
- moveTo, mootools, multistr, name, navigator, new, newcap, noarg, node, noempty, nomen,
+ moveTo, mocha, mootools, multistr, name, navigator, new, newcap, noarg, node, noempty, nomen,
  nonew, nonstandard, nud, onbeforeunload, onblur, onerror, onevar, onecase, onfocus,
  onload, onresize, onunload, open, openDatabase, openURL, opener, opera, options, outer, param,
  parent, parseFloat, parseInt, passfail, plusplus, postMessage, pop, predef, print, process, prompt,
@@ -214,10 +214,10 @@
  readFile, readUrl, regexdash, removeEventListener, replace, report, require,
  reserved, resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
  runCommand, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal, self,
- send, serialize, sessionStorage, setInterval, setTimeout, setter, setterToken, shift, slice,
- smarttabs, sort, spawn, split, stack, status, start, strict, sub, substr, supernew, shadow,
- supplant, sum, sync, test, toLowerCase, toString, toUpperCase, toint32, token, tokens, top,
- trailing, type, typeOf, Uint16Array, Uint32Array, Uint8Array, undef, undefs, unused,
+ send, serialize, sessionStorage, setup, setInterval, setTimeout, setter, setterToken, shift, slice,
+ smarttabs, sort, spawn, split, stack, status, start, strict, sub, substr, suite, supernew, shadow,
+ supplant, sum, sync, teardown, test, toLowerCase, toString, toUpperCase, toint32, token, tokens,
+ top, trailing, type, typeOf, Uint16Array, Uint32Array, Uint8Array, undef, undefs, unused,
  urls, validthis, value, valueOf, var, vars, version, WebSocket, withstmt, white, window, windows,
  Worker, worker, wsh*/
 
@@ -283,6 +283,7 @@ var JSHINT = (function () {
             laxcomma    : true, // if line breaks should not be checked around commas
             loopfunc    : true, // if functions should be allowed to be defined within
                                 // loops
+            mocha       : true, // if mocha globals should be predefined
             mootools    : true, // if MooTools globals should be predefined
             multistr    : true, // allow multiline strings
             newcap      : true, // if constructor names must be capitalized
@@ -561,6 +562,19 @@ var JSHINT = (function () {
         lookahead,
         member,
         membersOnly,
+
+        mocha = {
+            after           : false,
+            afterEach       : false,
+            before          : false,
+            beforeEach      : false,
+            describe        : false,
+            it              : false,
+            setup           : false,
+            suite           : false,
+            teardown        : false,
+            test            : false
+        },
 
         mootools = {
             "$"             : false,
@@ -965,6 +979,10 @@ var JSHINT = (function () {
 
         if (option.jquery) {
             combine(predefined, jquery);
+        }
+
+        if (option.mocha) {
+            combine(predefined, mocha);
         }
 
         if (option.mootools) {
