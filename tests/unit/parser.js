@@ -325,6 +325,9 @@ exports.jsonMode = function () {
 exports.comma = function () {
     var src = fs.readFileSync(__dirname + "/fixtures/comma.js", "utf8");
 
+    // !!
+    // there are more errors in comma.js
+    // but comma-operator isn't finished, yet - so jshint currently breaks at line 8
     TestRun()
         .addError(6, 'Expected a conditional expression and instead saw an assignment.')
         .addError(6, 'Expected \';\' and instead saw \',\'.')

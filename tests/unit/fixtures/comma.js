@@ -8,7 +8,11 @@ for ( var i = 0, channel, len = channels.length; channel = channels[i], i < len;
 }
 
 
-function Model(data, block) {
+// !!
+// see parser.js [exports.comma]
+// comma operator breaks jshint...
+// the next line should result in an error (parser or jshint)
+func tion Model(data, block) {
     // ...
 }
 Model.create = function(base, options) {

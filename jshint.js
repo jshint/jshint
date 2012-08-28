@@ -147,13 +147,13 @@
 
 /*members "\b", "\t", "\n", "\f", "\r", "!=", "!==", "\"", "%", "(begin)",
  "(breakage)", "(character)", "(context)", "(error)", "(explicitNewcap)", "(global)",
- "(identifier)", "(last)", "(lastcharacter)", "(line)", "(loopage)", "(name)",
- "(onevar)", "(params)", "(scope)", "(statement)", "(verb)", "(tokens)",
+ "(identifier)", "(last)", "(lastcharacter)", "(line)", "(loopage)", "(metrics)",
+ "(name)", "(onevar)", "(params)", "(scope)", "(statement)", "(verb)", "(tokens)",
  "*", "+", "++", "-", "--", "\/", "<", "<=", "==",
  "===", ">", ">=", $, $$, $A, $F, $H, $R, $break, $continue, $w, Abstract, Ajax,
  __filename, __dirname, ActiveXObject, Array, ArrayBuffer, ArrayBufferView, Audio,
  Autocompleter, Assets, Boolean, Builder, Buffer, Browser, COM, CScript, Canvas,
- CustomAnimation, Class, Control, Chain, Color, Cookie, Core, DataView, Date,
+ CustomAnimation, Class, Control, ComplexityCount, Chain, Color, Cookie, Core, DataView, Date,
  Debug, Draggable, Draggables, Droppables, Document, DomReady, DOMReady, DOMParser, Drag,
  E, Enumerator, Enumerable, Element, Elements, Error, Effect, EvalError, Event,
  Events, FadeAnimation, Field, Flash, Float32Array, Float64Array, Form,
@@ -189,9 +189,9 @@
  "\\", a, abs, addEventListener, address, alert, apply, applicationCache, arguments, arity,
  asi, atob, b, basic, basicToken, bitwise, blacklist, block, blur, boolOptions, boss,
  browser, btoa, c, call, callee, caller, camelcase, cases, charAt, charCodeAt, character,
- clearInterval, clearTimeout, close, closed, closure, comment, condition, confirm, console,
- constructor, content, couch, create, css, curly, d, data, datalist, dd, debug, decodeURI,
- decodeURIComponent, defaultStatus, defineClass, deserialize, devel, document,
+ clearInterval, clearTimeout, close, closed, closure, comment, complexityCount, condition,
+ confirm, console, constructor, content, couch, create, css, curly, d, data, datalist, dd, debug,
+ decodeURI, decodeURIComponent, defaultStatus, defineClass, deserialize, devel, document,
  dojo, dijit, dojox, define, else, emit, encodeURI, encodeURIComponent,
  eqeq, eqeqeq, eqnull, errors, es5, escape, esnext, eval, event, evidence, evil,
  ex, exception, exec, exps, expr, exports, FileReader, first, floor, focus, forEach,
@@ -202,21 +202,23 @@
  isDigit, isFinite, isNaN, iterator, java, join, jshint,
  JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastcharacter, lastsemic, laxbreak,
  laxcomma, latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
- log, loopfunc, m, match, max, maxerr, maxlen, member,message, meta, module, moveBy,
- moveTo, mootools, multistr, name, navigator, new, newcap, noarg, node, noempty, nomen,
- nonew, nonstandard, nud, onbeforeunload, onblur, onerror, onevar, onecase, onfocus,
- onload, onresize, onunload, open, openDatabase, openURL, opener, opera, options, outer, param,
- parent, parseFloat, parseInt, passfail, plusplus, postMessage, pop, predef, print, process, prompt,
- proto, prototype, prototypejs, provides, push, quit, quotmark, range, raw, reach, reason, regexp,
- readFile, readUrl, regexdash, removeEventListener, replace, report, require,
- reserved, resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
- runCommand, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal, self,
- send, serialize, sessionStorage, setInterval, setTimeout, setter, setterToken, shift, slice,
- smarttabs, sort, spawn, split, stack, status, start, strict, sub, substr, supernew, shadow,
- supplant, sum, sync, test, toLowerCase, toString, toUpperCase, toint32, token, tokens, top,
- trailing, type, typeOf, Uint16Array, Uint32Array, Uint8Array, undef, undefs, unused,
- urls, validthis, value, valueOf, var, vars, version, WebSocket, withstmt, white, window, windows,
- Worker, worker, wsh*/
+ log, loopfunc, m, match, max, maxcomplexity, maxdepth, maxerr, maxlen, maxstatements, maxparams,
+ member, message, meta, module, moveBy, moveTo, mootools, multistr, name, navigator, new, newcap,
+ nestedBlockDepth, noarg, node, noempty, nomen, nonew, nonstandard, nud, onbeforeunload, onblur,
+ onerror, onevar, onecase, onfocus, onload, onresize, onunload, open, openDatabase, openURL,
+ opener, opera, options, outer, param, parent, parseFloat, parseInt, passfail, plusplus,
+ postMessage, pop, predef, print, process, prompt, proto, prototype, prototypejs, provides, push,
+ quit, quotmark, range, raw, reach, reason, regexp, readFile, readUrl, regexdash,
+ removeEventListener, replace, report, require, reserved, resizeBy, resizeTo, resolvePath,
+ resumeUpdates, respond, rhino, right, runCommand, scroll, screen, scripturl, scrollBy, scrollTo,
+ scrollbar, search, seal, self, send, serialize, sessionStorage, setInterval, setTimeout, setter,
+ setterToken, shift, slice, smarttabs, sort, spawn, split, statementCount, stack, status, start,
+ strict, sub, substr, supernew, shadow, supplant, sum, sync, test, toLowerCase, toString,
+ toUpperCase, toint32, token, tokens, top, trailing, type, typeOf, Uint16Array, Uint32Array,
+ Uint8Array, undef, undefs, unused, urls, validthis, value, valueOf, var, vars, version,
+ verifyMaxParametersPerFunction, verifyMaxStatementsPerFunction, verifyMaxComplexityPerFunction,
+ verifyMaxNestedBlockDepthPerFunction, WebSocket, withstmt, white, window, windows, Worker, worker,
+ wsh*/
 
 /*global exports: false */
 
@@ -327,11 +329,15 @@ var JSHINT = (function () {
         // These are the JSHint options that can take any value
         // (we use this object to detect invalid options)
         valOptions = {
-            maxlen: false,
-            indent: false,
-            maxerr: false,
-            predef: false,
-            quotmark: false //'single'|'double'|true
+            maxlen       : false,
+            indent       : false,
+            maxerr       : false,
+            predef       : false,
+            quotmark     : false, //'single'|'double'|true
+            maxstatements: false, // {int} max statements per function
+            maxdepth     : false, // {int} max nested block depth per function
+            maxparams    : false, // {int} max params per function
+            maxcomplexity: false  // {int} max cyclomatic complexity per function
         },
 
         // These are JSHint boolean options which are shared with JSLint
@@ -2738,6 +2744,10 @@ loop:   for (;;) {
         nonadjacent(token, nexttoken);
         t = nexttoken;
 
+        var metrics = funct["(metrics)"];
+        metrics.nestedBlockDepth += 1;
+        metrics.verifyMaxNestedBlockDepthPerFunction();
+
         if (nexttoken.id === "{") {
             advance("{");
             line = token.line;
@@ -2764,6 +2774,8 @@ loop:   for (;;) {
                 }
 
                 a = statements(line);
+
+                metrics.statementCount += a.length;
 
                 if (isfunc) {
                     directive = m;
@@ -2799,6 +2811,7 @@ loop:   for (;;) {
         if (ordinary && option.noempty && (!a || a.length === 0)) {
             warning("Empty block.");
         }
+        metrics.nestedBlockDepth -= 1;
         return a;
     }
 
@@ -3442,6 +3455,7 @@ loop:   for (;;) {
             "(context)"  : funct,
             "(breakage)" : 0,
             "(loopage)"  : 0,
+            "(metrics)"  : createMetrics(nexttoken),
             "(scope)"    : scope,
             "(statement)": statement,
             "(tokens)"   : {}
@@ -3453,14 +3467,64 @@ loop:   for (;;) {
             addlabel(i, "function");
         }
         funct["(params)"] = functionparams();
+        funct["(metrics)"].verifyMaxParametersPerFunction(funct["(params)"]);
 
         block(false, false, true);
+
+        funct["(metrics)"].verifyMaxStatementsPerFunction();
+        funct["(metrics)"].verifyMaxComplexityPerFunction();
+
         scope = oldScope;
         option = oldOption;
         funct["(last)"] = token.line;
         funct["(lastcharacter)"] = token.character;
         funct = funct["(context)"];
         return f;
+    }
+
+    function createMetrics(functionStartToken) {
+        return {
+            statementCount: 0,
+            nestedBlockDepth: -1,
+            ComplexityCount: 1,
+            verifyMaxStatementsPerFunction: function () {
+                if (option.maxstatements &&
+                    this.statementCount > option.maxstatements) {
+                    var message = "Too many statements per function (" + this.statementCount + ").";
+                    warning(message, functionStartToken);
+                }
+            },
+
+            verifyMaxParametersPerFunction: function (parameters) {
+                if (option.maxparams &&
+                    parameters.length > option.maxparams) {
+                    var message = "Too many parameters per function (" + parameters.length + ").";
+                    warning(message, functionStartToken);
+                }
+            },
+
+            verifyMaxNestedBlockDepthPerFunction: function () {
+                if (option.maxdepth &&
+                    this.nestedBlockDepth > 0 &&
+                    this.nestedBlockDepth === option.maxdepth + 1) {
+                    var message = "Blocks are nested too deeply (" + this.nestedBlockDepth + ").";
+                    warning(message);
+                }
+            },
+
+            verifyMaxComplexityPerFunction: function () {
+                var max = option.maxcomplexity;
+                var cc = this.ComplexityCount;
+                if (max && cc > max) {
+                    var message = "Cyclomatic complexity is too high per function (" + cc + ").";
+                    warning(message, functionStartToken);
+                }
+            }
+        };
+    }
+
+    function increaseComplexityCount() {
+        funct["(metrics)"].ComplexityCount += 1;
     }
 
 
@@ -3746,6 +3810,7 @@ loop:   for (;;) {
 
     blockstmt("if", function () {
         var t = nexttoken;
+        increaseComplexityCount();
         advance("(");
         nonadjacent(this, t);
         nospace();
@@ -3776,6 +3841,7 @@ loop:   for (;;) {
 
         block(false);
         if (nexttoken.id === "catch") {
+            increaseComplexityCount();
             advance("catch");
             nonadjacent(token, nexttoken);
             advance("(");
@@ -3809,6 +3875,7 @@ loop:   for (;;) {
         var t = nexttoken;
         funct["(breakage)"] += 1;
         funct["(loopage)"] += 1;
+        increaseComplexityCount();
         advance("(");
         nonadjacent(this, t);
         nospace();
@@ -3886,6 +3953,7 @@ loop:   for (;;) {
                 indentation(-option.indent);
                 advance("case");
                 this.cases.push(expression(20));
+                increaseComplexityCount();
                 g = true;
                 advance(":");
                 funct["(verb)"] = "case";
@@ -3964,6 +4032,8 @@ loop:   for (;;) {
         var x = stmt("do", function () {
             funct["(breakage)"] += 1;
             funct["(loopage)"] += 1;
+            increaseComplexityCount();
+
             this.first = block(true);
             advance("while");
             var t = nexttoken;
@@ -3991,6 +4061,7 @@ loop:   for (;;) {
         var s, t = nexttoken;
         funct["(breakage)"] += 1;
         funct["(loopage)"] += 1;
+        increaseComplexityCount();
         advance("(");
         nonadjacent(this, t);
         nospace();
@@ -4324,12 +4395,13 @@ loop:   for (;;) {
         global = Object.create(predefined);
         scope = global;
         funct = {
-            "(global)": true,
-            "(name)": "(global)",
-            "(scope)": scope,
+            "(global)":   true,
+            "(name)":     "(global)",
+            "(scope)":    scope,
             "(breakage)": 0,
-            "(loopage)": 0,
-            "(tokens)": {}
+            "(loopage)":  0,
+            "(tokens)":   {},
+            "(metrics)":   createMetrics(nexttoken)
         };
         functions = [funct];
         urls = [];
