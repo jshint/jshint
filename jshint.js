@@ -1617,10 +1617,7 @@ unclosedString:     for (;;) {
                                         c = s.charAt(l);
                                         if (c === "^") {
                                             l += 1;
-                                            if (option.regexp) {
-                                                warningAt("Insecure '{a}'.",
-                                                        line, from + l, c);
-                                            } else if (s.charAt(l) === "]") {
+                                            if (s.charAt(l) === "]") {
                                                 errorAt("Unescaped '{a}'.",
                                                     line, from + l, "^");
                                             }
