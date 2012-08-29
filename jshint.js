@@ -195,13 +195,13 @@
  clearInterval, clearTimeout, close, closed, closure, comment, complexityCount, condition,
  confirm, console, constructor, content, couch, create, css, curly, d, data, datalist, dd, debug,
  decodeURI, decodeURIComponent, defaultStatus, defineClass, deserialize, devel, document,
- dojo, dijit, dojox, define, else, emit, encodeURI, encodeURIComponent,
+ dojo, dijit, dojox, define, else, emit, encodeURI, encodeURIComponent, elem,
  eqeq, eqeqeq, eqnull, errors, es5, escape, esnext, eval, event, evidence, evil,
  ex, exception, exec, exps, expr, exports, FileReader, first, floor, focus, forEach,
  forin, fragment, frames, from, fromCharCode, fud, funcscope, funct, function, functions,
  g, gc, getComputedStyle, getRow, getter, getterToken, GLOBAL, global, globals, globalstrict,
  hasOwnProperty, help, history, i, id, identifier, immed, implieds, importPackage, include,
- indent, indexOf, init, ins, instanceOf, isAlpha, isApplicationRunning, isArray,
+ indent, indexOf, init, ins, internals, instanceOf, isAlpha, isApplicationRunning, isArray,
  isDigit, isFinite, isNaN, iterator, java, join, jshint,
  JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastcharacter, lastsemic, laxbreak,
  laxcomma, latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
@@ -213,10 +213,10 @@
  postMessage, pop, predef, print, process, prompt, proto, prototype, prototypejs, provides, push,
  quit, quotmark, range, raw, reach, reason, regexp, readFile, readUrl, regexdash,
  removeEventListener, replace, report, require, reserved, resizeBy, resizeTo, resolvePath,
- resumeUpdates, respond, rhino, right, runCommand, scroll, screen, scripturl, scrollBy, scrollTo,
- scrollbar, search, seal, self, send, serialize, sessionStorage, setInterval, setTimeout, setter,
- setterToken, shift, slice, smarttabs, sort, spawn, split, statementCount, stack, status, start,
- strict, sub, substr, supernew, shadow, supplant, sum, sync, test, toLowerCase, toString,
+ resumeUpdates, respond, rhino, right, runCommand, scroll, scope, screen, scripturl, scrollBy,
+ scrollTo, scrollbar, search, seal, self, send, serialize, sessionStorage, setInterval, setTimeout,
+ setter, setterToken, shift, slice, smarttabs, sort, spawn, split, statementCount, stack, status,
+ start, strict, sub, substr, supernew, shadow, supplant, sum, sync, test, toLowerCase, toString,
  toUpperCase, toint32, token, tokens, top, trailing, type, typeOf, Uint16Array, Uint32Array,
  Uint8Array, undef, undefs, unused, urls, validthis, value, valueOf, var, vars, version,
  verifyMaxParametersPerFunction, verifyMaxStatementsPerFunction, verifyMaxComplexityPerFunction,
@@ -337,6 +337,7 @@ var JSHINT = (function () {
             maxerr       : false,
             predef       : false,
             quotmark     : false, //'single'|'double'|true
+            scope        : false,
             maxstatements: false, // {int} max statements per function
             maxdepth     : false, // {int} max nested block depth per function
             maxparams    : false, // {int} max params per function
@@ -1027,6 +1028,7 @@ var JSHINT = (function () {
             evidence: lines[l - 1] || "",
             line: l,
             character: ch,
+            scope: JSHINT.scope,
             a: a,
             b: b,
             c: c,
@@ -1062,6 +1064,17 @@ var JSHINT = (function () {
         }, a, b, c, d);
     }
 
+    // Tracking of "internal" scripts, like eval containing a static string
+    function addInternalSrc(elem, src) {
+        var i;
+        i = {
+            id: "(internal)",
+            elem: elem,
+            value: src
+        };
+        JSHINT.internals.push(i);
+        return i;
+    }
 
 
 // lexical analysis and token construction
@@ -3300,11 +3313,26 @@ loop:   for (;;) {
                 if (left.value === "eval" || left.value === "Function" ||
                         left.value === "execScript") {
                     warning("eval is evil.", left);
+
+                    if (p[0] && [0].id === "(string)") {
+                        addInternalSrc(left, p[0].value);
+                    }
                 } else if (p[0] && p[0].id === "(string)" &&
                        (left.value === "setTimeout" ||
                         left.value === "setInterval")) {
                     warning(
     "Implied eval is evil. Pass a function instead of a string.", left);
+                    addInternalSrc(left, p[0].value);
+
+                // window.setTimeout/setInterval
+                } else if (p[0] && p[0].id === "(string)" &&
+                       left.value === "." &&
+                       left.left.value === "window" &&
+                       (left.right === "setTimeout" ||
+                        left.right === "setInterval")) {
+                    warning(
+    "Implied eval is evil. Pass a function instead of a string.", left);
+                    addInternalSrc(left, p[0].value);
                 }
             }
             if (!left.identifier && left.id !== "." && left.id !== "[" &&
@@ -4349,13 +4377,19 @@ loop:   for (;;) {
 
     // The actual JSHINT function itself.
     var itself = function (s, o, g) {
-        var a, i, k, x,
-            optionKeys,
-            newOptionObj = {};
+        var a, i, k, x;
+        var optionKeys;
+        var newOptionObj = {};
 
-        JSHINT.errors = [];
-        JSHINT.undefs = [];
-        JSHINT.blacklist = {};
+        if (o && o.scope) {
+            JSHINT.scope = o.scope;
+        } else {
+            JSHINT.errors = [];
+            JSHINT.undefs = [];
+            JSHINT.internals = [];
+            JSHINT.blacklist = {};
+            JSHINT.scope = "(main)";
+        }
 
         predefined = Object.create(standard);
         declared = Object.create(null);
@@ -4603,6 +4637,18 @@ loop:   for (;;) {
                     line      : e.line || nt.line,
                     character : e.character || nt.from
                 }, null);
+            }
+        }
+
+        // Loop over the listed "internals", and check them as well.
+
+        if (JSHINT.scope === "(main)") {
+            o = o || {};
+
+            for (i = 0; i < JSHINT.internals.length; i += 1) {
+                k = JSHINT.internals[i];
+                o.scope = k.elem;
+                itself(k.value, o, g);
             }
         }
 
