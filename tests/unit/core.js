@@ -473,3 +473,8 @@ exports.missingRadix = function () {
         })
         .test(code);
 };
+
+exports.NumberNaN = function () {
+    var code = "(function () { return Number.NaN; })();";
+    TestRun().test(code);
+};

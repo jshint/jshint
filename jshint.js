@@ -175,7 +175,7 @@
  Iframe, IframeShim, Image, importScripts, Int16Array, Int32Array, Int8Array,
  Insertion, InputValidator, JSON, Keyboard, Locale, LN10, LN2, LOG10E, LOG2E,
  MAX_VALUE, MIN_VALUE, Map, Mask, Math, MenuItem, MessageChannel, MessageEvent, MessagePort,
- MoveAnimation, MooTools, MutationObserver, Native, NEGATIVE_INFINITY, Node, NodeFilter,
+ MoveAnimation, MooTools, MutationObserver, NaN, Native, NEGATIVE_INFINITY, Node, NodeFilter,
  Number, Object, ObjectRange,
  Option, Options, OverText, PI, POSITIVE_INFINITY, PeriodicalExecuter, Point, Position, Prototype,
  RangeError, Rectangle, ReferenceError, RegExp, ResizeAnimation, Request, RotateAnimation, Set,
@@ -727,6 +727,7 @@ var JSHINT = (function () {
             JSON                : false,
             Map                 : false,
             Math                : false,
+            NaN                 : false,
             Number              : false,
             Object              : false,
             parseInt            : false,
@@ -910,6 +911,16 @@ var JSHINT = (function () {
 
     function isDigit(str) {
         return (str >= "0" && str <= "9");
+    }
+
+    function isIdentifier(token, value) {
+        if (!token)
+            return false;
+
+        if (!token.identifier || token.value !== value)
+            return false;
+
+        return true;
     }
 
     function supplant(str, data) {
@@ -2384,7 +2395,8 @@ loop:   for (;;) {
             nobreaknonadjacent(prevtoken, token);
             nonadjacent(token, nexttoken);
             var right = expression(100);
-            if ((left && left.id === "NaN") || (right && right.id === "NaN")) {
+
+            if (isIdentifier(left, "NaN") || isIdentifier(right, "NaN")) {
                 warning("Use the isNaN function to compare with NaN.", this);
             } else if (f) {
                 f.apply(this, [left, right]);
@@ -3033,7 +3045,6 @@ loop:   for (;;) {
     reservevar("eval");
     reservevar("false");
     reservevar("Infinity");
-    reservevar("NaN");
     reservevar("null");
     reservevar("this", function (x) {
         if (directive["use strict"] && !option.validthis && ((funct["(statement)"] &&
