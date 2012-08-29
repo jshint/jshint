@@ -807,6 +807,8 @@ exports.strict = function () {
     TestRun()
         .addError(6, "Missing 'new' prefix when invoking a constructor.")
         .test(src3, {});
+
+    TestRun().test("var obj = Object({ foo: 'bar' });", { strict: true });
 };
 
 /** Option `globalstrict` allows you to use global "use strict"; */

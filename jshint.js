@@ -3288,14 +3288,11 @@ loop:   for (;;) {
         if (left) {
             if (left.type === "(identifier)") {
                 if (left.value.match(/^[A-Z]([A-Z0-9_$]*[a-z][A-Za-z0-9_$]*)?$/)) {
-                    if (left.value !== "Number" && left.value !== "String" &&
-                            left.value !== "Boolean" &&
-                            left.value !== "Date") {
+                    if ("Number String Boolean Date Object".indexOf(left.value) === -1) {
                         if (left.value === "Math") {
                             warning("Math is not a function.", left);
                         } else if (option.newcap) {
-                            warning(
-"Missing 'new' prefix when invoking a constructor.", left);
+                            warning("Missing 'new' prefix when invoking a constructor.", left);
                         }
                     }
                 }
