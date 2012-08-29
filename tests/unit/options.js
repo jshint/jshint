@@ -836,9 +836,8 @@ exports.globalstrict = function () {
 /** Option `regexp` disallows the use of . and [^...] in regular expressions. */
 exports.regexp = function () {
     var code = [
-        'var a = /hey/;'
-      , 'var a = /h.ey/;'
-      , 'var a = /h[^...]/;'
+        'var a = /hey/;',
+        'var a = /h.ey/;'
     ];
 
     for (var i = 0, st; st = code[i]; i += 1) {
@@ -850,10 +849,6 @@ exports.regexp = function () {
     TestRun()
         .addError(1, "Insecure '.'.")
         .test(code[1], { regexp: true });
-
-    TestRun()
-        .addError(1, "Insecure '^'.")
-        .test(code[2], { regexp: true });
 };
 
 /** Option `laxbreak` allows you to insert newlines before some operators. */
