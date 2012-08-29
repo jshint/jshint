@@ -468,7 +468,7 @@ exports.mootools = function () {
     var globals = [
             '$'
           , '$$'
-          , 'Assets'
+          , 'Asset'
           , 'Browser'
           , 'Chain'
           , 'Class'
@@ -478,6 +478,7 @@ exports.mootools = function () {
           , 'Document'
           , 'DomReady'
           , 'DOMReady'
+          , 'DOMEvent'
           , 'Drag'
           , 'Element'
           , 'Elements'
