@@ -758,6 +758,7 @@ exports.newcap = function () {
     TestRun()
         .addError(1, 'A constructor name should start with an uppercase letter.')
         .addError(5, "Missing 'new' prefix when invoking a constructor.")
+        .addError(10, "A constructor name should start with an uppercase letter.")
         .test(src, { newcap: true });
 };
 
@@ -804,7 +805,6 @@ exports.strict = function () {
         .test(src2, { strict: false });
 
     TestRun()
-        .addError(7, "A constructor name should start with an uppercase letter.")
         .test(src3, {});
 };
 
