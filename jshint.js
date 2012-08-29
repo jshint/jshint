@@ -3211,7 +3211,7 @@ loop:   for (;;) {
                 default:
                     if (c.id !== "function") {
                         i = c.value.substr(0, 1);
-                        if (option.newcap && (i < "A" || i > "Z")) {
+                        if (option.newcap && (i < "A" || i > "Z") && !is_own(global, c.value)) {
                             warning("A constructor name should start with an uppercase letter.",
                                 token);
                         }
