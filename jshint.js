@@ -1413,6 +1413,10 @@ unclosedString:     for (;;) {
                                 warningAt("Bad escapement of EOL. Use option multistr if needed.",
                                     line, character);
                                 break;
+                            case "!":
+                                if (s.charAt(j - 2) === "<")
+                                    break;
+                                /*falls through*/
                             default:
                                 warningAt("Bad escapement.", line, character);
                             }

@@ -478,3 +478,10 @@ exports.NumberNaN = function () {
     var code = "(function () { return Number.NaN; })();";
     TestRun().test(code);
 };
+
+exports.htmlEscapement = function () {
+    TestRun().test("var a = '<\\!--';");
+    TestRun()
+        .addError(1, "Bad escapement.")
+        .test("var a = '\\!';");
+};
