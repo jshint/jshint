@@ -222,6 +222,7 @@ exports.browser = function () {
             'ArrayBuffer'
           , 'ArrayBufferView'
           , 'Audio'
+          , 'Blob'
           , 'addEventListener'
           , 'applicationCache'
           , 'blur'
