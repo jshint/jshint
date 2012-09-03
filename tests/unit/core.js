@@ -485,3 +485,18 @@ exports.htmlEscapement = function () {
         .addError(1, "Bad escapement.")
         .test("var a = '\\!';");
 };
+
+// GH-551 regression test.
+exports.testSparseArrays = function () {
+    var src = "var arr = ['a',, null,, '',, undefined,,];";
+
+    TestRun()
+        .addError(1, "Extra comma.")
+        .addError(1, "Extra comma.")
+        .addError(1, "Extra comma.")
+        .addError(1, "Extra comma.")
+        .test(src);
+
+    TestRun()
+        .test(src, { es5: true });
+};

@@ -3410,7 +3410,8 @@ loop:   for (;;) {
         }
         while (nexttoken.id !== "(end)") {
             while (nexttoken.id === ",") {
-                warning("Extra comma.");
+                if (!option.es5)
+                    warning("Extra comma.");
                 advance(",");
             }
             if (nexttoken.id === "]") {
