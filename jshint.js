@@ -1762,6 +1762,7 @@ klass:                                  do {
                                             if (c < "0" || c > "9") {
                                                 warningAt(
 "Expected a number and instead saw '{a}'.", line, from + l, c);
+                                                break; // No reason to continue checking numbers.
                                             }
                                             l += 1;
                                             low = +c;

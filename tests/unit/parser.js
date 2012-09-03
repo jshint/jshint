@@ -279,6 +279,11 @@ exports.testRegexRegressions = function () {
     TestRun()
         .addError(1, "A regular expression literal can be confused with '/='.")
         .test("str = str.replace(/=abc/g, '');", {}, { str: true });
+
+    // GH-538
+    TestRun()
+        .addError(1, "Expected a number and instead saw '/'.")
+        .test("var exp = /function(.*){/gi;");
 };
 
 exports.strings = function () {
