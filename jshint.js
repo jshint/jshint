@@ -794,7 +794,7 @@ var JSHINT = (function () {
         cx = /[\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/;
 
         // token
-        tx = /^\s*([(){}\[.,:;'"~\?\]#@]|==?=?|\/(\*(jshint|jslint|members?|global)?|=|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|%=?|&[&=]?|\|[|=]?|>>?>?=?|<([\/=!]|\!(\[|--)?|<=?)?|\^=?|\!=?=?|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+\-]?[0-9]+)?)/;
+        tx = /^\s*([(){}\[.,:;'"~\?\]#@]|==?=?|\/=(?!(\S*\/[gim]?))|\/(\*(jshint|jslint|members?|global)?|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|%=?|&[&=]?|\|[|=]?|>>?>?=?|<([\/=!]|\!(\[|--)?|<=?)?|\^=?|\!=?=?|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+\-]?[0-9]+)?)/;
 
         // characters in strings that need escapement
         nx = /[\u0000-\u001f&<"\/\\\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/;
@@ -1267,6 +1267,7 @@ var JSHINT = (function () {
 
                 function match(x) {
                     var r = x.exec(s), r1;
+
                     if (r) {
                         l = r[0].length;
                         r1 = r[1];
@@ -1312,6 +1313,7 @@ var JSHINT = (function () {
                         character += n;
                         c = String.fromCharCode(i);
                     }
+
                     j = 0;
 unclosedString:     for (;;) {
                         while (j >= s.length) {
@@ -1329,12 +1331,14 @@ unclosedString:     for (;;) {
                                 warningAt("Unclosed string.", cl, cf);
                             }
                         }
+
                         c = s.charAt(j);
                         if (c === x) {
                             character += 1;
                             s = s.substr(j + 1);
                             return it("(string)", r, x);
                         }
+
                         if (c < " ") {
                             if (c === "\n" || c === "\r") {
                                 break;
@@ -1431,7 +1435,9 @@ unclosedString:     for (;;) {
                     if (!s) {
                         return it(nextLine() ? "(endline)" : "(end)", "");
                     }
+
                     t = match(tx);
+
                     if (!t) {
                         t = "";
                         c = "";
@@ -1530,10 +1536,11 @@ unclosedString:     for (;;) {
                             break;
     //      /
                         case "/":
-                            if (token.id === "/=") {
+                            if (s.charAt(0) === "=") {
                                 errorAt("A regular expression literal can be confused with '/='.",
                                     line, from);
                             }
+
                             if (prereg) {
                                 depth = 0;
                                 captures = 0;
