@@ -517,3 +517,12 @@ exports.testCatchBlocks = function () {
     TestRun()
         .test(src, { undef: true, devel: true, node: true });
 };
+
+exports.testNumericParams = function () {
+    TestRun()
+        .test("/*jshint maxparams:4, indent:3 */");
+
+    TestRun()
+        .addError(1, "Expected a small integer and instead saw 'face'.")
+        .test("/*jshint maxparams:face */");
+};
