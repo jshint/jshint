@@ -500,3 +500,20 @@ exports.testSparseArrays = function () {
     TestRun()
         .test(src, { es5: true });
 };
+
+exports.testCatchBlocks = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/gh247.js', 'utf8');
+
+    TestRun()
+        .addError(11, "'w' is not defined.")
+        .test(src, { undef: true, devel: true });
+
+    src = fs.readFileSync(__dirname + '/fixtures/gh618.js', 'utf8');
+
+    TestRun()
+        .addError(5, "Value of 'x' may be overwritten in IE.")
+        .test(src, { undef: true, devel: true });
+
+    TestRun()
+        .test(src, { undef: true, devel: true, node: true });
+};
