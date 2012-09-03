@@ -151,7 +151,7 @@
 /*members "\b", "\t", "\n", "\f", "\r", "!=", "!==", "\"", "%", "(begin)",
  "(breakage)", "(character)", "(context)", "(error)", "(explicitNewcap)", "(global)",
  "(identifier)", "(last)", "(lastcharacter)", "(line)", "(loopage)", "(metrics)",
- "(name)", "(onevar)", "(params)", "(scope)", "(statement)", "(verb)", "(tokens)",
+ "(name)", "(onevar)", "(params)", "(scope)", "(statement)", "(verb)", "(tokens)", "(catch)",
  "*", "+", "++", "-", "--", "\/", "<", "<=", "==",
  "===", ">", ">=", $, $$, $A, $F, $H, $R, $break, $continue, $w, Abstract, Ajax,
  __filename, __dirname, ActiveXObject, Array, ArrayBuffer, ArrayBufferView, Audio,
@@ -215,13 +215,13 @@
  removeEventListener, replace, report, require, reserved, resizeBy, resizeTo, resolvePath,
  resumeUpdates, respond, rhino, right, runCommand, scroll, scope, screen, scripturl, scrollBy,
  scrollTo, scrollbar, search, seal, self, send, serialize, sessionStorage, setInterval, setTimeout,
- setter, setterToken, shift, slice, smarttabs, sort, spawn, split, statementCount, stack, status,
- start, strict, sub, substr, supernew, shadow, supplant, sum, sync, test, toLowerCase, toString,
- toUpperCase, toint32, token, tokens, top, trailing, type, typeOf, Uint16Array, Uint32Array,
- Uint8Array, undef, undefs, unused, urls, validthis, value, valueOf, var, vars, version,
- verifyMaxParametersPerFunction, verifyMaxStatementsPerFunction, verifyMaxComplexityPerFunction,
- verifyMaxNestedBlockDepthPerFunction, WebSocket, withstmt, white, window, windows, Worker, worker,
- wsh*/
+ setter, setterToken, shift, slice, smarttabs, sort, spawn, split, statement, statementCount, stack,
+ status, start, strict, sub, substr, supernew, shadow, supplant, sum, sync, test, toLowerCase,
+ toString, toUpperCase, toint32, token, tokens, top, trailing, type, typeOf, Uint16Array,
+ Uint32Array, Uint8Array, undef, undefs, unused, urls, validthis, value, valueOf, var, vars,
+ version, verifyMaxParametersPerFunction, verifyMaxStatementsPerFunction,
+ verifyMaxComplexityPerFunction, verifyMaxNestedBlockDepthPerFunction, WebSocket, withstmt, white,
+ window, windows, Worker, worker, wsh*/
 
 /*global exports: false */
 
@@ -1835,13 +1835,22 @@ klass:                                  do {
         }
 
         // Define t in the current function in the current scope.
+        if (type === "exception") {
+            if (is_own(funct["(context)"], t)) {
+                if (funct[t] !== true && !option.node) {
+                    warning("Value of '{a}' may be overwritten in IE.", nexttoken, t);
+                }
+            }
+        }
+
         if (is_own(funct, t) && !funct["(global)"]) {
             if (funct[t] === true) {
                 if (option.latedef)
                     warning("'{a}' was used before it was defined.", nexttoken, t);
             } else {
-                if (!option.shadow && type !== "exception")
+                if (!option.shadow && type !== "exception") {
                     warning("'{a}' is already defined.", nexttoken, t);
+                }
             }
         }
 
@@ -2779,7 +2788,10 @@ loop:   for (;;) {
             d;
 
         inblock = ordinary;
-        if (!ordinary || !option.funcscope) scope = Object.create(scope);
+
+        if (!ordinary || !option.funcscope)
+            scope = Object.create(scope);
+
         nonadjacent(token, nexttoken);
         t = nexttoken;
 
@@ -3491,16 +3503,16 @@ loop:   for (;;) {
     }
 
 
-    function doFunction(i, statement) {
-        var f,
-            oldOption = option,
-            oldScope  = scope;
+    function doFunction(name, statement) {
+        var f;
+        var oldOption = option;
+        var oldScope  = scope;
 
         option = Object.create(option);
-        scope = Object.create(scope);
+        scope  = Object.create(scope);
 
         funct = {
-            "(name)"     : i || "\"" + anonname + "\"",
+            "(name)"     : name || "\"" + anonname + "\"",
             "(line)"     : nexttoken.line,
             "(character)": nexttoken.character,
             "(context)"  : funct,
@@ -3511,12 +3523,16 @@ loop:   for (;;) {
             "(statement)": statement,
             "(tokens)"   : {}
         };
+
         f = funct;
         token.funct = funct;
+
         functions.push(funct);
-        if (i) {
-            addlabel(i, "function");
+
+        if (name) {
+            addlabel(name, "function");
         }
+
         funct["(params)"] = functionparams();
         funct["(metrics)"].verifyMaxParametersPerFunction(funct["(params)"]);
 
@@ -3530,6 +3546,7 @@ loop:   for (;;) {
         funct["(last)"] = token.line;
         funct["(lastcharacter)"] = token.character;
         funct = funct["(context)"];
+
         return f;
     }
 
@@ -3837,7 +3854,7 @@ loop:   for (;;) {
         adjacent(token, nexttoken);
         addlabel(i, "unction", token);
 
-        doFunction(i, true);
+        doFunction(i, { statement: true });
         if (nexttoken.id === "(" && nexttoken.line === token.line) {
             error(
 "Function declarations are not invocable. Wrap the whole function invocation in parens.");
@@ -3888,29 +3905,65 @@ loop:   for (;;) {
     });
 
     blockstmt("try", function () {
-        var b, e, s;
+        var b;
 
-        block(false);
-        if (nexttoken.id === "catch") {
-            increaseComplexityCount();
+        function doCatch() {
+            var oldScope = scope;
+            var e;
+
             advance("catch");
             nonadjacent(token, nexttoken);
             advance("(");
-            s = scope;
-            scope = Object.create(s);
+
+            scope = Object.create(oldScope);
+
             e = nexttoken.value;
             if (nexttoken.type !== "(identifier)") {
-                warning("Expected an identifier and instead saw '{a}'.",
-                    nexttoken, e);
-            } else {
-                addlabel(e, "exception");
+                e = null;
+                warning("Expected an identifier and instead saw '{a}'.", nexttoken, e);
             }
+
             advance();
             advance(")");
+
+            funct = {
+                "(name)"     : "(catch)",
+                "(line)"     : nexttoken.line,
+                "(character)": nexttoken.character,
+                "(context)"  : funct,
+                "(breakage)" : funct["(breakage)"],
+                "(loopage)"  : funct["(loopage)"],
+                "(scope)"    : scope,
+                "(statement)": false,
+                "(metrics)"  : createMetrics(nexttoken),
+                "(catch)"    : true,
+                "(tokens)"   : {}
+            };
+
+            if (e) {
+                addlabel(e, "exception");
+            }
+
+            token.funct = funct;
+            functions.push(funct);
+
             block(false);
-            b = true;
-            scope = s;
+
+            scope = oldScope;
+
+            funct["(last)"] = token.line;
+            funct["(lastcharacter)"] = token.character;
+            funct = funct["(context)"];
         }
+
+        block(false);
+
+        if (nexttoken.id === "catch") {
+            increaseComplexityCount();
+            doCatch();
+            b = true;
+        }
+
         if (nexttoken.id === "finally") {
             advance("finally");
             block(false);
@@ -3919,6 +3972,7 @@ loop:   for (;;) {
             error("Expected '{a}' and instead saw '{b}'.",
                     nexttoken, "catch", nexttoken.value);
         }
+
         return this;
     });
 

@@ -119,6 +119,7 @@ exports.lodash_0_6_1 = function () {
     var src = fs.readFileSync(__dirname + '/libs/lodash.js', 'utf8');
     var globals = { _: false, define: false };
     var options = {
+        unused   : true,
         expr     : true,
         eqnull   : true,
         boss     : true,
@@ -182,5 +183,12 @@ exports.lodash_0_6_1 = function () {
 exports.json2 = function () {
     var src = fs.readFileSync(__dirname + '/libs/json2.js', 'utf8');
 
-    TestRun().test(src, { laxbreak: true }, { JSON: true });
+    TestRun()
+        .addError(177, "'key' is defined but never used.")
+        .addError(191, "'key' is defined but never used.")
+        .test(src, {
+            undef   : true,
+            unused  : true,
+            laxbreak: true
+        }, { JSON: true });
 };
