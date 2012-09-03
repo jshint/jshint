@@ -1939,31 +1939,27 @@ loop:   for (;;) {
                     checkOption(t.value, t);
                 }
 
-                if (t.value === "indent" && (o === "/*jshint" || o === "/*jslint")) {
+                var numericVals = [
+                    "maxstatements",
+                    "maxparams",
+                    "maxdepth",
+                    "maxcomplexity",
+                    "maxerr",
+                    "maxlen",
+                    "indent"
+                ];
+
+                if (numericVals.indexOf(t.value) > -1 && (o === "/*jshint" || o === "/*jslint")) {
                     b = +v.value;
-                    if (typeof b !== "number" || !isFinite(b) || b <= 0 ||
-                            Math.floor(b) !== b) {
-                        error("Expected a small integer and instead saw '{a}'.",
-                                v, v.value);
+
+                    if (typeof b !== "number" || !isFinite(b) || b <= 0 || Math.floor(b) !== b) {
+                        error("Expected a small integer and instead saw '{a}'.", v, v.value);
                     }
-                    obj.white = true;
-                    obj.indent = b;
-                } else if (t.value === "maxerr" && (o === "/*jshint" || o === "/*jslint")) {
-                    b = +v.value;
-                    if (typeof b !== "number" || !isFinite(b) || b <= 0 ||
-                            Math.floor(b) !== b) {
-                        error("Expected a small integer and instead saw '{a}'.",
-                                v, v.value);
-                    }
-                    obj.maxerr = b;
-                } else if (t.value === "maxlen" && (o === "/*jshint" || o === "/*jslint")) {
-                    b = +v.value;
-                    if (typeof b !== "number" || !isFinite(b) || b <= 0 ||
-                            Math.floor(b) !== b) {
-                        error("Expected a small integer and instead saw '{a}'.",
-                                v, v.value);
-                    }
-                    obj.maxlen = b;
+
+                    if (t.value === "indent")
+                        obj.white = true;
+
+                    obj[t.value] = b;
                 } else if (t.value === "validthis") {
                     if (funct["(global)"]) {
                         error("Option 'validthis' can't be used in a global scope.");
