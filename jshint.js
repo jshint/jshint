@@ -221,7 +221,7 @@
  Uint32Array, Uint8Array, undef, undefs, unused, urls, validthis, value, valueOf, var, vars,
  version, verifyMaxParametersPerFunction, verifyMaxStatementsPerFunction,
  verifyMaxComplexityPerFunction, verifyMaxNestedBlockDepthPerFunction, WebSocket, withstmt, white,
- window, windows, Worker, worker, wsh*/
+ window, windows, Worker, worker, wsh, yui, YUI, Y, YUI_config*/
 
 /*global exports: false */
 
@@ -325,8 +325,9 @@ var JSHINT = (function () {
             withstmt    : true, // if with statements should be allowed
             white       : true, // if strict whitespace rules apply
             worker      : true, // if Web Worker script symbols should be allowed
-            wsh         : true  // if the Windows Scripting Host environment globals
+            wsh         : true, // if the Windows Scripting Host environment globals
                                 // should be predefined
+            yui         : true  // YUI variables should be predefined
         },
 
         // These are the JSHint options that can take any value
@@ -780,8 +781,13 @@ var JSHINT = (function () {
             WSH                       : true,
             WScript                   : true,
             XDomainRequest            : true
-        };
+        },
 
+        yui = {
+            YUI             : false,
+            Y               : false,
+            YUI_config      : false
+        };
     // Regular expressions. Some of these are stupidly long.
     var ax, cx, tx, nx, nxg, lx, ix, jx, ft;
     (function () {
@@ -1005,6 +1011,10 @@ var JSHINT = (function () {
 
         if (option.globalstrict && option.strict !== false) {
             option.strict = true;
+        }
+
+        if (option.yui) {
+            combine(predefined, yui);
         }
     }
 
