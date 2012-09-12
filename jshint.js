@@ -3660,7 +3660,7 @@ loop:   for (;;) {
 
         if (nexttoken.id === ")") {
             advance(")");
-            return;
+            return params;
         }
 
         for (;;) {
