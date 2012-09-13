@@ -221,9 +221,36 @@
  Uint32Array, Uint8Array, undef, undefs, unused, urls, validthis, value, valueOf, var, vars,
  version, verifyMaxParametersPerFunction, verifyMaxStatementsPerFunction,
  verifyMaxComplexityPerFunction, verifyMaxNestedBlockDepthPerFunction, WebSocket, withstmt, white,
- window, windows, Worker, worker, wsh, yui, YUI, Y, YUI_config*/
+ window, windows, Worker, worker, wsh, yui, YUI, Y, YUI_config,
+ badoption_a, badname, beforedefined_a, alreadydefined_a, confusedp, confusingm, confusingp,
+ unmatched_a, expected_abcd, expected_ab, confusedd_a, arrayl, objectl, unexpectedsa_a,
+ unexpectedsb_a, missingsa_a, badlb_a, errorlb_a, expectedi_abc, laxcomma, unexpectedu_a,
+ badoperand, confusingu_a, useisNaN, readonly, isfunc_a, attempting_a, badassign, badassignp,
+ expectedid, expectedid_a, missingn, innerfunc, unreachable_ab, label_ab, labelj_a, expecteda,
+ nonew, unnecessarys, missingse, unnecessaryd_a, missingu, emptyb, unexpectedm_a, labelb_a,
+ outscope_a, notallowed_a, strictviolation, possiblestrict, comparewith_ab, jsscripturl,
+ variabledel, unexpected_a, notusecon_a, funceval, constructorname, badcontuctor,
+ weirdContuction, missinginvok, avoidargs_a, documentwrite, evalevil, immediatefunc, mathnotfunc,
+ missingnew, missingradix, badinvocation, noimmediatefunc, dotnotation_a, extracomma,
+ duplicatemem_a, unexpectedparam_ab, expectedsingle_a, withoutget, declaredalready_a,
+ redefinition_a, initundefined_a, unnessaryinit_a, toomanyvar, functiondeclarations, funcinloop,
+ conditionalexp, expectediden_a, dontusewith, switchif, removedebug,
+ varinloop_a, forinif, nolabel_a, outscope2_a, regexpslash, unexpectedcomma, expectedstring_a,
+ duplicatekey_a, unexpectedresult_a, unexpectedspace, usefuncform, mixedsptab, unsagechar,
+ toolong, js17_a, unexpecteddangle_ab, identifiercc_a, scripturl2, strdoublequote,
+ strsinglequote, mixquote, unnecessaryescap, unclosedstr, controlinstr_a, avoidrevslash,
+ avoidrevv, avoidrevx, avoideol, badescapeeol, badescape0, badnum_a, extraleadzero_a, avoid0x_a,
+ confuseddecimalp_a, unterminateregexp_a, unexpectedcontrolchar, unexpectedescapechar_a,
+ unescape_a, spaceshard_a, insecure_a, emptyclass, expectednum_a, notgreater_ab, returnconditional,
+ neverused_a, unbeguncommet, wtf, badoption0, expectedsmallint_a, optionvalidthis,
+ badoptionvalue, missingoptvalue, unexpectedearly, expectedoperator_a, confusedregexp,
+ es5feature, missingpropname, expectedstat, constant_a, variablecorr_a, functioninvok,
+ withnotallow, missing_a, caselabel, missingsemi, missingmatch_a, missingmatch1_a,
+ expectedjson, unclosedcomment, unclosedregexp, confusingregexp, inputstrarr, inputsemptystr,
+ inputsemptyarr, trailingwhite, propertydeprecate_a, impliedeval, expectedbreak,
+ expectedbreak2, ocatalliteral, isnotdefined, en, ko, lang*/
 
-/*global exports: false */
+/*global exports, require: false */
 
 // We build the application inside a function so that we produce only a single
 // global variable. That function will be invoked immediately, and its return
@@ -790,103 +817,106 @@ var JSHINT = (function () {
         },
         
         languages = {
-        	en: {
-        		badoption_a: "Bad option: '{a}'.",
-        		badname: "'hasOwnProperty' is a really bad name.",
-        		beforedefined_a: "'{a}' was used before it was defined.",
-        		alreadydefined_a: "'{a}' is already defined.",
-        		confusedp: "A dot following a number can be confused with a decimal point.",
-        		confusingm: "Confusing minuses.",
-        		confusingp: "Confusing pluses.",
-        		unmatched_a: "Unmatched '{a}'.",
-        		expected_abcd: "Expected '{a}' to match '{b}' from line {c} and instead saw '{d}'.",
-        		expected_ab: "Expected '{a}' and instead saw '{b}'.",
-        		confusedd_a: "A leading decimal point can be confused with a dot: '.{a}'.",
-        		arrayl: "Use the array literal notation [].",
-        		objectl: "Use the object literal notation {}.",
-        		unexpectedsa_a: "Unexpected space after '{a}'.",
-        		unexpectedsb_a: "Unexpected space before '{a}'.",
-        		missingsa_a: "Missing space after '{a}'.",
-        		badlb_a: "Bad line breaking before '{a}'.",
-        		errorlb_a: "Line breaking error '{a}'.",
-        		expectedi_abc: "Expected '{a}' to have an indentation at {b} instead at {c}.",
-        		laxcomma: "Comma warnings can be turned off with 'laxcomma'",
-        		unexpectedu_a: "Unexpected use of '{a}'.",
-        		badoperand: "Bad operand.",
-        		confusingu_a: "Confusing use of '{a}'.",
-        		useisNaN: "Use the isNaN function to compare with NaN.",
-        		readonly: "Read only.",
-        		isfunc_a: "'{a}' is a function.",
-        		attempting_a: "Attempting to override '{a}' which is a constant",
-        		badassign: "Bad assignment.",
-        		badassignp: "Do not assign to the exception parameter.",
-        		expectedid: "Expected an identifier in an assignment and instead saw a function invocation.",
-        		expectedid_a: "Expected an identifier and instead saw '{a}' (a reserved word).",
-  				missingn: "Missing name in function declaration.",
-  				innerfunc: "Inner functions should be listed at the top of the outer function.",
-  				unreachable_ab: "Unreachable '{a}' after '{b}'.",
-  				label_ab: "Label '{a}' on {b} statement.",
-  				labelj_a: "Label '{a}' looks like a javascript url.",
-  				expecteda: "Expected an assignment or function call and instead saw an expression.",
-  				nonew: "Do not use 'new' for side effects.",
-  				unnecessarys: "Unnecessary semicolon.",
-  				missingse: "Missing semicolon.",
-  				unnecessaryd_a: "Unnecessary directive \"{a}\".",
-  				missingu: "Missing \"use strict\" statement.",
-  				emptyb: "Empty block.",
-  				unexpectedm_a: "Unexpected /*member '{a}'.",
-  				labelb_a: "'{a}' is a statement label.",
-  				outscope_a: "'{a}' used out of scope.",
-  				notallowed_a: "'{a}' is not allowed.",
-  				strictviolation: "Strict violation.",
-  				possiblestrict: "Possible strict violation.",
-  				comparewith_ab: "Use '{a}' to compare with '{b}'.",
-  				jsscripturl: "JavaScript URL.",
-  				variabledel: "Variables should not be deleted.",
-  				unexpected_a: "Unexpected '{a}'.",
-  				notusecon_a: "Do not use {a} as a constructor.",
-  				funceval: "The Function constructor is eval.",
-  				constructorname: "A constructor name should start with an uppercase letter.",
-  				badcontuctor: "Bad constructor.",
-  				weirdContuction: "Weird construction. Delete 'new'.",
-  				missinginvok: "Missing '()' invoking a constructor.",
-  				avoidargs_a: "Avoid arguments.{a}.",
-  				documentwrite: "document.write can be a form of eval.",
-  				evalevil: "eval is evil.",
-  				immediatefunc: "Wrap an immediate function invocation in parentheses "
-  								+ "to assist the reader in understanding that the expression "
-  								+ "is the result of a function, and not the function itself.",
-  				mathnotfunc: "Math is not a function.",
-  				missingnew: "Missing 'new' prefix when invoking a constructor.",
-  				missingradix: "Missing radix parameter.",
-  				badinvocation: "Bad invocation.",
-  				noimmediatefunc: "Do not wrap function literals in parens unless they are to be immediately invoked.",
-  				dotnotation_a: "['{a}'] is better written in dot notation.",
-  				extracomma: "Extra comma.",
-  				duplicatemem_a: "Duplicate member '{a}'.",
-  				unexpectedparam_ab: "Unexpected parameter '{a}' in get {b} function.",
-  				expectedsingle_a: "Expected a single parameter in set {a} function.",
-  				withoutget: "Setter is defined without getter.",
-  				declaredalready_a: "const '{a}' has already been declared",
-  				redefinition_a: "Redefinition of '{a}'.",
-  				initundefined_a: "const '{a}' is initialized to 'undefined'.",
-  				unnessaryinit_a: "It is not necessary to initialize '{a}' to 'undefined'.",
-  				toomanyvar: "Too many var statements.",
-  				functiondeclarations: "Function declarations should not be placed in blocks. "
-									+ "Use a function expression or move the statement "
-									+ "to the top of the outer function.",
-  				funcinloop: "Don't make functions within a loop.",
-  				conditionalexp: "Expected a conditional expression and instead saw an assignment.",
-  				expectediden_a: "Expected an identifier and instead saw '{a}'.",
-  				dontusewith: "Don't use 'with'.",
-  				switchif: "This 'switch' should be an 'if'.",
-  				removedebug: "All 'debugger' statements should be removed.",
-  				varinloop_a: "Bad for in variable '{a}'.",
-  				forinif: "The body of a for in should be wrapped in an if statement to filter "
-  						+ "unwanted properties from the prototype.",
+			en: {
+				badoption_a: "Bad option: '{a}'.",
+				badname: "'hasOwnProperty' is a really bad name.",
+				beforedefined_a: "'{a}' was used before it was defined.",
+				alreadydefined_a: "'{a}' is already defined.",
+				confusedp: "A dot following a number can be confused with a decimal point.",
+				confusingm: "Confusing minuses.",
+				confusingp: "Confusing pluses.",
+				unmatched_a: "Unmatched '{a}'.",
+				expected_abcd: "Expected '{a}' to match '{b}' from line {c} and instead saw '{d}'.",
+				expected_ab: "Expected '{a}' and instead saw '{b}'.",
+				confusedd_a: "A leading decimal point can be confused with a dot: '.{a}'.",
+				arrayl: "Use the array literal notation [].",
+				objectl: "Use the object literal notation {}.",
+				unexpectedsa_a: "Unexpected space after '{a}'.",
+				unexpectedsb_a: "Unexpected space before '{a}'.",
+				missingsa_a: "Missing space after '{a}'.",
+				badlb_a: "Bad line breaking before '{a}'.",
+				errorlb_a: "Line breaking error '{a}'.",
+				expectedi_abc: "Expected '{a}' to have an indentation at {b} instead at {c}.",
+				laxcomma: "Comma warnings can be turned off with 'laxcomma'",
+				unexpectedu_a: "Unexpected use of '{a}'.",
+				badoperand: "Bad operand.",
+				confusingu_a: "Confusing use of '{a}'.",
+				useisNaN: "Use the isNaN function to compare with NaN.",
+				readonly: "Read only.",
+				isfunc_a: "'{a}' is a function.",
+				attempting_a: "Attempting to override '{a}' which is a constant",
+				badassign: "Bad assignment.",
+				badassignp: "Do not assign to the exception parameter.",
+				expectedid: "Expected an identifier in an assignment" +
+					"and instead saw a function invocation.",
+				expectedid_a: "Expected an identifier and instead saw '{a}' (a reserved word).",
+				missingn: "Missing name in function declaration.",
+				innerfunc: "Inner functions should be listed at the top of the outer function.",
+				unreachable_ab: "Unreachable '{a}' after '{b}'.",
+				label_ab: "Label '{a}' on {b} statement.",
+				labelj_a: "Label '{a}' looks like a javascript url.",
+				expecteda: "Expected an assignment or function call and instead saw an expression.",
+				nonew: "Do not use 'new' for side effects.",
+				unnecessarys: "Unnecessary semicolon.",
+				missingse: "Missing semicolon.",
+				unnecessaryd_a: "Unnecessary directive \"{a}\".",
+				missingu: "Missing \"use strict\" statement.",
+				emptyb: "Empty block.",
+				unexpectedm_a: "Unexpected /*member '{a}'.",
+				labelb_a: "'{a}' is a statement label.",
+				outscope_a: "'{a}' used out of scope.",
+				notallowed_a: "'{a}' is not allowed.",
+				strictviolation: "Strict violation.",
+				possiblestrict: "Possible strict violation.",
+				comparewith_ab: "Use '{a}' to compare with '{b}'.",
+				jsscripturl: "JavaScript URL.",
+				variabledel: "Variables should not be deleted.",
+				unexpected_a: "Unexpected '{a}'.",
+				notusecon_a: "Do not use {a} as a constructor.",
+				funceval: "The Function constructor is eval.",
+				constructorname: "A constructor name should start with an uppercase letter.",
+				badcontuctor: "Bad constructor.",
+				weirdContuction: "Weird construction. Delete 'new'.",
+				missinginvok: "Missing '()' invoking a constructor.",
+				avoidargs_a: "Avoid arguments.{a}.",
+				documentwrite: "document.write can be a form of eval.",
+				evalevil: "eval is evil.",
+				immediatefunc: "Wrap an immediate function invocation in parentheses " +
+					"to assist the reader in understanding that the expression " +
+					"is the result of a function, and not the function itself.",
+				mathnotfunc: "Math is not a function.",
+				missingnew: "Missing 'new' prefix when invoking a constructor.",
+				missingradix: "Missing radix parameter.",
+				badinvocation: "Bad invocation.",
+				noimmediatefunc: "Do not wrap function literals in parens" +
+					" unless they are to be immediately invoked.",
+				dotnotation_a: "['{a}'] is better written in dot notation.",
+				extracomma: "Extra comma.",
+				duplicatemem_a: "Duplicate member '{a}'.",
+				unexpectedparam_ab: "Unexpected parameter '{a}' in get {b} function.",
+				expectedsingle_a: "Expected a single parameter in set {a} function.",
+				withoutget: "Setter is defined without getter.",
+				declaredalready_a: "const '{a}' has already been declared",
+				redefinition_a: "Redefinition of '{a}'.",
+				initundefined_a: "const '{a}' is initialized to 'undefined'.",
+				unnessaryinit_a: "It is not necessary to initialize '{a}' to 'undefined'.",
+				toomanyvar: "Too many var statements.",
+				functiondeclarations: "Function declarations should not be placed in blocks. " +
+					"Use a function expression or move the statement " +
+					"to the top of the outer function.",
+				funcinloop: "Don't make functions within a loop.",
+				conditionalexp: "Expected a conditional expression and instead saw an assignment.",
+				expectediden_a: "Expected an identifier and instead saw '{a}'.",
+				dontusewith: "Don't use 'with'.",
+				switchif: "This 'switch' should be an 'if'.",
+				removedebug: "All 'debugger' statements should be removed.",
+				varinloop_a: "Bad for in variable '{a}'.",
+				forinif: "The body of a for in should be wrapped in an if statement to filter " +
+					"unwanted properties from the prototype.",
 				nolabel_a: "'{a}' is not a statement label.",
 				outscope2_a: "'{a}' is out of scope.",
-				regexpslash: "Wrap the /regexp/ literal in parens to disambiguate the slash operator.",
+				regexpslash: "Wrap the /regexp/ literal in parens" +
+					" to disambiguate the slash operator.",
 				unexpectedcomma: "Unexpected comma.",
 				expectedstring_a: "Expected a string and instead saw {a}.",
 				duplicatekey_a: "Duplicate key '{a}'.",
@@ -942,7 +972,8 @@ var JSHINT = (function () {
 				expectedstat: "Expected to see a statement and instead saw a block.",
 				constant_a: "Constant {a} was not declared correctly.",
 				variablecorr_a: "Variable {a} was not declared correctly.",
-				functioninvok: "Function declarations are not invocable. Wrap the whole function invocation in parens.",
+				functioninvok: "Function declarations are not invocable." +
+					" Wrap the whole function invocation in parens.",
 				withnotallow: "'with' is not allowed in strict mode.",
 				missing_a: "Missing '{a}'.",
 				caselabel: "Each value should have its own case label.",
@@ -953,190 +984,18 @@ var JSHINT = (function () {
 				unclosedcomment: "Unclosed comment.",
 				unclosedregexp: "Unclosed regular expression.",
 				confusingregexp: "Confusing regular expression.",
-			 	inputstrarr: "Input is neither a string nor an array of strings.",
-			 	inputsemptystr: "Input is an empty string.",
-			 	inputsemptyarr: "Input is an empty array.",
-			 	trailingwhite: "Trailing whitespace.",
-			 	propertydeprecate_a: "The '{a}' property is deprecated.",
-			 	impliedeval: "Implied eval is evil. Pass a function instead of a string.",
-			 	expectedbreak: "Expected a 'break' statement before 'case'.",
-			 	expectedbreak2: "Expected a 'break' statement before 'default'.",
-			 	ocatalliteral: "Octal literals are not allowed in strict mode.",
-			 	isnotdefined: "'{a}' is not defined."
-        	},
-        	
-        	ko: {
-        		badoption_a: "'{a}'는 잘못된 옵션입니다.",
-        		badname: "'hasOwnProperty'는 추천되는 이름이 아닙니다.",
-        		beforedefined_a: "'{a}'는 정의되기 전에 사용되었습니다.",
-        		alreadydefined_a: "'{a}'는 이미 정의되어 있습니다. ",
-        		confusedp: "숫자 뒤의 마침표 연산자는 소수점과 혼동될 수 있습니다.",
-        		confusingm: "뺄셈과 혼동될 수 있습니다.",
-        		confusingp: "덧셈과 혼동될 수 있습니다.",
-        		unmatched_a: "매치되는 '{a}'가 없습니다.",
-        		expected_abcd: "{c}라인의 '{b}'와 맞추기 위해 '{d}' 대신에 '{a}'를 사용해야 합니다.",
-        		expected_ab: "'{b}' 대신 '{a}'를 사용해야 합니다.",
-        		confusedd_a: "사용된 소수점은 마침표 연산자와 혼동될 수 있습니다: '.{a}'.",
-        		arrayl: "배열 리터럴 표기법인 []를 사용해야 합니다.",
-        		objectl: "객체 리터럴 표기법인 {}를 사용해야 합니다.",
-        		unexpectedsa_a: "'{a}'의 뒤에 불필요한 공백이 있습니다.",
-        		unexpectedsb_a: "'{a}'의 앞에 불필요한 공백이 있습니다.",
-        		missingsa_a: "'{a}'의 뒤에 공백이 없습니다.",
-        		badlb_a: "'{a}'의 앞에서 줄바꿈 처리가 잘못되었습니다.",
-        		errorlb_a: "줄바꿈 처리 오류 '{a}'.",
-        		expectedi_abc: "'{a}'가 {b}만큼 들여써지는 대신 {c}만큼 되어 있습니다.",
-        		laxcomma: "','에 의한 줄바꿈 처리 경고는 'laxcomma' 옵션으로 무시할 수 있습니다.",
-        		unexpectedu_a: "'{a}'의 사용법이 잘못되었습니다.",
-        		badoperand: "잘못된 피연산자를 사용하였습니다.",
-        		confusingu_a: "'{a}'는 잘못 사용될 여지가 있습니다.",
-        		useisNaN: "NaN과 비교하기 위해서는 isNaN 함수를 사용해야 합니다.",
-        		readonly: "읽기 전용입니다.",
-        		isfunc_a: "'{a}'는 함수입니다.",
-        		attempting_a: "상수 '{a}'를 재정의하고 있습니다.",
-        		badassign: "할당이 잘못되었습니다.",
-        		badassignp: "예외처리를 위한 매개 변수에 임의의 값을 할당하면 안됩니다.",
-        		expectedid: "Expected an identifier in an assignment and instead saw a function invocation.",
-        		expectedid_a: "'{a}'는 기대되는 식별자가 아닙니다. (예약어).",
-        		missingn: "함수 선언에 이름이 없습니다.",
-        		innerfunc: "내부함수는 외부함수의 첫부분에서 선언해야 합니다.",
-        		unreachable_ab: "'{b}' 뒤에 오는 '{a}'는 실행되지 않습니다.",
-        		label_ab: "{b} statement의 label은 '{a}'입니다.",
-        		labelj_a: "라벨 '{a}'는 자바스크립트URL 처럼 보입니다.",
-        		expecteda: "기대되는 할당 또는 함수호출 대신에 표현식이 사용되었습니다.",
-        		nonew: "'new'의 결과를 변수에 할당해야 합니다 .",
-        		unnecessarys: "불필요한 ';'가 있습니다.",
-        		missingse: "';'가 없습니다.",
-        		unnecessaryd_a: "불필요한 지시문(directive) \"{a}\"가 선언되었습니다.",
-        		missingu: "\"use strict\"가 선언되어 있지 않습니다.",
-        		emptyb: "비어있는 블럭입니다.",
-        		unexpectedm_a: "'{a}' 맴버 사용이 잘못되었습니다.",
-        		labelb_a: "'{a}'는 statement label입니다.",
-        		outscope_a: "'{a}'는 유효범위 바깥에서 사용되었습니다.",
-        		notallowed_a: "'{a}'는 허용되지 않습니다.",
-        		strictviolation: "Strict 모드에서 허용되지 않습니다.",
-        		possiblestrict: "생성자(Constructor)가 아닌 함수내에서는 'this'를 사용할 수 없습니다. (Strict 모드)",
-        		comparewith_ab: "'{b}'와 비교하기 위해서는 '{a}'를 사용해야 합니다.",
-        		jsscripturl: "타겟에 스크립트URL이 사용되었습니다.",
-        		variabledel: "일반 변수들은 삭제할 수 없습니다.",
-        		unexpected_a: "'{a}' 사용이 잘못되었습니다.",
-        		notusecon_a: "{a}는 생성자(Constructor)로 사용할 수 없습니다.",
-        		funceval: "'Function' 생성자(Constructor)를 이용한 객체 생성을 지양합니다.",
-        		constructorname: "생성자(constructor)의 이름은 대문자로 시작되어야 합니다.",
-        		badcontuctor: "잘못된 생성자(constructor)입니다.",
-        		weirdContuction: "불필요한 객체 생성(weird construction)입니다. 'new'를 삭제하세요.",
-        		missinginvok: "생성자(constructor) 호출, '()'가 없습니다.",
-        		avoidargs_a: "arguments.{a} 사용을 지양합니다.",
-        		documentwrite: "document.write 사용을 지양합니다.",
-        		evalevil: "eval 사용을 지양합니다. eval 나빠요.",
-        		immediatefunc: "가독성을 위해, immediate 함수 호출을 '()'로 감싸는 것을 권장합니다.",
-        		mathnotfunc: "'Math'는 함수가 아닙니다.",
-        		missingnew: "생성자(constructor) 호출 앞에 필요한 'new'가 없습니다.",
-        		missingradix: "기수 결정에 필요한 radix 매개변수가 없습니다.",
-        		badinvocation: "잘못된 호출입니다.",
-        		noimmediatefunc: "즉각적인 함수 호출이 필요하지 않을 경우, 함수 리터럴을 '()'로 감쌀 필요가 없습니다.",
-        		dotnotation_a: "[\"{a}\"] 보다는 마침표 연산자를 이용한 '.{a}'를 권장합니다.",
-        		extracomma: "불필요한 ','가 있습니다.",
-        		duplicatemem_a: "맴버 '{a}'가 중복 선언되었습니다.",
-        		unexpectedparam_ab: "함수 {b}의 getter에서는 매개변수 '{a}'를 사용할 수 없습니다.",
-        		expectedsingle_a: "함수 {a}의 setter에서는 하나의 매개변수를 사용해야 합니다.",
-        		withoutget: "Setter가 getter와 함께 정의되지 않았습니다.",
-        		declaredalready_a: "상수 '{a}'는 이미 선언되었습니다.",
-        		redefinition_a: "'{a}'를 재정의하고 있습니다.",
-        		initundefined_a: "상수 '{a}'가 'undefined'로 초기화되었습니다.",
-        		unnessaryinit_a: "'{a}'를 'undefined'로 초기화할 필요는 없습니다.",
-        		toomanyvar: "너무 많은 var문이 사용되었습니다.",
-        		functiondeclarations: "함수 선언을 블럭 안에서 해야할 필요는 없습니다. "
-        								+ "함수 표현식을 사용하거나, 선언문을 외부함수의 첫부분으로 옮길 것을 권장합니다.",
-        		funcinloop: "반복문 내부에서 함수 선언을 지양합니다.",
-        		conditionalexp: "조건표현식 대신에 값이 할당되었습니다.",
-        		expectediden_a: "'{a}'는 기대되는 식별자가 아닙니다.",
-        		dontusewith: "'with' 사용을 지양합니다.",
-        		switchif: "해당 'switch'문은 'if'문으로  권장합니다.",
-        		removedebug: "모든 'debugger'문은 제거되어야 합니다.",
-        		varinloop_a: "'{a}'는 var문으로 선언되어야 합니다.",
-        		forinif: "forin 반복문의 내부는 프로토타입의 불필요한 프로퍼티들을 걸러내기 위해, "
-        					+ "조건문으로 감싸야 합니다.",
-				nolabel_a: "'{a}'는 statement label이 아닙니다.",
-				outscope2_a: "'{a}'는 유효범위 바깥에서 사용되었습니다.",
-				regexpslash: "정규표현식의 '/' 리터럴을 명확히 하기위해 '()'로 감싸는 것을 권장합니다.",
-				unexpectedcomma: "',' 사용이 잘못되었습니다.",
-				expectedstring_a: "문자열 대신 {a}가 사용되었습니다.",
-				duplicatekey_a: "키 '{a}'가 중복 선언되었습니다.",
-				unexpectedresult_a: "'{a}'를 키로사용할 경우, 예상치 못한 결과를 낼 수도 있습니다.",
-				unexpectedspace: "'-'의 뒤에 불필요한 공백이 있습니다.",
-				usefuncform: "\"use strict\"모드를 사용하고 있습니다.",
-				mixedsptab: "공백과 탭이 혼용되고 있습니다.",
-				unsagechar: "이스케이프가 필요한 문자가 있습니다.",
-				toolong: "라인이 너무 깁니다.",
-				js17_a: "'{a}'는 JavaScript 1.7 이상에서 지원하는 스펙입니다.",
-				unexpecteddangle_ab: "'{b}'에서 {a} 부분이 잘못 사용되었습니다.",
-				identifiercc_a: "식별자 '{a}'가 카멜케이스가 아닙니다.",
-				scripturl2: "타겟에 스크립트URL이 사용되었습니다.",
-				strdoublequote: "문자열에는 반드시 쌍따옴표(\")를 사용해야 합니다.",
-				strsinglequote: "문자열에는 반드시 홑따옴표(\')를 사용해야 합니다.",
-				mixquote: "쌍타옴표와 홑따옴표를 혼용하고 있습니다.",
-				unnecessaryescap: "불필요한 이스케이프를 사용하고 있습니다.",
-				unclosedstr: "닫혀지지 않은 문자열입니다.",
-				controlinstr_a: "문자열안에 컨트롤 문자 '{a}'가 있습니다.",
-				avoidrevslash: "\\' 사용을 지양합니다.",
-				avoidrevv: "\\v 사용을 지양합니다.",
-				avoidrevx: "\\x- 사용을 지양합니다.",
-				avoideol: "EOL 이스케이프 사용을 지양합니다.",
-				badescapeeol: "EOL 이스케이프 문자를 잘못 사용했습니다. 필요하다면 'multistr' 옵션을 설정하세요.",
-				badescape0: "이스케이프 문자를 잘못 사용했습니다.",
-				badnum_a: "'{a}'는 숫자가 아닙니다.",
-				extraleadzero_a: "'{a}'의 앞에 불필요한 '0'가 사용되었습니다.",
-				avoid0x_a: "'{a}'와 같은 '0x-'의 사용을 지양합니다.",
-				confuseddecimalp_a: "'{a}' 끝의 소수점은 마침표로 혼동될 수 있습니다.",
-				unterminateregexp_a: "'{a}'는 끝나지 않은 정규표현식 그룹입니다.",
-				unexpectedcontrolchar: "정규표현식에서 컨트롤 문자가 사용되었습니다.",
-				unexpectedescapechar_a: "정규표현식에서 '\\{a}'를 잘못 사용했습니다.",
-				unescape_a: "이스케이프되지 않은 '{a}'가 있습니다.",
-				spaceshard_a: "공백수 세기가 힘듭니다. {{a}}를 사용해 주세요 ㅠㅠ.",
-				insecure_a: "정규표현식에서 위험한 표현인 '{a}'를 지양합니다.",
-				emptyclass: "비어있는 클래스입니다.",
-				expectednum_a: "숫자형 대신 '{a}'가 사용되었습니다.",
-				notgreater_ab: "'{a}'는 '{b}'보다 클 수 없습니다.",
-				returnconditional: "조건문 대신 할당된 값을 반환하는 것이 확실합니까?",
-				neverused_a: "'{a}'가 정의되었지만, 사용되지 않았습니다.",
-				unbeguncommet: "코멘트 시작 '\\*'이 없습니다.",
-				wtf: "뭐?",
-				badoption0: "잘못된 옵션입니다.",
-				expectedsmallint_a: "작은수의 integer 대신 '{a}'가 사용되었습니다.",
-				optionvalidthis: "옵션 'validthis'의 유효 범위는 전역적(Global)이 될 수 없습니다.",
-				badoptionvalue: "잘못된 옵션 값입니다.",
-				missingoptvalue: "옵션 값이 없습니다.",
-				unexpectedearly: "프로그램이 예상보다 일찍 종료되었습니다.",
-				expectedoperator_a: "'{a}'는 기대되는 명령어가 아닙니다.",
-				confusedregexp: "정규표현식 리터럴과 '/='가 혼동될 수 있습니다.",
-				es5feature: "get/set은 ES5 스펙입니다.",
-				missingpropname: "프로퍼티 이름이 없습니다.",
-				expectedstat: "기대되는 statement 대신에 블럭이 사용되었습니다.",
-				constant_a: "상수 '{a}'가 바르게 선언되지 않았습니다.",
-				variablecorr_a: "변수 '{a}'가 바르게 선언되지 않았습니다.",
-				functioninvok: "함수 선언부를 호출할 수 없습니다. 그런기 위해서는 함수 전체를 '()'로 감싸야 합니다.",
-				withnotallow: "스트릭트 모드에서는 'with' 사용을 허용하지 않습니다.",
-				missing_a: "'{a}'가 없습니다.",
-				caselabel: "각 값들은 고유의 case label이 있어야 합니다.",
-				missingsemi: "case 절 뒤에 ':'가 없습니다.",
-				missingmatch_a: "{a}라인의 '{'와 매칭될 '}'가 없습니다.",
-				missingmatch1_a: "{a}라인의 '['와 매칭될 ']'가 없습니다.",
-				expectedjson: "JSON 값이 있어야 합니다.",
-				unclosedcomment: "코맨트가 닫히지 않았습니다.",
-				unclosedregexp: "정규표현식이 닫히지 않았습니다.",
-				confusingregexp: "정규표현식과 혼동됩니다.",
-				inputstrarr: "입력이 문자열이나 배열이 아닙니다.",
-			 	inputsemptystr: "입력이 빈 문자열입니다.",
-			 	inputsemptyarr: "입력이 빈 배열입니다.",
-			 	trailingwhite: "뒤에 빈 공백이 있습니다.",
-			 	propertydeprecate_a: "'{a}' 프로퍼티 사용을 지양합니다.",
-			 	impliedeval: "Implied eval은 악입니다. 문자열 대신 함수를 넘기세요.",
-			 	expectedbreak: "case절 앞에 'break' statement가 없습니다.",
-			 	expectedbreak2: "default절 앞에 'break' statement가 없습니다.",
-			 	ocatalliteral: "스트릭트 모드에서는 8진법 리터럴 사용을 허용하지 않습니다.",
-			 	isnotdefined: "'{a}'는 정의되지 않았습니다."
-        	}
-        },
+				inputstrarr: "Input is neither a string nor an array of strings.",
+				inputsemptystr: "Input is an empty string.",
+				inputsemptyarr: "Input is an empty array.",
+				trailingwhite: "Trailing whitespace.",
+				propertydeprecate_a: "The '{a}' property is deprecated.",
+				impliedeval: "Implied eval is evil. Pass a function instead of a string.",
+				expectedbreak: "Expected a 'break' statement before 'case'.",
+				expectedbreak2: "Expected a 'break' statement before 'default'.",
+				ocatalliteral: "Octal literals are not allowed in strict mode.",
+				isnotdefined: "'{a}' is not defined."
+			}
+		},
         currentLanguage = "en",
         messages = languages[currentLanguage];
 
@@ -1904,7 +1763,8 @@ unclosedString:     for (;;) {
                                         return quit("Stopping.", line, from);
                                     case "/":
                                         if (depth > 0) {
-                                            warningAt(messages.unterminateregexp_a, line, from + l, depth);
+                                            warningAt(messages.unterminateregexp_a,
+                                            line, from + l, depth);
                                         }
                                         c = s.substr(0, l - 1);
                                         q = {
@@ -1926,9 +1786,11 @@ unclosedString:     for (;;) {
                                     case "\\":
                                         c = s.charAt(l);
                                         if (c < " ") {
-                                            warningAt(messages.unexpectedcontrolchar, line, from + l);
+                                            warningAt(messages.unexpectedcontrolchar,
+                                            line, from + l);
                                         } else if (c === "<") {
-                                            warningAt(messages.unexpectedescapechar_a, line, from + l, c);
+                                            warningAt(messages.unexpectedescapechar_a,
+                                            line, from + l, c);
                                         }
                                         l += 1;
                                         break;
@@ -1944,7 +1806,8 @@ unclosedString:     for (;;) {
                                                 l += 1;
                                                 break;
                                             default:
-                                                warningAt(messages.expected_ab, line, from + l, ":", s.charAt(l));
+                                                warningAt(messages.expected_ab,
+                                                line, from + l, ":", s.charAt(l));
                                             }
                                         } else {
                                             captures += 1;
@@ -1955,7 +1818,8 @@ unclosedString:     for (;;) {
                                         break;
                                     case ")":
                                         if (depth === 0) {
-                                            warningAt(messages.unescape_a, line, from + l, ")");
+                                            warningAt(messages.unescape_a,
+                                            line, from + l, ")");
                                         } else {
                                             depth -= 1;
                                         }
@@ -1967,7 +1831,8 @@ unclosedString:     for (;;) {
                                             q += 1;
                                         }
                                         if (q > 1) {
-                                            warningAt(messages.spaceshard_a, line, from + l, q);
+                                            warningAt(messages.spaceshard_a,
+                                            line, from + l, q);
                                         }
                                         break;
                                     case "[":
@@ -1975,11 +1840,13 @@ unclosedString:     for (;;) {
                                         if (c === "^") {
                                             l += 1;
                                             if (s.charAt(l) === "]") {
-                                                errorAt(messages.unescape_a, line, from + l, "^");
+                                                errorAt(messages.unescape_a,
+                                                line, from + l, "^");
                                             }
                                         }
                                         if (c === "]") {
-                                            warningAt(messages.emptyclass, line, from + l - 1);
+                                            warningAt(messages.emptyclass,
+                                            line, from + l - 1);
                                         }
                                         isLiteral = false;
                                         isInRange = false;
@@ -1989,7 +1856,8 @@ klass:                                  do {
                                             switch (c) {
                                             case "[":
                                             case "^":
-                                                warningAt(messages.unescape_a, line, from + l, c);
+                                                warningAt(messages.unescape_a,
+                                                line, from + l, c);
                                                 if (isInRange) {
                                                     isInRange = false;
                                                 } else {
@@ -2007,29 +1875,34 @@ klass:                                  do {
                                                 } else {
                                                     if (option.regexdash !== (l === 2 || (l === 3 &&
                                                         s.charAt(1) === "^"))) {
-                                                        warningAt(messages.unescape_a, line, from + l - 1, "-");
+                                                        warningAt(messages.unescape_a,
+                                                        line, from + l - 1, "-");
                                                     }
                                                     isLiteral = true;
                                                 }
                                                 break;
                                             case "]":
                                                 if (isInRange && !option.regexdash) {
-                                                    warningAt(messages.unescape_a, line, from + l - 1, "-");
+                                                    warningAt(messages.unescape_a,
+                                                    line, from + l - 1, "-");
                                                 }
                                                 break klass;
                                             case "\\":
                                                 c = s.charAt(l);
                                                 if (c < " ") {
-                                                    warningAt(messages.unexpectedcontrolchar, line, from + l);
+                                                    warningAt(messages.unexpectedcontrolchar,
+                                                    line, from + l);
                                                 } else if (c === "<") {
-                                                    warningAt(messages.unexpectedescapechar_a, line, from + l, c);
+                                                    warningAt(messages.unexpectedescapechar_a,
+                                                    line, from + l, c);
                                                 }
                                                 l += 1;
 
                                                 // \w, \s and \d are never part of a character range
                                                 if (/[wsd]/i.test(c)) {
                                                     if (isInRange) {
-                                                        warningAt(messages.unescape_a, line, from + l, "-");
+                                                        warningAt(messages.unescape_a,
+                                                        line, from + l, "-");
                                                         isInRange = false;
                                                     }
                                                     isLiteral = false;
@@ -2040,7 +1913,8 @@ klass:                                  do {
                                                 }
                                                 break;
                                             case "/":
-                                                warningAt(messages.unescape_a, line, from + l - 1, "/");
+                                                warningAt(messages.unescape_a,
+                                                line, from + l - 1, "/");
 
                                                 if (isInRange) {
                                                     isInRange = false;
@@ -2091,7 +1965,8 @@ klass:                                  do {
                                             l += 1;
                                             c = s.charAt(l);
                                             if (c < "0" || c > "9") {
-                                                warningAt(messages.expectednum_a, line, from + l, c);
+                                                warningAt(messages.expectednum_a,
+                                                line, from + l, c);
                                                 break; // No reason to continue checking numbers.
                                             }
                                             l += 1;
@@ -2123,7 +1998,8 @@ klass:                                  do {
                                                 }
                                             }
                                             if (s.charAt(l) !== "}") {
-                                                warningAt(messages.expected_ab, line, from + l, "}", c);
+                                                warningAt(messages.expected_ab,
+                                                line, from + l, "}", c);
                                             } else {
                                                 l += 1;
                                             }
@@ -2131,7 +2007,8 @@ klass:                                  do {
                                                 l += 1;
                                             }
                                             if (low > high) {
-                                                warningAt(messages.notgreater_ab, line, from + l, low, high);
+                                                warningAt(messages.notgreater_ab,
+                                                line, from + l, low, high);
                                             }
                                         }
                                     }
@@ -5076,18 +4953,20 @@ loop:   for (;;) {
         return data;
     };
     
-    /*itself.lang = function(key) {
-		var i;
+    itself.lang = function (key, value) {
 
-		if (!key) {
-			return currentLanguage;
+		if (value) {
+		
+			languages[key] = value;	
+		} else if (typeof require === "function" && require) {
+		
+			languages[key] = require("./lang/" + key);
 		}
-		if (languages[key]) {			
-			messages = languages[key];
+		
+		messages = languages[key];
 			
-			currentLanguage = key;
-		}
-    };*/
+		currentLanguage = key;
+    };
 
     itself.jshint = itself;
 

@@ -13,7 +13,7 @@ exports.checkJSHint = function () {
         console.log("file: jshint.js");
         console.log(JSHINT.errors);
     }
-
+	
     assert.ok(res);
     assert.isUndefined(JSHINT.data().implieds);
 };

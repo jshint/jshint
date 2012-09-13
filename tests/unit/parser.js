@@ -43,10 +43,10 @@ exports.confusingOps = function () {
     ];
 
     TestRun()
-        .addError(1, "Confusing minusses.")
-        .addError(2, "Confusing plusses.")
-        .addError(3, "Confusing minusses.")
-        .addError(4, "Confusing plusses.")
+        .addError(1, "Confusing minuses.")
+        .addError(2, "Confusing pluses.")
+        .addError(3, "Confusing minuses.")
+        .addError(4, "Confusing pluses.")
         .test(code);
 };
 
