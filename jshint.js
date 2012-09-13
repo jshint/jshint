@@ -1137,12 +1137,8 @@ var JSHINT = (function () {
 			 	isnotdefined: "'{a}'는 정의되지 않았습니다."
         	}
         },
-        
-        langConfigProperties = {},
-        
-        messages = {},
-        
-        currentLanguage = "en";
+        currentLanguage = "en",
+        messages = languages[currentLanguage];
 
     // Regular expressions. Some of these are stupidly long.
     var ax, cx, tx, nx, nxg, lx, ix, jx, ft;
@@ -5092,7 +5088,7 @@ loop:   for (;;) {
 			currentLanguage = key;
 		}
     };
-    itself.lang(currentLanguage);
+    //itself.lang(currentLanguage);
 
     itself.jshint = itself;
 
