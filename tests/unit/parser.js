@@ -77,7 +77,7 @@ exports.assignment = function () {
         .addError(1, "Bad assignment.")
         .addError(2, "Bad assignment.")
         .addError(2, "Expected an assignment or function call and instead saw an expression.")
-        .addError(2, "Missing semicolon.")
+        .addError(2, "Missing ';'.")
         .test(code, { plusplus: true });
 };
 
@@ -135,8 +135,8 @@ exports.options = function () {
         .addError(7, "Expected a small integer and instead saw '200.4'.")
         .addError(8, "Expected a small integer and instead saw '300.4'.")
         .addError(10, "Expected '*/' and instead saw ':'.")
-        .addError(11, "Bad option: 'd'.")
-        .addError(11, "Bad option value.")
+        .addError(11, "Bad option 'd'.")
+        .addError(11, "Bad option.")
         .addError(13, "Read only.")
         .test(code);
 };
@@ -152,7 +152,7 @@ exports.shebang = function () {
         .addError(3, "Expected an identifier and instead saw '#'.")
         .addError(3, "Expected an operator and instead saw '!'.")
         .addError(3, "Expected an assignment or function call and instead saw an expression.")
-        .addError(3, "Missing semicolon.")
+        .addError(3, "Missing ';'.")
         .test(code);
 };
 
@@ -175,7 +175,7 @@ exports.numbers = function () {
         .addError(4, "Don't use extra leading zeros '03'.")
         .addError(5, "A leading decimal point can be confused with a dot: '.3'.")
         .addError(6, "Missing space after '0xAA'.")
-        .addError(6, "Missing semicolon.")
+        .addError(6, "Missing ';'.")
         .addError(6, "Expected an assignment or function call and instead saw an expression.")
         .addError(7, "Don't use extra leading zeros '0033'.")
         .addError(8, "A trailing decimal point can be confused with a dot '3.'.")
@@ -350,22 +350,22 @@ exports.comma = function () {
         .addError(6, 'Expected a conditional expression and instead saw an assignment.')
         .addError(6, 'Expected \';\' and instead saw \',\'.')
         .addError(6, 'Expected \')\' to match \'(\' from line 6 and instead saw \';\'.')
-        .addError(6, 'Missing semicolon.')
+        .addError(6, 'Missing \';\'.')
         .addError(6, 'Expected an identifier and instead saw \')\'.')
         .addError(6, 'Expected an assignment or function call and instead saw an expression.')
-        .addError(6, 'Missing semicolon.')
+        .addError(6, 'Missing \';\'.')
         .addError(6, 'Expected an assignment or function call and instead saw an expression.')
-        .addError(6, 'Missing semicolon.')
+        .addError(6, 'Missing \';\'.')
         .addError(15, 'Expected an assignment or function call and instead saw an expression.')
-        .addError(15, 'Missing semicolon.')
+        .addError(15, 'Missing \';\'.')
         .addError(20, 'Expected \')\' to match \'(\' from line 20 and instead saw \',\'.')
         .addError(20, 'Expected an assignment or function call and instead saw an expression.')
-        .addError(20, 'Missing semicolon.')
+        .addError(20, 'Missing \';\'.')
         .addError(20, 'Expected an identifier and instead saw \')\'.')
         .addError(30, 'Expected \')\' to match \'(\' from line 30 and instead saw \',\'.')
         .addError(30, 'Expected \')\' and instead saw \'args\'.')
         .addError(30, 'Expected an assignment or function call and instead saw an expression.')
-        .addError(30, 'Missing semicolon.')
+        .addError(30, 'Missing \';\'.')
         .addError(30, 'Expected an identifier and instead saw \')\'.')
         .test(src);
 };
