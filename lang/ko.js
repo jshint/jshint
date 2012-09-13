@@ -28,7 +28,7 @@
 		
 		beforedefined_a: "'{a}'는 정의되기 전에 사용되었습니다.",
 		alreadydefined_a: "'{a}'는 이미 정의되어 있습니다. ",
-		notdefined: "'{a}'는 정의되지 않았습니다."
+		notdefined: "'{a}'는 정의되지 않았습니다.",
 		
 		expected_abcd: "{c}라인의 '{b}'와 맞추기 위해 '{d}' 대신에 '{a}'를 사용해야 합니다.",
 		expectedindent_abc: "'{a}'가 {b}만큼 들여써지는 대신 {c}만큼 되어 있습니다.",
