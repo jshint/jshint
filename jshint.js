@@ -5076,7 +5076,7 @@ loop:   for (;;) {
         return data;
     };
     
-    itself.lang = function(key) {
+    /*itself.lang = function(key) {
 		var i;
 
 		if (!key) {
@@ -5087,8 +5087,7 @@ loop:   for (;;) {
 			
 			currentLanguage = key;
 		}
-    };
-    //itself.lang(currentLanguage);
+    };*/
 
     itself.jshint = itself;
 
