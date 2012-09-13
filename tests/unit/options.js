@@ -758,6 +758,7 @@ exports.newcap = function () {
     TestRun()
         .addError(1, 'A constructor name should start with an uppercase letter.')
         .addError(5, "Missing 'new' prefix when invoking a constructor.")
+        .addError(10, "A constructor name should start with an uppercase letter.")
         .test(src, { newcap: true });
 };
 
@@ -804,8 +805,10 @@ exports.strict = function () {
         .test(src2, { strict: false });
 
     TestRun()
-        .addError(7, "A constructor name should start with an uppercase letter.")
+        .addError(6, "Missing 'new' prefix when invoking a constructor.")
         .test(src3, {});
+
+    TestRun().test("var obj = Object({ foo: 'bar' });", { strict: true });
 };
 
 /** Option `globalstrict` allows you to use global "use strict"; */
@@ -833,9 +836,8 @@ exports.globalstrict = function () {
 /** Option `regexp` disallows the use of . and [^...] in regular expressions. */
 exports.regexp = function () {
     var code = [
-        'var a = /hey/;'
-      , 'var a = /h.ey/;'
-      , 'var a = /h[^...]/;'
+        'var a = /hey/;',
+        'var a = /h.ey/;'
     ];
 
     for (var i = 0, st; st = code[i]; i += 1) {
@@ -847,10 +849,6 @@ exports.regexp = function () {
     TestRun()
         .addError(1, "Insecure '.'.")
         .test(code[1], { regexp: true });
-
-    TestRun()
-        .addError(1, "Insecure '^'.")
-        .test(code[2], { regexp: true });
 };
 
 /** Option `laxbreak` allows you to insert newlines before some operators. */
@@ -1255,4 +1253,85 @@ exports.blacklist = function () {
         .addError(4, "'foo' is not defined.")
         .addError(5, "'btoa' is not defined.")
         .test(code, { undef: true });
+};
+
+/*
+ * Tests the `maxstatements` option
+ */
+exports.maxstatements = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/max-statements-per-function.js', 'utf8');
+
+    TestRun()
+        .addError(1, "Too many statements per function (8).")
+        .test(src, { maxstatements: 7 });
+
+    TestRun()
+        .test(src, { maxstatements: 8 });
+
+    TestRun()
+        .test(src, {});
+};
+
+/*
+ * Tests the `maxdepth` option
+ */
+exports.maxdepth = function () {
+    var fixture = '/fixtures/max-nested-block-depth-per-function.js';
+    var src = fs.readFileSync(__dirname + fixture, 'utf8');
+
+    TestRun()
+        .addError(5, "Blocks are nested too deeply (2).")
+        .addError(14, "Blocks are nested too deeply (2).")
+        .test(src, { maxdepth: 1 });
+
+    TestRun()
+        .addError(9, "Blocks are nested too deeply (3).")
+        .test(src, { maxdepth: 2 });
+
+    TestRun()
+        .test(src, { maxdepth: 3 });
+
+    TestRun()
+        .test(src, {});
+};
+
+/*
+ * Tests the `maxparams` option
+ */
+exports.maxparams = function () {
+    var fixture = '/fixtures/max-parameters-per-function.js';
+    var src = fs.readFileSync(__dirname + fixture, 'utf8');
+
+    TestRun()
+        .addError(1, "Too many parameters per function (3).")
+        .test(src, { maxparams: 2 });
+
+    TestRun()
+        .test(src, { maxparams: 3 });
+
+
+    TestRun()
+        .test(src, {});
+};
+
+/*
+ * Tests the `maxcomplexity` option
+ */
+exports.maxcomplexity = function () {
+    var fixture = '/fixtures/max-cyclomatic-complexity-per-function.js';
+    var src = fs.readFileSync(__dirname + fixture, 'utf8');
+
+    TestRun()
+        .addError(8, "Cyclomatic complexity is too high per function (2).")
+        .addError(15, "Cyclomatic complexity is too high per function (2).")
+        .addError(25, "Cyclomatic complexity is too high per function (2).")
+        .addError(47, "Cyclomatic complexity is too high per function (8).")
+        .test(src, { maxcomplexity: 1 });
+
+    TestRun()
+        .test(src, { maxcomplexity: 8 });
+
+
+    TestRun()
+        .test(src, {});
 };

@@ -2,4 +2,12 @@ var dog = new animal();
 var cat = new Animal();
 
 dog = animal();
-doc = Animal();
+cat = Animal();
+
+/*global iAnimal*/
+
+var rat = new iAnimal();
+var bat = new myAnimal();
+
+rat = iAnimal();
+bat = myAnimal();

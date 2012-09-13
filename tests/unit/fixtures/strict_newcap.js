@@ -1,10 +1,9 @@
-var factory = function () {};
 var Factory = function () {};
 
 (function () {
     "use strict";
 
-    var a = new factory();
+    var a = Factory();
     var b = new Factory();
 
     return a && b;
@@ -15,7 +14,7 @@ var Factory = function () {};
     "use strict";
     /*jshint newcap:false */
 
-    var a = new factory();
+    var a = Factory();
     var b = new Factory();
 
     return a && b;

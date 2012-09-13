@@ -222,6 +222,7 @@ exports.browser = function () {
             'ArrayBuffer'
           , 'ArrayBufferView'
           , 'Audio'
+          , 'Blob'
           , 'addEventListener'
           , 'applicationCache'
           , 'blur'
@@ -468,7 +469,7 @@ exports.mootools = function () {
     var globals = [
             '$'
           , '$$'
-          , 'Assets'
+          , 'Asset'
           , 'Browser'
           , 'Chain'
           , 'Class'
@@ -478,6 +479,7 @@ exports.mootools = function () {
           , 'Document'
           , 'DomReady'
           , 'DOMReady'
+          , 'DOMEvent'
           , 'Drag'
           , 'Element'
           , 'Elements'
@@ -561,6 +563,7 @@ exports.standard = function () {
       , 'isFinite'
       , 'isNaN'
       , 'JSON'
+      , 'Map'
       , 'Math'
       , 'Number'
       , 'Object'
@@ -569,10 +572,12 @@ exports.standard = function () {
       , 'RangeError'
       , 'ReferenceError'
       , 'RegExp'
+      , 'Set'
       , 'String'
       , 'SyntaxError'
       , 'TypeError'
       , 'URIError'
+      , 'WeakMap'
     ];
 
     assert.globalsKnown(globals); // You don't need any option to recognize standard globals

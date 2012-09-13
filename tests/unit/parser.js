@@ -221,8 +221,7 @@ exports.regexp = function () {
       , 'var n = /a??b+?c*?d{3,4}? a?b+c*d{3,4}/;'
       , 'var o = /a\\/*  [a-^-22-]/;'
       , 'var p = /(?:(?=a|(?!b)))/;'
-      , 'var q = /=;//;' // hack to not get other errors than "... confused with '/='".
-                         // The current parser recognizes this as /= and not as regex
+      , 'var q = /=;/;'
       , 'var r = /(/;'
       , 'var s = /(((/;'
       , 'var t = /x/* 2;'
@@ -266,6 +265,25 @@ exports.regexp = function () {
         .addError(22, "Confusing regular expression.")
         .addError(24, "Unclosed regular expression.")
         .test(code);
+};
+
+exports.testRegexRegressions = function () {
+    // GH-536
+    TestRun()
+        .test("str /= 5;", {}, { str: true });
+
+    TestRun()
+        .addError(1, "A regular expression literal can be confused with '/='.")
+        .test("str = str.replace(/=/g, '');", {}, { str: true });
+
+    TestRun()
+        .addError(1, "A regular expression literal can be confused with '/='.")
+        .test("str = str.replace(/=abc/g, '');", {}, { str: true });
+
+    // GH-538
+    TestRun()
+        .addError(1, "Expected a number and instead saw '/'.")
+        .test("var exp = /function(.*){/gi;");
 };
 
 exports.strings = function () {

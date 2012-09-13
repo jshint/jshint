@@ -360,6 +360,30 @@ exports.yesEmptyStmt = function () {
         .test(src, { curly: false, expr: true });
 };
 
+exports.insideEval = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/insideEval.js', 'utf8');
+
+    TestRun()
+        .addError(1, "eval is evil.")
+        .addError(3, "eval is evil.")
+        .addError(5, "eval is evil.")
+        .addError(7, "eval is evil.")
+        .addError(9, "eval is evil.")
+        .addError(11, "Implied eval is evil. Pass a function instead of a string.")
+        .addError(13, "Implied eval is evil. Pass a function instead of a string.")
+        .addError(15, "Implied eval is evil. Pass a function instead of a string.")
+        .addError(17, "Implied eval is evil. Pass a function instead of a string.")
+
+        // The "TestRun" class (and these errors) probably needs some
+        // facility for checking the expected scope of the error
+        .addError(1, "Unexpected early end of program.")
+        .addError(1, "Expected an identifier and instead saw '(end)'.")
+        .addError(1, "Expected ')' and instead saw ''.")
+        .addError(1, "Missing semicolon.")
+
+        .test(src, { evil: false });
+};
+
 // Regression test for GH-394.
 exports.noExcOnTooManyUndefined = function () {
     var code = 'a(); b();';
@@ -448,4 +472,57 @@ exports.missingRadix = function () {
             character: 12
         })
         .test(code);
+};
+
+exports.NumberNaN = function () {
+    var code = "(function () { return Number.NaN; })();";
+    TestRun().test(code);
+};
+
+exports.htmlEscapement = function () {
+    TestRun().test("var a = '<\\!--';");
+    TestRun()
+        .addError(1, "Bad escapement.")
+        .test("var a = '\\!';");
+};
+
+// GH-551 regression test.
+exports.testSparseArrays = function () {
+    var src = "var arr = ['a',, null,, '',, undefined,,];";
+
+    TestRun()
+        .addError(1, "Extra comma.")
+        .addError(1, "Extra comma.")
+        .addError(1, "Extra comma.")
+        .addError(1, "Extra comma.")
+        .test(src);
+
+    TestRun()
+        .test(src, { es5: true });
+};
+
+exports.testCatchBlocks = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/gh247.js', 'utf8');
+
+    TestRun()
+        .addError(11, "'w' is not defined.")
+        .test(src, { undef: true, devel: true });
+
+    src = fs.readFileSync(__dirname + '/fixtures/gh618.js', 'utf8');
+
+    TestRun()
+        .addError(5, "Value of 'x' may be overwritten in IE.")
+        .test(src, { undef: true, devel: true });
+
+    TestRun()
+        .test(src, { undef: true, devel: true, node: true });
+};
+
+exports.testNumericParams = function () {
+    TestRun()
+        .test("/*jshint maxparams:4, indent:3 */");
+
+    TestRun()
+        .addError(1, "Expected a small integer and instead saw 'face'.")
+        .test("/*jshint maxparams:face */");
 };
