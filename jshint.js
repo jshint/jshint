@@ -150,15 +150,15 @@
 
 /*members "\b", "\t", "\n", "\f", "\r", "!=", "!==", "\"", "%", "(begin)",
  "(breakage)", "(character)", "(context)", "(error)", "(explicitNewcap)", "(global)",
- "(identifier)", "(last)", "(lastcharacter)", "(line)", "(loopage)", "(name)",
- "(onevar)", "(params)", "(scope)", "(statement)", "(verb)", "(tokens)",
+ "(identifier)", "(last)", "(lastcharacter)", "(line)", "(loopage)", "(metrics)",
+ "(name)", "(onevar)", "(params)", "(scope)", "(statement)", "(verb)", "(tokens)", "(catch)",
  "*", "+", "++", "-", "--", "\/", "<", "<=", "==",
  "===", ">", ">=", $, $$, $A, $F, $H, $R, $break, $continue, $w, Abstract, Ajax,
  __filename, __dirname, ActiveXObject, Array, ArrayBuffer, ArrayBufferView, Audio,
- Autocompleter, Assets, Boolean, Builder, Buffer, Browser, COM, CScript, Canvas,
- CustomAnimation, Class, Control, Chain, Color, Cookie, Core, DataView, Date,
- Debug, Draggable, Draggables, Droppables, Document, DomReady, DOMReady, DOMParser, Drag,
- E, Enumerator, Enumerable, Element, Elements, Error, Effect, EvalError, Event,
+ Autocompleter, Asset, Boolean, Builder, Buffer, Browser, Blob, COM, CScript, Canvas,
+ CustomAnimation, Class, Control, ComplexityCount, Chain, Color, Cookie, Core, DataView, Date,
+ Debug, Draggable, Draggables, Droppables, Document, DomReady, DOMEvent, DOMReady, DOMParser,
+ Drag, E, Enumerator, Enumerable, Element, Elements, Error, Effect, EvalError, Event,
  Events, FadeAnimation, Field, Flash, Float32Array, Float64Array, Form,
  FormField, Frame, FormData, Function, Fx, GetObject, Group, Hash, HotKey,
  HTMLElement, HTMLAnchorElement, HTMLBaseElement, HTMLBlockquoteElement,
@@ -177,49 +177,51 @@
  HTMLTextAreaElement, HTMLTitleElement, HTMLUListElement, HTMLVideoElement,
  Iframe, IframeShim, Image, importScripts, Int16Array, Int32Array, Int8Array,
  Insertion, InputValidator, JSON, Keyboard, Locale, LN10, LN2, LOG10E, LOG2E,
- MAX_VALUE, MIN_VALUE, Mask, Math, MenuItem, MessageChannel, MessageEvent, MessagePort,
- MoveAnimation, MooTools, MutationObserver, Native, NEGATIVE_INFINITY, Node, NodeFilter,
+ MAX_VALUE, MIN_VALUE, Map, Mask, Math, MenuItem, MessageChannel, MessageEvent, MessagePort,
+ MoveAnimation, MooTools, MutationObserver, NaN, Native, NEGATIVE_INFINITY, Node, NodeFilter,
  Number, Object, ObjectRange,
  Option, Options, OverText, PI, POSITIVE_INFINITY, PeriodicalExecuter, Point, Position, Prototype,
- RangeError, Rectangle, ReferenceError, RegExp, ResizeAnimation, Request, RotateAnimation,
+ RangeError, Rectangle, ReferenceError, RegExp, ResizeAnimation, Request, RotateAnimation, Set,
  SQRT1_2, SQRT2, ScrollBar, ScriptEngine, ScriptEngineBuildVersion,
  ScriptEngineMajorVersion, ScriptEngineMinorVersion, Scriptaculous, Scroller,
  Slick, Slider, Selector, SharedWorker, String, Style, SyntaxError, Sortable, Sortables,
  SortableObserver, Sound, Spinner, System, Swiff, Text, TextArea, Template,
  Timer, Tips, Type, TypeError, Toggle, Try, "use strict", unescape, URI, URIError, URL,
- VBArray, WSH, WScript, XDomainRequest, Web, Window, XMLDOM, XMLHttpRequest, XMLSerializer,
+ VBArray, WeakMap, WSH, WScript, XDomainRequest, Web, Window, XMLDOM, XMLHttpRequest, XMLSerializer,
  XPathEvaluator, XPathException, XPathExpression, XPathNamespace, XPathNSResolver, XPathResult,
- "\\", a, addEventListener, address, alert, apply, applicationCache, arguments, arity,
+ "\\", a, abs, addEventListener, address, alert, apply, applicationCache, arguments, arity,
  asi, atob, b, basic, basicToken, bitwise, blacklist, block, blur, boolOptions, boss,
  browser, btoa, c, call, callee, caller, camelcase, cases, charAt, charCodeAt, character,
- clearInterval, clearTimeout, close, closed, closure, comment, condition, confirm, console,
- constructor, content, couch, create, css, curly, d, data, datalist, dd, debug, decodeURI,
- decodeURIComponent, defaultStatus, defineClass, deserialize, devel, document,
- dojo, dijit, dojox, define, else, emit, encodeURI, encodeURIComponent,
+ clearInterval, clearTimeout, close, closed, closure, comment, complexityCount, condition,
+ confirm, console, constructor, content, couch, create, css, curly, d, data, datalist, dd, debug,
+ decodeURI, decodeURIComponent, defaultStatus, defineClass, deserialize, devel, document,
+ dojo, dijit, dojox, define, else, emit, encodeURI, encodeURIComponent, elem,
  eqeq, eqeqeq, eqnull, errors, es5, escape, esnext, eval, event, evidence, evil,
  ex, exception, exec, exps, expr, exports, FileReader, first, floor, focus, forEach,
  forin, fragment, frames, from, fromCharCode, fud, funcscope, funct, function, functions,
  g, gc, getComputedStyle, getRow, getter, getterToken, GLOBAL, global, globals, globalstrict,
  hasOwnProperty, help, history, i, id, identifier, immed, implieds, importPackage, include,
- indent, indexOf, init, ins, instanceOf, isAlpha, isApplicationRunning, isArray,
+ indent, indexOf, init, ins, internals, instanceOf, isAlpha, isApplicationRunning, isArray,
  isDigit, isFinite, isNaN, iterator, java, join, jshint,
  JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastcharacter, lastsemic, laxbreak,
  laxcomma, latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
- log, loopfunc, m, match, maxerr, maxlen, member,message, meta, module, moveBy,
- moveTo, mootools, multistr, name, navigator, new, newcap, noarg, node, noempty, nomen,
- nonew, nonstandard, nud, onbeforeunload, onblur, onerror, onevar, onecase, onfocus,
- onload, onresize, onunload, open, openDatabase, openURL, opener, opera, options, outer, param,
- parent, parseFloat, parseInt, passfail, plusplus, postMessage, pop, predef, print, process, prompt,
- proto, prototype, prototypejs, provides, push, quit, quotmark, range, raw, reach, reason, regexp,
- readFile, readUrl, regexdash, removeEventListener, replace, report, require,
- reserved, resizeBy, resizeTo, resolvePath, resumeUpdates, respond, rhino, right,
- runCommand, scroll, screen, scripturl, scrollBy, scrollTo, scrollbar, search, seal, self,
- send, serialize, sessionStorage, setInterval, setTimeout, setter, setterToken, shift, slice,
- smarttabs, sort, spawn, split, stack, status, start, strict, sub, substr, supernew, shadow,
- supplant, sum, sync, test, toLowerCase, toString, toUpperCase, toint32, token, tokens, top,
- trailing, type, typeOf, Uint16Array, Uint32Array, Uint8Array, undef, undefs, unused,
- urls, validthis, value, valueOf, var, vars, version, WebSocket, withstmt, white, window, windows,
- Worker, worker, wsh*/
+ log, loopfunc, m, match, max, maxcomplexity, maxdepth, maxerr, maxlen, maxstatements, maxparams,
+ member, message, meta, module, moveBy, moveTo, mootools, multistr, name, navigator, new, newcap,
+ nestedBlockDepth, noarg, node, noempty, nomen, nonew, nonstandard, nud, onbeforeunload, onblur,
+ onerror, onevar, onecase, onfocus, onload, onresize, onunload, open, openDatabase, openURL,
+ opener, opera, options, outer, param, parent, parseFloat, parseInt, passfail, plusplus,
+ postMessage, pop, predef, print, process, prompt, proto, prototype, prototypejs, provides, push,
+ quit, quotmark, range, raw, reach, reason, regexp, readFile, readUrl, regexdash,
+ removeEventListener, replace, report, require, reserved, resizeBy, resizeTo, resolvePath,
+ resumeUpdates, respond, rhino, right, runCommand, scroll, scope, screen, scripturl, scrollBy,
+ scrollTo, scrollbar, search, seal, self, send, serialize, sessionStorage, setInterval, setTimeout,
+ setter, setterToken, shift, slice, smarttabs, sort, spawn, split, statement, statementCount, stack,
+ status, start, strict, sub, substr, supernew, shadow, supplant, sum, sync, test, toLowerCase,
+ toString, toUpperCase, toint32, token, tokens, top, trailing, type, typeOf, Uint16Array,
+ Uint32Array, Uint8Array, undef, undefs, unused, urls, validthis, value, valueOf, var, vars,
+ version, verifyMaxParametersPerFunction, verifyMaxStatementsPerFunction,
+ verifyMaxComplexityPerFunction, verifyMaxNestedBlockDepthPerFunction, WebSocket, withstmt, white,
+ window, windows, Worker, worker, wsh, yui, YUI, Y, YUI_config*/
 
 /*global exports: false */
 
@@ -323,18 +325,24 @@ var JSHINT = (function () {
             withstmt    : true, // if with statements should be allowed
             white       : true, // if strict whitespace rules apply
             worker      : true, // if Web Worker script symbols should be allowed
-            wsh         : true  // if the Windows Scripting Host environment globals
+            wsh         : true, // if the Windows Scripting Host environment globals
                                 // should be predefined
+            yui         : true  // YUI variables should be predefined
         },
 
         // These are the JSHint options that can take any value
         // (we use this object to detect invalid options)
         valOptions = {
-            maxlen: false,
-            indent: false,
-            maxerr: false,
-            predef: false,
-            quotmark: false //'single'|'double'|true
+            maxlen       : false,
+            indent       : false,
+            maxerr       : false,
+            predef       : false,
+            quotmark     : false, //'single'|'double'|true
+            scope        : false,
+            maxstatements: false, // {int} max statements per function
+            maxdepth     : false, // {int} max nested block depth per function
+            maxparams    : false, // {int} max params per function
+            maxcomplexity: false  // {int} max cyclomatic complexity per function
         },
 
         // These are JSHint boolean options which are shared with JSLint
@@ -369,6 +377,7 @@ var JSHINT = (function () {
             ArrayBuffer              :  false,
             ArrayBufferView          :  false,
             Audio                    :  false,
+            Blob                     :  false,
             addEventListener         :  false,
             applicationCache         :  false,
             atob                     :  false,
@@ -565,7 +574,7 @@ var JSHINT = (function () {
         mootools = {
             "$"             : false,
             "$$"            : false,
-            Assets          : false,
+            Asset           : false,
             Browser         : false,
             Chain           : false,
             Class           : false,
@@ -574,6 +583,7 @@ var JSHINT = (function () {
             Core            : false,
             Document        : false,
             DomReady        : false,
+            DOMEvent        : false,
             DOMReady        : false,
             Drag            : false,
             Element         : false,
@@ -720,7 +730,9 @@ var JSHINT = (function () {
             isFinite            : false,
             isNaN               : false,
             JSON                : false,
+            Map                 : false,
             Math                : false,
+            NaN                 : false,
             Number              : false,
             Object              : false,
             parseInt            : false,
@@ -728,10 +740,12 @@ var JSHINT = (function () {
             RangeError          : false,
             ReferenceError      : false,
             RegExp              : false,
+            Set                 : false,
             String              : false,
             SyntaxError         : false,
             TypeError           : false,
-            URIError            : false
+            URIError            : false,
+            WeakMap             : false
         },
 
         // widely adopted global names that are not part of ECMAScript standard
@@ -767,6 +781,12 @@ var JSHINT = (function () {
             WSH                       : true,
             WScript                   : true,
             XDomainRequest            : true
+        },
+
+        yui = {
+            YUI             : false,
+            Y               : false,
+            YUI_config      : false
         },
         
         languages = {
@@ -1136,7 +1156,7 @@ var JSHINT = (function () {
         cx = /[\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/;
 
         // token
-        tx = /^\s*([(){}\[.,:;'"~\?\]#@]|==?=?|\/(\*(jshint|jslint|members?|global)?|=|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|%=?|&[&=]?|\|[|=]?|>>?>?=?|<([\/=!]|\!(\[|--)?|<=?)?|\^=?|\!=?=?|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+\-]?[0-9]+)?)/;
+        tx = /^\s*([(){}\[.,:;'"~\?\]#@]|==?=?|\/=(?!(\S*\/[gim]?))|\/(\*(jshint|jslint|members?|global)?|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|%=?|&[&=]?|\|[|=]?|>>?>?=?|<([\/=!]|\!(\[|--)?|<=?)?|\^=?|\!=?=?|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+\-]?[0-9]+)?)/;
 
         // characters in strings that need escapement
         nx = /[\u0000-\u001f&<"\/\\\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/;
@@ -1191,6 +1211,44 @@ var JSHINT = (function () {
         };
     }
 
+    if (!Array.prototype.indexOf) {
+        Array.prototype.indexOf = function (searchElement /*, fromIndex */ ) {
+            if (this === null || this === undefined) {
+                throw new TypeError();
+            }
+
+            var t = new Object(this);
+            var len = t.length >>> 0;
+
+            if (len === 0) {
+                return -1;
+            }
+
+            var n = 0;
+            if (arguments.length > 0) {
+                n = Number(arguments[1]);
+                if (n != n) { // shortcut for verifying if it's NaN
+                    n = 0;
+                } else if (n !== 0 && n != Infinity && n != -Infinity) {
+                    n = (n > 0 || -1) * Math.floor(Math.abs(n));
+                }
+            }
+
+            if (n >= len) {
+                return -1;
+            }
+
+            var k = n >= 0 ? n : Math.max(len - Math.abs(n), 0);
+            for (; k < len; k++) {
+                if (k in t && t[k] === searchElement) {
+                    return k;
+                }
+            }
+
+            return -1;
+        };
+    }
+
     if (typeof Object.create !== "function") {
         Object.create = function (o) {
             F.prototype = o;
@@ -1219,6 +1277,16 @@ var JSHINT = (function () {
 
     function isDigit(str) {
         return (str >= "0" && str <= "9");
+    }
+
+    function isIdentifier(token, value) {
+        if (!token)
+            return false;
+
+        if (!token.identifier || token.value !== value)
+            return false;
+
+        return true;
     }
 
     function supplant(str, data) {
@@ -1299,6 +1367,10 @@ var JSHINT = (function () {
 
         if (option.globalstrict && option.strict !== false) {
             option.strict = true;
+        }
+
+        if (option.yui) {
+            combine(predefined, yui);
         }
     }
 
@@ -1818,7 +1890,7 @@ unclosedString:     for (;;) {
                             break;
     //      /
                         case "/":
-                            if (token.id === "/=") {
+                            if (s.charAt(0) === "=") {
                                 errorAt(messages.confusedregexp, line, from);
                             }
 
@@ -1906,9 +1978,7 @@ unclosedString:     for (;;) {
                                         c = s.charAt(l);
                                         if (c === "^") {
                                             l += 1;
-                                            if (option.regexp) {
-                                                warningAt(messages.insecure_a, line, from + l, c);
-                                            } else if (s.charAt(l) === "]") {
+                                            if (s.charAt(l) === "]") {
                                                 errorAt(messages.unescape_a, line, from + l, "^");
                                             }
                                         }
@@ -2666,9 +2736,9 @@ loop:   for (;;) {
             nobreaknonadjacent(prevtoken, token);
             nonadjacent(token, nexttoken);
             var right = expression(100);
+
             if (isIdentifier(left, "NaN") || isIdentifier(right, "NaN")) {
                 warning(messages.useisNaN, this);
-
             } else if (f) {
                 f.apply(this, [left, right]);
             }
@@ -2986,7 +3056,7 @@ loop:   for (;;) {
                 }
 
                 indentation();
-                advance();console.log(directive);
+                advance();
                 if (directive[token.value]) {
                     warning(messages.unnecessaryd_a, token, token.value);
                 }
@@ -5016,12 +5086,7 @@ loop:   for (;;) {
 		if (!key) {
 			return currentLanguage;
 		}
-		if (languages[key]) {
-			// deprecated, to get the language definition variables, use the JSHINT.lang method.
-			/*for (i = 0; i < langConfigProperties.length; i++) {
-				messages[langConfigProperties[i]] = languages[key][langConfigProperties[i]];
-			}*/
-			
+		if (languages[key]) {			
 			messages = languages[key];
 			
 			currentLanguage = key;
