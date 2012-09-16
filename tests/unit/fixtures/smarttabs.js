@@ -8,3 +8,7 @@ function hello() {
 	/**
 	 * Allowed space after tab before block comment
 	 */
+
+// function commentedOut() {
+// 	console.log('space followed by tab after a // comment');
+// }
