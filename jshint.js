@@ -3491,7 +3491,7 @@ loop:   for (;;) {
 
         if (nexttoken.id === ")") {
             advance(")");
-            return params;
+            return;
         }
 
         for (;;) {
