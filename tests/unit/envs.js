@@ -593,3 +593,14 @@ exports.worker = function () {
     assert.globalsImplied(globals);
     assert.globalsKnown(globals, { worker: true });
 };
+
+exports.yui = function () {
+    var globals = [
+        'YUI',
+        'Y',
+        'YUI_config'
+    ];
+
+    assert.globalsImplied(globals);
+    assert.globalsKnown(globals, { yui: true });
+};
