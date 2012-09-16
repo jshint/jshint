@@ -1108,6 +1108,7 @@ var JSHINT = (function () {
 
         function nextLine() {
             var at,
+                match,
                 tw; // trailing whitespace check
 
             if (line >= lines.length)
@@ -1120,10 +1121,13 @@ var JSHINT = (function () {
             // If smarttabs option is used check for spaces followed by tabs only.
             // Otherwise check for any occurence of mixed tabs and spaces.
             // Tabs and one space followed by block comment is allowed.
-            if (option.smarttabs)
-                at = s.search(/ \t/);
-            else
+            if (option.smarttabs) {
+                // negative look-behind for "//"
+                match = s.match(/(\/\/)? \t/);
+                at = match && !match[1] ? 0 : -1;
+            } else {
                 at = s.search(/ \t|\t [^\*]/);
+            }
 
             if (at >= 0)
                 warningAt("Mixed spaces and tabs.", line, at + 1);
