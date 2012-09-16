@@ -1303,12 +1303,11 @@ exports.maxparams = function () {
     var src = fs.readFileSync(__dirname + fixture, 'utf8');
 
     TestRun()
-        .addError(1, "Too many parameters per function (3).")
+        .addError(4, "Too many parameters per function (3).")
         .test(src, { maxparams: 2 });
 
     TestRun()
         .test(src, { maxparams: 3 });
-
 
     TestRun()
         .test(src, {});

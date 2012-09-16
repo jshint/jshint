@@ -3569,10 +3569,11 @@ loop:   for (;;) {
                 }
             },
 
-            verifyMaxParametersPerFunction: function (parameters) {
-                if (option.maxparams &&
-                    parameters.length > option.maxparams) {
-                    var message = "Too many parameters per function (" + parameters.length + ").";
+            verifyMaxParametersPerFunction: function (params) {
+                params = params || [];
+
+                if (option.maxparams && params.length > option.maxparams) {
+                    var message = "Too many parameters per function (" + params.length + ").";
                     warning(message, functionStartToken);
                 }
             },
