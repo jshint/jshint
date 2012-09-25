@@ -4495,12 +4495,16 @@ loop:   for (;;) {
                     }
                 });
             }
+
             optionKeys = Object.keys(o);
             for (x = 0; x < optionKeys.length; x++) {
                 newOptionObj[optionKeys[x]] = o[optionKeys[x]];
 
                 if (optionKeys[x] === "newcap" && o[optionKeys[x]] === false)
                     newOptionObj["(explicitNewcap)"] = true;
+
+                if (optionKeys[x] === "indent")
+                    newOptionObj.white = true;
             }
         }
 
