@@ -1006,13 +1006,14 @@ exports.indentation = function () {
         .addError(6, "Mixed spaces and tabs.")
         .test(src, { indent: 4, white: true });
 
+    // 'indent' implies 'white'
     TestRun()
         .addError(5, "Mixed spaces and tabs.")
         .addError(5, "Expected 'var' to have an indentation at 5 instead at 7.")
         .addError(6, "Mixed spaces and tabs.")
         .addError(6, "Expected 'var' to have an indentation at 5 instead at 7.")
         .addError(7, "Expected '}' to have an indentation at 3 instead at 5.")
-        .test(src, { indent: 2, white: true });
+        .test(src, { indent: 2 });
 };
 
 /*
