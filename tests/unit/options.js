@@ -1139,6 +1139,7 @@ exports.smarttabs = function () {
     TestRun()
         .addError(4, "Mixed spaces and tabs.")
         .addError(5, "Mixed spaces and tabs.")
+        .addError(13, "Mixed spaces and tabs.")
         .test(src);
 
     TestRun()
