@@ -1,0 +1,29 @@
+{
+  "name":     "jshint",
+  "version":  "1.0.0",
+  "homepage": "http://jshint.com/",
+  "description": "Static analysis tool for JavaScript",
+
+  "author": {
+    "name":  "Anton Kovalyov",
+    "email": "anton@kovalyov.net",
+    "url":   "http://anton.kovalyov.net/"
+  },
+
+  "dependencies": {
+    "esprima":    "https://github.com/ariya/esprima/tarball/master",
+    "underscore": "*",
+    "peakle":     "*",
+    "cli":        "0.4.3",
+    "minimatch":  "0.0.x"
+  },
+
+  "devDependencies": {
+    "browserify": "*",
+    "coveraje":   "*",
+    "grunt":      "*",
+    "nodeunit":   "*"
+  },
+
+  "preferGlobal": true
+}
