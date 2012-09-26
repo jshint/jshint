@@ -396,6 +396,26 @@ exports.unused = function () {
     assert.ok(unused.some(function (err) { return err.line === 15 && err.name === "foo"; }));
 };
 
+// unused should complain when the second of two arguments is unused
+exports.unused_second_arg = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/unused_second_arg.js', 'utf8');
+
+    TestRun()
+		.addError(1, "'ui' is defined but never used.")
+		.test(src, { unused: true });
+
+	assert.ok(!JSHINT(src, { unused: true }));
+};
+
+// unused shouldn't complain when an unused argument is followed by a used one
+exports.unused_first_arg = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/unused_first_arg.js', 'utf8');
+
+    TestRun().test(src, { unused: true });
+
+	assert.ok(JSHINT(src, { unused: true }));
+};
+
 // Regression test for `undef` to make sure that ...
 exports['undef in a function scope'] = function () {
     var src = fixture('undef_func.js');
