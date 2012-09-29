@@ -4,6 +4,7 @@ module.exports = function (grunt) {
 			all: [
 				"tests/stable/unit/*.js",
 				"tests/stable/regression/thirdparty.js",
+				"tests/next/unit/**/*.js"
 			]
 		}
 	});
