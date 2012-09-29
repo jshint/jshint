@@ -4,7 +4,7 @@
  * of global variables.
  */
 
-/*jshint boss: true, laxbreak: true, node: true, maxlen:100 */
+"use strict";
 
 var JSHINT  = require('../../../src/stable/jshint.js').JSHINT;
 var fs      = require('fs');
@@ -546,10 +546,10 @@ exports.boss = function (test) {
  */
 exports.eqnull = function (test) {
     var code = [
-        'if (e == null) doSomething();'
-      , 'if (null == e) doSomething();'
-      , 'if (e != null) doSomething();'
-      , 'if (null != e) doSomething();'
+        'if (e == null) doSomething();',
+        'if (null == e) doSomething();',
+        'if (e != null) doSomething();',
+        'if (null != e) doSomething();',
     ];
 
     // By default, warn about `== null` comparison
@@ -745,9 +745,9 @@ exports.nomen = function (test) {
 /** Option `passfail` tells JSHint to stop at the first error. */
 exports.passfail = function (test) {
     var code = [
-        'one()'
-      , 'two()'
-      , 'three()'
+        'one()',
+        'two()',
+        'three()',
     ];
 
     TestRun(test)
@@ -883,8 +883,8 @@ exports.strict = function (test) {
 /** Option `globalstrict` allows you to use global "use strict"; */
 exports.globalstrict = function (test) {
     var code = [
-        '"use strict";'
-      , 'function hello() { return; }'
+        '"use strict";',
+        'function hello() { return; }'
     ];
 
     TestRun(test)
@@ -998,18 +998,18 @@ exports.trailing = function (test) {
 
 exports.regexdash = function (test) {
     var code = [
-        'var a = /[-ab]/;'
-      , 'var b = /[ab-]/;'
-      , 'var c = /[a-c-e]/;'
-      , 'var d = /[\\s-\\d]/;'
-      , 'var e = /[\\s-]/;'
-      , 'var f = /[-\\d]/;'
-      , 'var g = /[a-]/;'
-      , 'var h = /[-z]/;'
-      , 'var g = /[a-\\w]/;'
-      , 'var h = /[\\d-z]/;'
-      , 'var i = /[^-ab]/;'
-      , 'var j = /[^ab-]/;'
+        'var a = /[-ab]/;',
+        'var b = /[ab-]/;',
+        'var c = /[a-c-e]/;',
+        'var d = /[\\s-\\d]/;',
+        'var e = /[\\s-]/;',
+        'var f = /[-\\d]/;',
+        'var g = /[a-]/;',
+        'var h = /[-z]/;',
+        'var g = /[a-\\w]/;',
+        'var h = /[\\d-z]/;',
+        'var i = /[^-ab]/;',
+        'var j = /[^ab-]/;'
     ];
 
     // Default behavior
@@ -1291,18 +1291,17 @@ exports.laxcomma = function (test) {
 exports.browser = function (test) {
     var src = fs.readFileSync(__dirname + '/fixtures/browser.js', 'utf8');
 
-	TestRun(test)
-		.addError(2, "'atob' is not defined.")
-		.addError(3, "'btoa' is not defined.")
-		.addError(6, "'DOMParser' is not defined.")
-		.addError(10, "'XMLSerializer' is not defined.")
-		.addError(14, "'NodeFilter' is not defined.")
-		.addError(15, "'Node' is not defined.")
-		.addError(18, "'MutationObserver' is not defined.")
-		.test(src, { undef: true });
+    TestRun(test)
+        .addError(2, "'atob' is not defined.")
+        .addError(3, "'btoa' is not defined.")
+        .addError(6, "'DOMParser' is not defined.")
+        .addError(10, "'XMLSerializer' is not defined.")
+        .addError(14, "'NodeFilter' is not defined.")
+        .addError(15, "'Node' is not defined.")
+        .addError(18, "'MutationObserver' is not defined.")
+        .test(src, { undef: true });
 
-	TestRun(test).test(src, { browser: true, undef: true });
-
+    TestRun(test).test(src, { browser: true, undef: true });
 
     test.done();
 };

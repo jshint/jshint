@@ -1,4 +1,4 @@
-/*jshint boss:true, laxbreak:true, node:true, devel:true, undef:true, unused:true */
+"use strict";
 
 var fs      = require('fs');
 var TestRun = require("../helpers/testhelper").setup.testRun;

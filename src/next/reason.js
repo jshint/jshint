@@ -267,7 +267,8 @@ exports.register = function (linter) {
 			if (!expr.property || !expr.object)
 				return false;
 
-			return expr.object.name in constants.ecmaIdentifiers && expr.property.name === "prototype";
+			return expr.object.name in
+				constants.ecmaIdentifiers && expr.property.name === "prototype";
 		}
 
 		if (left.type !== "MemberExpression")

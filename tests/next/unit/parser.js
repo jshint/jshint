@@ -3,6 +3,8 @@
 // These shouldn't test actual JSHint behaviour. Instead they should ensure
 // that underlying Esprima parser works as expected.
 
+"use strict";
+
 var linter  = require("../../../src/next/jshint.js");
 var helpers = require("../lib/helpers.js");
 
