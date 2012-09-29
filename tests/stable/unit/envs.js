@@ -5,43 +5,42 @@
 /*jshint boss: true, laxbreak: true, node: true */
 /*global wrap: true */
 
-var JSHINT  = require('../../jshint.js').JSHINT,
-    assert  = require('assert'),
-    fs      = require('fs'),
-    TestRun = require("../helpers/testhelper").setup.testRun;
+var JSHINT  = require('../../../src/stable/jshint.js').JSHINT;
+var fs      = require('fs');
+var TestRun = require("../helpers/testhelper").setup.testRun;
 
 function wrap(globals) {
     return '(function () { return [ ' + globals.join(',') + ' ]; }());';
 }
 
-assert.globalsKnown = function (globals, options) {
+function globalsKnown(test, globals, options) {
     JSHINT(wrap(globals), options || {});
     var report = JSHINT.data();
 
-    assert.isUndefined(report.implieds);
-    assert.eql(report.globals.length, globals.length);
+    test.ok(report.implied === undefined);
+    test.equal(report.globals.length, globals.length);
 
     var dict = {};
     for (var i = 0, g; g = report.globals[i]; i += 1)
         globals[g] = true;
 
     for (i = 0, g = null; g = globals[i]; i += 1)
-        assert.ok(g in globals);
-};
+        test.ok(g in globals);
+}
 
-assert.globalsImplied = function (globals, options) {
+function globalsImplied(test, globals, options) {
     JSHINT(wrap(globals), options || {});
     var report = JSHINT.data();
 
-    assert.isDefined(report.implieds);
-    assert.isUndefined(report.globals, 0);
+    test.ok(report.implieds !== null);
+    test.ok(report.globals === undefined);
 
     var implieds = [];
     for (var i = 0, warn; warn = report.implieds[i]; i += 1)
         implieds.push(warn.name);
 
-    assert.eql(implieds.length, globals.length);
-};
+    test.equal(implieds.length, globals.length);
+}
 
 /*
  * Option `node` predefines Node.js (v 0.5.9) globals
@@ -49,41 +48,41 @@ assert.globalsImplied = function (globals, options) {
  * More info:
  *  + http://nodejs.org/docs/v0.5.9/api/globals.html
  */
-exports.node = function () {
+exports.node = function (test) {
     var globals = [
-            "__filename"
-          , "__dirname"
-          , "Buffer"
-          , "GLOBAL"
-          , "global"
-          , "module"
-          , "process"
-          , "require"
-          , "exports"
-          , "console"
-          , "setTimeout"
-          , "clearTimeout"
-          , "setInterval"
-          , "clearInterval"
-        ];
+        "__filename",
+        "__dirname",
+        "Buffer",
+        "GLOBAL",
+        "global",
+        "module",
+        "process",
+        "require",
+        "exports",
+        "console",
+        "setTimeout",
+        "clearTimeout",
+        "setInterval",
+        "clearInterval"
+    ];
 
-    assert.globalsImplied(globals);
-    assert.globalsKnown(globals, { node: true });
+    globalsImplied(test, globals);
+    globalsKnown(test, globals, { node: true });
 
     // Make sure that the `node` option doesn't conflict with `nomen`
     var asGlobals = [
         'console.log(__dirname);',
-        'console.log(__filename);'
+        "console.log(__filename);",
     ];
 
     var asProps = [
         'console.log(a.__dirname);',
         'console.log(a.__filename);',
-        'console.log(__hello);'
+        "console.log(__hello);",
     ];
 
-    TestRun().test(asGlobals, { node: true, nomen: true });
-    TestRun()
+    TestRun(test).test(asGlobals, { node: true, nomen: true });
+    TestRun(test)
         .addError(1, "Unexpected dangling '_' in '__dirname'.")
         .addError(2, "Unexpected dangling '_' in '__filename'.")
         .addError(3, "Unexpected dangling '_' in '__hello'.")
@@ -92,14 +91,14 @@ exports.node = function () {
     // Node environment assumes `globalstrict`
     var globalStrict = [
         '"use strict";',
-        'function test() { return; }'
+        "function test() { return; }",
     ].join('\n');
 
-    TestRun()
+    TestRun(test)
         .addError(1, 'Use the function form of "use strict".')
         .test(globalStrict);
 
-    TestRun()
+    TestRun(test)
         .test(globalStrict, { node: true });
 
     // Make sure that we can do fancy Node export
@@ -109,102 +108,112 @@ exports.node = function () {
         "exports = module.exports = {};"
     ];
 
-    TestRun()
-        .addError(1, 'Read only.')
+    TestRun(test)
+        .addError(1, "Read only.")
         .test(overwrites, { node: true });
+
+    test.done();
 };
 
 /** Option `jquery` predefines jQuery globals */
-exports.jquery = function () {
-    var globals = [ 'jQuery', '$' ];
+exports.jquery = function (test) {
+    var globals = ['jQuery', "$"];
 
-    assert.globalsImplied(globals);
-    assert.globalsKnown(globals, { jquery: true });
+    globalsImplied(test, globals);
+    globalsKnown(test, globals, { jquery: true });
+
+    test.done();
 };
 
 /** Option `couch` predefines CouchDB globals */
-exports.couch = function () {
+exports.couch = function (test) {
     var globals = [
-            "require"
-          , "respond"
-          , "getRow"
-          , "emit"
-          , "send"
-          , "start"
-          , "sum"
-          , "log"
-          , "exports"
-          , "module"
-          , "provides"
-        ];
+        "require",
+        "respond",
+        "getRow",
+        "emit",
+        "send",
+        "start",
+        "sum",
+        "log",
+        "exports",
+        "module",
+        "provides"
+    ];
 
-    assert.globalsImplied(globals);
-    assert.globalsKnown(globals, { couch: true });
+    globalsImplied(test, globals);
+    globalsKnown(test, globals, { couch: true });
+
+    test.done();
 };
 
 /** Option `prototypejs` predefines Prototype.js and Scriptaculous globals */
-exports.prototypejs = function () {
+exports.prototypejs = function (test) {
     var globals = [
-            "$"
-          , "$$"
-          , "$A"
-          , "$F"
-          , "$H"
-          , "$R"
-          , "$break"
-          , "$continue"
-          , "$w"
-          , "Abstract"
-          , "Ajax"
-          , "Class"
-          , "Enumerable"
-          , "Element"
-          , "Event"
-          , "Field"
-          , "Form"
-          , "Hash"
-          , "Insertion"
-          , "ObjectRange"
-          , "PeriodicalExecuter"
-          , "Position"
-          , "Prototype"
-          , "Selector"
-          , "Template"
-          , "Toggle"
-          , "Try"
-          , "Autocompleter"
-          , "Builder"
-          , "Control"
-          , "Draggable"
-          , "Draggables"
-          , "Droppables"
-          , "Effect"
-          , "Sortable"
-          , "SortableObserver"
-          , "Sound"
-          , "Scriptaculous"
-        ];
+        "$",
+        "$$",
+        "$A",
+        "$F",
+        "$H",
+        "$R",
+        "$break",
+        "$continue",
+        "$w",
+        "Abstract",
+        "Ajax",
+        "Class",
+        "Enumerable",
+        "Element",
+        "Event",
+        "Field",
+        "Form",
+        "Hash",
+        "Insertion",
+        "ObjectRange",
+        "PeriodicalExecuter",
+        "Position",
+        "Prototype",
+        "Selector",
+        "Template",
+        "Toggle",
+        "Try",
+        "Autocompleter",
+        "Builder",
+        "Control",
+        "Draggable",
+        "Draggables",
+        "Droppables",
+        "Effect",
+        "Sortable",
+        "SortableObserver",
+        "Sound",
+        "Scriptaculous"
+    ];
 
-    assert.globalsImplied(globals);
-    assert.globalsKnown(globals, { prototypejs: true });
+    globalsImplied(test, globals);
+    globalsKnown(test, globals, { prototypejs: true });
+
+    test.done();
 };
 
 /**
  * Option `devel` predefines global functions used for development
  * (console, alert, etc.)
  */
-exports.devel = function () {
+exports.devel = function (test) {
     var globals = [
-            "alert"
-          , "confirm"
-          , "console"
-          , "Debug"
-          , "opera"
-          , "prompt"
-        ];
+        "alert",
+        "confirm",
+        "console",
+        "Debug",
+        "opera",
+        "prompt"
+    ];
 
-    assert.globalsImplied(globals);
-    assert.globalsKnown(globals, { devel: true });
+    globalsImplied(test, globals);
+    globalsKnown(test, globals, { devel: true });
+
+    test.done();
 };
 
 /*
@@ -217,197 +226,203 @@ exports.devel = function () {
  *  + HTML5: http://www.html5rocks.com/
  *  + Typed arrays: https://developer.mozilla.org/en/JavaScript_typed_arrays
  */
-exports.browser = function () {
+exports.browser = function (test) {
     var globals = [
-            'ArrayBuffer'
-          , 'ArrayBufferView'
-          , 'Audio'
-          , 'Blob'
-          , 'addEventListener'
-          , 'applicationCache'
-          , 'blur'
-          , 'clearInterval'
-          , 'clearTimeout'
-          , 'close'
-          , 'closed'
-          , 'DataView'
-          , 'defaultStatus'
-          , 'document'
-          , 'event'
-          , 'FileReader'
-          , 'Float32Array'
-          , 'Float64Array'
-          , 'FormData'
-          , 'focus'
-          , 'frames'
-          , 'getComputedStyle'
-          , 'history'
-          , 'HTMLElement'
-          , 'HTMLAnchorElement'
-          , 'HTMLBaseElement'
-          , 'HTMLBlockquoteElement'
-          , 'HTMLBodyElement'
-          , 'HTMLBRElement'
-          , 'HTMLButtonElement'
-          , 'HTMLCanvasElement'
-          , 'HTMLDirectoryElement'
-          , 'HTMLDivElement'
-          , 'HTMLDListElement'
-          , 'HTMLFieldSetElement'
-          , 'HTMLFontElement'
-          , 'HTMLFormElement'
-          , 'HTMLFrameElement'
-          , 'HTMLFrameSetElement'
-          , 'HTMLHeadElement'
-          , 'HTMLHeadingElement'
-          , 'HTMLHRElement'
-          , 'HTMLHtmlElement'
-          , 'HTMLIFrameElement'
-          , 'HTMLImageElement'
-          , 'HTMLInputElement'
-          , 'HTMLIsIndexElement'
-          , 'HTMLLabelElement'
-          , 'HTMLLayerElement'
-          , 'HTMLLegendElement'
-          , 'HTMLLIElement'
-          , 'HTMLLinkElement'
-          , 'HTMLMapElement'
-          , 'HTMLMenuElement'
-          , 'HTMLMetaElement'
-          , 'HTMLModElement'
-          , 'HTMLObjectElement'
-          , 'HTMLOListElement'
-          , 'HTMLOptGroupElement'
-          , 'HTMLOptionElement'
-          , 'HTMLParagraphElement'
-          , 'HTMLParamElement'
-          , 'HTMLPreElement'
-          , 'HTMLQuoteElement'
-          , 'HTMLScriptElement'
-          , 'HTMLSelectElement'
-          , 'HTMLStyleElement'
-          , 'HTMLTableCaptionElement'
-          , 'HTMLTableCellElement'
-          , 'HTMLTableColElement'
-          , 'HTMLTableElement'
-          , 'HTMLTableRowElement'
-          , 'HTMLTableSectionElement'
-          , 'HTMLTextAreaElement'
-          , 'HTMLTitleElement'
-          , 'HTMLUListElement'
-          , 'HTMLVideoElement'
-          , 'Int16Array'
-          , 'Int32Array'
-          , 'Int8Array'
-          , 'Image'
-          , 'length'
-          , 'localStorage'
-          , 'location'
-          , 'MessageChannel'
-          , 'MessageEvent'
-          , 'MessagePort'
-          , 'moveBy'
-          , 'moveTo'
-          , 'MutationObserver'
-          , 'name'
-          , 'Node'
-          , 'NodeFilter'
-          , 'navigator'
-          , 'onbeforeunload'
-          , 'onblur'
-          , 'onerror'
-          , 'onfocus'
-          , 'onload'
-          , 'onresize'
-          , 'onunload'
-          , 'open'
-          , 'openDatabase'
-          , 'opener'
-          , 'Option'
-          , 'parent'
-          , 'print'
-          , 'removeEventListener'
-          , 'resizeBy'
-          , 'resizeTo'
-          , 'screen'
-          , 'scroll'
-          , 'scrollBy'
-          , 'scrollTo'
-          , 'SharedWorker'
-          , 'sessionStorage'
-          , 'setInterval'
-          , 'setTimeout'
-          , 'status'
-          , 'top'
-          , 'Uint16Array'
-          , 'Uint32Array'
-          , 'Uint8Array'
-          , 'WebSocket'
-          , 'window'
-          , 'Worker'
-          , 'XMLHttpRequest'
-          , 'XPathEvaluator'
-          , 'XPathException'
-          , 'XPathExpression'
-          , 'XPathNamespace'
-          , 'XPathNSResolver'
-          , 'XPathResult'
+        "ArrayBuffer",
+        "ArrayBufferView",
+        "Audio",
+        "Blob",
+        "addEventListener",
+        "applicationCache",
+        "blur",
+        "clearInterval",
+        "clearTimeout",
+        "close",
+        "closed",
+        "DataView",
+        "defaultStatus",
+        "document",
+        "event",
+        "FileReader",
+        "Float32Array",
+        "Float64Array",
+        "FormData",
+        "focus",
+        "frames",
+        "getComputedStyle",
+        "history",
+        "HTMLElement",
+        "HTMLAnchorElement",
+        "HTMLBaseElement",
+        "HTMLBlockquoteElement",
+        "HTMLBodyElement",
+        "HTMLBRElement",
+        "HTMLButtonElement",
+        "HTMLCanvasElement",
+        "HTMLDirectoryElement",
+        "HTMLDivElement",
+        "HTMLDListElement",
+        "HTMLFieldSetElement",
+        "HTMLFontElement",
+        "HTMLFormElement",
+        "HTMLFrameElement",
+        "HTMLFrameSetElement",
+        "HTMLHeadElement",
+        "HTMLHeadingElement",
+        "HTMLHRElement",
+        "HTMLHtmlElement",
+        "HTMLIFrameElement",
+        "HTMLImageElement",
+        "HTMLInputElement",
+        "HTMLIsIndexElement",
+        "HTMLLabelElement",
+        "HTMLLayerElement",
+        "HTMLLegendElement",
+        "HTMLLIElement",
+        "HTMLLinkElement",
+        "HTMLMapElement",
+        "HTMLMenuElement",
+        "HTMLMetaElement",
+        "HTMLModElement",
+        "HTMLObjectElement",
+        "HTMLOListElement",
+        "HTMLOptGroupElement",
+        "HTMLOptionElement",
+        "HTMLParagraphElement",
+        "HTMLParamElement",
+        "HTMLPreElement",
+        "HTMLQuoteElement",
+        "HTMLScriptElement",
+        "HTMLSelectElement",
+        "HTMLStyleElement",
+        "HTMLTableCaptionElement",
+        "HTMLTableCellElement",
+        "HTMLTableColElement",
+        "HTMLTableElement",
+        "HTMLTableRowElement",
+        "HTMLTableSectionElement",
+        "HTMLTextAreaElement",
+        "HTMLTitleElement",
+        "HTMLUListElement",
+        "HTMLVideoElement",
+        "Int16Array",
+        "Int32Array",
+        "Int8Array",
+        "Image",
+        "length",
+        "localStorage",
+        "location",
+        "MessageChannel",
+        "MessageEvent",
+        "MessagePort",
+        "moveBy",
+        "moveTo",
+        "MutationObserver",
+        "name",
+        "Node",
+        "NodeFilter",
+        "navigator",
+        "onbeforeunload",
+        "onblur",
+        "onerror",
+        "onfocus",
+        "onload",
+        "onresize",
+        "onunload",
+        "open",
+        "openDatabase",
+        "opener",
+        "Option",
+        "parent",
+        "print",
+        "removeEventListener",
+        "resizeBy",
+        "resizeTo",
+        "screen",
+        "scroll",
+        "scrollBy",
+        "scrollTo",
+        "SharedWorker",
+        "sessionStorage",
+        "setInterval",
+        "setTimeout",
+        "status",
+        "top",
+        "Uint16Array",
+        "Uint32Array",
+        "Uint8Array",
+        "WebSocket",
+        "window",
+        "Worker",
+        "XMLHttpRequest",
+        "XPathEvaluator",
+        "XPathException",
+        "XPathExpression",
+        "XPathNamespace",
+        "XPathNSResolver",
+        "XPathResult",
         ];
 
-    assert.globalsImplied(globals);
-    assert.globalsKnown(globals, { browser: true });
+    globalsImplied(test, globals);
+    globalsKnown(test, globals, { browser: true });
+
+    test.done();
 };
 
-exports.rhino = function () {
+exports.rhino = function (test) {
     var globals = [
-            'defineClass'
-          , 'deserialize'
-          , 'gc'
-          , 'help'
-          , 'importPackage'
-          , 'java'
-          , 'load'
-          , 'loadClass'
-          , 'print'
-          , 'quit'
-          , 'readFile'
-          , 'readUrl'
-          , 'runCommand'
-          , 'seal'
-          , 'serialize'
-          , 'spawn'
-          , 'sync'
-          , 'toint32'
-          , 'version'
-        ];
+        'defineClass',
+        "deserialize",
+        "gc",
+        "help",
+        "importPackage",
+        "java",
+        "load",
+        "loadClass",
+        "print",
+        "quit",
+        "readFile",
+        "readUrl",
+        "runCommand",
+        "seal",
+        "serialize",
+        "spawn",
+        "sync",
+        "toint32",
+        "version"
+    ];
 
-    assert.globalsImplied(globals);
-    assert.globalsKnown(globals, { rhino: true });
+    globalsImplied(test, globals);
+    globalsKnown(test, globals, { rhino: true });
+
+    test.done();
 };
 
-exports.wsh = function () {
+exports.wsh = function (test) {
     var globals = [
-            'ActiveXObject'
-          , 'Enumerator'
-          , 'GetObject'
-          , 'ScriptEngine'
-          , 'ScriptEngineBuildVersion'
-          , 'ScriptEngineMajorVersion'
-          , 'ScriptEngineMinorVersion'
-          , 'VBArray'
-          , 'WSH'
-          , 'WScript'
-          , 'XDomainRequest'
-        ];
+        'ActiveXObject',
+        "Enumerator",
+        "GetObject",
+        "ScriptEngine",
+        "ScriptEngineBuildVersion",
+        "ScriptEngineMajorVersion",
+        "ScriptEngineMinorVersion",
+        "VBArray",
+        "WSH",
+        "WScript",
+        "XDomainRequest"
+    ];
 
-    assert.globalsImplied(globals);
-    assert.globalsKnown(globals, { wsh: true });
+    globalsImplied(test, globals);
+    globalsKnown(test, globals, { wsh: true });
+
+    test.done();
 };
 
-exports.es5 = function () {
+exports.es5 = function (test) {
     var src = fs.readFileSync(__dirname + "/fixtures/es5.js", "utf8");
 
-    TestRun()
+    TestRun(test)
         .addError(3, "Extra comma.")
         .addError(8, "Extra comma.")
         .addError(15, "get/set are ES5 features.")
@@ -446,7 +461,7 @@ exports.es5 = function () {
         .addError(76, "get/set are ES5 features.")
         .test(src);
 
-    TestRun()
+    TestRun(test)
         .addError(36, "Setter is defined without getter.")
         .addError(43, "Duplicate member 'x'.")
         .addError(48, "Duplicate member 'x'.")
@@ -462,83 +477,91 @@ exports.es5 = function () {
     // Make sure that JSHint parses getters/setters as function expressions
     // (https://github.com/jshint/jshint/issues/96)
     src = fs.readFileSync(__dirname + "/fixtures/es5.funcexpr.js", "utf8");
-    TestRun().test(src, { es5: true });
+    TestRun(test).test(src, { es5: true });
+
+    test.done();
 };
 
-exports.mootools = function () {
+exports.mootools = function (test) {
     var globals = [
-            '$'
-          , '$$'
-          , 'Asset'
-          , 'Browser'
-          , 'Chain'
-          , 'Class'
-          , 'Color'
-          , 'Cookie'
-          , 'Core'
-          , 'Document'
-          , 'DomReady'
-          , 'DOMReady'
-          , 'DOMEvent'
-          , 'Drag'
-          , 'Element'
-          , 'Elements'
-          , 'Event'
-          , 'Events'
-          , 'Fx'
-          , 'Group'
-          , 'Hash'
-          , 'HtmlTable'
-          , 'Iframe'
-          , 'IframeShim'
-          , 'InputValidator'
-          , 'instanceOf'
-          , 'Keyboard'
-          , 'Locale'
-          , 'Mask'
-          , 'MooTools'
-          , 'Native'
-          , 'Options'
-          , 'OverText'
-          , 'Request'
-          , 'Scroller'
-          , 'Slick'
-          , 'Slider'
-          , 'Sortables'
-          , 'Spinner'
-          , 'Swiff'
-          , 'Tips'
-          , 'Type'
-          , 'typeOf'
-          , 'URI'
-          , 'Window'
-        ];
-
-    assert.globalsImplied(globals);
-    assert.globalsKnown(globals, { mootools: true });
-};
-
-exports.dojo = function () {
-    var globals = [
-        'dojo'
-      , 'dijit'
-      , 'dojox'
-      , 'define'
-      , 'require'
+        '$',
+        "$$",
+        "Asset",
+        "Browser",
+        "Chain",
+        "Class",
+        "Color",
+        "Cookie",
+        "Core",
+        "Document",
+        "DomReady",
+        "DOMReady",
+        "DOMEvent",
+        "Drag",
+        "Element",
+        "Elements",
+        "Event",
+        "Events",
+        "Fx",
+        "Group",
+        "Hash",
+        "HtmlTable",
+        "Iframe",
+        "IframeShim",
+        "InputValidator",
+        "instanceOf",
+        "Keyboard",
+        "Locale",
+        "Mask",
+        "MooTools",
+        "Native",
+        "Options",
+        "OverText",
+        "Request",
+        "Scroller",
+        "Slick",
+        "Slider",
+        "Sortables",
+        "Spinner",
+        "Swiff",
+        "Tips",
+        "Type",
+        "typeOf",
+        "URI",
+        "Window"
     ];
 
-    assert.globalsImplied(globals);
-    assert.globalsKnown(globals, { dojo: true });
+    globalsImplied(test, globals);
+    globalsKnown(test, globals, { mootools: true });
+
+    test.done();
 };
 
-exports.nonstandard = function () {
+exports.dojo = function (test) {
     var globals = [
-        'escape'
-      , 'unescape'
+        'dojo',
+        'dijit',
+        'dojox',
+        'define',
+        "require",
     ];
 
-    assert.globalsImplied(globals);
-    assert.globalsKnown(globals, { nonstandard: true });
+    globalsImplied(test, globals);
+    globalsKnown(test, globals, { dojo: true });
+
+    test.done();
+};
+
+exports.nonstandard = function (test) {
+    var globals = [
+        'escape',
+        "unescape",
+    ];
+
+    globalsImplied(test, globals);
+    globalsKnown(test, globals, { nonstandard: true });
+
+    test.done();
 };
 
 /*
@@ -547,60 +570,66 @@ exports.nonstandard = function () {
  * More info:
  *  + http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf
  */
-exports.standard = function () {
+exports.standard = function (test) {
     var globals = [
-        'Array'
-      , 'Boolean'
-      , 'Date'
-      , 'decodeURI'
-      , 'decodeURIComponent'
-      , 'encodeURI'
-      , 'encodeURIComponent'
-      , 'Error'
-      , 'EvalError'
-      , 'Function'
-      , 'hasOwnProperty'
-      , 'isFinite'
-      , 'isNaN'
-      , 'JSON'
-      , 'Map'
-      , 'Math'
-      , 'Number'
-      , 'Object'
-      , 'parseInt'
-      , 'parseFloat'
-      , 'RangeError'
-      , 'ReferenceError'
-      , 'RegExp'
-      , 'Set'
-      , 'String'
-      , 'SyntaxError'
-      , 'TypeError'
-      , 'URIError'
-      , 'WeakMap'
+        'Array',
+        'Boolean',
+        'Date',
+        'decodeURI',
+        'decodeURIComponent',
+        'encodeURI',
+        'encodeURIComponent',
+        'Error',
+        'EvalError',
+        'Function',
+        'hasOwnProperty',
+        'isFinite',
+        'isNaN',
+        'JSON',
+        'Map',
+        'Math',
+        'Number',
+        'Object',
+        'parseInt',
+        'parseFloat',
+        'RangeError',
+        'ReferenceError',
+        'RegExp',
+        'Set',
+        'String',
+        'SyntaxError',
+        'TypeError',
+        'URIError',
+        "WeakMap",
     ];
 
-    assert.globalsKnown(globals); // You don't need any option to recognize standard globals
+    globalsKnown(test, globals); // You don't need any option to recognize standard globals
+
+    test.done();
 };
 
-exports.worker = function () {
+exports.worker = function (test) {
     var globals = [
-        'importScripts'
-      , 'postMessage'
-      , 'self'
+        'importScripts',
+        'postMessage',
+        "self",
     ];
 
-    assert.globalsImplied(globals);
-    assert.globalsKnown(globals, { worker: true });
+    globalsImplied(test, globals);
+    globalsKnown(test, globals, { worker: true });
+
+    test.done();
 };
 
-exports.yui = function () {
+exports.yui = function (test) {
     var globals = [
         'YUI',
         'Y',
-        'YUI_config'
+        "YUI_config",
     ];
 
-    assert.globalsImplied(globals);
-    assert.globalsKnown(globals, { yui: true });
+    globalsImplied(test, globals);
+    globalsKnown(test, globals, { yui: true });
+
+    test.done();
 };

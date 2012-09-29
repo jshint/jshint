@@ -3,23 +3,25 @@
 var fs      = require('fs');
 var TestRun = require("../helpers/testhelper").setup.testRun;
 
-exports["Backbone.js 0.5.3"] = function () {
+exports["Backbone.js 0.5.3"] = function (test) {
     var src = fs.readFileSync(__dirname + '/libs/backbone.js', 'utf8');
 
-    TestRun()
+    TestRun(test)
         .addError(669, "Unescaped '['.")
         .addError(669, "Unescaped '^'.")
         .addError(685, "Missing '()' invoking a constructor.")
         .addError(764, "Use '===' to compare with '0'.")
         .addError(859, "Use '!==' to compare with '0'.")
         .test(src, { expr: true, eqnull: true, boss: true, regexdash: true });
+
+    test.done();
 };
 
-exports.jQuery_1_7 = function () {
+exports.jQuery_1_7 = function (test) {
     var src = fs.readFileSync(__dirname + '/libs/jquery-1.7.js', 'utf8');
     var globals = { DOMParser: false, ActiveXObject: false, define: false };
 
-    TestRun()
+    TestRun(test)
         .addError(551, "'name' is defined but never used.")
         .addError(1044, "'actual' is defined but never used.")
         .addError(1312, "'pCount' is defined but never used.")
@@ -50,12 +52,14 @@ exports.jQuery_1_7 = function () {
         .addError(6061, "'cur' is defined but never used.")
         .addError(9209, "Mixed spaces and tabs.")
         .test(src, { undef: true, unused: true }, globals);
+
+    test.done();
 };
 
-exports.prototype_1_7 = function () {
+exports.prototype_1_7 = function (test) {
     var src = fs.readFileSync(__dirname + '/libs/prototype-17.js', 'utf8');
 
-    TestRun()
+    TestRun(test)
         .addError(22, "Missing semicolon.")
         .addError(94, "Unnecessary semicolon.")
         .addError(110, "Missing '()' invoking a constructor.")
@@ -112,10 +116,12 @@ exports.prototype_1_7 = function () {
             expr     : true,
             maxerr   : 9001
         });
+
+    test.done();
 };
 
 
-exports.lodash_0_6_1 = function () {
+exports.lodash_0_6_1 = function (test) {
     var src = fs.readFileSync(__dirname + '/libs/lodash.js', 'utf8');
     var globals = { _: false, define: false };
     var options = {
@@ -132,7 +138,7 @@ exports.lodash_0_6_1 = function () {
         laxcomma : true
     };
 
-    TestRun()
+    TestRun(test)
         .addError(38, "Expected ')' to match '(' from line 38 and instead saw ','.")
         .addError(38, "Missing semicolon.")
         .addError(38, "Missing semicolon.")
@@ -178,12 +184,14 @@ exports.lodash_0_6_1 = function () {
         .addError(4226, "Possible strict violation.")
         .addError(4242, "Possible strict violation.")
         .test(src, options, globals);
+
+    test.done();
 };
 
-exports.json2 = function () {
+exports.json2 = function (test) {
     var src = fs.readFileSync(__dirname + '/libs/json2.js', 'utf8');
 
-    TestRun()
+    TestRun(test)
         .addError(177, "'key' is defined but never used.")
         .addError(191, "'key' is defined but never used.")
         .test(src, {
@@ -191,4 +199,6 @@ exports.json2 = function () {
             unused  : true,
             laxbreak: true
         }, { JSON: true });
+
+    test.done();
 };
