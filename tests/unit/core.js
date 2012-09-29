@@ -13,7 +13,7 @@ exports.checkJSHint = function () {
         console.log("file: jshint.js");
         console.log(JSHINT.errors);
     }
-
+	
     assert.ok(res);
     assert.isUndefined(JSHINT.data().implieds);
 };
@@ -379,7 +379,7 @@ exports.insideEval = function () {
         .addError(1, "Unexpected early end of program.")
         .addError(1, "Expected an identifier and instead saw '(end)'.")
         .addError(1, "Expected ')' and instead saw ''.")
-        .addError(1, "Missing semicolon.")
+        .addError(1, "Missing ';'.")
 
         .test(src, { evil: false });
 };
@@ -422,7 +422,7 @@ exports.iife = function () {
 // For code that tests /*jshint ... */ see parser.js
 exports.invalidOptions = function () {
     TestRun()
-        .addError(0, "Bad option: 'invalid'.")
+        .addError(0, "Bad option 'invalid'.")
         .test("function test() {}", { devel: true, invalid: true });
 };
 

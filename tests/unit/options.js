@@ -272,31 +272,31 @@ exports.asi = function () {
     var src = fs.readFileSync(__dirname + '/fixtures/asi.js', 'utf8');
 
     TestRun(1)
-        .addError(2, "Missing semicolon.")
+        .addError(2, "Missing ';'.")
         .addError(4, "Line breaking error 'return'.")
-        .addError(4, "Missing semicolon.")
-        .addError(5, "Missing semicolon.")
+        .addError(4, "Missing ';'.")
+        .addError(5, "Missing ';'.")
         .addError(9, "Line breaking error 'continue'.")
-        .addError(9, "Missing semicolon.")
-        .addError(10, "Missing semicolon.")
+        .addError(9, "Missing ';'.")
+        .addError(10, "Missing ';'.")
         .addError(11, "Line breaking error 'break'.")
-        .addError(11, "Missing semicolon.")
-        .addError(12, "Missing semicolon.")
-        .addError(16, "Missing semicolon.")
+        .addError(11, "Missing ';'.")
+        .addError(12, "Missing ';'.")
+        .addError(16, "Missing ';'.")
         .addError(17, "Line breaking error 'return'.")
-        .addError(17, "Missing semicolon.")
+        .addError(17, "Missing ';'.")
         .addError(19, "Line breaking error 'break'.")
-        .addError(19, "Missing semicolon.")
+        .addError(19, "Missing ';'.")
         .addError(21, "Line breaking error 'break'.")
-        .addError(21, "Missing semicolon.")
-        .addError(25, "Missing semicolon.")
-        .addError(26, "Missing semicolon.", { character: 10 })
-        .addError(27, "Missing semicolon.", { character: 12 })
-        .addError(28, "Missing semicolon.", { character: 12 })
+        .addError(21, "Missing ';'.")
+        .addError(25, "Missing ';'.")
+        .addError(26, "Missing ';'.", { character: 10 })
+        .addError(27, "Missing ';'.", { character: 12 })
+        .addError(28, "Missing ';'.", { character: 12 })
         .test(src);
 
     TestRun(2)
-        .addError(2, "Missing semicolon.") // throw on "use strict", even option asi is used
+        .addError(2, "Missing ';'.") // throw on "use strict", even option asi is used
         .test(src, { asi: true });
 };
 
@@ -307,15 +307,15 @@ exports.lastsemic = function () {
 
     // without lastsemic
     TestRun()
-        .addError(2, "Missing semicolon.") // missing semicolon in the middle of a block
-        .addError(4, "Missing semicolon.") // missing semicolon in a one-liner function
-        .addError(5, "Missing semicolon.") // missing semicolon at the end of a block
+        .addError(2, "Missing ';'.") // missing semicolon in the middle of a block
+        .addError(4, "Missing ';'.") // missing semicolon in a one-liner function
+        .addError(5, "Missing ';'.") // missing semicolon at the end of a block
         .test(src);
 
     // with lastsemic
     TestRun()
-        .addError(2, "Missing semicolon.")
-        .addError(5, "Missing semicolon.")
+        .addError(2, "Missing ';'.")
+        .addError(5, "Missing ';'.")
         .test(src, { lastsemic: true });
     // this line is valid now: [1, 2, 3].forEach(function(i) { print(i) });
     // line 5 isn't, because the block doesn't close on the same line
@@ -416,8 +416,7 @@ exports.scripturl = function () {
     // Make sure there is an error
     TestRun()
         .addError(1, "Script URL.")
-        .addError(2, "Script URL.") // 2 times?
-        .addError(2, "JavaScript URL.")
+        .addError(2, "Script URL.")
         .test(code);
 
     // Make sure the error goes away when javascript URLs are tolerated
@@ -694,13 +693,13 @@ exports.passfail = function () {
     ];
 
     TestRun()
-        .addError(1, "Missing semicolon.")
-        .addError(2, "Missing semicolon.")
-        .addError(3, "Missing semicolon.")
+        .addError(1, "Missing ';'.")
+        .addError(2, "Missing ';'.")
+        .addError(3, "Missing ';'.")
         .test(code);
 
     TestRun()
-        .addError(1, "Missing semicolon.")
+        .addError(1, "Missing ';'.")
         .test(code, { passfail: true });
 };
 
@@ -799,7 +798,7 @@ exports.strict = function () {
 
     TestRun()
         .addError(4, 'Expected an assignment or function call and instead saw an expression.')
-        .addError(9, 'Missing semicolon.')
+        .addError(9, 'Missing \';\'.')
         .addError(28, 'Expected an assignment or function call and instead saw an expression.')
         .addError(53, 'Expected an assignment or function call and instead saw an expression.')
         .test(src2, { strict: false });
@@ -989,7 +988,7 @@ exports.validthis = function () {
 
     code = ['function x() {', '/*jshint validthis:heya */', 'hello();', '}'];
     TestRun()
-        .addError(2, "Bad option value.")
+        .addError(2, "Bad option.")
         .test(code);
 };
 
@@ -1078,7 +1077,7 @@ exports.quotesInline = function () {
         .addError(6, "Strings must use doublequote.")
         .addError(14, "Strings must use singlequote.")
         .addError(21, "Mixed double and single quotes.")
-        .addError(32, "Bad option value.")
+        .addError(32, "Bad option.")
         .test(fs.readFileSync(__dirname + "/fixtures/quotes3.js", "utf8"));
 };
 
