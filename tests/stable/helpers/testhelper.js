@@ -7,11 +7,12 @@
  *
  *      var TestRun = require("./testhelper").setup.testRun;
  *
- *      TestRun(name)
+ *      TestRun(test, name)
  *          .addError(line, errorMessage)
  *          .test(source, options);
  *
- * TestRun(name)
+ * TestRun(test, name)
+ *     test:           nodeunit test object
  *     name:           optional. name of the test run
  *                     with a name, it's easier to identify a test run
  *
@@ -27,14 +28,13 @@
 
 /*jshint node: true, eqnull: true*/
 
-var assert = require('assert'),
-    JSHINT = require('../../jshint.js').JSHINT;
+var JSHINT = require('../../../src/stable/jshint.js').JSHINT;
 
 if (exports.setup === undefined || exports.setup === null) {
     exports.setup = {};
 }
 
-exports.setup.testRun = function (name) {
+exports.setup.testRun = function (test, name) {
     var initCounter = 0, runCounter = 0, seq = 0, checked = [], definedErrors = [];
 
     var helperObj = {
@@ -124,7 +124,7 @@ exports.setup.testRun = function (name) {
                 });
             });
 
-            assert.ok(
+            test.ok(
                 undefinedErrors.length === 0 && unthrownErrors.length === 0 && wrongLineNumbers.length === 0,
 
                 (name == null ? "" : "\n      TestRun: [bold]{" + name + "}") +
