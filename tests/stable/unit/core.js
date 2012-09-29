@@ -1,4 +1,4 @@
-/*jshint boss: true, laxbreak: true, node: true, devel: true */
+"use strict";
 
 var JSHINT  = require('../../../src/stable/jshint.js').JSHINT;
 var fs      = require('fs');
@@ -174,9 +174,9 @@ exports.switchFallThrough = function (test) {
 
 exports.testVoid = function (test) {
     var code = [
-        "void(0);"
-      , "void 0;"
-      , "var a = void(1);"
+        "void(0);",
+        "void 0;",
+        "var a = void(1);"
     ];
     TestRun(test).test(code);
 
@@ -350,7 +350,7 @@ exports.noExcOnTooManyUndefined = function (test) {
     try {
         JSHINT(code, {undef: true, maxerr: 1});
     } catch (e) {
-        assert.ok(false, 'Exception was thrown');
+        test.ok(false, 'Exception was thrown');
     }
 
     TestRun(test)

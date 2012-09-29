@@ -1,3 +1,5 @@
+"use strict";
+
 var _ = require("underscore");
 var linter = require("../../../src/next/jshint.js");
 var utils = require("../../../src/next/utils.js");

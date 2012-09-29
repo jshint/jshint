@@ -2,8 +2,7 @@
  * Tests for the environmental (browser, jquery, etc.) options
  */
 
-/*jshint boss: true, laxbreak: true, node: true */
-/*global wrap: true */
+"use strict";
 
 var JSHINT  = require('../../../src/stable/jshint.js').JSHINT;
 var fs      = require('fs');
@@ -361,7 +360,7 @@ exports.browser = function (test) {
         "XPathNamespace",
         "XPathNSResolver",
         "XPathResult",
-        ];
+    ];
 
     globalsImplied(test, globals);
     globalsKnown(test, globals, { browser: true });

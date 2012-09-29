@@ -2,7 +2,7 @@
  * Tests for the parser/tokenizer
  */
 
-/*jshint boss: true, laxbreak: true, node: true, maxlen:100 */
+"use strict";
 
 var JSHINT  = require('../../../src/stable/jshint.js').JSHINT;
 var fs      = require('fs');
