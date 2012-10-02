@@ -19,7 +19,6 @@ function globalsKnown(test, globals, options) {
     test.ok(report.implied === undefined);
     test.equal(report.globals.length, globals.length);
 
-    var dict = {};
     for (var i = 0, g; g = report.globals[i]; i += 1)
         globals[g] = true;
 

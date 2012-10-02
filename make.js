@@ -18,7 +18,10 @@ var OPTIONS = {
 	white: true,
 	smarttabs: true,
 	maxlen: 100,
-	newcap: false
+	newcap: false,
+	undef: true,
+	unused: true,
+	onecase: true
 };
 
 target.all = function () {

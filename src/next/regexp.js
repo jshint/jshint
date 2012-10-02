@@ -1,6 +1,5 @@
 "use strict";
 
-var _      = require("underscore");
 var events = require("events");
 
 function Tokens(exp) {
@@ -15,7 +14,7 @@ Tokens.prototype = {
 	},
 
 	at: function (index) {
-		var chr = this.exp.charAt(this.pos);
+		var chr = this.exp.charAt(index);
 		return chr === "" ? null : chr;
 	},
 
@@ -39,7 +38,6 @@ exports.register = function (linter) {
 
 	linter.on("Literal", function (literal) {
 		var value = (literal.value || "").toString();
-		var range = literal.range;
 
 		value = value.match(/^\/(.+)\/[igm]?$/);
 		if (value === null)

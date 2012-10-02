@@ -1,7 +1,6 @@
 "use strict";
 
 var _ = require("underscore");
-var utils = require("./utils.js");
 var constants = require('./constants');
 
 exports.register = function (linter) {
@@ -166,7 +165,7 @@ exports.register = function (linter) {
 	});
 
 	linter.on("FunctionExpression FunctionDeclaration", function (expr) {
-		_.each(expr.params, function (param, key) {
+		_.each(expr.params, function (param) {
 			isRedefined(param.name, param.range);
 			scopes.addVariable({ name: param.name });
 		});
