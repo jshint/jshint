@@ -17,6 +17,7 @@
 
   "dependencies": {
     "esprima":    "https://github.com/ariya/esprima/tarball/master",
+		"shelljs":    "*",
     "underscore": "*",
     "peakle":     "*",
     "cli":        "0.4.3",
@@ -28,7 +29,8 @@
 		"shelljs":    "*",
     "browserify": "*",
     "coveraje":   "*",
-    "nodeunit":   "*"
+    "nodeunit":   "*",
+		"sinon":      "*"
   },
 
   "preferGlobal": true

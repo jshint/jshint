@@ -178,7 +178,7 @@ Report.prototype = {
 		var ret = [];
 		cond = cond || function () { return true; };
 
-		_.each(this.messages, function (pool, line) {
+		_.each(this.messages, function (pool) {
 			_.each(pool, function (msg) {
 				if (cond(msg))
 					ret.push(msg);
@@ -328,13 +328,11 @@ Tokens.prototype.getRange = function (range) {
 	return new Tokens(slice);
 };
 
-var commentsCache = {};
 var commentsTypes = { "set": true, "ignore": true };
 
 function parseComment(text) {
 	var parts  = text.trim().split(" ");
 	var defval = { type: "text", value: text };
-	var values = [];
 	var head, body;
 
 	if (parts.length === 0)

@@ -1,7 +1,5 @@
 "use strict";
 
-var _ = require("underscore");
-var linter  = require("../../../src/next/jshint.js");
 var helpers = require("../lib/helpers.js");
 var runner = helpers.createRunner(__dirname, __filename);
 

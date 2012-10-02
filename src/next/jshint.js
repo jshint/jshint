@@ -3,7 +3,6 @@
 var _         = require("underscore");
 var parser    = require("esprima");
 var events    = require("events");
-var peakle    = require("peakle");
 var utils     = require("./utils.js");
 var reason    = require("./reason.js");
 var regexp    = require("./regexp.js");
@@ -125,7 +124,7 @@ Linter.prototype = {
 			if (self.report.length > MAXERR)
 				return;
 
-			_.each(tree, function (val, key) {
+			_.each(tree, function (val) {
 				if (val === null)
 					return;
 
