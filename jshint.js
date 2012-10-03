@@ -283,6 +283,7 @@ var JSHINT = (function () {
             latedef     : true, // if the use before definition should not be tolerated
             laxbreak    : true, // if line breaks should not be checked
             laxcomma    : true, // if line breaks should not be checked around commas
+            laxeq       : true, // if === and !== should not be checked
             loopfunc    : true, // if functions should be allowed to be defined within
                                 // loops
             laxspacetabs: true, // if mixed spaces and tabulations are allowed
@@ -3120,31 +3121,34 @@ loop:   for (;;) {
     bitwise("^", "bitxor", 80);
     bitwise("&", "bitand", 90);
     relation("==", function (left, right) {
-        var eqnull = option.eqnull && (left.value === "null" || right.value === "null");
+        if (!option.laxeq) {
+            var eqnull = option.eqnull && (left.value === "null" || right.value === "null");
 
-        if (!eqnull && option.eqeqeq)
-            warning("Expected '{a}' and instead saw '{b}'.", this, "===", "==");
-        else if (isPoorRelation(left))
-            warning("Use '{a}' to compare with '{b}'.", this, "===", left.value);
-        else if (isPoorRelation(right))
-            warning("Use '{a}' to compare with '{b}'.", this, "===", right.value);
-
+            if (!eqnull && option.eqeqeq)
+                warning("Expected '{a}' and instead saw '{b}'.", this, "===", "==");
+            else if (isPoorRelation(left))
+                warning("Use '{a}' to compare with '{b}'.", this, "===", left.value);
+            else if (isPoorRelation(right))
+                warning("Use '{a}' to compare with '{b}'.", this, "===", right.value);
+        }
         return this;
     });
     relation("===");
     relation("!=", function (left, right) {
-        var eqnull = option.eqnull &&
+        if (!option.laxeq) {
+            var eqnull = option.eqnull &&
                 (left.value === "null" || right.value === "null");
 
-        if (!eqnull && option.eqeqeq) {
-            warning("Expected '{a}' and instead saw '{b}'.",
+            if (!eqnull && option.eqeqeq) {
+                warning("Expected '{a}' and instead saw '{b}'.",
                     this, "!==", "!=");
-        } else if (isPoorRelation(left)) {
-            warning("Use '{a}' to compare with '{b}'.",
+            } else if (isPoorRelation(left)) {
+                warning("Use '{a}' to compare with '{b}'.",
                     this, "!==", left.value);
-        } else if (isPoorRelation(right)) {
-            warning("Use '{a}' to compare with '{b}'.",
+            } else if (isPoorRelation(right)) {
+                warning("Use '{a}' to compare with '{b}'.",
                     this, "!==", right.value);
+            }
         }
         return this;
     });
