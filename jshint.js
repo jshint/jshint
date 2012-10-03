@@ -285,6 +285,7 @@ var JSHINT = (function () {
             laxcomma    : true, // if line breaks should not be checked around commas
             loopfunc    : true, // if functions should be allowed to be defined within
                                 // loops
+            laxspacetabs: true, // if mixed spaces and tabulations are allowed
             mootools    : true, // if MooTools globals should be predefined
             multistr    : true, // allow multiline strings
             newcap      : true, // if constructor names must be capitalized
@@ -1118,19 +1119,21 @@ var JSHINT = (function () {
             s = lines[line];
             line += 1;
 
-            // If smarttabs option is used check for spaces followed by tabs only.
-            // Otherwise check for any occurence of mixed tabs and spaces.
-            // Tabs and one space followed by block comment is allowed.
-            if (option.smarttabs) {
-                // negative look-behind for "//"
-                match = s.match(/(\/\/)? \t/);
-                at = match && !match[1] ? 0 : -1;
-            } else {
-                at = s.search(/ \t|\t [^\*]/);
-            }
+            if (!option.laxspacetabs) {
+                // If smarttabs option is used check for spaces followed by tabs only.
+                // Otherwise check for any occurence of mixed tabs and spaces.
+                // Tabs and one space followed by block comment is allowed.
+                if (option.smarttabs) {
+                    // negative look-behind for "//"
+                    match = s.match(/(\/\/)? \t/);
+                    at = match && !match[1] ? 0 : -1;
+                } else {
+                    at = s.search(/ \t|\t [^\*]/);
+                }
 
-            if (at >= 0)
-                warningAt("Mixed spaces and tabs.", line, at + 1);
+                if (at >= 0)
+                    warningAt("Mixed spaces and tabs.", line, at + 1);
+            }
 
             s = s.replace(/\t/g, tab);
             at = s.search(cx);
