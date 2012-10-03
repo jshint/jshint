@@ -283,8 +283,10 @@ var JSHINT = (function () {
             latedef     : true, // if the use before definition should not be tolerated
             laxbreak    : true, // if line breaks should not be checked
             laxcomma    : true, // if line breaks should not be checked around commas
+            laxeq       : true, // if === and !== should not be checked
             loopfunc    : true, // if functions should be allowed to be defined within
                                 // loops
+            laxspacetabs: true, // if mixed spaces and tabulations are allowed
             mootools    : true, // if MooTools globals should be predefined
             multistr    : true, // allow multiline strings
             newcap      : true, // if constructor names must be capitalized
@@ -1118,19 +1120,21 @@ var JSHINT = (function () {
             s = lines[line];
             line += 1;
 
-            // If smarttabs option is used check for spaces followed by tabs only.
-            // Otherwise check for any occurence of mixed tabs and spaces.
-            // Tabs and one space followed by block comment is allowed.
-            if (option.smarttabs) {
-                // negative look-behind for "//"
-                match = s.match(/(\/\/)? \t/);
-                at = match && !match[1] ? 0 : -1;
-            } else {
-                at = s.search(/ \t|\t [^\*]/);
-            }
+            if (!option.laxspacetabs) {
+                // If smarttabs option is used check for spaces followed by tabs only.
+                // Otherwise check for any occurence of mixed tabs and spaces.
+                // Tabs and one space followed by block comment is allowed.
+                if (option.smarttabs) {
+                    // negative look-behind for "//"
+                    match = s.match(/(\/\/)? \t/);
+                    at = match && !match[1] ? 0 : -1;
+                } else {
+                    at = s.search(/ \t|\t [^\*]/);
+                }
 
-            if (at >= 0)
-                warningAt("Mixed spaces and tabs.", line, at + 1);
+                if (at >= 0)
+                    warningAt("Mixed spaces and tabs.", line, at + 1);
+            }
 
             s = s.replace(/\t/g, tab);
             at = s.search(cx);
@@ -3117,31 +3121,34 @@ loop:   for (;;) {
     bitwise("^", "bitxor", 80);
     bitwise("&", "bitand", 90);
     relation("==", function (left, right) {
-        var eqnull = option.eqnull && (left.value === "null" || right.value === "null");
+        if (!option.laxeq) {
+            var eqnull = option.eqnull && (left.value === "null" || right.value === "null");
 
-        if (!eqnull && option.eqeqeq)
-            warning("Expected '{a}' and instead saw '{b}'.", this, "===", "==");
-        else if (isPoorRelation(left))
-            warning("Use '{a}' to compare with '{b}'.", this, "===", left.value);
-        else if (isPoorRelation(right))
-            warning("Use '{a}' to compare with '{b}'.", this, "===", right.value);
-
+            if (!eqnull && option.eqeqeq)
+                warning("Expected '{a}' and instead saw '{b}'.", this, "===", "==");
+            else if (isPoorRelation(left))
+                warning("Use '{a}' to compare with '{b}'.", this, "===", left.value);
+            else if (isPoorRelation(right))
+                warning("Use '{a}' to compare with '{b}'.", this, "===", right.value);
+        }
         return this;
     });
     relation("===");
     relation("!=", function (left, right) {
-        var eqnull = option.eqnull &&
+        if (!option.laxeq) {
+            var eqnull = option.eqnull &&
                 (left.value === "null" || right.value === "null");
 
-        if (!eqnull && option.eqeqeq) {
-            warning("Expected '{a}' and instead saw '{b}'.",
+            if (!eqnull && option.eqeqeq) {
+                warning("Expected '{a}' and instead saw '{b}'.",
                     this, "!==", "!=");
-        } else if (isPoorRelation(left)) {
-            warning("Use '{a}' to compare with '{b}'.",
+            } else if (isPoorRelation(left)) {
+                warning("Use '{a}' to compare with '{b}'.",
                     this, "!==", left.value);
-        } else if (isPoorRelation(right)) {
-            warning("Use '{a}' to compare with '{b}'.",
+            } else if (isPoorRelation(right)) {
+                warning("Use '{a}' to compare with '{b}'.",
                     this, "!==", right.value);
+            }
         }
         return this;
     });

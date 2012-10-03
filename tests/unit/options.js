@@ -1148,6 +1148,19 @@ exports.smarttabs = function () {
         .test(src, { smarttabs: true });
 };
 
+exports.laxspacetabs = function () {
+    var src = fs.readFileSync(__dirname + '/fixtures/smarttabs.js', 'utf8');
+
+    TestRun()
+        .addError(4, "Mixed spaces and tabs.")
+        .addError(5, "Mixed spaces and tabs.")
+        .addError(13, "Mixed spaces and tabs.")
+        .test(src);
+
+    TestRun()
+        .test(src, { laxspacetabs: true });
+};
+
 /*
  * Tests the `laxcomma` option
  */
