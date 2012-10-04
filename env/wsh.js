@@ -223,6 +223,9 @@
 			}
 		} else {
 			options[option] = value === "true" ? true : value === "false" ? false : value;
+			if (!isNaN(Number(value))) {
+				options[option] = parseInt(value, 10);
+			}
 		}
 	}
 
