@@ -169,6 +169,14 @@ function loadIgnores() {
 		});
 }
 
+/**
+ * Checks whether we should ignore a file or not.
+ *
+ * @param {string} fp       a path to a file
+ * @param {array}  patterns a list of patterns for files to ignore
+ *
+ * @return {boolean} 'true' if file should be ignored, 'false' otherwise.
+ */
 function isIgnored(fp, patterns) {
 	return patterns.some(function (ip) {
 		if (minimatch(fp, ip, { nocase: true })) {
@@ -186,6 +194,15 @@ function isIgnored(fp, patterns) {
 	});
 }
 
+/**
+ * Recursively gather all files that need to be linted,
+ * excluding those that user asked to ignore.
+ *
+ * @param {string} fp      a path to a file or directory to lint
+ * @param {array}  files   a pointer to an array that stores a list of files
+ * @param {array}  ignores a list of patterns for files to ignore
+ * @param {array}  ext     a list of non-dot-js extensions to lint
+ */
 function collect(fp, files, ignores, ext) {
 	if (ignores && isIgnored(fp, ignores)) {
 		return;
@@ -204,6 +221,14 @@ function collect(fp, files, ignores, ext) {
 	}
 }
 
+/**
+ * Runs JSHint against provided file and saves the result
+ *
+ * @param {string} file    a path to a file that needs to be linted
+ * @param {object} results a pointer to an object with results
+ * @param {object} config  an object with JSHint configuration
+ * @param {object} data    a pointer to an object with extra data
+ */
 function lint(file, results, config, data) {
 	var buffer;
 	var globals;
@@ -244,6 +269,19 @@ function lint(file, results, config, data) {
 }
 
 var exports = {
+	/**
+	 * Gathers all files that need to be linted, lints them, sends them to
+	 * a reporter and returns the overall result.
+	 *
+	 * @param {object} post-processed options from 'interpret':
+	 *								   args     - CLI arguments
+	 *								   config   - Configuration object
+	 *								   reporter - Reporter function
+	 *								   ignores  - A list of files/dirs to ignore
+	 *								   extensions - A list of non-dot-js extensions to check
+	 *
+	 * @returns {bool} 'true' if all files passed and 'false' otherwise.
+	 */
 	run: function (opts) {
 		var files = [];
 		var results = [];
