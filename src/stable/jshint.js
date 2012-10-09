@@ -25,8 +25,6 @@
  *   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *   DEALINGS IN THE SOFTWARE.
  *
- * JSHint was forked from the 2010-12-14 edition of JSLint.
- *
  */
 
 /*
