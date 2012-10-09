@@ -1,8 +1,8 @@
 /*!
  * JSHint, by JSHint Community.
  *
- * Licensed under the same slightly modified MIT license that JSLint is.
- * It stops evil-doers everywhere.
+ * This file (and this file only) is licensed under the same slightly modified
+ * MIT license that JSLint is. It stops evil-doers everywhere.
  *
  * JSHint is a derivative work of JSLint:
  *
@@ -27,8 +27,6 @@
  *   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  *   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  *   DEALINGS IN THE SOFTWARE.
- *
- * JSHint was forked from the 2010-12-16 edition of JSLint.
  *
  */
 
