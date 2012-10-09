@@ -35,20 +35,22 @@ many people contributed. —[idiomatic.js](https://github.com/rwldrn/idiomatic.j
 * [Smart tabs](http://www.emacswiki.org/SmartTabs) are okay.
 * Use one space after `if`, `for`, `while`, etc.
 * Use one space after `function` for anonymous functions but not for named functions:
+
 ```javascript
 var a = function () {};
 function a() {}
 ```
-* Feel free to indent variable assignments or property definitions if it makes the code look better. But don't abuse that:
-```javascript
 
+* Feel free to indent variable assignments or property definitions if it makes the code look better. But don't abuse that:
+
+```javascript
 // Good
 var next = token.peak();
 var prev = token.peak(-1);
 var cur  = token.current;
 
 var scope = {
-  name:   '(global)',
+  name:   "(global)",
   parent: parentScope,
   vars:   [],
   uses:   []
@@ -58,16 +60,19 @@ var scope = {
 var cur         = token.current;
 var isSemicolon = cur.isPunctuator(";");
 ```
+
 * Wrap multi-line comments with new lines on both sides.
 
 ### Variables
 
 * Use one `var` per variable unless you don't assign any values to it (and it's short enough):
+
 ```javascript
 var token = tokens.find(index);
 var scope = scopes.current;
 var next, prev, cur;
 ```
+
 * Don't be overly descriptive with your variable names but don't abuse one-letter variables either. Find a sweet spot somewhere in between.
 
 ### Comments
@@ -84,8 +89,8 @@ var next, prev, cur;
 * Don't use comma-first notation.
 * Try not to chain stuff unless it **really** helps (e.g. in tests).
 * Don't short-circuit expressions if you're not assigning the result:
-```javascript
 
+```javascript
 // Good
 token = token || tokens.find(0);
 

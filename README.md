@@ -44,13 +44,13 @@ use them, clone this repo and run our build command:
 Contributing
 ------------
 
-Look for a file named CONTRIBUTING.md in this repository. It contains our contributing
+Look for a file named `CONTRIBUTING.md` in this repository. It contains our contributing
 guidelines. We also have [a mailing list](http://groups.google.com/group/jshint/).
 
 License
 -------
 
-JSHint is distributed under the MIT License. One file (`src/stable/jshint.js`) is
+JSHint is distributed under the MIT License. One file and one file only (src/stable/jshint.js) is
 distributed under the slightly modified MIT License.
 
 Attribution
