@@ -5,7 +5,7 @@
 //   jsc ${env_home}/jsc.js -- ${file} "$(cat ${file})" "option1:true,option2:false ${env_home}"
 var env_home = '';
 if (arguments.length > 3) {
-  env_home = arguments[3].toString().replace(/\/env$/, '/');
+  env_home = arguments[3].toString().replace(/\/dist/, '/src/stable/');
 }
 load(env_home + "jshint.js");
 
