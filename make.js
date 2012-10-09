@@ -27,6 +27,7 @@ var OPTIONS = {
 target.all = function () {
 	target.lint();
 	target.test();
+	target.build();
 };
 
 target.lint = function () {
@@ -94,4 +95,22 @@ target.test = function () {
 
 	echo("Running tests...", "\n");
 	nodeunit.run(files);
+};
+
+target.build = function () {
+	echo("Building platform wrappers:");
+
+	var rhino = cat("./src/stable/jshint.js", "./src/platforms/rhino.js");
+	rhino = "#!/usr/bin/env rhino\n\n" + rhino;
+	rhino.to("./dist/jshint-rhino.js");
+	exec("chmod +x dist/jshint-rhino.js");
+	cli.ok("Rhino");
+
+	cat("./src/platforms/wsh.js").to("./dist/jshint-wsh.js");
+	cli.ok("Windows Script Host");
+
+	cat("./src/platforms/jsc.sh").to("./dist/jshint-jsc.sh");
+	cat("./src/platforms/jsc.js").to("./dist/jshint-jsc.js");
+	exec("chmod +x dist/jshint-jsc.sh");
+	cli.ok("JavaScript Core");
 };

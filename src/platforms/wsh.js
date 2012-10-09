@@ -166,7 +166,7 @@
 
 	// load JSHint if the two scripts have not been concatenated
 	if (typeof JSHINT === "undefined") {
-		eval(readFile(scriptPath + "..\\jshint.js", 'utf-8'));
+		eval(readFile(scriptPath + "..\\src\\stable\\jshint.js", 'utf-8'));
 
 		if (typeof JSHINT === "undefined") {
 			WScript.StdOut.WriteLine("ERROR: Could not find 'jshint.js'.");

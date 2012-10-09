@@ -16,7 +16,7 @@ else
   ENV_HOME="$( cd "$( dirname "$BASH_SOURCE" )" && pwd )"
 fi
 
-LINT_RESULT=$(jsc "${ENV_HOME}"/jsc.js -- "${FILE}" "${FILE_CONTENT}" "${OPTS}" "${ENV_HOME}")
+LINT_RESULT=$(jsc "${ENV_HOME}"/jshint-jsc.js -- "${FILE}" "${FILE_CONTENT}" "${OPTS}" "${ENV_HOME}")
 ERRORS=$(echo ${LINT_RESULT} | egrep [^\s] -c)
 
 if [[ ${ERRORS} -ne 0 ]]; then
