@@ -1,7 +1,8 @@
-/*jshint evil: true, shadow: true, wsh: true, undef: true, unused: true */
-/*global JSHINT: false */
+/*global JSHINT, WScript, Enumerator */
 
-(function() {
+(function () {
+	"use strict";
+
 	function readFile(path, charset) {
 		try {
 			var stream = WScript.CreateObject("ADODB.Stream");
@@ -106,7 +107,7 @@
 	}
 
 	var formatters = {
-		errors: function(errors, lines) {
+		errors: function (errors, lines) {
 			for (var i = 0; i < errors.length; i++) {
 				var error = errors[i];
 
@@ -114,13 +115,15 @@
 
 				if (i) lines.push("");
 
-				lines.push("Line " + error.line + " character " + error.character + ": " + error.reason);
+				lines.push("Line " + error.line + " character " +
+					error.character + ": " + error.reason);
 
-				if (error.evidence) lines.push("    " + error.evidence.replace(/^\s*((?:[\S\s]*\S)?)\s*$/, "$1"));
+				if (error.evidence) lines.push("    " +
+					error.evidence.replace(/^\s*((?:[\S\s]*\S)?)\s*$/, "$1"));
 			}
 		},
 
-		implieds: function(implieds, lines) {
+		implieds: function (implieds, lines) {
 			lines.push("Implied globals:");
 
 			var globals = {};
@@ -138,7 +141,7 @@
 			}
 		},
 
-		unused: function(unused, lines) {
+		unused: function (unused, lines) {
 			lines.push("Unused variables:");
 
 			var func, names = {};
@@ -166,6 +169,7 @@
 
 	// load JSHint if the two scripts have not been concatenated
 	if (typeof JSHINT === "undefined") {
+		/*jshint evil:true */
 		eval(readFile(scriptPath + "..\\src\\stable\\jshint.js", 'utf-8'));
 
 		if (typeof JSHINT === "undefined") {
@@ -181,19 +185,28 @@
 	var unnamed = WScript.Arguments.Unnamed;
 
 	if (unnamed.length !== 1) {
-		WScript.StdOut.WriteLine("    usage: cscript " + scriptName + " [options] <script | directory>");
+		WScript.StdOut.WriteLine("    usage: cscript " + scriptName +
+			" [options] <script | directory>");
+
 		WScript.StdOut.WriteLine("");
-		WScript.StdOut.WriteLine("Scans the specified script with JSHint and reports any errors encountered.  If");
-		WScript.StdOut.WriteLine("the script name is \"-\", it will be read from standard input instead.");
-		WScript.StdOut.WriteLine("If a directory is passed, all .js files in that directory and subdirectories");
+		WScript.StdOut.WriteLine("Scans the specified script with JSHint " +
+			"and reports any errors encountered.  If");
+		WScript.StdOut.WriteLine("the script name is \"-\", it will be read " +
+			"from standard input instead.");
+		WScript.StdOut.WriteLine("If a directory is passed, all .js files in " +
+			"that directory and subdirectories");
 		WScript.StdOut.WriteLine("will be scanned.");
 		WScript.StdOut.WriteLine("");
-		WScript.StdOut.WriteLine("JSHint configuration options can be passed in via optional, Windows-style");
+		WScript.StdOut.WriteLine("JSHint configuration options can be passed in " +
+			"via optional, Windows-style");
 		WScript.StdOut.WriteLine("arguments.  For example:");
-		WScript.StdOut.WriteLine("    cscript " + scriptName + " /jquery:true myscript.js");
-		WScript.StdOut.WriteLine("    cscript " + scriptName + " /global:QUnit:false,_:false,foo:true foo.js");
+		WScript.StdOut.WriteLine("    cscript " + scriptName +
+			" /jquery:true myscript.js");
+		WScript.StdOut.WriteLine("    cscript " + scriptName +
+			" /global:QUnit:false,_:false,foo:true foo.js");
 		WScript.StdOut.WriteLine("");
-		WScript.StdOut.WriteLine("By default, we assume that your file is encoded in UTF-8. You can change that");
+		WScript.StdOut.WriteLine("By default, we assume that your file is encoded " +
+			"in UTF-8. You can change that");
 		WScript.StdOut.WriteLine("by providing a custom charset option:");
 		WScript.StdOut.WriteLine("    cscript " + scriptName + " /charset:ascii myscript.js");
 
