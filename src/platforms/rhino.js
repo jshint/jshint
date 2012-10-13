@@ -2,6 +2,8 @@
 /*global JSHINT*/
 
 (function (args) {
+    "use strict";
+
     var filenames = [];
     var optstr; // arg1=val1,arg2=val2,...
     var predef; // global1=true,global2,global3,...
