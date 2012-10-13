@@ -72,9 +72,9 @@ Configuration Options
 
 **Note:** This behavior described below is very different from versions prior to `0.6`.
 
-The CLI uses the default options that come with JSHint. 
+The CLI uses the default options that come with JSHint.
 
-Only one extra option is unique to node-jshint: `globals` 
+Only one extra option is unique to node-jshint: `globals`
 allows you to define an object of globals that get ignored for every file.
 To see an example you can look at how whitelisted globals are defined
 in the [jshint code](https://github.com/jshint/jshint/blob/c047ea1b01097fcc220fcd1a55c41f67ae2e6e81/jshint.js#L556)
@@ -106,6 +106,17 @@ Default extension for files is ".js". If you want to use JSHint with other file 
 If there is a .jshintignore file in your project's directory tree, (also provided you run `jshint` from within your project's directory) then any directories or files specified will be skipped over. (behaves just like a `.gitignore` file)
 
 **Note:** Pattern matching uses minimatch, with the nocase [option](https://github.com/isaacs/minimatch). When there is no match, it performs a left side match (when no forward slashes present and path is a directory).
+
+FAQ
+---
+
+#### How do I turn off "mixed tabs and spaces" warning?
+
+If you're using so-called [smart tabs](http://www.emacswiki.org/SmartTabs) then
+we have an option `smarttabs` for you. Otherwise, your solution is to run JSHint with
+a custom reporter that discards any warnings you don't like. For example, this [example
+reporter](https://gist.github.com/3885619) discards all warnings about mixed tabs and
+spaces.
 
 Contributing
 ------------
