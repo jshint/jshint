@@ -389,6 +389,7 @@ var JSHINT = (function () {
 			DOMParser				 :	false,
 			defaultStatus			 :	false,
 			document				 :	false,
+			Element          : false,
 			event					 :	false,
 			FileReader				 :	false,
 			Float32Array			 :	false,
