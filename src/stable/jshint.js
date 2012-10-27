@@ -4720,9 +4720,10 @@ loop:
 			if (e) {
 				var nt = nexttoken || {};
 				JSHINT.errors.push({
-					raw		  : e.raw,
-					reason	  : e.message,
-					line	  : e.line || nt.line,
+					scope     : "(main)",
+					raw       : e.raw,
+					reason    : e.message,
+					line      : e.line || nt.line,
 					character : e.character || nt.from
 				}, null);
 			}
