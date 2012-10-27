@@ -4,8 +4,8 @@
 
 "use strict";
 
-var JSHINT	= require('../../../src/stable/jshint.js').JSHINT;
-var fs		= require('fs');
+var JSHINT  = require('../../../src/stable/jshint.js').JSHINT;
+var fs      = require('fs');
 var TestRun = require("../helpers/testhelper").setup.testRun;
 
 function wrap(globals) {
@@ -241,6 +241,7 @@ exports.browser = function (test) {
 		"defaultStatus",
 		"document",
 		"event",
+		"Element",
 		"FileReader",
 		"Float32Array",
 		"Float64Array",
