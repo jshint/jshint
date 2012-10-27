@@ -31,7 +31,7 @@ many people contributed. —[idiomatic.js](https://github.com/rwldrn/idiomatic.j
 
 ### Whitespace:
 
-* We use hard tabs everywhere except for `src/stable/jshint.js`. It's annoying, we know.
+* We use hard tabs everywhere.
 * [Smart tabs](http://www.emacswiki.org/SmartTabs) are okay.
 * Use one space after `if`, `for`, `while`, etc.
 * Use one space after `function` for anonymous functions but not for named functions:
