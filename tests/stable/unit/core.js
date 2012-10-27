@@ -340,6 +340,12 @@ exports.insideEval = function (test) {
 
 		.test(src, { evil: false });
 
+	// Regression test for bug GH-714.
+	JSHINT(src, { evil: false, maxerr: 1 });
+	var err = JSHINT.data().errors[1];
+	test.equal(err.raw, "Too many errors.");
+	test.equal(err.scope, "(main)");
+
 	test.done();
 };
 
