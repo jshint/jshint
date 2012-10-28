@@ -10,14 +10,14 @@
     "url":   "http://anton.kovalyov.net/"
   },
 
-	"scripts": {
-		"test": "node ./make.js test",
-		"lint": "node ./make.js lint"
-	},
+  "scripts": {
+    "test": "node ./make.js test",
+    "lint": "node ./make.js lint"
+  },
 
   "dependencies": {
     "esprima":    "https://github.com/ariya/esprima/tarball/master",
-		"shelljs":    "*",
+    "shelljs":    "*",
     "underscore": "*",
     "peakle":     "*",
     "cli":        "0.4.3",
@@ -25,12 +25,12 @@
   },
 
   "devDependencies": {
-		"jshint":     "*",
-		"shelljs":    "*",
+    "jshint":     "*",
+    "shelljs":    "*",
     "browserify": "*",
     "coveraje":   "*",
     "nodeunit":   "*",
-		"sinon":      "*"
+    "sinon":      "*"
   },
 
   "preferGlobal": true
