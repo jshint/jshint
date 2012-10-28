@@ -15,6 +15,8 @@
 		"lint": "node ./make.js lint"
 	},
 
+	"main": "./src/stable/jshint.js",
+
 	"dependencies": {
 		"esprima":    "https://github.com/ariya/esprima/tarball/master",
 		"shelljs":    "*",
