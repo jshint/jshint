@@ -457,3 +457,11 @@ exports.functionCharaterLocation = function (test) {
 
 	test.done();
 };
+
+exports.unicodeIdentifiers = function (test) {
+	JSHINT('var josé = 42, π = 3.1415, Женя;');
+
+	test.equal(typeof JSHINT.data().errors, "undefined",
+		"accepts any Unicode letters in identifiers");
+	test.done();
+};
