@@ -10,6 +10,8 @@
     "url":   "http://anton.kovalyov.net/"
   },
 
+  "main": "./src/stable/jshint.js",
+
   "scripts": {
     "test": "node ./make.js test",
     "lint": "node ./make.js lint"
