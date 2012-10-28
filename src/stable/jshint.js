@@ -219,7 +219,7 @@
  Uint32Array, Uint8Array, undef, undefs, unused, urls, validthis, value, valueOf, var, vars,
  version, verifyMaxParametersPerFunction, verifyMaxStatementsPerFunction,
  verifyMaxComplexityPerFunction, verifyMaxNestedBlockDepthPerFunction, WebSocket, withstmt, white,
- window, windows, Worker, worker, wsh, yui, YUI, Y, YUI_config*/
+ window, windows, Worker, worker, wsh, yui, YUI, Y, YUI_config, Lu, Ll */
 
 /*global exports: false */
 
@@ -787,10 +787,23 @@ var JSHINT = (function () {
 			Y				: false,
 			YUI_config		: false
 		};
+
 	// Regular expressions. Some of these are stupidly long.
 	var ax, cx, tx, nx, nxg, lx, ix, jx, ft;
+	var u = require("../unicode/letters.js"),
+			uLu = u.Lu,
+			uLl = u.Ll,
+			uL = uLu + uLl,
+			uLre;
+	var constructorName, camelCase;
+
 	(function () {
 		/*jshint maxlen:300 */
+
+		uLre = new RegExp("[" + uL + "]");
+
+		constructorName = new RegExp("^[" + uLu + "]([" + uLu + "0-9_$]*[" + uLl + "][" + uL + "0-9_$]*)?$");
+		camelCase = new RegExp("^[" + uLu + "0-9_]*$");
 
 		// unsafe comment or string
 		ax = /@cc|<\/?|script|\]\s*\]|<\s*!|&lt/i;
@@ -799,7 +812,9 @@ var JSHINT = (function () {
 		cx = /[\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/;
 
 		// token
-		tx = /^\s*([(){}\[.,:;'"~\?\]#@]|==?=?|\/=(?!(\S*\/[gim]?))|\/(\*(jshint|jslint|members?|global)?|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|%=?|&[&=]?|\|[|=]?|>>?>?=?|<([\/=!]|\!(\[|--)?|<=?)?|\^=?|\!=?=?|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+\-]?[0-9]+)?)/;
+		tx = new RegExp("^\\s*([(){}\\[.,:;'\"~\\?\\]#@]|==?=?|\\/=(?!(\\S*\\/[gim]?))|\\/(\\*(jshint|jslint|members?|global)?|\\/)?" +
+			"|\\*[\\/=]?|\\+(?:=|\\++)?|-(?:=|-+)?|%=?|&[&=]?|\\|[|=]?|>>?>?=?|<([\\/=!]|\\!(\\[|--)?|<=?)?|\\^=?|\\!=?=?|" +
+			"[" + uL + "_$][" + uL + "0-9_$]*|[0-9]+([xX][0-9a-fA-F]+|\\.[0-9]*)?([eE][+\\-]?[0-9]+)?)");
 
 		// characters in strings that need escapement
 		nx = /[\u0000-\u001f&<"\/\\\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/;
@@ -809,7 +824,7 @@ var JSHINT = (function () {
 		lx = /\*\//;
 
 		// identifier
-		ix = /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/;
+		ix = new RegExp("^([" + uL + "_$][" + uL + "0-9_$]*)$");
 
 		// javascript url
 		jx = /^(?:javascript|jscript|ecmascript|vbscript|mocha|livescript)\s*:/i;
@@ -914,8 +929,7 @@ var JSHINT = (function () {
 	// Non standard methods
 
 	function isAlpha(str) {
-		return (str >= "a" && str <= "z\uffff") ||
-			(str >= "A" && str <= "Z\uffff");
+		return uLre.test(str);
 	}
 
 	function isDigit(str) {
@@ -1182,7 +1196,7 @@ var JSHINT = (function () {
 				// _myVar are okay though.
 
 				if (option.camelcase) {
-					if (name.replace(/^_+/, "").indexOf("_") > -1 && !name.match(/^[A-Z0-9_]*$/)) {
+					if (name.replace(/^_+/, "").indexOf("_") > -1 && !name.match(camelCase)) {
 						warningAt("Identifier '{a}' is not in camel case.", line, from, value);
 					}
 				}
@@ -3326,7 +3340,7 @@ loop:
 			p = [];
 		if (left) {
 			if (left.type === "(identifier)") {
-				if (left.value.match(/^[A-Z]([A-Z0-9_$]*[a-z][A-Za-z0-9_$]*)?$/)) {
+				if (left.value.match(constructorName)) {
 					if ("Number String Boolean Date Object".indexOf(left.value) === -1) {
 						if (left.value === "Math") {
 							warning("Math is not a function.", left);
