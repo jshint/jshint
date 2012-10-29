@@ -27,7 +27,6 @@
 	},
 
 	"devDependencies": {
-		"jshint":     "*",
 		"shelljs":    "*",
 		"browserify": "*",
 		"coveraje":   "*",
