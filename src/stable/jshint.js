@@ -27,198 +27,7 @@
  *
  */
 
-/*
- JSHINT is a global function. It takes two parameters.
-
-	 var myResult = JSHINT(source, option);
-
- The first parameter is either a string or an array of strings. If it is a
- string, it will be split on '\n' or '\r'. If it is an array of strings, it
- is assumed that each string represents one line. The source can be a
- JavaScript text or a JSON text.
-
- The second parameter is an optional object of options which control the
- operation of JSHINT. Most of the options are booleans: They are all
- optional and have a default value of false. One of the options, predef,
- can be an array of names, which will be used to declare global variables,
- or an object whose keys are used as global names, with a boolean value
- that determines if they are assignable.
-
- If it checks out, JSHINT returns true. Otherwise, it returns false.
-
- If false, you can inspect JSHINT.errors to find out the problems.
- JSHINT.errors is an array of objects containing these members:
-
- {
-	 line	   : The line (relative to 1) at which the lint was found
-	 character : The character (relative to 1) at which the lint was found
-	 reason    : The problem
-	 evidence  : The text line in which the problem occurred
-	 raw	   : The raw message before the details were inserted
-	 a		   : The first detail
-	 b		   : The second detail
-	 c		   : The third detail
-	 d		   : The fourth detail
- }
-
- If a fatal error was found, a null will be the last element of the
- JSHINT.errors array.
-
- You can request a data structure which contains JSHint's results.
-
-	 var myData = JSHINT.data();
-
- It returns a structure with this form:
-
- {
-	 errors: [
-		 {
-			 line: NUMBER,
-			 character: NUMBER,
-			 reason: STRING,
-			 evidence: STRING
-		 }
-	 ],
-	 functions: [
-		 name: STRING,
-		 line: NUMBER,
-		 character: NUMBER,
-		 last: NUMBER,
-		 lastcharacter: NUMBER,
-		 param: [
-			 STRING
-		 ],
-		 closure: [
-			 STRING
-		 ],
-		 var: [
-			 STRING
-		 ],
-		 exception: [
-			 STRING
-		 ],
-		 outer: [
-			 STRING
-		 ],
-		 unused: [
-			 STRING
-		 ],
-		 global: [
-			 STRING
-		 ],
-		 label: [
-			 STRING
-		 ]
-	 ],
-	 globals: [
-		 STRING
-	 ],
-	 member: {
-		 STRING: NUMBER
-	 },
-	 unused: [
-		 {
-			 name: STRING,
-			 line: NUMBER
-		 }
-	 ],
-	 implieds: [
-		 {
-			 name: STRING,
-			 line: NUMBER
-		 }
-	 ],
-	 urls: [
-		 STRING
-	 ],
-	 json: BOOLEAN
- }
-
- Empty arrays will not be included.
-
-*/
-
-/*jshint
- evil: true, nomen: false, onevar: false, regexp: false, strict: true, boss: true,
- undef: true, maxlen: 100, indent: 4, quotmark: double, unused: true
-*/
-
-/*members "\b", "\t", "\n", "\f", "\r", "!=", "!==", "\"", "%", "(begin)",
- "(breakage)", "(character)", "(context)", "(error)", "(explicitNewcap)", "(global)",
- "(identifier)", "(last)", "(lastcharacter)", "(line)", "(loopage)", "(metrics)",
- "(name)", "(onevar)", "(params)", "(scope)", "(statement)", "(verb)", "(tokens)", "(catch)",
- "*", "+", "++", "-", "--", "\/", "<", "<=", "==",
- "===", ">", ">=", $, $$, $A, $F, $H, $R, $break, $continue, $w, Abstract, Ajax,
- __filename, __dirname, ActiveXObject, Array, ArrayBuffer, ArrayBufferView, Audio,
- Autocompleter, Asset, Boolean, Builder, Buffer, Browser, Blob, COM, CScript, Canvas,
- CustomAnimation, Class, Control, ComplexityCount, Chain, Color, Cookie, Core, DataView, Date,
- Debug, Draggable, Draggables, Droppables, Document, DomReady, DOMEvent, DOMReady, DOMParser,
- Drag, E, Enumerator, Enumerable, Element, Elements, Error, Effect, EvalError, Event,
- Events, FadeAnimation, Field, Flash, Float32Array, Float64Array, Form,
- FormField, Frame, FormData, Function, Fx, GetObject, Group, Hash, HotKey,
- HTMLElement, HTMLAnchorElement, HTMLBaseElement, HTMLBlockquoteElement,
- HTMLBodyElement, HTMLBRElement, HTMLButtonElement, HTMLCanvasElement, HTMLDirectoryElement,
- HTMLDivElement, HTMLDListElement, HTMLFieldSetElement,
- HTMLFontElement, HTMLFormElement, HTMLFrameElement, HTMLFrameSetElement,
- HTMLHeadElement, HTMLHeadingElement, HTMLHRElement, HTMLHtmlElement,
- HTMLIFrameElement, HTMLImageElement, HTMLInputElement, HTMLIsIndexElement,
- HTMLLabelElement, HTMLLayerElement, HTMLLegendElement, HTMLLIElement,
- HTMLLinkElement, HTMLMapElement, HTMLMenuElement, HTMLMetaElement,
- HTMLModElement, HTMLObjectElement, HTMLOListElement, HTMLOptGroupElement,
- HTMLOptionElement, HTMLParagraphElement, HTMLParamElement, HTMLPreElement,
- HTMLQuoteElement, HTMLScriptElement, HTMLSelectElement, HTMLStyleElement,
- HtmlTable, HTMLTableCaptionElement, HTMLTableCellElement, HTMLTableColElement,
- HTMLTableElement, HTMLTableRowElement, HTMLTableSectionElement,
- HTMLTextAreaElement, HTMLTitleElement, HTMLUListElement, HTMLVideoElement,
- Iframe, IframeShim, Image, importScripts, Int16Array, Int32Array, Int8Array,
- Insertion, InputValidator, JSON, Keyboard, Locale, LN10, LN2, LOG10E, LOG2E,
- MAX_VALUE, MIN_VALUE, Map, Mask, Math, MenuItem, MessageChannel, MessageEvent, MessagePort,
- MoveAnimation, MooTools, MutationObserver, NaN, Native, NEGATIVE_INFINITY, Node, NodeFilter,
- Number, Object, ObjectRange,
- Option, Options, OverText, PI, POSITIVE_INFINITY, PeriodicalExecuter, Point, Position, Prototype,
- RangeError, Rectangle, ReferenceError, RegExp, ResizeAnimation, Request, RotateAnimation, Set,
- SQRT1_2, SQRT2, ScrollBar, ScriptEngine, ScriptEngineBuildVersion,
- ScriptEngineMajorVersion, ScriptEngineMinorVersion, Scriptaculous, Scroller,
- Slick, Slider, Selector, SharedWorker, String, Style, SyntaxError, Sortable, Sortables,
- SortableObserver, Sound, Spinner, System, Swiff, Text, TextArea, Template,
- Timer, Tips, Type, TypeError, Toggle, Try, "use strict", unescape, URI, URIError, URL,
- VBArray, WeakMap, WSH, WScript, XDomainRequest, Web, Window, XMLDOM, XMLHttpRequest, XMLSerializer,
- XPathEvaluator, XPathException, XPathExpression, XPathNamespace, XPathNSResolver, XPathResult,
- "\\", a, abs, addEventListener, address, alert, apply, applicationCache, arguments, arity,
- asi, atob, b, basic, basicToken, bitwise, blacklist, block, blur, boolOptions, boss,
- browser, btoa, c, call, callee, caller, camelcase, cases, charAt, charCodeAt, character,
- clearInterval, clearTimeout, close, closed, closure, comment, complexityCount, condition,
- confirm, console, constructor, content, couch, create, css, curly, d, data, datalist, dd, debug,
- decodeURI, decodeURIComponent, defaultStatus, defineClass, deserialize, devel, document,
- dojo, dijit, dojox, define, else, emit, encodeURI, encodeURIComponent, elem,
- eqeq, eqeqeq, eqnull, errors, es5, escape, esnext, eval, event, evidence, evil,
- ex, exception, exec, exps, expr, exports, FileReader, first, floor, focus, forEach,
- forin, fragment, frames, from, fromCharCode, fud, funcscope, funct, function, functions,
- g, gc, getComputedStyle, getRow, getter, getterToken, GLOBAL, global, globals, globalstrict,
- hasOwnProperty, help, history, i, id, identifier, immed, implieds, importPackage, include,
- indent, indexOf, init, ins, internals, instanceOf, isAlpha, isApplicationRunning, isArray,
- isDigit, isFinite, isNaN, iterator, java, join, jshint,
- JSHINT, json, jquery, jQuery, keys, label, labelled, last, lastcharacter, lastsemic, laxbreak,
- laxcomma, latedef, lbp, led, left, length, line, load, loadClass, localStorage, location,
- log, loopfunc, m, match, max, maxcomplexity, maxdepth, maxerr, maxlen, maxstatements, maxparams,
- member, message, meta, module, moveBy, moveTo, mootools, multistr, name, navigator, new, newcap,
- nestedBlockDepth, noarg, node, noempty, nomen, nonew, nonstandard, nud, onbeforeunload, onblur,
- onerror, onevar, onecase, onfocus, onload, onresize, onunload, open, openDatabase, openURL,
- opener, opera, options, outer, param, parent, parseFloat, parseInt, passfail, plusplus,
- postMessage, pop, predef, print, process, prompt, proto, prototype, prototypejs, provides, push,
- quit, quotmark, range, raw, reach, reason, regexp, readFile, readUrl, regexdash,
- removeEventListener, replace, report, require, reserved, resizeBy, resizeTo, resolvePath,
- resumeUpdates, respond, rhino, right, runCommand, scroll, scope, screen, scripturl, scrollBy,
- scrollTo, scrollbar, search, seal, self, send, serialize, sessionStorage, setInterval, setTimeout,
- setter, setterToken, shift, slice, smarttabs, sort, spawn, split, statement, statementCount, stack,
- status, start, strict, sub, substr, supernew, shadow, supplant, sum, sync, test, toLowerCase,
- toString, toUpperCase, toint32, token, tokens, top, trailing, type, typeOf, Uint16Array,
- Uint32Array, Uint8Array, undef, undefs, unused, urls, validthis, value, valueOf, var, vars,
- version, verifyMaxParametersPerFunction, verifyMaxStatementsPerFunction,
- verifyMaxComplexityPerFunction, verifyMaxNestedBlockDepthPerFunction, WebSocket, withstmt, white,
- window, windows, Worker, worker, wsh, yui, YUI, Y, YUI_config*/
-
-/*global exports: false */
+/*jshint quotmark:double */
 
 // We build the application inside a function so that we produce only a single
 // global variable. That function will be invoked immediately, and its return
@@ -249,310 +58,308 @@ var JSHINT = (function () {
 
 		// These are the JSHint boolean options.
 		boolOptions = {
-			asi			: true, // if automatic semicolon insertion should be tolerated
-			bitwise		: true, // if bitwise operators should not be allowed
-			boss		: true, // if advanced usage of assignments should be allowed
-			browser		: true, // if the standard browser globals should be predefined
-			camelcase	: true, // if identifiers should be required in camel case
-			couch		: true, // if CouchDB globals should be predefined
-			curly		: true, // if curly braces around all blocks should be required
-			debug		: true, // if debugger statements should be allowed
-			devel		: true, // if logging globals should be predefined (console,
-								// alert, etc.)
-			dojo		: true, // if Dojo Toolkit globals should be predefined
-			eqeqeq		: true, // if === should be required
-			eqnull		: true, // if == null comparisons should be tolerated
-			es5			: true, // if ES5 syntax should be allowed
-			esnext		: true, // if es.next specific syntax should be allowed
-			evil		: true, // if eval should be allowed
-			expr		: true, // if ExpressionStatement should be allowed as Programs
-			forin		: true, // if for in statements must filter
-			funcscope	: true, // if only function scope should be used for scope tests
-			globalstrict: true, // if global "use strict"; should be allowed (also
-								// enables 'strict')
-			immed		: true, // if immediate invocations must be wrapped in parens
-			iterator	: true, // if the `__iterator__` property should be allowed
-			jquery		: true, // if jQuery globals should be predefined
-			lastsemic	: true, // if semicolons may be ommitted for the trailing
-								// statements inside of a one-line blocks.
-			latedef		: true, // if the use before definition should not be tolerated
-			laxbreak	: true, // if line breaks should not be checked
-			laxcomma	: true, // if line breaks should not be checked around commas
-			loopfunc	: true, // if functions should be allowed to be defined within
-								// loops
-			mootools	: true, // if MooTools globals should be predefined
-			multistr	: true, // allow multiline strings
-			newcap		: true, // if constructor names must be capitalized
-			noarg		: true, // if arguments.caller and arguments.callee should be
-								// disallowed
-			node		: true, // if the Node.js environment globals should be
-								// predefined
-			noempty		: true, // if empty blocks should be disallowed
-			nonew		: true, // if using `new` for side-effects should be disallowed
+			asi         : true, // if automatic semicolon insertion should be tolerated
+			bitwise     : true, // if bitwise operators should not be allowed
+			boss        : true, // if advanced usage of assignments should be allowed
+			browser     : true, // if the standard browser globals should be predefined
+			camelcase   : true, // if identifiers should be required in camel case
+			couch       : true, // if CouchDB globals should be predefined
+			curly       : true, // if curly braces around all blocks should be required
+			debug       : true, // if debugger statements should be allowed
+			devel       : true, // if logging globals should be predefined (console, alert, etc.)
+			dojo        : true, // if Dojo Toolkit globals should be predefined
+			eqeqeq      : true, // if === should be required
+			eqnull      : true, // if == null comparisons should be tolerated
+			es5         : true, // if ES5 syntax should be allowed
+			esnext      : true, // if es.next specific syntax should be allowed
+			evil        : true, // if eval should be allowed
+			expr        : true, // if ExpressionStatement should be allowed as Programs
+			forin       : true, // if for in statements must filter
+			funcscope   : true, // if only function scope should be used for scope tests
+			globalstrict: true, // if global "use strict"; should be allowed (also enables 'strict')
+			immed       : true, // if immediate invocations must be wrapped in parens
+			iterator    : true, // if the `__iterator__` property should be allowed
+			jquery      : true, // if jQuery globals should be predefined
+			lastsemic   : true, // if semicolons may be ommitted for the trailing
+			                    // statements inside of a one-line blocks.
+			latedef     : true, // if the use before definition should not be tolerated
+			laxbreak    : true, // if line breaks should not be checked
+			laxcomma    : true, // if line breaks should not be checked around commas
+			loopfunc    : true, // if functions should be allowed to be defined within
+			                    // loops
+			mootools    : true, // if MooTools globals should be predefined
+			multistr    : true, // allow multiline strings
+			newcap      : true, // if constructor names must be capitalized
+			noarg       : true, // if arguments.caller and arguments.callee should be
+			                    // disallowed
+			node        : true, // if the Node.js environment globals should be
+			                    // predefined
+			noempty     : true, // if empty blocks should be disallowed
+			nonew       : true, // if using `new` for side-effects should be disallowed
 			nonstandard : true, // if non-standard (but widely adopted) globals should
-								// be predefined
-			nomen		: true, // if names should be checked
-			onevar		: true, // if only one var statement per function should be
-								// allowed
-			onecase		: true, // if one case switch statements should be allowed
-			passfail	: true, // if the scan should stop on first error
-			plusplus	: true, // if increment/decrement should not be allowed
-			proto		: true, // if the `__proto__` property should be allowed
+			                    // be predefined
+			nomen       : true, // if names should be checked
+			onevar      : true, // if only one var statement per function should be
+			                    // allowed
+			onecase     : true, // if one case switch statements should be allowed
+			passfail    : true, // if the scan should stop on first error
+			plusplus    : true, // if increment/decrement should not be allowed
+			proto       : true, // if the `__proto__` property should be allowed
 			prototypejs : true, // if Prototype and Scriptaculous globals should be
-								// predefined
-			regexdash	: true, // if unescaped first/last dash (-) inside brackets
-								// should be tolerated
-			regexp		: true, // if the . should not be allowed in regexp literals
-			rhino		: true, // if the Rhino environment globals should be predefined
-			undef		: true, // if variables should be declared before used
-			unused		: true, // if variables should be always used
-			scripturl	: true, // if script-targeted URLs should be tolerated
-			shadow		: true, // if variable shadowing should be tolerated
-			smarttabs	: true, // if smarttabs should be tolerated
-								// (http://www.emacswiki.org/emacs/SmartTabs)
-			strict		: true, // require the "use strict"; pragma
-			sub			: true, // if all forms of subscript notation are tolerated
-			supernew	: true, // if `new function () { ... };` and `new Object;`
-								// should be tolerated
-			trailing	: true, // if trailing whitespace rules apply
-			validthis	: true, // if 'this' inside a non-constructor function is valid.
-								// This is a function scoped option only.
-			withstmt	: true, // if with statements should be allowed
-			white		: true, // if strict whitespace rules apply
-			worker		: true, // if Web Worker script symbols should be allowed
-			wsh			: true, // if the Windows Scripting Host environment globals
-								// should be predefined
-			yui			: true	// YUI variables should be predefined
+			                    // predefined
+			regexdash   : true, // if unescaped first/last dash (-) inside brackets
+			                    // should be tolerated
+			regexp      : true, // if the . should not be allowed in regexp literals
+			rhino       : true, // if the Rhino environment globals should be predefined
+			undef       : true, // if variables should be declared before used
+			unused      : true, // if variables should be always used
+			scripturl   : true, // if script-targeted URLs should be tolerated
+			shadow      : true, // if variable shadowing should be tolerated
+			smarttabs   : true, // if smarttabs should be tolerated
+			                    // (http://www.emacswiki.org/emacs/SmartTabs)
+			strict      : true, // require the "use strict"; pragma
+			sub         : true, // if all forms of subscript notation are tolerated
+			supernew    : true, // if `new function () { ... };` and `new Object;`
+			                    // should be tolerated
+			trailing    : true, // if trailing whitespace rules apply
+			validthis   : true, // if 'this' inside a non-constructor function is valid.
+			                    // This is a function scoped option only.
+			withstmt    : true, // if with statements should be allowed
+			white       : true, // if strict whitespace rules apply
+			worker      : true, // if Web Worker script symbols should be allowed
+			wsh         : true, // if the Windows Scripting Host environment globals
+			                    // should be predefined
+			yui         : true  // YUI variables should be predefined
 		},
 
 		// These are the JSHint options that can take any value
 		// (we use this object to detect invalid options)
 		valOptions = {
-			maxlen		 : false,
-			indent		 : false,
-			maxerr		 : false,
-			predef		 : false,
-			quotmark	 : false, //'single'|'double'|true
-			scope		 : false,
+			maxlen       : false,
+			indent       : false,
+			maxerr       : false,
+			predef       : false,
+			quotmark     : false, //'single'|'double'|true
+			scope        : false,
 			maxstatements: false, // {int} max statements per function
-			maxdepth	 : false, // {int} max nested block depth per function
-			maxparams	 : false, // {int} max params per function
+			maxdepth     : false, // {int} max nested block depth per function
+			maxparams    : false, // {int} max params per function
 			maxcomplexity: false  // {int} max cyclomatic complexity per function
 		},
 
 		// These are JSHint boolean options which are shared with JSLint
 		// where the definition in JSHint is opposite JSLint
 		invertedOptions = {
-			bitwise		: true,
-			forin		: true,
-			newcap		: true,
-			nomen		: true,
-			plusplus	: true,
-			regexp		: true,
-			undef		: true,
-			white		: true,
+			bitwise : true,
+			forin   : true,
+			newcap  : true,
+			nomen   : true,
+			plusplus: true,
+			regexp  : true,
+			undef   : true,
+			white   : true,
 
 			// Inverted and renamed, use JSHint name here
-			eqeqeq		: true,
-			onevar		: true
+			eqeqeq  : true,
+			onevar  : true
 		},
 
 		// These are JSHint boolean options which are shared with JSLint
 		// where the name has been changed but the effect is unchanged
 		renamedOptions = {
-			eqeq		: "eqeqeq",
-			vars		: "onevar",
-			windows		: "wsh"
+			eqeq   : "eqeqeq",
+			vars   : "onevar",
+			windows: "wsh"
 		},
 
 
 		// browser contains a set of global names which are commonly provided by a
 		// web browser environment.
 		browser = {
-			ArrayBuffer				 :	false,
-			ArrayBufferView			 :	false,
-			Audio					 :	false,
-			Blob					 :	false,
-			addEventListener		 :	false,
-			applicationCache		 :	false,
-			atob					 :	false,
-			blur					 :	false,
-			btoa					 :	false,
-			clearInterval			 :	false,
-			clearTimeout			 :	false,
-			close					 :	false,
-			closed					 :	false,
-			DataView				 :	false,
-			DOMParser				 :	false,
-			defaultStatus			 :	false,
-			document				 :	false,
-			Element          : false,
-			event					 :	false,
-			FileReader				 :	false,
-			Float32Array			 :	false,
-			Float64Array			 :	false,
-			FormData				 :	false,
-			focus					 :	false,
-			frames					 :	false,
-			getComputedStyle		 :	false,
-			HTMLElement				 :	false,
-			HTMLAnchorElement		 :	false,
-			HTMLBaseElement			 :	false,
-			HTMLBlockquoteElement	 :	false,
-			HTMLBodyElement			 :	false,
-			HTMLBRElement			 :	false,
-			HTMLButtonElement		 :	false,
-			HTMLCanvasElement		 :	false,
-			HTMLDirectoryElement	 :	false,
-			HTMLDivElement			 :	false,
-			HTMLDListElement		 :	false,
-			HTMLFieldSetElement		 :	false,
-			HTMLFontElement			 :	false,
-			HTMLFormElement			 :	false,
-			HTMLFrameElement		 :	false,
-			HTMLFrameSetElement		 :	false,
-			HTMLHeadElement			 :	false,
-			HTMLHeadingElement		 :	false,
-			HTMLHRElement			 :	false,
-			HTMLHtmlElement			 :	false,
-			HTMLIFrameElement		 :	false,
-			HTMLImageElement		 :	false,
-			HTMLInputElement		 :	false,
-			HTMLIsIndexElement		 :	false,
-			HTMLLabelElement		 :	false,
-			HTMLLayerElement		 :	false,
-			HTMLLegendElement		 :	false,
-			HTMLLIElement			 :	false,
-			HTMLLinkElement			 :	false,
-			HTMLMapElement			 :	false,
-			HTMLMenuElement			 :	false,
-			HTMLMetaElement			 :	false,
-			HTMLModElement			 :	false,
-			HTMLObjectElement		 :	false,
-			HTMLOListElement		 :	false,
-			HTMLOptGroupElement		 :	false,
-			HTMLOptionElement		 :	false,
-			HTMLParagraphElement	 :	false,
-			HTMLParamElement		 :	false,
-			HTMLPreElement			 :	false,
-			HTMLQuoteElement		 :	false,
-			HTMLScriptElement		 :	false,
-			HTMLSelectElement		 :	false,
-			HTMLStyleElement		 :	false,
-			HTMLTableCaptionElement  :	false,
-			HTMLTableCellElement	 :	false,
-			HTMLTableColElement		 :	false,
-			HTMLTableElement		 :	false,
-			HTMLTableRowElement		 :	false,
-			HTMLTableSectionElement  :	false,
-			HTMLTextAreaElement		 :	false,
-			HTMLTitleElement		 :	false,
-			HTMLUListElement		 :	false,
-			HTMLVideoElement		 :	false,
-			history					 :	false,
-			Int16Array				 :	false,
-			Int32Array				 :	false,
-			Int8Array				 :	false,
-			Image					 :	false,
-			length					 :	false,
-			localStorage			 :	false,
-			location				 :	false,
-			MessageChannel			 :	false,
-			MessageEvent			 :	false,
-			MessagePort				 :	false,
-			moveBy					 :	false,
-			moveTo					 :	false,
-			MutationObserver		 :	false,
-			name					 :	false,
-			Node					 :	false,
-			NodeFilter				 :	false,
-			navigator				 :	false,
-			onbeforeunload			 :	true,
-			onblur					 :	true,
-			onerror					 :	true,
-			onfocus					 :	true,
-			onload					 :	true,
-			onresize				 :	true,
-			onunload				 :	true,
-			open					 :	false,
-			openDatabase			 :	false,
-			opener					 :	false,
-			Option					 :	false,
-			parent					 :	false,
-			print					 :	false,
-			removeEventListener		 :	false,
-			resizeBy				 :	false,
-			resizeTo				 :	false,
-			screen					 :	false,
-			scroll					 :	false,
-			scrollBy				 :	false,
-			scrollTo				 :	false,
-			sessionStorage			 :	false,
-			setInterval				 :	false,
-			setTimeout				 :	false,
-			SharedWorker			 :	false,
-			status					 :	false,
-			top						 :	false,
-			Uint16Array				 :	false,
-			Uint32Array				 :	false,
-			Uint8Array				 :	false,
-			WebSocket				 :	false,
-			window					 :	false,
-			Worker					 :	false,
-			XMLHttpRequest			 :	false,
-			XMLSerializer			 :	false,
-			XPathEvaluator			 :	false,
-			XPathException			 :	false,
-			XPathExpression			 :	false,
-			XPathNamespace			 :	false,
-			XPathNSResolver			 :	false,
-			XPathResult				 :	false
+			ArrayBuffer          : false,
+			ArrayBufferView      : false,
+			Audio                : false,
+			Blob                 : false,
+			addEventListener     : false,
+			applicationCache     : false,
+			atob                 : false,
+			blur                 : false,
+			btoa                 : false,
+			clearInterval        : false,
+			clearTimeout         : false,
+			close                : false,
+			closed               : false,
+			DataView             : false,
+			DOMParser            : false,
+			defaultStatus        : false,
+			document             : false,
+			Element              : false,
+			event                : false,
+			FileReader           : false,
+			Float32Array         : false,
+			Float64Array         : false,
+			FormData             : false,
+			focus                : false,
+			frames               : false,
+			getComputedStyle     : false,
+			HTMLElement          : false,
+			HTMLAnchorElement    : false,
+			HTMLBaseElement      : false,
+			HTMLBlockquoteElement: false,
+			HTMLBodyElement      : false,
+			HTMLBRElement        : false,
+			HTMLButtonElement    : false,
+			HTMLCanvasElement    : false,
+			HTMLDirectoryElement : false,
+			HTMLDivElement       : false,
+			HTMLDListElement     : false,
+			HTMLFieldSetElement  : false,
+			HTMLFontElement      : false,
+			HTMLFormElement      : false,
+			HTMLFrameElement     : false,
+			HTMLFrameSetElement  : false,
+			HTMLHeadElement      : false,
+			HTMLHeadingElement   : false,
+			HTMLHRElement        : false,
+			HTMLHtmlElement      : false,
+			HTMLIFrameElement    : false,
+			HTMLImageElement     : false,
+			HTMLInputElement     : false,
+			HTMLIsIndexElement   : false,
+			HTMLLabelElement     : false,
+			HTMLLayerElement     : false,
+			HTMLLegendElement    : false,
+			HTMLLIElement        : false,
+			HTMLLinkElement      : false,
+			HTMLMapElement       : false,
+			HTMLMenuElement      : false,
+			HTMLMetaElement      : false,
+			HTMLModElement       : false,
+			HTMLObjectElement    : false,
+			HTMLOListElement     : false,
+			HTMLOptGroupElement  : false,
+			HTMLOptionElement    : false,
+			HTMLParagraphElement : false,
+			HTMLParamElement     : false,
+			HTMLPreElement       : false,
+			HTMLQuoteElement     : false,
+			HTMLScriptElement    : false,
+			HTMLSelectElement    : false,
+			HTMLStyleElement     : false,
+			HTMLTableCaptionElement: false,
+			HTMLTableCellElement : false,
+			HTMLTableColElement  : false,
+			HTMLTableElement     : false,
+			HTMLTableRowElement  : false,
+			HTMLTableSectionElement: false,
+			HTMLTextAreaElement  : false,
+			HTMLTitleElement     : false,
+			HTMLUListElement     : false,
+			HTMLVideoElement     : false,
+			history              : false,
+			Int16Array           : false,
+			Int32Array           : false,
+			Int8Array            : false,
+			Image                : false,
+			length               : false,
+			localStorage         : false,
+			location             : false,
+			MessageChannel       : false,
+			MessageEvent         : false,
+			MessagePort          : false,
+			moveBy               : false,
+			moveTo               : false,
+			MutationObserver     : false,
+			name                 : false,
+			Node                 : false,
+			NodeFilter           : false,
+			navigator            : false,
+			onbeforeunload       : true,
+			onblur               : true,
+			onerror              : true,
+			onfocus              : true,
+			onload               : true,
+			onresize             : true,
+			onunload             : true,
+			open                 : false,
+			openDatabase         : false,
+			opener               : false,
+			Option               : false,
+			parent               : false,
+			print                : false,
+			removeEventListener  : false,
+			resizeBy             : false,
+			resizeTo             : false,
+			screen               : false,
+			scroll               : false,
+			scrollBy             : false,
+			scrollTo             : false,
+			sessionStorage       : false,
+			setInterval          : false,
+			setTimeout           : false,
+			SharedWorker         : false,
+			status               : false,
+			top                  : false,
+			Uint16Array          : false,
+			Uint32Array          : false,
+			Uint8Array           : false,
+			WebSocket            : false,
+			window               : false,
+			Worker               : false,
+			XMLHttpRequest       : false,
+			XMLSerializer        : false,
+			XPathEvaluator       : false,
+			XPathException       : false,
+			XPathExpression      : false,
+			XPathNamespace       : false,
+			XPathNSResolver      : false,
+			XPathResult          : false
 		},
 
 		couch = {
 			"require" : false,
 			respond   : false,
-			getRow	  : false,
-			emit	  : false,
-			send	  : false,
-			start	  : false,
-			sum		  : false,
-			log		  : false,
+			getRow    : false,
+			emit      : false,
+			send      : false,
+			start     : false,
+			sum       : false,
+			log       : false,
 			exports   : false,
-			module	  : false,
+			module    : false,
 			provides  : false
 		},
 
 		declared, // Globals that were declared using /*global ... */ syntax.
 
 		devel = {
-			alert	: false,
-			confirm : false,
-			console : false,
-			Debug	: false,
-			opera	: false,
-			prompt	: false
+			alert  : false,
+			confirm: false,
+			console: false,
+			Debug  : false,
+			opera  : false,
+			prompt : false
 		},
 
 		dojo = {
-			dojo	  : false,
-			dijit	  : false,
-			dojox	  : false,
-			define	  : false,
-			"require" : false
+			dojo     : false,
+			dijit    : false,
+			dojox    : false,
+			define	 : false,
+			"require": false
 		},
 
-		funct,			// The current function
+		funct, // The current function
 
 		functionicity = [
 			"closure", "exception", "global", "label",
 			"outer", "unused", "var"
 		],
 
-		functions,		// All of the functions
+		functions, // All of the functions
 
-		global,			// The global scope
-		implied,		// Implied globals
+		global, // The global scope
+		implied, // Implied globals
 		inblock,
 		indent,
 		jsonmode,
@@ -567,71 +374,73 @@ var JSHINT = (function () {
 		member,
 		membersOnly,
 
+		// FIXME
+
 		mootools = {
-			"$"				: false,
-			"$$"			: false,
-			Asset			: false,
-			Browser			: false,
-			Chain			: false,
-			Class			: false,
-			Color			: false,
-			Cookie			: false,
-			Core			: false,
-			Document		: false,
-			DomReady		: false,
-			DOMEvent		: false,
-			DOMReady		: false,
-			Drag			: false,
-			Element			: false,
-			Elements		: false,
-			Event			: false,
-			Events			: false,
-			Fx				: false,
-			Group			: false,
-			Hash			: false,
-			HtmlTable		: false,
-			Iframe			: false,
-			IframeShim		: false,
-			InputValidator	: false,
-			instanceOf		: false,
-			Keyboard		: false,
-			Locale			: false,
-			Mask			: false,
-			MooTools		: false,
-			Native			: false,
-			Options			: false,
-			OverText		: false,
-			Request			: false,
-			Scroller		: false,
-			Slick			: false,
-			Slider			: false,
-			Sortables		: false,
-			Spinner			: false,
-			Swiff			: false,
-			Tips			: false,
-			Type			: false,
-			typeOf			: false,
-			URI				: false,
-			Window			: false
+			"$"           : false,
+			"$$"          : false,
+			Asset         : false,
+			Browser       : false,
+			Chain         : false,
+			Class         : false,
+			Color         : false,
+			Cookie        : false,
+			Core          : false,
+			Document      : false,
+			DomReady      : false,
+			DOMEvent      : false,
+			DOMReady      : false,
+			Drag          : false,
+			Element       : false,
+			Elements      : false,
+			Event         : false,
+			Events        : false,
+			Fx            : false,
+			Group         : false,
+			Hash          : false,
+			HtmlTable     : false,
+			Iframe        : false,
+			IframeShim    : false,
+			InputValidator: false,
+			instanceOf    : false,
+			Keyboard      : false,
+			Locale        : false,
+			Mask          : false,
+			MooTools      : false,
+			Native        : false,
+			Options       : false,
+			OverText      : false,
+			Request       : false,
+			Scroller      : false,
+			Slick         : false,
+			Slider        : false,
+			Sortables     : false,
+			Spinner       : false,
+			Swiff         : false,
+			Tips          : false,
+			Type          : false,
+			typeOf        : false,
+			URI           : false,
+			Window        : false
 		},
 
 		nexttoken,
 
 		node = {
-			__filename	  : false,
-			__dirname	  : false,
-			Buffer		  : false,
-			console		  : false,
-			exports		  : true,  // In Node it is ok to exports = module.exports = foo();
-			GLOBAL		  : false,
-			global		  : false,
-			module		  : false,
-			process		  : false,
-			require		  : false,
-			setTimeout	  : false,
-			clearTimeout  : false,
-			setInterval   : false,
-			clearInterval : false
+			__filename   : false,
+			__dirname    : false,
+			Buffer       : false,
+			console      : false,
+			exports      : true,  // In Node it is ok to exports = module.exports = foo();
+			GLOBAL       : false,
+			global       : false,
+			module       : false,
+			process      : false,
+			require      : false,
+			setTimeout   : false,
+			clearTimeout : false,
+			setInterval  : false,
+			clearInterval: false
 		},
 
 		noreach,
@@ -641,44 +450,44 @@ var JSHINT = (function () {
 		prevtoken,
 
 		prototypejs = {
-			"$"				  : false,
-			"$$"			  : false,
-			"$A"			  : false,
-			"$F"			  : false,
-			"$H"			  : false,
-			"$R"			  : false,
-			"$break"		  : false,
-			"$continue"		  : false,
-			"$w"			  : false,
-			Abstract		  : false,
-			Ajax			  : false,
-			Class			  : false,
-			Enumerable		  : false,
-			Element			  : false,
-			Event			  : false,
-			Field			  : false,
-			Form			  : false,
-			Hash			  : false,
-			Insertion		  : false,
-			ObjectRange		  : false,
+			"$"               : false,
+			"$$"              : false,
+			"$A"              : false,
+			"$F"              : false,
+			"$H"              : false,
+			"$R"              : false,
+			"$break"          : false,
+			"$continue"       : false,
+			"$w"              : false,
+			Abstract          : false,
+			Ajax              : false,
+			Class             : false,
+			Enumerable        : false,
+			Element           : false,
+			Event             : false,
+			Field             : false,
+			Form              : false,
+			Hash              : false,
+			Insertion         : false,
+			ObjectRange       : false,
 			PeriodicalExecuter: false,
-			Position		  : false,
-			Prototype		  : false,
-			Selector		  : false,
-			Template		  : false,
-			Toggle			  : false,
-			Try				  : false,
-			Autocompleter	  : false,
-			Builder			  : false,
-			Control			  : false,
-			Draggable		  : false,
-			Draggables		  : false,
-			Droppables		  : false,
-			Effect			  : false,
-			Sortable		  : false,
+			Position          : false,
+			Prototype         : false,
+			Selector          : false,
+			Template          : false,
+			Toggle            : false,
+			Try               : false,
+			Autocompleter     : false,
+			Builder           : false,
+			Control           : false,
+			Draggable         : false,
+			Draggables        : false,
+			Droppables        : false,
+			Effect            : false,
+			Sortable          : false,
 			SortableObserver  : false,
-			Sound			  : false,
-			Scriptaculous	  : false
+			Sound             : false,
+			Scriptaculous     : false
 		},
 
 		quotmark,
@@ -686,68 +495,68 @@ var JSHINT = (function () {
 		rhino = {
 			defineClass  : false,
 			deserialize  : false,
-			gc			 : false,
-			help		 : false,
+			gc           : false,
+			help         : false,
 			importPackage: false,
-			"java"		 : false,
-			load		 : false,
-			loadClass	 : false,
-			print		 : false,
-			quit		 : false,
-			readFile	 : false,
-			readUrl		 : false,
-			runCommand	 : false,
-			seal		 : false,
-			serialize	 : false,
-			spawn		 : false,
-			sync		 : false,
-			toint32		 : false,
-			version		 : false
+			"java"       : false,
+			load         : false,
+			loadClass    : false,
+			print        : false,
+			quit         : false,
+			readFile     : false,
+			readUrl      : false,
+			runCommand   : false,
+			seal         : false,
+			serialize    : false,
+			spawn        : false,
+			sync         : false,
+			toint32      : false,
+			version      : false
 		},
 
-		scope,		// The current scope
+		scope,  // The current scope
 		stack,
 
 		// standard contains the global names that are provided by the
 		// ECMAScript standard.
 		standard = {
-			Array				: false,
-			Boolean				: false,
-			Date				: false,
-			decodeURI			: false,
-			decodeURIComponent	: false,
-			encodeURI			: false,
-			encodeURIComponent	: false,
-			Error				: false,
-			"eval"				: false,
-			EvalError			: false,
-			Function			: false,
-			hasOwnProperty		: false,
-			isFinite			: false,
-			isNaN				: false,
-			JSON				: false,
-			Map					: false,
-			Math				: false,
-			NaN					: false,
-			Number				: false,
-			Object				: false,
-			parseInt			: false,
-			parseFloat			: false,
-			RangeError			: false,
-			ReferenceError		: false,
-			RegExp				: false,
-			Set					: false,
-			String				: false,
-			SyntaxError			: false,
-			TypeError			: false,
-			URIError			: false,
-			WeakMap				: false
+			Array             : false,
+			Boolean           : false,
+			Date              : false,
+			decodeURI         : false,
+			decodeURIComponent: false,
+			encodeURI         : false,
+			encodeURIComponent: false,
+			Error             : false,
+			"eval"            : false,
+			EvalError         : false,
+			Function          : false,
+			hasOwnProperty    : false,
+			isFinite          : false,
+			isNaN             : false,
+			JSON              : false,
+			Map               : false,
+			Math              : false,
+			NaN               : false,
+			Number            : false,
+			Object            : false,
+			parseInt          : false,
+			parseFloat        : false,
+			RangeError        : false,
+			ReferenceError    : false,
+			RegExp            : false,
+			Set               : false,
+			String            : false,
+			SyntaxError       : false,
+			TypeError         : false,
+			URIError          : false,
+			WeakMap           : false
 		},
 
 		// widely adopted global names that are not part of ECMAScript standard
 		nonstandard = {
-			escape				: false,
-			unescape			: false
+			escape  : false,
+			unescape: false
 		},
 
 		directive,
@@ -760,30 +569,31 @@ var JSHINT = (function () {
 		warnings,
 
 		worker = {
-			importScripts		: true,
-			postMessage			: true,
-			self				: true
+			importScripts: true,
+			postMessage  : true,
+			self         : true
 		},
 
 		wsh = {
-			ActiveXObject			  : true,
-			Enumerator				  : true,
-			GetObject				  : true,
-			ScriptEngine			  : true,
-			ScriptEngineBuildVersion  : true,
-			ScriptEngineMajorVersion  : true,
-			ScriptEngineMinorVersion  : true,
-			VBArray					  : true,
-			WSH						  : true,
-			WScript					  : true,
-			XDomainRequest			  : true
+			ActiveXObject            : true,
+			Enumerator               : true,
+			GetObject                : true,
+			ScriptEngine             : true,
+			ScriptEngineBuildVersion : true,
+			ScriptEngineMajorVersion : true,
+			ScriptEngineMinorVersion : true,
+			VBArray                  : true,
+			WSH                      : true,
+			WScript                  : true,
+			XDomainRequest           : true
 		},
 
 		yui = {
-			YUI				: false,
-			Y				: false,
-			YUI_config		: false
+			YUI       : false,
+			Y         : false,
+			YUI_config: false
 		};
+
 	// Regular expressions. Some of these are stupidly long.
 	var ax, cx, tx, nx, nxg, lx, ix, jx, ft;
 	(function () {
@@ -3523,16 +3333,16 @@ loop:
 		scope  = Object.create(scope);
 
 		funct = {
-			"(name)"	 : name || "\"" + anonname + "\"",
-			"(line)"	 : nexttoken.line,
+			"(name)"     : name || "\"" + anonname + "\"",
+			"(line)"     : nexttoken.line,
 			"(character)": nexttoken.character,
 			"(context)"  : funct,
 			"(breakage)" : 0,
 			"(loopage)"  : 0,
 			"(metrics)"  : createMetrics(nexttoken),
-			"(scope)"	 : scope,
+			"(scope)"    : scope,
 			"(statement)": statement,
-			"(tokens)"	 : {}
+			"(tokens)"   : {}
 		};
 
 		f = funct;
@@ -3939,17 +3749,17 @@ loop:
 			advance(")");
 
 			funct = {
-				"(name)"	 : "(catch)",
-				"(line)"	 : nexttoken.line,
+				"(name)"     : "(catch)",
+				"(line)"     : nexttoken.line,
 				"(character)": nexttoken.character,
 				"(context)"  : funct,
 				"(breakage)" : funct["(breakage)"],
 				"(loopage)"  : funct["(loopage)"],
-				"(scope)"	 : scope,
+				"(scope)"    : scope,
 				"(statement)": false,
 				"(metrics)"  : createMetrics(nexttoken),
-				"(catch)"	 : true,
-				"(tokens)"	 : {}
+				"(catch)"    : true,
+				"(tokens)"   : {}
 			};
 
 			if (e) {
