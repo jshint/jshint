@@ -58,7 +58,7 @@ target.lint = function () {
 
 	echo("\n");
 
-	if (Object.keys(failures).length == 0) {
+	if (Object.keys(failures).length === 0) {
 		cli.ok("All files passed.");
 		return;
 	}
