@@ -33,7 +33,7 @@ target.all = function () {
 };
 
 target.lint = function () {
-	var jshint = require("jshint").JSHINT;
+	var jshint = require(__dirname).JSHINT;
 	var files = find("src").filter(function (file) {
 		return file.match(/\.js$/);
 	});
