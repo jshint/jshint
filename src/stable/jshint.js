@@ -1530,7 +1530,7 @@ klass:
 												}
 												break;
 											case "/":
-												warningAt("Unescaped '{a}'.",
+												warningAt("'{a}' in character sets should be escaped.",
 														line, from + l - 1, "/");
 
 												if (isInRange) {
