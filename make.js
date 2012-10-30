@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/*global ls:true, target:true, find: true, echo: true, cat:true, exit:true, exec: true */
 
 "use strict";
 
