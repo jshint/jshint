@@ -64,23 +64,23 @@ target.lint = function () {
 		return;
 	}
 
+	var outputError = function (err) {
+		if (!err) {
+			return;
+		}
+
+		var line = "[L" + err.line + "]";
+		while (line.length < 10) {
+			line += " ";
+		}
+
+		echo(line, err.reason);
+		echo("\n");
+	};
+
 	for (var key in failures) {
 		cli.error(key);
-
-		failures[key].errors.forEach(function (err) {
-			if (!err) {
-				return;
-			}
-
-			var line = "[L" + err.line + "]";
-			while (line.length < 10) {
-				line += " ";
-			}
-
-			echo(line, err.reason);
-		});
-
-		echo("\n");
+		failures[key].errors.forEach(outputError);
 	}
 
 	exit(1);
