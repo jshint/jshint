@@ -2,45 +2,6 @@
 
 var _ = require("underscore");
 
-// Identifiers provided by the ECMAScript standard
-
-exports.reservedVars = {
-	undefined : false,
-	arguments : false,
-	NaN       : false
-};
-
-exports.ecmaIdentifiers = {
-	Array              : false,
-	Boolean            : false,
-	Date               : false,
-	decodeURI          : false,
-	decodeURIComponent : false,
-	encodeURI          : false,
-	encodeURIComponent : false,
-	Error              : false,
-	"eval"             : false,
-	EvalError          : false,
-	Function           : false,
-	hasOwnProperty     : false,
-	isFinite           : false,
-	isNaN              : false,
-	JSON               : false,
-	Math               : false,
-	Number             : false,
-	Object             : false,
-	parseInt           : false,
-	parseFloat         : false,
-	RangeError         : false,
-	ReferenceError     : false,
-	RegExp             : false,
-	String             : false,
-	SyntaxError        : false,
-	TypeError          : false,
-	URIError           : false
-};
-
-
 // Errors and warnings
 
 var errors = {
