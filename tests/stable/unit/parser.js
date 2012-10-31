@@ -263,7 +263,7 @@ exports.regexp = function (test) {
 		.addError(9, "Unescaped '^'.")
 		.addError(9, "Unescaped '['.")
 		.addError(10, "Unescaped '-'.")
-		.addError(11, "Unescaped '/'.")
+		.addError(11, "'/' in character sets should be escaped.")
 		.addError(13, "Unescaped ']'.")
 		.addError(13, "Unescaped '}'.")
 		.addError(14, "Unescaped '?'.")
