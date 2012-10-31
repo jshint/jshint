@@ -777,7 +777,6 @@ var JSHINT = (function () {
 
 		if (option.node) {
 			combine(predefined, node);
-			option.globalstrict = true;
 		}
 
 		if (option.devel) {
@@ -928,6 +927,7 @@ var JSHINT = (function () {
 			// If smarttabs option is used check for spaces followed by tabs only.
 			// Otherwise check for any occurence of mixed tabs and spaces.
 			// Tabs and one space followed by block comment is allowed.
+
 			if (option.smarttabs) {
 				// negative look-behind for "//"
 				match = s.match(/(\/\/)? \t/);
@@ -4403,8 +4403,11 @@ loop:
 				break;
 			default:
 				directives();
-				if (directive["use strict"] && !option.globalstrict) {
-					warning("Use the function form of \"use strict\".", prevtoken);
+
+				if (directive["use strict"]) {
+					if (!option.globalstrict && !option.node) {
+						warning("Use the function form of \"use strict\".", prevtoken);
+					}
 				}
 
 				statements();

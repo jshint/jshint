@@ -94,10 +94,14 @@ exports.node = function (test) {
 
 	TestRun(test)
 		.addError(1, 'Use the function form of "use strict".')
-		.test(globalStrict);
+		.test(globalStrict, { strict: true });
 
 	TestRun(test)
-		.test(globalStrict, { node: true });
+		.test(globalStrict, { node: true, strict: true });
+
+	// Don't assume strict:true for Node environments. See bug GH-721.
+	TestRun(test)
+		.test("function test() { return; }", { node: true });
 
 	// Make sure that we can do fancy Node export
 
