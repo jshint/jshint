@@ -6,7 +6,7 @@ var events    = require("events");
 var utils     = require("./utils.js");
 var reason    = require("./reason.js");
 var regexp    = require("./regexp.js");
-var constants = require("./constants.js");
+var vars      = require("../shared/vars.js");
 
 var MAXERR = 50;
 
@@ -43,8 +43,8 @@ function Linter(code) {
 	// Pre-populate globals array with reserved variables,
 	// standard ECMAScript globals and user-supplied globals.
 
-	this.setGlobals(constants.reservedVars);
-	this.setGlobals(constants.ecmaIdentifiers);
+	this.setGlobals(vars.reservedVars);
+	this.setGlobals(vars.ecmaIdentifiers);
 }
 
 Linter.prototype = {
