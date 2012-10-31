@@ -24,7 +24,8 @@ var OPTIONS = {
 	newcap: false,
 	undef: true,
 	unused: true,
-	onecase: true
+	onecase: true,
+	indent: 2
 };
 
 target.all = function () {
