@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/*global ls:true, target:true, find: true, echo: true, cat:true, exit:true, exec: true */
 
 "use strict";
 
@@ -36,7 +37,7 @@ target.lint = function () {
 	var jshint = require("jshint").JSHINT;
 	var files = find("src").filter(function (file) {
 		return file.match(/\.js$/);
-	});
+	}).concat(ls(__dirname + "/*.js"));
 
 	TESTS.forEach(function (dir) {
 		ls(dir + "*.js").forEach(function (file) {
@@ -58,28 +59,28 @@ target.lint = function () {
 
 	echo("\n");
 
-	if (Object.keys(failures).length == 0) {
+	if (Object.keys(failures).length === 0) {
 		cli.ok("All files passed.");
 		return;
 	}
 
+	var outputError = function (err) {
+		if (!err) {
+			return;
+		}
+
+		var line = "[L" + err.line + "]";
+		while (line.length < 10) {
+			line += " ";
+		}
+
+		echo(line, err.reason);
+		echo("\n");
+	};
+
 	for (var key in failures) {
 		cli.error(key);
-
-		failures[key].errors.forEach(function (err) {
-			if (!err) {
-				return;
-			}
-
-			var line = "[L" + err.line + "]";
-			while (line.length < 10) {
-				line += " ";
-			}
-
-			echo(line, err.reason);
-		});
-
-		echo("\n");
+		failures[key].errors.forEach(outputError);
 	}
 
 	exit(1);
