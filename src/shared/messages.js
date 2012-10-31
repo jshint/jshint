@@ -10,7 +10,7 @@ var errors = {
 	E004: "Expected '{a}' and instead saw '{b}'.",
 	E005: "Expected an identifier and instead saw '{a}'.",
 	E006: "Line breaking error '{a}'.",
-	E007: "Attempting to verride '{a}' which is a constant.",
+	E007: "Attempting to override '{a}' which is a constant.",
 	E008: "Bad assignment.",
 	E009: "Missing \"use strict\" statement.",
 	E010: "Strict violation.",
@@ -48,10 +48,11 @@ var errors = {
 	E041: "Expected a JSON value.",
 	E042: "Input is neither a string nor an array of strings.",
 	E043: "Input is empty.",
+	E044: "Unclosed string.",
 };
 
 var warnings = {
-	W001: "'{a}' is a really bad name.",
+	W001: "'hasOwnProperty' is a really bad name.",
 	W002: "Value of '{a}' may be overwritten in IE.",
 	W003: "'{a}' was used before it was defined.",
 	W004: "'{a}' is already defined.",
@@ -83,7 +84,7 @@ var warnings = {
 	W029: "Label '{a}' looks like a javascript url.",
 	W030: "Expected an assignment or function call and instead saw " +
 		"an expression.",
-	W031: "Do not use 'new' for side-effects.",
+	W031: "Do not use 'new' for side effects.",
 	W032: "Unnecessary semicolon.",
 	W033: "Missing semicolon.",
 	W034: "Unnecessary directive \"{a}\".",
@@ -102,7 +103,7 @@ var warnings = {
 	W055: "A constructor name should start with an uppercase letter.",
 	W056: "Bad constructor.",
 	W057: "Weird construction. Is 'new' unnecessary?",
-	W058: "Missing '()' invoking a constructor",
+	W058: "Missing '()' invoking a constructor.",
 	W059: "Avoid arguments.{a}.",
 	W060: "document.write can be a form of eval.",
 	W061: "eval can be harmful.",
@@ -154,10 +155,10 @@ var warnings = {
 	W101: "Line is too long.",
 	W102: "Trailing whitespace.",
 	W103: "The '{a}' property is deprecated.",
-	W104: "'{a}' is only available in JavaScript 1.7",
+	W104: "'{a}' is only available in JavaScript 1.7.",
 	W105: "Unexpected {a} in '{b}'.",
 	W106: "Identifier '{a}' is not in camel case.",
-	W107: "Script URL",
+	W107: "Script URL.",
 	W108: "Strings must use doublequote.",
 	W109: "Strings must use singlequote.",
 	W110: "Mixed double and single quotes.",
@@ -170,9 +171,9 @@ var warnings = {
 	W117: "Bad escapement of EOL. Use option multistr if needed.",
 	W118: "Bad escapement.",
 	W119: "Bad number '{a}'.",
-	W120: "Don't use extra leading zeroes '{a}'.",
+	W120: "Don't use extra leading zeros '{a}'.",
 	W121: "A trailing decimal point can be confused with a dot: '{a}'.",
-	W122: "Unterminated regular expression.",
+	W122: "{a} unterminated regular expression group(s).",
 	W123: "Unexpected control character in regular expression.",
 	W124: "Unexpected escaped character '{a}' in regular expression.",
 	W125: "Unescaped '{a}'.",
@@ -182,6 +183,7 @@ var warnings = {
 	W129: "Insecure '{a}'.",
 	W130: "Expected a number and instead saw '{a}'.",
 	W131: "'{a}' should not be greater than '{b}'.",
+	W132: "Expected '{a}' and instead saw '{b}'.",
 };
 
 var info = {

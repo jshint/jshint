@@ -581,7 +581,7 @@ exports.supernew = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/supernew.js', 'utf8');
 
 	TestRun(test)
-		.addError(1, "Weird construction. Delete 'new'.")
+		.addError(1, "Weird construction. Is 'new' unnecessary?")
 		.addError(9, "Missing '()' invoking a constructor.", { character: 1 })
 		.addError(11, "Missing '()' invoking a constructor.", {
 			character: 13
@@ -626,7 +626,7 @@ exports.debug = function (test) {
 
 	// By default disallow debugger statements.
 	TestRun(test)
-		.addError(1, "All 'debugger' statements should be removed.")
+		.addError(1, "Forgotten 'debugger' statement?")
 		.test(code);
 
 	// But allow them if debug is true.
@@ -666,14 +666,14 @@ exports.evil = function (test) {
 	];
 
 	TestRun(test)
-		.addError(1, "eval is evil.")
+		.addError(1, "eval can be harmful.")
 		.addError(2, "document.write can be a form of eval.")
 		.addError(3, "document.write can be a form of eval.")
-		.addError(4, "eval is evil.")
-		.addError(5, "The Function constructor is eval.")
-		.addError(6, "Implied eval is evil. Pass a function instead of a string.")
-		.addError(7, "Implied eval is evil. Pass a function instead of a string.")
-		.addError(8, "eval is evil.")
+		.addError(4, "eval can be harmful.")
+		.addError(5, "The Function constructor is a form of eval.")
+		.addError(6, "Implied eval. Consider passing a function instead of a string.")
+		.addError(7, "Implied eval. Consider passing a function instead of a string.")
+		.addError(8, "eval can be harmful.")
 		.test(src, { browser: true });
 
 	TestRun(test).test(src, { evil: true, browser: true });
@@ -700,11 +700,10 @@ exports.immed = function (test) {
 	TestRun(test).test(src);
 
 	TestRun(test)
-		.addError(3, "Wrap an immediate function invocation in parentheses " +
+		.addError(3, "Wrap an immediate function invocation in parens " +
 					 "to assist the reader in understanding that the expression " +
 					 "is the result of a function, and not the function itself.")
-		.addError(13, "Do not wrap function literals in parens unless they are to " +
-					  "be immediately invoked.")
+		.addError(13, "Wrapping non-IIFE function literals in parens is unnecessary.")
 		.test(src, { immed: true });
 
 	test.done();
@@ -930,7 +929,7 @@ exports.laxbreak = function (test) {
 
 	TestRun(test)
 		.addError(2, "Bad line breaking before ','.")
-		.addError(3, "Comma warnings can be turned off with 'laxcomma'")
+		.addError(3, "Comma warnings can be turned off with 'laxcomma'.")
 		.addError(12, "Bad line breaking before ','.")
 		.test(src);
 
@@ -1035,18 +1034,6 @@ exports.regexdash = function (test) {
 		.addError(9, "Unescaped '-'.")
 		.addError(10, "Unescaped '-'.")
 		.test(code, { regexdash: true });
-
-	test.done();
-};
-
-exports.onecase = function (test) {
-	var code = "switch (a) { case '1': b(); }";
-
-	TestRun(test)
-		.addError(1, "This 'switch' should be an 'if'.")
-		.test(code);
-
-	TestRun(test).test(code, { onecase: true });
 
 	test.done();
 };
@@ -1213,8 +1200,8 @@ exports.esnext = function (test) {
 		.test(src, { esnext: true });
 
 	TestRun(test)
-		.addError(3, "const 'myConst' has already been declared")
-		.addError(4, "Attempting to override 'foo' which is a constant")
+		.addError(3, "const 'myConst' has already been declared.")
+		.addError(4, "Attempting to override 'foo' which is a constant.")
 		.test(code, { esnext: true });
 
 	test.done();
@@ -1227,7 +1214,7 @@ exports.maxlen = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/maxlen.js', 'utf8');
 
 	TestRun(test)
-		.addError(3, "Line too long.")
+		.addError(3, "Line is too long.")
 		.test(src, { maxlen: 23 });
 
 	test.done();
@@ -1258,7 +1245,7 @@ exports.laxcomma = function (test) {
 	// All errors.
 	TestRun(test)
 		.addError(1, "Bad line breaking before ','.")
-		.addError(2, "Comma warnings can be turned off with 'laxcomma'")
+		.addError(2, "Comma warnings can be turned off with 'laxcomma'.")
 		.addError(2, "Bad line breaking before ','.")
 		.addError(6, "Bad line breaking before ','.")
 		.addError(10, "Bad line breaking before '&&'.")
@@ -1268,7 +1255,7 @@ exports.laxcomma = function (test) {
 	// Allows bad line breaking, but not on commas.
 	TestRun(test)
 		.addError(1, "Bad line breaking before ','.")
-		.addError(2, "Comma warnings can be turned off with 'laxcomma'")
+		.addError(2, "Comma warnings can be turned off with 'laxcomma'.")
 		.addError(2, "Bad line breaking before ','.")
 		.addError(6, "Bad line breaking before ','.")
 		.test(src, { laxbreak: true });
@@ -1372,7 +1359,7 @@ exports.maxstatements = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/max-statements-per-function.js', 'utf8');
 
 	TestRun(test)
-		.addError(1, "Too many statements per function (8).")
+		.addError(1, "This function has too many statements. (8)")
 		.test(src, { maxstatements: 7 });
 
 	TestRun(test)
@@ -1392,12 +1379,12 @@ exports.maxdepth = function (test) {
 	var src = fs.readFileSync(__dirname + fixture, 'utf8');
 
 	TestRun(test)
-		.addError(5, "Blocks are nested too deeply (2).")
-		.addError(14, "Blocks are nested too deeply (2).")
+		.addError(5, "Blocks are nested too deeply. (2)")
+		.addError(14, "Blocks are nested too deeply. (2)")
 		.test(src, { maxdepth: 1 });
 
 	TestRun(test)
-		.addError(9, "Blocks are nested too deeply (3).")
+		.addError(9, "Blocks are nested too deeply. (3)")
 		.test(src, { maxdepth: 2 });
 
 	TestRun(test)
@@ -1417,7 +1404,7 @@ exports.maxparams = function (test) {
 	var src = fs.readFileSync(__dirname + fixture, 'utf8');
 
 	TestRun(test)
-		.addError(4, "Too many parameters per function (3).")
+		.addError(4, "This function has too many parameters. (3)")
 		.test(src, { maxparams: 2 });
 
 	TestRun(test)
@@ -1437,10 +1424,10 @@ exports.maxcomplexity = function (test) {
 	var src = fs.readFileSync(__dirname + fixture, 'utf8');
 
 	TestRun(test)
-		.addError(8, "Cyclomatic complexity is too high per function (2).")
-		.addError(15, "Cyclomatic complexity is too high per function (2).")
-		.addError(25, "Cyclomatic complexity is too high per function (2).")
-		.addError(47, "Cyclomatic complexity is too high per function (8).")
+		.addError(8, "This function's cyclomatic complexity is too high. (2)")
+		.addError(15, "This function's cyclomatic complexity is too high. (2)")
+		.addError(25, "This function's cyclomatic complexity is too high. (2)")
+		.addError(47, "This function's cyclomatic complexity is too high. (8)")
 		.test(src, { maxcomplexity: 1 });
 
 	TestRun(test)
