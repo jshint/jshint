@@ -180,6 +180,8 @@ var JSHINT = (function () {
 
 		declared, // Globals that were declared using /*global ... */ syntax.
 
+		exported, // Variables known to be unused declared using /*exported ... */
+
 		funct, // The current function
 
 		functionicity = [
@@ -228,7 +230,7 @@ var JSHINT = (function () {
 		cx = /[\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/;
 
 		// token
-		tx = /^\s*([(){}\[.,:;'"~\?\]#@]|==?=?|\/=(?!(\S*\/[gim]?))|\/(\*(jshint|jslint|members?|global)?|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|%=?|&[&=]?|\|[|=]?|>>?>?=?|<([\/=!]|\!(\[|--)?|<=?)?|\^=?|\!=?=?|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+\-]?[0-9]+)?)/;
+		tx = /^\s*([(){}\[.,:;'"~\?\]#@]|==?=?|\/=(?!(\S*\/[gim]?))|\/(\*(jshint|jslint|members?|global|exported)?|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|%=?|&[&=]?|\|[|=]?|>>?>?=?|<([\/=!]|\!(\[|--)?|<=?)?|\^=?|\!=?=?|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+\-]?[0-9]+)?)/;
 
 		// characters in strings that need escapement
 		nx = /[\u0000-\u001f&<"\/\\\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/;
@@ -1042,6 +1044,7 @@ unclosedString:
 						case "/*jshint":
 						case "/*jslint":
 						case "/*global":
+						case "/*exported":
 						case "*/":
 							return {
 								value: t,
@@ -1400,7 +1403,8 @@ klass:
 		var o  = nt.value;
 		var quotmarkValue = option.quotmark;
 		var predef = {};
-		var b, obj, filter, t, tn, v, minus;
+		var exp = {};
+		var b, obj, filter, t, tn, v, minus, key;
 
 		switch (o) {
 		case "*/":
@@ -1422,6 +1426,9 @@ klass:
 			break;
 		case "/*global":
 			obj = predef;
+			break;
+		case "/*exported":
+			obj = exp;
 			break;
 		default:
 			error("E021");
@@ -1547,7 +1554,13 @@ loop:
 
 		combine(predefined, predef);
 
-		for (var key in predef) {
+		for (key in exp) {
+			if (is_own(exp, key)) {
+				exported[key] = exp[key];
+			}
+		}
+
+		for (key in predef) {
 			if (is_own(predef, key)) {
 				declared[key] = nt;
 			}
@@ -3917,6 +3930,7 @@ loop:
 
 		predefined = Object.create(vars.ecmaIdentifiers);
 		declared = Object.create(null);
+		exported = Object.create(null);
 		combine(predefined, g || {});
 
 		if (o) {
@@ -4107,6 +4121,10 @@ loop:
 
 				// Params are checked separately from other variables.
 				if (func["(params)"] && func["(params)"].indexOf(key) !== -1)
+					return;
+
+				// Expression is in global scope and is exported
+				if (func["(global)"] && is_own(exported, key))
 					return;
 
 				warnUnused(key, token);
