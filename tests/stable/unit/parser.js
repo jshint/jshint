@@ -14,7 +14,7 @@ exports.unsafe = function (test) {
 	];
 
 	TestRun(test)
-		.addError(1, "Unsafe character.")
+		.addError(1, "This character may get silently deleted by one or more browsers.")
 		.test(code);
 
 	test.done();
@@ -46,10 +46,10 @@ exports.confusingOps = function (test) {
 	];
 
 	TestRun(test)
-		.addError(1, "Confusing minusses.")
-		.addError(2, "Confusing plusses.")
-		.addError(3, "Confusing minusses.")
-		.addError(4, "Confusing plusses.")
+		.addError(1, "Confusing minuses.")
+		.addError(2, "Confusing pluses.")
+		.addError(3, "Confusing minuses.")
+		.addError(4, "Confusing pluses.")
 		.test(code);
 
 	test.done();
@@ -137,10 +137,10 @@ exports.options = function (test) {
 
 	TestRun(test)
 		.addError(3, "Unexpected /*member 'c'.")
-		.addError(4, "Bad option.")
+		.addError(4, "Bad option: '+++'.")
 		.addError(4, "Missing option value.")
 		.addError(5, "Expected a small integer and instead saw '-'.")
-		.addError(5, "Bad option.")
+		.addError(5, "Bad option: '2'.")
 		.addError(5, "Missing option value.")
 		.addError(6, "Expected a small integer and instead saw '100.4'.")
 		.addError(7, "Expected a small integer and instead saw '200.4'.")
@@ -173,6 +173,7 @@ exports.shebang = function (test) {
 
 exports.numbers = function (test) {
 	/*jshint maxlen: 300*/
+
 	var code = [
 		"var a = 10e307;",
 		"var b = 10e308;",
@@ -193,7 +194,7 @@ exports.numbers = function (test) {
 		.addError(6, "Missing semicolon.")
 		.addError(6, "Expected an assignment or function call and instead saw an expression.")
 		.addError(7, "Don't use extra leading zeros '0033'.")
-		.addError(8, "A trailing decimal point can be confused with a dot '3.'.")
+		.addError(8, "A trailing decimal point can be confused with a dot: '3.'.")
 		.addError(9, "A dot following a number can be confused with a decimal point.")
 		.test(code);
 
@@ -249,9 +250,9 @@ exports.regexp = function (test) {
 	];
 
 	TestRun(test)
-		.addError(1, "Unsafe character.")
+		.addError(1, "This character may get silently deleted by one or more browsers.")
 		.addError(1, "Unexpected control character in regular expression.")
-		.addError(2, "Unsafe character.")
+		.addError(2, "This character may get silently deleted by one or more browsers.")
 		.addError(2, "Unexpected control character in regular expression.")
 		.addError(3, "Unexpected escaped character '<' in regular expression.")
 		.addError(4, "Unexpected escaped character '<' in regular expression.")
@@ -319,7 +320,7 @@ exports.strings = function (test) {
 
 	TestRun(test)
 		.addError(1, "Control character in string: .")
-		.addError(1, "Unsafe character.")
+		.addError(1, "This character may get silently deleted by one or more browsers.")
 		.addError(2, "Bad escapement.")
 		.addError(3, "Unnecessary escapement.")
 		.addError(4, "Unclosed string.")
@@ -363,7 +364,7 @@ exports.jsonMode = function (test) {
 		.addError(4, "Avoid \\x-.")
 		.addError(4, "Strings must use doublequote.")
 		.addError(5, "Avoid EOL escapement.")
-		.addError(7, "Avoid 0x-. '0x332'.")
+		.addError(7, "Avoid 0x-.")
 		.test(code, {multistr: true});
 
 	test.done();

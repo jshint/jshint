@@ -1,7 +1,7 @@
 "use strict";
 
 var _ = require("underscore");
-var constants = require('./constants');
+var vars = require("../shared/vars.js");
 
 exports.register = function (linter) {
 	var report = linter.report;
@@ -267,7 +267,7 @@ exports.register = function (linter) {
 				return false;
 
 			return expr.object.name in
-				constants.ecmaIdentifiers && expr.property.name === "prototype";
+				vars.ecmaIdentifiers && expr.property.name === "prototype";
 		}
 
 		if (left.type !== "MemberExpression")
