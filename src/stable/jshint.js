@@ -547,7 +547,7 @@ var JSHINT = (function () {
 	 * Lexical analysis and token construction.
 	 */
 	var lex = (function lex() {
-		var character, from, line, s;
+		var character, from, line, input;
 
 		// Private lex methods
 
@@ -559,7 +559,7 @@ var JSHINT = (function () {
 			}
 
 			character = 1;
-			s = lines[line];
+			input = lines[line];
 			line += 1;
 
 			// If smarttabs option is used check for spaces followed by tabs only.
@@ -568,10 +568,10 @@ var JSHINT = (function () {
 
 			if (option.smarttabs) {
 				// negative look-behind for "//"
-				match = s.match(/(\/\/)? \t/);
+				match = input.match(/(\/\/)? \t/);
 				at = match && !match[1] ? 0 : -1;
 			} else {
-				at = s.search(/ \t|\t [^\*]/);
+				at = input.search(/ \t|\t [^\*]/);
 			}
 
 			// Warn about mixed spaces and tabs.
@@ -580,12 +580,12 @@ var JSHINT = (function () {
 				warningAt("W099", line, at + 1);
 			}
 
-			s = s.replace(/\t/g, tab);
+			input = input.replace(/\t/g, tab);
 
 			// Warn about unsafe characters that get silently deleted by one
 			// or more browsers.
 
-			at = s.search(cx);
+			at = input.search(cx);
 			if (at >= 0) {
 				warningAt("W100", line, at);
 			}
@@ -593,14 +593,14 @@ var JSHINT = (function () {
 			// If there is a limit on line length, warn when lines get too
 			// long.
 
-			if (option.maxlen && option.maxlen < s.length) {
-				warningAt("W101", line, s.length);
+			if (option.maxlen && option.maxlen < input.length) {
+				warningAt("W101", line, input.length);
 			}
 
 			// Check for trailing whitespaces
 
-			var tw = option.trailing && s.match(/^(.*?)\s+$/);
-			if (tw && !/^\s+$/.test(s)) {
+			var tw = option.trailing && input.match(/^(.*?)\s+$/);
+			if (tw && !/^\s+$/.test(input)) {
 				warningAt("W102", line, tw[1].length + 1);
 			}
 
@@ -648,7 +648,7 @@ var JSHINT = (function () {
 				}
 			}
 
-			if (type === "(color)" || type === "(range)") {
+			if (type === "(range)") {
 				t = {type: type};
 			} else if (type === "(punctuator)" ||
 					(type === "(identifier)" && is_own(syntax, value))) {
@@ -711,21 +711,21 @@ var JSHINT = (function () {
 				var c, value = "";
 				from = character;
 
-				if (s.charAt(0) !== begin) {
-					errorAt("E004", line, character, begin, s.charAt(0));
+				if (input.charAt(0) !== begin) {
+					errorAt("E004", line, character, begin, input.charAt(0));
 				}
 
 				for (;;) {
-					s = s.slice(1);
+					input = input.slice(1);
 					character += 1;
-					c = s.charAt(0);
+					c = input.charAt(0);
 
 					switch (c) {
 					case "":
 						errorAt("E013", line, character, c);
 						break;
 					case end:
-						s = s.slice(1);
+						input = input.slice(1);
 						character += 1;
 						return it("(range)", value);
 					case "\\":
@@ -746,13 +746,13 @@ var JSHINT = (function () {
 				var b, c, captures, d, depth, high, i, l, low, q, t, isLiteral, isInRange, n;
 
 				function match(x) {
-					var r = x.exec(s), r1;
+					var r = x.exec(input), r1;
 
 					if (r) {
 						l = r[0].length;
 						r1 = r[1];
 						c = r1.charAt(0);
-						s = s.substr(l);
+						input = input.substr(l);
 						from = character + l - r1.length;
 						character += l;
 						return r1;
@@ -797,7 +797,7 @@ var JSHINT = (function () {
 					}
 
 					function esc(n) {
-						var i = parseInt(s.substr(j + 1, n), 16);
+						var i = parseInt(input.substr(j + 1, n), 16);
 						j += n;
 
 						// Warn about unnecessary escapements.
@@ -813,7 +813,7 @@ var JSHINT = (function () {
 
 unclosedString:
 					for (;;) {
-						while (j >= s.length) {
+						while (j >= input.length) {
 							j = 0;
 
 							var cl = line;
@@ -832,10 +832,10 @@ unclosedString:
 							}
 						}
 
-						c = s.charAt(j);
+						c = input.charAt(j);
 						if (c === x) {
 							character += 1;
-							s = s.substr(j + 1);
+							input = input.substr(j + 1);
 							return it("(string)", r, x);
 						}
 
@@ -845,12 +845,12 @@ unclosedString:
 							}
 
 							// Warn about a control character in a string.
-							warningAt("W113", line, character + j, s.slice(0, j));
+							warningAt("W113", line, character + j, input.slice(0, j));
 						} else if (c === "\\") {
 							j += 1;
 							character += 1;
-							c = s.charAt(j);
-							n = s.charAt(j + 1);
+							c = input.charAt(j);
+							n = input.charAt(j + 1);
 							switch (c) {
 							case "\\":
 							case "\"":
@@ -923,7 +923,7 @@ unclosedString:
 								warningAt("W117", line, character);
 								break;
 							case "!":
-								if (s.charAt(j - 2) === "<")
+								if (input.charAt(j - 2) === "<")
 									break;
 
 								/*falls through*/
@@ -940,7 +940,7 @@ unclosedString:
 				}
 
 				for (;;) {
-					if (!s) {
+					if (!input) {
 						return it(nextLine() ? "(endline)" : "(end)", "");
 					}
 
@@ -950,13 +950,13 @@ unclosedString:
 						t = "";
 						c = "";
 
-						while (s && s < "!") {
-							s = s.substr(1);
+						while (input && input < "!") {
+							input = input.substr(1);
 						}
 
-						if (s) {
-							errorAt("E014", line, character, s.substr(0, 1));
-							s = "";
+						if (input) {
+							errorAt("E014", line, character, input.substr(0, 1));
+							input = "";
 						}
 					} else {
 
@@ -976,7 +976,7 @@ unclosedString:
 								warningAt("W119", line, character, t);
 							}
 
-							if (isAlpha(s.substr(0, 1))) {
+							if (isAlpha(input.substr(0, 1))) {
 								warningAt("W013", line, character, t);
 							}
 
@@ -1011,7 +1011,7 @@ unclosedString:
 						// Single line comment
 
 						case "//":
-							s = "";
+							input = "";
 							token.comment = true;
 							break;
 
@@ -1019,7 +1019,7 @@ unclosedString:
 
 						case "/*":
 							for (;;) {
-								i = s.search(lx);
+								i = input.search(lx);
 								if (i >= 0) {
 									break;
 								}
@@ -1030,7 +1030,7 @@ unclosedString:
 								}
 							}
 
-							s = s.substr(i + 2);
+							input = input.substr(i + 2);
 							token.comment = true;
 							break;
 
@@ -1057,7 +1057,7 @@ unclosedString:
 
 						case "/":
 							// Warn about '/=' (it can be confused with /= operator.
-							if (s.charAt(0) === "=") {
+							if (input.charAt(0) === "=") {
 								errorAt("E016", line, from);
 							}
 
@@ -1067,7 +1067,7 @@ unclosedString:
 								l = 0;
 								for (;;) {
 									b = true;
-									c = s.charAt(l);
+									c = input.charAt(l);
 									l += 1;
 									switch (c) {
 									case "":
@@ -1080,7 +1080,7 @@ unclosedString:
 											warningAt("W122", line, from + l, depth);
 										}
 
-										c = s.substr(0, l - 1);
+										c = input.substr(0, l - 1);
 
 										q = {
 											g: true,
@@ -1088,14 +1088,14 @@ unclosedString:
 											m: true
 										};
 
-										while (q[s.charAt(l)] === true) {
-											q[s.charAt(l)] = false;
+										while (q[input.charAt(l)] === true) {
+											q[input.charAt(l)] = false;
 											l += 1;
 										}
 
 										character += l;
-										s = s.substr(l);
-										q = s.charAt(0);
+										input = input.substr(l);
+										q = input.charAt(0);
 
 										if (q === "/" || q === "*") {
 											errorAt("E018", line, from);
@@ -1103,7 +1103,7 @@ unclosedString:
 
 										return it("(regexp)", c);
 									case "\\":
-										c = s.charAt(l);
+										c = input.charAt(l);
 
 										if (c < " ") {
 											// Unexpected control character.
@@ -1118,16 +1118,16 @@ unclosedString:
 									case "(":
 										depth += 1;
 										b = false;
-										if (s.charAt(l) === "?") {
+										if (input.charAt(l) === "?") {
 											l += 1;
-											switch (s.charAt(l)) {
+											switch (input.charAt(l)) {
 											case ":":
 											case "=":
 											case "!":
 												l += 1;
 												break;
 											default:
-												warningAt("W132", line, from + l, ":", s.charAt(l));
+												warningAt("W132", line, from + l, ":", input.charAt(l));
 											}
 										} else {
 											captures += 1;
@@ -1146,7 +1146,7 @@ unclosedString:
 										break;
 									case " ":
 										q = 1;
-										while (s.charAt(l) === " ") {
+										while (input.charAt(l) === " ") {
 											l += 1;
 											q += 1;
 										}
@@ -1155,10 +1155,10 @@ unclosedString:
 										}
 										break;
 									case "[":
-										c = s.charAt(l);
+										c = input.charAt(l);
 										if (c === "^") {
 											l += 1;
-											if (s.charAt(l) === "]") {
+											if (input.charAt(l) === "]") {
 												errorAt("E019", line, from + l, "^");
 											}
 										}
@@ -1169,7 +1169,7 @@ unclosedString:
 										isInRange = false;
 klass:
 										do {
-											c = s.charAt(l);
+											c = input.charAt(l);
 											l += 1;
 											switch (c) {
 											case "[":
@@ -1189,11 +1189,11 @@ klass:
 													isInRange = true;
 												} else if (isInRange) {
 													isInRange = false;
-												} else if (s.charAt(l) === "]") {
+												} else if (input.charAt(l) === "]") {
 													isInRange = true;
 												} else {
 													if (option.regexdash !== (l === 2 || (l === 3 &&
-														s.charAt(1) === "^"))) {
+														input.charAt(1) === "^"))) {
 														warningAt("W125", line, from + l - 1, "-");
 													}
 													isLiteral = true;
@@ -1205,7 +1205,7 @@ klass:
 												}
 												break klass;
 											case "\\":
-												c = s.charAt(l);
+												c = input.charAt(l);
 
 												if (c < " ") {
 													warningAt("W123", line, from + l);
@@ -1269,18 +1269,18 @@ klass:
 									}
 
 									if (b) {
-										switch (s.charAt(l)) {
+										switch (input.charAt(l)) {
 										case "?":
 										case "+":
 										case "*":
 											l += 1;
-											if (s.charAt(l) === "?") {
+											if (input.charAt(l) === "?") {
 												l += 1;
 											}
 											break;
 										case "{":
 											l += 1;
-											c = s.charAt(l);
+											c = input.charAt(l);
 											if (c < "0" || c > "9") {
 												warningAt("W130", line, from + l, c);
 												break; // No reason to continue checking numbers.
@@ -1288,7 +1288,7 @@ klass:
 											l += 1;
 											low = +c;
 											for (;;) {
-												c = s.charAt(l);
+												c = input.charAt(l);
 												if (c < "0" || c > "9") {
 													break;
 												}
@@ -1299,12 +1299,12 @@ klass:
 											if (c === ",") {
 												l += 1;
 												high = Infinity;
-												c = s.charAt(l);
+												c = input.charAt(l);
 												if (c >= "0" && c <= "9") {
 													l += 1;
 													high = +c;
 													for (;;) {
-														c = s.charAt(l);
+														c = input.charAt(l);
 														if (c < "0" || c > "9") {
 															break;
 														}
@@ -1313,12 +1313,12 @@ klass:
 													}
 												}
 											}
-											if (s.charAt(l) !== "}") {
+											if (input.charAt(l) !== "}") {
 												warningAt("W132", line, from + l, "}", c);
 											} else {
 												l += 1;
 											}
-											if (s.charAt(l) === "?") {
+											if (input.charAt(l) === "?") {
 												l += 1;
 											}
 											if (low > high) {
@@ -1327,9 +1327,9 @@ klass:
 										}
 									}
 								}
-								c = s.substr(0, l - 1);
+								c = input.substr(0, l - 1);
 								character += l;
-								s = s.substr(l);
+								input = input.substr(l);
 								return it("(regexp)", c);
 							}
 							return it("(punctuator)", t);
