@@ -49,7 +49,7 @@ exports.testNewArray = function (test) {
 	TestRun(test).test(code2);
 
 	TestRun(test)
-		.addError(1, "Use the array literal notation [].")
+		.addError(1, "The array literal notation [] is preferrable.")
 		.test('new Array();');
 
 	test.done();
@@ -92,11 +92,11 @@ exports.testNewObject = function (test) {
 	TestRun(test).test(code1);
 
 	TestRun(test)
-		.addError(1, "Use the object literal notation {}.")
+		.addError(1, "The object literal notation {} is preferrable.")
 		.test('Object();');
 
 	TestRun(test)
-		.addError(1, "Use the object literal notation {}.")
+		.addError(1, "The object literal notation {} is preferrable.")
 		.test('new Object();');
 
 	test.done();
@@ -209,8 +209,8 @@ exports.testMissingSpaces = function (test) {
 exports.functionScopedOptions = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/functionScopedOptions.js', 'utf8');
 	TestRun(test)
-		.addError(1, "eval is evil.")
-		.addError(8, "eval is evil.")
+		.addError(1, "eval can be harmful.")
+		.addError(8, "eval can be harmful.")
 		.test(src);
 
 	test.done();
@@ -243,7 +243,6 @@ exports.jslintRenamed = function (test) {
 exports.caseExpressions = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/caseExpressions.js', 'utf8');
 	TestRun(test)
-		.addError(2, "This 'switch' should be an 'if'.")
 		.test(src);
 
 	test.done();
@@ -321,15 +320,15 @@ exports.insideEval = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/insideEval.js', 'utf8');
 
 	TestRun(test)
-		.addError(1, "eval is evil.")
-		.addError(3, "eval is evil.")
-		.addError(5, "eval is evil.")
-		.addError(7, "eval is evil.")
-		.addError(9, "eval is evil.")
-		.addError(11, "Implied eval is evil. Pass a function instead of a string.")
-		.addError(13, "Implied eval is evil. Pass a function instead of a string.")
-		.addError(15, "Implied eval is evil. Pass a function instead of a string.")
-		.addError(17, "Implied eval is evil. Pass a function instead of a string.")
+		.addError(1, "eval can be harmful.")
+		.addError(3, "eval can be harmful.")
+		.addError(5, "eval can be harmful.")
+		.addError(7, "eval can be harmful.")
+		.addError(9, "eval can be harmful.")
+		.addError(11, "Implied eval. Consider passing a function instead of a string.")
+		.addError(13, "Implied eval. Consider passing a function instead of a string.")
+		.addError(15, "Implied eval. Consider passing a function instead of a string.")
+		.addError(17, "Implied eval. Consider passing a function instead of a string.")
 
 		// The "TestRun" class (and these errors) probably needs some
 		// facility for checking the expected scope of the error
@@ -421,11 +420,11 @@ exports.testInvalidSource = function (test) {
 		.test({});
 
 	TestRun(test)
-		.addError(0, "Input is an empty string.")
+		.addError(0, "Input is empty.")
 		.test("");
 
 	TestRun(test)
-		.addError(0, "Input is an empty array.")
+		.addError(0, "Input is empty.")
 		.test([]);
 
 	test.done();
@@ -476,10 +475,10 @@ exports.testSparseArrays = function (test) {
 	var src = "var arr = ['a',, null,, '',, undefined,,];";
 
 	TestRun(test)
-		.addError(1, "Extra comma.")
-		.addError(1, "Extra comma.")
-		.addError(1, "Extra comma.")
-		.addError(1, "Extra comma.")
+		.addError(1, "Extra comma. (it breaks older versions of IE)")
+		.addError(1, "Extra comma. (it breaks older versions of IE)")
+		.addError(1, "Extra comma. (it breaks older versions of IE)")
+		.addError(1, "Extra comma. (it breaks older versions of IE)")
 		.test(src);
 
 	TestRun(test)
