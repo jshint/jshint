@@ -30,6 +30,7 @@
 
 /*jshint quotmark:double */
 
+var _ = require("underscore");
 var vars = require("../shared/vars.js");
 var messages = require("../shared/messages.js");
 var lex = require("./lex.js").lex;
@@ -211,12 +212,6 @@ var JSHINT = (function () {
 
 	function F() {}		// Used by Object.create
 
-	function is_own(object, name) {
-		// The object.hasOwnProperty method fails when the property under consideration
-		// is named 'hasOwnProperty'. So we have to use this more convoluted form.
-		return Object.prototype.hasOwnProperty.call(object, name);
-	}
-
 	function checkOption(name, t) {
 		if (valOptions[name] === undefined && boolOptions[name] === undefined) {
 			error("E001", t, name);
@@ -294,7 +289,7 @@ var JSHINT = (function () {
 		Object.keys = function (o) {
 			var a = [], k;
 			for (k in o) {
-				if (is_own(o, k)) {
+				if (_.has(o, k)) {
 					a.push(k);
 				}
 			}
@@ -324,7 +319,7 @@ var JSHINT = (function () {
 	function combine(t, o) {
 		var n;
 		for (n in o) {
-			if (is_own(o, n) && !is_own(JSHINT.blacklist, n)) {
+			if (_.has(o, n) && !_.has(JSHINT.blacklist, n)) {
 				t[n] = o[n];
 			}
 		}
@@ -503,14 +498,14 @@ var JSHINT = (function () {
 
 		// Define t in the current function in the current scope.
 		if (type === "exception") {
-			if (is_own(funct["(context)"], t)) {
+			if (_.has(funct["(context)"], t)) {
 				if (funct[t] !== true && !state.option.node) {
 					warning("W002", state.tokens.next, t);
 				}
 			}
 		}
 
-		if (is_own(funct, t) && !funct["(global)"]) {
+		if (_.has(funct, t) && !funct["(global)"]) {
 			if (funct[t] === true) {
 				if (state.option.latedef)
 					warning("W003", state.tokens.next, t);
@@ -529,7 +524,7 @@ var JSHINT = (function () {
 
 		if (funct["(global)"]) {
 			global[t] = funct;
-			if (is_own(implied, t)) {
+			if (_.has(implied, t)) {
 				if (state.option.latedef) {
 					warning("W003", state.tokens.next, t);
 				}
@@ -695,7 +690,7 @@ loop:
 		combine(predefined, predef);
 
 		for (var key in predef) {
-			if (is_own(predef, key)) {
+			if (_.has(predef, key)) {
 				declared[key] = nt;
 			}
 		}
@@ -1470,7 +1465,7 @@ loop:
 				if (isfunc) {
 					m = {};
 					for (d in state.directive) {
-						if (is_own(state.directive, d)) {
+						if (_.has(state.directive, d)) {
 							m[d] = state.directive[d];
 						}
 					}
@@ -1908,7 +1903,7 @@ loop:
 				default:
 					if (c.id !== "function") {
 						i = c.value.substr(0, 1);
-						if (state.option.newcap && (i < "A" || i > "Z") && !is_own(global, c.value)) {
+						if (state.option.newcap && (i < "A" || i > "Z") && !_.has(global, c.value)) {
 							warning("W055", state.tokens.curr);
 						}
 					}
@@ -2251,7 +2246,7 @@ loop:
 			var props = {}; // All properties, including accessors
 
 			function saveProperty(name, tkn) {
-				if (props[name] && is_own(props, name))
+				if (props[name] && _.has(props, name))
 					warning("W075", state.tokens.next, i);
 				else
 					props[name] = {};
@@ -2261,7 +2256,7 @@ loop:
 			}
 
 			function saveSetter(name, tkn) {
-				if (props[name] && is_own(props, name)) {
+				if (props[name] && _.has(props, name)) {
 					if (props[name].basic || props[name].setter)
 						warning("W075", state.tokens.next, i);
 				} else {
@@ -2273,7 +2268,7 @@ loop:
 			}
 
 			function saveGetter(name) {
-				if (props[name] && is_own(props, name)) {
+				if (props[name] && _.has(props, name)) {
 					if (props[name].basic || props[name].getter)
 						warning("W075", state.tokens.next, i);
 				} else {
@@ -2365,7 +2360,7 @@ loop:
 			// Check for lonely setters if in the ES5 mode.
 			if (state.option.es5) {
 				for (var name in props) {
-					if (is_own(props, name) && props[name].setter && !props[name].getter) {
+					if (_.has(props, name) && props[name].setter && !props[name].getter) {
 						warning("W078", props[name].setterToken);
 					}
 				}
@@ -2377,8 +2372,8 @@ loop:
 		};
 	}(delim("{")));
 
-// This Function is called when esnext option is set to true
-// it adds the `const` statement to JSHINT
+	// This Function is called when esnext option is set to true
+	// it adds the `const` statement to JSHINT
 
 	useESNextSyntax = function () {
 		var conststatement = stmt("const", function (prefix) {
@@ -2958,7 +2953,7 @@ loop:
 		return this;
 	}).exps = true;
 
-//	Superfluous reserved words
+	// Superfluous reserved words
 
 	reserve("class");
 	reserve("const");
@@ -3175,7 +3170,7 @@ loop:
 
 		// Check options
 		for (var name in o) {
-			if (is_own(o, name)) {
+			if (_.has(o, name)) {
 				checkOption(name, state.tokens.curr);
 			}
 		}
@@ -3293,7 +3288,7 @@ loop:
 
 			functions.forEach(function (func) {
 				for (var key in func) {
-					if (is_own(func, key)) {
+					if (_.has(func, key)) {
 						checkUnused(func, key);
 					}
 				}
@@ -3323,7 +3318,7 @@ loop:
 			});
 
 			for (var key in declared) {
-				if (is_own(declared, key) && !is_own(global, key)) {
+				if (_.has(declared, key) && !_.has(global, key)) {
 					warnUnused(key, declared[key]);
 				}
 			}
@@ -3376,7 +3371,7 @@ loop:
 		}
 
 		for (n in implied) {
-			if (is_own(implied, n)) {
+			if (_.has(implied, n)) {
 				implieds.push({
 					name: n,
 					line: implied[n]

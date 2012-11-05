@@ -4,21 +4,11 @@
 
 "use strict";
 
+var _ = require("underscore");
 var reg = require("./reg.js");
 var state = require("./state.js").state;
 
-var character, from, line, input, prereg;
-
-// Globals from jshint.js
-var warningAt;
-var errorAt;
-var quit;
-
-function is_own(object, name) {
-	// The object.hasOwnProperty method fails when the property under consideration
-	// is named 'hasOwnProperty'. So we have to use this more convoluted form.
-	return Object.prototype.hasOwnProperty.call(object, name);
-}
+// Helper functions
 
 function isAlpha(str) {
 	return (str >= "a" && str <= "z\uffff") ||
@@ -29,76 +19,70 @@ function isDigit(str) {
 	return (str >= "0" && str <= "9");
 }
 
-function nextLine() {
-	var at, match;
-
-	if (line >= state.lines.length) {
-		return false;
+var Lexer = function (source) {
+	var lines = source;
+	
+	if (typeof lines === "string") {
+		lines = lines
+			.replace(/\r\n/g, "\n")
+			.replace(/\r/g, "\n")
+			.split("\n");
 	}
-
-	character = 1;
-	input = state.lines[line];
-	line += 1;
-
-	// If smartstate.tabs option is used check for spaces followed by tabs only.
-	// Otherwise check for any occurence of mixed tabs and spaces.
-	// Tabs and one space followed by block comment is allowed.
-
-	if (state.option.smarttabs) {
-		// negative look-behind for "//"
-		match = input.match(/(\/\/)? \t/);
-		at = match && !match[1] ? 0 : -1;
-	} else {
-		at = input.search(/ \t|\t [^\*]/);
+	
+	// If the first line is a shebang (#!), make it a blank and move on.
+	// Shebangs are used by Node scripts.
+	if (lines[0] && lines[0].substr(0, 2) === "#!") {
+		lines[0] = "";
 	}
+	
+	this.emitter = new events.EventEmitter();
+	this.source = source;
+	this.lines = lines;
+	this.line = 0;
+	this.character = 1;
+	this.input = null;
 
-	// Warn about mixed spaces and tabs.
-
-	if (at >= 0) {
-		warningAt("W099", line, at + 1);
+	this.nextLine();
+	
+	this.from = 1;
+	this.preref = true;
+	
+	for (var i = 0; i < state.option.indent; i += 1) {
+		state.tab += " ";
 	}
+};
 
-	input = input.replace(/\t/g, state.tab);
+Lexer.prototype = {
+	_lines: [],
 
-	// Warn about unsafe characters that get silently deleted by one
-	// or more browsers.
-
-	at = input.search(reg.unsafeChars);
-	if (at >= 0) {
-		warningAt("W100", line, at);
-	}
-
-	// If there is a limit on line length, warn when lines get too
-	// long.
-
-	if (state.option.maxlen && state.option.maxlen < input.length) {
-		warningAt("W101", line, input.length);
-	}
-
-	// Check for trailing whitespaces
-
-	var tw = state.option.trailing && input.match(/^(.*?)\s+$/);
-	if (tw && !/^\s+$/.test(input)) {
-		warningAt("W102", line, tw[1].length + 1);
-	}
-
-	return true;
-}
-
-/*
- * Produce a token object. The token inherits from a syntax symbol.
- */
-function it(type, value) {
-	var i, t;
-
-	function checkName(name) {
+	get lines() {
+		this._lines = state.lines;
+		return this._lines;
+	},
+	
+	set lines(val) {
+		this._lines = val;
+		state.lines = this._lines;
+	},
+	
+	on: function (names, listener) {
+		names.split(" ").forEach(function (name) {
+			this.emitter.on(name, listener);
+		}.bind(this));
+	},
+	
+	trigger: function () {
+		this.emitter.emit.apply(this.emitter, Array.prototype.slice.call(arguments));
+	},
+	
+	lintName: function (name) {
 		if (!state.option.proto && name === "__proto__") {
-			warningAt("W103", line, from, name);
+			this.trigger("warning", { code: "W103", line: line, character: from, data: [ name ] });
 			return;
 		}
 
 		if (!state.option.iterator && name === "__iterator__") {
-			warningAt("W104", line, from, name);
+			this.trigger("warning", { code: "W104", line: line, character: from, data: [ name ] });
 			return;
 		}
 
@@ -107,14 +91,20 @@ function it(type, value) {
 		// Node globals with underscores.
 
 		var hasDangling = /^(_+.*|.*_+)$/.test(name);
+		var isSpecial = /^(__dirname|__filename)$/.test(name);
 
 		if (state.option.nomen && hasDangling && name !== "_") {
-			if (state.option.node && state.tokens.curr.id !== "." &&
-				/^(__dirname|__filename)$/.test(name)) {
+			if (state.option.node && state.tokens.curr.id !== "." && isSpecial) {
 				return;
 			}
 
-			warningAt("W105", line, from, "dangling '_'", name);
+			this.trigger("warning", {
+				code: "W105",
+				line: line,
+				character: from,
+				data: [ "dangling '_'", name ]
+			});
+
 			return;
 		}
 
@@ -123,110 +113,155 @@ function it(type, value) {
 
 		if (state.option.camelcase) {
 			if (name.replace(/^_+/, "").indexOf("_") > -1 && !name.match(/^[A-Z0-9_]*$/)) {
-				warningAt("W106", line, from, value);
+				this.trigger("warning", {
+					code: "W106",
+					line: line,
+					character: from,
+					data: [ value ]
+				});
 			}
 		}
-	}
-
-	if (type === "(range)") {
-		t = {type: type};
-	} else if (type === "(punctuator)" ||
-			(type === "(identifier)" && is_own(state.syntax, value))) {
-		t = state.syntax[value] || state.syntax["(error)"];
-	} else {
-		t = state.syntax[type];
-	}
-
-	t = Object.create(t);
-
-	if (type === "(string)" || type === "(range)") {
-		if (!state.option.scripturl && reg.javascriptURL.test(value)) {
-			warningAt("W107", line, from);
+	},
+	
+	nextLine: function () {
+		if (this.line >= this.lines.length) {
+			return false;
 		}
-	}
+		
+		this.character = 1;
+		this.input = state.lines[line];
+		this.line += 1;
 
-	if (type === "(identifier)") {
-		t.identifier = true;
-		checkName(value);
-	}
+		// If smartstate.tabs option is used check for spaces followed by tabs only.
+		// Otherwise check for any occurence of mixed tabs and spaces.
+		// Tabs and one space followed by block comment is allowed.
 
-	t.value = value;
-	t.line = line;
-	t.character = character;
-	t.from = from;
-	i = t.id;
-	if (i !== "(endline)") {
-		prereg = i &&
-			(("(,=:[!&|?{};".indexOf(i.charAt(i.length - 1)) >= 0) ||
-			i === "return" ||
-			i === "case");
-	}
-	return t;
-}
-
-// Public lex methods
-// FIXME: Better architecture for sharing options and other stuff.
-
-exports.lex = {
-	init: function (source, funcs) {
-		warningAt = funcs.warningAt;
-		errorAt = funcs.errorAt;
-		quit = funcs.quit;
-
-		if (typeof source === "string") {
-			state.lines = source
-				.replace(/\r\n/g, "\n")
-				.replace(/\r/g, "\n")
-				.split("\n");
+		var at, match;
+		if (state.option.smarttabs) {
+			// Negative look-behind for "//"
+			match = this.input.match(/(\/\/)? \t/);
+			at = match && !match[1] ? 0 : -1;
 		} else {
-			state.lines = source;
+			at = this.input.search(/ \t|\t [^\*]/);
 		}
 
-		// If the first line is a shebang (#!), make it a blank and move on.
-		// Shebangs are used by Node scripts.
-		if (state.lines[0] && state.lines[0].substr(0, 2) === "#!")
-			state.lines[0] = "";
+		// Warn about mixed spaces and tabs.
 
-		line = 0;
-		nextLine();
-		from = 1;
-		prereg = true;
+		if (at >= 0) {
+			this.trigger("warning", { code: "W099", line: this.line, character: at + 1 });
+		}
+		
+		// Replace tabs with spaces.
 
-		for (var i = 0; i < state.option.indent; i += 1) {
-			state.tab += " ";
+		this.input = this.input.replace(/\t/g, state.tab);
+
+		// Warn about unsafe characters that get silently deleted by one
+		// or more browsers.
+
+		at = this.input.search(reg.unsafeChars);
+		if (at >= 0) {
+			this.trigger("warning", { code: "W100", line: this.line, character: at });
 		}
 
-		return state.lines;
+		// If there is a limit on line length, warn when lines get too
+		// long.
+
+		if (state.option.maxlen && state.option.maxlen < this.input.length) {
+			this.trigger("warning", { code: "W101", line: this.line, character: this.input.length });
+		}
+
+		// Check for trailing whitespaces
+
+		var tw = state.option.trailing && this.input.match(/^(.*?)\s+$/);
+		if (tw && !/^\s+$/.test(this.input)) {
+			this.trigger("warning", { code: "W102", line: this.line, character: tw[1].length + 1 });
+		}
+
+		return true;
 	},
 
-	range: function (begin, end) {
-		var c, value = "";
-		from = character;
+	/*
+	 * Produce a token object. The token inherits from a syntax symbol.
+	 */
+	create: function (type, value) {
+		var token;
+		
+		switch (true) {
+		case type === "(range)":
+			token = { type: type };
+			break;
+		case type === "(punctuator)":
+		case type === "(identifier)" && _.has(state.syntax, value):
+			token = state.syntax[value] || state.syntax["(error)"];
+			break;
+		default:
+			token = state.syntax[type];
+		}
 
-		if (input.charAt(0) !== begin) {
-			errorAt("E004", line, character, begin, input.charAt(0));
+		token = Object.create(token);
+
+		if (type === "(string)" || type === "(range)") {
+			if (!state.option.scripturl && reg.javascriptURL.test(value)) {
+				this.trigger("warning", { code: "W107", line: this.line, character: from });
+			}
+		}
+
+		if (type === "(identifier)") {
+			token.identifier = true;
+			this.lintName(value);
+		}
+
+		token.value = value;
+		token.line = this.line;
+		token.character = this.character;
+		token.from = this.from;
+
+		var id = token.id;
+		if (id !== "(endline)") {
+			this.prereg = id && (("(,=:[!&|?{};".indexOf(id.charAt(id.length - 1)) >= 0) ||
+				id === "return" || i === "case");
+		}
+		
+		return token;
+	},
+	
+	range: function (begin, end) {
+		var chr, value = "";
+		this.from = this.character;
+
+		if (this.input.charAt(0) !== begin) {
+			this.trigger("error", {
+				code: "E004",
+				line: line,
+				character: character,
+				data: [ begin, input.charAt(0) ]
+			});
 		}
 
 		for (;;) {
-			input = input.slice(1);
-			character += 1;
-			c = input.charAt(0);
+			this.input = this.input.slice(1);
+			this.character += 1;
+			chr = this.input.charAt(0);
 
-			switch (c) {
+			switch (chr) {
 			case "":
-				errorAt("E013", line, character, c);
+				this.trigger("error", { code: "E013", line: line, character: character, data: [ c ] });
 				break;
 			case end:
-				input = input.slice(1);
-				character += 1;
-				return it("(range)", value);
+				this.input = this.input.slice(1);
+				this.character += 1;
+				return this.create("(range)", value);
 			case "\\":
-				warningAt("W052", line, character, c);
+				this.trigger("warning", {
+					code: "W052",
+					line: line,
+					character: character,
+					data: [ c ]
+				});
 			}
 
-			value += c;
+			value += chr;
 		}
-
 	},
 
 	/*
@@ -303,9 +338,8 @@ exports.lex = {
 
 			j = 0;
 
-unclosedString:
 			for (;;) {
-				while (j >= input.length) {
+				while (j >= input.length) { // What is this? j >= input.length?
 					j = 0;
 
 					var cl = line;
@@ -314,7 +348,7 @@ unclosedString:
 					if (!nextLine()) {
 						// Display an error about an unclosed string.
 						errorAt("E044", cl, cf);
-						break unclosedString;
+						return;
 					}
 
 					if (allowNewLine) {
@@ -328,7 +362,7 @@ unclosedString:
 				if (c === x) {
 					character += 1;
 					input = input.substr(j + 1);
-					return it("(string)", r, x);
+					return this.create("(string)", r, x);
 				}
 
 				if (c < " ") {
@@ -343,6 +377,7 @@ unclosedString:
 					character += 1;
 					c = input.charAt(j);
 					n = input.charAt(j + 1);
+
 					switch (c) {
 					case "\\":
 					case "\"":
@@ -433,7 +468,7 @@ unclosedString:
 
 		for (;;) {
 			if (!input) {
-				return it(nextLine() ? "(endline)" : "(end)", "");
+				return this.create(nextLine() ? "(endline)" : "(end)", "");
 			}
 
 			t = match(reg.token);
@@ -442,11 +477,13 @@ unclosedString:
 				t = "";
 				c = "";
 
+				// Reducing input for?
 				while (input && input < "!") {
 					input = input.substr(1);
 				}
 
 				if (input) {
+					// Unexpected character.
 					errorAt("E014", line, character, input.substr(0, 1));
 					input = "";
 				}
@@ -455,7 +492,7 @@ unclosedString:
 				// Identifier
 
 				if (isAlpha(c) || c === "_" || c === "$") {
-					return it("(identifier)", t);
+					return this.create("(identifier)", t);
 				}
 
 				// Number
@@ -489,7 +526,7 @@ unclosedString:
 						warningAt("W121", line, character, t);
 					}
 
-					return it("(number)", t);
+					return this.create("(number)", t);
 				}
 
 				switch (t) {
@@ -593,7 +630,7 @@ unclosedString:
 									errorAt("E018", line, from);
 								}
 
-								return it("(regexp)", c);
+								return this.create("(regexp)", c);
 							case "\\":
 								c = input.charAt(l);
 
@@ -822,18 +859,18 @@ klass:
 						c = input.substr(0, l - 1);
 						character += l;
 						input = input.substr(l);
-						return it("(regexp)", c);
+						return this.create("(regexp)", c);
 					}
-					return it("(punctuator)", t);
+					return this.create("(punctuator)", t);
 
 				// punctuator
 
 				case "#":
-					return it("(punctuator)", t);
+					return this.create("(punctuator)", t);
 				default:
-					return it("(punctuator)", t);
+					return this.create("(punctuator)", t);
 				}
 			}
 		}
-	}
+	}	
 };
