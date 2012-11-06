@@ -292,7 +292,7 @@ exports.lex = {
 				var i = parseInt(input.substr(j + 1, n), 16);
 				j += n;
 
-				// Warn about unnecessary escapements.
+				// Warn about unnecessary escapings.
 				if (i >= 32 && i <= 126 && i !== 34 && i !== 92 && i !== 39) {
 					warningAt("W111", line, character);
 				}
@@ -420,7 +420,7 @@ unclosedString:
 
 						/*falls through*/
 					default:
-						// Weird escapement, warn about that.
+						// Weird escaping, warn about that.
 						warningAt("W118", line, character);
 					}
 				}
