@@ -12,21 +12,7 @@ var TESTS = [
 	"tests/next/unit/"
 ];
 
-var OPTIONS = {
-	es5: true,
-	boss: true,
-	node: true,
-	globalstrict: true,
-	strict: true,
-	white: true,
-	smarttabs: true,
-	maxlen: 100,
-	newcap: false,
-	undef: true,
-	unused: true,
-	onecase: true,
-	indent: 2
-};
+var OPTIONS = JSON.parse(cat("./jshint.json"));
 
 target.all = function () {
 	target.lint();
