@@ -29,12 +29,12 @@
 
 /*jshint quotmark:double */
 
-var _ = require("underscore");
-var vars = require("../shared/vars.js");
+var _        = require("underscore");
+var vars     = require("../shared/vars.js");
 var messages = require("../shared/messages.js");
-var lex = require("./lex.js").lex;
-var reg = require("./reg.js");
-var state = require("./state.js").state;
+var Lexer    = require("./lex.js").Lexer;
+var reg      = require("./reg.js");
+var state    = require("./state.js").state;
 
 // We build the application inside a function so that we produce only a single
 // global variable. That function will be invoked immediately, and its return
@@ -197,6 +197,7 @@ var JSHINT = (function () {
 		inblock,
 		indent,
 		lookahead,
+		lex,
 		member,
 		membersOnly,
 		noreach,
@@ -3160,12 +3161,21 @@ loop:
 
 		state.tokens.prev = state.tokens.curr = state.tokens.next = state.syntax["(begin)"];
 
-		lex.init(s,
-			{ // Functions
-				warningAt: warningAt,
-				errorAt: errorAt,
-				quit: quit
-			});
+		lex = new Lexer(s);
+
+		lex.on("warning", function (ev) {
+			warningAt.apply(null, [ ev.code, ev.line, ev.character].concat(ev.data));
+		});
+
+		lex.on("error", function (ev) {
+			errorAt.apply(null, [ ev.code, ev.line, ev.character ].concat(ev.data));
+		});
+
+		lex.on("fatal", function (ev) {
+			quit(ev.line, ev.from);
+		});
+
+		lex.start();
 
 		// Check options
 		for (var name in o) {
