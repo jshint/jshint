@@ -123,7 +123,7 @@ exports.options = function (test) {
 		"/*member a*/",
 		"/*members b*/",
 		"var x; x.a.b.c();",
-		"/*jshint +++ */",
+		"/*jshint ++ */",
 		"/*jslint indent: -2 */",
 		"/*jslint indent: 100.4 */",
 		"/*jslint maxlen: 200.4 */",
@@ -137,7 +137,7 @@ exports.options = function (test) {
 
 	TestRun(test)
 		.addError(3, "Unexpected /*member 'c'.")
-		.addError(4, "Bad option: '+++'.")
+		.addError(4, "Bad option: '++'.")
 		.addError(4, "Missing option value.")
 		.addError(5, "Expected a small integer and instead saw '-'.")
 		.addError(5, "Bad option: '2'.")
@@ -436,7 +436,7 @@ exports.blocks = function (test) {
 	test.done();
 };
 
-exports.functionCharaterLocation = function (test) {
+exports.functionCharacterLocation = function (test) {
 	var i;
 	var src = fs.readFileSync(__dirname + "/fixtures/nestedFunctions.js", "utf8");
 	var locations = JSON.parse(

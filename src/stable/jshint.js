@@ -30,11 +30,13 @@
 /*jshint quotmark:double */
 
 var _        = require("underscore");
+var events   = require("events");
 var vars     = require("../shared/vars.js");
 var messages = require("../shared/messages.js");
 var Lexer    = require("./lex.js").Lexer;
 var reg      = require("./reg.js");
 var state    = require("./state.js").state;
+var style    = require("./style.js");
 
 // We build the application inside a function so that we produce only a single
 // global variable. That function will be invoked immediately, and its return
@@ -208,7 +210,10 @@ var JSHINT = (function () {
 		unuseds,
 		urls,
 		useESNextSyntax,
-		warnings;
+		warnings,
+
+		extraModules = [],
+		emitter = new events.EventEmitter();
 
 	function F() {}		// Used by Object.create
 
@@ -1689,16 +1694,11 @@ loop:
 		return this;
 	});
 
-
-// ECMAScript parser
+	// ECMAScript parser
 
 	delim("(endline)");
 	delim("(begin)");
 	delim("(end)").reach = true;
-	delim("</").reach = true;
-	delim("<!");
-	delim("<!--");
-	delim("-->");
 	delim("(error)").reach = true;
 	delim("}").reach = true;
 	delim(")");
@@ -1709,7 +1709,7 @@ loop:
 	delim(":").reach = true;
 	delim(",");
 	delim("#");
-	delim("@");
+
 	reserve("else");
 	reserve("case").reach = true;
 	reserve("catch");
@@ -3159,6 +3159,27 @@ loop:
 			return false;
 		}
 
+		var api = {
+			getOption: function (name) {
+				return state.option[name] || null;
+			},
+
+			warn: function (code, data) {
+				warningAt.apply(null, [ code, data.line, data.char ].concat(data.data));
+			},
+
+			on: function (names, listener) {
+				names.split(" ").forEach(function (name) {
+					emitter.on(name, listener);
+				}.bind(this));
+			}
+		};
+
+		emitter.removeAllListeners();
+		(extraModules || []).forEach(function (func) {
+			func(api);
+		});
+
 		state.tokens.prev = state.tokens.curr = state.tokens.next = state.syntax["(begin)"];
 
 		lex = new Lexer(s);
@@ -3173,6 +3194,10 @@ loop:
 
 		lex.on("fatal", function (ev) {
 			quit(ev.line, ev.from);
+		});
+
+		lex.on("Identifier", function (ev) {
+			emitter.emit("Identifier", ev);
 		});
 
 		lex.start();
@@ -3360,6 +3385,13 @@ loop:
 
 		return JSHINT.errors.length === 0;
 	};
+
+	// Modules.
+	itself.addModule = function (func) {
+		extraModules.push(func);
+	};
+
+	itself.addModule(style.register);
 
 	// Data summary.
 	itself.data = function () {

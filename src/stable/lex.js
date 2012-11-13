@@ -39,11 +39,12 @@ var Lexer = function (source) {
 	this.emitter = new events.EventEmitter();
 	this.source = source;
 	this.lines = lines;
-	this.line = 0;
-	this.character = 1;
-	this.input = null;
-	this.from = 1;
 	this.prereg = true;
+
+	this.line = 0;
+	this.char = 1;
+	this.from = 1;
+	this.input = "";
 
 	for (var i = 0; i < state.option.indent; i += 1) {
 		state.tab += " ";
@@ -63,6 +64,16 @@ Lexer.prototype = {
 		state.lines = this._lines;
 	},
 
+	peek: function (i) {
+		return this.input.charAt(i || 0);
+	},
+
+	skip: function (i) {
+		i = i || 1;
+		this.char += i;
+		this.input = this.input.slice(i);
+	},
+
 	on: function (names, listener) {
 		names.split(" ").forEach(function (name) {
 			this.emitter.on(name, listener);
@@ -73,82 +84,193 @@ Lexer.prototype = {
 		this.emitter.emit.apply(this.emitter, Array.prototype.slice.call(arguments));
 	},
 
-	start: function () {
-		this.nextLine();
-	},
+	scanPunctuator: function () {
+		var ch1 = this.peek();
+		var ch2, ch3, ch4;
 
-	lintName: function (name) {
-		if (!state.option.proto && name === "__proto__") {
-			this.trigger("warning", {
-				code: "W103",
-				line: this.line,
-				character: this.from,
-				data: [ name ]
-			});
-			return;
+		switch (ch1) {
+		// Most common single-character punctuators
+		case ".":
+		case "(":
+		case ")":
+		case ";":
+		case ",":
+		case "{":
+		case "}":
+		case "[":
+		case "]":
+		case ":":
+		case "~":
+		case "?":
+			return ch1;
+
+		// Quotes
+		case '"':
+		case "'":
+			return ch1;
+
+		// A pound sign (for Node shebangs)
+		case "#":
+			return ch1;
 		}
 
-		if (!state.option.iterator && name === "__iterator__") {
-			this.trigger("warning", {
-				code: "W104",
-				line: this.line,
-				character: this.from,
-				data: [ name ]
-			});
-			return;
+		// Peek more characters
+
+		ch2 = this.peek(1);
+		ch3 = this.peek(2);
+		ch4 = this.peek(3);
+
+		// 4-character punctuator: >>>=
+
+		if (ch1 === ">" && ch2 === ">" && ch3 === ">" && ch4 === "=") {
+			return ">>>=";
 		}
 
-		// Check for dangling underscores unless we're in Node
-		// environment and this identifier represents built-in
-		// Node globals with underscores.
+		// 3-character punctuators: === !== >>> <<= >>=
 
-		var hasDangling = /^(_+.*|.*_+)$/.test(name);
-		var isSpecial = /^(__dirname|__filename)$/.test(name);
+		if (ch1 === "=" && ch2 === "=" && ch3 === "=") {
+			return "===";
+		}
 
-		if (state.option.nomen && hasDangling && name !== "_") {
-			if (state.option.node && state.tokens.curr.id !== "." && isSpecial) {
-				return;
+		if (ch1 === "!" && ch2 === "=" && ch3 === "=") {
+			return "!==";
+		}
+
+		if (ch1 === ">" && ch2 === ">" && ch3 === ">") {
+			return ">>>";
+		}
+
+		if (ch1 === "<" && ch2 === "<" && ch3 === "=") {
+			return "<<=";
+		}
+
+		if (ch1 === ">" && ch2 === ">" && ch3 === "=") {
+			return "<<=";
+		}
+
+		// 2-character punctuators: <= >= == != ++ -- << >> && ||
+		// += -= *= %= &= |= ^= (but not /=, see below)
+		if (ch1 === ch2 && ("+-<>&|".indexOf(ch1) >= 0)) {
+			return ch1 + ch2;
+		}
+
+		if ("<>=!+-*%&|^".indexOf(ch1) >= 0) {
+			if (ch2 === "=") {
+				return ch1 + ch2;
 			}
 
-			this.trigger("warning", {
-				code: "W105",
-				line: this.line,
-				character: this.from,
-				data: [ "dangling '_'", name ]
-			});
-
-			return;
+			return ch1;
 		}
 
-		// Check for non-camelcase names. Names like MY_VAR and
-		// _myVar are okay though.
+		// Special case: /=. We need to make sure that this is an
+		// operator and not a regular expression.
 
-		if (state.option.camelcase) {
-			if (name.replace(/^_+/, "").indexOf("_") > -1 && !name.match(/^[A-Z0-9_]*$/)) {
-				this.trigger("warning", {
-					code: "W106",
-					line: this.line,
-					character: this.from,
-					data: [ name ]
-				});
+		if (ch1 === "/") {
+			if (ch2 === "=" && /\/=(?!(\S*\/[gim]?))/.test(this.input)) {
+				// /= is not a part of a regular expression, return it as a
+				// punctuator.
+				return "/=";
 			}
+
+			return "/";
 		}
+
+		return null;
 	},
 
-	nextLine: function () {
-		if (this.line >= this.lines.length) {
-			return false;
+	scanCommentSymbols: function () {
+		var ch1 = this.peek();
+		var ch2 = this.peek(1);
+		var rest = this.input.substr(2);
+
+		if (ch1 === "*" && ch2 === "/") {
+			return "*/";
 		}
 
-		this.character = 1;
-		this.input = this.lines[this.line];
-		this.line += 1;
+		if (ch1 === "/") {
+			if (ch2 === "*" || ch2 === "/") {
 
-		// If smartstate.tabs option is used check for spaces followed by tabs only.
-		// Otherwise check for any occurence of mixed tabs and spaces.
-		// Tabs and one space followed by block comment is allowed.
+				// Special comments: /*jshint, /*global
 
+				if (rest.indexOf("jshint") === 0) {
+					return ch1 + ch2 + "jshint";
+				}
+
+				// if (rest.indexOf(" jshint") === 0) {
+				//	return ch1 + ch2 + " jshint";
+				// }
+
+				if (rest.indexOf("jslint") === 0) {
+					return ch1 + ch2 + "jslint";
+				}
+
+				// if (rest.indexOf(" jslint") === 0) {
+				// 	return ch1 + ch2 + " jslint";
+				// }
+
+				if (rest.indexOf("member") === 0) {
+					return ch1 + ch2 + "members";
+				}
+
+				// if (rest.indexOf(" member") === 0) {
+				// 	return ch1 + ch2 + " members";
+				// }
+
+				if (rest.indexOf("members") === 0) {
+					return ch1 + ch2 + "members";
+				}
+
+				// if (rest.indexOf(" members") === 0) {
+				// 	return ch1 + ch2 + " members";
+				// }
+
+				if (rest.indexOf("global") === 0) {
+					return ch1 + ch2 + "global";
+				}
+
+				// if (rest.indexOf(" jslint") === 0) {
+				// 	return ch1 + ch2 + " jslint";
+				// }
+
+				// If no special comments matched, return the marker itself
+
+				return ch1 + ch2;
+			}
+		}
+
+		return null;
+	},
+
+	scanIdentifier: function () {
+		var result = /^[a-zA-Z_$][a-zA-Z0-9_$]*/.exec(this.input);
+
+		if (result) {
+			return result[0];
+		}
+
+		return null;
+	},
+
+	// TODO: We need more explicit scanning here.
+	scanNumericLiteral: function () {
+		var result = /^[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+\-]?[0-9]+)?/.exec(this.input);
+
+		if (result) {
+			return result[0];
+		}
+
+		return null;
+	},
+
+	/*
+	 * Scan for any occurence of mixed tabs and spaces. If smarttabs option
+	 * is on, ignore tabs followed by spaces.
+	 *
+	 * Tabs followed by one space followed by a block comment are allowed.
+	 */
+	scanMixedSpacesAndTabs: function () {
 		var at, match;
+
 		if (state.option.smarttabs) {
 			// Negative look-behind for "//"
 			match = this.input.match(/(\/\/)? \t/);
@@ -157,22 +279,72 @@ Lexer.prototype = {
 			at = this.input.search(/ \t|\t [^\*]/);
 		}
 
-		// Warn about mixed spaces and tabs.
+		return at;
+	},
 
-		if (at >= 0) {
-			this.trigger("warning", { code: "W099", line: this.line, character: at + 1 });
+	/*
+	 * Scan for characters that get silently deleted by one or more browsers.
+	 */
+	scanUnsafeChars: function () {
+		return this.input.search(reg.unsafeChars);
+	},
+
+	next: function () {
+		this.from = this.char;
+
+		// Move to the next non-space character.
+		var start;
+		if (/\s/.test(this.peek())) {
+			start = this.char;
+
+			while (/\s/.test(this.peek())) {
+				this.from += 1;
+				this.skip();
+			}
+
+			if (this.peek() === "") { // EOL
+				if (state.option.trailing) {
+					this.trigger("warning", { code: "W102", line: this.line, character: start });
+				}
+			}
 		}
 
-		// Replace tabs with spaces.
+		var match =
+			this.scanCommentSymbols() ||
+			this.scanPunctuator() ||
+			this.scanIdentifier() ||
+			this.scanNumericLiteral();
+
+		if (match) {
+			this.skip(match.length);
+			return match;
+		}
+
+		return null;
+	},
+
+	nextLine: function () {
+		var char;
+
+		if (this.line >= this.lines.length) {
+			return false;
+		}
+
+		this.input = this.lines[this.line];
+		this.line += 1;
+		this.char = 1;
+		this.from = 1;
+
+		char = this.scanMixedSpacesAndTabs();
+		if (char >= 0) {
+			this.trigger("warning", { code: "W099", line: this.line, character: char + 1 });
+		}
 
 		this.input = this.input.replace(/\t/g, state.tab);
+		char = this.scanUnsafeChars();
 
-		// Warn about unsafe characters that get silently deleted by one
-		// or more browsers.
-
-		at = this.input.search(reg.unsafeChars);
-		if (at >= 0) {
-			this.trigger("warning", { code: "W100", line: this.line, character: at });
+		if (char >= 0) {
+			this.trigger("warning", { code: "W100", line: this.line, character: char });
 		}
 
 		// If there is a limit on line length, warn when lines get too
@@ -182,14 +354,11 @@ Lexer.prototype = {
 			this.trigger("warning", { code: "W101", line: this.line, character: this.input.length });
 		}
 
-		// Check for trailing whitespaces
-
-		var tw = state.option.trailing && this.input.match(/^(.*?)\s+$/);
-		if (tw && !/^\s+$/.test(this.input)) {
-			this.trigger("warning", { code: "W102", line: this.line, character: tw[1].length + 1 });
-		}
-
 		return true;
+	},
+
+	start: function () {
+		this.nextLine();
 	},
 
 	/*
@@ -220,12 +389,19 @@ Lexer.prototype = {
 
 		if (type === "(identifier)") {
 			token.identifier = true;
-			this.lintName(value);
+
+			this.trigger("Identifier", {
+				line: this.line,
+				char: this.character,
+				from: this.from,
+				name: value,
+				isProperty: state.tokens.curr.id === "."
+			});
 		}
 
 		token.value = value;
 		token.line = this.line;
-		token.character = this.character;
+		token.character = this.char;
 		token.from = this.from;
 
 		var id = token.id;
@@ -239,40 +415,38 @@ Lexer.prototype = {
 
 	range: function (begin, end) {
 		var chr, value = "";
-		this.from = this.character;
+		this.from = this.char;
 
-		if (this.input.charAt(0) !== begin) {
+		if (this.peek() !== begin) {
 			this.trigger("error", {
 				code: "E004",
 				line: this.line,
-				character: this.character,
-				data: [ begin, this.input.charAt(0) ]
+				character: this.char,
+				data: [ begin, this.peek() ]
 			});
 		}
 
 		for (;;) {
-			this.input = this.input.slice(1);
-			this.character += 1;
-			chr = this.input.charAt(0);
+			this.skip();
+			chr = this.peek();
 
 			switch (chr) {
 			case "":
 				this.trigger("error", {
 					code: "E013",
 					line: this.line,
-					character: this.character,
+					character: this.char,
 					data: [ chr ]
 				});
 				break;
 			case end:
-				this.input = this.input.slice(1);
-				this.character += 1;
+				this.skip();
 				return this.create("(range)", value);
 			case "\\":
 				this.trigger("warning", {
 					code: "W052",
 					line: this.line,
-					character: this.character,
+					character: this.char,
 					data: [ chr ]
 				});
 			}
@@ -290,22 +464,8 @@ Lexer.prototype = {
 		var b, c, captures, d, depth, high, i, l, low, q, t, isLiteral, isInRange, n;
 
 		// This function must be bound to 'this'.
-		var match = function (x) {
-			var r = x.exec(this.input), r1;
-
-			if (r) {
-				l = r[0].length;
-				r1 = r[1];
-				c = r1.charAt(0);
-				this.input = this.input.substr(l);
-				this.from = this.character + l - r1.length;
-				this.character += l;
-				return r1;
-			}
-		}.bind(this);
-
-		// This function must be bound to 'this'.
-		var string = function (x) { /*jshint validthis:true */
+		var string = function (x) {
+			/*jshint validthis:true */
 			var c, j, r = "", allowNewLine = false;
 
 			// In JSON mode all strings must use double-quote.
@@ -314,7 +474,7 @@ Lexer.prototype = {
 				this.trigger("warning", {
 					code: "W108",
 					line: this.line,
-					character: this.character
+					character: this.char
 				});
 			}
 
@@ -345,7 +505,7 @@ Lexer.prototype = {
 					this.trigger("warning", {
 						code: code,
 						line: this.line,
-						character: this.character
+						character: this.char
 					});
 				}
 			}
@@ -360,11 +520,11 @@ Lexer.prototype = {
 					this.trigger("warning", {
 						code: "W111",
 						line: this.line,
-						character: this.character
+						character: this.char
 					});
 				}
 
-				this.character += n;
+				this.char += n;
 				c = String.fromCharCode(i);
 			}.bind(this);
 
@@ -399,9 +559,9 @@ Lexer.prototype = {
 					}
 				}
 
-				c = this.input.charAt(j);
+				c = this.peek(j);
 				if (c === x) {
-					this.character += 1;
+					this.char += 1;
 					this.input = this.input.substr(j + 1);
 					return this.create("(string)", r, x);
 				}
@@ -415,14 +575,14 @@ Lexer.prototype = {
 					this.trigger("warning", {
 						code: "W113",
 						line: this.line,
-						character: this.character + j,
+						character: this.char + j,
 						data: [ this.input.slice(0, j) ]
 					});
 				} else if (c === "\\") {
 					j += 1;
-					this.character += 1;
-					c = this.input.charAt(j);
-					n = this.input.charAt(j + 1);
+					this.char += 1;
+					c = this.peek(j);
+					n = this.peek(j + 1);
 
 					switch (c) {
 					case "\\":
@@ -434,7 +594,7 @@ Lexer.prototype = {
 							this.trigger("warning", {
 								code: "W114",
 								line: this.line,
-								character: this.character,
+								character: this.char,
 								data: [ "\\'" ]
 							});
 						}
@@ -465,7 +625,7 @@ Lexer.prototype = {
 							this.trigger("warning", {
 								code: "W115",
 								line: this.line,
-								character: this.character
+								character: this.char
 							});
 						}
 
@@ -478,7 +638,7 @@ Lexer.prototype = {
 							this.trigger("warning", {
 								code: "W114",
 								line: this.line,
-								character: this.character,
+								character: this.char,
 								data: [ "\\v" ]
 							});
 						}
@@ -490,7 +650,7 @@ Lexer.prototype = {
 							this.trigger("warning", {
 								code: "W114",
 								line: this.line,
-								character: this.character,
+								character: this.char,
 								data: [ "\\x-" ]
 							});
 						}
@@ -507,23 +667,23 @@ Lexer.prototype = {
 								this.trigger("warning", {
 									code: "W116",
 									line: this.line,
-									character: this.character
+									character: this.char
 								});
 							}
 
 							c = "";
-							this.character -= 1;
+							this.char -= 1;
 							break;
 						}
 
 						this.trigger("warning", {
 							code: "W117",
 							line: this.line,
-							character: this.character
+							character: this.char
 						});
 						break;
 					case "!":
-						if (this.input.charAt(j - 2) === "<")
+						if (this.peek(j - 2) === "<")
 							break;
 
 						/*falls through*/
@@ -532,44 +692,41 @@ Lexer.prototype = {
 						this.trigger("warning", {
 							code: "W118",
 							line: this.line,
-							character: this.character
+							character: this.char
 						});
 					}
 				}
 
 				r += c;
-				this.character += 1;
+				this.char += 1;
 				j += 1;
 			}
 		}.bind(this);
 
 		for (;;) {
-			if (!this.input) {
+			if (!this.input.length) {
 				return this.create(this.nextLine() ? "(endline)" : "(end)", "");
 			}
 
-			t = match(reg.token);
+			t = this.next();
 
 			if (!t) {
 				t = "";
 				c = "";
 
-				// Reducing input for?
-				while (this.input && this.input < "!") {
-					this.input = this.input.substr(1);
-				}
-
-				if (this.input) {
+				if (this.input.length) {
 					// Unexpected character.
 					this.trigger("error", {
 						code: "E014",
 						line: this.line,
-						character: this.character,
-						data: [ this.input.substr(0, 1) ]
+						character: this.char,
+						data: [ this.peek() ]
 					});
+
 					this.input = "";
 				}
 			} else {
+				c = t.charAt(0);
 
 				// Identifier
 
@@ -587,16 +744,16 @@ Lexer.prototype = {
 						this.trigger("warning", {
 							code: "W119",
 							line: this.line,
-							character: this.character,
+							character: this.char,
 							data: [ t ]
 						});
 					}
 
-					if (isAlpha(this.input.substr(0, 1))) {
+					if (isAlpha(this.peek())) {
 						this.trigger("warning", {
 							code: "W013",
 							line: this.line,
-							character: this.character,
+							character: this.char,
 							data: [ t ]
 						});
 					}
@@ -609,7 +766,7 @@ Lexer.prototype = {
 								this.trigger("warning", {
 									code: "W120",
 									line: this.line,
-									character: this.character,
+									character: this.char,
 									data: [ t ]
 								});
 							}
@@ -617,7 +774,7 @@ Lexer.prototype = {
 							this.trigger("warning", {
 								code: "W114",
 								line: this.line,
-								character: this.character,
+								character: this.char,
 								data: [ "0x-" ]
 							});
 						}
@@ -628,7 +785,7 @@ Lexer.prototype = {
 						this.trigger("warning", {
 							code: "W121",
 							line: this.line,
-							character: this.character,
+							character: this.char,
 							data: [ t ]
 						});
 					}
@@ -665,7 +822,7 @@ Lexer.prototype = {
 							this.trigger("error", {
 								code: "E015",
 								line: this.line,
-								character: this.character
+								character: this.char
 							});
 						}
 					}
@@ -686,7 +843,7 @@ Lexer.prototype = {
 						value: t,
 						type: "special",
 						line: this.line,
-						character: this.character,
+						character: this.char,
 						from: this.from
 					};
 
@@ -697,7 +854,7 @@ Lexer.prototype = {
 
 				case "/":
 					// Warn about '/=' (it can be confused with /= operator.
-					if (this.input.charAt(0) === "=") {
+					if (this.peek() === "=") {
 						this.trigger("error", {
 							code: "E016",
 							line: this.line,
@@ -711,7 +868,7 @@ Lexer.prototype = {
 						l = 0;
 						for (;;) {
 							b = true;
-							c = this.input.charAt(l);
+							c = this.peek(l);
 							l += 1;
 							switch (c) {
 							case "":
@@ -745,14 +902,13 @@ Lexer.prototype = {
 									m: true
 								};
 
-								while (q[this.input.charAt(l)] === true) {
-									q[this.input.charAt(l)] = false;
+								while (q[this.peek(l)] === true) {
+									q[this.peek(l)] = false;
 									l += 1;
 								}
 
-								this.character += l;
-								this.input = this.input.substr(l);
-								q = this.input.charAt(0);
+								this.skip(l);
+								q = this.peek();
 
 								if (q === "/" || q === "*") {
 									this.trigger("error", {
@@ -764,7 +920,7 @@ Lexer.prototype = {
 
 								return this.create("(regexp)", c);
 							case "\\":
-								c = this.input.charAt(l);
+								c = this.peek(l);
 
 								if (c < " ") {
 									// Unexpected control character.
@@ -788,9 +944,9 @@ Lexer.prototype = {
 							case "(":
 								depth += 1;
 								b = false;
-								if (this.input.charAt(l) === "?") {
+								if (this.peek(l) === "?") {
 									l += 1;
-									switch (this.input.charAt(l)) {
+									switch (this.peek(l)) {
 									case ":":
 									case "=":
 									case "!":
@@ -801,7 +957,7 @@ Lexer.prototype = {
 											code: "W132",
 											line: this.line,
 											character: this.from + l,
-											data: [ ":", this.input.charAt(l) ]
+											data: [ ":", this.peek(l) ]
 										});
 									}
 								} else {
@@ -826,7 +982,7 @@ Lexer.prototype = {
 								break;
 							case " ":
 								q = 1;
-								while (this.input.charAt(l) === " ") {
+								while (this.peek(l) === " ") {
 									l += 1;
 									q += 1;
 								}
@@ -840,10 +996,10 @@ Lexer.prototype = {
 								}
 								break;
 							case "[":
-								c = this.input.charAt(l);
+								c = this.peek(l);
 								if (c === "^") {
 									l += 1;
-									if (this.input.charAt(l) === "]") {
+									if (this.peek(l) === "]") {
 										this.trigger("error", {
 											code: "E019",
 											line: this.line,
@@ -863,7 +1019,7 @@ Lexer.prototype = {
 								isInRange = false;
 klass:
 								do {
-									c = this.input.charAt(l);
+									c = this.peek(l);
 									l += 1;
 									switch (c) {
 									case "[":
@@ -888,11 +1044,11 @@ klass:
 											isInRange = true;
 										} else if (isInRange) {
 											isInRange = false;
-										} else if (this.input.charAt(l) === "]") {
+										} else if (this.peek(l) === "]") {
 											isInRange = true;
 										} else {
 											if (state.option.regexdash !== (l === 2 || (l === 3 &&
-												this.input.charAt(1) === "^"))) {
+												this.peek(1) === "^"))) {
 												this.trigger("warning", {
 													code: "W125",
 													line: this.line,
@@ -914,7 +1070,7 @@ klass:
 										}
 										break klass;
 									case "\\":
-										c = this.input.charAt(l);
+										c = this.peek(l);
 
 										if (c < " ") {
 											this.trigger("warning", {
@@ -1007,18 +1163,18 @@ klass:
 							}
 
 							if (b) {
-								switch (this.input.charAt(l)) {
+								switch (this.peek(l)) {
 								case "?":
 								case "+":
 								case "*":
 									l += 1;
-									if (this.input.charAt(l) === "?") {
+									if (this.peek(l) === "?") {
 										l += 1;
 									}
 									break;
 								case "{":
 									l += 1;
-									c = this.input.charAt(l);
+									c = this.peek(l);
 									if (c < "0" || c > "9") {
 										this.trigger("warning", {
 											code: "W130",
@@ -1031,7 +1187,7 @@ klass:
 									l += 1;
 									low = +c;
 									for (;;) {
-										c = this.input.charAt(l);
+										c = this.peek(l);
 										if (c < "0" || c > "9") {
 											break;
 										}
@@ -1042,12 +1198,12 @@ klass:
 									if (c === ",") {
 										l += 1;
 										high = Infinity;
-										c = this.input.charAt(l);
+										c = this.peek(l);
 										if (c >= "0" && c <= "9") {
 											l += 1;
 											high = +c;
 											for (;;) {
-												c = this.input.charAt(l);
+												c = this.peek(l);
 												if (c < "0" || c > "9") {
 													break;
 												}
@@ -1056,7 +1212,7 @@ klass:
 											}
 										}
 									}
-									if (this.input.charAt(l) !== "}") {
+									if (this.peek(l) !== "}") {
 										this.trigger("warning", {
 											code: "W132",
 											line: this.line,
@@ -1066,7 +1222,7 @@ klass:
 									} else {
 										l += 1;
 									}
-									if (this.input.charAt(l) === "?") {
+									if (this.peek(l) === "?") {
 										l += 1;
 									}
 									if (low > high) {
@@ -1081,8 +1237,7 @@ klass:
 							}
 						}
 						c = this.input.substr(0, l - 1);
-						this.character += l;
-						this.input = this.input.substr(l);
+						this.skip(l);
 						return this.create("(regexp)", c);
 					}
 					return this.create("(punctuator)", t);
