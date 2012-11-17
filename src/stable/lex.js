@@ -20,6 +20,13 @@ function isDigit(str) {
 	return (str >= "0" && str <= "9");
 }
 
+var Token = {
+	Identifier: 1,
+	Punctuator: 2,
+	NumericLiteral: 3,
+	CommentSymbol: 4
+};
+
 var Lexer = function (source) {
 	var lines = source;
 
@@ -102,16 +109,25 @@ Lexer.prototype = {
 		case ":":
 		case "~":
 		case "?":
-			return ch1;
+			return {
+				type: Token.Punctuator,
+				value: ch1
+			};
 
 		// Quotes
 		case '"':
 		case "'":
-			return ch1;
+			return {
+				type: Token.Punctuator,
+				value: ch1
+			};
 
 		// A pound sign (for Node shebangs)
 		case "#":
-			return ch1;
+			return {
+				type: Token.Punctuator,
+				value: ch1
+			};
 		}
 
 		// Peek more characters
@@ -123,43 +139,70 @@ Lexer.prototype = {
 		// 4-character punctuator: >>>=
 
 		if (ch1 === ">" && ch2 === ">" && ch3 === ">" && ch4 === "=") {
-			return ">>>=";
+			return {
+				type: Token.Punctuator,
+				value: ">>>="
+			};
 		}
 
 		// 3-character punctuators: === !== >>> <<= >>=
 
 		if (ch1 === "=" && ch2 === "=" && ch3 === "=") {
-			return "===";
+			return {
+				type: Token.Punctuator,
+				value: "==="
+			};
 		}
 
 		if (ch1 === "!" && ch2 === "=" && ch3 === "=") {
-			return "!==";
+			return {
+				type: Token.Punctuator,
+				value: "!=="
+			};
 		}
 
 		if (ch1 === ">" && ch2 === ">" && ch3 === ">") {
-			return ">>>";
+			return {
+				type: Token.Punctuator,
+				value: ">>>"
+			};
 		}
 
 		if (ch1 === "<" && ch2 === "<" && ch3 === "=") {
-			return "<<=";
+			return {
+				type: Token.Punctuator,
+				value: "<<="
+			};
 		}
 
 		if (ch1 === ">" && ch2 === ">" && ch3 === "=") {
-			return "<<=";
+			return {
+				type: Token.Punctuator,
+				value: "<<="
+			};
 		}
 
 		// 2-character punctuators: <= >= == != ++ -- << >> && ||
 		// += -= *= %= &= |= ^= (but not /=, see below)
 		if (ch1 === ch2 && ("+-<>&|".indexOf(ch1) >= 0)) {
-			return ch1 + ch2;
+			return {
+				type: Token.Punctuator,
+				value: ch1 + ch2
+			};
 		}
 
 		if ("<>=!+-*%&|^".indexOf(ch1) >= 0) {
 			if (ch2 === "=") {
-				return ch1 + ch2;
+				return {
+					type: Token.Punctuator,
+					value: ch1 + ch2
+				};
 			}
 
-			return ch1;
+			return {
+				type: Token.Punctuator,
+				value: ch1
+			};
 		}
 
 		// Special case: /=. We need to make sure that this is an
@@ -169,10 +212,16 @@ Lexer.prototype = {
 			if (ch2 === "=" && /\/=(?!(\S*\/[gim]?))/.test(this.input)) {
 				// /= is not a part of a regular expression, return it as a
 				// punctuator.
-				return "/=";
+				return {
+					type: Token.Punctuator,
+					value: "/="
+				};
 			}
 
-			return "/";
+			return {
+				type: Token.Punctuator,
+				value: "/"
+			};
 		}
 
 		return null;
@@ -184,7 +233,10 @@ Lexer.prototype = {
 		var rest = this.input.substr(2);
 
 		if (ch1 === "*" && ch2 === "/") {
-			return "*/";
+			return {
+				type: Token.CommentSymbol,
+				value: "*/"
+			};
 		}
 
 		if (ch1 === "/") {
@@ -193,48 +245,46 @@ Lexer.prototype = {
 				// Special comments: /*jshint, /*global
 
 				if (rest.indexOf("jshint") === 0) {
-					return ch1 + ch2 + "jshint";
+					return {
+						type: Token.CommentSymbol,
+						value: ch1 + ch2 + "jshint"
+					};
 				}
-
-				// if (rest.indexOf(" jshint") === 0) {
-				//	return ch1 + ch2 + " jshint";
-				// }
 
 				if (rest.indexOf("jslint") === 0) {
-					return ch1 + ch2 + "jslint";
+					return {
+						type: Token.CommentSymbol,
+						value: ch1 + ch2 + "jslint"
+					};
 				}
-
-				// if (rest.indexOf(" jslint") === 0) {
-				// 	return ch1 + ch2 + " jslint";
-				// }
 
 				if (rest.indexOf("member") === 0) {
-					return ch1 + ch2 + "members";
+					return {
+						type: Token.CommentSymbol,
+						value: ch1 + ch2 + "members"
+					};
 				}
-
-				// if (rest.indexOf(" member") === 0) {
-				// 	return ch1 + ch2 + " members";
-				// }
 
 				if (rest.indexOf("members") === 0) {
-					return ch1 + ch2 + "members";
+					return {
+						type: Token.CommentSymbol,
+						value: ch1 + ch2 + "members"
+					};
 				}
-
-				// if (rest.indexOf(" members") === 0) {
-				// 	return ch1 + ch2 + " members";
-				// }
 
 				if (rest.indexOf("global") === 0) {
-					return ch1 + ch2 + "global";
+					return {
+						type: Token.CommentSymbol,
+						value: ch1 + ch2 + "global"
+					};
 				}
-
-				// if (rest.indexOf(" jslint") === 0) {
-				// 	return ch1 + ch2 + " jslint";
-				// }
 
 				// If no special comments matched, return the marker itself
 
-				return ch1 + ch2;
+				return {
+					type: Token.CommentSymbol,
+					value: ch1 + ch2
+				};
 			}
 		}
 
@@ -245,7 +295,10 @@ Lexer.prototype = {
 		var result = /^[a-zA-Z_$][a-zA-Z0-9_$]*/.exec(this.input);
 
 		if (result) {
-			return result[0];
+			return {
+				type: Token.Identifier,
+				value: result[0]
+			};
 		}
 
 		return null;
@@ -256,7 +309,10 @@ Lexer.prototype = {
 		var result = /^[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+\-]?[0-9]+)?/.exec(this.input);
 
 		if (result) {
-			return result[0];
+			return {
+				type: Token.NumericLiteral,
+				value: result[0]
+			};
 		}
 
 		return null;
@@ -316,7 +372,7 @@ Lexer.prototype = {
 			this.scanNumericLiteral();
 
 		if (match) {
-			this.skip(match.length);
+			this.skip(match.value.length);
 			return match;
 		}
 
@@ -709,6 +765,10 @@ Lexer.prototype = {
 			}
 
 			t = this.next();
+			
+			if (t) {
+				t = t.value;
+			}
 
 			if (!t) {
 				t = "";
