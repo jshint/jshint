@@ -82,7 +82,7 @@ exports.register = function (linter) {
 
 	// Enforce consistency in style of quoting.
 
-	linter.on("StringLiteral", function style_scanQuotes(data) {
+	linter.on("String", function style_scanQuotes(data) {
 		var quotmark = linter.getOption("quotmark");
 		var code;
 

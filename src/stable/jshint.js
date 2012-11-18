@@ -3212,8 +3212,8 @@ loop:
 			emitter.emit("Identifier", ev);
 		});
 
-		lex.on("StringLiteral", function (ev) {
-			emitter.emit("StringLiteral", ev);
+		lex.on("String", function (ev) {
+			emitter.emit("String", ev);
 		});
 
 		lex.start();
