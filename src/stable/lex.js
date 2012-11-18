@@ -11,13 +11,9 @@ var state  = require("./state.js").state;
 
 // Helper functions
 
-function isAlpha(str) {
-	return (str >= "a" && str <= "z\uffff") ||
-		(str >= "A" && str <= "Z\uffff");
-}
-
-function isDigit(str) {
-	return (str >= "0" && str <= "9");
+function isIdentifierStart(ch) {
+	return (ch === "$") || (ch === "_") || (ch === "\\") ||
+		(ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z");
 }
 
 var Token = {
@@ -338,18 +334,182 @@ Lexer.prototype = {
 		return null;
 	},
 
-	// TODO: We need more explicit scanning here.
 	scanNumericLiteral: function () {
-		var result = /^[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+\-]?[0-9]+)?/.exec(this.input);
+		var index = 0;
+		var value = "";
+		var length = this.input.length;
+		var char = this.peek(index);
+		var bad;
 
-		if (result) {
-			return {
-				type: Token.NumericLiteral,
-				value: result[0]
-			};
+		function isDecimalDigit(str) {
+			return (/^[0-9]$/).test(str);
 		}
 
-		return null;
+		function isOctalDigit(str) {
+			return (/^[0-7]$/).test(str);
+		}
+
+		function isHexDigit(str) {
+			return (/^[0-9a-fA-F]$/).test(str);
+		}
+
+		// Numbers must start either with a decimal digit or a point.
+
+		if (char !== "." && !isDecimalDigit(char)) {
+			return null;
+		}
+
+		if (char !== ".") {
+			value = this.peek(index);
+			index += 1;
+			char = this.peek(index);
+
+			if (value === "0") {
+				if (char === "x" || char === "X") {
+					index += 1;
+					value += char;
+
+					while (index < length) {
+						char = this.peek(index);
+						if (!isHexDigit(char)) {
+							break;
+						}
+						value += char;
+						index += 1;
+					}
+
+					if (value.length <= 2) { // 0x
+						return {
+							type: Token.NumericLiteral,
+							value: value,
+							malformed: true
+						};
+					}
+
+					if (index < length) {
+						char = this.peek(index);
+						if (isIdentifierStart(char)) {
+							return null;
+						}
+					}
+
+					return {
+						type: Token.NumericLiteral,
+						value: value,
+						base: 16,
+						malformed: false
+					};
+				}
+
+				if (isOctalDigit(char)) {
+					index += 1;
+					value += char;
+					bad = false;
+
+					while (index < length) {
+						char = this.peek(index);
+
+						// Numbers like '019' (note the 9) are not valid octals
+						// but we still parse them and mark as 'malformed'.
+
+						if (isDecimalDigit(char)) {
+							bad = true;
+						} else if (!isOctalDigit(char)) {
+							break;
+						}
+						value += char;
+						index += 1;
+					}
+
+					if (index < length) {
+						char = this.peek(index);
+						if (isIdentifierStart(char)) {
+							return null;
+						}
+					}
+
+					return {
+						type: Token.NumericLiteral,
+						value: value,
+						base: 8,
+						malformed: false
+					};
+				}
+
+				// Decimal numbers that start with '0' such as '09' are illegal
+				// but we still parse them and return as malformed.
+
+				if (isDecimalDigit(char)) {
+					index += 1;
+					value += char;
+				}
+			}
+
+			while (index < length) {
+				char = this.peek(index);
+				if (!isDecimalDigit(char)) {
+					break;
+				}
+				value += char;
+				index += 1;
+			}
+		}
+
+		if (char === ".") {
+			value += char;
+			index += 1;
+
+			while (index < length) {
+				char = this.peek(index);
+				if (!isDecimalDigit(char)) {
+					break;
+				}
+				value += char;
+				index += 1;
+			}
+		}
+
+		if (char === "e" || char === "E") {
+			value += char;
+			index += 1;
+			char = this.peek(index);
+
+			if (char === "+" || char === "-") {
+				value += this.input(index);
+				index += 1;
+			}
+
+			char = this.peek(index);
+			if (isDecimalDigit(char)) {
+				value += char;
+				index += 1;
+
+				while (index < length) {
+					char = this.peek(index);
+					if (!isDecimalDigit(char)) {
+						break;
+					}
+					value += char;
+					index += 1;
+				}
+			} else {
+				return null;
+			}
+		}
+
+		if (index < length) {
+			char = this.peek(index);
+			if (isIdentifierStart(char)) {
+				return null;
+			}
+		}
+
+		return {
+			type: Token.NumericLiteral,
+			value: value,
+			base: 10,
+			malformed: !isFinite(value)
+		};
 	},
 
 	scanStringLiteral: function () {
@@ -781,7 +941,7 @@ Lexer.prototype = {
 	 * This function is called by advance() to get the next token.
 	 */
 	token: function () {
-		var b, c, captures, d, depth, high, i, l, low, q, t, isLiteral, isInRange;
+		var b, c, captures, depth, high, i, l, low, q, t, isLiteral, isInRange;
 		var token;
 
 		for (;;) {
@@ -827,68 +987,47 @@ Lexer.prototype = {
 				case Token.NullLiteral:
 				case Token.BooleanLiteral:
 					return this.create("(identifier)", token.value);
-				}
 
-				c = t.charAt(0);
-
-				// Number
-
-				if (isDigit(c)) {
-
-					// Check if this number is invalid.
-
-					if (!isFinite(Number(t))) {
+				case Token.NumericLiteral:
+					if (token.malformed) {
 						this.trigger("warning", {
 							code: "W119",
 							line: this.line,
 							character: this.char,
-							data: [ t ]
+							data: [ token.value ]
 						});
 					}
 
-					if (isAlpha(this.peek())) {
+					if (state.jsonMode && token.base === 16) {
 						this.trigger("warning", {
-							code: "W013",
+							code: "W114",
 							line: this.line,
 							character: this.char,
-							data: [ t ]
+							data: [ "0x-" ]
 						});
 					}
 
-					if (c === "0") {
-						d = t.substr(1, 1);
-						if (isDigit(d)) {
-							// Check for leading zeroes.
-							if (state.tokens.curr.id !== ".") {
-								this.trigger("warning", {
-									code: "W120",
-									line: this.line,
-									character: this.char,
-									data: [ t ]
-								});
-							}
-						} else if (state.jsonMode && (d === "x" || d === "X")) {
-							this.trigger("warning", {
-								code: "W114",
-								line: this.line,
-								character: this.char,
-								data: [ "0x-" ]
-							});
-						}
-					}
-
-					if (t.substr(t.length - 1) === ".") {
-						// Warn about a trailing decimal point.
+					if (state.directive["use strict"] && token.base === 8) {
 						this.trigger("warning", {
-							code: "W121",
+							code: "W115",
 							line: this.line,
-							character: this.char,
-							data: [ t ]
+							character: this.char
 						});
 					}
 
-					return this.create("(number)", t);
+					this.trigger("Number", {
+						line: this.line,
+						char: this.character,
+						from: this.from,
+						value: token.value,
+						base: token.base,
+						malformed: token.malformed
+					});
+
+					return this.create("(number)", token.value);
 				}
+
+				c = t.charAt(0);
 
 				switch (t) {
 
