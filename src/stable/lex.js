@@ -25,7 +25,10 @@ var Token = {
 	Punctuator: 2,
 	NumericLiteral: 3,
 	StringLiteral: 4,
-	CommentSymbol: 5
+	CommentSymbol: 5,
+	Keyword: 6,
+	NullLiteral: 7,
+	BooleanLiteral: 8
 };
 
 var Lexer = function (source) {
@@ -284,13 +287,51 @@ Lexer.prototype = {
 		return null;
 	},
 
+	scanKeyword: function () {
+		var result = /^[a-zA-Z_$][a-zA-Z0-9_$]*/.exec(this.input);
+		var keywords = [
+			"if", "in", "do", "var", "for", "new",
+			"try", "let", "this", "else", "case",
+			"void", "with", "enum", "while", "break",
+			"catch", "throw", "const", "yield", "class",
+			"super", "return", "typeof", "delete",
+			"switch", "export", "import", "default",
+			"finally", "extends", "function", "continue",
+			"debugger", "instanceof"
+		];
+
+		if (result && keywords.indexOf(result[0]) >= 0) {
+			return {
+				type: Token.Keyword,
+				value: result[0]
+			};
+		}
+
+		return null;
+	},
+
 	scanIdentifier: function () {
 		var result = /^[a-zA-Z_$][a-zA-Z0-9_$]*/.exec(this.input);
+		var id, type;
 
 		if (result) {
+			id = result[0];
+
+			switch (id) {
+			case "true":
+			case "false":
+				type = Token.BooleanLiteral;
+				break;
+			case "null":
+				type = Token.NullLiteral;
+				break;
+			default:
+				type = Token.Identifier;
+			}
+
 			return {
-				type: Token.Identifier,
-				value: result[0]
+				type: type,
+				value: id
 			};
 		}
 
@@ -580,6 +621,7 @@ Lexer.prototype = {
 		var match =
 			this.scanCommentSymbols() ||
 			this.scanPunctuator() ||
+			this.scanKeyword() ||
 			this.scanIdentifier() ||
 			this.scanNumericLiteral();
 
@@ -769,8 +811,9 @@ Lexer.prototype = {
 					this.input = "";
 				}
 			} else {
-				if (token.type === Token.StringLiteral) {
-					this.trigger("StringLiteral", {
+				switch (token.type) {
+				case Token.StringLiteral:
+					this.trigger("String", {
 						line: this.line,
 						char: this.character,
 						from: this.from,
@@ -779,15 +822,14 @@ Lexer.prototype = {
 					});
 
 					return this.create("(string)", token.value);
+				case Token.Identifier:
+				case Token.Keyword:
+				case Token.NullLiteral:
+				case Token.BooleanLiteral:
+					return this.create("(identifier)", token.value);
 				}
 
 				c = t.charAt(0);
-
-				// Identifier
-
-				if (isAlpha(c) || c === "_" || c === "$") {
-					return this.create("(identifier)", t);
-				}
 
 				// Number
 
