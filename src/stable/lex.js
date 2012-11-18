@@ -24,7 +24,8 @@ var Token = {
 	Identifier: 1,
 	Punctuator: 2,
 	NumericLiteral: 3,
-	CommentSymbol: 4
+	StringLiteral: 4,
+	CommentSymbol: 5
 };
 
 var Lexer = function (source) {
@@ -109,14 +110,6 @@ Lexer.prototype = {
 		case ":":
 		case "~":
 		case "?":
-			return {
-				type: Token.Punctuator,
-				value: ch1
-			};
-
-		// Quotes
-		case '"':
-		case "'":
 			return {
 				type: Token.Punctuator,
 				value: ch1
@@ -318,6 +311,223 @@ Lexer.prototype = {
 		return null;
 	},
 
+	scanStringLiteral: function () {
+		var quote = this.peek();
+
+		// String must start with a quote.
+		if (quote !== "\"" && quote !== "'") {
+			return null;
+		}
+
+		// In JSON strings must always use double quotes.
+		if (state.jsonMode && quote !== "\"") {
+			this.trigger("warning", {
+				code: "W108",
+				line: this.line,
+				character: this.char // +1?
+			});
+		}
+
+		var value = "";
+		var startLine = this.line;
+		var startChar = this.char;
+		var allowNewLine = false;
+
+		this.skip();
+
+		while (this.peek() !== quote) {
+			while (this.peek() === "") { // End Of Line
+
+				// If an EOL is not preceded by a backslash, show a warning
+				// and proceed like it was a legit multi-line string where
+				// author simply forgot to escape the newline symbol.
+				//
+				// Another approach is to implicitly close a string on EOL
+				// but it generates too many false positives.
+
+				if (!allowNewLine) {
+					this.trigger("warning", {
+						code: "W112",
+						line: this.line,
+						character: this.char
+					});
+				} else {
+					allowNewLine = false;
+
+					// Otherwise show a warning if multistr option was not set.
+					// For JSON, show warning no matter what.
+
+					if (!state.option.multistr) {
+						this.trigger("warning", {
+							code: "W117",
+							line: this.line,
+							character: this.char
+						});
+					} else if (state.jsonMode) {
+						this.trigger("warning", {
+							code: "W116",
+							line: this.line,
+							character: this.char
+						});
+					}
+				}
+
+				// If we get an EOF inside of an unclosed string, show an
+				// error and implicitly close it at the EOF point.
+
+				if (!this.nextLine()) {
+					this.trigger("error", {
+						code: "E044",
+						line: startLine,
+						character: startChar
+					});
+
+					return {
+						type: Token.StringLiteral,
+						value: value,
+						isUnclosed: true,
+						quote: quote
+					};
+				}
+			}
+
+			allowNewLine = false;
+			var char = this.peek();
+			var jump = 1; // A length of a jump, after we're done
+			              // parsing this character.
+
+			if (char < " ") {
+				// Warn about a control character in a string.
+				this.trigger("warning", {
+					code: "W113",
+					line: this.line,
+					character: this.char,
+					data: [ "<non-printable>" ]
+				});
+			}
+
+			if (char === "\\") {
+				this.skip();
+				char = this.peek();
+
+				switch (char) {
+				case "'":
+					if (state.jsonMode) {
+						this.trigger("warning", {
+							code: "W114",
+							line: this.line,
+							character: this.char,
+							data: [ "\\'" ]
+						});
+					}
+					break;
+				case "b":
+					char = "\b";
+					break;
+				case "f":
+					char = "\f";
+					break;
+				case "n":
+					char = "\n";
+					break;
+				case "r":
+					char = "\r";
+					break;
+				case "t":
+					char = "\t";
+					break;
+				case "0":
+					char = "\0";
+
+					// Octal literals fail in strict mode.
+					// Check if the number is between 00 and 07.
+					var n = parseInt(this.peek(), 10);
+					if (n >= 0 && n <= 7 && state.directive["use strict"]) {
+						this.trigger("warning", {
+							code: "W115",
+							line: this.line,
+							character: this.char
+						});
+					}
+					break;
+				case "u":
+					var u = parseInt(this.input.substr(1, 4), 16);
+
+					if (u >= 32 && u <= 126 && u !== 34 && u !== 92 && u !== 39) {
+						this.trigger("warning", {
+							code: "W111",
+							line: this.line,
+							character: this.char
+						});
+					}
+
+					char = String.fromCharCode(u);
+					jump = 5;
+					break;
+				case "v":
+					if (state.jsonMode) {
+						this.trigger("warning", {
+							code: "W114",
+							line: this.line,
+							character: this.char,
+							data: [ "\\v" ]
+						});
+					}
+
+					char = "\v";
+					break;
+				case "x":
+					var	x = parseInt(this.input.substr(1, 2), 16);
+
+					if (state.jsonMode) {
+						this.trigger("warning", {
+							code: "W114",
+							line: this.line,
+							character: this.char,
+							data: [ "\\x-" ]
+						});
+					}
+
+					char = String.fromCharCode(x);
+					jump = 3;
+					break;
+				case "\\":
+				case "\"":
+				case "/":
+					break;
+				case "":
+					allowNewLine = true;
+					char = "";
+					break;
+				case "!":
+					if (value.slice(value.length - 2) === "<") {
+						break;
+					}
+
+					/*falls through */
+				default:
+					// Weird escapement.
+					this.trigger("warning", {
+						code: "W118",
+						line: this.line,
+						character: this.char
+					});
+				}
+			}
+
+			value += char;
+			this.skip(jump);
+		}
+
+		this.skip();
+		return {
+			type: Token.StringLiteral,
+			value: value,
+			isUnclosed: false,
+			quote: quote
+		};
+	},
+
 	/*
 	 * Scan for any occurence of mixed tabs and spaces. If smarttabs option
 	 * is on, ignore tabs followed by spaces.
@@ -365,6 +575,8 @@ Lexer.prototype = {
 			}
 		}
 
+		// Methods that don't move the character pointer.
+
 		var match =
 			this.scanCommentSymbols() ||
 			this.scanPunctuator() ||
@@ -375,6 +587,16 @@ Lexer.prototype = {
 			this.skip(match.value.length);
 			return match;
 		}
+
+		// Methods that move the character pointer.
+
+		match = this.scanStringLiteral();
+
+		if (match) {
+			return match;
+		}
+
+		// No token could be matched, give up.
 
 		return null;
 	},
@@ -517,260 +739,21 @@ Lexer.prototype = {
 	 * This function is called by advance() to get the next token.
 	 */
 	token: function () {
-		var b, c, captures, d, depth, high, i, l, low, q, t, isLiteral, isInRange, n;
-
-		// This function must be bound to 'this'.
-		var string = function (x) {
-			/*jshint validthis:true */
-			var c, j, r = "", allowNewLine = false;
-
-			// In JSON mode all strings must use double-quote.
-
-			if (state.jsonMode && x !== "\"") {
-				this.trigger("warning", {
-					code: "W108",
-					line: this.line,
-					character: this.char
-				});
-			}
-
-			// Option 'quotmark' helps you to enforce one particular
-			// style of quoting.
-
-			var code;
-			if (state.option.quotmark) {
-				switch (true) {
-				case state.option.quotmark === "single" && x !== "'":
-					code = "W109";
-					break;
-				case state.option.quotmark === "double" && x !== "\"":
-					code = "W108";
-					break;
-				case state.option.quotmark === true:
-					// If quotmark is set to true, we remember the very first
-					// quotation style and then use it as a reference.
-					state.quotmark = state.quotmark || x;
-
-					// Warn about mixed double and single quotes.
-					if (state.quotmark !== x) {
-						code = "W110";
-					}
-				}
-
-				if (code) {
-					this.trigger("warning", {
-						code: code,
-						line: this.line,
-						character: this.char
-					});
-				}
-			}
-
-			// This function must be bound to 'this'.
-			var esc = function (n) {
-				var i = parseInt(this.input.substr(j + 1, n), 16);
-				j += n;
-
-				// Warn about unnecessary escapements.
-				if (i >= 32 && i <= 126 && i !== 34 && i !== 92 && i !== 39) {
-					this.trigger("warning", {
-						code: "W111",
-						line: this.line,
-						character: this.char
-					});
-				}
-
-				this.char += n;
-				c = String.fromCharCode(i);
-			}.bind(this);
-
-			j = 0;
-
-			for (;;) {
-				while (j >= this.input.length) { // What is this? j >= this.input.length?
-					j = 0;
-
-					var cl = this.line;
-					var cf = this.from;
-
-					if (!this.nextLine()) {
-						// Display an error about an unclosed string.
-						this.trigger("error", {
-							code: "E044",
-							line: cl,
-							character: cf
-						});
-						return;
-					}
-
-					if (allowNewLine) {
-						allowNewLine = false;
-					} else {
-						// Warn about an unclosed string.
-						this.trigger("warning", {
-							code: "W112",
-							line: cl,
-							character: cf
-						});
-					}
-				}
-
-				c = this.peek(j);
-				if (c === x) {
-					this.char += 1;
-					this.input = this.input.substr(j + 1);
-					return this.create("(string)", r, x);
-				}
-
-				if (c < " ") {
-					if (c === "\n" || c === "\r") {
-						break;
-					}
-
-					// Warn about a control character in a string.
-					this.trigger("warning", {
-						code: "W113",
-						line: this.line,
-						character: this.char + j,
-						data: [ this.input.slice(0, j) ]
-					});
-				} else if (c === "\\") {
-					j += 1;
-					this.char += 1;
-					c = this.peek(j);
-					n = this.peek(j + 1);
-
-					switch (c) {
-					case "\\":
-					case "\"":
-					case "/":
-						break;
-					case "\'":
-						if (state.jsonMode) {
-							this.trigger("warning", {
-								code: "W114",
-								line: this.line,
-								character: this.char,
-								data: [ "\\'" ]
-							});
-						}
-						break;
-					case "b":
-						c = "\b";
-						break;
-					case "f":
-						c = "\f";
-						break;
-					case "n":
-						c = "\n";
-						break;
-					case "r":
-						c = "\r";
-						break;
-					case "t":
-						c = "\t";
-						break;
-					case "0":
-						c = "\0";
-
-						// Octal literals fail in strict mode
-						// check if the number is between 00 and 07
-						// where 'n' is the token next to 'c'
-
-						if (n >= 0 && n <= 7 && state.directive["use strict"]) {
-							this.trigger("warning", {
-								code: "W115",
-								line: this.line,
-								character: this.char
-							});
-						}
-
-						break;
-					case "u":
-						esc(4);
-						break;
-					case "v":
-						if (state.jsonMode) {
-							this.trigger("warning", {
-								code: "W114",
-								line: this.line,
-								character: this.char,
-								data: [ "\\v" ]
-							});
-						}
-
-						c = "\v";
-						break;
-					case "x":
-						if (state.jsonMode) {
-							this.trigger("warning", {
-								code: "W114",
-								line: this.line,
-								character: this.char,
-								data: [ "\\x-" ]
-							});
-						}
-
-						esc(2);
-						break;
-					case "":
-						// last character is escape character
-						// always allow new line if escaped, but show
-						// warning if option is not set
-						allowNewLine = true;
-						if (state.option.multistr) {
-							if (state.jsonMode) {
-								this.trigger("warning", {
-									code: "W116",
-									line: this.line,
-									character: this.char
-								});
-							}
-
-							c = "";
-							this.char -= 1;
-							break;
-						}
-
-						this.trigger("warning", {
-							code: "W117",
-							line: this.line,
-							character: this.char
-						});
-						break;
-					case "!":
-						if (this.peek(j - 2) === "<")
-							break;
-
-						/*falls through*/
-					default:
-						// Weird escapement, warn about that.
-						this.trigger("warning", {
-							code: "W118",
-							line: this.line,
-							character: this.char
-						});
-					}
-				}
-
-				r += c;
-				this.char += 1;
-				j += 1;
-			}
-		}.bind(this);
+		var b, c, captures, d, depth, high, i, l, low, q, t, isLiteral, isInRange;
+		var token;
 
 		for (;;) {
 			if (!this.input.length) {
 				return this.create(this.nextLine() ? "(endline)" : "(end)", "");
 			}
 
-			t = this.next();
-			
-			if (t) {
-				t = t.value;
+			token = this.next();
+
+			if (token) {
+				t = token.value;
 			}
 
-			if (!t) {
+			if (!token) {
 				t = "";
 				c = "";
 
@@ -786,6 +769,18 @@ Lexer.prototype = {
 					this.input = "";
 				}
 			} else {
+				if (token.type === Token.StringLiteral) {
+					this.trigger("StringLiteral", {
+						line: this.line,
+						char: this.character,
+						from: this.from,
+						value: token.value,
+						quote: token.quote
+					});
+
+					return this.create("(string)", token.value);
+				}
+
 				c = t.charAt(0);
 
 				// Identifier
@@ -854,12 +849,6 @@ Lexer.prototype = {
 				}
 
 				switch (t) {
-
-				// String
-
-				case "\"":
-				case "'":
-					return string(t);
 
 				// Single line comment
 

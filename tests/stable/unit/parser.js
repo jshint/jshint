@@ -319,11 +319,12 @@ exports.strings = function (test) {
 	];
 
 	TestRun(test)
-		.addError(1, "Control character in string: .")
+		.addError(1, "Control character in string: <non-printable>.", {character: 10})
 		.addError(1, "This character may get silently deleted by one or more browsers.")
 		.addError(2, "Bad escapement.")
 		.addError(3, "Unnecessary escapement.")
 		.addError(4, "Unclosed string.")
+		.addError(4, "Missing semicolon.")
 		.test(code);
 
 	test.done();
