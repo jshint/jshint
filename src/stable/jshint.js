@@ -3161,8 +3161,20 @@ loop:
 		}
 
 		var api = {
+			get isJSON() {
+				return state.jsonMode;
+			},
+
 			getOption: function (name) {
 				return state.option[name] || null;
+			},
+
+			getCache: function (name) {
+				return state.cache[name];
+			},
+
+			setCache: function (name, value) {
+				state.cache[name] = value;
 			},
 
 			warn: function (code, data) {
@@ -3199,6 +3211,10 @@ loop:
 
 		lex.on("Identifier", function (ev) {
 			emitter.emit("Identifier", ev);
+		});
+
+		lex.on("StringLiteral", function (ev) {
+			emitter.emit("StringLiteral", ev);
 		});
 
 		lex.start();

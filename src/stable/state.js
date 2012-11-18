@@ -15,7 +15,7 @@ var state = {
 		this.jsonMode = false;
 		this.lines = [];
 		this.tab = "";
-		this.quotmark = null;
+		this.cache = {}; // Node.JS doesn't have Map. Sniff.
 	}
 };
 
