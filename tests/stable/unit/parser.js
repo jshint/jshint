@@ -188,15 +188,24 @@ exports.numbers = function (test) {
 
 	TestRun(test)
 		.addError(2, "Bad number '10e308'.")
-		.addError(4, "Don't use extra leading zeros '03'.")
 		.addError(5, "A leading decimal point can be confused with a dot: '.3'.")
-		.addError(6, "Missing space after '0xAA'.")
-		.addError(6, "Missing semicolon.")
-		.addError(6, "Expected an assignment or function call and instead saw an expression.")
+		.addError(6, "Unexpected '0'.")
+		.addError(7, "Expected an identifier and instead saw 'var'.")
+		.addError(7, "Missing semicolon.")
 		.addError(7, "Don't use extra leading zeros '0033'.")
 		.addError(8, "A trailing decimal point can be confused with a dot: '3.'.")
 		.addError(9, "A dot following a number can be confused with a decimal point.")
 		.test(code);
+
+	// Octals are prohibited in strict mode.
+	TestRun(test)
+		.addError(3, "Octal literals are not allowed in strict mode.")
+		.test([
+			"(function () {",
+			"'use strict';",
+			"return 045;",
+			"}());"
+		]);
 
 	test.done();
 };

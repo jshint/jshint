@@ -122,4 +122,24 @@ exports.register = function (linter) {
 			});
 		}
 	});
+
+	linter.on("Number", function style_scanNumbers(data) {
+		if (data.value.substr(data.value.length - 1) === ".") {
+			// Warn about a trailing decimal point.
+			linter.warn("W121", {
+				line: data.line,
+				char: data.char,
+				data: [ data.value ]
+			});
+		}
+
+		if (/^00+/.test(data.value)) {
+			// Multiple leading zeroes.
+			linter.warn("W120", {
+				line: data.line,
+				char: data.char,
+				data: [ data.value ]
+			});
+		}
+	});
 };

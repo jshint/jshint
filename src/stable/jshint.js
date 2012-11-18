@@ -3216,6 +3216,10 @@ loop:
 			emitter.emit("String", ev);
 		});
 
+		lex.on("Number", function (ev) {
+			emitter.emit("Number", ev);
+		});
+
 		lex.start();
 
 		// Check options
