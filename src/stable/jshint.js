@@ -115,9 +115,6 @@ var JSHINT = (function () {
 			proto       : true, // if the `__proto__` property should be allowed
 			prototypejs : true, // if Prototype and Scriptaculous globals should be
 			                    // predefined
-			regexdash   : true, // if unescaped first/last dash (-) inside brackets
-			                    // should be tolerated
-			regexp      : true, // if the . should not be allowed in regexp literals
 			rhino       : true, // if the Rhino environment globals should be predefined
 			undef       : true, // if variables should be declared before used
 			unused      : true, // if variables should be always used
@@ -140,7 +137,10 @@ var JSHINT = (function () {
 			yui         : true, // YUI variables should be predefined
 
 			// Obsolete options
-			onecase     : true  // if one case switch statements should be allowed
+			onecase     : true, // if one case switch statements should be allowed
+			regexp      : true, // if the . should not be allowed in regexp literals
+			regexdash   : true  // if unescaped first/last dash (-) inside brackets
+			                    // should be tolerated
 		},
 
 		// These are the JSHint options that can take any value
