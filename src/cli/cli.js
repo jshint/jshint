@@ -360,20 +360,12 @@ var exports = {
 			extensions: options["extra-ext"]
 		});
 
-		// Avoid stdout cutoff in Node 0.4.x, also supports 0.5.x.
-		// See https://github.com/joyent/node/issues/1669
-
-		function exit() { process.exit(passed ? 0 : 2); }
-
-		try {
-			if (!process.stdout.flush()) {
-				process.stdout.once("drain", exit);
-			} else {
-				exit();
-			}
-		} catch (err) {
-			exit();
-		}
+		var exiting = false;
+		process.on('exit', function() {
+			if (exiting) { return; }
+			exiting = true;
+			process.exit(passed ? 0 : 2);
+		});
 	}
 };
 
