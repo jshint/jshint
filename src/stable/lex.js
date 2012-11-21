@@ -24,7 +24,8 @@ var Token = {
 	CommentSymbol: 5,
 	Keyword: 6,
 	NullLiteral: 7,
-	BooleanLiteral: 8
+	BooleanLiteral: 8,
+	RegExp: 9
 };
 
 var Lexer = function (source) {
@@ -729,6 +730,155 @@ Lexer.prototype = {
 		};
 	},
 
+	scanRegExp: function () {
+		var index = 0;
+		var length = this.input.length;
+		var char = this.peek();
+		var value = char;
+		var body = "";
+		var flags = [];
+		var malformed = false;
+		var isCharSet = false;
+		var terminated;
+
+		var scanUnexpectedChars = function () {
+			// Unexpected control character
+			if (char < " ") {
+				malformed = true;
+				this.trigger("warning", {
+					code: "W123",
+					line: this.line,
+					character: this.char
+				});
+			}
+
+			// Unexpected escaped character
+			if (char === "<") {
+				malformed = true;
+				this.trigger("warning", {
+					code: "W124",
+					line: this.line,
+					character: this.char,
+					data: [ char ]
+				});
+			}
+		}.bind(this);
+
+		// Regular expressions must start with '/'
+
+		if (!this.prereg || char !== "/") {
+			return null;
+		}
+
+		index += 1;
+		terminated = false;
+
+		while (index < length) {
+			char = this.peek(index);
+			value += char;
+			body += char;
+
+			if (isCharSet) {
+				if (char === "]") {
+					if (this.peek(index - 1) !== "\\" || this.peek(index - 2) === "\\") {
+						isCharSet = false;
+					}
+				}
+
+				if (char === "\\") {
+					index += 1;
+					char = this.peek(index);
+					body += char;
+					value += char;
+
+					scanUnexpectedChars();
+				}
+
+				index += 1;
+				continue;
+			}
+
+			if (char === "\\") {
+				index += 1;
+				char = this.peek(index);
+				body += char;
+				value += char;
+
+				scanUnexpectedChars();
+
+				if (char === "/") {
+					index += 1;
+					continue;
+				}
+
+				if (char === "[") {
+					index += 1;
+					continue;
+				}
+			}
+
+			if (char === "[") {
+				isCharSet = true;
+				index += 1;
+				continue;
+			}
+
+			if (char === "/") {
+				body = body.substr(0, body.length - 1);
+				terminated = true;
+				index += 1;
+				break;
+			}
+
+			index += 1;
+		}
+
+		if (!terminated) {
+			this.trigger("error", {
+				code: "E017",
+				line: this.line,
+				character: this.from
+			});
+
+			return void this.trigger("fatal", {
+				line: this.line,
+				from: this.from
+			});
+		}
+
+		// Parse flags (if any).
+
+		while (index < length) {
+			char = this.peek(index);
+			if (!/[gim]/.test(char)) {
+				break;
+			}
+			flags.push(char);
+			value += char;
+			index += 1;
+		}
+
+		// Check regular expression for correctness.
+		try {
+			new RegExp(body, flags.join(""));
+		} catch (err) {
+			malformed = true;
+			this.trigger("error", {
+				code: "E018",
+				line: this.line,
+				character: this.char,
+				data: [ err.message ] // Platform dependent!
+			});
+		}
+
+		return {
+			type: Token.RegExp,
+			value: value,
+			flags: flags,
+			malformed: malformed
+		};
+	},
+
 	/*
 	 * Scan for any occurence of mixed tabs and spaces. If smarttabs option
 	 * is on, ignore tabs followed by spaces.
@@ -780,6 +930,7 @@ Lexer.prototype = {
 
 		var match =
 			this.scanCommentSymbols() ||
+			this.scanRegExp() ||
 			this.scanPunctuator() ||
 			this.scanKeyword() ||
 			this.scanIdentifier() ||
@@ -941,7 +1092,7 @@ Lexer.prototype = {
 	 * This function is called by advance() to get the next token.
 	 */
 	token: function () {
-		var b, c, captures, depth, high, i, l, low, q, t, isLiteral, isInRange;
+		var c, i, t;
 		var token;
 
 		for (;;) {
@@ -1025,6 +1176,9 @@ Lexer.prototype = {
 					});
 
 					return this.create("(number)", token.value);
+
+				case Token.RegExp:
+					return this.create("(regexp)", token.value);
 				}
 
 				c = t.charAt(0);
@@ -1079,398 +1233,6 @@ Lexer.prototype = {
 
 				case "":
 					break;
-
-				//		/
-
-				case "/":
-					// Warn about '/=' (it can be confused with /= operator.
-					if (this.peek() === "=") {
-						this.trigger("error", {
-							code: "E016",
-							line: this.line,
-							character: this.from
-						});
-					}
-
-					if (this.prereg) {
-						depth = 0;
-						captures = 0;
-						l = 0;
-						for (;;) {
-							b = true;
-							c = this.peek(l);
-							l += 1;
-							switch (c) {
-							case "":
-								// Fatal: unclosed regular expression.
-								this.trigger("error", {
-									code: "E017",
-									line: this.line,
-									character: this.from
-								});
-
-								return void this.trigger("fatal", {
-									line: this.line,
-									from: this.from
-								});
-							case "/":
-								// Check that all regexp groups were terminated.
-								if (depth > 0) {
-									this.trigger("warning", {
-										code: "W122",
-										line: this.line,
-										character: this.from + l,
-										data: [ depth ]
-									});
-								}
-
-								c = this.input.substr(0, l - 1);
-
-								q = {
-									g: true,
-									i: true,
-									m: true
-								};
-
-								while (q[this.peek(l)] === true) {
-									q[this.peek(l)] = false;
-									l += 1;
-								}
-
-								this.skip(l);
-								q = this.peek();
-
-								if (q === "/" || q === "*") {
-									this.trigger("error", {
-										code: "E018",
-										line: this.line,
-										character: this.from
-									});
-								}
-
-								return this.create("(regexp)", c);
-							case "\\":
-								c = this.peek(l);
-
-								if (c < " ") {
-									// Unexpected control character.
-									this.trigger("warning", {
-										code: "W123",
-										line: this.line,
-										character: this.from + l
-									});
-								} else if (c === "<") {
-									// Unexpected escaped character.
-									this.trigger("warning", {
-										code: "W124",
-										line: this.line,
-										character: this.from + l,
-										data: [ c ]
-									});
-								}
-
-								l += 1;
-								break;
-							case "(":
-								depth += 1;
-								b = false;
-								if (this.peek(l) === "?") {
-									l += 1;
-									switch (this.peek(l)) {
-									case ":":
-									case "=":
-									case "!":
-										l += 1;
-										break;
-									default:
-										this.trigger("warning", {
-											code: "W132",
-											line: this.line,
-											character: this.from + l,
-											data: [ ":", this.peek(l) ]
-										});
-									}
-								} else {
-									captures += 1;
-								}
-								break;
-							case "|":
-								b = false;
-								break;
-							case ")":
-								if (depth === 0) {
-									// Warn about unexpected paren.
-									this.trigger("warning", {
-										code: "W125",
-										line: this.line,
-										character: this.from + l,
-										data: [ ")" ]
-									});
-								} else {
-									depth -= 1;
-								}
-								break;
-							case " ":
-								q = 1;
-								while (this.peek(l) === " ") {
-									l += 1;
-									q += 1;
-								}
-								if (q > 1) {
-									this.trigger("warning", {
-										code: "W126",
-										line: this.line,
-										character: this.from + l,
-										data: [ q ]
-									});
-								}
-								break;
-							case "[":
-								c = this.peek(l);
-								if (c === "^") {
-									l += 1;
-									if (this.peek(l) === "]") {
-										this.trigger("error", {
-											code: "E019",
-											line: this.line,
-											character: this.from + l,
-											data: [ "^" ]
-										});
-									}
-								}
-								if (c === "]") {
-									this.trigger("warning", {
-										code: "W127",
-										line: this.line,
-										character: this.from + l - 1
-									});
-								}
-								isLiteral = false;
-								isInRange = false;
-klass:
-								do {
-									c = this.peek(l);
-									l += 1;
-									switch (c) {
-									case "[":
-									case "^":
-										this.trigger("warning", {
-											code: "W125",
-											line: this.line,
-											character: this.from + l,
-											data: [ c ]
-										});
-
-										if (isInRange) {
-											isInRange = false;
-										} else {
-											isLiteral = true;
-										}
-
-										break;
-									case "-":
-										if (isLiteral && !isInRange) {
-											isLiteral = false;
-											isInRange = true;
-										} else if (isInRange) {
-											isInRange = false;
-										} else if (this.peek(l) === "]") {
-											isInRange = true;
-										} else {
-											if (state.option.regexdash !== (l === 2 || (l === 3 &&
-												this.peek(1) === "^"))) {
-												this.trigger("warning", {
-													code: "W125",
-													line: this.line,
-													character: this.from + l - 1,
-													data: [ "-" ]
-												});
-											}
-											isLiteral = true;
-										}
-										break;
-									case "]":
-										if (isInRange && !state.option.regexdash) {
-											this.trigger("warning", {
-												code: "W125",
-												line: this.line,
-												character: this.from + l - 1,
-												data: [ "-" ]
-											});
-										}
-										break klass;
-									case "\\":
-										c = this.peek(l);
-
-										if (c < " ") {
-											this.trigger("warning", {
-												code: "W123",
-												line: this.line,
-												character: this.from + l
-											});
-										} else if (c === "<") {
-											this.trigger("warning", {
-												code: "W124",
-												line: this.line,
-												character: this.from + l,
-												data: [ c ]
-											});
-										}
-
-										l += 1;
-
-										// \w, \s and \d are never part of a character range
-										if (/[wsd]/i.test(c)) {
-											if (isInRange) {
-												this.trigger("warning", {
-													code: "W125",
-													line: this.line,
-													character: this.from + l,
-													data: [ "-" ]
-												});
-												isInRange = false;
-											}
-											isLiteral = false;
-										} else if (isInRange) {
-											isInRange = false;
-										} else {
-											isLiteral = true;
-										}
-										break;
-									case "/":
-										this.trigger("warning", {
-											code: "W128",
-											line: this.line,
-											character: this.from + l - 1,
-											data: [ "/" ]
-										});
-
-										if (isInRange) {
-											isInRange = false;
-										} else {
-											isLiteral = true;
-										}
-
-										break;
-									case "<":
-										if (isInRange) {
-											isInRange = false;
-										} else {
-											isLiteral = true;
-										}
-										break;
-									default:
-										if (isInRange) {
-											isInRange = false;
-										} else {
-											isLiteral = true;
-										}
-									}
-								} while (c);
-								break;
-							case ".":
-								if (state.option.regexp) {
-									this.trigger("warning", {
-										code: "W129",
-										line: this.line,
-										character: this.from + l,
-										data: [ c ]
-									});
-								}
-								break;
-							case "]":
-							case "?":
-							case "{":
-							case "}":
-							case "+":
-							case "*":
-								this.trigger("warning", {
-									code: "W125",
-									line: this.line,
-									character: this.from + l,
-									data: [ c ]
-								});
-							}
-
-							if (b) {
-								switch (this.peek(l)) {
-								case "?":
-								case "+":
-								case "*":
-									l += 1;
-									if (this.peek(l) === "?") {
-										l += 1;
-									}
-									break;
-								case "{":
-									l += 1;
-									c = this.peek(l);
-									if (c < "0" || c > "9") {
-										this.trigger("warning", {
-											code: "W130",
-											line: this.line,
-											character: this.from + l,
-											data: [ c ]
-										});
-										break; // No reason to continue checking numbers.
-									}
-									l += 1;
-									low = +c;
-									for (;;) {
-										c = this.peek(l);
-										if (c < "0" || c > "9") {
-											break;
-										}
-										l += 1;
-										low = +c + (low * 10);
-									}
-									high = low;
-									if (c === ",") {
-										l += 1;
-										high = Infinity;
-										c = this.peek(l);
-										if (c >= "0" && c <= "9") {
-											l += 1;
-											high = +c;
-											for (;;) {
-												c = this.peek(l);
-												if (c < "0" || c > "9") {
-													break;
-												}
-												l += 1;
-												high = +c + (high * 10);
-											}
-										}
-									}
-									if (this.peek(l) !== "}") {
-										this.trigger("warning", {
-											code: "W132",
-											line: this.line,
-											character: this.from + l,
-											data: [ "}", c ]
-										});
-									} else {
-										l += 1;
-									}
-									if (this.peek(l) === "?") {
-										l += 1;
-									}
-									if (low > high) {
-										this.trigger("warning", {
-											code: "W131",
-											line: this.line,
-											character: this.from + l,
-											data: [ low, high ]
-										});
-									}
-								}
-							}
-						}
-						c = this.input.substr(0, l - 1);
-						this.skip(l);
-						return this.create("(regexp)", c);
-					}
-					return this.create("(punctuator)", t);
 
 				// punctuator
 

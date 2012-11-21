@@ -19,9 +19,9 @@ var errors = {
 	E013: "Missing '{a}'.",
 	E014: "Unexpected '{a}'.",
 	E015: "Unclosed comment.",
-	E016: "A regular expression literal can be confused with '/='.",
+	E016: "A regular expression literal can be confused with '/='.", // KILLED
 	E017: "Unclosed regular expression.",
-	E018: "Confusing regular expression.",
+	E018: "Invalid regular expression.",
 	E019: "Unescaped '{a}'.",
 	E020: "Unbegun comment.",
 	E021: "What?", // FIXME,

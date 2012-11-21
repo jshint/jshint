@@ -241,7 +241,11 @@ exports.regexp = function (test) {
 		"var e = /[]/;",
 		"var f = /[^]/;",
 		"var g = /[a^[]/;",
-		"var h = /[a-\\s-\\w-\\d\\x10-\\x20--]/;",
+
+		// FIXME: Firefox doesn't handle [a-\\s] well.
+		// See https://bugzilla.mozilla.org/show_bug.cgi?id=813249
+		"", // "var h = /[a-\\s-\\w-\\d\\x10-\\x20--]/;",
+
 		"var i = /[/-a1-/]/;",
 		"var j = /[a-<<-3]./;",
 		"var k = /]}/;",
@@ -265,33 +269,15 @@ exports.regexp = function (test) {
 		.addError(2, "Unexpected control character in regular expression.")
 		.addError(3, "Unexpected escaped character '<' in regular expression.")
 		.addError(4, "Unexpected escaped character '<' in regular expression.")
-		.addError(5, "Expected ':' and instead saw '('.")
-		.addError(6, "Unescaped ')'.")
-		.addError(6, "Unescaped '-'.")
-		.addError(7, "Empty class.")
-		.addError(8, "Unescaped '^'.")
-		.addError(9, "Unescaped '^'.")
-		.addError(9, "Unescaped '['.")
-		.addError(10, "Unescaped '-'.")
-		.addError(11, "'/' in character sets should be escaped.")
-		.addError(13, "Unescaped ']'.")
-		.addError(13, "Unescaped '}'.")
-		.addError(14, "Unescaped '?'.")
-		.addError(14, "Unescaped '*'.")
-		.addError(14, "Unescaped '+'.")
-		.addError(14, "Unescaped '{'.")
-		.addError(15, "Expected a number and instead saw 'b'.")
-		.addError(15, "Expected '}' and instead saw 'c'.")
-		.addError(15, "Unescaped '}'.")
-		.addError(15, "Expected '}' and instead saw '?'.")
-		.addError(15, "'3' should not be greater than '2'.")
-		.addError(17, "Spaces are hard to count. Use {2}.")
-		.addError(17, "Unescaped '^'.")
-		.addError(17, "Unescaped '-'.")
-		.addError(19, "A regular expression literal can be confused with '/='.")
-		.addError(20, "1 unterminated regular expression group(s).")
-		.addError(21, "3 unterminated regular expression group(s).")
-		.addError(22, "Confusing regular expression.")
+		.addError(5, "Invalid regular expression.")
+		.addError(6, "Invalid regular expression.")
+		.addError(11, "Invalid regular expression.")
+		.addError(12, "Invalid regular expression.")
+		.addError(14, "Invalid regular expression.")
+		.addError(15, "Invalid regular expression.")
+		.addError(17, "Invalid regular expression.")
+		.addError(20, "Invalid regular expression.")
+		.addError(21, "Invalid regular expression.")
 		.addError(24, "Unclosed regular expression.")
 		.test(code);
 
@@ -304,16 +290,13 @@ exports.testRegexRegressions = function (test) {
 		.test("str /= 5;", {}, { str: true });
 
 	TestRun(test)
-		.addError(1, "A regular expression literal can be confused with '/='.")
 		.test("str = str.replace(/=/g, '');", {}, { str: true });
 
 	TestRun(test)
-		.addError(1, "A regular expression literal can be confused with '/='.")
 		.test("str = str.replace(/=abc/g, '');", {}, { str: true });
 
 	// GH-538
 	TestRun(test)
-		.addError(1, "Expected a number and instead saw '/'.")
 		.test("var exp = /function(.*){/gi;");
 
 	test.done();

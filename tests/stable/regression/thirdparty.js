@@ -7,8 +7,6 @@ exports["Backbone.js 0.5.3"] = function (test) {
 	var src = fs.readFileSync(__dirname + '/libs/backbone.js', 'utf8');
 
 	TestRun(test)
-		.addError(669, "Unescaped '['.")
-		.addError(669, "Unescaped '^'.")
 		.addError(685, "Missing '()' invoking a constructor.")
 		.addError(764, "Use '===' to compare with '0'.")
 		.addError(859, "Use '!==' to compare with '0'.")
@@ -75,13 +73,9 @@ exports.prototype_1_7 = function (test) {
 		.addError(409, "Missing semicolon.")
 		.addError(430, "Missing semicolon.")
 		.addError(451, "Missing semicolon.")
-		.addError(482, "Unescaped '^'.")
-		.addError(482, "Unescaped '['.")
 		.addError(633, "Use '!==' to compare with 'undefined'.")
 		.addError(737, "Use '===' to compare with ''.")
 		.addError(741, "Wrap the /regexp/ literal in parens to disambiguate the slash operator.")
-		.addError(799, "Unescaped '['.")
-		.addError(805, "Unescaped ']'.")
 		.addError(807, "Use '===' to compare with ''.")
 		.addError(1137, "Use '===' to compare with '0'.")
 		.addError(1215, "Missing semicolon.")
@@ -97,7 +91,6 @@ exports.prototype_1_7 = function (test) {
 		.addError(2990, "'tagName' used out of scope.")
 		.addError(3844, "'positionedOffset' is a function.")
 		.addError(3860, "'cumulativeOffset' is a function.")
-		.addError(3974, "Unescaped '['.")
 		.addError(3987, "Variable context was not declared correctly.")
 		.addError(4000, "Expected ')' to match '(' from line 4000 and instead saw ','.")
 		.addError(4000, "Expected ')' to match '(' from line 4000 and instead saw 'm'.")
@@ -125,16 +118,16 @@ exports.lodash_0_6_1 = function (test) {
 	var src = fs.readFileSync(__dirname + '/libs/lodash.js', 'utf8');
 	var globals = { _: false, define: false };
 	var options = {
-		unused	 : true,
-		expr	 : true,
-		eqnull	 : true,
-		boss	 : true,
+		unused   : true,
+		expr     : true,
+		eqnull   : true,
+		boss     : true,
 		regexdash: true,
-		proto	 : true,
+		proto    : true,
 		laxbreak : true,
-		newcap	 : false,
-		node	 : true,
-		evil	 : true,
+		newcap   : false,
+		node     : true,
+		evil     : true,
 		laxcomma : true
 	};
 
@@ -143,9 +136,6 @@ exports.lodash_0_6_1 = function (test) {
 		.addError(38, "Missing semicolon.")
 		.addError(38, "Missing semicolon.")
 		.addError(38, "Expected an identifier and instead saw ')'.")
-		.addError(57, "Unescaped '^'.")
-		.addError(76, "Unescaped '^'.")
-		.addError(76, "Unescaped '['.")
 		.addError(107, "'hasOwnProperty' is a really bad name.")
 		.addError(168, "Possible strict violation.")
 		.addError(170, "Missing '()' invoking a constructor.")

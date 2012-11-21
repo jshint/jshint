@@ -903,26 +903,6 @@ exports.globalstrict = function (test) {
 	test.done();
 };
 
-/** Option `regexp` disallows the use of . and [^...] in regular expressions. */
-exports.regexp = function (test) {
-	var code = [
-		'var a = /hey/;',
-		'var a = /h.ey/;'
-	];
-
-	for (var i = 0, st; st = code[i]; i += 1) {
-		TestRun(test).test(code);
-	}
-
-	TestRun(test).test(code[0], { regexp: true });
-
-	TestRun(test)
-		.addError(1, "Insecure '.'.")
-		.test(code[1], { regexp: true });
-
-	test.done();
-};
-
 /** Option `laxbreak` allows you to insert newlines before some operators. */
 exports.laxbreak = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/laxbreak.js', 'utf8');
@@ -991,49 +971,6 @@ exports.trailing = function (test) {
 		.addError(8, "Trailing whitespace.", { character: 16 })
 		.addError(9, "Trailing whitespace.", { character: 6 })
 		.test(src, { trailing: true });
-
-	test.done();
-};
-
-exports.regexdash = function (test) {
-	var code = [
-		'var a = /[-ab]/;',
-		'var b = /[ab-]/;',
-		'var c = /[a-c-e]/;',
-		'var d = /[\\s-\\d]/;',
-		'var e = /[\\s-]/;',
-		'var f = /[-\\d]/;',
-		'var g = /[a-]/;',
-		'var h = /[-z]/;',
-		'var g = /[a-\\w]/;',
-		'var h = /[\\d-z]/;',
-		'var i = /[^-ab]/;',
-		'var j = /[^ab-]/;'
-	];
-
-	// Default behavior
-	TestRun(test)
-		.addError(1, "Unescaped '-'.")
-		.addError(2, "Unescaped '-'.")
-		.addError(3, "Unescaped '-'.")
-		.addError(4, "Unescaped '-'.")
-		.addError(5, "Unescaped '-'.")
-		.addError(6, "Unescaped '-'.")
-		.addError(7, "Unescaped '-'.")
-		.addError(8, "Unescaped '-'.")
-		.addError(9, "Unescaped '-'.")
-		.addError(10, "Unescaped '-'.")
-		.addError(11, "Unescaped '-'.")
-		.addError(12, "Unescaped '-'.")
-		.test(code);
-
-	// Regex dash is on
-	TestRun(test)
-		.addError(3, "Unescaped '-'.")
-		.addError(4, "Unescaped '-'.")
-		.addError(9, "Unescaped '-'.")
-		.addError(10, "Unescaped '-'.")
-		.test(code, { regexdash: true });
 
 	test.done();
 };
