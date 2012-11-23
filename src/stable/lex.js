@@ -443,7 +443,7 @@ Lexer.prototype = {
 						return {
 							type: Token.NumericLiteral,
 							value: value,
-							malformed: true
+							isMalformed: true
 						};
 					}
 
@@ -458,7 +458,7 @@ Lexer.prototype = {
 						type: Token.NumericLiteral,
 						value: value,
 						base: 16,
-						malformed: false
+						isMalformed: false
 					};
 				}
 
@@ -471,7 +471,7 @@ Lexer.prototype = {
 						char = this.peek(index);
 
 						// Numbers like '019' (note the 9) are not valid octals
-						// but we still parse them and mark as 'malformed'.
+						// but we still parse them and mark as malformed.
 
 						if (isDecimalDigit(char)) {
 							bad = true;
@@ -493,7 +493,7 @@ Lexer.prototype = {
 						type: Token.NumericLiteral,
 						value: value,
 						base: 8,
-						malformed: false
+						isMalformed: false
 					};
 				}
 
@@ -569,7 +569,7 @@ Lexer.prototype = {
 			type: Token.NumericLiteral,
 			value: value,
 			base: 10,
-			malformed: !isFinite(value)
+			isMalformed: !isFinite(value)
 		};
 	},
 
@@ -935,7 +935,7 @@ Lexer.prototype = {
 			type: Token.RegExp,
 			value: value,
 			flags: flags,
-			malformed: malformed
+			isMalformed: malformed
 		};
 	},
 
@@ -1139,7 +1139,7 @@ Lexer.prototype = {
 				return create("(identifier)", token.value);
 
 			case Token.NumericLiteral:
-				if (token.malformed) {
+				if (token.isMalformed) {
 					this.trigger("warning", {
 						code: "W119",
 						line: this.line,
@@ -1171,7 +1171,7 @@ Lexer.prototype = {
 					from: this.from,
 					value: token.value,
 					base: token.base,
-					malformed: token.malformed
+					isMalformed: token.malformed
 				});
 
 				return create("(number)", token.value);
