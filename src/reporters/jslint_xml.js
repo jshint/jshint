@@ -40,7 +40,7 @@ module.exports =
 
 		for (file in files) {
 			out.push("\t<file name=\"" + file + "\">");
-			for (i = 0; i < files[file].length; i++) {
+			for (var i = 0, len = files[file].length; i < len; i++) {
 				issue = files[file][i];
 				out.push("\t\t<issue line=\"" + issue.line + "\" char=\"" +
 					issue.character + "\" reason=\"" + encode(issue.reason) +

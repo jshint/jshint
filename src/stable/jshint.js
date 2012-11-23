@@ -233,9 +233,7 @@ var JSHINT = (function () {
 
 	if (!Array.prototype.forEach) {
 		Array.prototype.forEach = function (fn, scope) {
-			var len = this.length;
-
-			for (var i = 0; i < len; i++) {
+			for (var i = 0, len = this.length; i < len; i++) {
 				fn.call(scope || this, this[i], i, this);
 			}
 		};
@@ -3068,7 +3066,7 @@ loop:
 
 	// The actual JSHINT function itself.
 	var itself = function (s, o, g) {
-		var a, i, k, x;
+		var a, i, k;
 		var optionKeys;
 		var newOptionObj = {};
 
@@ -3106,7 +3104,7 @@ loop:
 			}
 
 			optionKeys = Object.keys(o);
-			for (x = 0; x < optionKeys.length; x++) {
+			for (var x = 0, len = optionKeys.length; x < len; x++) {
 				newOptionObj[optionKeys[x]] = o[optionKeys[x]];
 
 				if (optionKeys[x] === "newcap" && o[optionKeys[x]] === false)
@@ -3243,7 +3241,7 @@ loop:
 					return;
 
 				var newImplied = [];
-				for (var i = 0; i < implied[name].length; i += 1) {
+				for (var i = 0,len = implied[name].length; i < len; i += 1) {
 					if (implied[name][i] !== line)
 						newImplied.push(implied[name][i]);
 				}
@@ -3286,7 +3284,7 @@ loop:
 			};
 
 			// Check queued 'x is not defined' instances to see if they're still undefined.
-			for (i = 0; i < JSHINT.undefs.length; i += 1) {
+			for (var i = 0, len = JSHINT.undefs.length; i < len; i += 1) {
 				k = JSHINT.undefs[i].slice(0);
 
 				if (markDefined(k[2].value, k[0])) {
@@ -3352,7 +3350,7 @@ loop:
 		if (JSHINT.scope === "(main)") {
 			o = o || {};
 
-			for (i = 0; i < JSHINT.internals.length; i += 1) {
+			for (var i = 0, len = JSHINT.internals.length; i < len; i += 1) {
 				k = JSHINT.internals[i];
 				o.scope = k.elem;
 				itself(k.value, o, g);
@@ -3402,15 +3400,15 @@ loop:
 			data.globals = globals;
 		}
 
-		for (i = 1; i < functions.length; i += 1) {
+		for (var i = 1, len = functions.length; i < len; i += 1) {
 			f = functions[i];
 			fu = {};
 
-			for (j = 0; j < functionicity.length; j += 1) {
+			for (var j = 0, len2 = functionicity.length; j < len2; j += 1) {
 				fu[functionicity[j]] = [];
 			}
 
-			for (j = 0; j < functionicity.length; j += 1) {
+			for (var j = 0, len2 = functionicity.length; j < len2; j += 1) {
 				if (fu[functionicity[j]].length === 0) {
 					delete fu[functionicity[j]];
 				}

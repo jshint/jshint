@@ -45,7 +45,7 @@ var Lexer = function (source) {
 	this.from = 1;
 	this.prereg = true;
 
-	for (var i = 0; i < state.option.indent; i += 1) {
+	for (var i = 0, indent = state.option.indent; i < indent; i += 1) {
 		state.tab += " ";
 	}
 };
