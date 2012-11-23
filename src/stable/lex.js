@@ -9,13 +9,6 @@ var events = require("events");
 var reg    = require("./reg.js");
 var state  = require("./state.js").state;
 
-// Helper functions
-
-function isIdentifierStart(ch) {
-	return (ch === "$") || (ch === "_") || (ch === "\\") ||
-		(ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z");
-}
-
 var Token = {
 	Identifier: 1,
 	Punctuator: 2,
@@ -412,6 +405,11 @@ Lexer.prototype = {
 
 		function isHexDigit(str) {
 			return (/^[0-9a-fA-F]$/).test(str);
+		}
+		
+		function isIdentifierStart(ch) {
+			return (ch === "$") || (ch === "_") || (ch === "\\") ||
+				(ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z");
 		}
 
 		// Numbers must start either with a decimal digit or a point.
