@@ -131,6 +131,7 @@ exports.options = function (test) {
 		"/*jslint maxerr: 20 */",
 		"/*member c:true */",
 		"/*jshint d:no */",
+		"/*jshint white:no */",
 		"/*global xxx*/",
 		"xxx = 2;",
 	];
@@ -138,17 +139,13 @@ exports.options = function (test) {
 	TestRun(test)
 		.addError(3, "Unexpected /*member 'c'.")
 		.addError(4, "Bad option: '++'.")
-		.addError(4, "Missing option value.")
-		.addError(5, "Expected a small integer and instead saw '-'.")
-		.addError(5, "Bad option: '2'.")
-		.addError(5, "Missing option value.")
+		.addError(5, "Expected a small integer and instead saw '-2'.")
 		.addError(6, "Expected a small integer and instead saw '100.4'.")
 		.addError(7, "Expected a small integer and instead saw '200.4'.")
 		.addError(8, "Expected a small integer and instead saw '300.4'.")
-		.addError(10, "Expected '*/' and instead saw ':'.")
 		.addError(11, "Bad option: 'd'.")
-		.addError(11, "Bad option value.")
-		.addError(13, "Read only.")
+		.addError(12, "Bad option value.")
+		.addError(14, "Read only.")
 		.test(code);
 
 	test.done();

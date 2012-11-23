@@ -142,4 +142,21 @@ exports.register = function (linter) {
 			});
 		}
 	});
+
+	// Warn about script URLs.
+
+	linter.on("String", function style_scanJavaScriptURLs(data) {
+		var re = /^(?:javascript|jscript|ecmascript|vbscript|mocha|livescript)\s*:/i;
+
+		if (linter.getOption("scripturl")) {
+			return;
+		}
+
+		if (re.test(data.value)) {
+			linter.warn("W107", {
+				line: data.line,
+				char: data.char
+			});
+		}
+	});
 };

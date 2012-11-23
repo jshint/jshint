@@ -1252,7 +1252,7 @@ exports.blacklist = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/browser.js', 'utf8');
 	var code = [
 		'/*jshint browser: true */',
-		'/*global -event bar -btoa */',
+		'/*global -event, bar, -btoa */',
 		'var a = event.hello();',
 		'var c = foo();',
 		'var b = btoa(1);',

@@ -121,6 +121,10 @@ Lexer.prototype = {
 				type: Token.Punctuator,
 				value: ch1
 			};
+
+		// We're at the end of input
+		case "":
+			return null;
 		}
 
 		// Peek more characters
@@ -220,68 +224,124 @@ Lexer.prototype = {
 		return null;
 	},
 
-	scanCommentSymbols: function () {
+	scanComments: function () {
 		var ch1 = this.peek();
 		var ch2 = this.peek(1);
 		var rest = this.input.substr(2);
+		var startLine = this.line;
+		var startChar = this.character;
 
-		if (ch1 === "*" && ch2 === "/") {
+		function commentToken(label, body, opt) {
+			var special = ["jshint", "jslint", "members", "member", "globals", "global"];
+			var isSpecial = false;
+			var value = label + body;
+			var commentType = "plain";
+			opt = opt || {};
+
+			if (opt.isMultiline) {
+				value += "*/";
+			}
+
+			special.forEach(function (str) {
+				if (isSpecial) {
+					return;
+				}
+
+				if (body.substr(0, str.length) === str) {
+					isSpecial = true;
+					label = label + str;
+					body = body.substr(str.length);
+				}
+
+				if (body.charAt(0) === " " && body.substr(1, str.length) === str) {
+					isSpecial = true;
+					label = label + " " + str;
+					body = body.substr(str.length + 1);
+				}
+
+				if (!isSpecial) {
+					return;
+				}
+
+				switch (str) {
+				case "member":
+					commentType = "members";
+					break;
+				case "global":
+					commentType = "globals";
+					break;
+				default:
+					commentType = str;
+				}
+			});
+
 			return {
-				type: Token.CommentSymbol,
-				value: "*/"
+				type: Token.Comment,
+				commentType: commentType,
+				value: value,
+				body: body,
+				isSpecial: isSpecial,
+				isMultiline: opt.isMultiline || false,
+				isMalformed: opt.isMalformed || false
 			};
 		}
 
-		if (ch1 === "/") {
-			if (ch2 === "*" || ch2 === "/") {
+		// End of unbegun comment. Raise an error and skip that input.
+		if (ch1 === "*" && ch2 === "/") {
+			this.trigger("error", {
+				code: "E020",
+				line: startLine,
+				character: startChar
+			});
 
-				// Special comments: /*jshint, /*global
-
-				if (rest.indexOf("jshint") === 0) {
-					return {
-						type: Token.CommentSymbol,
-						value: ch1 + ch2 + "jshint"
-					};
-				}
-
-				if (rest.indexOf("jslint") === 0) {
-					return {
-						type: Token.CommentSymbol,
-						value: ch1 + ch2 + "jslint"
-					};
-				}
-
-				if (rest.indexOf("member") === 0) {
-					return {
-						type: Token.CommentSymbol,
-						value: ch1 + ch2 + "members"
-					};
-				}
-
-				if (rest.indexOf("members") === 0) {
-					return {
-						type: Token.CommentSymbol,
-						value: ch1 + ch2 + "members"
-					};
-				}
-
-				if (rest.indexOf("global") === 0) {
-					return {
-						type: Token.CommentSymbol,
-						value: ch1 + ch2 + "global"
-					};
-				}
-
-				// If no special comments matched, return the marker itself
-
-				return {
-					type: Token.CommentSymbol,
-					value: ch1 + ch2
-				};
-			}
+			this.skip(2);
+			return null;
 		}
 
-		return null;
+		// Comments must start either with // or /*
+		if (ch1 !== "/" || (ch2 !== "*" && ch2 !== "/")) {
+			return null;
+		}
+
+		// One-line comment
+		if (ch2 === "/") {
+			this.skip(this.input.length); // Skip to the EOL.
+			return commentToken("//", rest);
+		}
+
+		var body = "";
+
+		/* Multi-line comment */
+		if (ch2 === "*") {
+			this.skip(2);
+
+			while (this.peek() !== "*" || this.peek(1) !== "/") {
+				if (this.peek() === "") { // End of Line
+					body += "\n";
+
+					// If we hit EOF and our comment is still unclosed,
+					// trigger an error and end the comment implicitly.
+					if (!this.nextLine()) {
+						this.trigger("error", {
+							code: "E015",
+							line: startLine,
+							character: startChar
+						});
+
+						return commentToken("/*", body, {
+							isMultiline: true,
+							isMalformed: true
+						});
+					}
+				} else {
+					body += this.peek();
+					this.skip();
+				}
+			}
+
+			this.skip(2);
+			return commentToken("/*", body, { isMultiline: true });
+		}
 	},
 
 	scanKeyword: function () {
@@ -926,10 +986,19 @@ Lexer.prototype = {
 			}
 		}
 
+		// Methods that work with multi-line structures and move the
+		// character pointer.
+
+		var match = this.scanComments() ||
+			this.scanStringLiteral();
+
+		if (match) {
+			return match;
+		}
+
 		// Methods that don't move the character pointer.
 
-		var match =
-			this.scanCommentSymbols() ||
+		match =
 			this.scanRegExp() ||
 			this.scanPunctuator() ||
 			this.scanKeyword() ||
@@ -938,14 +1007,6 @@ Lexer.prototype = {
 
 		if (match) {
 			this.skip(match.value.length);
-			return match;
-		}
-
-		// Methods that move the character pointer.
-
-		match = this.scanStringLiteral();
-
-		if (match) {
 			return match;
 		}
 
@@ -993,123 +1054,49 @@ Lexer.prototype = {
 	},
 
 	/*
-	 * Produce a token object. The token inherits from a syntax symbol.
-	 */
-	create: function (type, value) {
-		var token;
-
-		switch (true) {
-		case type === "(range)":
-			token = { type: type };
-			break;
-		case type === "(punctuator)":
-		case type === "(identifier)" && _.has(state.syntax, value):
-			token = state.syntax[value] || state.syntax["(error)"];
-			break;
-		default:
-			token = state.syntax[type];
-		}
-
-		token = Object.create(token);
-
-		if (type === "(string)" || type === "(range)") {
-			if (!state.option.scripturl && reg.javascriptURL.test(value)) {
-				this.trigger("warning", { code: "W107", line: this.line, character: this.from });
-			}
-		}
-
-		if (type === "(identifier)") {
-			token.identifier = true;
-
-			this.trigger("Identifier", {
-				line: this.line,
-				char: this.character,
-				from: this.from,
-				name: value,
-				isProperty: state.tokens.curr.id === "."
-			});
-		}
-
-		token.value = value;
-		token.line = this.line;
-		token.character = this.char;
-		token.from = this.from;
-
-		var id = token.id;
-		if (id !== "(endline)") {
-			this.prereg = id && (("(,=:[!&|?{};".indexOf(id.charAt(id.length - 1)) >= 0) ||
-				id === "return" || id === "case");
-		}
-
-		return token;
-	},
-
-	range: function (begin, end) {
-		var chr, value = "";
-		this.from = this.char;
-
-		if (this.peek() !== begin) {
-			this.trigger("error", {
-				code: "E004",
-				line: this.line,
-				character: this.char,
-				data: [ begin, this.peek() ]
-			});
-		}
-
-		for (;;) {
-			this.skip();
-			chr = this.peek();
-
-			switch (chr) {
-			case "":
-				this.trigger("error", {
-					code: "E013",
-					line: this.line,
-					character: this.char,
-					data: [ chr ]
-				});
-				break;
-			case end:
-				this.skip();
-				return this.create("(range)", value);
-			case "\\":
-				this.trigger("warning", {
-					code: "W052",
-					line: this.line,
-					character: this.char,
-					data: [ chr ]
-				});
-			}
-
-			value += chr;
-		}
-	},
-
-	/*
 	 * Produce the next token.
 	 *
 	 * This function is called by advance() to get the next token.
 	 */
 	token: function () {
-		var c, i, t;
 		var token;
+
+		// Produce a token object.
+		var create = function (type, value) {
+			/*jshint validthis:true */
+
+			var obj;
+			if (type === "(punctuator)" || (type === "(identifier)" && _.has(state.syntax, value))) {
+				obj = Object.create(state.syntax[value] || state.syntax["(error)"]);
+			} else {
+				obj = Object.create(state.syntax[type]);
+			}
+
+			obj.identifier = (type === "(identifier)");
+			obj.value = value;
+			obj.line = this.line;
+			obj.character = this.char;
+			obj.from = this.from;
+
+			var id = obj.id;
+
+			if (id !== "(endline)") {
+				this.prereg = id &&
+					(("(,=:[!&|?{};".indexOf(id.charAt(id.length - 1)) >= 0) ||
+						id === "return" || id === "case");
+			}
+
+			return obj;
+		}.bind(this);
 
 		for (;;) {
 			if (!this.input.length) {
-				return this.create(this.nextLine() ? "(endline)" : "(end)", "");
+				return create(this.nextLine() ? "(endline)" : "(end)", "");
 			}
 
 			token = this.next();
 
-			if (token) {
-				t = token.value;
-			}
-
 			if (!token) {
-				t = "";
-				c = "";
-
 				if (this.input.length) {
 					// Unexpected character.
 					this.trigger("error", {
@@ -1121,126 +1108,99 @@ Lexer.prototype = {
 
 					this.input = "";
 				}
-			} else {
-				switch (token.type) {
-				case Token.StringLiteral:
-					this.trigger("String", {
-						line: this.line,
-						char: this.character,
-						from: this.from,
-						value: token.value,
-						quote: token.quote
-					});
 
-					return this.create("(string)", token.value);
-				case Token.Identifier:
-				case Token.Keyword:
-				case Token.NullLiteral:
-				case Token.BooleanLiteral:
-					return this.create("(identifier)", token.value);
+				continue;
+			}
 
-				case Token.NumericLiteral:
-					if (token.malformed) {
-						this.trigger("warning", {
-							code: "W119",
-							line: this.line,
-							character: this.char,
-							data: [ token.value ]
-						});
-					}
+			switch (token.type) {
+			case Token.StringLiteral:
+				this.trigger("String", {
+					line: this.line,
+					char: this.character,
+					from: this.from,
+					value: token.value,
+					quote: token.quote
+				});
 
-					if (state.jsonMode && token.base === 16) {
-						this.trigger("warning", {
-							code: "W114",
-							line: this.line,
-							character: this.char,
-							data: [ "0x-" ]
-						});
-					}
+				return create("(string)", token.value);
+			case Token.Identifier:
+				this.trigger("Identifier", {
+					line: this.line,
+					char: this.character,
+					from: this.form,
+					name: token.value,
+					isProperty: state.tokens.curr.id === "."
+				});
 
-					if (state.directive["use strict"] && token.base === 8) {
-						this.trigger("warning", {
-							code: "W115",
-							line: this.line,
-							character: this.char
-						});
-					}
+				/* falls through */
+			case Token.Keyword:
+			case Token.NullLiteral:
+			case Token.BooleanLiteral:
+				return create("(identifier)", token.value);
 
-					this.trigger("Number", {
-						line: this.line,
-						char: this.character,
-						from: this.from,
-						value: token.value,
-						base: token.base,
-						malformed: token.malformed
-					});
-
-					return this.create("(number)", token.value);
-
-				case Token.RegExp:
-					return this.create("(regexp)", token.value);
-				}
-
-				c = t.charAt(0);
-
-				switch (t) {
-
-				// Single line comment
-
-				case "//":
-					this.input = "";
-					state.tokens.curr.comment = true;
-					break;
-
-				// Block comment
-
-				case "/*":
-					for (;;) {
-						i = this.input.search(reg.starSlash);
-						if (i >= 0) {
-							break;
-						}
-
-						// Is this comment unclosed?
-						if (!this.nextLine()) {
-							this.trigger("error", {
-								code: "E015",
-								line: this.line,
-								character: this.char
-							});
-						}
-					}
-
-					this.input = this.input.substr(i + 2);
-					state.tokens.curr.comment = true;
-					break;
-
-				//		/*members /*jshint /*global
-
-				case "/*members":
-				case "/*member":
-				case "/*jshint":
-				case "/*jslint":
-				case "/*global":
-				case "*/":
-					return {
-						value: t,
-						type: "special",
+			case Token.NumericLiteral:
+				if (token.malformed) {
+					this.trigger("warning", {
+						code: "W119",
 						line: this.line,
 						character: this.char,
+						data: [ token.value ]
+					});
+				}
+
+				if (state.jsonMode && token.base === 16) {
+					this.trigger("warning", {
+						code: "W114",
+						line: this.line,
+						character: this.char,
+						data: [ "0x-" ]
+					});
+				}
+
+				if (state.directive["use strict"] && token.base === 8) {
+					this.trigger("warning", {
+						code: "W115",
+						line: this.line,
+						character: this.char
+					});
+				}
+
+				this.trigger("Number", {
+					line: this.line,
+					char: this.character,
+					from: this.from,
+					value: token.value,
+					base: token.base,
+					malformed: token.malformed
+				});
+
+				return create("(number)", token.value);
+
+			case Token.RegExp:
+				return create("(regexp)", token.value);
+
+			case Token.Comment:
+				state.tokens.curr.comment = true;
+
+				if (token.isSpecial) {
+					return {
+						value: token.value,
+						body: token.body,
+						type: token.commentType,
+						isSpecial: token.isSpecial,
+						line: this.line,
+						character: this.character,
 						from: this.from
 					};
-
-				case "":
-					break;
-
-				// punctuator
-
-				case "#":
-					return this.create("(punctuator)", t);
-				default:
-					return this.create("(punctuator)", t);
 				}
+
+				break;
+
+			case "":
+				break;
+
+			default:
+				return create("(punctuator)", token.value);
 			}
 		}
 	}
