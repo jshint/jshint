@@ -219,8 +219,13 @@ var JSHINT = (function () {
 
 	function checkOption(name, t) {
 		if (valOptions[name] === undefined && boolOptions[name] === undefined) {
-			error("E001", t, name);
+			if (t.type !== "jslint" || renamedOptions[name] === undefined) {
+				error("E001", t, name);
+				return false;
+			}
 		}
+
+		return true;
 	}
 
 	function isString(obj) {
@@ -544,163 +549,147 @@ var JSHINT = (function () {
 
 	function doOption() {
 		var nt = state.tokens.next;
-		var o  = nt.value;
-		var quotmarkValue = state.option.quotmark;
+		var body = nt.body.split(",").map(function (s) { return s.trim(); });
 		var predef = {};
-		var b, obj, filter, t, tn, v, minus;
 
-		switch (o) {
-		case "*/":
-			error("E020");
-			break;
-		case "/*members":
-		case "/*member":
-			o = "/*members";
-			if (!membersOnly) {
-				membersOnly = {};
+		if (nt.type === "globals") {
+			body.forEach(function (g) {
+				g = g.split(":");
+				var key = g[0];
+				var val = g[1];
+
+				if (key.charAt(0) === "-") {
+					key = key.slice(1);
+					val = false;
+
+					JSHINT.blacklist[key] = key;
+					updatePredefined();
+				} else {
+					predef[key] = (val === "true");
+				}
+			});
+
+			combine(predefined, predef);
+
+			for (var key in predef) {
+				if (_.has(predef, key)) {
+					declared[key] = nt;
+				}
 			}
-			obj = membersOnly;
-			state.option.quotmark = false;
-			break;
-		case "/*jshint":
-		case "/*jslint":
-			obj = state.option;
-			filter = boolOptions;
-			break;
-		case "/*global":
-			obj = predef;
-			break;
-		default:
-			error("E021");
 		}
 
-		t = lex.token();
+		if (nt.type === "members") {
+			membersOnly = membersOnly || {};
 
-loop:
-		for (;;) {
-			minus = false;
-			for (;;) {
-				if (t.type === "special" && t.value === "*/") {
-					break loop;
-				}
-				if (t.id !== "(endline)" && t.id !== ",") {
-					break;
-				}
-				t = lex.token();
-			}
+			body.forEach(function (m) {
+				var ch1 = m.charAt(0);
+				var ch2 = m.charAt(m.length - 1);
 
-			if (o === "/*global" && t.value === "-") {
-				minus = true;
-				t = lex.token();
-			}
-
-			if (t.type !== "(string)" && t.type !== "(identifier)" && o !== "/*members") {
-				error("E001", t, t.value);
-			}
-
-			v = lex.token();
-			if (v.id === ":") {
-				v = lex.token();
-
-				if (obj === membersOnly) {
-					error("E004", t, "*/", ":");
+				if (ch1 === ch2 && (ch1 === "\"" || ch1 === "'")) {
+					m = m
+						.substr(1, m.length - 2)
+						.replace("\\b", "\b")
+						.replace("\\t", "\t")
+						.replace("\\n", "\n")
+						.replace("\\v", "\v")
+						.replace("\\f", "\f")
+						.replace("\\r", "\r")
+						.replace("\\\\", "\\")
+						.replace("\\\"", "\"");
 				}
 
-				if (o === "/*jshint") {
-					checkOption(t.value, t);
+				membersOnly[m] = false;
+			});
+		}
+
+		var numvals = [
+			"maxstatements",
+			"maxparams",
+			"maxdepth",
+			"maxcomplexity",
+			"maxerr",
+			"maxlen",
+			"indent"
+		];
+
+		if (nt.type === "jshint" || nt.type === "jslint") {
+			body.forEach(function (g) {
+				g = g.split(":");
+				var key = (g[0] || "").trim();
+				var val = (g[1] || "").trim();
+
+				if (!checkOption(key, nt)) {
+					return;
 				}
 
-				var numericVals = [
-					"maxstatements",
-					"maxparams",
-					"maxdepth",
-					"maxcomplexity",
-					"maxerr",
-					"maxlen",
-					"indent"
-				];
+				if (numvals.indexOf(key) >= 0) {
+					val = +val;
 
-				if (numericVals.indexOf(t.value) > -1 && (o === "/*jshint" || o === "/*jslint")) {
-					b = +v.value;
-
-					if (typeof b !== "number" || !isFinite(b) || b <= 0 || Math.floor(b) !== b) {
-						error("E022", v, v.value);
+					if (typeof val !== "number" || !isFinite(val) || val <= 0 || Math.floor(val) !== val) {
+						error("E022", nt, g[1].trim());
+						return;
 					}
 
-					if (t.value === "indent")
-						obj.white = true;
+					if (key === "indent") {
+						state.option.white = true; // FIXME: No need to turn on 'white'. See GH-667.
+					}
 
-					obj[t.value] = b;
-				} else if (t.value === "validthis") {
+					state.option[key] = val;
+					return;
+				}
+
+				if (key === "validthis") {
+					// `validthis` is valid only within a function scope.
 					if (funct["(global)"]) {
 						error("E023");
 					} else {
-						if (v.value === "true" || v.value === "false")
-							obj[t.value] = v.value === "true";
-						else
-							error("E024", v);
+						if (val === "true" || val === "false") {
+							state.option.validthis = (val === "true");
+						} else {
+							error("E024", nt);
+						}
 					}
-				} else if (t.value === "quotmark" && (o === "/*jshint")) {
-					switch (v.value) {
+					return;
+				}
+
+				if (key === "quotmark") {
+					switch (val) {
 					case "true":
-						obj.quotmark = true;
-						break;
 					case "false":
-						obj.quotmark = false;
+						state.option.quotmark = (val === "true");
 						break;
 					case "double":
 					case "single":
-						obj.quotmark = v.value;
+						state.option.quotmark = val;
 						break;
 					default:
-						error("E024", v);
+						error("E024", nt);
 					}
-				} else if (v.value === "true" || v.value === "false") {
-					if (o === "/*jslint") {
-						tn = renamedOptions[t.value] || t.value;
-						obj[tn] = v.value === "true";
+					return;
+				}
+
+				var tn;
+				if (val === "true" || val === "false") {
+					if (nt.type === "jslint") {
+						tn = renamedOptions[key] || key;
+						state.option[tn] = (val === "true");
+
 						if (invertedOptions[tn] !== undefined) {
-							obj[tn] = !obj[tn];
+							state.option[tn] = !state.option[tn];
 						}
 					} else {
-						obj[t.value] = v.value === "true";
+						state.option[key] = (val === "true");
 					}
 
-					if (t.value === "newcap")
-						obj["(explicitNewcap)"] = true;
-				} else {
-					error("E024", v);
-				}
-				t = lex.token();
-			} else {
-				if (o === "/*jshint" || o === "/*jslint") {
-					error("E025", t);
+					if (key === "newcap") {
+						state.option["(explicitNewcap)"] = true;
+					}
+					return;
 				}
 
-				obj[t.value] = false;
+				error("E024", nt);
+			});
 
-				if (o === "/*global" && minus === true) {
-					JSHINT.blacklist[t.value] = t.value;
-					updatePredefined();
-				}
-
-				t = v;
-			}
-		}
-
-		if (o === "/*members") {
-			state.option.quotmark = quotmarkValue;
-		}
-
-		combine(predefined, predef);
-
-		for (var key in predef) {
-			if (_.has(predef, key)) {
-				declared[key] = nt;
-			}
-		}
-
-		if (filter) {
 			assume();
 		}
 	}
@@ -777,7 +766,7 @@ loop:
 				return;
 			}
 
-			if (state.tokens.next.type === "special") {
+			if (state.tokens.next.isSpecial) {
 				doOption();
 			} else {
 				if (state.tokens.next.id !== "(endline)") {
