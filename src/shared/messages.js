@@ -138,7 +138,7 @@ var warnings = {
 	W085: "Don't use 'with'.",
 	W086: "Expected a 'break' statement before '{a}'.",
 	W087: "Forgotten 'debugger' statement?",
-	W088: "Bad for in variable '{a}'.",
+	W088: "Creating global 'for' variable. Should be 'for ( var {a} ...'.",
 	W089: "The body of a for in should be wrapped in an if statement to filter " +
 		"unwanted properties from the prototype.",
 	W090: "'{a}' is not a statement label.",
