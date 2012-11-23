@@ -9,19 +9,49 @@ var events = require("events");
 var reg    = require("./reg.js");
 var state  = require("./state.js").state;
 
+// Some of these token types are from JavaScript Parser API
+// while others are specific to JSHint parser.
+// JS Parser API: https://developer.mozilla.org/en-US/docs/SpiderMonkey/Parser_API
+
 var Token = {
 	Identifier: 1,
 	Punctuator: 2,
 	NumericLiteral: 3,
 	StringLiteral: 4,
-	CommentSymbol: 5,
+	Comment: 5,
 	Keyword: 6,
 	NullLiteral: 7,
 	BooleanLiteral: 8,
 	RegExp: 9
 };
 
-var Lexer = function (source) {
+/*
+ * Lexer for JSHint.
+ *
+ * This object does a char-by-char scan of the provided source code
+ * and produces a sequence of tokens.
+ *
+ *   var lex = new Lexer("var i = 0;");
+ *   lex.start();
+ *   lex.token(); // returns the next token
+ *
+ * You have to use the token() method to move the lexer forward
+ * but you don't have to use its return value to get tokens. In addition
+ * to token() method returning the next token, the Lexer object also
+ * emits events.
+ *
+ *   lex.on("Identifier", function (data) {
+ *     if (data.name.indexOf("_") >= 0) {
+ *       // Produce a warning.
+ *     }
+ *   });
+ *
+ * Note that the token() method returns tokens in a JSLint-compatible
+ * format while the event emitter uses a slightly modified version of
+ * Mozilla's JavaScript Parser API. Eventually, we will move away from
+ * JSLint format.
+ */
+function Lexer(source) {
 	var lines = source;
 
 	if (typeof lines === "string") {
@@ -33,6 +63,7 @@ var Lexer = function (source) {
 
 	// If the first line is a shebang (#!), make it a blank and move on.
 	// Shebangs are used by Node scripts.
+
 	if (lines[0] && lines[0].substr(0, 2) === "#!") {
 		lines[0] = "";
 	}
@@ -50,7 +81,7 @@ var Lexer = function (source) {
 	for (var i = 0; i < state.option.indent; i += 1) {
 		state.tab += " ";
 	}
-};
+}
 
 Lexer.prototype = {
 	_lines: [],
@@ -65,26 +96,53 @@ Lexer.prototype = {
 		state.lines = this._lines;
 	},
 
+	/*
+	 * Return the next i character without actually moving the
+	 * char pointer.
+	 */
 	peek: function (i) {
 		return this.input.charAt(i || 0);
 	},
 
+	/*
+	 * Move the char pointer forward i times.
+	 */
 	skip: function (i) {
 		i = i || 1;
 		this.char += i;
 		this.input = this.input.slice(i);
 	},
 
+	/*
+	 * Subscribe to a token event. The API for this method is similar
+	 * Underscore.js i.e. you can subscribe to multiple events with
+	 * one call:
+	 *
+	 *   lex.on("Identifier Number", function (data) {
+	 *     // ...
+	 *   });
+	 */
 	on: function (names, listener) {
 		names.split(" ").forEach(function (name) {
 			this.emitter.on(name, listener);
 		}.bind(this));
 	},
 
+	/*
+	 * Trigger a token event. All arguments will be passed to each
+	 * listener.
+	 */
 	trigger: function () {
 		this.emitter.emit.apply(this.emitter, Array.prototype.slice.call(arguments));
 	},
 
+	/*
+	 * Extract a punctuator out of the next sequence of characters
+	 * or return 'null' if its not possible.
+	 *
+	 * This method's implementation was heavily influenced by the
+	 * scanPunctuator function in the Esprima parser's source code.
+	 */
 	scanPunctuator: function () {
 		var ch1 = this.peek();
 		var ch2, ch3, ch4;
@@ -217,12 +275,26 @@ Lexer.prototype = {
 		return null;
 	},
 
+	/*
+	 * Extract a comment out of the next sequence of characters and/or
+	 * lines or return 'null' if its not possible. Since comments can
+	 * span across multiple lines this method has to move the char
+	 * pointer.
+	 *
+	 * In addition to normal JavaScript comments (// and /*) this method
+	 * also recognizes JSHint- and JSLint-specific comments such as
+	 * /*jshint, /*jslint, /*globals and so on.
+	 */
 	scanComments: function () {
 		var ch1 = this.peek();
 		var ch2 = this.peek(1);
 		var rest = this.input.substr(2);
 		var startLine = this.line;
 		var startChar = this.character;
+
+		// Create a comment token object and make sure it
+		// has all the data JSHint needs to work with special
+		// comments.
 
 		function commentToken(label, body, opt) {
 			var special = ["jshint", "jslint", "members", "member", "globals", "global"];
@@ -337,6 +409,10 @@ Lexer.prototype = {
 		}
 	},
 
+	/*
+	 * Extract a keyword out of the next sequence of characters or
+	 * return 'null' if its not possible.
+	 */
 	scanKeyword: function () {
 		var result = /^[a-zA-Z_$][a-zA-Z0-9_$]*/.exec(this.input);
 		var keywords = [
@@ -360,6 +436,12 @@ Lexer.prototype = {
 		return null;
 	},
 
+	/*
+	 * Extract a JavaScript identifier out of the next sequence of
+	 * characters or return 'null' if its not possible. In addition,
+	 * to Identifier this method can also produce BooleanLiteral
+	 * (true/false) and NullLiteral (null).
+	 */
 	scanIdentifier: function () {
 		var result = /^[a-zA-Z_$][a-zA-Z0-9_$]*/.exec(this.input);
 		var id, type;
@@ -388,6 +470,15 @@ Lexer.prototype = {
 		return null;
 	},
 
+	/*
+	 * Extract a numeric literal out of the next sequence of
+	 * characters or return 'null' if its not possible. This method
+	 * supports all numeric literals described in section 7.8.3
+	 * of the EcmaScript 5 specification.
+	 *
+	 * This method's implementation was heavily influenced by the
+	 * scanNumericLiteral function in the Esprima parser's source code.
+	 */
 	scanNumericLiteral: function () {
 		var index = 0;
 		var value = "";
@@ -406,7 +497,7 @@ Lexer.prototype = {
 		function isHexDigit(str) {
 			return (/^[0-9a-fA-F]$/).test(str);
 		}
-		
+
 		function isIdentifierStart(ch) {
 			return (ch === "$") || (ch === "_") || (ch === "\\") ||
 				(ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z");
@@ -424,6 +515,7 @@ Lexer.prototype = {
 			char = this.peek(index);
 
 			if (value === "0") {
+				// Base-16 numbers.
 				if (char === "x" || char === "X") {
 					index += 1;
 					value += char;
@@ -460,6 +552,7 @@ Lexer.prototype = {
 					};
 				}
 
+				// Base-8 numbers.
 				if (isOctalDigit(char)) {
 					index += 1;
 					value += char;
@@ -514,6 +607,8 @@ Lexer.prototype = {
 			}
 		}
 
+		// Decimal digits.
+
 		if (char === ".") {
 			value += char;
 			index += 1;
@@ -527,6 +622,8 @@ Lexer.prototype = {
 				index += 1;
 			}
 		}
+
+		// Exponent part.
 
 		if (char === "e" || char === "E") {
 			value += char;
@@ -571,6 +668,17 @@ Lexer.prototype = {
 		};
 	},
 
+	/*
+	 * Extract a string out of the next sequence of characters and/or
+	 * lines or return 'null' if its not possible. Since strings can
+	 * span across multiple lines this method has to move the char
+	 * pointer.
+	 *
+	 * This method recognizes pseudo-multiline JavaScript strings:
+	 *
+	 *   var str = "hello\
+	 *   world";
+   */
 	scanStringLiteral: function () {
 		var quote = this.peek();
 
@@ -665,6 +773,8 @@ Lexer.prototype = {
 					data: [ "<non-printable>" ]
 				});
 			}
+
+			// Special treatment for some escaped characters.
 
 			if (char === "\\") {
 				this.skip();
@@ -788,6 +898,16 @@ Lexer.prototype = {
 		};
 	},
 
+	/*
+	 * Extract a regular expression out of the next sequence of
+	 * characters and/or lines or return 'null' if its not possible.
+	 *
+	 * This method is platform dependent: it accepts almost any
+	 * regular expression values but then tries to compile and run
+	 * them using system's RegExp object. This means that there are
+	 * rare edge cases where one JavaScript engine complains about
+	 * your regular expression while others don't.
+	 */
 	scanRegExp: function () {
 		var index = 0;
 		var length = this.input.length;
@@ -830,6 +950,11 @@ Lexer.prototype = {
 
 		index += 1;
 		terminated = false;
+
+		// Try to get everything in between slashes. A couple of
+		// cases aside (see scanUnexpectedChars) we don't really
+		// care whether the resulting expression is valid or not.
+		// We will check that later using the RegExp object.
 
 		while (index < length) {
 			char = this.peek(index);
@@ -891,6 +1016,9 @@ Lexer.prototype = {
 			index += 1;
 		}
 
+		// A regular expression that was never closed is an
+		// error from which we cannot recover.
+
 		if (!terminated) {
 			this.trigger("error", {
 				code: "E017",
@@ -917,6 +1045,7 @@ Lexer.prototype = {
 		}
 
 		// Check regular expression for correctness.
+
 		try {
 			new RegExp(body, flags.join(""));
 		} catch (err) {
@@ -964,6 +1093,10 @@ Lexer.prototype = {
 		return this.input.search(reg.unsafeChars);
 	},
 
+	/*
+	 * Produce the next raw token or return 'null' if no tokens can be matched.
+	 * This method skips over all space characters.
+	 */
 	next: function () {
 		this.from = this.char;
 
@@ -1013,6 +1146,11 @@ Lexer.prototype = {
 		return null;
 	},
 
+	/*
+	 * Switch to the next line and reset all char pointers. Once
+	 * switched, this method also checks for mixed spaces and tabs
+	 * and other minor warnings.
+	 */
 	nextLine: function () {
 		var char;
 
@@ -1047,14 +1185,17 @@ Lexer.prototype = {
 		return true;
 	},
 
+	/*
+	 * This is simply a synonym for nextLine() method with a friendlier
+	 * public name.
+	 */
 	start: function () {
 		this.nextLine();
 	},
 
 	/*
-	 * Produce the next token.
-	 *
-	 * This function is called by advance() to get the next token.
+	 * Produce the next token. This function is called by advance() to get
+	 * the next token. It retuns a token in a JSLint-compatible format.
 	 */
 	token: function () {
 		var token;
@@ -1077,6 +1218,8 @@ Lexer.prototype = {
 			obj.from = this.from;
 
 			var id = obj.id;
+
+			// Check if the next token could potentially be a regular expression.
 
 			if (id !== "(endline)") {
 				this.prereg = id &&
