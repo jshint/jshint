@@ -204,6 +204,15 @@ exports.numbers = function (test) {
 			"}());"
 		]);
 
+	// GitHub #751 - an expression containing a number with a leading decimal point should be parsed in its entirety
+	TestRun(test)
+		.addError(1, "A leading decimal point can be confused with a dot: '.3'.")
+		.addError(2, "A leading decimal point can be confused with a dot: '.3'.")
+		.test([
+			"var a = .3 + 1;",
+			"var b = 1 + .3;",
+		]);
+
 	test.done();
 };
 
