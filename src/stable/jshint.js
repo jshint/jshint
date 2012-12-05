@@ -3111,17 +3111,19 @@ var JSHINT = (function () {
 
 		if (o) {
 			a = o.predef;
+
 			if (a) {
 				if (!Array.isArray(a) && typeof a === "object") {
 					a = Object.keys(a);
 				}
+
 				a.forEach(function (item) {
 					var slice;
 					if (item[0] === "-") {
 						slice = item.slice(1);
 						JSHINT.blacklist[slice] = slice;
 					} else {
-						predefined[item] = true;
+						predefined[item] = o.predef[item];
 					}
 				});
 			}

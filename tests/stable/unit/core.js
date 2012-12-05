@@ -25,6 +25,18 @@ exports.testCustomGlobals = function (test) {
 	for (i = 0, g = null; g = custom[i]; i += 1)
 		test.ok(g in dict);
 
+	// Regression test (GH-665)
+	code = [
+		"//global bar",
+		"foo = {};",
+		"bar = {};"
+	];
+
+	TestRun(test)
+		.addError(2, "Read only.")
+		.addError(3, "Read only.")
+		.test(code, { unused: true, predef: { foo: false }});
+
 	test.done();
 };
 
