@@ -814,7 +814,6 @@ var JSHINT = (function () {
 				if (state.tokens.next.type === "(number)" && state.tokens.curr.id === ".") {
 					warning("W008", state.tokens.curr, state.tokens.next.value);
 					advance();
-					return state.tokens.curr;
 				} else {
 					error("E005", state.tokens.curr, state.tokens.curr.id);
 				}
