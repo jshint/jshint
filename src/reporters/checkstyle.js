@@ -84,7 +84,7 @@ module.exports =
 		for (fileName in files) {
 			if (files.hasOwnProperty(fileName)) {
 				out.push("\t<file name=\"" + fileName + "\">");
-				for (i = 0; i < files[fileName].length; i++) {
+				for (var i = 0, len = files[fileName].length; i < len; i++) {
 					issue = files[fileName][i];
 					out.push(
 						"\t\t<error " +

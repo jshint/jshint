@@ -58,7 +58,7 @@
 				WScript.StdOut.WriteLine("[" + currentScriptName + "]");
 			}
 
-			for (var i = 0; i < lines.length; i++) {
+			for (var i = 0, len = lines.length; i < len; i++) {
 				WScript.StdOut.WriteLine(lines[i]);
 			}
 
@@ -108,7 +108,7 @@
 
 	var formatters = {
 		errors: function (errors, lines) {
-			for (var i = 0; i < errors.length; i++) {
+			for (var i = 0, len = errors.length; i < len; i++) {
 				var error = errors[i];
 
 				if (!error) continue;
@@ -128,7 +128,7 @@
 
 			var globals = {};
 
-			for (var i = 0; i < implieds.length; i++) {
+			for (var i = 0, len = implieds.length; i < len; i++) {
 				var item = implieds[i];
 
 				if (!(item.name in globals)) globals[item.name] = [];
@@ -146,7 +146,7 @@
 
 			var func, names = {};
 
-			for (var i = 0; i < unused.length; i++) {
+			for (var i = 0, len = unused.length; i < len; i++) {
 				var item = unused[i];
 
 				func = item["function"];
@@ -220,7 +220,7 @@
 		if (option === "global") {
 			value = value.split(",");
 
-			for (var i = 0; i < value.length; i++) {
+			for (var i = 0,len = value.length; i < len; i++) {
 				var name = value[i].split(":");
 
 				if (name.length === 1 || name[1] === "false") {

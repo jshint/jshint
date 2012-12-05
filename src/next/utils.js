@@ -11,7 +11,7 @@ function safe(name) {
 		return "(__proto__)";
 
 	var special = Object.getOwnPropertyNames(Object.prototype);
-	for (var i = 0; i < special.length; i++) {
+	for (var i = 0, len = special.length; i < len; i++) {
 		if (name === special[i])
 			return "(" + name + ")";
 	}
@@ -300,7 +300,7 @@ Tokens.prototype.find = function (rangeIndex) {
 
 	// Otherwise go in a slow O(N) loop looking for our token.
 
-	for (var i = index; i < this.length; i++) {
+	for (var i = index, len = this.length; i < len; i++) {
 		if (this.list[i].range[0] >= rangeIndex)
 			return i;
 	}
