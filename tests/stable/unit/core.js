@@ -487,6 +487,27 @@ exports.testSparseArrays = function (test) {
 	test.done();
 };
 
+// GH-744: Prohibit the use of reserved words as non-property
+// identifiers.
+exports.testES5Reserved = function (test) {
+	var src = fs.readFileSync(__dirname + "/fixtures/es5Reserved.js", "utf8");
+
+	TestRun(test)
+		.addError(2, "Expected an identifier and instead saw 'default' (a reserved word).")
+		.addError(5, "Expected an identifier and instead saw 'default' (a reserved word).")
+		.addError(6, "Expected an identifier and instead saw 'new' (a reserved word).")
+		.addError(7, "Expected an identifier and instead saw 'class' (a reserved word).")
+		.test(src);
+
+	TestRun(test)
+		.addError(5, "Expected an identifier and instead saw 'default' (a reserved word).")
+		.addError(6, "Expected an identifier and instead saw 'new' (a reserved word).")
+		.addError(7, "Expected an identifier and instead saw 'class' (a reserved word).")
+		.test(src, { es5: true });
+
+	test.done();
+};
+
 exports.testCatchBlocks = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/gh247.js', 'utf8');
 
