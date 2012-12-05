@@ -29,3 +29,4 @@ function gh56() {
 
     callback && callback.apply( commit, (args.push( commit ), args) );
 }
+

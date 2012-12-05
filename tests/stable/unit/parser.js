@@ -372,9 +372,6 @@ exports.jsonMode = function (test) {
 exports.comma = function (test) {
 	var src = fs.readFileSync(__dirname + "/fixtures/comma.js", "utf8");
 
-	// !!
-	// there are more errors in comma.js
-	// but comma-operator isn't finished, yet - so jshint currently breaks at line 8
 	TestRun(test)
 		.addError(6, "Expected a conditional expression and instead saw an assignment.")
 		.addError(6, "Expected \';\' and instead saw \',\'.")
@@ -387,16 +384,14 @@ exports.comma = function (test) {
 		.addError(6, "Missing semicolon.")
 		.addError(15, "Expected an assignment or function call and instead saw an expression.")
 		.addError(15, "Missing semicolon.")
-		.addError(20, "Expected \')\' to match \'(\' from line 20 and instead saw \',\'.")
 		.addError(20, "Expected an assignment or function call and instead saw an expression.")
-		.addError(20, "Missing semicolon.")
-		.addError(20, "Expected an identifier and instead saw \')\'.")
-		.addError(30, "Expected \')\' to match \'(\' from line 30 and instead saw \',\'.")
-		.addError(30, "Expected \')\' and instead saw \'args\'.")
 		.addError(30, "Expected an assignment or function call and instead saw an expression.")
-		.addError(30, "Missing semicolon.")
-		.addError(30, "Expected an identifier and instead saw \')\'.")
 		.test(src);
+
+	// Regression test (GH-56)
+	TestRun(test)
+		.addError(4, "Expected an assignment or function call and instead saw an expression.")
+		.test(fs.readFileSync(__dirname + "/fixtures/gh56.js", "utf8"));
 
 	test.done();
 };
