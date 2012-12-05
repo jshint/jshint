@@ -956,7 +956,14 @@ var JSHINT = (function () {
 			warning("W011", state.tokens.curr, state.tokens.curr.value);
 		}
 		advance(",");
-		nonadjacent(state.tokens.curr, state.tokens.next);
+		
+		// TODO: This is a temporary solution to fight against false-positives in
+		// arrays and objects with trailing commas (see GH-363). The best solution
+		// would be to extract all whitespace rules out of parser.
+
+		if (state.tokens.next.value !== "]" && state.tokens.next.value !== "}") {
+			nonadjacent(state.tokens.curr, state.tokens.next);
+		}
 	}
 
 	// Functional constructors for making the symbols that will be inherited by
