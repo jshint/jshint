@@ -1013,9 +1013,11 @@ exports.indentation = function (test) {
 	TestRun(test)
 		.addError(5, "Mixed spaces and tabs.")
 		.addError(6, "Mixed spaces and tabs.")
+		.addError(10, "Unexpected space after 'hello'.")
+		.addError(11, "Unexpected space after '('.")
+		.addError(11, "Unexpected space after 'Hello World'.")
 		.test(src, { indent: 4, white: true });
 
-	// 'indent' implies 'white'
 	TestRun(test)
 		.addError(5, "Mixed spaces and tabs.")
 		.addError(5, "Expected 'var' to have an indentation at 5 instead at 7.")

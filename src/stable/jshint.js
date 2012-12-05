@@ -632,7 +632,7 @@ var JSHINT = (function () {
 					}
 
 					if (key === "indent") {
-						state.option.white = true; // FIXME: No need to turn on 'white'. See GH-667.
+						state.option["(explicitIndent)"] = true;
 					}
 
 					state.option[key] = val;
@@ -919,12 +919,17 @@ var JSHINT = (function () {
 	}
 
 	function indentation(bias) {
-		var i;
-		if (state.option.white && state.tokens.next.id !== "(end)") {
-			i = indent + (bias || 0);
-			if (state.tokens.next.from !== i) {
-				warning("W015", state.tokens.next, state.tokens.next.value, i, state.tokens.next.from);
-			}
+		if (!state.option.white && !state.option["(explicitIndent)"]) {
+			return;
+		}
+
+		if (state.tokens.next.id === "(end)") {
+			return;
+		}
+
+		var i = indent + (bias || 0);
+		if (state.tokens.next.from !== i) {
+			warning("W015", state.tokens.next, state.tokens.next.value, i, state.tokens.next.from);
 		}
 	}
 
@@ -3102,7 +3107,7 @@ var JSHINT = (function () {
 					newOptionObj["(explicitNewcap)"] = true;
 
 				if (optionKeys[x] === "indent")
-					newOptionObj.white = true;
+					newOptionObj["(explicitIndent)"] = true;
 			}
 		}
 
