@@ -6,3 +6,7 @@ if (true) {
     	var s = 324; // mixed indent / \t/
     } // whitespace indent
 }
+
+function hello   () {
+	return console.log(  "Hello World"  );
+}
