@@ -392,6 +392,11 @@ exports.comma = function (test) {
 	TestRun(test)
 		.addError(4, "Expected an assignment or function call and instead saw an expression.")
 		.test(fs.readFileSync(__dirname + "/fixtures/gh56.js", "utf8"));
+		
+	// Regression test (GH-363)
+	TestRun(test)
+		.addError(1, "Extra comma. (it breaks older versions of IE)")
+		.test("var f = [1,];");
 
 	test.done();
 };
