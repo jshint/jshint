@@ -1950,12 +1950,15 @@ var JSHINT = (function () {
 		if (state.tokens.prev.id !== "}" && state.tokens.prev.id !== ")") {
 			nobreak(state.tokens.prev, state.tokens.curr);
 		}
+
 		nospace();
 		if (state.option.immed && !left.immed && left.id === "function") {
 			warning("W062");
 		}
-		var n = 0,
-			p = [];
+
+		var n = 0;
+		var p = [];
+
 		if (left) {
 			if (left.type === "(identifier)") {
 				if (left.value.match(/^[A-Z]([A-Z0-9_$]*[a-z][A-Za-z0-9_$]*)?$/)) {
@@ -1969,6 +1972,7 @@ var JSHINT = (function () {
 				}
 			}
 		}
+
 		if (state.tokens.next.id !== ")") {
 			for (;;) {
 				p[p.length] = expression(10);
@@ -1979,8 +1983,10 @@ var JSHINT = (function () {
 				comma();
 			}
 		}
+
 		advance(")");
 		nospace(state.tokens.prev, state.tokens.curr);
+
 		if (typeof left === "object") {
 			if (left.value === "parseInt" && n === 1) {
 				warning("W065", state.tokens.curr);
@@ -2015,26 +2021,40 @@ var JSHINT = (function () {
 				warning("W067", left);
 			}
 		}
+
 		that.left = left;
 		return that;
 	}, 155, true).exps = true;
 
 	prefix("(", function () {
 		nospace();
+
 		if (state.tokens.next.id === "function") {
 			state.tokens.next.immed = true;
 		}
-		var v = expression(0);
+
+		var exprs = [];
+
+		if (state.tokens.next.id !== ")") {
+			for (;;) {
+				exprs.push(expression(0));
+				if (state.tokens.next.id !== ",") {
+					break;
+				}
+				comma();
+			}
+		}
+
 		advance(")", this);
 		nospace(state.tokens.prev, state.tokens.curr);
-		if (state.option.immed && v.id === "function") {
+		if (state.option.immed && exprs[0].id === "function") {
 			if (state.tokens.next.id !== "(" &&
 			  (state.tokens.next.id !== "." || (peek().value !== "call" && peek().value !== "apply"))) {
 				warning("W068", this);
 			}
 		}
 
-		return v;
+		return exprs[0];
 	});
 
 	infix("[", function (left, that) {
