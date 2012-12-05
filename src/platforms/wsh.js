@@ -142,22 +142,24 @@
 		},
 
 		unused: function (unused, lines) {
-			lines.push("Unused variables:");
+			if (options.unused) {
+				lines.push("Unused variables:");
 
-			var func, names = {};
+				var func, names = {};
 
-			for (var i = 0; i < unused.length; i++) {
-				var item = unused[i];
+				for (var i = 0; i < unused.length; i++) {
+					var item = unused[i];
 
-				func = item["function"];
+					func = item["function"];
 
-				if (!(func in names)) names[func] = [];
+					if (!(func in names)) names[func] = [];
 
-				names[func].push(item.name + " (" + item.line + ")");
-			}
+					names[func].push(item.name + " (" + item.line + ")");
+				}
 
-			for (func in names) {
-				lines.push("    " + func + ": " + names[func].join(", "));
+				for (func in names) {
+					lines.push("    " + func + ": " + names[func].join(", "));
+				}
 			}
 		}
 	};
