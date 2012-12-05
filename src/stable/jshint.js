@@ -1198,10 +1198,11 @@ var JSHINT = (function () {
 
 	// fnparam means that this identifier is being defined as a function
 	// argument (see identifier())
-	function optionalidentifier(fnparam) {
+	// prop means that this identifier is that of an object property
+	function optionalidentifier(fnparam, prop) {
 		if (state.tokens.next.identifier) {
 			advance();
-			if (state.tokens.curr.reserved && !state.option.es5) {
+			if (state.tokens.curr.reserved && (!prop || !state.option.es5)) {
 				// `undefined` as a function param is a common pattern to protect
 				// against the case when somebody does `undefined = true` and
 				// help with minification. More info: https://gist.github.com/315916
@@ -2096,7 +2097,7 @@ var JSHINT = (function () {
 
 
 	function property_name() {
-		var id = optionalidentifier(true);
+		var id = optionalidentifier(false, true);
 		if (!id) {
 			if (state.tokens.next.id === "(string)") {
 				id = state.tokens.next.value;
