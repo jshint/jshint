@@ -15,3 +15,7 @@ var foo;
 
 ;function boo() {
 };
+
+// From GH-487
+;(x || y).doSomething();
+;[a, b, c].foreach(doSomething);

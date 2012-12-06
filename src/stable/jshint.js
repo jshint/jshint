@@ -1391,7 +1391,7 @@ var JSHINT = (function () {
 			if (state.tokens.next.id === ";") {
 				p = peek();
 
-				if (!p || p.id !== "(") {
+				if (!p || (p.id !== "(" && p.id !== "[")) {
 					warning("W032");
 				}
 
