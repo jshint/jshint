@@ -1203,11 +1203,36 @@ Lexer.prototype = {
 		// Produce a token object.
 		var create = function (type, value) {
 			/*jshint validthis:true */
-
 			var obj;
-			if (type === "(punctuator)" || (type === "(identifier)" && _.has(state.syntax, value))) {
+			this.prereg = false;
+
+			if (type === "(punctuator)") {
+				switch (value) {
+				case ".":
+				case ")":
+				case ",":
+				case "~":
+				case "#":
+					this.prereg = false;
+					break;
+				default:
+					this.prereg = true;
+				}
+
 				obj = Object.create(state.syntax[value] || state.syntax["(error)"]);
-			} else {
+			}
+
+			if (type === "(identifier)") {
+				if (value === "return" || value === "case") {
+					this.prereg = true;
+				}
+
+				if (_.has(state.syntax, value)) {
+					obj = Object.create(state.syntax[value] || state.syntax["(error)"]);
+				}
+			}
+
+			if (!obj) {
 				obj = Object.create(state.syntax[type]);
 			}
 
@@ -1216,16 +1241,6 @@ Lexer.prototype = {
 			obj.line = this.line;
 			obj.character = this.char;
 			obj.from = this.from;
-
-			var id = obj.id;
-
-			// Check if the next token could potentially be a regular expression.
-
-			if (id !== "(endline)") {
-				this.prereg = id &&
-					(("(,=:[!&|?{};".indexOf(id.charAt(id.length - 1)) >= 0) ||
-						id === "return" || id === "case");
-			}
 
 			return obj;
 		}.bind(this);

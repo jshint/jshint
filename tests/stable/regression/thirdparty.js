@@ -91,8 +91,6 @@ exports.prototype_1_7 = function (test) {
 		.addError(2990, "'tagName' used out of scope.")
 		.addError(3844, "'positionedOffset' is a function.")
 		.addError(3860, "'cumulativeOffset' is a function.")
-		.addError(3972, "Unmatched '{'.") // Weird messages,
-		.addError(3972, "Unmatched '('.") // possibly related to GH-760.
 		.addError(3987, "Variable context was not declared correctly.")
 		.addError(4036, "'ret' is already defined.")
 		.addError(4072, "'cur' used out of scope.")
@@ -113,35 +111,12 @@ exports.prototype_1_7 = function (test) {
 		.addError(4565, "Use '===' to compare with '0'.")
 		.addError(4566, "Use '===' to compare with '0'.")
 		.addError(4568, "Use '===' to compare with '0'.")
-
-		// Following messages are due to a parser bug (see GH-759)
-		.addError(4626, "Expected an identifier and instead saw '/'.")
-		.addError(4626, "Expected an identifier and instead saw '?'.")
-		.addError(4626, "Expected an operator and instead saw '!'.")
-		.addError(4626, "Unexpected '\\'.")
-		.addError(4626, "Expected an identifier and instead saw '^'.")
-		.addError(4627, "Expected ']' to match '[' from line 4626 and instead saw 'Expr'.")
-		.addError(4627, "Expected ')' and instead saw ';'.")
-		.addError(4628, "Expected ')' and instead saw '}'.")
-		.addError(4628, "Missing semicolon.")
-		// End of GH-759-related messages
-
 		.addError(4656, "'i' is already defined.")
 		.addError(4722, "Missing '()' invoking a constructor.")
-
-		// For following messages see GH-760
-		.addError(4831, "Function declarations should not be placed in blocks. Use a function " +
-			"expression or move the statement to the top of the outer function.")
-		.addError(4867, "Function declarations should not be placed in blocks. Use a function " +
-			"expression or move the statement to the top of the outer function.")
-		.addError(4942, "Expected an identifier and instead saw ')'.")
-		// End of GH-760
-
 		.addError(4988, "Missing semicolon.")
 		.addError(4988, "Missing semicolon.")
 		.addError(5021, "Missing semicolon.")
 		.addError(5397, "Missing semicolon.")
-		.addError(6082, "Missing semicolon.") // Weird message, possibly related to GH-760.
 		.addError(5061, "Wrap the /regexp/ literal in parens to disambiguate the slash operator.")
 		.addError(5112, "Use '!==' to compare with 'undefined'.")
 		.addError(5140, "Use '!==' to compare with ''.")

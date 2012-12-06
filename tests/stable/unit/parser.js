@@ -266,6 +266,8 @@ exports.regexp = function (test) {
 		"var t = /x/* 2;",
 		"var u = /x/;",
 		"var v = /dsdg;",
+		"var w = v + /s/",
+		"var x = w - /s/"
 	];
 
 	TestRun(test)
