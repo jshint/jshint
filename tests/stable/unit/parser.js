@@ -386,6 +386,7 @@ exports.comma = function (test) {
 		.addError(15, "Missing semicolon.")
 		.addError(20, "Expected an assignment or function call and instead saw an expression.")
 		.addError(30, "Expected an assignment or function call and instead saw an expression.")
+		.addError(36, "Unexpected 'if'.")
 		.test(src);
 
 	// Regression test (GH-56)
