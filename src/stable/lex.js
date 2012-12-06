@@ -876,7 +876,7 @@ Lexer.prototype = {
 
 					/*falls through */
 				default:
-					// Weird escapement.
+					// Weird escaping.
 					this.trigger("warning", {
 						code: "W118",
 						line: this.line,

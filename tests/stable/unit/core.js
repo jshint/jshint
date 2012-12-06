@@ -476,7 +476,7 @@ exports.NumberNaN = function (test) {
 exports.htmlEscapement = function (test) {
 	TestRun(test).test("var a = '<\\!--';");
 	TestRun(test)
-		.addError(1, "Bad escapement.")
+		.addError(1, "Bad escaping.")
 		.test("var a = '\\!';");
 
 	test.done();
@@ -546,6 +546,29 @@ exports.testNumericParams = function (test) {
 	TestRun(test)
 		.addError(1, "Expected a small integer and instead saw 'face'.")
 		.test("/*jshint maxparams:face */");
+
+	test.done();
+};
+
+exports.testForIn = function (test) {
+	var src = [
+		"(function (o) {",
+		"for (var i in o) { i(); }",
+		"}());"
+	];
+
+	TestRun(test)
+		.test(src);
+
+	src = [
+		"(function (o) {",
+		"for (i in o) { i(); }",
+		"}());"
+	];
+
+	TestRun(test)
+		.addError(2, "Creating global 'for' variable. Should be 'for (var i ...'.")
+		.test(src);
 
 	test.done();
 };

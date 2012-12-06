@@ -321,8 +321,8 @@ exports.strings = function (test) {
 	TestRun(test)
 		.addError(1, "Control character in string: <non-printable>.", {character: 10})
 		.addError(1, "This character may get silently deleted by one or more browsers.")
-		.addError(2, "Bad escapement.")
-		.addError(3, "Unnecessary escapement.")
+		.addError(2, "Bad escaping.")
+		.addError(3, "Unnecessary escaping.")
 		.addError(4, "Unclosed string.")
 		.addError(4, "Missing semicolon.")
 		.test(code);
@@ -364,7 +364,7 @@ exports.jsonMode = function (test) {
 		.addError(4, "Avoid \\v.")
 		.addError(4, "Avoid \\x-.")
 		.addError(4, "Strings must use doublequote.")
-		.addError(5, "Avoid EOL escapement.")
+		.addError(5, "Avoid EOL escaping.")
 		.addError(7, "Avoid 0x-.")
 		.test(code, {multistr: true});
 
