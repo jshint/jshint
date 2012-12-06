@@ -954,6 +954,7 @@ var JSHINT = (function () {
 			state.tokens.curr.from += (state.tokens.curr.character - state.tokens.curr.from);
 			warning("W011", state.tokens.curr, state.tokens.curr.value);
 		}
+
 		advance(",");
 		
 		// TODO: This is a temporary solution to fight against false-positives in
@@ -962,6 +963,34 @@ var JSHINT = (function () {
 
 		if (state.tokens.next.value !== "]" && state.tokens.next.value !== "}") {
 			nonadjacent(state.tokens.curr, state.tokens.next);
+		}
+
+		if (state.tokens.next.identifier) {
+			// Keywords that cannot follow a comma operator.
+			switch (state.tokens.next.value) {
+			case "break":
+			case "case":
+			case "catch":
+			case "continue":
+			case "debugger":
+			case "default":
+			case "do":
+			case "else":
+			case "finally":
+			case "for":
+			case "if":
+			case "in":
+			case "instanceof":
+			case "new":
+			case "return":
+			case "switch":
+			case "throw":
+			case "try":
+			case "var":
+			case "while":
+			case "with":
+				error("E014", state.tokens.next, state.tokens.next.value);
+			}
 		}
 	}
 
@@ -1207,10 +1236,10 @@ var JSHINT = (function () {
 		return x;
 	}
 
-
 	// fnparam means that this identifier is being defined as a function
 	// argument (see identifier())
 	// prop means that this identifier is that of an object property
+
 	function optionalidentifier(fnparam, prop) {
 		if (state.tokens.next.identifier) {
 			advance();

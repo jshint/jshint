@@ -30,3 +30,11 @@ function gh56() {
     callback && callback.apply( commit, (args.push( commit ), args) );
 }
 
+function gh676() {
+	var c = b;
+	b = a,
+	if (b) {
+		a = c;
+	}
+	return a;
+}
