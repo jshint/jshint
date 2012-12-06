@@ -460,3 +460,17 @@ exports.functionCharacterLocation = function (test) {
 
 	test.done();
 };
+
+exports.exported = function (test) {
+	var src = fs.readFileSync(__dirname + "/fixtures/exported.js", "utf8");
+	
+	TestRun(test)
+		.addError(5, "'unused' is defined but never used.")
+		.addError(6, "'isDog' is defined but never used.")
+		.addError(13, "'unusedDeclaration' is defined but never used.")
+		.addError(14, "'unusedExpression' is defined but never used.")
+		.addError(17, "'cannotBeExported' is defined but never used.")
+		.test(src, { unused: true });
+	
+	test.done();
+};

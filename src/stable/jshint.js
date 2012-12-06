@@ -184,14 +184,14 @@ var JSHINT = (function () {
 		},
 
 		declared, // Globals that were declared using /*global ... */ syntax.
-
-		funct, // The current function
+		exported, // Variables that are used outside of the current file.
 
 		functionicity = [
 			"closure", "exception", "global", "label",
 			"outer", "unused", "var"
 		],
 
+		funct, // The current function
 		functions, // All of the functions
 
 		global, // The global scope
@@ -576,6 +576,12 @@ var JSHINT = (function () {
 					declared[key] = nt;
 				}
 			}
+		}
+		
+		if (nt.type === "exported") {
+			body.forEach(function (e) {
+				exported[e] = true;
+			});
 		}
 
 		if (nt.type === "members") {
@@ -3135,6 +3141,7 @@ var JSHINT = (function () {
 
 		predefined = Object.create(vars.ecmaIdentifiers);
 		declared = Object.create(null);
+		exported = Object.create(null);
 		combine(predefined, g || {});
 
 		if (o) {
@@ -3377,6 +3384,11 @@ var JSHINT = (function () {
 				// Params are checked separately from other variables.
 				if (func["(params)"] && func["(params)"].indexOf(key) !== -1)
 					return;
+					
+				// Variable is in global scope and defined as exported.
+				if (func["(global)"] && _.has(exported, key)) {
+					return;
+				}
 
 				warnUnused(key, tkn);
 			};
