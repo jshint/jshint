@@ -196,6 +196,7 @@ var JSHINT = (function () {
 		functions, // All of the functions
 
 		global, // The global scope
+		ignored, // Ignored warnings
 		implied, // Implied globals
 		inblock,
 		indent,
@@ -219,6 +220,12 @@ var JSHINT = (function () {
 	function F() {}		// Used by Object.create
 
 	function checkOption(name, t) {
+		name = name.trim();
+
+		if (/^-W\d{3}$/g.test(name)) {
+			return true;
+		}
+
 		if (valOptions[name] === undefined && boolOptions[name] === undefined) {
 			if (t.type !== "jslint" || renamedOptions[name] === undefined) {
 				error("E001", t, name);
@@ -425,7 +432,11 @@ var JSHINT = (function () {
 	function warning(code, t, a, b, c, d) {
 		var ch, l, w, msg;
 
-		if (/W\d{3}/.test(code)) {
+		if (/^W\d{3}$/.test(code)) {
+			if (ignored[code]) {
+				return;
+			}
+
 			msg = messages.warnings[code];
 		} else if (/E\d{3}/.test(code)) {
 			msg = messages.errors[code];
@@ -672,6 +683,11 @@ var JSHINT = (function () {
 					default:
 						error("E024", nt);
 					}
+					return;
+				}
+
+				if (/^-W\d{3}$/g.test(key)) {
+					ignored[key.slice(1)] = true;
 					return;
 				}
 
@@ -3143,6 +3159,7 @@ var JSHINT = (function () {
 		predefined = Object.create(vars.ecmaIdentifiers);
 		declared = Object.create(null);
 		exported = Object.create(null);
+		ignored = Object.create(null);
 		combine(predefined, g || {});
 
 		if (o) {
@@ -3166,13 +3183,17 @@ var JSHINT = (function () {
 
 			optionKeys = Object.keys(o);
 			for (x = 0; x < optionKeys.length; x++) {
-				newOptionObj[optionKeys[x]] = o[optionKeys[x]];
+				if (/^-W\d{3}$/g.test(optionKeys[x])) {
+					ignored[optionKeys[x].slice(1)] = true;
+				} else {
+					newOptionObj[optionKeys[x]] = o[optionKeys[x]];
 
-				if (optionKeys[x] === "newcap" && o[optionKeys[x]] === false)
-					newOptionObj["(explicitNewcap)"] = true;
+					if (optionKeys[x] === "newcap" && o[optionKeys[x]] === false)
+						newOptionObj["(explicitNewcap)"] = true;
 
-				if (optionKeys[x] === "indent")
-					newOptionObj["(explicitIndent)"] = true;
+					if (optionKeys[x] === "indent")
+						newOptionObj["(explicitIndent)"] = true;
+				}
 			}
 		}
 
