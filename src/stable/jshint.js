@@ -588,7 +588,7 @@ var JSHINT = (function () {
 				}
 			}
 		}
-		
+
 		if (nt.type === "exported") {
 			body.forEach(function (e) {
 				exported[e] = true;
@@ -799,19 +799,19 @@ var JSHINT = (function () {
 	}
 
 
-// This is the heart of JSHINT, the Pratt parser. In addition to parsing, it
-// is looking for ad hoc lint patterns. We add .fud to Pratt's model, which is
-// like .nud except that it is only used on the first token of a statement.
-// Having .fud makes it much easier to define statement-oriented languages like
-// JavaScript. I retained Pratt's nomenclature.
+	// This is the heart of JSHINT, the Pratt parser. In addition to parsing, it
+	// is looking for ad hoc lint patterns. We add .fud to Pratt's model, which is
+	// like .nud except that it is only used on the first token of a statement.
+	// Having .fud makes it much easier to define statement-oriented languages like
+	// JavaScript. I retained Pratt's nomenclature.
 
-// .nud		Null denotation
-// .fud		First null denotation
-// .led		Left denotation
-//	lbp		Left binding power
-//	rbp		Right binding power
+	// .nud  Null denotation
+	// .fud  First null denotation
+	// .led  Left denotation
+	//  lbp  Left binding power
+	//  rbp  Right binding power
 
-// They are elements of the parsing method called Top Down Operator Precedence.
+	// They are elements of the parsing method called Top Down Operator Precedence.
 
 	function expression(rbp, initial) {
 		var left, isArray = false, isObject = false;
@@ -839,6 +839,7 @@ var JSHINT = (function () {
 					error("E005", state.tokens.curr, state.tokens.curr.id);
 				}
 			}
+
 			while (rbp < state.tokens.next.lbp) {
 				isArray = state.tokens.curr.value === "Array";
 				isObject = state.tokens.curr.value === "Object";
@@ -978,7 +979,7 @@ var JSHINT = (function () {
 		}
 
 		advance(",");
-		
+
 		// TODO: This is a temporary solution to fight against false-positives in
 		// arrays and objects with trailing commas (see GH-363). The best solution
 		// would be to extract all whitespace rules out of parser.
@@ -1784,6 +1785,7 @@ var JSHINT = (function () {
 	});
 	reservevar("true");
 	reservevar("undefined");
+
 	assignop("=", "assign", 20);
 	assignop("+=", "assignadd", 20);
 	assignop("-=", "assignsub", 20);
@@ -1792,6 +1794,7 @@ var JSHINT = (function () {
 		error("E016");
 	};
 	assignop("%=", "assignmod", 20);
+
 	bitwiseassignop("&=", "assignbitand", 20);
 	bitwiseassignop("|=", "assignbitor", 20);
 	bitwiseassignop("^=", "assignbitxor", 20);
@@ -2311,6 +2314,29 @@ var JSHINT = (function () {
 		funct["(metrics)"].ComplexityCount += 1;
 	}
 
+	// Parse assignments that were found instead of conditionals.
+	// For example: if (a = 1) { ... }
+
+	function parseCondAssignment() {
+		switch (state.tokens.next.id) {
+		case "=":
+		case "+=":
+		case "-=":
+		case "*=":
+		case "%=":
+		case "&=":
+		case "|=":
+		case "^=":
+		case "/=":
+			if (!state.option.boss) {
+				warning("W084");
+			}
+
+			advance(state.tokens.next.id);
+			expression(20);
+		}
+	}
+
 
 	(function (x) {
 		x.nud = function () {
@@ -2592,12 +2618,7 @@ var JSHINT = (function () {
 		nonadjacent(this, t);
 		nospace();
 		expression(20);
-		if (state.tokens.next.id === "=") {
-			if (!state.option.boss)
-				warning("W084");
-			advance("=");
-			expression(20);
-		}
+		parseCondAssignment();
 		advance(")", t);
 		nospace(state.tokens.prev, state.tokens.curr);
 		block(true, true);
@@ -2693,12 +2714,7 @@ var JSHINT = (function () {
 		nonadjacent(this, t);
 		nospace();
 		expression(20);
-		if (state.tokens.next.id === "=") {
-			if (!state.option.boss)
-				warning("W084");
-			advance("=");
-			expression(20);
-		}
+		parseCondAssignment();
 		advance(")", t);
 		nospace(state.tokens.prev, state.tokens.curr);
 		block(true, true);
@@ -2844,12 +2860,7 @@ var JSHINT = (function () {
 			advance("(");
 			nospace();
 			expression(20);
-			if (state.tokens.next.id === "=") {
-				if (!state.option.boss)
-					warning("W084");
-				advance("=");
-				expression(20);
-			}
+			parseCondAssignment();
 			advance(")", t);
 			nospace(state.tokens.prev, state.tokens.curr);
 			funct["(breakage)"] -= 1;
@@ -2914,12 +2925,7 @@ var JSHINT = (function () {
 			advance(";");
 			if (state.tokens.next.id !== ";") {
 				expression(20);
-				if (state.tokens.next.id === "=") {
-					if (!state.option.boss)
-						warning("W084");
-					advance("=");
-					expression(20);
-				}
+				parseCondAssignment();
 			}
 			nolinebreak(state.tokens.curr);
 			advance(";");
@@ -3405,7 +3411,7 @@ var JSHINT = (function () {
 				// Params are checked separately from other variables.
 				if (func["(params)"] && func["(params)"].indexOf(key) !== -1)
 					return;
-					
+
 				// Variable is in global scope and defined as exported.
 				if (func["(global)"] && _.has(exported, key)) {
 					return;

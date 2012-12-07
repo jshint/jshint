@@ -532,6 +532,12 @@ exports.boss = function (test) {
 		.addError(4, 'Expected a conditional expression and instead saw an assignment.')
 		.addError(7, 'Expected a conditional expression and instead saw an assignment.')
 		.addError(12, 'Expected a conditional expression and instead saw an assignment.')
+
+		// GH-657
+		.addError(14, 'Expected a conditional expression and instead saw an assignment.')
+		.addError(17, 'Expected a conditional expression and instead saw an assignment.')
+		.addError(20, 'Expected a conditional expression and instead saw an assignment.')
+		.addError(25, 'Expected a conditional expression and instead saw an assignment.')
 		.test(src);
 
 	// But if you are the boss, all is good
