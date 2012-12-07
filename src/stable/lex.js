@@ -943,7 +943,6 @@ Lexer.prototype = {
 		}.bind(this);
 
 		// Regular expressions must start with '/'
-
 		if (!this.prereg || char !== "/") {
 			return null;
 		}
@@ -1223,7 +1222,7 @@ Lexer.prototype = {
 			}
 
 			if (type === "(identifier)") {
-				if (value === "return" || value === "case") {
+				if (value === "return" || value === "case" || value === "typeof") {
 					this.prereg = true;
 				}
 

@@ -266,8 +266,9 @@ exports.regexp = function (test) {
 		"var t = /x/* 2;",
 		"var u = /x/;",
 		"var v = /dsdg;",
-		"var w = v + /s/",
-		"var x = w - /s/"
+		"var w = v + /s/;",
+		"var x = w - /s/;",
+		"var y = typeof /[a-z]/;" // GH-657
 	];
 
 	TestRun(test)
