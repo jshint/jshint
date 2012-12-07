@@ -184,6 +184,18 @@ exports.switchFallThrough = function (test) {
 	test.done();
 };
 
+// GH-490: JSHint shouldn't require break before default if default is
+// the first switch statement.
+exports.switchDefaultFirst = function (test) {
+	var src = fs.readFileSync(__dirname + "/fixtures/switchDefaultFirst.js", "utf8");
+
+	TestRun(test)
+		.addError(5, "Expected a 'break' statement before 'default'.")
+		.test(src);
+
+	test.done();
+};
+
 exports.testVoid = function (test) {
 	var code = [
 		"void(0);",
