@@ -1378,3 +1378,19 @@ exports.maxcomplexity = function (test) {
 
 	test.done();
 };
+
+/*
+ * Tests ignored warnings.
+ */
+exports.ignored = function (test) {
+	var src = fs.readFileSync(__dirname + "/fixtures/ignored.js", "utf-8");
+
+	TestRun(test)
+		.addError(4, "A trailing decimal point can be confused with a dot: '12.'.")
+		.test(src);
+
+	TestRun(test)
+		.test(src, { "-W121": true });
+
+	test.done();
+};
