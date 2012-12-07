@@ -354,6 +354,7 @@ exports.browser = function (test) {
 		"Uint16Array",
 		"Uint32Array",
 		"Uint8Array",
+		"Uint8ClampedArray",
 		"WebSocket",
 		"window",
 		"Worker",
