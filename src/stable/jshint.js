@@ -2758,6 +2758,7 @@ var JSHINT = (function () {
 		nonadjacent(state.tokens.curr, state.tokens.next);
 		indent += state.option.indent;
 		this.cases = [];
+
 		for (;;) {
 			switch (state.tokens.next.id) {
 			case "case":
@@ -2793,8 +2794,12 @@ var JSHINT = (function () {
 				case "throw":
 					break;
 				default:
-					if (!reg.fallsThrough.test(state.lines[state.tokens.next.line - 2])) {
-						warning("W086", state.tokens.curr, "default");
+					// Do not display a warning if 'default' is the first statement or if
+					// there is a special /* falls through */ comment.
+					if (this.cases.length) {
+						if (!reg.fallsThrough.test(state.lines[state.tokens.next.line - 2])) {
+							warning("W086", state.tokens.curr, "default");
+						}
 					}
 				}
 				indentation(-state.option.indent);
