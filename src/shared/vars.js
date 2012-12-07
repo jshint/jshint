@@ -171,7 +171,7 @@ exports.browser = {
 	Uint16Array          : false,
 	Uint32Array          : false,
 	Uint8Array           : false,
-        Uint8ClampedArray    : false,
+	Uint8ClampedArray    : false,
 	WebSocket            : false,
 	window               : false,
 	Worker               : false,
