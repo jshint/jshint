@@ -38,3 +38,7 @@ function gh676() {
 	}
 	return a;
 }
+
+function gh771() {
+	gh676(),
+}
