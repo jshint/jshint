@@ -1236,6 +1236,7 @@ Lexer.prototype = {
 			}
 
 			obj.identifier = (type === "(identifier)");
+			obj.type = obj.type || type;
 			obj.value = value;
 			obj.line = this.line;
 			obj.character = this.char;

@@ -964,7 +964,9 @@ var JSHINT = (function () {
 	}
 
 
-	function comma() {
+	function comma(opts) {
+		opts = opts || {};
+
 		if (state.tokens.curr.line !== state.tokens.next.line) {
 			if (!state.option.laxcomma) {
 				if (comma.first) {
@@ -1013,6 +1015,22 @@ var JSHINT = (function () {
 			case "var":
 			case "while":
 			case "with":
+				error("E014", state.tokens.next, state.tokens.next.value);
+				return;
+			}
+		}
+
+		if (state.tokens.next.type === "(punctuator)") {
+			switch (state.tokens.next.value) {
+			case "}":
+			case "]":
+			case ",":
+				if (opts.allowTrailing) {
+					return;
+				}
+
+				/* falls through */
+			case ")":
 				error("E014", state.tokens.next, state.tokens.next.value);
 			}
 		}
@@ -2165,7 +2183,7 @@ var JSHINT = (function () {
 			}
 			this.first.push(expression(10));
 			if (state.tokens.next.id === ",") {
-				comma();
+				comma({ allowTrailing: true });
 				if (state.tokens.next.id === "]" && !state.option.es5) {
 					warning("W070", state.tokens.curr);
 					break;
@@ -2440,7 +2458,7 @@ var JSHINT = (function () {
 
 				countMember(i);
 				if (state.tokens.next.id === ",") {
-					comma();
+					comma({ allowTrailing: true });
 					if (state.tokens.next.id === ",") {
 						warning("W070", state.tokens.curr);
 					} else if (state.tokens.next.id === "}" && !state.option.es5) {
