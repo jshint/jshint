@@ -193,11 +193,49 @@ exports.json2 = function (test) {
 	TestRun(test)
 		.addError(177, "'key' is defined but never used.")
 		.addError(191, "'key' is defined but never used.")
-		.test(src, {
-			undef	: true,
-			unused	: true,
-			laxbreak: true
-		}, { JSON: true });
+		.test(src, { undef: true, unused: true, laxbreak: true }, { JSON: true });
+
+	test.done();
+};
+
+exports.codemirror3 = function (test) {
+	var src = fs.readFileSync(__dirname + '/libs/codemirror3.js', 'utf8');
+	var opt = {
+		newcap:   false,
+		undef:    true,
+		unused:   true,
+		eqnull:   true,
+		boss:     true,
+		laxbreak: true,
+		shadow:   true,
+		loopfunc: true,
+		browser:  true,
+		supernew: true,
+
+		"-W008":  true, // Ignore warnings about leading dots in numbers.
+		"-W038":  true, // Ignore scope warnings.
+		"-W040":  true, // Ignore possible strict violations.
+		"-W041":  true, // Ignore poor relations warnings.
+
+	};
+
+	TestRun(test)
+		.addError(1157, "'result' is defined but never used.")
+		.addError(1342, "Value of 'e' may be overwritten in IE.")
+		.addError(1526, "Value of 'e' may be overwritten in IE.")
+		.addError(1532, "'mX' is defined but never used.")
+		.addError(1532, "'mY' is defined but never used.")
+		.addError(1533, "Value of 'e' may be overwritten in IE.")
+		.addError(2218, "'state' is defined but never used.")
+		.addError(2298, "Wrap the /regexp/ literal in parens to disambiguate the slash operator.")
+		.addError(2427, "'style' is defined but never used.")
+		.addError(2696, "'target' is defined but never used.")
+		.addError(3168, "'ok' is defined but never used.")
+		.addError(4093, "Unnecessary semicolon.")
+		.addError(4168, "Wrap the /regexp/ literal in parens to disambiguate the slash operator.")
+		.addError(4277, "'range' is defined but never used.")
+		.addError(4357, "Expected '{' and instead saw 'pos'.")
+		.test(src, opt, { CodeMirror: true });
 
 	test.done();
 };

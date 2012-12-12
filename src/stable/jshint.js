@@ -833,12 +833,7 @@ var JSHINT = (function () {
 			if (state.tokens.curr.nud) {
 				left = state.tokens.curr.nud();
 			} else {
-				if (state.tokens.next.type === "(number)" && state.tokens.curr.id === ".") {
-					warning("W008", state.tokens.curr, state.tokens.next.value);
-					advance();
-				} else {
-					error("E005", state.tokens.curr, state.tokens.curr.id);
-				}
+				error("E005", state.tokens.curr, state.tokens.curr.id);
 			}
 
 			while (rbp < state.tokens.next.lbp) {
@@ -864,10 +859,15 @@ var JSHINT = (function () {
 				}
 
 				advance();
-				if (isArray && state.tokens.curr.id === "(" && state.tokens.next.id === ")")
+
+				if (isArray && state.tokens.curr.id === "(" && state.tokens.next.id === ")") {
 					warning("W009", state.tokens.curr);
-				if (isObject && state.tokens.curr.id === "(" && state.tokens.next.id === ")")
+				}
+
+				if (isObject && state.tokens.curr.id === "(" && state.tokens.next.id === ")") {
 					warning("W010", state.tokens.curr);
+				}
+
 				if (state.tokens.curr.led) {
 					left = state.tokens.curr.led(left);
 				} else {
@@ -3186,10 +3186,12 @@ var JSHINT = (function () {
 		}
 
 		predefined = Object.create(vars.ecmaIdentifiers);
+		combine(predefined, vars.reservedVars);
+		combine(predefined, g || {});
+
 		declared = Object.create(null);
 		exported = Object.create(null);
 		ignored = Object.create(null);
-		combine(predefined, g || {});
 
 		if (o) {
 			a = o.predef;

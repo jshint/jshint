@@ -59,7 +59,7 @@ var warnings = {
 	W005: "A dot following a number can be confused with a decimal point.",
 	W006: "Confusing minuses.",
 	W007: "Confusing pluses.",
-	W008: "A leading decimal point can be confused with a dot: '.{a}'.",
+	W008: "A leading decimal point can be confused with a dot: '{a}'.",
 	W009: "The array literal notation [] is preferrable.",
 	W010: "The object literal notation {} is preferrable.",
 	W011: "Unexpected space after '{a}'.",

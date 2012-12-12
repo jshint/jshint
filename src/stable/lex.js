@@ -150,6 +150,11 @@ Lexer.prototype = {
 		switch (ch1) {
 		// Most common single-character punctuators
 		case ".":
+			if ((/^[0-9]$/).test(this.peek(1))) {
+				return null;
+			}
+
+			/* falls through */
 		case "(":
 		case ")":
 		case ";":
@@ -1203,7 +1208,10 @@ Lexer.prototype = {
 		var create = function (type, value) {
 			/*jshint validthis:true */
 			var obj;
-			this.prereg = false;
+
+			if (type !== "(endline)" && type !== "(end)") {
+				this.prereg = false;
+			}
 
 			if (type === "(punctuator)") {
 				switch (value) {
