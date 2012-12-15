@@ -3,7 +3,6 @@
 // Identifiers provided by the ECMAScript standard.
 
 exports.reservedVars = {
-	undefined : false,
 	arguments : false,
 	NaN       : false
 };

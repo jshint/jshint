@@ -45,6 +45,7 @@ function Linter(code) {
 
 	this.setGlobals(vars.reservedVars);
 	this.setGlobals(vars.ecmaIdentifiers);
+	this.setGlobals({ "undefined": false });
 }
 
 Linter.prototype = {
