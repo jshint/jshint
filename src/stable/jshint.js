@@ -3184,8 +3184,10 @@ var JSHINT = (function () {
 			JSHINT.scope = "(main)";
 		}
 
-		predefined = Object.create(vars.ecmaIdentifiers);
+		predefined = Object.create(null);
+		combine(predefined, vars.ecmaIdentifiers);
 		combine(predefined, vars.reservedVars);
+
 		combine(predefined, g || {});
 
 		declared = Object.create(null);
