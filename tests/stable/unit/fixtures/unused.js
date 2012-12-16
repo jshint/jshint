@@ -16,3 +16,9 @@ function foo(err, cb) {
     main();
     cb();
 }
+
+function bar(g, h) {
+	//jshint unused:false
+	var i = 1;
+	return h;
+}
