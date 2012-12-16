@@ -413,12 +413,13 @@ exports.unused = function (test) {
 		.addError(6, "'f' is defined but never used.")
 		.addError(7, "'c' is defined but never used.")
 		.addError(15, "'foo' is defined but never used.")
+		.addError(20, "'bar' is defined but never used.")
 		.test(src, { unused: true });
 
 	test.ok(!JSHINT(src, { unused: true }));
 
 	var unused = JSHINT.data().unused;
-	test.equal(4, unused.length);
+	test.equal(5, unused.length);
 	test.ok(unused.some(function (err) { return err.line === 1 && err.name === "a"; }));
 	test.ok(unused.some(function (err) { return err.line === 6 && err.name === "f"; }));
 	test.ok(unused.some(function (err) { return err.line === 7 && err.name === "c"; }));

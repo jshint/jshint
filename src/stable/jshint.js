@@ -2273,6 +2273,10 @@ var JSHINT = (function () {
 		funct["(metrics)"].verifyMaxStatementsPerFunction();
 		funct["(metrics)"].verifyMaxComplexityPerFunction();
 
+		if (state.option.unused === false) {
+			funct["(ignoreUnused)"] = true;
+		}
+
 		scope = oldScope;
 		state.option = oldOption;
 		funct["(last)"] = state.tokens.curr.line;
@@ -3479,6 +3483,10 @@ var JSHINT = (function () {
 			}
 
 			functions.forEach(function (func) {
+				if (func["(ignoreUnused)"]) {
+					return;
+				}
+
 				for (var key in func) {
 					if (_.has(func, key)) {
 						checkUnused(func, key);
