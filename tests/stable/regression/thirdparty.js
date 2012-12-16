@@ -163,7 +163,6 @@ exports.lodash_0_6_1 = function (test) {
 	};
 
 	TestRun(test)
-		.addError(107, "'hasOwnProperty' is a really bad name.")
 		.addError(168, "Possible strict violation.")
 		.addError(170, "Missing '()' invoking a constructor.")
 		.addError(632, "Missing semicolon.")

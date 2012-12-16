@@ -457,10 +457,6 @@ var JSHINT = (function () {
 	}
 
 	function addlabel(t, type, tkn) {
-		if (t === "hasOwnProperty") {
-			warning("W001");
-		}
-
 		// Define t in the current function in the current scope.
 		if (type === "exception") {
 			if (_.has(funct["(context)"], t)) {
@@ -1979,11 +1975,18 @@ var JSHINT = (function () {
 		adjacent(state.tokens.prev, state.tokens.curr);
 		nobreak();
 		var m = identifier();
+
 		if (typeof m === "string") {
 			countMember(m);
 		}
+
 		that.left = left;
 		that.right = m;
+
+		if (m && m === "hasOwnProperty" && state.tokens.next.value === "=") {
+			warning("W001");
+		}
+
 		if (left && left.value === "arguments" && (m === "callee" || m === "caller")) {
 			if (state.option.noarg)
 				warning("W059", left, m);
@@ -1993,9 +1996,11 @@ var JSHINT = (function () {
 				(m === "write" || m === "writeln")) {
 			warning("W060", left);
 		}
+
 		if (!state.option.evil && (m === "eval" || m === "execScript")) {
 			warning("W061");
 		}
+
 		return that;
 	}, 160, true);
 
@@ -2118,6 +2123,7 @@ var JSHINT = (function () {
 			if (!state.option.evil && (e.value === "eval" || e.value === "execScript")) {
 				warning("W061", that);
 			}
+
 			countMember(e.value);
 			if (!state.option.sub && reg.identifier.test(e.value)) {
 				s = state.syntax[e.value];
@@ -2127,6 +2133,11 @@ var JSHINT = (function () {
 			}
 		}
 		advance("]", that);
+
+		if (e && e.value === "hasOwnProperty" && state.tokens.next.value === "=") {
+			warning("W001");
+		}
+
 		nospace(state.tokens.prev, state.tokens.curr);
 		that.left = left;
 		that.right = e;
@@ -2176,6 +2187,7 @@ var JSHINT = (function () {
 
 	function property_name() {
 		var id = optionalidentifier(false, true);
+
 		if (!id) {
 			if (state.tokens.next.id === "(string)") {
 				id = state.tokens.next.value;
@@ -2185,6 +2197,11 @@ var JSHINT = (function () {
 				advance();
 			}
 		}
+
+		if (id === "hasOwnProperty") {
+			warning("W001");
+		}
+
 		return id;
 	}
 
@@ -2376,54 +2393,68 @@ var JSHINT = (function () {
 					indent += state.option.indent;
 				}
 			}
+
 			for (;;) {
 				if (state.tokens.next.id === "}") {
 					break;
 				}
+
 				if (b) {
 					indentation();
 				}
+
 				if (state.tokens.next.value === "get" && peek().id !== ":") {
 					advance("get");
+
 					if (!state.option.es5) {
 						error("E029");
 					}
+
 					i = property_name();
 					if (!i) {
 						error("E030");
 					}
+
 					saveGetter(i);
 					t = state.tokens.next;
 					adjacent(state.tokens.curr, state.tokens.next);
 					f = doFunction();
 					p = f["(params)"];
+
 					if (p) {
 						warning("W076", t, p[0], i);
 					}
+
 					adjacent(state.tokens.curr, state.tokens.next);
 				} else if (state.tokens.next.value === "set" && peek().id !== ":") {
 					advance("set");
+
 					if (!state.option.es5) {
 						error("E029");
 					}
+
 					i = property_name();
 					if (!i) {
 						error("E030");
 					}
+
 					saveSetter(i, state.tokens.next);
 					t = state.tokens.next;
 					adjacent(state.tokens.curr, state.tokens.next);
 					f = doFunction();
 					p = f["(params)"];
+
 					if (!p || p.length !== 1) {
 						warning("W077", t, i);
 					}
 				} else {
 					i = property_name();
 					saveProperty(i, state.tokens.next);
+
 					if (typeof i !== "string") {
 						break;
 					}
+
 					advance(":");
 					nonadjacent(state.tokens.curr, state.tokens.next);
 					expression(10);
