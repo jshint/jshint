@@ -23,3 +23,11 @@ for (var b; b /= arr.next();)
 do {
     doSomething();
 } while (b /= arr.next());
+
+function foo(a) {
+	return a = 1;
+}
+
+function bar(a) {
+	return b.a = 1;
+}

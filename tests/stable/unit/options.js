@@ -538,6 +538,10 @@ exports.boss = function (test) {
 		.addError(17, 'Expected a conditional expression and instead saw an assignment.')
 		.addError(20, 'Expected a conditional expression and instead saw an assignment.')
 		.addError(25, 'Expected a conditional expression and instead saw an assignment.')
+
+		// GH-670
+		.addError(28, "Did you mean to return a conditional instead of an assignment?")
+		.addError(32, "Did you mean to return a conditional instead of an assignment?")
 		.test(src);
 
 	// But if you are the boss, all is good
