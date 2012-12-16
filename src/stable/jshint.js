@@ -237,14 +237,35 @@ var JSHINT = (function () {
 		return Object.prototype.toString.call(obj) === "[object String]";
 	}
 
-	// Non standard methods
-
 	function isIdentifier(tkn, value) {
 		if (!tkn)
 			return false;
 
 		if (!tkn.identifier || tkn.value !== value)
 			return false;
+
+		return true;
+	}
+
+	function isReserved(token) {
+		if (!token.reserved) {
+			return false;
+		}
+
+		if (token.meta && token.meta.isFutureReservedWord) {
+			// ES3 FutureReservedWord in an ES5 environment.
+			if (state.option.es5 && !token.meta.es5) {
+				return false;
+			}
+
+			// Some ES5 FutureReservedWord identifiers are active only
+			// within a strict mode environment.
+			if (token.meta.strictOnly) {
+				if (!state.option.strict && !state.directive["use strict"]) {
+					return false;
+				}
+			}
+		}
 
 		return true;
 	}
@@ -480,7 +501,6 @@ var JSHINT = (function () {
 		}
 	}
 
-
 	function doOption() {
 		var nt = state.tokens.next;
 		var body = nt.body.split(",").map(function (s) { return s.trim(); });
@@ -639,12 +659,11 @@ var JSHINT = (function () {
 		}
 	}
 
-
-// We need a peek function. If it has an argument, it peeks that much farther
-// ahead. It is used to distinguish
-//	   for ( var i in ...
-// from
-//	   for ( var i = ...
+	// We need a peek function. If it has an argument, it peeks that much farther
+	// ahead. It is used to distinguish
+	//	   for ( var i in ...
+	// from
+	//	   for ( var i = ...
 
 	function peek(p) {
 		var i = p || 0, j = 0, t;
@@ -659,9 +678,7 @@ var JSHINT = (function () {
 		return t;
 	}
 
-
-
-// Produce the next token. It looks for programming errors.
+	// Produce the next token. It looks for programming errors.
 
 	function advance(id, t) {
 		switch (state.tokens.curr.id) {
@@ -1007,7 +1024,7 @@ var JSHINT = (function () {
 			if (this.id === "++" || this.id === "--") {
 				if (state.option.plusplus) {
 					warning("W016", this, this.id);
-				} else if ((!this.right.identifier || this.right.reserved) &&
+				} else if ((!this.right.identifier || isReserved(this.right)) &&
 						this.right.id !== "." && this.right.id !== "[") {
 					warning("W017", this);
 				}
@@ -1024,9 +1041,23 @@ var JSHINT = (function () {
 		return x;
 	}
 
-	function reserve(s, f) {
-		var x = type(s, f);
-		x.identifier = x.reserved = true;
+	function reserve(name, func) {
+		var x = type(name, func);
+		x.identifier = true;
+		x.reserved = true;
+		return x;
+	}
+
+	function FutureReservedWord(name, meta) {
+		var x = type(name);
+
+		meta = meta || {};
+		meta.isFutureReservedWord = true;
+
+		x.identifier = true;
+		x.reserved = true;
+		x.meta = meta;
+
 		return x;
 	}
 
@@ -1127,7 +1158,7 @@ var JSHINT = (function () {
 					}
 					that.right = expression(19);
 					return that;
-				} else if (left.identifier && !left.reserved) {
+				} else if (left.identifier && !isReserved(left)) {
 					if (funct[left.value] === "exception") {
 						warning("W022", left);
 					}
@@ -1170,7 +1201,7 @@ var JSHINT = (function () {
 			nonadjacent(state.tokens.curr, state.tokens.next);
 			if (left) {
 				if (left.id === "." || left.id === "[" ||
-						(left.identifier && !left.reserved)) {
+						(left.identifier && !isReserved(left))) {
 					expression(19);
 					return that;
 				}
@@ -1190,7 +1221,7 @@ var JSHINT = (function () {
 		x.led = function (left) {
 			if (state.option.plusplus) {
 				warning("W016", this, this.id);
-			} else if ((!left.identifier || left.reserved) && left.id !== "." && left.id !== "[") {
+			} else if ((!left.identifier || isReserved(left)) && left.id !== "." && left.id !== "[") {
 				warning("W017", this);
 			}
 
@@ -1205,18 +1236,28 @@ var JSHINT = (function () {
 	// prop means that this identifier is that of an object property
 
 	function optionalidentifier(fnparam, prop) {
-		if (state.tokens.next.identifier) {
-			advance();
-			if (state.tokens.curr.reserved && (!prop || !state.option.es5)) {
-				// `undefined` as a function param is a common pattern to protect
-				// against the case when somebody does `undefined = true` and
-				// help with minification. More info: https://gist.github.com/315916
-				if (!fnparam || state.tokens.curr.value !== "undefined") {
-					warning("W024", state.tokens.curr, state.tokens.curr.id);
+		if (!state.tokens.next.identifier) {
+			return;
+		}
+
+		advance();
+
+		var curr = state.tokens.curr;
+
+		if (isReserved(curr)) {
+			if (!curr.meta || !curr.meta.isFuturedReservedWord) {
+				if (!prop || !state.option.es5) {
+					// `undefined` as a function param is a common pattern to protect
+					// against the case when somebody does `undefined = true` and
+					// help with minification. More info: https://gist.github.com/315916
+					if (!fnparam || state.tokens.curr.value !== "undefined") {
+						warning("W024", state.tokens.curr, state.tokens.curr.id);
+					}
 				}
 			}
-			return state.tokens.curr.value;
 		}
+
+		return state.tokens.curr.value;
 	}
 
 	// fnparam means that this identifier is being defined as a function
@@ -1271,8 +1312,18 @@ var JSHINT = (function () {
 		}
 
 		// Is this a labelled statement?
+		var res = isReserved(t);
 
-		if (t.identifier && !t.reserved && peek().id === ":") {
+		// We're being more tolerant here: if someone uses
+		// a FutureReservedWord as a label, we warn but proceed
+		// anyway.
+
+		if (res && t.meta && t.meta.isFutureReservedWord) {
+			warning("W024", t, t.id);
+			res = false;
+		}
+
+		if (t.identifier && !res && peek().id === ":") {
 			advance();
 			advance(":");
 			scope = Object.create(s);
@@ -2070,7 +2121,7 @@ var JSHINT = (function () {
 			countMember(e.value);
 			if (!state.option.sub && reg.identifier.test(e.value)) {
 				s = state.syntax[e.value];
-				if (!s || !s.reserved) {
+				if (!s || !isReserved(s)) {
 					warning("W069", state.tokens.prev, e.value);
 				}
 			}
@@ -2977,28 +3028,41 @@ var JSHINT = (function () {
 		return this;
 	}).exps = true;
 
-	// Superfluous reserved words
+	// Future Reserved Words
 
-	reserve("class");
-	reserve("const");
-	reserve("enum");
-	reserve("export");
-	reserve("extends");
-	reserve("import");
-	reserve("super");
+	FutureReservedWord("abstract");
+	FutureReservedWord("boolean");
+	FutureReservedWord("byte");
+	FutureReservedWord("char");
+	FutureReservedWord("class", { es5: true });
+	FutureReservedWord("double");
+	FutureReservedWord("enum", { es5: true });
+	FutureReservedWord("export", { es5: true });
+	FutureReservedWord("extends", { es5: true });
+	FutureReservedWord("final");
+	FutureReservedWord("float");
+	FutureReservedWord("goto");
+	FutureReservedWord("implements", { es5: true, strictOnly: true });
+	FutureReservedWord("import", { es5: true });
+	FutureReservedWord("int");
+	FutureReservedWord("interface");
+	FutureReservedWord("let", { es5: true, strictOnly: true });
+	FutureReservedWord("long");
+	FutureReservedWord("native");
+	FutureReservedWord("package", { es5: true, strictOnly: true });
+	FutureReservedWord("private", { es5: true, strictOnly: true });
+	FutureReservedWord("protected", { es5: true, strictOnly: true });
+	FutureReservedWord("public", { es5: true, strictOnly: true });
+	FutureReservedWord("short");
+	FutureReservedWord("static", { es5: true, strictOnly: true });
+	FutureReservedWord("super", { es5: true });
+	FutureReservedWord("synchronized");
+	FutureReservedWord("throws");
+	FutureReservedWord("transient");
+	FutureReservedWord("volatile");
+	FutureReservedWord("yield", { es5: true, strictOnly: true });
 
-	reserve("let");
-	reserve("yield");
-	reserve("implements");
-	reserve("interface");
-	reserve("package");
-	reserve("private");
-	reserve("protected");
-	reserve("public");
-	reserve("static");
-
-
-// Parse JSON
+	// Parse JSON
 
 	function jsonValue() {
 

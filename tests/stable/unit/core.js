@@ -511,6 +511,24 @@ exports.testSparseArrays = function (test) {
 	test.done();
 };
 
+exports.testReserved = function (test) {
+	var src = fs.readFileSync(__dirname + "/fixtures/reserved.js", "utf8");
+
+	TestRun(test)
+		.addError(1, "Expected an identifier and instead saw 'volatile' (a reserved word).")
+		.addError(10, "Expected an identifier and instead saw 'let' (a reserved word).")
+		.addError(14, "Expected an identifier and instead saw 'else' (a reserved word).")
+		.addError(15, "Expected an identifier and instead saw 'throws' (a reserved word).")
+		.test(src);
+
+	TestRun(test)
+		.addError(10, "Expected an identifier and instead saw 'let' (a reserved word).")
+		.addError(14, "Expected an identifier and instead saw 'else' (a reserved word).")
+		.test(src, { es5: true });
+
+	test.done();
+};
+
 // GH-744: Prohibit the use of reserved words as non-property
 // identifiers.
 exports.testES5Reserved = function (test) {
