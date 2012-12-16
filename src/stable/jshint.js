@@ -3007,10 +3007,11 @@ var JSHINT = (function () {
 
 			if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
 				nonadjacent(state.tokens.curr, state.tokens.next);
-				if (peek().value === "=" && !state.option.boss) {
-					warningAt("W093", state.tokens.curr.line, state.tokens.curr.character + 1);
-				}
 				this.first = expression(0);
+
+				if (this.first.value === "=" && !state.option.boss) {
+					warningAt("W093", this.first.line, this.first.character);
+				}
 			}
 		} else if (!state.option.asi) {
 			nolinebreak(this); // always warn (Line breaking error)
