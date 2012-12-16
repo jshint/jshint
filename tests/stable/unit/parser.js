@@ -333,11 +333,17 @@ exports.strings = function (test) {
 
 exports.ownProperty = function (test) {
 	var code = [
-		"hasOwnProperty: for(;;) {break;}",
+		"var obj = { hasOwnProperty: false };",
+		"obj.hasOwnProperty = true;",
+		"obj['hasOwnProperty'] = true;",
+		"function test() { var hasOwnProperty = {}.hasOwnProperty; }"
 	];
 
 	TestRun(test)
 		.addError(1, "'hasOwnProperty' is a really bad name.")
+		.addError(2, "'hasOwnProperty' is a really bad name.")
+		.addError(3, "'hasOwnProperty' is a really bad name.")
+		.addError(3, "['hasOwnProperty'] is better written in dot notation.")
 		.test(code);
 
 	test.done();
