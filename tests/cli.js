@@ -231,11 +231,13 @@ exports.group = {
 		sinon.stub(process, "cwd").returns(dir);
 		sinon.stub(shjs, "cat")
 			.withArgs(sinon.match(/file2?\.js$/)).returns("console.log('Hello');")
+			.withArgs(sinon.match(/ignore\/file\d\.js$/)).returns("console.log('Hello, ignore me');")
+			.withArgs(sinon.match(/ignore\/dir\/file\d\.js$/)).returns("console.log('Hello, ignore me');")
 			.withArgs(sinon.match(/\.jshintrc$/)).returns("{}")
-			.withArgs(sinon.match(/\.jshintignore$/)).returns("");
+			.withArgs(sinon.match(/\.jshintignore$/)).returns("ignore/**");
 
 		cli.interpret([
-			"node", "jshint", "file.js", "file2.js", ".hidden", "file4.json"
+			"node", "jshint", "file.js", "file2.js", ".hidden", "file4.json", "ignore/file1.js", "ignore/file2.js", "ignore/dir/file1.js"
 		]);
 
 		var args = shjs.cat.args.filter(function (arg) {
