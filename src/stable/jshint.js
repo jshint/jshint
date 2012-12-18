@@ -368,8 +368,8 @@ var JSHINT = (function () {
 		};
 	}
 
-	function isundef(scope, m, t, a) {
-		return JSHINT.undefs.push([scope, m, t, a]);
+	function isundef(scope, code, token, a) {
+		return JSHINT.undefs.push([scope, code, token, a]);
 	}
 
 	function warning(code, t, a, b, c, d) {
@@ -1656,7 +1656,7 @@ var JSHINT = (function () {
 						(state.tokens.next && (state.tokens.next.value === "." ||
 							state.tokens.next.value === "["))) {
 
-						isundef(funct, "'{a}' is not defined.", state.tokens.curr, v);
+						isundef(funct, "W133", state.tokens.curr, v);
 					}
 				}
 
