@@ -184,6 +184,7 @@ var warnings = {
 	W130: "Expected a number and instead saw '{a}'.",
 	W131: "'{a}' should not be greater than '{b}'.",
 	W132: "Expected '{a}' and instead saw '{b}'.",
+	W133: "'{a}' is not defined.",
 };
 
 var info = {
