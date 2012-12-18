@@ -1649,7 +1649,7 @@ var JSHINT = (function () {
 				// the base object of a reference is null so no need to display warning
 				// if we're inside of typeof or delete.
 
-				if (state.option.undef && typeof predefined[v] !== "boolean") {
+				if (typeof predefined[v] !== "boolean") {
 					// Attempting to subscript a null reference will throw an
 					// error, even within the typeof and delete operators
 					if (!(anonname === "typeof" || anonname === "delete") ||
@@ -1689,16 +1689,15 @@ var JSHINT = (function () {
 					} else if (typeof s !== "object") {
 						// Operators typeof and delete do not raise runtime errors even
 						// if the base object of a reference is null so no need to
+						//
 						// display warning if we're inside of typeof or delete.
-						if (state.option.undef) {
-							// Attempting to subscript a null reference will throw an
-							// error, even within the typeof and delete operators
-							if (!(anonname === "typeof" || anonname === "delete") ||
-								(state.tokens.next &&
-									(state.tokens.next.value === "." || state.tokens.next.value === "["))) {
+						// Attempting to subscript a null reference will throw an
+						// error, even within the typeof and delete operators
+						if (!(anonname === "typeof" || anonname === "delete") ||
+							(state.tokens.next &&
+								(state.tokens.next.value === "." || state.tokens.next.value === "["))) {
 
-								isundef(funct, "'{a}' is not defined.", state.tokens.curr, v);
-							}
+							isundef(funct, "'{a}' is not defined.", state.tokens.curr, v);
 						}
 						funct[v] = true;
 						note_implied(state.tokens.curr);
@@ -3476,7 +3475,7 @@ var JSHINT = (function () {
 
 				if (markDefined(k[2].value, k[0])) {
 					clearImplied(k[2].value, k[2].line);
-				} else {
+				} else if (state.option.undef) {
 					warning.apply(warning, k.slice(1));
 				}
 			}
