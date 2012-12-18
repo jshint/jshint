@@ -74,11 +74,21 @@ function removeComments(str) {
  * @returns {object} config object
  */
 function loadConfig(fp) {
-	if (fp && shjs.test("-e", fp)) {
-		return JSON.parse(removeComments(shjs.cat(fp)));
+	if (!fp) {
+		return {};
 	}
 
-	return {};
+	if (!shjs.test("-e", fp)) {
+		cli.error("Can't find config file: " + fp);
+		process.exit(1);
+	}
+
+	try {
+		return JSON.parse(removeComments(shjs.cat(fp)));
+	} catch (err) {
+		cli.error("Can't parse config file: " + fp);
+		process.exit(1);
+	}
 }
 
 /**

@@ -1,6 +1,5 @@
 "use strict";
 
-var fs = require("fs");
 var path = require("path");
 var shjs = require("shelljs");
 var sinon = require("sinon");
@@ -22,29 +21,60 @@ exports.group = {
 	},
 
 	testConfig: function (test) {
-		// Test when configuration file doesn't exist.
-		sinon.stub(shjs, "cat").returns("{ \"node\": true }");
-		sinon.stub(shjs, "test").returns(false);
+		var _cli = require("cli");
+		var out = sinon.stub(_cli, "error");
+		sinon.stub(cli, "run").returns(true);
 
-		var run = sinon.stub(cli, "run");
+		sinon.stub(shjs, "cat")
+			.withArgs(sinon.match(/file\.js$/)).returns("var a = function () {}; a();")
+			.withArgs(sinon.match(/file1\.json$/)).returns("wat")
+			.withArgs(sinon.match(/file2\.json$/)).returns("{\"node\":true}");
+
+		sinon.stub(shjs, "test")
+			.withArgs("-e", sinon.match(/file\.js$/)).returns(true)
+			.withArgs("-e", sinon.match(/file1\.json$/)).returns(true)
+			.withArgs("-e", sinon.match(/file2\.json$/)).returns(true)
+			.withArgs("-e", sinon.match(/file3\.json$/)).returns(false);
+
+		process.exit.restore();
+		sinon.stub(process, "exit").throws("ProcessExit");
+
+		// File doesn't exist.
+		try {
+			cli.interpret([
+				"node", "jshint", "file.js", "--config", "file3.json"
+			]);
+		} catch (err) {
+			var msg = out.args[0][0];
+			test.equal(msg.slice(0, 23), "Can't find config file:");
+			test.equal(msg.slice(msg.length - 10), "file3.json");
+			test.equal(err, "ProcessExit");
+		}
+
+		// Invalid config
+		try {
+			cli.interpret([
+				"node", "jshint", "file.js", "--config", "file1.json"
+			]);
+		} catch (err) {
+			var msg = out.args[1][0];
+			test.equal(msg.slice(0, 24), "Can't parse config file:");
+			test.equal(msg.slice(msg.length - 10), "file1.json");
+			test.equal(err, "ProcessExit");
+		}
+
+		// Valid config
+		process.exit.restore();
+		sinon.stub(process, "exit");
 
 		cli.interpret([
-			"node", "jshint", "file.js", "--config", "file.json"
+			"node", "jshint", "file.js", "--config", "file2.json"
 		]);
-		test.deepEqual(run.args[0][0].config, {});
-		shjs.test.restore();
 
-		// Test when configuration file exists.
-		sinon.stub(shjs, "test").returns(true);
-
-		cli.interpret([
-			"node", "jshint", "file.js", "--config", "file.json"
-		]);
-		test.deepEqual(run.args[1][0].config, { node: true });
-
-		shjs.test.restore();
+		_cli.error.restore();
+		cli.run.restore();
 		shjs.cat.restore();
-		run.restore();
+		shjs.test.restore();
 
 		test.done();
 	},
@@ -237,7 +267,8 @@ exports.group = {
 			.withArgs(sinon.match(/\.jshintignore$/)).returns("ignore/**");
 
 		cli.interpret([
-			"node", "jshint", "file.js", "file2.js", ".hidden", "file4.json", "ignore/file1.js", "ignore/file2.js", "ignore/dir/file1.js"
+			"node", "jshint", "file.js", "file2.js", ".hidden", "file4.json", "ignore/file1.js",
+			"ignore/file2.js", "ignore/dir/file1.js"
 		]);
 
 		var args = shjs.cat.args.filter(function (arg) {
