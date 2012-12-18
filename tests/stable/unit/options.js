@@ -400,6 +400,14 @@ exports.undef = function (test) {
 		.addError(22, "'localUndef' is not defined.")
 		.test(src, { undef: true });
 
+	// Regression test for GH-668.
+	src = fs.readFileSync(__dirname + "/fixtures/gh668.js", "utf8");
+	test.ok(JSHINT(src, { undef: true }));
+	test.ok(!JSHINT.data().implieds);
+
+	test.ok(JSHINT(src));
+	test.ok(!JSHINT.data().implieds);
+
 	test.done();
 };
 
