@@ -263,11 +263,12 @@ exports.group = {
 			.withArgs(sinon.match(/file2?\.js$/)).returns("console.log('Hello');")
 			.withArgs(sinon.match(/ignore\/file\d\.js$/)).returns("console.log('Hello, ignore me');")
 			.withArgs(sinon.match(/ignore\/dir\/file\d\.js$/)).returns("console.log('Hello, ignore me');")
+			.withArgs(sinon.match(/node_script$/)).returns("console.log('Hello, ignore me');")
 			.withArgs(sinon.match(/\.jshintrc$/)).returns("{}")
 			.withArgs(sinon.match(/\.jshintignore$/)).returns("ignore/**");
 
 		cli.interpret([
-			"node", "jshint", "file.js", "file2.js", ".hidden", "file4.json", "ignore/file1.js",
+			"node", "jshint", "file.js", "file2.js", "node_script", "ignore/file1.js",
 			"ignore/file2.js", "ignore/dir/file1.js"
 		]);
 
@@ -275,9 +276,10 @@ exports.group = {
 			return !/\.jshintrc$/.test(arg[0]) && !/\.jshintignore$/.test(arg[0]);
 		});
 
-		test.equal(args.length, 2);
+		test.equal(args.length, 3);
 		test.equal(args[0][0], "file.js");
 		test.equal(args[1][0], "file2.js");
+		test.equal(args[2][0], "node_script");
 
 		shjs.cat.restore();
 		sinon.stub(shjs, "cat")

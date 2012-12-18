@@ -220,15 +220,15 @@ function collect(fp, files, ignores, ext) {
 
 	if (shjs.test("-d", fp)) {
 		shjs.ls(fp).forEach(function (item) {
-			collect(path.join(fp, item), files, ignores, ext);
+			if (item.match(ext)) {
+				collect(path.join(fp, item), files, ignores, ext);
+			}
 		});
 
 		return;
 	}
 
-	if (fp.match(ext)) {
-		files.push(fp);
-	}
+	files.push(fp);
 }
 
 /**
