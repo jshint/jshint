@@ -7,9 +7,10 @@ require("shelljs/make");
 var cli = require("cli");
 
 var TESTS = [
+	"tests/",
 	"tests/stable/unit/",
 	"tests/stable/regression/",
-	"tests/next/unit/"
+	"tests/next/unit/",
 ];
 
 var OPTIONS = JSON.parse(cat("./jshint.json"));
