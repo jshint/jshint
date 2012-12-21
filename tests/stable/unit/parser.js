@@ -403,7 +403,7 @@ exports.comma = function (test) {
 	TestRun(test)
 		.addError(4, "Expected an assignment or function call and instead saw an expression.")
 		.test(fs.readFileSync(__dirname + "/fixtures/gh56.js", "utf8"));
-		
+
 	// Regression test (GH-363)
 	TestRun(test)
 		.addError(1, "Extra comma. (it breaks older versions of IE)")
@@ -471,7 +471,7 @@ exports.functionCharacterLocation = function (test) {
 
 exports.exported = function (test) {
 	var src = fs.readFileSync(__dirname + "/fixtures/exported.js", "utf8");
-	
+
 	TestRun(test)
 		.addError(5, "'unused' is defined but never used.")
 		.addError(6, "'isDog' is defined but never used.")
@@ -479,6 +479,23 @@ exports.exported = function (test) {
 		.addError(14, "'unusedExpression' is defined but never used.")
 		.addError(17, "'cannotBeExported' is defined but never used.")
 		.test(src, { unused: true });
-	
+
+	test.done();
+};
+
+exports.testIdentifiers = function (test) {
+	var src = fs.readFileSync(__dirname + "/fixtures/identifiers.js", "utf8");
+
+	TestRun(test).test(src);
+	TestRun(test)
+		.addError(1, "'ascii' is defined but never used.")
+		.addError(2, "'num1' is defined but never used.")
+		.addError(3, "'lifé' is defined but never used.")
+		.addError(4, "'π' is defined but never used.")
+		.addError(5, "'привет' is defined but never used.")
+		.addError(6, "'\\u1d44' is defined but never used.")
+		.addError(7, "'encoded\\u1d44' is defined but never used.")
+		.test(src, { unused: true });
+
 	test.done();
 };
