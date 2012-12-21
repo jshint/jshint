@@ -369,7 +369,7 @@ var exports = {
 			reporter: reporter,
 			ignores: loadIgnores(),
 			extensions: options["extra-ext"],
-			verbose: options["verbose"]
+			verbose: options.verbose
 		});
 
 		// Avoid stdout cutoff in Node 0.4.x, also supports 0.5.x.
