@@ -316,16 +316,16 @@ exports.strings = function (test) {
 		"var a = '\u0012\\r';",
 		"var b = \'\\g\';",
 		"var c = '\\u0022\\u0070\\u005C';",
-		"var x = 'ax",
+		"var e = '\\x6b..\\x6e';",
+		"var f = 'ax"
 	];
 
 	TestRun(test)
 		.addError(1, "Control character in string: <non-printable>.", {character: 10})
 		.addError(1, "This character may get silently deleted by one or more browsers.")
 		.addError(2, "Bad escaping.")
-		.addError(3, "Unnecessary escaping.")
-		.addError(4, "Unclosed string.")
-		.addError(4, "Missing semicolon.")
+		.addError(5, "Unclosed string.")
+		.addError(5, "Missing semicolon.")
 		.test(code);
 
 	test.done();

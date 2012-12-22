@@ -1071,17 +1071,7 @@ Lexer.prototype = {
 					}
 					break;
 				case "u":
-					var u = parseInt(this.input.substr(1, 4), 16);
-
-					if (u >= 32 && u <= 126 && u !== 34 && u !== 92 && u !== 39) {
-						this.trigger("warning", {
-							code: "W111",
-							line: this.line,
-							character: this.char
-						});
-					}
-
-					char = String.fromCharCode(u);
+					char = String.fromCharCode(parseInt(this.input.substr(1, 4), 16));
 					jump = 5;
 					break;
 				case "v":
