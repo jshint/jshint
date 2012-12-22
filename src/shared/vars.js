@@ -225,6 +225,7 @@ exports.node = {
 	__filename   : false,
 	__dirname    : false,
 	Buffer       : false,
+	DataView     : false,
 	console      : false,
 	exports      : true,  // In Node it is ok to exports = module.exports = foo();
 	GLOBAL       : false,
