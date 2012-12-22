@@ -51,6 +51,7 @@ exports.node = function (test) {
 		"__filename",
 		"__dirname",
 		"Buffer",
+		"DataView",
 		"GLOBAL",
 		"global",
 		"module",
