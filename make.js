@@ -89,19 +89,21 @@ target.test = function () {
 };
 
 target.build = function () {
-	echo("Building platform wrappers:");
+	var browserify = require("browserify");
+	var bundle = browserify({ debug: true, exports: [ "require" ] });
 
-	var rhino = cat("./src/stable/jshint.js", "./src/platforms/rhino.js");
+	bundle.addEntry("./src/stable/jshint.js");
+	bundle.bundle().to("./dist/jshint.js");
+	cli.ok("Bundle");
+
+	// Rhino
+	var rhino = cat("./dist/jshint.js", "./src/platforms/rhino.js");
 	rhino = "#!/usr/bin/env rhino\n\n" + rhino;
 	rhino.to("./dist/jshint-rhino.js");
 	exec("chmod +x dist/jshint-rhino.js");
 	cli.ok("Rhino");
 
-	cat("./src/platforms/wsh.js").to("./dist/jshint-wsh.js");
+	// Windows Script Host
+	cat("./dist/jshint.js", "./src/platforms/wsh.js").to("./dist/jshint-wsh.js");
 	cli.ok("Windows Script Host");
-
-	cat("./src/platforms/jsc.sh").to("./dist/jshint-jsc.sh");
-	cat("./src/platforms/jsc.js").to("./dist/jshint-jsc.js");
-	exec("chmod +x dist/jshint-jsc.sh");
-	cli.ok("JavaScript Core");
 };

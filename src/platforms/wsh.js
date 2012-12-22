@@ -1,7 +1,9 @@
-/*global JSHINT, WScript, Enumerator */
+/*global WScript, Enumerator */
 
 (function () {
 	"use strict";
+
+	var JSHINT = require("/src/stable/jshint.js").JSHINT;
 
 	function readFile(path, charset) {
 		try {
@@ -168,18 +170,6 @@
 	var scriptPath = WScript.ScriptFullName;
 
 	scriptPath = scriptPath.substr(0, scriptPath.length - scriptName.length);
-
-	// load JSHint if the two scripts have not been concatenated
-	if (typeof JSHINT === "undefined") {
-		/*jshint evil:true */
-		eval(readFile(scriptPath + "..\\src\\stable\\jshint.js", 'utf-8'));
-
-		if (typeof JSHINT === "undefined") {
-			WScript.StdOut.WriteLine("ERROR: Could not find 'jshint.js'.");
-
-			WScript.Quit(-2);
-		}
-	}
 
 	var globals = {};
 	var options = {};
