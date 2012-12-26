@@ -266,6 +266,10 @@ var JSHINT = (function () {
 					return false;
 				}
 			}
+
+			if (token.isProperty) {
+				return false;
+			}
 		}
 
 		return true;
@@ -1240,21 +1244,25 @@ var JSHINT = (function () {
 		advance();
 
 		var curr = state.tokens.curr;
+		var meta = curr.meta || {};
+		var val  = state.tokens.curr.value;
 
-		if (isReserved(curr)) {
-			if (!curr.meta || !curr.meta.isFuturedReservedWord) {
-				if (!prop || !state.option.es5) {
-					// `undefined` as a function param is a common pattern to protect
-					// against the case when somebody does `undefined = true` and
-					// help with minification. More info: https://gist.github.com/315916
-					if (!fnparam || state.tokens.curr.value !== "undefined") {
-						warning("W024", state.tokens.curr, state.tokens.curr.id);
-					}
-				}
+		if (!isReserved(curr)) {
+			return val;
+		}
+
+		if (prop) {
+			if (state.option.es5 || meta.isFutureReservedWord) {
+				return val;
 			}
 		}
 
-		return state.tokens.curr.value;
+		if (fnparam && val === "undefined") {
+			return val;
+		}
+
+		warning("W024", state.tokens.curr, state.tokens.curr.id);
+		return val;
 	}
 
 	// fnparam means that this identifier is being defined as a function
