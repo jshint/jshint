@@ -1440,7 +1440,7 @@ Lexer.prototype = {
 		var token;
 
 		// Produce a token object.
-		var create = function (type, value) {
+		var create = function (type, value, isProperty) {
 			/*jshint validthis:true */
 			var obj;
 
@@ -1484,6 +1484,10 @@ Lexer.prototype = {
 			obj.line = this.line;
 			obj.character = this.char;
 			obj.from = this.from;
+
+			if (isProperty && obj.identifier) {
+				obj.isProperty = isProperty;
+			}
 
 			return obj;
 		}.bind(this);
@@ -1535,7 +1539,7 @@ Lexer.prototype = {
 			case Token.Keyword:
 			case Token.NullLiteral:
 			case Token.BooleanLiteral:
-				return create("(identifier)", token.value);
+				return create("(identifier)", token.value, state.tokens.curr.id === ".");
 
 			case Token.NumericLiteral:
 				if (token.isMalformed) {
