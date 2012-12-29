@@ -487,7 +487,7 @@ Lexer.prototype = {
 		// End of unbegun comment. Raise an error and skip that input.
 		if (ch1 === "*" && ch2 === "/") {
 			this.trigger("error", {
-				code: "E020",
+				code: "E018",
 				line: startLine,
 				character: startChar
 			});
@@ -521,7 +521,7 @@ Lexer.prototype = {
 					// trigger an error and end the comment implicitly.
 					if (!this.nextLine()) {
 						this.trigger("error", {
-							code: "E015",
+							code: "E017",
 							line: startLine,
 							character: startChar
 						});
@@ -977,13 +977,13 @@ Lexer.prototype = {
 
 					if (!state.option.multistr) {
 						this.trigger("warning", {
-							code: "W117",
+							code: "W043",
 							line: this.line,
 							character: this.char
 						});
 					} else if (state.jsonMode) {
 						this.trigger("warning", {
-							code: "W116",
+							code: "W042",
 							line: this.line,
 							character: this.char
 						});
@@ -995,7 +995,7 @@ Lexer.prototype = {
 
 				if (!this.nextLine()) {
 					this.trigger("error", {
-						code: "E044",
+						code: "E029",
 						line: startLine,
 						character: startChar
 					});
@@ -1118,7 +1118,7 @@ Lexer.prototype = {
 				default:
 					// Weird escaping.
 					this.trigger("warning", {
-						code: "W118",
+						code: "W044",
 						line: this.line,
 						character: this.char
 					});
@@ -1164,7 +1164,7 @@ Lexer.prototype = {
 			if (char < " ") {
 				malformed = true;
 				this.trigger("warning", {
-					code: "W123",
+					code: "W048",
 					line: this.line,
 					character: this.char
 				});
@@ -1174,7 +1174,7 @@ Lexer.prototype = {
 			if (char === "<") {
 				malformed = true;
 				this.trigger("warning", {
-					code: "W124",
+					code: "W049",
 					line: this.line,
 					character: this.char,
 					data: [ char ]
@@ -1260,7 +1260,7 @@ Lexer.prototype = {
 
 		if (!terminated) {
 			this.trigger("error", {
-				code: "E017",
+				code: "E015",
 				line: this.line,
 				character: this.from
 			});
@@ -1290,7 +1290,7 @@ Lexer.prototype = {
 		} catch (err) {
 			malformed = true;
 			this.trigger("error", {
-				code: "E018",
+				code: "E016",
 				line: this.line,
 				character: this.char,
 				data: [ err.message ] // Platform dependent!
@@ -1503,7 +1503,7 @@ Lexer.prototype = {
 				if (this.input.length) {
 					// Unexpected character.
 					this.trigger("error", {
-						code: "E014",
+						code: "E024",
 						line: this.line,
 						character: this.char,
 						data: [ this.peek() ]
@@ -1544,7 +1544,7 @@ Lexer.prototype = {
 			case Token.NumericLiteral:
 				if (token.isMalformed) {
 					this.trigger("warning", {
-						code: "W119",
+						code: "W045",
 						line: this.line,
 						character: this.char,
 						data: [ token.value ]

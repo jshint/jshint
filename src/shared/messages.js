@@ -3,52 +3,59 @@
 var _ = require("underscore");
 
 var errors = {
+	// JSHint options
 	E001: "Bad option: '{a}'.",
-	E002: "Unmatched '{a}'.",
-	E003: "Expected '{a}' to match '{b}' from line {c} and " +
-		"instead saw '{d}'.",
-	E004: "Expected '{a}' and instead saw '{b}'.",
-	E005: "Expected an identifier and instead saw '{a}'.",
-	E006: "Line breaking error '{a}'.",
-	E007: "Attempting to override '{a}' which is a constant.",
-	E008: "Bad assignment.",
-	E009: "Missing \"use strict\" statement.",
-	E010: "Strict violation.",
+	E002: "Bad option value.",
+
+	// JSHint input
+	E003: "Expected a JSON value.",
+	E004: "Input is neither a string nor an array of strings.",
+	E005: "Input is empty.",
+	E006: "Unexpected early end of program.",
+
+	// Strict mode
+	E007: "Missing \"use strict\" statement.",
+	E008: "Strict violation.",
+	E009: "Option 'validthis' can't be used in a global scope.",
+	E010: "'with' is not allowed in strict mode.",
+
+	// Constants
 	E011: "const '{a}' has already been declared.",
 	E012: "const '{a}' is initialized to 'undefined'.",
-	E013: "Missing '{a}'.",
-	E014: "Unexpected '{a}'.",
-	E015: "Unclosed comment.",
-	E016: "A regular expression literal can be confused with '/='.", // KILLED
-	E017: "Unclosed regular expression.",
-	E018: "Invalid regular expression.",
-	E019: "Unescaped '{a}'.",
-	E020: "Unbegun comment.",
-	E021: "What?", // FIXME,
-	E022: "Expected a small integer and instead saw '{a}'.",
-	E023: "Option 'validthis' can't be used in a global scope.",
-	E024: "Bad option value.",
-	E025: "Missing option value.",
-	E026: "Unexpected early end of program.",
-	E027: "Expected an operator and instead saw '{a}'.",
-	E028: "Strict violation.",
-	E029: "get/set are ES5 features.",
-	E030: "Missing property name.",
-	E031: "Expected to see a statement and instead saw a block.",
-	E032: "Constant {a} was not declared correctly.",
-	E033: "Variable {a} was not declared correctly.",
-	E034: "Function declarations are not invocable. Wrap the whole function " +
-		"invocation in parens.",
-	E035: "'with' is not allowed in strict mode.",
-	E036: "Each value should have its own case label.",
-	E037: "Missing ':' on a case clause.",
-	E038: "Missing '}' to match '{' from line {a}.",
-	E039: "Missing ']' to match '[' form line {a}.",
-	E040: "Unexpected comma.",
-	E041: "Expected a JSON value.",
-	E042: "Input is neither a string nor an array of strings.",
-	E043: "Input is empty.",
-	E044: "Unclosed string.",
+	E013: "Attempting to override '{a}' which is a constant.",
+
+	// Regular expressions
+	E014: "A regular expression literal can be confused with '/='.",
+	E015: "Unclosed regular expression.",
+	E016: "Invalid regular expression.",
+
+	// Tokens
+	E017: "Unclosed comment.",
+	E018: "Unbegun comment.",
+	E019: "Unmatched '{a}'.",
+	E020: "Expected '{a}' to match '{b}' from line {c} and instead saw '{d}'.",
+	E021: "Expected '{a}' and instead saw '{b}'.",
+	E022: "Line breaking error '{a}'.",
+	E023: "Missing '{a}'.",
+	E024: "Unexpected '{a}'.",
+	E025: "Missing ':' on a case clause.",
+	E026: "Missing '}' to match '{' from line {a}.",
+	E027: "Missing ']' to match '[' form line {a}.",
+	E028: "Illegal comma.",
+	E029: "Unclosed string.",
+
+	// Everything else
+	E030: "Expected an identifier and instead saw '{a}'.",
+	E031: "Bad assignment.", // FIXME: Rephrase
+	E032: "Expected a small integer and instead saw '{a}'.",
+	E033: "Expected an operator and instead saw '{a}'.",
+	E034: "get/set are ES5 features.",
+	E035: "Missing property name.",
+	E036: "Expected to see a statement and instead saw a block.",
+	E037: "Constant {a} was not declared correctly.",
+	E038: "Variable {a} was not declared correctly.",
+	E039: "Function declarations are not invocable. Wrap the whole function invocation in parens.",
+	E040: "Each value should have its own case label.",
 };
 
 var warnings = {
@@ -74,16 +81,14 @@ var warnings = {
 	W020: "Read only.",
 	W021: "'{a}' is a function.",
 	W022: "Do not assign to the exception parameter.",
-	W023: "Expected an identifier in an assignment and instead saw a " +
-		"function invocation.",
+	W023: "Expected an identifier in an assignment and instead saw a function invocation.",
 	W024: "Expected an identifier and instead saw '{a}' (a reserved word).",
 	W025: "Missing name in function declaration.",
 	W026: "Inner functions should be listed at the top of the outer function.",
 	W027: "Unreachable '{a}' after '{b}'.",
 	W028: "Label '{a}' on {b} statement.",
 	W029: "Label '{a}' looks like a javascript url.",
-	W030: "Expected an assignment or function call and instead saw " +
-		"an expression.",
+	W030: "Expected an assignment or function call and instead saw an expression.",
 	W031: "Do not use 'new' for side effects.",
 	W032: "Unnecessary semicolon.",
 	W033: "Missing semicolon.",
@@ -95,6 +100,14 @@ var warnings = {
 	W039: "'{a}' is not allowed.",
 	W040: "Possible strict violation.",
 	W041: "Use '{a}' to compare with '{b}'.",
+	W042: "Avoid EOL escaping.",
+	W043: "Bad escaping of EOL. Use option multistr if needed.",
+	W044: "Bad escaping.",
+	W045: "Bad number '{a}'.",
+	W046: "Don't use extra leading zeros '{a}'.",
+	W047: "A trailing decimal point can be confused with a dot: '{a}'.",
+	W048: "Unexpected control character in regular expression.",
+	W049: "Unexpected escaped character '{a}' in regular expression.",
 	W050: "JavaScript URL.",
 	W051: "Variables should not be deleted.",
 	W052: "Unexpected '{a}'.",
@@ -133,8 +146,7 @@ var warnings = {
 		"Use a function expression or move the statement to the top of " +
 		"the outer function.",
 	W083: "Don't make functions within a loop.",
-	W084: "Expected a conditional expression and instead saw an " +
-		"assignment.",
+	W084: "Expected a conditional expression and instead saw an assignment.",
 	W085: "Don't use 'with'.",
 	W086: "Expected a 'break' statement before '{a}'.",
 	W087: "Forgotten 'debugger' statement?",
@@ -162,29 +174,12 @@ var warnings = {
 	W108: "Strings must use doublequote.",
 	W109: "Strings must use singlequote.",
 	W110: "Mixed double and single quotes.",
-	W111: "Unnecessary escaping.",
 	W112: "Unclosed string.",
 	W113: "Control character in string: {a}.",
 	W114: "Avoid {a}.",
 	W115: "Octal literals are not allowed in strict mode.",
-	W116: "Avoid EOL escaping.",
-	W117: "Bad escaping of EOL. Use option multistr if needed.",
-	W118: "Bad escaping.",
-	W119: "Bad number '{a}'.",
-	W120: "Don't use extra leading zeros '{a}'.",
-	W121: "A trailing decimal point can be confused with a dot: '{a}'.",
-	W122: "{a} unterminated regular expression group(s).",
-	W123: "Unexpected control character in regular expression.",
-	W124: "Unexpected escaped character '{a}' in regular expression.",
-	W125: "Unescaped '{a}'.",
-	W126: "Spaces are hard to count. Use {{a}}.",
-	W127: "Empty class.",
-	W128: "'{a}' in character sets should be escaped.",
-	W129: "Insecure '{a}'.",
-	W130: "Expected a number and instead saw '{a}'.",
-	W131: "'{a}' should not be greater than '{b}'.",
-	W132: "Expected '{a}' and instead saw '{b}'.",
-	W133: "'{a}' is not defined.",
+	W116: "Expected '{a}' and instead saw '{b}'.",
+	W117: "'{a}' is not defined.",
 };
 
 var info = {

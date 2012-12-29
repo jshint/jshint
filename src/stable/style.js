@@ -135,7 +135,7 @@ exports.register = function (linter) {
 
 		if (data.value.substr(data.value.length - 1) === ".") {
 			// Warn about a trailing decimal point.
-			linter.warn("W121", {
+			linter.warn("W047", {
 				line: data.line,
 				char: data.char,
 				data: [ data.value ]
@@ -144,7 +144,7 @@ exports.register = function (linter) {
 
 		if (/^00+/.test(data.value)) {
 			// Multiple leading zeroes.
-			linter.warn("W120", {
+			linter.warn("W046", {
 				line: data.line,
 				char: data.char,
 				data: [ data.value ]

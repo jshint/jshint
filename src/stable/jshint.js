@@ -389,8 +389,6 @@ var JSHINT = (function () {
 			msg = messages.errors[code];
 		} else if (/I\d{3}/.test(code)) {
 			msg = messages.info[code];
-		} else {
-			msg = { code: "W000", desc: code };
 		}
 
 		t = t || state.tokens.next;
@@ -586,7 +584,7 @@ var JSHINT = (function () {
 					val = +val;
 
 					if (typeof val !== "number" || !isFinite(val) || val <= 0 || Math.floor(val) !== val) {
-						error("E022", nt, g[1].trim());
+						error("E032", nt, g[1].trim());
 						return;
 					}
 
@@ -601,12 +599,12 @@ var JSHINT = (function () {
 				if (key === "validthis") {
 					// `validthis` is valid only within a function scope.
 					if (funct["(global)"]) {
-						error("E023");
+						error("E009");
 					} else {
 						if (val === "true" || val === "false") {
 							state.option.validthis = (val === "true");
 						} else {
-							error("E024", nt);
+							error("E002", nt);
 						}
 					}
 					return;
@@ -623,7 +621,7 @@ var JSHINT = (function () {
 						state.option.quotmark = val;
 						break;
 					default:
-						error("E024", nt);
+						error("E002", nt);
 					}
 					return;
 				}
@@ -652,7 +650,7 @@ var JSHINT = (function () {
 					return;
 				}
 
-				error("E024", nt);
+				error("E002", nt);
 			});
 
 			assume();
@@ -706,12 +704,12 @@ var JSHINT = (function () {
 		if (id && state.tokens.next.id !== id) {
 			if (t) {
 				if (state.tokens.next.id === "(end)") {
-					error("E002", t, t.id);
+					error("E019", t, t.id);
 				} else {
-					error("E003", state.tokens.next, id, t.id, t.line, state.tokens.next.value);
+					error("E020", state.tokens.next, id, t.id, t.line, state.tokens.next.value);
 				}
 			} else if (state.tokens.next.type !== "(identifier)" || state.tokens.next.value !== id) {
-				warning("W132", state.tokens.next, id, state.tokens.next.value);
+				warning("W116", state.tokens.next, id, state.tokens.next.value);
 			}
 		}
 
@@ -757,7 +755,7 @@ var JSHINT = (function () {
 		var left, isArray = false, isObject = false;
 
 		if (state.tokens.next.id === "(end)")
-			error("E026", state.tokens.curr);
+			error("E006", state.tokens.curr);
 
 		advance();
 
@@ -772,7 +770,7 @@ var JSHINT = (function () {
 			if (state.tokens.curr.nud) {
 				left = state.tokens.curr.nud();
 			} else {
-				error("E005", state.tokens.curr, state.tokens.curr.id);
+				error("E030", state.tokens.curr, state.tokens.curr.id);
 			}
 
 			while (rbp < state.tokens.next.lbp) {
@@ -810,7 +808,7 @@ var JSHINT = (function () {
 				if (state.tokens.curr.led) {
 					left = state.tokens.curr.led(left);
 				} else {
-					error("E027", state.tokens.curr, state.tokens.curr.id);
+					error("E033", state.tokens.curr, state.tokens.curr.id);
 				}
 			}
 		}
@@ -898,7 +896,7 @@ var JSHINT = (function () {
 	function nolinebreak(t) {
 		t = t || state.tokens.curr;
 		if (t.line !== state.tokens.next.line) {
-			warning("E006", t, t.value);
+			warning("E022", t, t.value);
 		}
 	}
 
@@ -954,7 +952,7 @@ var JSHINT = (function () {
 			case "var":
 			case "while":
 			case "with":
-				error("E014", state.tokens.next, state.tokens.next.value);
+				error("E024", state.tokens.next, state.tokens.next.value);
 				return;
 			}
 		}
@@ -970,7 +968,7 @@ var JSHINT = (function () {
 
 				/* falls through */
 			case ")":
-				error("E014", state.tokens.next, state.tokens.next.value);
+				error("E024", state.tokens.next, state.tokens.next.value);
 			}
 		}
 	}
@@ -1149,12 +1147,12 @@ var JSHINT = (function () {
 
 			if (left) {
 				if (state.option.esnext && funct[left.value] === "const") {
-					error("E007", left, left.value);
+					error("E013", left, left.value);
 				}
 
 				if (left.id === "." || left.id === "[") {
 					if (!left.left || left.left.value === "arguments") {
-						warning("E008", that);
+						warning("E031", that);
 					}
 					that.right = expression(19);
 					return that;
@@ -1171,7 +1169,7 @@ var JSHINT = (function () {
 				}
 			}
 
-			error("E008", that);
+			error("E031", that);
 		}, 20);
 	}
 
@@ -1210,7 +1208,7 @@ var JSHINT = (function () {
 				}
 				return that;
 			}
-			error("E008", that);
+			error("E031", that);
 		}, 20);
 	}
 
@@ -1274,7 +1272,7 @@ var JSHINT = (function () {
 		if (state.tokens.curr.id === "function" && state.tokens.next.id === "(") {
 			warning("W025");
 		} else {
-			error("E005", state.tokens.next, state.tokens.next.value);
+			error("E030", state.tokens.next, state.tokens.next.value);
 		}
 	}
 
@@ -1527,7 +1525,7 @@ var JSHINT = (function () {
 
 					if (state.option.strict && funct["(context)"]["(global)"]) {
 						if (!m["use strict"] && !state.directive["use strict"]) {
-							warning("E009");
+							warning("E007");
 						}
 					}
 				}
@@ -1550,10 +1548,10 @@ var JSHINT = (function () {
 			advance("}", t);
 			indent = old_indent;
 		} else if (!ordinary) {
-			error("E004", state.tokens.next, "{", state.tokens.next.value);
+			error("E021", state.tokens.next, "{", state.tokens.next.value);
 		} else {
 			if (!stmt || state.option.curly) {
-				warning("W132", state.tokens.next, "{", state.tokens.next.value);
+				warning("W116", state.tokens.next, "{", state.tokens.next.value);
 			}
 
 			noreach = true;
@@ -1664,7 +1662,7 @@ var JSHINT = (function () {
 						(state.tokens.next && (state.tokens.next.value === "." ||
 							state.tokens.next.value === "["))) {
 
-						isundef(funct, "W133", state.tokens.curr, v);
+						isundef(funct, "W117", state.tokens.curr, v);
 					}
 				}
 
@@ -1705,7 +1703,7 @@ var JSHINT = (function () {
 							(state.tokens.next &&
 								(state.tokens.next.value === "." || state.tokens.next.value === "["))) {
 
-							isundef(funct, "'{a}' is not defined.", state.tokens.curr, v);
+							isundef(funct, "W117", state.tokens.curr, v);
 						}
 						funct[v] = true;
 						note_implied(state.tokens.curr);
@@ -1734,7 +1732,7 @@ var JSHINT = (function () {
 			return this;
 		},
 		led: function () {
-			error("E027", state.tokens.next, state.tokens.next.value);
+			error("E033", state.tokens.next, state.tokens.next.value);
 		}
 	};
 
@@ -1765,7 +1763,7 @@ var JSHINT = (function () {
 	reserve("finally");
 	reservevar("arguments", function (x) {
 		if (state.directive["use strict"] && funct["(global)"]) {
-			warning("E010", x);
+			warning("E008", x);
 		}
 	});
 	reservevar("eval");
@@ -1786,7 +1784,7 @@ var JSHINT = (function () {
 	assignop("-=", "assignsub", 20);
 	assignop("*=", "assignmult", 20);
 	assignop("/=", "assigndiv", 20).nud = function () {
-		error("E016");
+		error("E014");
 	};
 	assignop("%=", "assignmod", 20);
 
@@ -1813,7 +1811,7 @@ var JSHINT = (function () {
 		var eqnull = state.option.eqnull && (left.value === "null" || right.value === "null");
 
 		if (!eqnull && state.option.eqeqeq)
-			warning("W132", this, "===", "==");
+			warning("W116", this, "===", "==");
 		else if (isPoorRelation(left))
 			warning("W041", this, "===", left.value);
 		else if (isPoorRelation(right))
@@ -1827,7 +1825,7 @@ var JSHINT = (function () {
 				(left.value === "null" || right.value === "null");
 
 		if (!eqnull && state.option.eqeqeq) {
-			warning("W132", this, "!==", "!=");
+			warning("W116", this, "!==", "!=");
 		} else if (isPoorRelation(left)) {
 			warning("W041", this, "!==", left.value);
 		} else if (isPoorRelation(right)) {
@@ -1998,7 +1996,7 @@ var JSHINT = (function () {
 			if (state.option.noarg)
 				warning("W059", left, m);
 			else if (state.directive["use strict"])
-				error("E028");
+				error("E008");
 		} else if (!state.option.evil && left && left.value === "document" &&
 				(m === "write" || m === "writeln")) {
 			warning("W060", left);
@@ -2418,12 +2416,12 @@ var JSHINT = (function () {
 					advance("get");
 
 					if (!state.option.es5) {
-						error("E029");
+						error("E034");
 					}
 
 					i = property_name();
 					if (!i) {
-						error("E030");
+						error("E035");
 					}
 
 					saveGetter(i);
@@ -2441,12 +2439,12 @@ var JSHINT = (function () {
 					advance("set");
 
 					if (!state.option.es5) {
-						error("E029");
+						error("E034");
 					}
 
 					i = property_name();
 					if (!i) {
-						error("E030");
+						error("E035");
 					}
 
 					saveSetter(i, state.tokens.next);
@@ -2500,7 +2498,7 @@ var JSHINT = (function () {
 			return this;
 		};
 		x.fud = function () {
-			error("E031", state.tokens.curr);
+			error("E036", state.tokens.curr);
 		};
 	}(delim("{")));
 
@@ -2540,7 +2538,7 @@ var JSHINT = (function () {
 						warning("W080", state.tokens.curr, id);
 					}
 					if (peek(0).id === "=" && state.tokens.next.identifier) {
-						error("E032", state.tokens.next, state.tokens.next.value);
+						error("E037", state.tokens.next, state.tokens.next.value);
 					}
 					value = expression(0);
 					name.first = value;
@@ -2598,7 +2596,7 @@ var JSHINT = (function () {
 					warning("W080", state.tokens.curr, id);
 				}
 				if (peek(0).id === "=" && state.tokens.next.identifier) {
-					error("E033", state.tokens.next, state.tokens.next.value);
+					error("E038", state.tokens.next, state.tokens.next.value);
 				}
 				value = expression(0);
 				name.first = value;
@@ -2626,7 +2624,7 @@ var JSHINT = (function () {
 
 		doFunction(i, { statement: true });
 		if (state.tokens.next.id === "(" && state.tokens.next.line === state.tokens.curr.line) {
-			error("E034");
+			error("E039");
 		}
 		return this;
 	});
@@ -2684,7 +2682,7 @@ var JSHINT = (function () {
 			e = state.tokens.next.value;
 			if (state.tokens.next.type !== "(identifier)") {
 				e = null;
-				warning("E005", state.tokens.next, e);
+				warning("E030", state.tokens.next, e);
 			}
 
 			advance();
@@ -2733,7 +2731,7 @@ var JSHINT = (function () {
 			block(false);
 			return;
 		} else if (!b) {
-			error("E004", state.tokens.next, "catch", state.tokens.next.value);
+			error("E021", state.tokens.next, "catch", state.tokens.next.value);
 		}
 
 		return this;
@@ -2760,7 +2758,7 @@ var JSHINT = (function () {
 	blockstmt("with", function () {
 		var t = state.tokens.next;
 		if (state.directive["use strict"]) {
-			error("E035", state.tokens.curr);
+			error("E010", state.tokens.curr);
 		} else if (!state.option.withstmt) {
 			warning("W085", state.tokens.curr);
 		}
@@ -2849,29 +2847,29 @@ var JSHINT = (function () {
 				funct["(verb)"] = undefined;
 				return;
 			case "(end)":
-				error("E013", state.tokens.next, "}");
+				error("E023", state.tokens.next, "}");
 				return;
 			default:
 				if (g) {
 					switch (state.tokens.curr.id) {
 					case ",":
-						error("E036");
+						error("E040");
 						return;
 					case ":":
 						g = false;
 						statements();
 						break;
 					default:
-						error("E037", state.tokens.curr);
+						error("E025", state.tokens.curr);
 						return;
 					}
 				} else {
 					if (state.tokens.curr.id === ":") {
 						advance(":");
-						error("E014", state.tokens.curr, ":");
+						error("E024", state.tokens.curr, ":");
 						statements();
 					} else {
-						error("E004", state.tokens.next, "case", state.tokens.next.value);
+						error("E021", state.tokens.next, "case", state.tokens.next.value);
 						return;
 					}
 				}
@@ -2969,7 +2967,7 @@ var JSHINT = (function () {
 			nolinebreak(state.tokens.curr);
 			advance(";");
 			if (state.tokens.next.id === ";") {
-				error("E004", state.tokens.next, ")", ";");
+				error("E021", state.tokens.next, ")", ";");
 			}
 			if (state.tokens.next.id !== ")") {
 				for (;;) {
@@ -3115,12 +3113,12 @@ var JSHINT = (function () {
 			if (state.tokens.next.id !== "}") {
 				for (;;) {
 					if (state.tokens.next.id === "(end)") {
-						error("E038", state.tokens.next, t.line);
+						error("E026", state.tokens.next, t.line);
 					} else if (state.tokens.next.id === "}") {
 						warning("W094", state.tokens.curr);
 						break;
 					} else if (state.tokens.next.id === ",") {
-						error("W094", state.tokens.next);
+						error("E028", state.tokens.next);
 					} else if (state.tokens.next.id !== "(string)") {
 						warning("W095", state.tokens.next, state.tokens.next.value);
 					}
@@ -3151,12 +3149,12 @@ var JSHINT = (function () {
 			if (state.tokens.next.id !== "]") {
 				for (;;) {
 					if (state.tokens.next.id === "(end)") {
-						error("E039", state.tokens.next, t.line);
+						error("E027", state.tokens.next, t.line);
 					} else if (state.tokens.next.id === "]") {
 						warning("W094", state.tokens.curr);
 						break;
 					} else if (state.tokens.next.id === ",") {
-						error("E040", state.tokens.next);
+						error("E028", state.tokens.next);
 					}
 					jsonValue();
 					if (state.tokens.next.id !== ",") {
@@ -3191,7 +3189,7 @@ var JSHINT = (function () {
 			advance("(number)");
 			break;
 		default:
-			error("E041", state.tokens.next);
+			error("E003", state.tokens.next);
 		}
 	}
 
@@ -3288,17 +3286,17 @@ var JSHINT = (function () {
 		unuseds = [];
 
 		if (!isString(s) && !Array.isArray(s)) {
-			errorAt("E042", 0);
+			errorAt("E004", 0);
 			return false;
 		}
 
 		if (isString(s) && /^\s*$/g.test(s)) {
-			errorAt("E043", 0);
+			errorAt("E005", 0);
 			return false;
 		}
 
 		if (s.length === 0) {
-			errorAt("E043", 0);
+			errorAt("E005", 0);
 			return false;
 		}
 
