@@ -1409,7 +1409,7 @@ exports.ignored = function (test) {
 		.test(src);
 
 	TestRun(test)
-		.test(src, { "-W121": true });
+		.test(src, { "-W047": true });
 
 	test.done();
 };
