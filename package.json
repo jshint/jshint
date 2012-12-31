@@ -27,7 +27,7 @@
 		"underscore": "*",
 		"peakle":     "*",
 		"cli":        "0.4.3",
-		"minimatch":  "0.0.x"
+		"minimatch":  "0.x.x"
 	},
 
 	"devDependencies": {
