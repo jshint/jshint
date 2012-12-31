@@ -102,8 +102,4 @@ target.build = function () {
 	rhino.to("./dist/jshint-rhino.js");
 	exec("chmod +x dist/jshint-rhino.js");
 	cli.ok("Rhino");
-
-	// Windows Script Host
-	cat("./dist/jshint.js", "./src/platforms/wsh.js").to("./dist/jshint-wsh.js");
-	cli.ok("Windows Script Host");
 };
