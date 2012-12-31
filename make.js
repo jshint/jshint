@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/*global ls:true, target:true, find: true, echo: true, cat:true, exit:true, exec: true */
+/*global ls, target, find, echo, cat, exit, exec, mkdir, test */
 
 "use strict";
 
@@ -16,9 +16,9 @@ var TESTS = [
 var OPTIONS = JSON.parse(cat("./jshint.json"));
 
 target.all = function () {
+	target.build();
 	target.lint();
 	target.test();
-	target.build();
 };
 
 target.lint = function () {
@@ -49,6 +49,7 @@ target.lint = function () {
 
 	if (Object.keys(failures).length === 0) {
 		cli.ok("All files passed.");
+		echo("\n");
 		return;
 	}
 
@@ -93,15 +94,21 @@ target.build = function () {
 	var bundle = browserify({ debug: true, exports: [ "require" ] });
 
 	bundle.addEntry("./src/stable/jshint.js");
-	require('fs').mkdir('dist', function () {
-		bundle.bundle().to("./dist/jshint.js");
-		cli.ok("Bundle");
 
-		// Rhino
-		var rhino = cat("./dist/jshint.js", "./src/platforms/rhino.js");
-		rhino = "#!/usr/bin/env rhino\n\n" + rhino;
-		rhino.to("./dist/jshint-rhino.js");
-		exec("chmod +x dist/jshint-rhino.js");
-		cli.ok("Rhino");
-	});
+	if (!test("-e", "./dist")) {
+		mkdir("./dist");
+	}
+
+	echo("Building into dist/...", "\n");
+
+	bundle.bundle().to("./dist/jshint.js");
+	cli.ok("Bundle");
+
+	// Rhino
+	var rhino = cat("./dist/jshint.js", "./src/platforms/rhino.js");
+	rhino = "#!/usr/bin/env rhino\n\n" + rhino;
+	rhino.to("./dist/jshint-rhino.js");
+	exec("chmod +x dist/jshint-rhino.js");
+	cli.ok("Rhino");
+	echo("\n");
 };
