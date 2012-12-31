@@ -601,3 +601,12 @@ exports.testForIn = function (test) {
 
 	test.done();
 };
+
+exports.testRegexArray = function (test) {
+	var src = fs.readFileSync(__dirname + "/fixtures/regex_array.js", "utf8");
+
+	TestRun(test)
+		.test(src);
+
+	test.done();
+};
