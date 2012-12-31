@@ -1,6 +1,6 @@
 {
 	"name":     "jshint",
-	"version":  "1.0.0-rc1",
+	"version":  "1.0.0-rc2",
 	"homepage": "http://jshint.com/",
 	"description": "Static analysis tool for JavaScript",
 
