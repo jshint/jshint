@@ -10,6 +10,10 @@
 		"url":   "http://anton.kovalyov.net/"
 	},
 
+	"bin": {
+		"jshint": "./bin/jshint"
+	},
+
 	"scripts": {
 		"test": "node ./make.js test",
 		"lint": "node ./make.js lint"
