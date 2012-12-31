@@ -93,13 +93,15 @@ target.build = function () {
 	var bundle = browserify({ debug: true, exports: [ "require" ] });
 
 	bundle.addEntry("./src/stable/jshint.js");
-	bundle.bundle().to("./dist/jshint.js");
-	cli.ok("Bundle");
+	require('fs').mkdir('dist', function () {
+		bundle.bundle().to("./dist/jshint.js");
+		cli.ok("Bundle");
 
-	// Rhino
-	var rhino = cat("./dist/jshint.js", "./src/platforms/rhino.js");
-	rhino = "#!/usr/bin/env rhino\n\n" + rhino;
-	rhino.to("./dist/jshint-rhino.js");
-	exec("chmod +x dist/jshint-rhino.js");
-	cli.ok("Rhino");
+		// Rhino
+		var rhino = cat("./dist/jshint.js", "./src/platforms/rhino.js");
+		rhino = "#!/usr/bin/env rhino\n\n" + rhino;
+		rhino.to("./dist/jshint-rhino.js");
+		exec("chmod +x dist/jshint-rhino.js");
+		cli.ok("Rhino");
+	});
 };
