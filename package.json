@@ -9,10 +9,10 @@
 		"email": "anton@kovalyov.net",
 		"url":   "http://anton.kovalyov.net/"
 	},
-	
+
 	"bin": {
 		"jshint": "./bin/jshint"
-	}
+	},
 
 	"scripts": {
 		"test": "node ./make.js test",
