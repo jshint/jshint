@@ -1452,7 +1452,6 @@ Lexer.prototype = {
 				switch (value) {
 				case ".":
 				case ")":
-				case ",":
 				case "~":
 				case "#":
 					this.prereg = false;
