@@ -261,15 +261,15 @@ exports.group = {
 		sinon.stub(process, "cwd").returns(dir);
 		sinon.stub(shjs, "cat")
 			.withArgs(sinon.match(/file2?\.js$/)).returns("console.log('Hello');")
-			.withArgs(sinon.match(/ignore\/file\d\.js$/)).returns("console.log('Hello, ignore me');")
-			.withArgs(sinon.match(/ignore\/dir\/file\d\.js$/)).returns("console.log('Hello, ignore me');")
+			.withArgs(sinon.match(/ignore[\/\\]file\d\.js$/)).returns("console.log('Hello, ignore me');")
+			.withArgs(sinon.match(/ignore[\/\\]dir[\/\\]file\d\.js$/)).returns("print('Ignore me');")
 			.withArgs(sinon.match(/node_script$/)).returns("console.log('Hello, ignore me');")
 			.withArgs(sinon.match(/\.jshintrc$/)).returns("{}")
-			.withArgs(sinon.match(/\.jshintignore$/)).returns("ignore/**");
+			.withArgs(sinon.match(/\.jshintignore$/)).returns(path.join("ignore", "**"));
 
 		cli.interpret([
-			"node", "jshint", "file.js", "file2.js", "node_script", "ignore/file1.js",
-			"ignore/file2.js", "ignore/dir/file1.js"
+			"node", "jshint", "file.js", "file2.js", "node_script", path.join("ignore", "file1.js"),
+			path.join("ignore", "file2.js"), path.join("ignore", "dir", "file1.js")
 		]);
 
 		var args = shjs.cat.args.filter(function (arg) {
@@ -319,7 +319,7 @@ exports.group = {
 		});
 
 		test.equal(args.length, 1);
-		test.equal(args[0][0], "examples/reporter.js");
+		test.equal(args[0][0], path.join("examples", "reporter.js"));
 
 		shjs.cat.restore();
 		process.cwd.restore();
