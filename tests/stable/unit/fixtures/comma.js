@@ -42,3 +42,9 @@ function gh676() {
 function gh771() {
 	gh676(),
 }
+
+// GH-793.
+
+function next() {}
+next.bind(null, new Error());
+next.bind(null, typeof gh56);
