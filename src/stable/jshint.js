@@ -935,7 +935,6 @@ var JSHINT = (function () {
 			case "case":
 			case "catch":
 			case "continue":
-			case "debugger":
 			case "default":
 			case "do":
 			case "else":
@@ -944,7 +943,6 @@ var JSHINT = (function () {
 			case "if":
 			case "in":
 			case "instanceof":
-			case "new":
 			case "return":
 			case "switch":
 			case "throw":
