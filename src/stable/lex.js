@@ -451,7 +451,7 @@ Lexer.prototype = {
 					body = body.substr(str.length);
 				}
 
-				if (body.charAt(0) === " " && body.substr(1, str.length) === str) {
+				if (!isSpecial && body.charAt(0) === " " && body.substr(1, str.length) === str) {
 					isSpecial = true;
 					label = label + " " + str;
 					body = body.substr(str.length + 1);
