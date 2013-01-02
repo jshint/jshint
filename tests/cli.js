@@ -107,6 +107,11 @@ exports.group = {
 		// Test successful attempt.
 		run.restore();
 		sinon.stub(rep, "reporter");
+		sinon.stub(shjs, "test")
+			.withArgs("-e", sinon.match(/file\.js$/)).returns(true)
+			.withArgs("-e", sinon.match(/\.jshintrc$/)).returns(true)
+			.withArgs("-e", sinon.match(/\.jshintignore$/)).returns(true);
+
 		sinon.stub(shjs, "cat")
 			.withArgs(sinon.match(/file\.js$/)).returns("func()")
 			.withArgs(sinon.match(/\.jshintrc$/)).returns("{}")
@@ -126,6 +131,7 @@ exports.group = {
 		}
 
 		rep.reporter.restore();
+		shjs.test.restore();
 		shjs.cat.restore();
 		process.cwd.restore();
 		test.done();
@@ -259,6 +265,10 @@ exports.group = {
 	testCollectFiles: function (test) {
 		var dir = __dirname + "/../examples/";
 		sinon.stub(process, "cwd").returns(dir);
+
+		sinon.stub(shjs, "test")
+			.withArgs("-e", sinon.match(/.*/)).returns(true);
+
 		sinon.stub(shjs, "cat")
 			.withArgs(sinon.match(/file2?\.js$/)).returns("console.log('Hello');")
 			.withArgs(sinon.match(/ignore[\/\\]file\d\.js$/)).returns("console.log('Hello, ignore me');")
@@ -281,9 +291,11 @@ exports.group = {
 		test.equal(args[1][0], "file2.js");
 		test.equal(args[2][0], "node_script");
 
+		shjs.test.restore();
 		shjs.cat.restore();
 
 		sinon.stub(shjs, "test")
+			.withArgs("-e", sinon.match(/.*/)).returns(true)
 			.withArgs("-d", sinon.match(/src$/)).returns(true)
 			.withArgs("-d", sinon.match(/src[\/\\]lib$/)).returns(true);
 
@@ -347,6 +359,9 @@ exports.group = {
 		sinon.stub(rep, "reporter");
 		sinon.stub(process, "cwd").returns(dir);
 
+		sinon.stub(shjs, "test")
+			.withArgs("-e", sinon.match(/.*/)).returns(true);
+
 		sinon.stub(shjs, "cat")
 			.withArgs(sinon.match(/pass\.js$/)).returns("function test() { return 0; }")
 			.withArgs(sinon.match(/fail\.js$/)).returns("console.log('Hello')")
@@ -369,6 +384,7 @@ exports.group = {
 
 		rep.reporter.restore();
 		process.cwd.restore();
+		shjs.test.restore();
 		shjs.cat.restore();
 
 		test.done();
