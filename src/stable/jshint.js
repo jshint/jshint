@@ -1046,11 +1046,14 @@ var JSHINT = (function () {
 	}
 
 	function FutureReservedWord(name, meta) {
-		var x = type(name);
+		var x = type(name, function () {
+			return this;
+		});
 
 		meta = meta || {};
 		meta.isFutureReservedWord = true;
 
+		x.value = name;
 		x.identifier = true;
 		x.reserved = true;
 		x.meta = meta;
