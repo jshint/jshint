@@ -221,8 +221,9 @@ function collect(fp, files, ignores, ext) {
 
 	if (shjs.test("-d", fp)) {
 		shjs.ls(fp).forEach(function (item) {
-			if (item.match(ext)) {
-				collect(path.join(fp, item), files, ignores, ext);
+			var itempath = path.join(fp, item);
+			if (shjs.test("-d", itempath) || item.match(ext)) {
+				collect(itempath, files, ignores, ext);
 			}
 		});
 

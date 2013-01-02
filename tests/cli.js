@@ -282,25 +282,40 @@ exports.group = {
 		test.equal(args[2][0], "node_script");
 
 		shjs.cat.restore();
+
+		sinon.stub(shjs, "test")
+			.withArgs("-d", sinon.match(/src$/)).returns(true)
+			.withArgs("-d", sinon.match(/src[\/\\]lib$/)).returns(true);
+
+		sinon.stub(shjs, "ls")
+			.withArgs(sinon.match(/src$/)).returns(["lib", "file4.js"])
+			.withArgs(sinon.match(/src[\/\\]lib$/)).returns(["file5.js"]);
+
 		sinon.stub(shjs, "cat")
 			.withArgs(sinon.match(/file2?\.js$/)).returns("console.log('Hello');")
 			.withArgs(sinon.match(/file3\.json$/)).returns("{}")
+			.withArgs(sinon.match(/src[\/\\]file4\.js$/)).returns("print('Hello');")
+			.withArgs(sinon.match(/src[\/\\]lib[\/\\]file5\.js$/)).returns("print('Hello');")
 			.withArgs(sinon.match(/\.jshintrc$/)).returns("{}")
 			.withArgs(sinon.match(/\.jshintignore$/)).returns("");
 
 		cli.interpret([
-			"node", "jshint", "file.js", "file2.js", "file3.json", "--extra-ext=json"
+			"node", "jshint", "file.js", "file2.js", "file3.json", "--extra-ext=json", "src"
 		]);
 
 		args = shjs.cat.args.filter(function (arg) {
 			return !/\.jshintrc$/.test(arg[0]) && !/\.jshintignore$/.test(arg[0]);
 		});
 
-		test.equal(args.length, 3);
+		test.equal(args.length, 5);
 		test.equal(args[0][0], "file.js");
 		test.equal(args[1][0], "file2.js");
 		test.equal(args[2][0], "file3.json");
+		test.equal(args[3][0], path.join("src", "lib", "file5.js"));
+		test.equal(args[4][0], path.join("src", "file4.js"));
 
+		shjs.test.restore();
+		shjs.ls.restore();
 		shjs.cat.restore();
 		process.cwd.restore();
 
