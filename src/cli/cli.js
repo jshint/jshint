@@ -219,6 +219,11 @@ function collect(fp, files, ignores, ext) {
 		return;
 	}
 
+	if (!shjs.test("-e", fp)) {
+		cli.error("Can't open " + fp);
+		return;
+	}
+
 	if (shjs.test("-d", fp)) {
 		shjs.ls(fp).forEach(function (item) {
 			var itempath = path.join(fp, item);
