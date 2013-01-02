@@ -157,13 +157,13 @@ JSHINT.errors is an array of objects containing these members:
       character : The character (relative to 1) at which the lint was found
       reason    : The problem
       evidence  : The text line in which the problem occured
-			scope     : The scope of the problem.
+      scope     : The scope of the problem.
       raw       : The raw message before the details were inserted
       a         : The first detail
       b         : The second detail
       c         : The third detail
       d         : The fourth detail
-		}
+    }
 
 If a fatal error was found, a null will be the last element of the
 JSHINT.errors array.
