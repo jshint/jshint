@@ -5,3 +5,4 @@ var x = {
 var default = 10;
 function new () {}
 function x(class) {}
+x.default = 5;
