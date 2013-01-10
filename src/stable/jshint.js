@@ -2637,7 +2637,7 @@ var JSHINT = (function () {
 		if (i) {
 			adjacent(state.tokens.curr, state.tokens.next);
 		} else {
-			if (option.anon) {
+			if (state.option.anon) {
 				adjacent(state.tokens.curr, state.tokens.next);
             } else {
 				nonadjacent(state.tokens.curr, state.tokens.next);
