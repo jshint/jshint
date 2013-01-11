@@ -111,6 +111,7 @@ var JSHINT = (function () {
 			onevar      : true, // if only one var statement per function should be
 			                    // allowed
 			passfail    : true, // if the scan should stop on first error
+			phantom     : true, // if PhantomJS symbols should be allowed
 			plusplus    : true, // if increment/decrement should not be allowed
 			proto       : true, // if the `__proto__` property should be allowed
 			prototypejs : true, // if Prototype and Scriptaculous globals should be
@@ -303,6 +304,10 @@ var JSHINT = (function () {
 
 		if (state.option.rhino) {
 			combine(predefined, vars.rhino);
+		}
+
+		if (state.option.phantom) {
+			combine(predefined, vars.phantom);
 		}
 
 		if (state.option.prototypejs) {
