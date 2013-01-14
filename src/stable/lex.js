@@ -1454,6 +1454,7 @@ Lexer.prototype = {
 				case ")":
 				case "~":
 				case "#":
+				case "]":
 					this.prereg = false;
 					break;
 				default:
