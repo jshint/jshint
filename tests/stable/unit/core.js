@@ -522,7 +522,6 @@ exports.testReserved = function (test) {
 
 	TestRun(test)
 		.addError(10, "Expected an identifier and instead saw 'let' (a reserved word).")
-		.addError(14, "Expected an identifier and instead saw 'else' (a reserved word).")
 		.test(src, { es5: true });
 
 	test.done();
@@ -538,6 +537,7 @@ exports.testES5Reserved = function (test) {
 		.addError(5, "Expected an identifier and instead saw 'default' (a reserved word).")
 		.addError(6, "Expected an identifier and instead saw 'new' (a reserved word).")
 		.addError(7, "Expected an identifier and instead saw 'class' (a reserved word).")
+		.addError(8, "Expected an identifier and instead saw 'default' (a reserved word).")
 		.test(src);
 
 	TestRun(test)

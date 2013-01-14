@@ -1265,8 +1265,9 @@ var JSHINT = (function () {
 
 	// fnparam means that this identifier is being defined as a function
 	// argument
-	function identifier(fnparam) {
-		var i = optionalidentifier(fnparam);
+	// prop means that this identifier is that of an object property
+	function identifier(fnparam, prop) {
+		var i = optionalidentifier(fnparam, prop);
 		if (i) {
 			return i;
 		}
@@ -1980,7 +1981,7 @@ var JSHINT = (function () {
 	infix(".", function (left, that) {
 		adjacent(state.tokens.prev, state.tokens.curr);
 		nobreak();
-		var m = identifier();
+		var m = identifier(false, true);
 
 		if (typeof m === "string") {
 			countMember(m);
