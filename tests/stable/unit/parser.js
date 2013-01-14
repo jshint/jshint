@@ -290,6 +290,13 @@ exports.regexp = function (test) {
 		.addError(24, "Unclosed regular expression.")
 		.test(code);
 
+	TestRun(test)
+		.test("var y = Math.sqrt(16) / 180;");
+
+	// GH-803
+	TestRun(test)
+		.test("var x = [1]; var y = x[0] / 180;");
+
 	test.done();
 };
 
