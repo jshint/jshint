@@ -459,7 +459,7 @@ var JSHINT = (function () {
 		return i;
 	}
 
-	function addlabel(t, type, tkn) {
+	function addlabel(t, type) {
 		// Define t in the current function in the current scope.
 		if (type === "exception") {
 			if (_.has(funct["(context)"], t)) {
@@ -475,16 +475,14 @@ var JSHINT = (function () {
 					warning("W003", state.tokens.next, t);
 			} else {
 				if (!state.option.shadow && type !== "exception") {
-					warning("W004", state.tokens.next, t);
+					warning("W004", state.tokens.next, t, funct["(tokens)"][t]);
 				}
 			}
 		}
 
 		funct[t] = type;
 
-		if (tkn) {
-			funct["(tokens)"][t] = tkn;
-		}
+		funct["(tokens)"][t] = state.tokens.curr;
 
 		if (funct["(global)"]) {
 			global[t] = funct;
@@ -2230,7 +2228,7 @@ var JSHINT = (function () {
 		for (;;) {
 			ident = identifier(true);
 			params.push(ident);
-			addlabel(ident, "unused", state.tokens.curr);
+			addlabel(ident, "unused");
 			if (state.tokens.next.id === ",") {
 				comma();
 			} else {
@@ -2582,7 +2580,7 @@ var JSHINT = (function () {
 				warning("W079", state.tokens.curr, id);
 			}
 
-			addlabel(id, "unused", state.tokens.curr);
+			addlabel(id, "unused");
 
 			if (prefix) {
 				break;
@@ -2623,7 +2621,7 @@ var JSHINT = (function () {
 			warning("E011", null, i);
 		}
 		adjacent(state.tokens.curr, state.tokens.next);
-		addlabel(i, "unction", state.tokens.curr);
+		addlabel(i, "unction");
 
 		doFunction(i, { statement: true });
 		if (state.tokens.next.id === "(" && state.tokens.next.line === state.tokens.curr.line) {
