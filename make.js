@@ -23,9 +23,15 @@ target.all = function () {
 
 target.lint = function () {
 	var jshint = require("jshint").JSHINT;
-	var files = find("src").filter(function (file) {
-		return file.match(/\.js$/);
-	}).concat(ls(__dirname + "/*.js"));
+	var files = find("src")
+		.filter(function (file) {
+			return file.match(/\.js$/);
+		})
+		.concat(
+			ls(__dirname + "/*.js").filter(function (file) {
+				return file !== __dirname + "/demo.js";
+			})
+		);
 
 	TESTS.forEach(function (dir) {
 		ls(dir + "*.js").forEach(function (file) {
