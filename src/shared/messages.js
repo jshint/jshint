@@ -56,6 +56,9 @@ var errors = {
 	E038: "Variable {a} was not declared correctly.",
 	E039: "Function declarations are not invocable. Wrap the whole function invocation in parens.",
 	E040: "Each value should have its own case label.",
+	E041: "Unrecoverable syntax error.",
+	E042: "Stopping.",
+	E043: "Too many errors."
 };
 
 var warnings = {
