@@ -423,7 +423,7 @@ Lexer.prototype = {
 		var ch2 = this.peek(1);
 		var rest = this.input.substr(2);
 		var startLine = this.line;
-		var startChar = this.character;
+		var startChar = this.char;
 
 		// Create a comment token object and make sure it
 		// has all the data JSHint needs to work with special
@@ -1519,7 +1519,7 @@ Lexer.prototype = {
 			case Token.StringLiteral:
 				this.trigger("String", {
 					line: this.line,
-					char: this.character,
+					char: this.char,
 					from: this.from,
 					value: token.value,
 					quote: token.quote
@@ -1529,7 +1529,7 @@ Lexer.prototype = {
 			case Token.Identifier:
 				this.trigger("Identifier", {
 					line: this.line,
-					char: this.character,
+					char: this.char,
 					from: this.form,
 					name: token.value,
 					isProperty: state.tokens.curr.id === "."
@@ -1570,7 +1570,7 @@ Lexer.prototype = {
 
 				this.trigger("Number", {
 					line: this.line,
-					char: this.character,
+					char: this.char,
 					from: this.from,
 					value: token.value,
 					base: token.base,
@@ -1592,7 +1592,7 @@ Lexer.prototype = {
 						type: token.commentType,
 						isSpecial: token.isSpecial,
 						line: this.line,
-						character: this.character,
+						character: this.char,
 						from: this.from
 					};
 				}
