@@ -881,7 +881,7 @@ Lexer.prototype = {
 			char = this.peek(index);
 
 			if (char === "+" || char === "-") {
-				value += this.input(index);
+				value += this.peek(index);
 				index += 1;
 			}
 

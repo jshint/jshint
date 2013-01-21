@@ -186,6 +186,7 @@ exports.numbers = function (test) {
 		"var g = 0033;",
 		"var h = 3.;",
 		"var i = 3.7.toString();",
+		"var j = 1e-10;" // GH-821
 	];
 
 	TestRun(test)
