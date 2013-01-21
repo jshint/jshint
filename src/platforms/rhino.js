@@ -3,8 +3,6 @@
 (function (args) {
 	"use strict";
 
-	var JSHINT = require("/src/stable/jshint.js").JSHINT;
-
 	var filenames = [];
 	var optstr; // arg1=val1,arg2=val2,...
 	var predef; // global1=true,global2,global3,...

@@ -97,7 +97,7 @@ target.test = function () {
 
 target.build = function () {
 	var browserify = require("browserify");
-	var bundle = browserify({ debug: true, exports: [ "require" ] });
+	var bundle = browserify({ debug: true });
 
 	bundle.addEntry("./src/stable/jshint.js");
 
@@ -107,7 +107,9 @@ target.build = function () {
 
 	echo("Building into dist/...", "\n");
 
-	bundle.bundle().to("./dist/jshint.js");
+	bundle.append("JSHINT = require('/src/stable/jshint.js').JSHINT;");
+	var web = "var JSHINT;\n" + bundle.bundle();
+	web.to("./dist/jshint.js");
 	cli.ok("Bundle");
 
 	// Rhino
