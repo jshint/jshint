@@ -360,8 +360,9 @@ var JSHINT = (function () {
 
 
 	// Produce an error warning.
-	function quit(message, line, chr) {
+	function quit(code, line, chr) {
 		var percentage = Math.floor((line / state.lines.length) * 100);
+		var message = messages.errors[code].desc;
 
 		throw {
 			name: "JSHintError",
@@ -417,12 +418,12 @@ var JSHINT = (function () {
 		JSHINT.errors.push(w);
 
 		if (state.option.passfail) {
-			quit("Stopping. ", l, ch);
+			quit("E042", l, ch);
 		}
 
 		warnings += 1;
 		if (warnings >= state.option.maxerr) {
-			quit("Too many errors.", l, ch);
+			quit("E043", l, ch);
 		}
 
 		return w;
@@ -719,7 +720,7 @@ var JSHINT = (function () {
 			state.tokens.next = lookahead.shift() || lex.token();
 
 			if (!state.tokens.next) { // No more tokens left, give up
-				quit();
+				quit("E041", state.tokens.curr.line);
 			}
 
 			if (state.tokens.next.id === "(end)" || state.tokens.next.id === "(error)") {
@@ -1105,8 +1106,8 @@ var JSHINT = (function () {
 				f.apply(this, [left, right]);
 			}
 
-			if (!left) {
-				quit();
+			if (!left || !right) {
+				quit("E041", state.tokens.curr.line);
 			}
 
 			if (left.id === "!") {
@@ -1116,6 +1117,7 @@ var JSHINT = (function () {
 			if (right.id === "!") {
 				warning("W018", right, "!");
 			}
+
 			this.left = left;
 			this.right = right;
 			return this;
@@ -1919,7 +1921,7 @@ var JSHINT = (function () {
 		this.arity = "unary";
 
 		if (!this.right) { // '!' followed by nothing? Give up.
-			quit();
+			quit("E041", this.line || 0);
 		}
 
 		if (bang[this.right.id] === true) {
@@ -3349,7 +3351,7 @@ var JSHINT = (function () {
 		});
 
 		lex.on("fatal", function (ev) {
-			quit(ev.line, ev.from);
+			quit("E041", ev.line, ev.from);
 		});
 
 		lex.on("Identifier", function (ev) {

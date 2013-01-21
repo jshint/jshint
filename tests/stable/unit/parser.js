@@ -32,6 +32,11 @@ exports.other = function (test) {
 		.addError(2, "Expected an identifier and instead saw '(end)'.")
 		.test(code);
 
+	// GH-818
+	TestRun(test)
+		.addError(1, "Expected an identifier and instead saw ')'.")
+		.test("if (product < ) {}");
+
 	test.done();
 };
 
