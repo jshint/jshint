@@ -5,6 +5,7 @@
 
 require("shelljs/make");
 var cli = require("cli");
+var pkg = require("./package.json");
 
 var TESTS = [
 	"tests/",
@@ -108,15 +109,19 @@ target.build = function () {
 	echo("Building into dist/...", "\n");
 
 	bundle.append("JSHINT = require('/src/stable/jshint.js').JSHINT;");
-	var web = "var JSHINT;\n" + bundle.bundle();
-	web.to("./dist/jshint.js");
+
+	[ "// " + pkg.version,
+		"var JSHINT;",
+		bundle.bundle()
+	].join("\n").to("./dist/jshint-" + pkg.version + ".js");
+
 	cli.ok("Bundle");
 
 	// Rhino
-	var rhino = cat("./dist/jshint.js", "./src/platforms/rhino.js");
+	var rhino = cat("./dist/jshint-" + pkg.version + ".js", "./src/platforms/rhino.js");
 	rhino = "#!/usr/bin/env rhino\n\n" + rhino;
-	rhino.to("./dist/jshint-rhino.js");
-	exec("chmod +x dist/jshint-rhino.js");
+	rhino.to("./dist/jshint-rhino-" + pkg.version + ".js");
+	exec("chmod +x dist/jshint-rhino-" + pkg.version + ".js");
 	cli.ok("Rhino");
 	echo("\n");
 };
