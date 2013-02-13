@@ -16,6 +16,23 @@ should not alienate their users.
 For general usage information, visit our website:
 [http://jshint.com/](http://jshint.com/).
 
+JSHint Fundraiser / Bug Bounties
+--------------------------------
+
+We're [running a fundraiser](https://www.bountysource.com/#fundraisers/91-jshint)
+for JSHint! If JSHint helps you in your day-to-day development, please consider
+donating.  All money raised on this page will be used as monetary rewards for
+fixing JSHint bugs and implementing new features. Our hope is to introduce more
+developers to JSHint hacking and boost its development.
+
+**Rules**:
+
+1. All funds (aside from fees) will be used only to fund bounties.
+2. If core team ends up fixing bounty bugs, the reward will be donated to the Electronic Frontier Foundation.
+3. Before marking bugs as fixed, all patches must be reviewed by a core team member.
+
+Thanks!
+
 Reporting a bug
 ---------------
 
