@@ -119,7 +119,6 @@ var JSHINT = (function () {
 			                    // predefined
 			rhino       : true, // if the Rhino environment globals should be predefined
 			undef       : true, // if variables should be declared before used
-			unused      : true, // if variables should be always used
 			scripturl   : true, // if script-targeted URLs should be tolerated
 			shadow      : true, // if variable shadowing should be tolerated
 			smarttabs   : true, // if smarttabs should be tolerated
@@ -157,7 +156,12 @@ var JSHINT = (function () {
 			maxstatements: false, // {int} max statements per function
 			maxdepth     : false, // {int} max nested block depth per function
 			maxparams    : false, // {int} max params per function
-			maxcomplexity: false  // {int} max cyclomatic complexity per function
+			maxcomplexity: false, // {int} max cyclomatic complexity per function
+			unused       : true // warn if variables are unused
+										//  false - don't check for unused variables
+										//  true - "vars" + check last function param
+										//  "vars" - skip checking unused function params
+										//  "strict" - "vars" + check all function params
 		},
 
 		// These are JSHint boolean options which are shared with JSLint
@@ -629,6 +633,24 @@ var JSHINT = (function () {
 						break;
 					default:
 						error("E002", nt);
+					}
+					return;
+				}
+
+				if (key === "unused") {
+					switch(val) {
+						case "true":
+							state.option.unused = true;
+							break;
+						case "false":
+							state.option.unused = false;
+							break;
+						case "vars":
+						case "strict":
+							state.option.unused = val;
+							break;
+						default:
+							error("E002", nt);
 					}
 					return;
 				}
@@ -2286,10 +2308,7 @@ var JSHINT = (function () {
 
 		funct["(metrics)"].verifyMaxStatementsPerFunction();
 		funct["(metrics)"].verifyMaxComplexityPerFunction();
-
-		if (state.option.unused === false) {
-			funct["(ignoreUnused)"] = true;
-		}
+		funct["(unusedOption)"] = state.option.unused;
 
 		scope = oldScope;
 		state.option = oldOption;
@@ -3440,11 +3459,23 @@ var JSHINT = (function () {
 					implied[name] = newImplied;
 			};
 
-			var warnUnused = function (name, tkn) {
+			var warnUnused = function (name, tkn, type, unused_opt) {
 				var line = tkn.line;
 				var chr  = tkn.character;
 
-				if (state.option.unused)
+				if (typeof(unused_opt) === 'undefined') {
+					unused_opt = state.option.unused;
+				}
+				if (unused_opt === true) {
+					unused_opt = "last-param";
+				}
+
+				var warnable_types = {
+					"vars": ["var"],
+					"last-param": ["var", "last-param"],
+					"strict": ["var", "param", "last-param"]};
+
+				if (unused_opt && (unused_opt in warnable_types) && warnable_types[unused_opt].indexOf(type) !== -1)
 					warningAt("W098", line, chr, name);
 
 				unuseds.push({
@@ -3473,7 +3504,7 @@ var JSHINT = (function () {
 					return;
 				}
 
-				warnUnused(key, tkn);
+				warnUnused(key, tkn, "var");
 			};
 
 			// Check queued 'x is not defined' instances to see if they're still undefined.
@@ -3488,7 +3519,7 @@ var JSHINT = (function () {
 			}
 
 			functions.forEach(function (func) {
-				if (func["(ignoreUnused)"]) {
+				if (func["(unusedOption)"] === false) {
 					return;
 				}
 
@@ -3503,10 +3534,11 @@ var JSHINT = (function () {
 
 				var params = func["(params)"].slice();
 				var param  = params.pop();
-				var type;
+				var type, unused_type;
 
 				while (param) {
 					type = func[param];
+					unused_type = (params.length === func["(params)"].length-1 ? "last-param" : "param");
 
 					// 'undefined' is a special case for (function (window, undefined) { ... })();
 					// patterns.
@@ -3514,17 +3546,17 @@ var JSHINT = (function () {
 					if (param === "undefined")
 						return;
 
-					if (type !== "unused" && type !== "unction")
-						return;
+					if (type === "unused" || type === "unction") {
+						warnUnused(param, func["(tokens)"][param], unused_type, func["(unusedOption)"]);
+					}
 
-					warnUnused(param, func["(tokens)"][param]);
 					param = params.pop();
 				}
 			});
 
 			for (var key in declared) {
 				if (_.has(declared, key) && !_.has(global, key)) {
-					warnUnused(key, declared[key]);
+					warnUnused(key, declared[key], "var");
 				}
 			}
 		} catch (err) {
