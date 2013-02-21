@@ -183,6 +183,7 @@ var warnings = {
 	W115: "Octal literals are not allowed in strict mode.",
 	W116: "Expected '{a}' and instead saw '{b}'.",
 	W117: "'{a}' is not defined.",
+	W118: "Expected exactly one space between '{a}' and '{b}'.",
 };
 
 var info = {

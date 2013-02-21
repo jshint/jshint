@@ -981,6 +981,25 @@ exports.white = function (test) {
 	test.done();
 };
 
+exports.onespace = function (test) {
+	var src = fs.readFileSync(__dirname + '/fixtures/onespace.js', 'utf8');
+
+	TestRun(test).test(src);
+	TestRun(test)
+		.addError(1, "Expected exactly one space between 'a' and '='.", { character: 6 })
+		.addError(1, "Expected exactly one space between '=' and 'function'.", { character: 9 })
+		.addError(2, "Expected exactly one space between 'function' and '('.", { character: 15 })
+		.addError(5, "Expected exactly one space between '+' and '0'.", { character: 12 })
+		.addError(10, "Expected exactly one space between ')' and '{'.", { character: 9 })
+		.addError(13, "Expected exactly one space between 'else' and '{'.", { character: 9 })
+		.addError(18, "Expected exactly one space between 'try' and '{'.", { character: 6 })
+		.addError(23, "Expected exactly one space between 'finally' and '{'.", { character: 10 })
+		.addError(27, "Expected exactly one space between 'do' and '{'.", { character: 5 })
+		.test(src, { onespace: true });
+
+	test.done();
+};
+
 exports.trailing = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/white.js', 'utf8');
 
