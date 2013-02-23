@@ -2115,7 +2115,7 @@ var JSHINT = (function () {
 
 		advance(")", this);
 		nospace(state.tokens.prev, state.tokens.curr);
-		if (state.option.immed && exprs[0].id === "function") {
+		if (state.option.immed && exprs[0] && exprs[0].id === "function") {
 			if (state.tokens.next.id !== "(" &&
 			  (state.tokens.next.id !== "." || (peek().value !== "call" && peek().value !== "apply"))) {
 				warning("W068", this);
