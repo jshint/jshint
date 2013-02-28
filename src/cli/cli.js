@@ -145,7 +145,7 @@ function findFile(name, dir) {
 	dir = dir || process.cwd();
 
 	var filename = path.normalize(path.join(dir, name));
-	var parent = path.resolve(dir, "../../");
+	var parent = path.resolve(dir, "../");
 
 	if (shjs.test("-e", filename)) {
 		return filename;
