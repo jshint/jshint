@@ -86,6 +86,7 @@ var JSHINT = (function () {
 			expr        : true, // if ExpressionStatement should be allowed as Programs
 			forin       : true, // if for in statements must filter
 			funcscope   : true, // if only function scope should be used for scope tests
+			gcl         : true, // if JSHint should be compatible with Google Closure Linter
 			globalstrict: true, // if global "use strict"; should be allowed (also enables 'strict')
 			immed       : true, // if immediate invocations must be wrapped in parens
 			iterator    : true, // if the `__iterator__` property should be allowed
@@ -2641,7 +2642,7 @@ var JSHINT = (function () {
 
 	prefix("function", function () {
 		var i = optionalidentifier();
-		if (i) {
+		if (i || state.option.gcl) {
 			adjacent(state.tokens.curr, state.tokens.next);
 		} else {
 			nonadjacent(state.tokens.curr, state.tokens.next);
