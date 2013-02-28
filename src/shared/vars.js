@@ -239,6 +239,12 @@ exports.node = {
 	clearInterval: false
 };
 
+exports.phantom = {
+	phantom      : true,
+	require      : true,
+	WebPage      : true
+};
+
 exports.rhino = {
 	defineClass  : false,
 	deserialize  : false,
