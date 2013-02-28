@@ -33,7 +33,7 @@
 	"devDependencies": {
 		"jshint":     "*",
 		"shelljs":    "*",
-		"browserify": "*",
+		"browserify": "1.16.1",
 		"coveraje":   "*",
 		"nodeunit":   "*",
 		"sinon":      "*"
