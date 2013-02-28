@@ -68,6 +68,7 @@ var JSHINT = (function () {
 
 		// These are the JSHint boolean options.
 		boolOptions = {
+			anon        : true, // allow immediate left-paren after "function".
 			asi         : true, // if automatic semicolon insertion should be tolerated
 			bitwise     : true, // if bitwise operators should not be allowed
 			boss        : true, // if advanced usage of assignments should be allowed
@@ -2645,7 +2646,11 @@ var JSHINT = (function () {
 		if (i || state.option.gcl) {
 			adjacent(state.tokens.curr, state.tokens.next);
 		} else {
-			nonadjacent(state.tokens.curr, state.tokens.next);
+			if (state.option.anon) {
+				adjacent(state.tokens.curr, state.tokens.next);
+            } else {
+				nonadjacent(state.tokens.curr, state.tokens.next);
+            }
 		}
 		doFunction(i);
 		if (!state.option.loopfunc && funct["(loopage)"]) {
