@@ -638,3 +638,16 @@ exports.yui = function (test) {
 
 	test.done();
 };
+
+exports.phantom = function (test) {
+	var globals = [
+		'phantom',
+		'require',
+		'WebPage',
+	];
+
+	globalsImplied(test, globals);
+	globalsKnown(test, globals, { phantom: true });
+
+	test.done();
+};
