@@ -230,6 +230,19 @@ exports.testMissingSpaces = function (test) {
 	test.done();
 };
 
+exports.testGoogleClosureLinterCompatibility = function (test) {
+	var code = "var a = function() { return; };";
+
+	TestRun(test)
+		.addError(1, "Missing space after 'function'.")
+		.test(code, { white: true });
+
+	TestRun(test)
+		.test(code, { white: true, gcl: true });
+
+	test.done();
+};
+
 exports.functionScopedOptions = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/functionScopedOptions.js', 'utf8');
 	TestRun(test)
