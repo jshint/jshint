@@ -2237,9 +2237,18 @@ var JSHINT = (function () {
 		}
 
 		for (;;) {
-			ident = identifier(true);
-			params.push(ident);
-			addlabel(ident, "unused", state.tokens.curr);
+			if (state.option.esnext && _.contains(["{", "["], state.tokens.next.id)) {
+				tokens = destructuringExpression();
+				for (var t in tokens) {
+					t = tokens[t];
+					params.push(t.id);
+					addlabel(t.id, "unused", t.token);
+				}
+			} else {
+				ident = identifier(true);
+				params.push(ident);
+				addlabel(ident, "unused", state.tokens.curr);
+			}
 			if (state.tokens.next.id === ",") {
 				comma();
 			} else {
@@ -2514,7 +2523,8 @@ var JSHINT = (function () {
 		};
 	}(delim("{")));
 
-	function destructuringExpression (propdef) {
+	function destructuringExpression () {
+		var id;
 		var identifiers = [];
 		if (state.tokens.next.value === "[") {
 			advance("[");
@@ -2526,10 +2536,22 @@ var JSHINT = (function () {
 			advance("]");
 		} else if (state.tokens.next.value === "{") {
 			advance("{");
-			identifiers.push({ id: identifier(), token: state.tokens.curr });
+			id = identifier();
+			if (state.tokens.next.value === ":") {
+				advance(":");
+				identifiers.push({ id: identifier(), token: state.tokens.curr });
+			} else {
+				identifiers.push({ id: id, token: state.tokens.curr });
+			}
 			while (state.tokens.next.value !== "}") {
 				advance(",");
-				identifiers.push({ id: identifier(), token: state.tokens.curr });
+				id = identifier();
+				if (state.tokens.next.value === ":") {
+					advance(":");
+					identifiers.push({ id: identifier(), token: state.tokens.curr });
+				} else {
+					identifiers.push({ id: id, token: state.tokens.curr });
+				}
 			}
 			advance("}");
 		}
