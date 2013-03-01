@@ -2554,27 +2554,38 @@ var JSHINT = (function () {
 			}
 		}
 		var conststatement = stmt("const", function (prefix) {
-			var id, name, value;
+			var tokens, lone, value;
 
 			this.first = [];
 			for (;;) {
+				var names = [];
 				nonadjacent(state.tokens.curr, state.tokens.next);
-				id = identifier();
-				if (funct[id] === "const") {
-					warning("E011", null, id);
+				if (_.contains(["{", "["], state.tokens.next.value)) {
+					tokens = destructuredAssign();
+					lone = false;
+				} else {
+					tokens = [ { id: identifier(), token: state.tokens.curr.value } ];
+					lone = true;
 				}
-				if (funct["(global)"] && predefined[id] === false) {
-					warning("W079", state.tokens.curr, id);
+				for (var t in tokens) {
+					t = tokens[t];
+					if (funct[t.id] === "const") {
+						warning("E011", null, t.id);
+					}
+					if (funct["(global)"] && predefined[t.id] === false) {
+						warning("W079", token, t.id);
+					}
+					addlabel(t.id, "const");
+					names.push(t.token);
 				}
-				addlabel(id, "const");
 				if (prefix) {
 					break;
 				}
-				name = state.tokens.curr;
-				this.first.push(state.tokens.curr);
+
+				this.first = this.first.concat(names);
 
 				if (state.tokens.next.id !== "=") {
-					warning("E012", state.tokens.curr, id);
+					warning("E012", state.tokens.curr, state.tokens.curr.value);
 				}
 
 				if (state.tokens.next.id === "=") {
@@ -2582,13 +2593,17 @@ var JSHINT = (function () {
 					advance("=");
 					nonadjacent(state.tokens.curr, state.tokens.next);
 					if (state.tokens.next.id === "undefined") {
-						warning("W080", state.tokens.curr, id);
+						warning("W080", state.tokens.curr, state.tokens.curr.value);
 					}
 					if (peek(0).id === "=" && state.tokens.next.identifier) {
 						error("E037", state.tokens.next, state.tokens.next.value);
 					}
 					value = expression(0);
-					name.first = value;
+					if (lone) {
+						tokens[0].first = value;
+					} else {
+						destructuredAssignValues(names, value);
+					}
 				}
 
 				if (state.tokens.next.id !== ",") {
