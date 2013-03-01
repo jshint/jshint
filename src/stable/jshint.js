@@ -2614,6 +2614,71 @@ var JSHINT = (function () {
 			return this;
 		});
 		conststatement.exps = true;
+		var varstatement = stmt("var", function (prefix) {
+			// JavaScript does not have block scope. It only has function scope. So,
+			// declaring a variable in a block can have unexpected consequences.
+			var tokens, lone, value;
+
+			if (funct["(onevar)"] && state.option.onevar) {
+				warning("W081");
+			} else if (!funct["(global)"]) {
+				funct["(onevar)"] = true;
+			}
+
+			this.first = [];
+			for (;;) {
+				var names = [];
+				nonadjacent(state.tokens.curr, state.tokens.next);
+				if (_.contains(["{", "["], state.tokens.next.value)) {
+					tokens = destructuredAssign();
+					lone = false;
+				} else {
+					tokens = [ { id: identifier(), token: state.tokens.curr.value } ];
+					lone = true;
+				}
+				for (var t in tokens) {
+					t = tokens[t];
+					if (state.option.esnext && funct[t.id] === "const") {
+						warning("E011", null, t.id);
+					}
+					if (funct["(global)"] && predefined[t.id] === false) {
+						warning("W079", token, t.id);
+					}
+					addlabel(t.id, "unused", t.token);
+					names.push(t.token);
+				}
+				if (prefix) {
+					break;
+				}
+
+				this.first = this.first.concat(names);
+
+				if (state.tokens.next.id === "=") {
+					nonadjacent(state.tokens.curr, state.tokens.next);
+					advance("=");
+					nonadjacent(state.tokens.curr, state.tokens.next);
+					if (state.tokens.next.id === "undefined") {
+						warning("W080", state.tokens.curr, state.tokens.curr.value);
+					}
+					if (peek(0).id === "=" && state.tokens.next.identifier) {
+						error("E037", state.tokens.next, state.tokens.next.value);
+					}
+					value = expression(0);
+					if (lone) {
+						tokens[0].first = value;
+					} else {
+						destructuredAssignValues(names, value);
+					}
+				}
+
+				if (state.tokens.next.id !== ",") {
+					break;
+				}
+				comma();
+			}
+			return this;
+		});
+		varstatement.exps = true;
 	};
 
 	var varstatement = stmt("var", function (prefix) {
