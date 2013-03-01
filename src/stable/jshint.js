@@ -2226,6 +2226,7 @@ var JSHINT = (function () {
 		var next   = state.tokens.next;
 		var params = [];
 		var ident;
+		var tokens = [];
 
 		advance("(");
 		nospace();
@@ -2513,47 +2514,48 @@ var JSHINT = (function () {
 		};
 	}(delim("{")));
 
+	function destructuringExpression (propdef) {
+		var identifiers = [];
+		if (state.tokens.next.value === "[") {
+			advance("[");
+			identifiers.push({ id: identifier(), token: state.tokens.curr });
+			while (state.tokens.next.value !== "]") {
+				advance(",");
+				identifiers.push({ id: identifier(), token: state.tokens.curr });
+			}
+			advance("]");
+		} else if (state.tokens.next.value === "{") {
+			advance("{");
+			identifiers.push({ id: identifier(), token: state.tokens.curr });
+			while (state.tokens.next.value !== "}") {
+				advance(",");
+				identifiers.push({ id: identifier(), token: state.tokens.curr });
+			}
+			advance("}");
+		}
+		return identifiers;
+	}
+	function destructuringExpressionMatch (tokens, value) {
+		if (value.first) {
+			_.zip(tokens, value.first).forEach(function (val) {
+				var token = val[0];
+				var value = val[1];
+				if (token && value) {
+					token.first = value;
+				} else if (!value) {
+					token.first = undefined;
+					warning("W080", token.first, token.first.value);
+				} /* else {
+					XXX value is discarded: wouldn't it need a warning ?
+				} */
+			});
+		}
+	}
+
 	// This Function is called when esnext option is set to true
 	// it adds the `const` statement to JSHINT
 
 	useESNextSyntax = function () {
-		function destructuredAssign () {
-			var identifiers = [];
-			if (state.tokens.next.value === "[") {
-				advance("[");
-				identifiers.push({ id: identifier(), token: state.tokens.curr });
-				while (state.tokens.next.value !== "]") {
-					advance(",");
-					identifiers.push({ id: identifier(), token: state.tokens.curr });
-				}
-				advance("]");
-			} else if (state.tokens.next.value === "{") {
-				advance("{");
-				identifiers.push({ id: identifier(), token: state.tokens.curr });
-				while (state.tokens.next.value !== "}") {
-					advance(",");
-					identifiers.push({ id: identifier(), token: state.tokens.curr });
-				}
-				advance("}");
-			}
-			return identifiers;
-		}
-		function destructuredAssignValues (tokens, value) {
-			if (value.first) {
-				_.zip(tokens, value.first).forEach(function (val) {
-					var token = val[0];
-					var value = val[1];
-					if (token && value) {
-						token.first = value;
-					} else if (!value) {
-						token.first = undefined;
-						warning("W080", token.first, token.first.value);
-					} /* else {
-						XXX value is discarded: wouldn't it need a warning ?
-					} */
-				});
-			}
-		}
 		var conststatement = stmt("const", function (prefix) {
 			var tokens, lone, value;
 
@@ -2562,7 +2564,7 @@ var JSHINT = (function () {
 				var names = [];
 				nonadjacent(state.tokens.curr, state.tokens.next);
 				if (_.contains(["{", "["], state.tokens.next.value)) {
-					tokens = destructuredAssign();
+					tokens = destructuringExpression();
 					lone = false;
 				} else {
 					tokens = [ { id: identifier(), token: state.tokens.curr.value } ];
@@ -2603,7 +2605,7 @@ var JSHINT = (function () {
 					if (lone) {
 						tokens[0].first = value;
 					} else {
-						destructuredAssignValues(names, value);
+						destructuringExpressionMatch(names, value);
 					}
 				}
 
@@ -2631,7 +2633,7 @@ var JSHINT = (function () {
 				var names = [];
 				nonadjacent(state.tokens.curr, state.tokens.next);
 				if (_.contains(["{", "["], state.tokens.next.value)) {
-					tokens = destructuredAssign();
+					tokens = destructuringExpression();
 					lone = false;
 				} else {
 					tokens = [ { id: identifier(), token: state.tokens.curr.value } ];
@@ -2668,7 +2670,7 @@ var JSHINT = (function () {
 					if (lone) {
 						tokens[0].first = value;
 					} else {
-						destructuredAssignValues(names, value);
+						destructuringExpressionMatch(names, value);
 					}
 				}
 
