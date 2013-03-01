@@ -2516,6 +2516,43 @@ var JSHINT = (function () {
 	// it adds the `const` statement to JSHINT
 
 	useESNextSyntax = function () {
+		function destructuredAssign () {
+			var identifiers = [];
+			if (state.tokens.next.value === "[") {
+				advance("[");
+				identifiers.push({ id: identifier(), token: state.tokens.curr });
+				while (state.tokens.next.value !== "]") {
+					advance(",");
+					identifiers.push({ id: identifier(), token: state.tokens.curr });
+				}
+				advance("]");
+			} else if (state.tokens.next.value === "{") {
+				advance("{");
+				identifiers.push({ id: identifier(), token: state.tokens.curr });
+				while (state.tokens.next.value !== "}") {
+					advance(",");
+					identifiers.push({ id: identifier(), token: state.tokens.curr });
+				}
+				advance("}");
+			}
+			return identifiers;
+		}
+		function destructuredAssignValues (tokens, value) {
+			if (value.first) {
+				_.zip(tokens, value.first).forEach(function (val) {
+					var token = val[0];
+					var value = val[1];
+					if (token && value) {
+						token.first = value;
+					} else if (!value) {
+						token.first = undefined;
+						warning("W080", token.first, token.first.value);
+					} /* else {
+						XXX value is discarded: wouldn't it need a warning ?
+					} */
+				});
+			}
+		}
 		var conststatement = stmt("const", function (prefix) {
 			var id, name, value;
 
