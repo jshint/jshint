@@ -3302,16 +3302,6 @@ var JSHINT = (function () {
 			return false;
 		}
 
-		if (isString(s) && /^\s*$/g.test(s)) {
-			errorAt("E005", 0);
-			return false;
-		}
-
-		if (s.length === 0) {
-			errorAt("E005", 0);
-			return false;
-		}
-
 		var api = {
 			get isJSON() {
 				return state.jsonMode;
