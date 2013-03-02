@@ -38,9 +38,9 @@ var reg      = require("./reg.js");
 var state    = require("./state.js").state;
 var style    = require("./style.js");
 
-// We build the application inside a function so that we produce only a single
-// global variable. That function will be invoked immediately, and its return
-// value is the JSHINT function itself.
+// We build the application inside a function so that we produce only a singleton
+// variable. That function will be invoked immediately, and its return value is
+// the JSHINT function itself.
 
 var JSHINT = (function () {
 	"use strict";
