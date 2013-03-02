@@ -1166,7 +1166,7 @@ var JSHINT = (function () {
 					that.right = expression(19);
 					return that;
 				} else if (left.id === "[") {
-					if (state.option.esnext) {
+					if (state.option.esnext && state.tokens.curr.left.first) {
 						state.tokens.curr.left.first.forEach(function (t) {
 							if (funct[t.value] === "const") {
 								error("E013", t, t.value);
