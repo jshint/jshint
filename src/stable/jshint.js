@@ -1148,12 +1148,12 @@ var JSHINT = (function () {
 			that.left = left;
 
 			if (left) {
-			if (predefined[left.value] === false &&
-					scope[left.value]["(global)"] === true) {
-				warning("W020", left);
-			} else if (left["function"]) {
-				warning("W021", left, left.value);
-			}
+				if (predefined[left.value] === false &&
+						scope[left.value]["(global)"] === true) {
+					warning("W020", left);
+				} else if (left["function"]) {
+					warning("W021", left, left.value);
+				}
 
 				if (state.option.esnext && funct[left.value] === "const") {
 					error("E013", left, left.value);
@@ -2534,7 +2534,7 @@ var JSHINT = (function () {
 		};
 	}(delim("{")));
 
-	function destructuringExpression () {
+	function destructuringExpression() {
 		var id;
 		var identifiers = [];
 		if (state.tokens.next.value === "[") {
@@ -2568,7 +2568,7 @@ var JSHINT = (function () {
 		}
 		return identifiers;
 	}
-	function destructuringExpressionMatch (tokens, value) {
+	function destructuringExpressionMatch(tokens, value) {
 		if (value.first) {
 			_.zip(tokens, value.first).forEach(function (val) {
 				var token = val[0];
