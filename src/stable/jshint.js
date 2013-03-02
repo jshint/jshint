@@ -1167,11 +1167,15 @@ var JSHINT = (function () {
 					that.right = expression(19);
 					return that;
 				} else if (left.id === "[") {
-					state.tokens.curr.left.first.forEach(function (t) {
-						if (funct[t.value] === "const") {
-							error("E013", t, t.value);
-						}
-					});
+					if (state.option.esnext) {
+						state.tokens.curr.left.first.forEach(function (t) {
+							if (funct[t.value] === "const") {
+								error("E013", t, t.value);
+							}
+						});
+					} else if (!left.left || left.left.value === "arguments") {
+						warning("E031", that);
+					}
 					that.right = expression(19);
 					return that;
 				} else if (left.identifier && !isReserved(left)) {
@@ -2605,7 +2609,7 @@ var JSHINT = (function () {
 						warning("E011", null, t.id);
 					}
 					if (funct["(global)"] && predefined[t.id] === false) {
-						warning("W079", token, t.id);
+						warning("W079", t.token, t.id);
 					}
 					addlabel(t.id, "const");
 					names.push(t.token);
@@ -2674,7 +2678,7 @@ var JSHINT = (function () {
 						warning("E011", null, t.id);
 					}
 					if (funct["(global)"] && predefined[t.id] === false) {
-						warning("W079", token, t.id);
+						warning("W079", t.token, t.id);
 					}
 					addlabel(t.id, "unused", t.token);
 					names.push(t.token);
@@ -3269,14 +3273,14 @@ var JSHINT = (function () {
 		do {
 			pn = peek(i);
 			i = i + 1;
-		} while (pn.value !== "=" && pn.id !== "(endline)");
+		} while (pn.value !== "=" && pn.id !== "(endline)" && pn.id !== "(end)");
 		// if we're in an assignment, check for undeclared variables
-		if (pn.value === "=") {
+		if (state.option.esnext && pn.value === "=") {
 			if (state.tokens.next.value !== "[") {
 				error("E031", pn);
 			} else {
 				values = destructuringExpression();
-				values.forEach(function(t) {
+				values.forEach(function (t) {
 					isundef(funct, "W117", t.token, t.id);
 				});
 				advance("=");
