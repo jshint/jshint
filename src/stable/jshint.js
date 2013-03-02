@@ -1159,10 +1159,18 @@ var JSHINT = (function () {
 					error("E013", left, left.value);
 				}
 
-				if (left.id === "." || left.id === "[") {
+				if (left.id === ".") {
 					if (!left.left || left.left.value === "arguments") {
 						warning("E031", that);
 					}
+					that.right = expression(19);
+					return that;
+				} else if (left.id === "[") {
+					state.tokens.curr.left.first.forEach(function (t) {
+						if (funct[t.value] === "const") {
+							error("E013", t, t.value);
+						}
+					});
 					that.right = expression(19);
 					return that;
 				} else if (left.identifier && !isReserved(left)) {
