@@ -3307,6 +3307,8 @@ var JSHINT = (function () {
 			}
 		// otherwise parse json value
 		} else {
+			state.option.laxbreak = true;
+			state.jsonMode = true;
 			jsonValue();
 		}
 	}
@@ -3592,8 +3594,6 @@ var JSHINT = (function () {
 			switch (state.tokens.next.id) {
 			case "{":
 			case "[":
-				state.option.laxbreak = true;
-				state.jsonMode = true;
 				destructuringAssignOrJsonValue();
 				break;
 			default:
