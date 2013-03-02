@@ -3263,6 +3263,33 @@ var JSHINT = (function () {
 	FutureReservedWord("volatile");
 	FutureReservedWord("yield", { es5: true, strictOnly: true });
 
+	// Check whether this function has been reached for a destructuring assign with undeclared values
+	function destructuringAssignOrJsonValue() {
+		var pn, i = 1, values;
+		// lookup for the assignment
+		do {
+			pn = peek(i);
+			i = i + 1;
+		} while (pn.value !== "=" && pn.id !== "(endline)");
+		// if we're in an assignment, check for undeclared variables
+		if (pn.value === "=") {
+			if (state.tokens.next.value !== "[") {
+				error("E031", pn);
+			} else {
+				values = destructuringExpression();
+				values.forEach(function(t) {
+					isundef(funct, "W117", t.token, t.id);
+				});
+				advance("=");
+				destructuringExpressionMatch(values, expression(0));
+				advance(";");
+			}
+		// otherwise parse json value
+		} else {
+			jsonValue();
+		}
+	}
+
 	// Parse JSON
 
 	function jsonValue() {
@@ -3546,7 +3573,7 @@ var JSHINT = (function () {
 			case "[":
 				state.option.laxbreak = true;
 				state.jsonMode = true;
-				jsonValue();
+				destructuringAssignOrJsonValue();
 				break;
 			default:
 				directives();
