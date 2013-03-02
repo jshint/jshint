@@ -2535,14 +2535,27 @@ var JSHINT = (function () {
 	}(delim("{")));
 
 	function destructuringExpression() {
-		var id;
+		var id, ids;
 		var identifiers = [];
 		if (state.tokens.next.value === "[") {
+			var nextInnerDE = function () {
+				if (_.contains(["[", "{"], state.tokens.next.value)) {
+					ids = destructuringExpression();
+					for (var id in ids) {
+						id = ids[id];
+						identifiers.push({ id: id.id, token: id.token });
+					}
+				} else if (state.tokens.next.value === ",") {
+					identifiers.push({ id: null, token: state.tokens.curr });
+				} else {
+					identifiers.push({ id: identifier(), token: state.tokens.curr });
+				}
+			};
 			advance("[");
-			identifiers.push({ id: identifier(), token: state.tokens.curr });
+			nextInnerDE();
 			while (state.tokens.next.value !== "]") {
 				advance(",");
-				identifiers.push({ id: identifier(), token: state.tokens.curr });
+				nextInnerDE();
 			}
 			advance("]");
 		} else if (state.tokens.next.value === "{") {
