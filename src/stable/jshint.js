@@ -2253,8 +2253,10 @@ var JSHINT = (function () {
 				tokens = destructuringExpression();
 				for (var t in tokens) {
 					t = tokens[t];
-					params.push(t.id);
-					addlabel(t.id, "unused", t.token);
+					if (t.id) {
+						params.push(t.id);
+						addlabel(t.id, "unused", t.token);
+					}
 				}
 			} else {
 				ident = identifier(true);
@@ -2589,7 +2591,7 @@ var JSHINT = (function () {
 				var value = val[1];
 				if (token && value) {
 					token.first = value;
-				} else if (!value) {
+				} else if (token && token.first && !value) {
 					warning("W080", token.first, token.first.value);
 				} /* else {
 					XXX value is discarded: wouldn't it need a warning ?
@@ -2624,8 +2626,10 @@ var JSHINT = (function () {
 					if (funct["(global)"] && predefined[t.id] === false) {
 						warning("W079", t.token, t.id);
 					}
-					addlabel(t.id, "const");
-					names.push(t.token);
+					if (t.id) {
+						addlabel(t.id, "const");
+						names.push(t.token);
+					}
 				}
 				if (prefix) {
 					break;
@@ -2693,8 +2697,10 @@ var JSHINT = (function () {
 					if (funct["(global)"] && predefined[t.id] === false) {
 						warning("W079", t.token, t.id);
 					}
-					addlabel(t.id, "unused", t.token);
-					names.push(t.token);
+					if (t.id) {
+						addlabel(t.id, "unused", t.token);
+						names.push(t.token);
+					}
 				}
 				if (prefix) {
 					break;
