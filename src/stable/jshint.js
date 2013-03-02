@@ -1148,6 +1148,7 @@ var JSHINT = (function () {
 		return infix(s, function (left, that) {
 			that.left = left;
 
+			if (left) {
 			if (predefined[left.value] === false &&
 					scope[left.value]["(global)"] === true) {
 				warning("W020", left);
@@ -1155,7 +1156,6 @@ var JSHINT = (function () {
 				warning("W021", left, left.value);
 			}
 
-			if (left) {
 				if (state.option.esnext && funct[left.value] === "const") {
 					error("E013", left, left.value);
 				}
