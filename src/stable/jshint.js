@@ -2572,7 +2572,6 @@ var JSHINT = (function () {
 				if (token && value) {
 					token.first = value;
 				} else if (!value) {
-					token.first = undefined;
 					warning("W080", token.first, token.first.value);
 				} /* else {
 					XXX value is discarded: wouldn't it need a warning ?
