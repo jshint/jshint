@@ -1,43 +1,35 @@
 {
-	"name":     "jshint",
-	"version":  "1.0.0",
-	"homepage": "http://jshint.com/",
-	"description": "Static analysis tool for JavaScript",
-
-	"author": {
-		"name":  "Anton Kovalyov",
-		"email": "anton@kovalyov.net",
-		"url":   "http://anton.kovalyov.net/"
-	},
-
-	"bin": {
-		"jshint": "./bin/jshint"
-	},
-
-	"scripts": {
-		"test": "node ./make.js test",
-		"lint": "node ./make.js lint"
-	},
-
-	"main": "./src/stable/jshint.js",
-
-	"dependencies": {
-		"esprima":    "https://github.com/ariya/esprima/tarball/master",
-		"shelljs":    "*",
-		"underscore": "*",
-		"peakle":     "*",
-		"cli":        "0.4.3",
-		"minimatch":  "0.x.x"
-	},
-
-	"devDependencies": {
-		"jshint":     "*",
-		"shelljs":    "*",
-		"browserify": "1.16.1",
-		"coveraje":   "*",
-		"nodeunit":   "*",
-		"sinon":      "*"
-	},
-
-	"preferGlobal": true
+  "name": "jshint",
+  "version": "1.0.0",
+  "homepage": "http://jshint.com/",
+  "description": "Static analysis tool for JavaScript",
+  "author": {
+    "name": "Anton Kovalyov",
+    "email": "anton@kovalyov.net",
+    "url": "http://anton.kovalyov.net/"
+  },
+  "bin": {
+    "jshint": "./bin/jshint"
+  },
+  "scripts": {
+    "test": "node ./make.js test",
+    "lint": "node ./make.js lint"
+  },
+  "main": "./src/stable/jshint.js",
+  "dependencies": {
+    "esprima": "~1.0.x",
+    "shelljs": "~0.1.x",
+    "underscore": "~1.4.x",
+    "peakle": "0.0.1",
+    "cli": "~0.4.x",
+    "minimatch": "~0.2.x"
+  },
+  "devDependencies": {
+    "jshint": "*",
+    "browserify": "~1.16.x",
+    "coveraje": "~0.2.x",
+    "nodeunit": "~0.7.x",
+    "sinon": "~1.6.x"
+  },
+  "preferGlobal": true
 }
