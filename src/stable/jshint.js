@@ -465,7 +465,24 @@ var JSHINT = (function () {
 		return i;
 	}
 
-	function addlabel(t, type, tkn) {
+	function resetblocklabels(blockenv) {
+		for (var t in blockenv) {
+			if (funct[t] === "unused") {
+				if (state.option.unused) {
+					var tkn = funct["(tokens)"][t];
+					var line = tkn.line;
+					var chr  = tkn.character;
+					warningAt("W098", line, chr, t);
+				}
+			}
+			delete global[t];
+			delete scope[t];
+			delete funct["(tokens)"][t];
+			delete funct[t];
+		}
+	}
+
+	function addlabel(t, type, tkn, islet) {
 		// Define t in the current function in the current scope.
 		if (type === "exception") {
 			if (_.has(funct["(context)"], t)) {
@@ -484,6 +501,10 @@ var JSHINT = (function () {
 					warning("W004", state.tokens.next, t);
 				}
 			}
+		}
+
+		if (state.option.esnext && islet) {
+			funct["(blockscope)"][funct["(blockscope)"].length-1][t] = type;
 		}
 
 		funct[t] = type;
@@ -1529,6 +1550,12 @@ var JSHINT = (function () {
 
 		if (state.tokens.next.id === "{") {
 			advance("{");
+			if (state.option.esnext) {
+				if (!funct["(blockscope)"]) {
+					funct["(blockscope)"] = [];
+				}
+				funct["(blockscope)"].push({});
+			}
 			line = state.tokens.curr.line;
 			if (state.tokens.next.id !== "}") {
 				indent += state.option.indent;
@@ -1568,6 +1595,10 @@ var JSHINT = (function () {
 				indentation();
 			}
 			advance("}", t);
+			if (state.option.esnext) {
+				resetblocklabels(funct["(blockscope)"][funct["(blockscope)"].length-1]);
+				funct["(blockscope)"].splice(funct["(blockscope)"].length-1, 1);
+			}
 			indent = old_indent;
 		} else if (!ordinary) {
 			error("E021", state.tokens.next, "{", state.tokens.next.value);
@@ -2733,6 +2764,73 @@ var JSHINT = (function () {
 			return this;
 		});
 		varstatement.exps = true;
+		var letstatement = stmt("let", function (prefix) {
+			// JavaScript does not have block scope. It only has function scope. So,
+			// declaring a variable in a block can have unexpected consequences.
+			var tokens, lone, value;
+
+			if (funct["(onevar)"] && state.option.onevar) {
+				warning("W081");
+			} else if (!funct["(global)"]) {
+				funct["(onevar)"] = true;
+			}
+
+			this.first = [];
+			for (;;) {
+				var names = [];
+				nonadjacent(state.tokens.curr, state.tokens.next);
+				if (_.contains(["{", "["], state.tokens.next.value)) {
+					tokens = destructuringExpression();
+					lone = false;
+				} else {
+					tokens = [ { id: identifier(), token: state.tokens.curr.value } ];
+					lone = true;
+				}
+				for (var t in tokens) {
+					t = tokens[t];
+					if (state.option.esnext && funct[t.id] === "const") {
+						warning("E011", null, t.id);
+					}
+					if (funct["(global)"] && predefined[t.id] === false) {
+						warning("W079", t.token, t.id);
+					}
+					if (t.id) {
+						addlabel(t.id, "unused", t.token, true);
+						names.push(t.token);
+					}
+				}
+				if (prefix) {
+					break;
+				}
+
+				this.first = this.first.concat(names);
+
+				if (state.tokens.next.id === "=") {
+					nonadjacent(state.tokens.curr, state.tokens.next);
+					advance("=");
+					nonadjacent(state.tokens.curr, state.tokens.next);
+					if (state.tokens.next.id === "undefined") {
+						warning("W080", state.tokens.curr, state.tokens.curr.value);
+					}
+					if (peek(0).id === "=" && state.tokens.next.identifier) {
+						error("E037", state.tokens.next, state.tokens.next.value);
+					}
+					value = expression(0);
+					if (lone) {
+						tokens[0].first = value;
+					} else {
+						destructuringExpressionMatch(names, value);
+					}
+				}
+
+				if (state.tokens.next.id !== ",") {
+					break;
+				}
+				comma();
+			}
+			return this;
+		});
+		letstatement.exps = true;
 	};
 
 	var varstatement = stmt("var", function (prefix) {
