@@ -3414,14 +3414,24 @@ var JSHINT = (function () {
 
 	// Check whether this function has been reached for a destructuring assign with undeclared values
 	function destructuringAssignOrJsonValue() {
-		var pn, i = 1, values;
+		var pn, values, seeneq, seensc;
+		var i = 1; 
 		// lookup for the assignment
-		do {
-			pn = peek(i);
-			i = i + 1;
-		} while (pn.value !== "=" && pn.id !== "(endline)" && pn.id !== "(end)");
-		// if we're in an assignment, check for undeclared variables
-		if (state.option.esnext && pn.value === "=") {
+		if (state.option.esnext) {
+			do {
+				pn = peek(i);
+				i = i + 1;
+				if (pn.value === "=")
+					seeneq = true;
+				if (pn.value === ";")
+					seensc = true;
+			} while (pn.value !== "}" && pn.id !== "(end)");
+		}
+		// if it has semicolons, it is a block, so go parse it as a block
+		if (seensc) {
+			statements();
+		// if it's not a block, but there are assignments, check for undeclared variables
+		} else if (seeneq) {
 			if (state.tokens.next.value !== "[") {
 				error("E031", pn);
 			} else {
