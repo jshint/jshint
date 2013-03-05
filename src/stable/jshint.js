@@ -2615,7 +2615,7 @@ var JSHINT = (function () {
 					tokens = destructuringExpression();
 					lone = false;
 				} else {
-					tokens = [ { id: identifier(), token: state.tokens.curr.value } ];
+					tokens = [ { id: identifier(), token: state.tokens.curr } ];
 					lone = true;
 				}
 				for (var t in tokens) {
@@ -2686,7 +2686,7 @@ var JSHINT = (function () {
 					tokens = destructuringExpression();
 					lone = false;
 				} else {
-					tokens = [ { id: identifier(), token: state.tokens.curr.value } ];
+					tokens = [ { id: identifier(), token: state.tokens.curr } ];
 					lone = true;
 				}
 				for (var t in tokens) {
@@ -2716,7 +2716,7 @@ var JSHINT = (function () {
 						warning("W080", state.tokens.curr, state.tokens.curr.value);
 					}
 					if (peek(0).id === "=" && state.tokens.next.identifier) {
-						error("E037", state.tokens.next, state.tokens.next.value);
+						error("E038", state.tokens.next, state.tokens.next.value);
 					}
 					value = expression(0);
 					if (lone) {
