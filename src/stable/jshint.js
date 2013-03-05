@@ -157,11 +157,11 @@ var JSHINT = (function () {
 			maxdepth     : false, // {int} max nested block depth per function
 			maxparams    : false, // {int} max params per function
 			maxcomplexity: false, // {int} max cyclomatic complexity per function
-			unused       : true // warn if variables are unused
-										//  false - don't check for unused variables
-										//  true - "vars" + check last function param
-										//  "vars" - skip checking unused function params
-										//  "strict" - "vars" + check all function params
+			unused       : true  // warn if variables are unused. Available options:
+			                     //   false    - don't check for unused variables
+			                     //   true     - "vars" + check last function param
+			                     //   "vars"   - skip checking unused function params
+			                     //   "strict" - "vars" + check all function params
 		},
 
 		// These are JSHint boolean options which are shared with JSLint
@@ -638,19 +638,19 @@ var JSHINT = (function () {
 				}
 
 				if (key === "unused") {
-					switch(val) {
-						case "true":
-							state.option.unused = true;
-							break;
-						case "false":
-							state.option.unused = false;
-							break;
-						case "vars":
-						case "strict":
-							state.option.unused = val;
-							break;
-						default:
-							error("E002", nt);
+					switch (val) {
+					case "true":
+						state.option.unused = true;
+						break;
+					case "false":
+						state.option.unused = false;
+						break;
+					case "vars":
+					case "strict":
+						state.option.unused = val;
+						break;
+					default:
+						error("E002", nt);
 					}
 					return;
 				}
@@ -3463,9 +3463,10 @@ var JSHINT = (function () {
 				var line = tkn.line;
 				var chr  = tkn.character;
 
-				if (typeof(unused_opt) === 'undefined') {
+				if (unused_opt === undefined) {
 					unused_opt = state.option.unused;
 				}
+
 				if (unused_opt === true) {
 					unused_opt = "last-param";
 				}
@@ -3473,10 +3474,14 @@ var JSHINT = (function () {
 				var warnable_types = {
 					"vars": ["var"],
 					"last-param": ["var", "last-param"],
-					"strict": ["var", "param", "last-param"]};
+					"strict": ["var", "param", "last-param"]
+				};
 
-				if (unused_opt && (unused_opt in warnable_types) && warnable_types[unused_opt].indexOf(type) !== -1)
-					warningAt("W098", line, chr, name);
+				if (unused_opt) {
+					if (warnable_types[unused_opt] && warnable_types[unused_opt].indexOf(type) !== -1) {
+						warningAt("W098", line, chr, name);
+					}
+				}
 
 				unuseds.push({
 					name: name,
@@ -3538,7 +3543,7 @@ var JSHINT = (function () {
 
 				while (param) {
 					type = func[param];
-					unused_type = (params.length === func["(params)"].length-1 ? "last-param" : "param");
+					unused_type = (params.length === func["(params)"].length - 1 ? "last-param" : "param");
 
 					// 'undefined' is a special case for (function (window, undefined) { ... })();
 					// patterns.
@@ -3559,6 +3564,7 @@ var JSHINT = (function () {
 					warnUnused(key, declared[key], "var");
 				}
 			}
+
 		} catch (err) {
 			if (err && err.name === "JSHintError") {
 				var nt = state.tokens.next || {};
