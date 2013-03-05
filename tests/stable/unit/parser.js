@@ -638,12 +638,101 @@ exports.testDestructuringNone = function (test) {
 	];
 
 	TestRun(test)
-		.addError(1,  "'a' is defined but never used.")
-		.addError(2,  "'c' is defined but never used.")
-		.addError(2,  "'d' is defined but never used.")
-		.addError(3,  "'e' is defined but never used.")
-		.addError(3,  "'f' is defined but never used.")
+		.addError(1, "'a' is defined but never used.")
+		.addError(2, "'c' is defined but never used.")
+		.addError(2, "'d' is defined but never used.")
+		.addError(3, "'e' is defined but never used.")
+		.addError(3, "'f' is defined but never used.")
 		.test(code, {esnext: true, es5: true, unused: true, undef: true});
+
+	test.done();
+};
+exports.testLetStmt = function (test) {
+	var code = [
+		"let x = 1;",
+		"{",
+		"	let y = 3 ;",
+		"	{",
+		"		let z = 2;",
+		"		print(x + ' ' + y + ' ' + z);",
+		"	}",
+		"	print(x + ' ' + y);",
+		"}",
+		"print(x);"
+	];
+
+	TestRun(test)
+		.test(code, {esnext: true, es5: true, unused: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+exports.testLetStmtOutOfScope = function (test) {
+	var code = [
+		"let x = 1;",
+		"{",
+		"	let y = 3 ;",
+		"	{",
+		"		let z = 2;",
+		"	}",
+		"	print(z);",
+		"}",
+		"print(y);",
+	];
+
+	TestRun(test)
+		.addError(5, "'z' is defined but never used.")
+		.addError(3, "'y' is defined but never used.")
+		.addError(7, "'z' is not defined.")
+		.addError(9, "'y' is not defined.")
+		.test(code, {esnext: true, es5: true, unused: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+exports.testLetStmtInFunctions = function (test) {
+	var code = [
+		"let x = 1;",
+		"function foo() {",
+		"	let y = 3 ;",
+		"	function bar() {",
+		"		let z = 2;",
+		"		print(x);",
+		"		print(z);",
+		"	}",
+		"	print(y);",
+		"	bar();",
+		"}",
+		"foo();"
+	];
+
+	TestRun(test)
+		.test(code, {esnext: true, es5: true, unused: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+exports.testLetStmtInFunctionsOutOfScope = function (test) {
+	var code = [
+		"let x = 1;",
+		"function foo() {",
+		"	let y = 3 ;",
+		"	let bar = function () {",
+		"		print(x);",
+		"		let z = 2;",
+		"	};",
+		"	print(z);",
+		"}",
+		"print(y);",
+		"bar();",
+		"foo();",
+	];
+
+	TestRun(test)
+		.addError(6, "'z' is defined but never used.")
+		.addError(3, "'y' is defined but never used.")
+		.addError(4, "'bar' is defined but never used.")
+		.addError(8, "'z' is not defined.")
+		.addError(10, "'y' is not defined.")
+		.addError(11, "'bar' is not defined.")
+		.test(code, {esnext: true, es5: true, unused: true, undef: true, predef: ["print"]});
 
 	test.done();
 };
