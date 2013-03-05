@@ -1,31 +1,31 @@
 {
-    // JSHint Default Configuration File
+    // JSHint Default Configuration File (as on JSHint website)
     // See http://jshint.com/docs/ for more details
-    
-    "maxerr"        : false,    // {int} Maximum error before stopping
+
+    "maxerr"        : 50,       // {int} Maximum error before stopping
 
     // Enforcing
-    "bitwise"       : false,    // true: Prohibit bitwise operators (&, |, ^, etc.)
+    "bitwise"       : true,     // true: Prohibit bitwise operators (&, |, ^, etc.)
     "camelcase"     : false,    // true: Identifiers must be in camelCase
-    "curly"         : false,    // true: Require {} for every new block or scope
-    "eqeqeq"        : false,    // true: Require triple equals (===) for comparison
-    "forin"         : false,    // true: Require filtering for..in loops with obj.hasOwnProperty()
+    "curly"         : true,     // true: Require {} for every new block or scope
+    "eqeqeq"        : true,     // true: Require triple equals (===) for comparison
+    "forin"         : true,     // true: Require filtering for..in loops with obj.hasOwnProperty()
     "immed"         : false,    // true: Require immediate invocations to be wrapped in parens e.g. `(function () { } ());`
-    "indent"        : false,    // {int} Number of spaces to use for indentation
+    "indent"        : 4,        // {int} Number of spaces to use for indentation
     "latedef"       : false,    // true: Require variables/functions to be defined before being used
     "newcap"        : false,    // true: Require capitalization of all constructor functions e.g. `new F()`
-    "noarg"         : false,    // true: Prohibit use of `arguments.caller` and `arguments.callee`
-    "noempty"       : false,    // true: Prohibit use of empty blocks
+    "noarg"         : true,     // true: Prohibit use of `arguments.caller` and `arguments.callee`
+    "noempty"       : true,     // true: Prohibit use of empty blocks
     "nonew"         : false,    // true: Prohibit use of constructors for side-effects (without assignment)
     "plusplus"      : false,    // true: Prohibit use of `++` & `--`
     "quotmark"      : false,    // Quotation mark consistency:
-                                    // false    : do nothing (default)
-                                    // true     : ensure whatever is used is consistent
-                                    // "single" : require single quotes
-                                    // "double" : require double quotes
-    "undef"         : false,    // true: Require all non-global variables to be declared (prevents global leaks)
-    "unused"        : false,    // true: Require all defined variables be used
-    "strict"        : false,    // true: Requires all functions run in ES5 Strict Mode
+                                //   false    : do nothing (default)
+                                //   true     : ensure whatever is used is consistent
+                                //   "single" : require single quotes
+                                //   "double" : require double quotes
+    "undef"         : true,     // true: Require all non-global variables to be declared (prevents global leaks)
+    "unused"        : true,     // true: Require all defined variables be used
+    "strict"        : true,     // true: Requires all functions run in ES5 Strict Mode
     "trailing"      : false,    // true: Prohibit trailing whitespaces
     "maxparams"     : false,    // {int} Max number of formal params allowed per function
     "maxdepth"      : false,    // {int} Max depth of nested blocks (within functions)
@@ -60,18 +60,18 @@
 
     // Environments
     "browser"       : true,     // Web Browser (window, document, etc)
-    "couch"         : true,     // CouchDB
+    "couch"         : false,    // CouchDB
     "devel"         : true,     // Development/debugging (alert, confirm, etc)
-    "dojo"          : true,     // Dojo Toolkit
-    "jquery"        : true,     // jQuery
-    "mootools"      : true,     // MooTools
-    "node"          : true,     // Node.js
-    "nonstandard"   : true,     // Widely adopted globals (escape, unescape, etc)
-    "prototypejs"   : true,     // Prototype and Scriptaculous
-    "rhino"         : true,     // Rhino
-    "worker"        : true,     // Web Workers
-    "wsh"           : true,     // Windows Scripting Host
-    "yui"           : true,     // Yahoo User Interface
+    "dojo"          : false,    // Dojo Toolkit
+    "jquery"        : false,    // jQuery
+    "mootools"      : false,    // MooTools
+    "node"          : false,    // Node.js
+    "nonstandard"   : false,    // Widely adopted globals (escape, unescape, etc)
+    "prototypejs"   : false,    // Prototype and Scriptaculous
+    "rhino"         : false,    // Rhino
+    "worker"        : false,    // Web Workers
+    "wsh"           : false,    // Windows Scripting Host
+    "yui"           : false,    // Yahoo User Interface
 
     // Legacy
     "nomen"         : false,    // true: Prohibit dangling `_` in variables
