@@ -1554,18 +1554,7 @@ var JSHINT = (function () {
 		if (state.tokens.next.id === "{") {
 			advance("{");
 			if (state.option.esnext) {
-				if (!funct["(blockscope)"]) {
-					funct["(blockscope)"] = [];
-					// adds a handler function that looks up an identifier in all blocks 
-					// starting by the most recent one
-					funct["(blockscope)"].getlabelblock = function (l) {
-						for (var i = this.length - 1 ; i >= 0; --i) {
-							if (_.has(this[i], l)) {
-								return this[i];
-							}
-						}
-					};
-				}
+				// create a new block scope
 				funct["(curblock)"] = {};
 				funct["(blockscope)"].push(funct["(curblock)"]);
 			}
@@ -1611,6 +1600,7 @@ var JSHINT = (function () {
 			if (state.option.esnext) {
 				checkblocklabels();
 				funct["(blockscope)"].splice(funct["(blockscope)"].length - 1, 1);
+				funct["(curblock)"] = _.last(funct["(blockscope)"]);
 			}
 			indent = old_indent;
 		} else if (!ordinary) {
@@ -2352,16 +2342,18 @@ var JSHINT = (function () {
 		scope  = Object.create(scope);
 
 		funct = {
-			"(name)"     : name || "\"" + anonname + "\"",
-			"(line)"     : state.tokens.next.line,
-			"(character)": state.tokens.next.character,
-			"(context)"  : funct,
-			"(breakage)" : 0,
-			"(loopage)"  : 0,
-			"(metrics)"  : createMetrics(state.tokens.next),
-			"(scope)"    : scope,
-			"(statement)": statement,
-			"(tokens)"   : {}
+			"(name)"      : name || "\"" + anonname + "\"",
+			"(line)"      : state.tokens.next.line,
+			"(character)" : state.tokens.next.character,
+			"(context)"   : funct,
+			"(breakage)"  : 0,
+			"(loopage)"   : 0,
+			"(metrics)"   : createMetrics(state.tokens.next),
+			"(scope)"     : scope,
+			"(statement)" : statement,
+			"(tokens)"    : {},
+			"(blockscope)": funct["(blockscope)"],
+			"(curscope)"  : funct["(curscope)"]
 		};
 
 		f = funct;
@@ -3546,6 +3538,7 @@ var JSHINT = (function () {
 		var a, i, k, x;
 		var optionKeys;
 		var newOptionObj = {};
+		var globBlock = {};
 
 		state.reset();
 
@@ -3620,7 +3613,16 @@ var JSHINT = (function () {
 			"(breakage)": 0,
 			"(loopage)":  0,
 			"(tokens)":   {},
-			"(metrics)":   createMetrics(state.tokens.next)
+			"(metrics)":   createMetrics(state.tokens.next),
+			"(curblock)"  : globBlock,
+			"(blockscope)": [globBlock]
+		};
+		funct["(blockscope)"].getlabelblock = function (l) {
+			for (var i = this.length - 1 ; i >= 0; --i) {
+				if (_.has(this[i], l)) {
+					return this[i];
+				}
+			}
 		};
 		functions = [funct];
 		urls = [];
