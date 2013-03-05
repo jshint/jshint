@@ -27,7 +27,7 @@ exports.testCustomGlobals = function (test) {
 
 	// Regression test (GH-665)
 	code = [
-		"//global bar",
+		"/*global bar*/",
 		"foo = {};",
 		"bar = {};"
 	];
