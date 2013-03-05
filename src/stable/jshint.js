@@ -465,20 +465,16 @@ var JSHINT = (function () {
 		return i;
 	}
 
-	function resetblocklabels(blockenv) {
-		for (var t in blockenv) {
-			if (funct[t] === "unused") {
+	function checkblocklabels() {
+		for (var t in funct["(curblock)"]) {
+			if (funct["(curblock)"][t]["(type)"] === "unused") {
 				if (state.option.unused) {
-					var tkn = funct["(tokens)"][t];
+					var tkn = funct["(curblock)"][t]["(token)"];
 					var line = tkn.line;
 					var chr  = tkn.character;
 					warningAt("W098", line, chr, t);
 				}
 			}
-			delete global[t];
-			delete scope[t];
-			delete funct["(tokens)"][t];
-			delete funct[t];
 		}
 	}
 
@@ -499,31 +495,37 @@ var JSHINT = (function () {
 			} else {
 				if (!state.option.shadow && type !== "exception") {
 					warning("W004", state.tokens.next, t);
+					if (state.option.esnext && funct["(blockscope)"].getlabelblock(t)) {
+							warning("W004", state.tokens.next, t);
+					}
 				}
 			}
 		}
 
+		// if the identifier is from a let, adds it only to the current blockscope
 		if (state.option.esnext && islet) {
-			funct["(blockscope)"][funct["(blockscope)"].length-1][t] = type;
-		}
-
-		funct[t] = type;
-
-		if (tkn) {
-			funct["(tokens)"][t] = tkn;
-		}
-
-		if (funct["(global)"]) {
-			global[t] = funct;
-			if (_.has(implied, t)) {
-				if (state.option.latedef) {
-					warning("W003", state.tokens.next, t);
-				}
-
-				delete implied[t];
-			}
+			funct["(curblock)"][t] = { "(type)" : type,
+									   "(token)": state.tokens.curr };
 		} else {
-			scope[t] = funct;
+
+			funct[t] = type;
+
+			if (tkn) {
+				funct["(tokens)"][t] = tkn;
+			}
+
+			if (funct["(global)"]) {
+				global[t] = funct;
+				if (_.has(implied, t)) {
+					if (state.option.latedef) {
+						warning("W003", state.tokens.next, t);
+					}
+
+					delete implied[t];
+				}
+			} else {
+				scope[t] = funct;
+			}
 		}
 	}
 
@@ -1553,8 +1555,18 @@ var JSHINT = (function () {
 			if (state.option.esnext) {
 				if (!funct["(blockscope)"]) {
 					funct["(blockscope)"] = [];
+					// adds a handler function that looks up an identifier in all blocks 
+					// starting by the most recent one
+					funct["(blockscope)"].getlabelblock = function (l) {
+						for (var i=this.length-1; i>=0; --i) {
+							if (_.has(this[i], l)) {
+								return this[i];
+							}
+						}
+					};
 				}
-				funct["(blockscope)"].push({});
+				funct["(curblock)"] = {};
+				funct["(blockscope)"].push(funct["(curblock)"]);
 			}
 			line = state.tokens.curr.line;
 			if (state.tokens.next.id !== "}") {
@@ -1596,7 +1608,7 @@ var JSHINT = (function () {
 			}
 			advance("}", t);
 			if (state.option.esnext) {
-				resetblocklabels(funct["(blockscope)"][funct["(blockscope)"].length-1]);
+				checkblocklabels();
 				funct["(blockscope)"].splice(funct["(blockscope)"].length-1, 1);
 			}
 			indent = old_indent;
@@ -1681,24 +1693,50 @@ var JSHINT = (function () {
 				s = funct;
 				funct = f;
 			}
-
+			var block;
+			if (state.option.esnext && _.has(funct, "(blockscope)")) {
+				block = funct["(blockscope)"].getlabelblock(v);
+			}
+			
 			// The name is in scope and defined in the current function.
-			if (funct === s) {
+			if (funct === s || block) {
 				// Change 'unused' to 'var', and reject labels.
-				switch (funct[v]) {
-				case "unused":
-					funct[v] = "var";
-					break;
-				case "unction":
-					funct[v] = "function";
-					this["function"] = true;
-					break;
-				case "function":
-					this["function"] = true;
-					break;
-				case "label":
-					warning("W037", state.tokens.curr, v);
-					break;
+				// the name is in a block scope
+				if (state.option.esnext) {
+					if (block) {
+						switch (block[v]["(type)"]) {
+						case "unused":
+							block[v]["(type)"] = "var";
+							break;
+						case "unction":
+							block[v]["(type)"] = "function";
+							this["function"] = true;
+							break;
+						case "function":
+							this["function"] = true;
+							break;
+						case "label":
+							warning("W037", state.tokens.curr, v);
+							break;
+						}
+					}
+				}
+				if (!block) {
+					switch (funct[v]) {
+					case "unused":
+						funct[v] = "var";
+						break;
+					case "unction":
+						funct[v] = "function";
+						this["function"] = true;
+						break;
+					case "function":
+						this["function"] = true;
+						break;
+					case "label":
+						warning("W037", state.tokens.curr, v);
+						break;
+					}
 				}
 			} else if (funct["(global)"]) {
 				// The name is not defined in the function.  If we are in the global
