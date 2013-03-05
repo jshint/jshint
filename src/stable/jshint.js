@@ -813,7 +813,7 @@ var JSHINT = (function () {
 					warning("W010", state.tokens.curr);
 				}
 
-				if (state.tokens.curr.led) {
+				if (left && state.tokens.curr.led) {
 					left = state.tokens.curr.led(left);
 				} else {
 					error("E033", state.tokens.curr, state.tokens.curr.id);
