@@ -7,9 +7,6 @@ to a snippet, graffiti outside of Anton's apartment, etc.
 
 However, before sending a patch, please make sure that the following applies:
 
-* There is a corresponding issue. If there is no issue yet, create one before
-  working on your patch. Patches that come out of nowhere usually end up in
-	the end of our queue.
 * Your commit message links to that issue.
 * Your commit message is very descriptive ([example](https://github.com/jshint/jshint/commit/5751c5ed249b7a035758a3ae876cfa1a360fd144)).
 * Your patch doesn't have useless merge commits.
