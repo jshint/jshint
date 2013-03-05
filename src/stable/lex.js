@@ -1061,7 +1061,7 @@ Lexer.prototype = {
 
 					// Octal literals fail in strict mode.
 					// Check if the number is between 00 and 07.
-					var n = parseInt(this.peek(), 10);
+					var n = parseInt(this.peek(1), 10);
 					if (n >= 0 && n <= 7 && state.directive["use strict"]) {
 						this.trigger("warning", {
 							code: "W115",
