@@ -445,6 +445,12 @@ Lexer.prototype = {
 					return;
 				}
 
+				// Don't recognize any special comments other than jshint for single-line
+				// comments. This introduced many problems with legit comments.
+				if (label === "//" && str !== "jshint") {
+					return;
+				}
+
 				if (body.substr(0, str.length) === str) {
 					isSpecial = true;
 					label = label + str;
