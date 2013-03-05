@@ -497,7 +497,7 @@ var JSHINT = (function () {
 				if (!state.option.shadow && type !== "exception") {
 					warning("W004", state.tokens.next, t);
 					if (state.option.esnext && funct["(blockscope)"].getlabelblock(t)) {
-							warning("W004", state.tokens.next, t);
+						warning("W004", state.tokens.next, t);
 					}
 				}
 			}
@@ -1559,7 +1559,7 @@ var JSHINT = (function () {
 					// adds a handler function that looks up an identifier in all blocks 
 					// starting by the most recent one
 					funct["(blockscope)"].getlabelblock = function (l) {
-						for (var i=this.length-1; i>=0; --i) {
+						for (var i = this.length - 1 ; i >= 0; --i) {
 							if (_.has(this[i], l)) {
 								return this[i];
 							}
@@ -1610,7 +1610,7 @@ var JSHINT = (function () {
 			advance("}", t);
 			if (state.option.esnext) {
 				checkblocklabels();
-				funct["(blockscope)"].splice(funct["(blockscope)"].length-1, 1);
+				funct["(blockscope)"].splice(funct["(blockscope)"].length - 1, 1);
 			}
 			indent = old_indent;
 		} else if (!ordinary) {
