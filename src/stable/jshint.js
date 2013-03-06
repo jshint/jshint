@@ -1328,6 +1328,7 @@ var JSHINT = (function () {
 
 
 	function statement(noindent) {
+		var values;
 		var i = indent, r, s = scope, t = state.tokens.next;
 
 		if (t.id === ";") {
@@ -1347,6 +1348,19 @@ var JSHINT = (function () {
 			res = false;
 		}
 
+		if (state.option.esnext && _.has(["[", "{"],t.value)) {
+			if (new lookupBlockType().isDestAssign) {
+				values = destructuringExpression();
+				values.forEach(function (tok) {
+					isundef(funct, "W117", tok.token, tok.id);
+				});
+				advance("=");
+				console.log(values);
+				destructuringExpressionMatch(values, expression(0, true));
+				advance(";");
+				return;
+			} 
+		}
 		if (t.identifier && !res && peek().id === ":") {
 			advance();
 			advance(":");
@@ -2541,6 +2555,7 @@ var JSHINT = (function () {
 		var identifiers = [];
 		if (state.tokens.next.value === "[") {
 			var nextInnerDE = function () {
+				var ident;
 				if (_.contains(["[", "{"], state.tokens.next.value)) {
 					ids = destructuringExpression();
 					for (var id in ids) {
@@ -2550,7 +2565,9 @@ var JSHINT = (function () {
 				} else if (state.tokens.next.value === ",") {
 					identifiers.push({ id: null, token: state.tokens.curr });
 				} else {
-					identifiers.push({ id: identifier(), token: state.tokens.curr });
+					ident = identifier();
+					if (ident)
+						identifiers.push({ id: ident, token: state.tokens.curr });
 				}
 			};
 			advance("[");
@@ -3284,27 +3301,40 @@ var JSHINT = (function () {
 	FutureReservedWord("volatile");
 	FutureReservedWord("yield", { es5: true, strictOnly: true });
 
-	// Check whether this function has been reached for a destructuring assign with undeclared values
-	function destructuringAssignOrJsonValue() {
-		var pn, i = 1, values;
-		// lookup for the assignment
+	var lookupBlockType = function () {
+		var pn, pn1;
+		var i = 1; 
 		do {
 			pn = peek(i);
+			pn1 = peek(i+1);
 			i = i + 1;
-		} while (pn.value !== "=" && pn.id !== "(endline)" && pn.id !== "(end)");
-		// if we're in an assignment, check for undeclared variables
-		if (state.option.esnext && pn.value === "=") {
-			if (state.tokens.next.value !== "[") {
-				error("E031", pn);
-			} else {
-				values = destructuringExpression();
-				values.forEach(function (t) {
-					isundef(funct, "W117", t.token, t.id);
-				});
-				advance("=");
-				destructuringExpressionMatch(values, expression(0));
-				advance(";");
+			if (_.contains(["}", "]"], pn.value) && pn1.value === "=") {
+				this.isDestAssign = true;
+				this.notJson = true;
+				break;
 			}
+			if (pn.value === ";") {
+				this.isBlock = true;
+				this.notJson = true;
+			}
+		} while (!_.contains(["}", "]"], pn.value) && pn.id !== "(end)");
+		console.log(this);
+		return this;
+	};
+
+	// Check whether this function has been reached for a destructuring assign with undeclared values
+	function destructuringAssignOrJsonValue() {
+
+		// lookup for the assignment (esnext only)
+		// if it has semicolons, it is a block, so go parse it as a block
+		// or it's not a block, but there are assignments, check for undeclared variables
+		var block=null;
+
+		if (state.option.esnext) {
+			block = new lookupBlockType();
+		}
+		if (block && block.notJson) {
+			statements();
 		// otherwise parse json value
 		} else {
 			state.option.laxbreak = true;
