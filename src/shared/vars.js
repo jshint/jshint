@@ -1,3 +1,5 @@
+// jshint -W001
+
 "use strict";
 
 // Identifiers provided by the ECMAScript standard.
