@@ -496,11 +496,12 @@ var JSHINT = (function () {
 			} else {
 				if (!state.option.shadow && type !== "exception") {
 					warning("W004", state.tokens.next, t);
-					if (state.option.esnext && funct["(blockscope)"].getlabelblock(t)) {
-						warning("W004", state.tokens.next, t);
-					}
 				}
 			}
+		}
+		// a double definition of a let variable throws a TypeError
+		if (state.option.esnext && funct["(blockscope)"].getlabelblock(t)) {
+			error("E044", state.tokens.next, t);
 		}
 
 		// if the identifier is from a let, adds it only to the current blockscope
