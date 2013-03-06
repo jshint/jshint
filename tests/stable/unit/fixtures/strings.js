@@ -21,4 +21,5 @@ function octal_strictmode() {
   "use strict";
 
   var test = "\033\t";
+  test = "\0"; // Regression for false positives on \0
 }

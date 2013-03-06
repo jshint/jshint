@@ -27,7 +27,7 @@ exports.testCustomGlobals = function (test) {
 
 	// Regression test (GH-665)
 	code = [
-		"//global bar",
+		"/*global bar*/",
 		"foo = {};",
 		"bar = {};"
 	];
@@ -226,6 +226,19 @@ exports.testMissingSpaces = function (test) {
 		.addError(8, "Missing space after '/likes?access_token='.", { character: 43 })
 		.addError(8, "Missing space after '+'.", { character: 44 })
 		.test(src, { white: true });
+
+	test.done();
+};
+
+exports.testGoogleClosureLinterCompatibility = function (test) {
+	var code = "var a = function() { return; };";
+
+	TestRun(test)
+		.addError(1, "Missing space after 'function'.")
+		.test(code, { white: true });
+
+	TestRun(test)
+		.test(code, { white: true, gcl: true });
 
 	test.done();
 };
@@ -444,11 +457,9 @@ exports.testInvalidSource = function (test) {
 		.test({});
 
 	TestRun(test)
-		.addError(0, "Input is empty.")
 		.test("");
 
 	TestRun(test)
-		.addError(0, "Input is empty.")
 		.test([]);
 
 	test.done();

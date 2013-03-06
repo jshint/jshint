@@ -93,7 +93,9 @@ target.test = function () {
 	});
 
 	echo("Running tests...", "\n");
-	nodeunit.run(files);
+	nodeunit.run(files, null, function (err) {
+		exit(err ? 1 : 0);
+	});
 };
 
 target.build = function () {

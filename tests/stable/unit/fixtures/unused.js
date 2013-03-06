@@ -18,7 +18,9 @@ function foo(err, cb) {
 }
 
 function bar(g, h) {
-	//jshint unused:false
+	//jshint unused:false, es5:true
 	var i = 1;
+	var char;
+	char = 1;
 	return h;
 }

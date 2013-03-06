@@ -229,6 +229,29 @@ exports.group = {
 		run.restore();
 		test.done();
 	},
+    
+	testRcLookup: function (test) {
+		var run = sinon.stub(cli, "run");
+		var srcDir = __dirname + "../src/";
+		var confPath = path.join(srcDir, ".jshintrc");
+		var cliDir = path.join(srcDir, "cli/");
+		var conf = shjs.cat(path.join(__dirname + "/../examples/", ".jshintrc"));
+
+		sinon.stub(process, "cwd").returns(cliDir);
+		sinon.stub(shjs, "test").withArgs("-e", confPath).returns(true);
+		sinon.stub(shjs, "cat").withArgs(confPath).returns(conf);
+
+		cli.interpret([
+			"node", "jshint", "file.js"
+		]);
+		test.equal(run.args[0][0].config.strict, true);
+
+		shjs.test.restore();
+		shjs.cat.restore();
+		process.cwd.restore();
+		run.restore();
+		test.done();
+	},
 
 	testIgnoreFile: function (test) {
 		var run = sinon.stub(cli, "run");
