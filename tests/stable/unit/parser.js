@@ -512,6 +512,15 @@ exports.testIdentifiers = function (test) {
 
 	test.done();
 };
+
+exports["regression for GH-878"] = function (test) {
+	var src = fs.readFileSync(__dirname + "/fixtures/gh878.js", "utf8");
+
+	TestRun(test).test(src);
+
+	test.done();
+};
+
 exports.testDestructuringVar = function (test) {
 	var code = [
 		"var [ a, b, c ] = [ 1, 2, 3 ];",
