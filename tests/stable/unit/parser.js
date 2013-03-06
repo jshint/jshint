@@ -512,6 +512,144 @@ exports.testIdentifiers = function (test) {
 
 	test.done();
 };
+<<<<<<< HEAD
+exports.testDestructuringVar = function (test) {
+	var code = [
+		"var [ a, b, c ] = [ 1, 2, 3 ];",
+		"var [ a ] = [ 1 ];",
+		"var [ a ] = [ z ];",
+		"var [ h, w ] = [ 'hello', 'world' ]; ",
+		"var [ o ] = [ { o : 1 } ];",
+		"var [ a, [ [ [ b ], c ], d ] ] = [ 1, [ [ [ 2 ], 3], 4 ] ];",
+		"var { foo : bar } = { foo : 1 };",
+		"var [ a, { foo : bar } ] = [ 2, { foo : 1 } ];",
+		"var [ 1 ] = [ a ];",
+		"var [ a, b; c ] = [ 1, 2, 3 ];",
+		"var [ a, b, c ] = [ 1, 2; 3 ];"
+	];
+
+	TestRun(test)
+		.addError(9,  "Expected an identifier and instead saw '1'.")
+		.addError(9,  "Expected ',' and instead saw '1'.")
+		.addError(9,  "Expected an identifier and instead saw ']'.")
+		.addError(10, "Expected ',' and instead saw ';'.")
+		.addError(11, "Expected ']' to match '[' from line 11 and instead saw ';'.")
+		.addError(11, "Missing semicolon.")
+		.addError(11, "Expected an assignment or function call and instead saw an expression.")
+		.addError(11, "Missing semicolon.")
+		.addError(11, "Expected an identifier and instead saw ']'.")
+		.addError(11, "Expected an assignment or function call and instead saw an expression.")
+		.addError(3,  "'z' is not defined.")
+		.addError(11, "'a' is defined but never used.")
+		.addError(11, "'b' is defined but never used.")
+		.addError(11, "'c' is defined but never used.")
+		.addError(4,  "'h' is defined but never used.")
+		.addError(4,  "'w' is defined but never used.")
+		.addError(5,  "'o' is defined but never used.")
+		.addError(6,  "'d' is defined but never used.")
+		.addError(8,  "'bar' is defined but never used.")
+		.test(code, {esnext: true, unused: true, undef: true});
+
+	test.done();
+};
+exports.testDestructuringConst = function (test) {
+	var code = [
+		"const [ a, b, c ] = [ 1, 2, 3 ];",
+		"const [ d ] = [ 1 ];",
+		"const [ e ] = [ z ];",
+		"const [ hel, wor ] = [ 'hello', 'world' ]; ",
+		"const [ o ] = [ { o : 1 } ];",
+		"const [ f, [ [ [ g ], h ], i ] ] = [ 1, [ [ [ 2 ], 3], 4 ] ];",
+		"const { foo : bar } = { foo : 1 };",
+		"const [ j, { foo : foobar } ] = [ 2, { foo : 1 } ];",
+		"const [ a, b, c ] = [ 1, 2, 3 ];",
+		"const [ 1 ] = [ a ];",
+		"const [ k, l; m ] = [ 1, 2, 3 ];",
+		"const [ n, o, p ] = [ 1, 2; 3 ];"
+	];
+
+	TestRun(test)
+		.addError(9, "const 'a' has already been declared.")
+		.addError(9, "const 'b' has already been declared.")
+		.addError(9, "const 'c' has already been declared.")
+		.addError(10, "Expected an identifier and instead saw '1'.")
+		.addError(10, "Expected ',' and instead saw '1'.")
+		.addError(10, "Expected an identifier and instead saw ']'.")
+		.addError(11, "Expected ',' and instead saw ';'.")
+		.addError(12, "const 'o' has already been declared.")
+		.addError(12, "Expected ']' to match '[' from line 12 and instead saw ';'.")
+		.addError(12, "Missing semicolon.")
+		.addError(12, "Expected an assignment or function call and instead saw an expression.")
+		.addError(12, "Missing semicolon.")
+		.addError(12, "Expected an identifier and instead saw ']'.")
+		.addError(12, "Expected an assignment or function call and instead saw an expression.")
+		.addError(12, "Missing semicolon.")
+		.addError(3, "'z' is not defined.")
+		.test(code, {esnext: true, unused: true, undef: true});
+
+	test.done();
+};
+exports.testDestructuringNone = function (test) {
+	var code = [
+		"var a, b, c, d, h, w, o;",
+		"[ a, b, c ] = [ 1, 2, 3 ];",
+		"[ a ] = [ 1 ];",
+		"[ a ] = [ z ];",
+		"[ h, w ] = [ 'hello', 'world' ]; ",
+		"[ o ] = [ { o : 1 } ];",
+		"[ a, [ [ [ b ], c ], d ] ] = [ 1, [ [ [ 2 ], 3], 4 ] ];",
+		"[ a, { foo : b } ] = [ 2, { foo : 1 } ];",
+		"[ 1 ] = [ a ];",
+		"[ a, b; c ] = [ 1, 2, 3 ];",
+		"[ a, b, c ] = [ 1, 2; 3 ];"
+	];
+
+	TestRun(test)
+		.addError(10, "Expected ']' to match '[' from line 10 and instead saw ';'.")
+		.addError(10, "Expected an assignment or function call and instead saw an expression.")
+		.addError(10, "Missing semicolon.")
+		.addError(10, "Expected an assignment or function call and instead saw an expression.")
+		.addError(10, "Missing semicolon.")
+		.addError(10, "Expected an identifier and instead saw ']'.")
+		.addError(10, "Bad assignment.")
+		.addError(10, "Expected ']' to match '[' from line 10 and instead saw ','.")
+		.addError(10, "Expected an assignment or function call and instead saw an expression.")
+		.addError(10, "Missing semicolon.")
+		.addError(10, "Expected an assignment or function call and instead saw an expression.")
+		.addError(10, "Expected an assignment or function call and instead saw an expression.")
+		.addError(10, "Missing semicolon.")
+		.addError(10, "Expected an identifier and instead saw ']'.")
+		.addError(10, "Expected an assignment or function call and instead saw an expression.")
+		.addError(11, "Expected ']' to match '[' from line 11 and instead saw ';'.")
+		.addError(11, "Missing semicolon.")
+		.addError(11, "Expected an assignment or function call and instead saw an expression.")
+		.addError(11, "Missing semicolon.")
+		.addError(11, "Expected an identifier and instead saw ']'.")
+		.addError(11, "Expected an assignment or function call and instead saw an expression.")
+		.addError(4,  "'z' is not defined.")
+		.test(code, {esnext: true, unused: true, undef: true});
+
+	test.done();
+};
+exports.testDestructuringNone = function (test) {
+	var code = [
+		"var [ a ] = [ 1, 2 ];",
+		"var [ c, d ] = [ 1 ];",
+		"var [ e, , f ] = [ 3, , 4 ];"
+	];
+
+	TestRun(test)
+		.addError(1,  "'a' is defined but never used.")
+		.addError(2,  "'c' is defined but never used.")
+		.addError(2,  "'d' is defined but never used.")
+		.addError(3,  "'e' is defined but never used.")
+		.addError(3,  "'f' is defined but never used.")
+		.test(code, {esnext: true, es5: true, unused: true, undef: true});
+
+	test.done();
+};
+
+=======
 
 exports["regression for GH-878"] = function (test) {
 	var src = fs.readFileSync(__dirname + "/fixtures/gh878.js", "utf8");
@@ -520,3 +658,4 @@ exports["regression for GH-878"] = function (test) {
 
 	test.done();
 };
+>>>>>>> origin/master

@@ -39,9 +39,9 @@ var reg      = require("./reg.js");
 var state    = require("./state.js").state;
 var style    = require("./style.js");
 
-// We build the application inside a function so that we produce only a single
-// global variable. That function will be invoked immediately, and its return
-// value is the JSHINT function itself.
+// We build the application inside a function so that we produce only a singleton
+// variable. That function will be invoked immediately, and its return value is
+// the JSHINT function itself.
 
 var JSHINT = (function () {
 	"use strict";
@@ -1170,20 +1170,32 @@ var JSHINT = (function () {
 		return infix(s, function (left, that) {
 			that.left = left;
 
-			if (predefined[left.value] === false &&
-					scope[left.value]["(global)"] === true) {
-				warning("W020", left);
-			} else if (left["function"]) {
-				warning("W021", left, left.value);
-			}
-
 			if (left) {
+				if (predefined[left.value] === false &&
+						scope[left.value]["(global)"] === true) {
+					warning("W020", left);
+				} else if (left["function"]) {
+					warning("W021", left, left.value);
+				}
+
 				if (state.option.esnext && funct[left.value] === "const") {
 					error("E013", left, left.value);
 				}
 
-				if (left.id === "." || left.id === "[") {
+				if (left.id === ".") {
 					if (!left.left || left.left.value === "arguments") {
+						warning("E031", that);
+					}
+					that.right = expression(19);
+					return that;
+				} else if (left.id === "[") {
+					if (state.option.esnext && state.tokens.curr.left.first) {
+						state.tokens.curr.left.first.forEach(function (t) {
+							if (funct[t.value] === "const") {
+								error("E013", t, t.value);
+							}
+						});
+					} else if (!left.left || left.left.value === "arguments") {
 						warning("E031", that);
 					}
 					that.right = expression(19);
@@ -1339,6 +1351,7 @@ var JSHINT = (function () {
 
 
 	function statement(noindent) {
+		var values;
 		var i = indent, r, s = scope, t = state.tokens.next;
 
 		if (t.id === ";") {
@@ -1358,6 +1371,19 @@ var JSHINT = (function () {
 			res = false;
 		}
 
+		if (state.option.esnext && _.has(["[", "{"],t.value)) {
+			if (new lookupBlockType().isDestAssign) {
+				values = destructuringExpression();
+				values.forEach(function (tok) {
+					isundef(funct, "W117", tok.token, tok.id);
+				});
+				advance("=");
+				console.log(values);
+				destructuringExpressionMatch(values, expression(0, true));
+				advance(";");
+				return;
+			} 
+		}
 		if (t.identifier && !res && peek().id === ":") {
 			advance();
 			advance(":");
@@ -2248,6 +2274,7 @@ var JSHINT = (function () {
 		var next   = state.tokens.next;
 		var params = [];
 		var ident;
+		var tokens = [];
 
 		advance("(");
 		nospace();
@@ -2258,9 +2285,20 @@ var JSHINT = (function () {
 		}
 
 		for (;;) {
-			ident = identifier(true);
-			params.push(ident);
-			addlabel(ident, "unused", state.tokens.curr);
+			if (state.option.esnext && _.contains(["{", "["], state.tokens.next.id)) {
+				tokens = destructuringExpression();
+				for (var t in tokens) {
+					t = tokens[t];
+					if (t.id) {
+						params.push(t.id);
+						addlabel(t.id, "unused", t.token);
+					}
+				}
+			} else {
+				ident = identifier(true);
+				params.push(ident);
+				addlabel(ident, "unused", state.tokens.curr);
+			}
 			if (state.tokens.next.id === ",") {
 				comma();
 			} else {
@@ -2532,32 +2570,111 @@ var JSHINT = (function () {
 		};
 	}(delim("{")));
 
+	function destructuringExpression() {
+		var id, ids;
+		var identifiers = [];
+		if (state.tokens.next.value === "[") {
+			var nextInnerDE = function () {
+				var ident;
+				if (_.contains(["[", "{"], state.tokens.next.value)) {
+					ids = destructuringExpression();
+					for (var id in ids) {
+						id = ids[id];
+						identifiers.push({ id: id.id, token: id.token });
+					}
+				} else if (state.tokens.next.value === ",") {
+					identifiers.push({ id: null, token: state.tokens.curr });
+				} else {
+					ident = identifier();
+					if (ident)
+						identifiers.push({ id: ident, token: state.tokens.curr });
+				}
+			};
+			advance("[");
+			nextInnerDE();
+			while (state.tokens.next.value !== "]") {
+				advance(",");
+				nextInnerDE();
+			}
+			advance("]");
+		} else if (state.tokens.next.value === "{") {
+			advance("{");
+			id = identifier();
+			if (state.tokens.next.value === ":") {
+				advance(":");
+				identifiers.push({ id: identifier(), token: state.tokens.curr });
+			} else {
+				identifiers.push({ id: id, token: state.tokens.curr });
+			}
+			while (state.tokens.next.value !== "}") {
+				advance(",");
+				id = identifier();
+				if (state.tokens.next.value === ":") {
+					advance(":");
+					identifiers.push({ id: identifier(), token: state.tokens.curr });
+				} else {
+					identifiers.push({ id: id, token: state.tokens.curr });
+				}
+			}
+			advance("}");
+		}
+		return identifiers;
+	}
+	function destructuringExpressionMatch(tokens, value) {
+		if (value.first) {
+			_.zip(tokens, value.first).forEach(function (val) {
+				var token = val[0];
+				var value = val[1];
+				if (token && value) {
+					token.first = value;
+				} else if (token && token.first && !value) {
+					warning("W080", token.first, token.first.value);
+				} /* else {
+					XXX value is discarded: wouldn't it need a warning ?
+				} */
+			});
+		}
+	}
+
 	// This Function is called when esnext option is set to true
 	// it adds the `const` statement to JSHINT
 
 	useESNextSyntax = function () {
 		var conststatement = stmt("const", function (prefix) {
-			var id, name, value;
+			var tokens, lone, value;
 
 			this.first = [];
 			for (;;) {
+				var names = [];
 				nonadjacent(state.tokens.curr, state.tokens.next);
-				id = identifier();
-				if (funct[id] === "const") {
-					warning("E011", null, id);
+				if (_.contains(["{", "["], state.tokens.next.value)) {
+					tokens = destructuringExpression();
+					lone = false;
+				} else {
+					tokens = [ { id: identifier(), token: state.tokens.curr } ];
+					lone = true;
 				}
-				if (funct["(global)"] && predefined[id] === false) {
-					warning("W079", state.tokens.curr, id);
+				for (var t in tokens) {
+					t = tokens[t];
+					if (funct[t.id] === "const") {
+						warning("E011", null, t.id);
+					}
+					if (funct["(global)"] && predefined[t.id] === false) {
+						warning("W079", t.token, t.id);
+					}
+					if (t.id) {
+						addlabel(t.id, "const");
+						names.push(t.token);
+					}
 				}
-				addlabel(id, "const");
 				if (prefix) {
 					break;
 				}
-				name = state.tokens.curr;
-				this.first.push(state.tokens.curr);
+
+				this.first = this.first.concat(names);
 
 				if (state.tokens.next.id !== "=") {
-					warning("E012", state.tokens.curr, id);
+					warning("E012", state.tokens.curr, state.tokens.curr.value);
 				}
 
 				if (state.tokens.next.id === "=") {
@@ -2565,13 +2682,17 @@ var JSHINT = (function () {
 					advance("=");
 					nonadjacent(state.tokens.curr, state.tokens.next);
 					if (state.tokens.next.id === "undefined") {
-						warning("W080", state.tokens.curr, id);
+						warning("W080", state.tokens.curr, state.tokens.curr.value);
 					}
 					if (peek(0).id === "=" && state.tokens.next.identifier) {
 						error("E037", state.tokens.next, state.tokens.next.value);
 					}
 					value = expression(0);
-					name.first = value;
+					if (lone) {
+						tokens[0].first = value;
+					} else {
+						destructuringExpressionMatch(names, value);
+					}
 				}
 
 				if (state.tokens.next.id !== ",") {
@@ -2582,6 +2703,73 @@ var JSHINT = (function () {
 			return this;
 		});
 		conststatement.exps = true;
+		var varstatement = stmt("var", function (prefix) {
+			// JavaScript does not have block scope. It only has function scope. So,
+			// declaring a variable in a block can have unexpected consequences.
+			var tokens, lone, value;
+
+			if (funct["(onevar)"] && state.option.onevar) {
+				warning("W081");
+			} else if (!funct["(global)"]) {
+				funct["(onevar)"] = true;
+			}
+
+			this.first = [];
+			for (;;) {
+				var names = [];
+				nonadjacent(state.tokens.curr, state.tokens.next);
+				if (_.contains(["{", "["], state.tokens.next.value)) {
+					tokens = destructuringExpression();
+					lone = false;
+				} else {
+					tokens = [ { id: identifier(), token: state.tokens.curr } ];
+					lone = true;
+				}
+				for (var t in tokens) {
+					t = tokens[t];
+					if (state.option.esnext && funct[t.id] === "const") {
+						warning("E011", null, t.id);
+					}
+					if (funct["(global)"] && predefined[t.id] === false) {
+						warning("W079", t.token, t.id);
+					}
+					if (t.id) {
+						addlabel(t.id, "unused", t.token);
+						names.push(t.token);
+					}
+				}
+				if (prefix) {
+					break;
+				}
+
+				this.first = this.first.concat(names);
+
+				if (state.tokens.next.id === "=") {
+					nonadjacent(state.tokens.curr, state.tokens.next);
+					advance("=");
+					nonadjacent(state.tokens.curr, state.tokens.next);
+					if (state.tokens.next.id === "undefined") {
+						warning("W080", state.tokens.curr, state.tokens.curr.value);
+					}
+					if (peek(0).id === "=" && state.tokens.next.identifier) {
+						error("E038", state.tokens.next, state.tokens.next.value);
+					}
+					value = expression(0);
+					if (lone) {
+						tokens[0].first = value;
+					} else {
+						destructuringExpressionMatch(names, value);
+					}
+				}
+
+				if (state.tokens.next.id !== ",") {
+					break;
+				}
+				comma();
+			}
+			return this;
+		});
+		varstatement.exps = true;
 	};
 
 	var varstatement = stmt("var", function (prefix) {
@@ -3133,6 +3321,48 @@ var JSHINT = (function () {
 	FutureReservedWord("volatile");
 	FutureReservedWord("yield", { es5: true, strictOnly: true });
 
+	var lookupBlockType = function () {
+		var pn, pn1;
+		var i = 1; 
+		do {
+			pn = peek(i);
+			pn1 = peek(i+1);
+			i = i + 1;
+			if (_.contains(["}", "]"], pn.value) && pn1.value === "=") {
+				this.isDestAssign = true;
+				this.notJson = true;
+				break;
+			}
+			if (pn.value === ";") {
+				this.isBlock = true;
+				this.notJson = true;
+			}
+		} while (!_.contains(["}", "]"], pn.value) && pn.id !== "(end)");
+		console.log(this);
+		return this;
+	};
+
+	// Check whether this function has been reached for a destructuring assign with undeclared values
+	function destructuringAssignOrJsonValue() {
+
+		// lookup for the assignment (esnext only)
+		// if it has semicolons, it is a block, so go parse it as a block
+		// or it's not a block, but there are assignments, check for undeclared variables
+		var block=null;
+
+		if (state.option.esnext) {
+			block = new lookupBlockType();
+		}
+		if (block && block.notJson) {
+			statements();
+		// otherwise parse json value
+		} else {
+			state.option.laxbreak = true;
+			state.jsonMode = true;
+			jsonValue();
+		}
+	}
+
 	// Parse JSON
 
 	function jsonValue() {
@@ -3404,9 +3634,7 @@ var JSHINT = (function () {
 			switch (state.tokens.next.id) {
 			case "{":
 			case "[":
-				state.option.laxbreak = true;
-				state.jsonMode = true;
-				jsonValue();
+				destructuringAssignOrJsonValue();
 				break;
 			default:
 				directives();
