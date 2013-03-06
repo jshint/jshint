@@ -499,7 +499,7 @@ exports.NumberNaN = function (test) {
 exports.htmlEscapement = function (test) {
 	TestRun(test).test("var a = '<\\!--';");
 	TestRun(test)
-		.addError(1, "Bad escaping.")
+		.addError(1, "Bad or unnecessary escaping.")
 		.test("var a = '\\!';");
 
 	test.done();
