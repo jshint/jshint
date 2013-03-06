@@ -3322,6 +3322,13 @@ var JSHINT = (function () {
 	blockstmt("for", function () {
 		var s, t = state.tokens.next;
 		var letscope = false;
+		var foreachtok = null;
+
+		if (t.value === "each") {
+			foreachtok = t;
+			advance("each");
+		}
+
 		funct["(breakage)"] += 1;
 		funct["(loopage)"] += 1;
 		increaseComplexityCount();
@@ -3371,6 +3378,9 @@ var JSHINT = (function () {
 			funct["(breakage)"] -= 1;
 			funct["(loopage)"] -= 1;
 		} else {
+			if (foreachtok) {
+				error("E045", foreachtok);
+			}
 			if (state.tokens.next.id !== ";") {
 				if (state.tokens.next.id === "var") {
 					advance("var");

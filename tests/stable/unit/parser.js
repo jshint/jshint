@@ -841,3 +841,18 @@ exports.testDestructuringFunction = function (test) {
 	test.done();
 };
 
+exports.testForEachError = function (test) {
+	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
+	var code = [
+		"for each (let i = 0; i<15; ++i) {",
+		"	print(i);",
+		"}"
+	];
+
+	TestRun(test)
+		.addError(1, "Invalid for each loop.")
+		.test(code, {esnext: true, es5: true, unused: true, undef: true, predef: ["print", "Iterator"]});
+
+	test.done();
+};
+
