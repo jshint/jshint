@@ -3247,7 +3247,7 @@ var JSHINT = (function () {
 				nonadjacent(state.tokens.curr, state.tokens.next);
 				this.first = expression(0);
 
-				if (this.first.value === "=" && !state.option.boss) {
+				if (this.first.type === "(punctuator)" && this.first.value === "=" && !state.option.boss) {
 					warningAt("W093", this.first.line, this.first.character);
 				}
 			}
@@ -3528,16 +3528,6 @@ var JSHINT = (function () {
 
 		if (!isString(s) && !Array.isArray(s)) {
 			errorAt("E004", 0);
-			return false;
-		}
-
-		if (isString(s) && /^\s*$/g.test(s)) {
-			errorAt("E005", 0);
-			return false;
-		}
-
-		if (s.length === 0) {
-			errorAt("E005", 0);
 			return false;
 		}
 
