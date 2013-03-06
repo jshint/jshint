@@ -457,11 +457,9 @@ exports.testInvalidSource = function (test) {
 		.test({});
 
 	TestRun(test)
-		.addError(0, "Input is empty.")
 		.test("");
 
 	TestRun(test)
-		.addError(0, "Input is empty.")
 		.test([]);
 
 	test.done();
