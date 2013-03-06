@@ -957,7 +957,7 @@ var JSHINT = (function () {
 			nonadjacent(state.tokens.curr, state.tokens.next);
 		}
 
-		if (state.tokens.next.identifier) {
+		if (state.tokens.next.identifier && !state.option.es5) {
 			// Keywords that cannot follow a comma operator.
 			switch (state.tokens.next.value) {
 			case "break":
