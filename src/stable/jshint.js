@@ -1436,6 +1436,7 @@ var JSHINT = (function () {
 
 
 	function statement(noindent) {
+		var values;
 		var i = indent, r, s = scope, t = state.tokens.next;
 
 		if (t.id === ";") {
@@ -1455,6 +1456,19 @@ var JSHINT = (function () {
 			res = false;
 		}
 
+		if (state.option.esnext && _.has(["[", "{"],t.value)) {
+			if (new lookupBlockType().isDestAssign) {
+				values = destructuringExpression();
+				values.forEach(function (tok) {
+					isundef(funct, "W117", tok.token, tok.id);
+				});
+				advance("=");
+				console.log(values);
+				destructuringExpressionMatch(values, expression(0, true));
+				advance(";");
+				return;
+			} 
+		}
 		if (t.identifier && !res && peek().id === ":") {
 			advance();
 			advance(":");
@@ -2687,6 +2701,7 @@ var JSHINT = (function () {
 		var identifiers = [];
 		if (state.tokens.next.value === "[") {
 			var nextInnerDE = function () {
+				var ident;
 				if (_.contains(["[", "{"], state.tokens.next.value)) {
 					ids = destructuringExpression();
 					for (var id in ids) {
@@ -2696,7 +2711,9 @@ var JSHINT = (function () {
 				} else if (state.tokens.next.value === ",") {
 					identifiers.push({ id: null, token: state.tokens.curr });
 				} else {
-					identifiers.push({ id: identifier(), token: state.tokens.curr });
+					ident = identifier();
+					if (ident)
+						identifiers.push({ id: ident, token: state.tokens.curr });
 				}
 			};
 			advance("[");
@@ -3443,7 +3460,7 @@ var JSHINT = (function () {
 				nonadjacent(state.tokens.curr, state.tokens.next);
 				this.first = expression(0);
 
-				if (this.first.value === "=" && !state.option.boss) {
+				if (this.first.type === "(punctuator)" && this.first.value === "=" && !state.option.boss) {
 					warningAt("W093", this.first.line, this.first.character);
 				}
 			}
@@ -3497,37 +3514,40 @@ var JSHINT = (function () {
 	FutureReservedWord("volatile");
 	FutureReservedWord("yield", { es5: true, strictOnly: true });
 
+	var lookupBlockType = function () {
+		var pn, pn1;
+		var i = 1; 
+		do {
+			pn = peek(i);
+			pn1 = peek(i+1);
+			i = i + 1;
+			if (_.contains(["}", "]"], pn.value) && pn1.value === "=") {
+				this.isDestAssign = true;
+				this.notJson = true;
+				break;
+			}
+			if (pn.value === ";") {
+				this.isBlock = true;
+				this.notJson = true;
+			}
+		} while (!_.contains(["}", "]"], pn.value) && pn.id !== "(end)");
+		console.log(this);
+		return this;
+	};
+
 	// Check whether this function has been reached for a destructuring assign with undeclared values
 	function destructuringAssignOrJsonValue() {
-		var pn, values, seeneq, seensc;
-		var i = 1; 
-		// lookup for the assignment
-		if (state.option.esnext) {
-			do {
-				pn = peek(i);
-				i = i + 1;
-				if (pn.value === "=")
-					seeneq = true;
-				if (pn.value === ";")
-					seensc = true;
-			} while (pn.value !== "}" && pn.id !== "(end)");
-		}
+
+		// lookup for the assignment (esnext only)
 		// if it has semicolons, it is a block, so go parse it as a block
-		if (seensc) {
+		// or it's not a block, but there are assignments, check for undeclared variables
+		var block=null;
+
+		if (state.option.esnext) {
+			block = new lookupBlockType();
+		}
+		if (block && block.notJson) {
 			statements();
-		// if it's not a block, but there are assignments, check for undeclared variables
-		} else if (seeneq) {
-			if (state.tokens.next.value !== "[") {
-				error("E031", pn);
-			} else {
-				values = destructuringExpression();
-				values.forEach(function (t) {
-					isundef(funct, "W117", t.token, t.id);
-				});
-				advance("=");
-				destructuringExpressionMatch(values, expression(0));
-				advance(";");
-			}
 		// otherwise parse json value
 		} else {
 			state.option.laxbreak = true;
@@ -3731,16 +3751,6 @@ var JSHINT = (function () {
 
 		if (!isString(s) && !Array.isArray(s)) {
 			errorAt("E004", 0);
-			return false;
-		}
-
-		if (isString(s) && /^\s*$/g.test(s)) {
-			errorAt("E005", 0);
-			return false;
-		}
-
-		if (s.length === 0) {
-			errorAt("E005", 0);
 			return false;
 		}
 

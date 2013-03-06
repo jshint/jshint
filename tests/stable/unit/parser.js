@@ -512,6 +512,15 @@ exports.testIdentifiers = function (test) {
 
 	test.done();
 };
+
+exports["regression for GH-878"] = function (test) {
+	var src = fs.readFileSync(__dirname + "/fixtures/gh878.js", "utf8");
+
+	TestRun(test).test(src);
+
+	test.done();
+};
+
 exports.testDestructuringVar = function (test) {
 	var code = [
 		"var [ a, b, c ] = [ 1, 2, 3 ];",
@@ -528,10 +537,23 @@ exports.testDestructuringVar = function (test) {
 	];
 
 	TestRun(test)
+		.addError(2,  "'a' is already defined.")
+		.addError(3,  "'a' is already defined.")
+		.addError(6,  "'a' is already defined.")
+		.addError(6,  "'b' is already defined.")
+		.addError(6,  "'c' is already defined.")
+		.addError(8,  "'a' is already defined.")
+		.addError(8,  "'bar' is already defined.")
 		.addError(9,  "Expected an identifier and instead saw '1'.")
 		.addError(9,  "Expected ',' and instead saw '1'.")
 		.addError(9,  "Expected an identifier and instead saw ']'.")
 		.addError(10, "Expected ',' and instead saw ';'.")
+		.addError(10, "'a' is already defined.")
+		.addError(10, "'b' is already defined.")
+		.addError(10, "'c' is already defined.")
+		.addError(11, "'a' is already defined.")
+		.addError(11, "'b' is already defined.")
+		.addError(11, "'c' is already defined.")
 		.addError(11, "Expected ']' to match '[' from line 11 and instead saw ';'.")
 		.addError(11, "Missing semicolon.")
 		.addError(11, "Expected an assignment or function call and instead saw an expression.")
