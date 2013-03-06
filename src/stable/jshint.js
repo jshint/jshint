@@ -3206,6 +3206,7 @@ var JSHINT = (function () {
 			switch (state.tokens.next.id) {
 			case "case":
 				switch (funct["(verb)"]) {
+				case "yield":
 				case "break":
 				case "case":
 				case "continue":
@@ -3231,6 +3232,7 @@ var JSHINT = (function () {
 				break;
 			case "default":
 				switch (funct["(verb)"]) {
+				case "yield":
 				case "break":
 				case "continue":
 				case "return":
@@ -3508,6 +3510,28 @@ var JSHINT = (function () {
 			nolinebreak(this); // always warn (Line breaking error)
 		}
 		reachable("return");
+		return this;
+	}).exps = true;
+
+	stmt("yield", function () {
+		if (!state.option.esnext) {
+			warning("W104", state.tokens.curr, "yield");
+		}
+		if (this.line === state.tokens.next.line) {
+			if (state.tokens.next.id === "(regexp)")
+				warning("W092");
+
+			if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
+				nonadjacent(state.tokens.curr, state.tokens.next);
+				this.first = expression(0);
+
+				if (this.first.type === "(punctuator)" && this.first.value === "=" && !state.option.boss) {
+					warningAt("W093", this.first.line, this.first.character);
+				}
+			}
+		} else if (!state.option.asi) {
+			nolinebreak(this); // always warn (Line breaking error)
+		}
 		return this;
 	}).exps = true;
 
