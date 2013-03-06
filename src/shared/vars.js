@@ -1,3 +1,5 @@
+// jshint -W001
+
 "use strict";
 
 // Identifiers provided by the ECMAScript standard.
@@ -237,6 +239,12 @@ exports.node = {
 	clearTimeout : false,
 	setInterval  : false,
 	clearInterval: false
+};
+
+exports.phantom = {
+	phantom      : true,
+	require      : true,
+	WebPage      : true
 };
 
 exports.rhino = {

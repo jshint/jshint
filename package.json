@@ -1,6 +1,6 @@
 {
 	"name":     "jshint",
-	"version":  "1.0.0",
+	"version":  "1.1.0",
 	"homepage": "http://jshint.com/",
 	"description": "Static analysis tool for JavaScript",
 
@@ -23,20 +23,20 @@
 
 	"dependencies": {
 		"esprima":    "https://github.com/ariya/esprima/tarball/master",
-		"shelljs":    "*",
-		"underscore": "*",
-		"peakle":     "*",
-		"cli":        "0.4.3",
+		"shelljs":    "0.1.x",
+		"underscore": "1.4.x",
+		"peakle":     "0.0.x",
+		"cli":        "0.4.x",
 		"minimatch":  "0.x.x"
 	},
 
 	"devDependencies": {
-		"jshint":     "*",
-		"shelljs":    "*",
-		"browserify": "*",
-		"coveraje":   "*",
-		"nodeunit":   "*",
-		"sinon":      "*"
+		"jshint":     "1.1.0",
+		"shelljs":    "0.1.x",
+		"browserify": "1.16.1",
+		"coveraje":   "0.2.x",
+		"nodeunit":   "0.7.x",
+		"sinon":      "1.6.x"
 	},
 
 	"preferGlobal": true

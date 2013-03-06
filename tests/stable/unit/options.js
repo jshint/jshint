@@ -416,22 +416,79 @@ exports.unused = function (test) {
 
 	TestRun(test).test(src);
 
-	TestRun(test)
-		.addError(1, "'a' is defined but never used.")
-		.addError(6, "'f' is defined but never used.")
-		.addError(7, "'c' is defined but never used.")
-		.addError(15, "'foo' is defined but never used.")
-		.addError(20, "'bar' is defined but never used.")
-		.test(src, { unused: true });
+	var var_errors = [
+		[1, "'a' is defined but never used."],
+		[7, "'c' is defined but never used."],
+		[15, "'foo' is defined but never used."],
+		[20, "'bar' is defined but never used."]
+	];
 
+	var last_param_errors = [[6, "'f' is defined but never used."]];
+	var all_param_errors = [[15, "'err' is defined but never used."]];
+	var true_run = TestRun(test);
+
+	var_errors.concat(last_param_errors).forEach(function (e) {
+		true_run.addError.apply(true_run, e);
+	});
+
+	true_run.test(src, { unused: true });
 	test.ok(!JSHINT(src, { unused: true }));
 
+	// Test checking all function params via unused="strict"
+	var all_run = TestRun(test);
+	var_errors.concat(last_param_errors, all_param_errors).forEach(function (e) {
+		all_run.addError.apply(true_run, e);
+	});
+
+	all_run.test(src, {unused: "strict"});
+
+	// Test checking everything except function params
+	var vars_run = TestRun(test);
+	var_errors.forEach(function (e) { vars_run.addError.apply(vars_run, e); });
+	vars_run.test(src, {unused: "vars"});
+
 	var unused = JSHINT.data().unused;
-	test.equal(5, unused.length);
+	test.equal(6, unused.length);
 	test.ok(unused.some(function (err) { return err.line === 1 && err.name === "a"; }));
 	test.ok(unused.some(function (err) { return err.line === 6 && err.name === "f"; }));
 	test.ok(unused.some(function (err) { return err.line === 7 && err.name === "c"; }));
 	test.ok(unused.some(function (err) { return err.line === 15 && err.name === "foo"; }));
+
+	test.done();
+};
+
+// Regressions for "unused" getting overwritten via comment (GH-778)
+exports['unused overrides'] = function (test) {
+	var code;
+	
+	code = ['function foo(a) {', '/*jshint unused:false */', '}', 'foo();'];
+	TestRun(test).test(code, {unused: true});
+	
+	code = ['function foo(a, b) {', '/*jshint unused:vars */', 'var i = 3;', '}', 'foo();'];
+	TestRun(test)
+		.addError(3, "'i' is defined but never used.")
+		.test(code, {unused: true});
+
+	code = ['function foo(a, b) {', '/*jshint unused:true */', 'var i = 3;', '}', 'foo();'];
+	TestRun(test)
+		.addError(1, "'b' is defined but never used.")
+		.addError(3, "'i' is defined but never used.")
+		.test(code, {unused: "strict"});
+
+	code = ['function foo(a, b) {', '/*jshint unused:strict */', 'var i = 3;', '}', 'foo();'];
+	TestRun(test)
+		.addError(1, "'a' is defined but never used.")
+		.addError(1, "'b' is defined but never used.")
+		.addError(3, "'i' is defined but never used.")
+		.test(code, {unused: true});
+
+	code = ['/*jshint unused:vars */', 'function foo(a, b) {}', 'foo();'];
+	TestRun(test).test(code, {unused: "strict"});
+	
+	code = ['/*jshint unused:vars */', 'function foo(a, b) {', 'var i = 3;', '}', 'foo();'];
+	TestRun(test)
+		.addError(3, "'i' is defined but never used.")
+		.test(code, {unused: "strict"});
 
 	test.done();
 };
