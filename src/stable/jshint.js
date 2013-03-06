@@ -498,9 +498,14 @@ var JSHINT = (function () {
 				}
 			}
 		}
-		// a double definition of a let variable throws a TypeError
-		if (state.option.esnext && funct["(blockscope)"].getlabelblock(t)) {
-			error("E044", state.tokens.next, t);
+		if (state.option.esnext) {
+			// a double definition of a let variable in same block throws a TypeError
+			if (_.has(funct["(curblock)"], t)) {
+				error("E044", state.tokens.next, t);
+			} else if (!state.option.shadow) {
+				if (funct["(blockscope)"].getlabelblock(t) || _.has(funct, t))
+					warning("W004", state.tokens.next, t);
+			}
 		}
 
 		// if the identifier is from a let, adds it only to the current blockscope
