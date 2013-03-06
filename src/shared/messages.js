@@ -105,7 +105,7 @@ var warnings = {
 	W041: "Use '{a}' to compare with '{b}'.",
 	W042: "Avoid EOL escaping.",
 	W043: "Bad escaping of EOL. Use option multistr if needed.",
-	W044: "Bad escaping.",
+	W044: "Bad or unnecessary escaping.",
 	W045: "Bad number '{a}'.",
 	W046: "Don't use extra leading zeros '{a}'.",
 	W047: "A trailing decimal point can be confused with a dot: '{a}'.",
