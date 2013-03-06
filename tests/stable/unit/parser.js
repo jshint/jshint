@@ -759,3 +759,63 @@ exports.testLetStmtInFunctionsOutOfScope = function (test) {
 	test.done();
 };
 
+exports.testLetStmtInForLoop = function (test) {
+	var code = [
+		"var obj={foo: 'bar', bar: 'foo'};",
+		"for ( let [n, v] in Iterator(obj) ) {",
+		"	print('Name: ' + n + ', Value: ' + v);",
+		"}",
+		"for (let i in [1, 2, 3, 4]) {",
+		"	print(i);",
+		"}",
+		"for (let i in [1, 2, 3, 4]) {",
+		"	print(i);",
+		"}",
+		"for (let i = 0; i<15; ++i) {",
+		"	print(i);",
+		"}",
+		"for (let i=i ; i < 10 ; i++ ) {",
+		"print(i);",
+		"}"
+	];
+
+	TestRun(test)
+		.test(code, {esnext: true, es5: true, unused: true, undef: true, predef: ["print", "Iterator"]});
+
+	test.done();
+};
+
+exports.testLetStmtInForLoopDEStmt = function (test) {
+	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
+	var code = [
+		"var people = [",
+		"{",
+		"	name: 'Mike Smith',",
+		"	family: {",
+		"	mother: 'Jane Smith',",
+		"	father: 'Harry Smith',",
+		"	sister: 'Samantha Smith'",
+		"	},",
+		"	age: 35",
+		"},",
+		"{",
+		"	name: 'Tom Jones',",
+		"	family: {",
+		"	mother: 'Norah Jones',",
+		"	father: 'Richard Jones',",
+		"	brother: 'Howard Jones'",
+		"	},",
+		"	age: 25",
+		"}",
+		"];",
+		"for each (let {name: n, family: { father: f } } in people) {",
+		"print('Name: ' + n + ', Father: ' + f);",
+		"}"
+	];
+
+	TestRun(test)
+		.test(code, {esnext: true, es5: true, unused: true, undef: true, predef: ["print", "Iterator"]});
+
+	test.done();
+};
+

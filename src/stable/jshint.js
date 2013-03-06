@@ -3321,16 +3321,32 @@ var JSHINT = (function () {
 
 	blockstmt("for", function () {
 		var s, t = state.tokens.next;
+		var letscope = false;
 		funct["(breakage)"] += 1;
 		funct["(loopage)"] += 1;
 		increaseComplexityCount();
 		advance("(");
 		nonadjacent(this, t);
 		nospace();
-		if (peek(state.tokens.next.id === "var" ? 1 : 0).id === "in") {
+
+		// if we're in a for (… in …) statement
+		var pn;
+		var i = 0;
+		do {
+			pn = peek(i);
+			++i;
+		} while (pn.id !== "in" && pn.value !== ";" && pn.type !== "(end)");
+		if (pn.id === "in") {
 			if (state.tokens.next.id === "var") {
 				advance("var");
-				varstatement.fud.call(varstatement, true);
+				state.syntax["var"].fud.call(state.syntax["var"].fud, true);
+			} else if (state.option.esnext && state.tokens.next.id === "let") {
+				advance("let");
+				// create a new block scope
+				letscope = true;
+				funct["(curblock)"] = {};
+				funct["(blockscope)"].push(funct["(curblock)"]);
+				state.syntax["let"].fud.call(state.syntax["let"].fud, true);
 			} else {
 				switch (funct[state.tokens.next.value]) {
 				case "unused":
@@ -3339,7 +3355,8 @@ var JSHINT = (function () {
 				case "var":
 					break;
 				default:
-					warning("W088", state.tokens.next, state.tokens.next.value);
+					if (!funct["(blockscope)"].getlabelblock(state.tokens.next.value))
+						warning("W088", state.tokens.next, state.tokens.next.value);
 				}
 				advance();
 			}
@@ -3353,12 +3370,18 @@ var JSHINT = (function () {
 			}
 			funct["(breakage)"] -= 1;
 			funct["(loopage)"] -= 1;
-			return this;
 		} else {
 			if (state.tokens.next.id !== ";") {
 				if (state.tokens.next.id === "var") {
 					advance("var");
-					varstatement.fud.call(varstatement);
+					state.syntax["var"].fud.call(state.syntax["var"].fud);
+				} else if (state.option.esnext && state.tokens.next.id === "let") {
+					advance("let");
+					// create a new block scope
+					letscope = true;
+					funct["(curblock)"] = {};
+					funct["(blockscope)"].push(funct["(curblock)"]);
+					state.syntax["let"].fud.call(state.syntax["let"].fud);
 				} else {
 					for (;;) {
 						expression(0, "for");
@@ -3394,8 +3417,15 @@ var JSHINT = (function () {
 			block(true, true);
 			funct["(breakage)"] -= 1;
 			funct["(loopage)"] -= 1;
-			return this;
+
 		}
+		// unstack loop blockscope
+		if (letscope) {
+			checkblocklabels();
+			funct["(blockscope)"].splice(funct["(blockscope)"].length - 1, 1);
+			funct["(curblock)"] = _.last(funct["(blockscope)"]);
+		}
+		return this;
 	}).labelled = true;
 
 
