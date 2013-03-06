@@ -501,9 +501,9 @@ var JSHINT = (function () {
 		}
 		if (state.option.esnext) {
 			// a double definition of a let variable in same block throws a TypeError
-			if (_.has(funct["(curblock)"], t)) {
+			if (funct["(curblock)"] && _.has(funct["(curblock)"], t)) {
 				error("E044", state.tokens.next, t);
-			} else if (!state.option.shadow) {
+			} else if (!state.option.shadow && funct[t] !== "const") {
 				if (funct["(blockscope)"].getlabelblock(t) || _.has(funct, t))
 					warning("W004", state.tokens.next, t);
 			}
@@ -859,6 +859,9 @@ var JSHINT = (function () {
 			advance("(");
 			letexpression();
 			advance(")");
+			if (state.tokens.next.value === "{") {
+				block(true);
+			}
 		}
 
 		if (state.tokens.next.id === "(end)")
