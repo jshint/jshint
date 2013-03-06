@@ -58,7 +58,8 @@ var errors = {
 	E040: "Each value should have its own case label.",
 	E041: "Unrecoverable syntax error.",
 	E042: "Stopping.",
-	E043: "Too many errors."
+	E043: "Too many errors.",
+	E044: "'{a}' is already defined and can't be redefined."
 };
 
 var warnings = {
