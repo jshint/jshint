@@ -827,3 +827,25 @@ exports.testLetStmtInForLoopDEStmt = function (test) {
 	test.done();
 };
 
+exports.testDestructuringFunction = function (test) {
+	// Example from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
+	var code = [
+		"function userId({id}) {",
+		"	return id;",
+		"}",
+
+		"function whois({displayName: displayName, fullName: {firstName: name}}) {",
+		"	print(displayName + ' is ' + name);",
+		"}",
+
+		"var user = {id: 42, displayName: 'jdoe', fullName: {firstName: 'John', lastName: 'Doe'}};",
+
+		"print('userId: ' + userId(user));",
+		"whois(user);"
+	];
+	TestRun(test)
+		.test(code, {esnext: true, es5: true, unused: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+
