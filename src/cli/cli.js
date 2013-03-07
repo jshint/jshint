@@ -97,11 +97,13 @@ function loadConfig(fp) {
  * or in the home directory. Configuration files are named
  * '.jshintrc'.
  *
+ * @param {sting} file path to the file to be linted
  * @returns {string} a path to the config file
  */
-function findConfig() {
+function findConfig(file) {
 	var name = ".jshintrc";
-	var proj = findFile(name);
+	var dir = path.dirname(path.resolve(file));
+	var proj = findFile(name, dir);
 	var home = path.normalize(path.join(process.env.HOME, name));
 
 	if (proj) {
@@ -130,6 +132,10 @@ function loadReporter(fp) {
 	}
 }
 
+// Storage for memoized results from find file
+// Should prevent lots of directory traversal &
+// lookups when liniting an entire project
+var findFileResults = {};
 /**
  * Searches for a file with a specified name starting with
  * 'dir' and going all the way up either until it finds the file
@@ -145,13 +151,19 @@ function findFile(name, dir) {
 	dir = dir || process.cwd();
 
 	var filename = path.normalize(path.join(dir, name));
+	if (findFileResults[filename] !== undefined) {
+		return findFileResults[filename];
+	}
+
 	var parent = path.resolve(dir, "../");
 
 	if (shjs.test("-e", filename)) {
+		findFileResults[filename] = filename;
 		return filename;
 	}
 
 	if (dir === parent) {
+		findFileResults[filename] = null;
 		return null;
 	}
 
@@ -312,7 +324,8 @@ var exports = {
 		});
 
 		files.forEach(function (file) {
-			lint(file, results, opts.config, data);
+			var config = opts.config || loadConfig(findConfig(file));
+			lint(file, results, config, data);
 		});
 
 		(opts.reporter || defReporter)(results, data, { verbose: opts.verbose });
@@ -334,7 +347,11 @@ var exports = {
 		cli.setApp(path.resolve(__dirname + "/../../package.json"));
 
 		var options = cli.parse(OPTIONS);
-		var config = loadConfig(options.config || findConfig());
+		// Use config file if specified
+		var config;
+		if (options.config) {
+			config = loadConfig(options.config);
+		}
 
 		switch (true) {
 		// JSLint reporter
