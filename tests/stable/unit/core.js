@@ -27,7 +27,7 @@ exports.testCustomGlobals = function (test) {
 
 	// Regression test (GH-665)
 	code = [
-		"//global bar",
+		"/*global bar*/",
 		"foo = {};",
 		"bar = {};"
 	];
@@ -499,7 +499,7 @@ exports.NumberNaN = function (test) {
 exports.htmlEscapement = function (test) {
 	TestRun(test).test("var a = '<\\!--';");
 	TestRun(test)
-		.addError(1, "Bad escaping.")
+		.addError(1, "Bad or unnecessary escaping.")
 		.test("var a = '\\!';");
 
 	test.done();
@@ -545,16 +545,21 @@ exports.testES5Reserved = function (test) {
 
 	TestRun(test)
 		.addError(2, "Expected an identifier and instead saw 'default' (a reserved word).")
-		.addError(5, "Expected an identifier and instead saw 'default' (a reserved word).")
-		.addError(6, "Expected an identifier and instead saw 'new' (a reserved word).")
-		.addError(7, "Expected an identifier and instead saw 'class' (a reserved word).")
-		.addError(8, "Expected an identifier and instead saw 'default' (a reserved word).")
+		.addError(3, "Unexpected 'in'.")
+		.addError(3, "Expected an identifier and instead saw 'in' (a reserved word).")
+		.addError(6, "Expected an identifier and instead saw 'default' (a reserved word).")
+		.addError(7, "Expected an identifier and instead saw 'new' (a reserved word).")
+		.addError(8, "Expected an identifier and instead saw 'class' (a reserved word).")
+		.addError(9, "Expected an identifier and instead saw 'default' (a reserved word).")
+		.addError(10, "Expected an identifier and instead saw 'in' (a reserved word).")
+		.addError(11, "Expected an identifier and instead saw 'in' (a reserved word).")
 		.test(src);
 
 	TestRun(test)
-		.addError(5, "Expected an identifier and instead saw 'default' (a reserved word).")
-		.addError(6, "Expected an identifier and instead saw 'new' (a reserved word).")
-		.addError(7, "Expected an identifier and instead saw 'class' (a reserved word).")
+		.addError(6, "Expected an identifier and instead saw 'default' (a reserved word).")
+		.addError(7, "Expected an identifier and instead saw 'new' (a reserved word).")
+		.addError(8, "Expected an identifier and instead saw 'class' (a reserved word).")
+		.addError(11, "Expected an identifier and instead saw 'in' (a reserved word).")
 		.test(src, { es5: true });
 
 	test.done();
