@@ -856,3 +856,24 @@ exports.testForEachError = function (test) {
 	test.done();
 };
 
+exports.testGenerator = function (test) {
+	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
+	var code = [
+		"function fib() {",
+		"	var i = 0, j = 1;",
+		"	while (true) {",
+		"		yield i;",
+		"		[i, j] = [j, i + j];",
+		"	}",
+		"}",
+
+		"var g = fib();",
+		"for (let i = 0; i < 10; i++)",
+		"	print(g.next());"
+	];
+	TestRun(test)
+		.test(code, {esnext: true, es5: true, unused: true, undef: true, predef: ["print", "Iterator"]});
+
+	test.done();
+};
+
