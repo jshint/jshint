@@ -204,52 +204,105 @@ exports.group = {
 	},
 
 	testRcFile: function (test) {
-		var run = sinon.stub(cli, "run");
-		var dir = __dirname + "/../examples/";
-		sinon.stub(process, "cwd").returns(dir);
+		sinon.stub(process, "cwd").returns(__dirname);
+		var localRc = __dirname + "/.jshintrc";
+		var testStub = sinon.stub(shjs, "test");
+		var catStub = sinon.stub(shjs, "cat");
+
+		//stub rc file
+		testStub.withArgs("-e", localRc).returns(true);
+		catStub.withArgs(localRc).returns('{"evil": true}');
+
+		//stub src file
+		testStub.withArgs("-e", sinon.match(/file\.js$/)).returns(true);
+		catStub.withArgs(sinon.match(/file\.js$/)).returns("eval('a=2');");
 
 		cli.interpret([
 			"node", "jshint", "file.js"
 		]);
-		test.equal(run.args[0][0].config.strict, true);
-		process.cwd.restore();
-
-		var home = path.join(process.env.HOME, ".jshintrc");
-		var conf = shjs.cat(path.join(dir, ".jshintrc"));
-		sinon.stub(shjs, "test").withArgs("-e", home).returns(true);
-		sinon.stub(shjs, "cat").withArgs(home).returns(conf);
-
-		cli.interpret([
-			"node", "jshint", "file.js"
-		]);
-		test.equal(run.args[1][0].config.strict, true);
+		test.equal(process.exit.args[0][0], 0); //eval allowed = rc file found
 
 		shjs.test.restore();
 		shjs.cat.restore();
-		run.restore();
+		process.cwd.restore();
 		test.done();
 	},
-    
-	testRcLookup: function (test) {
-		var run = sinon.stub(cli, "run");
-		var srcDir = __dirname + "../src/";
-		var confPath = path.join(srcDir, ".jshintrc");
-		var cliDir = path.join(srcDir, "cli/");
-		var conf = shjs.cat(path.join(__dirname + "/../examples/", ".jshintrc"));
 
+	testHomeRcFile: function (test) {
+		var homeRc = path.join(process.env.HOME, ".jshintrc");
+		var testStub = sinon.stub(shjs, "test");
+		var catStub = sinon.stub(shjs, "cat");
+
+		//stub rc file
+		testStub.withArgs("-e", homeRc).returns(true);
+		catStub.withArgs(homeRc).returns('{"evil": true}');
+
+		//stub src file (in root where we are unlikely to find a .jshintrc)
+		testStub.withArgs("-e", sinon.match(/\/file\.js$/)).returns(true);
+		catStub.withArgs(sinon.match(/\/file\.js$/)).returns("eval('a=2');");
+
+		cli.interpret([
+			"node", "jshint", "/file.js"
+		]);
+		test.equal(process.exit.args[0][0], 0); //eval allowed = rc file found
+
+		shjs.test.restore();
+		shjs.cat.restore();
+		test.done();
+	},
+
+	testOneLevelRcLookup: function (test) {
+		var srcDir = __dirname + "../src/";
+		var parentRc = path.join(srcDir, ".jshintrc");
+
+		var cliDir = path.join(srcDir, "cli/");
 		sinon.stub(process, "cwd").returns(cliDir);
-		sinon.stub(shjs, "test").withArgs("-e", confPath).returns(true);
-		sinon.stub(shjs, "cat").withArgs(confPath).returns(conf);
+
+		var testStub = sinon.stub(shjs, "test");
+		var catStub = sinon.stub(shjs, "cat");
+
+		//stub rc file
+		testStub.withArgs("-e", parentRc).returns(true);
+		catStub.withArgs(parentRc).returns('{"evil": true}');
+
+		//stub src file
+		testStub.withArgs("-e", sinon.match(/file\.js$/)).returns(true);
+		catStub.withArgs(sinon.match(/file\.js$/)).returns("eval('a=2');");
 
 		cli.interpret([
 			"node", "jshint", "file.js"
 		]);
-		test.equal(run.args[0][0].config.strict, true);
+		test.equal(process.exit.args[0][0], 0); //eval allowed = rc file found
 
 		shjs.test.restore();
 		shjs.cat.restore();
 		process.cwd.restore();
-		run.restore();
+		test.done();
+	},
+
+	testTargetRelativeRcLookup: function (test) {
+		sinon.stub(process, "cwd").returns(process.env.HOME); //working fro m outside the project
+		var projectRc = __dirname + "/.jshintrc";
+		var srcFile = __dirname + "/sub/file.js";
+		var testStub = sinon.stub(shjs, "test");
+		var catStub = sinon.stub(shjs, "cat");
+
+		//stub rc file
+		testStub.withArgs("-e", projectRc).returns(true);
+		catStub.withArgs(projectRc).returns('{"evil": true}');
+
+		//stub src file
+		testStub.withArgs("-e", srcFile).returns(true);
+		catStub.withArgs(srcFile).returns("eval('a=2');");
+
+		cli.interpret([
+			"node", "jshint", srcFile
+		]);
+		test.equal(process.exit.args[0][0], 0); //eval allowed = rc file found
+
+		shjs.test.restore();
+		shjs.cat.restore();
+		process.cwd.restore();
 		test.done();
 	},
 
