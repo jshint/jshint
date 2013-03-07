@@ -782,6 +782,19 @@ exports.immed = function (test) {
 		.addError(13, "Wrapping non-IIFE function literals in parens is unnecessary.")
 		.test(src, { immed: true });
 
+	// Regression for GH-900
+	TestRun(test)
+		.addError(1, "Expected an assignment or function call and instead saw an expression.")
+		.addError(1, "Missing semicolon.")
+		.addError(1, "Expected an identifier and instead saw ')'.")
+		.addError(1, "Expected an assignment or function call and instead saw an expression.")
+		.addError(1, "Unmatched '{'.")
+		.addError(1, "Unmatched '('.")
+		.addError(1, "Wrapping non-IIFE function literals in parens is unnecessary.")
+		.addError(1, "Expected an assignment or function call and instead saw an expression.")
+		.addError(1, "Missing semicolon.")
+		.test("(function () { if (true) { }());", { immed: true });
+
 	test.done();
 };
 
