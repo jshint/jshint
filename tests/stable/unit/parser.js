@@ -573,6 +573,7 @@ exports.testDestructuringVar = function (test) {
 
 	test.done();
 };
+
 exports.testDestructuringConst = function (test) {
 	var code = [
 		"const [ a, b, c ] = [ 1, 2, 3 ];",
@@ -610,6 +611,7 @@ exports.testDestructuringConst = function (test) {
 
 	test.done();
 };
+
 exports.testDestructuringNone = function (test) {
 	var code = [
 		"var a, b, c, d, h, w, o;",
@@ -652,6 +654,7 @@ exports.testDestructuringNone = function (test) {
 
 	test.done();
 };
+
 exports.testDestructuringNone = function (test) {
 	var code = [
 		"var [ a ] = [ 1, 2 ];",
@@ -688,6 +691,7 @@ exports.testLetStmt = function (test) {
 
 	test.done();
 };
+
 exports.testLetStmtOutOfScope = function (test) {
 	var code = [
 		"let x = 1;",
@@ -710,6 +714,7 @@ exports.testLetStmtOutOfScope = function (test) {
 
 	test.done();
 };
+
 exports.testLetStmtInFunctions = function (test) {
 	var code = [
 		"let x = 1;",
@@ -731,6 +736,7 @@ exports.testLetStmtInFunctions = function (test) {
 
 	test.done();
 };
+
 exports.testLetStmtInFunctionsOutOfScope = function (test) {
 	var code = [
 		"let x = 1;",
@@ -780,7 +786,8 @@ exports.testLetStmtInForLoop = function (test) {
 	];
 
 	TestRun(test)
-		.test(code, {esnext: true, es5: true, unused: true, undef: true, predef: ["print", "Iterator"]});
+		.test(code, {esnext: true, es5: true, unused: true,
+					 undef: true, predef: ["print", "Iterator"]});
 
 	test.done();
 };
@@ -814,7 +821,8 @@ exports.testLetStmtInForLoopDEStmt = function (test) {
 	];
 
 	TestRun(test)
-		.test(code, {esnext: true, es5: true, unused: true, undef: true, predef: ["print", "Iterator"]});
+		.test(code, {esnext: true, es5: true, unused: true, 
+					 undef: true, predef: ["print", "Iterator"]});
 
 	test.done();
 };

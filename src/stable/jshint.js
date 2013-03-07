@@ -1456,7 +1456,7 @@ var JSHINT = (function () {
 			res = false;
 		}
 
-		if (state.option.esnext && _.has(["[", "{"],t.value)) {
+		if (state.option.esnext && _.has(["[", "{"], t.value)) {
 			if (new lookupBlockType().isDestAssign) {
 				values = destructuringExpression();
 				values.forEach(function (tok) {
@@ -3583,7 +3583,7 @@ var JSHINT = (function () {
 		var i = 1; 
 		do {
 			pn = peek(i);
-			pn1 = peek(i+1);
+			pn1 = peek(i + 1);
 			i = i + 1;
 			if (_.contains(["}", "]"], pn.value) && pn1.value === "=") {
 				this.isDestAssign = true;
@@ -3605,7 +3605,8 @@ var JSHINT = (function () {
 		// lookup for the assignment (esnext only)
 		// if it has semicolons, it is a block, so go parse it as a block
 		// or it's not a block, but there are assignments, check for undeclared variables
-		var block=null;
+
+		var block = null;
 
 		if (state.option.esnext) {
 			block = new lookupBlockType();
