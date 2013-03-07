@@ -445,6 +445,12 @@ Lexer.prototype = {
 					return;
 				}
 
+				// Don't recognize any special comments other than jshint for single-line
+				// comments. This introduced many problems with legit comments.
+				if (label === "//" && str !== "jshint") {
+					return;
+				}
+
 				if (body.substr(0, str.length) === str) {
 					isSpecial = true;
 					label = label + str;
@@ -1061,7 +1067,7 @@ Lexer.prototype = {
 
 					// Octal literals fail in strict mode.
 					// Check if the number is between 00 and 07.
-					var n = parseInt(this.peek(), 10);
+					var n = parseInt(this.peek(1), 10);
 					if (n >= 0 && n <= 7 && state.directive["use strict"]) {
 						this.trigger("warning", {
 							code: "W115",
@@ -1439,6 +1445,33 @@ Lexer.prototype = {
 	token: function () {
 		var token;
 
+		function isReserved(token, isProperty) {
+			if (!token.reserved) {
+				return false;
+			}
+
+			if (token.meta && token.meta.isFutureReservedWord) {
+				// ES3 FutureReservedWord in an ES5 environment.
+				if (state.option.es5 && !token.meta.es5) {
+					return false;
+				}
+
+				// Some ES5 FutureReservedWord identifiers are active only
+				// within a strict mode environment.
+				if (token.meta.strictOnly) {
+					if (!state.option.strict && !state.directive["use strict"]) {
+						return false;
+					}
+				}
+
+				if (isProperty) {
+					return false;
+				}
+			}
+
+			return true;
+		}
+
 		// Produce a token object.
 		var create = function (type, value, isProperty) {
 			/*jshint validthis:true */
@@ -1471,6 +1504,11 @@ Lexer.prototype = {
 
 				if (_.has(state.syntax, value)) {
 					obj = Object.create(state.syntax[value] || state.syntax["(error)"]);
+
+					// If this can't be a reserved keyword, reset the object.
+					if (!isReserved(obj, isProperty && type === "(identifier)")) {
+						obj = null;
+					}
 				}
 			}
 
