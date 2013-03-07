@@ -537,10 +537,23 @@ exports.testDestructuringVar = function (test) {
 	];
 
 	TestRun(test)
+		.addError(2,  "'a' is already defined.")
+		.addError(3,  "'a' is already defined.")
+		.addError(6,  "'a' is already defined.")
+		.addError(6,  "'b' is already defined.")
+		.addError(6,  "'c' is already defined.")
+		.addError(8,  "'a' is already defined.")
+		.addError(8,  "'bar' is already defined.")
 		.addError(9,  "Expected an identifier and instead saw '1'.")
 		.addError(9,  "Expected ',' and instead saw '1'.")
 		.addError(9,  "Expected an identifier and instead saw ']'.")
 		.addError(10, "Expected ',' and instead saw ';'.")
+		.addError(10, "'a' is already defined.")
+		.addError(10, "'b' is already defined.")
+		.addError(10, "'c' is already defined.")
+		.addError(11, "'a' is already defined.")
+		.addError(11, "'b' is already defined.")
+		.addError(11, "'c' is already defined.")
 		.addError(11, "Expected ']' to match '[' from line 11 and instead saw ';'.")
 		.addError(11, "Missing semicolon.")
 		.addError(11, "Expected an assignment or function call and instead saw an expression.")
@@ -647,12 +660,161 @@ exports.testDestructuringNone = function (test) {
 	];
 
 	TestRun(test)
-		.addError(1,  "'a' is defined but never used.")
-		.addError(2,  "'c' is defined but never used.")
-		.addError(2,  "'d' is defined but never used.")
-		.addError(3,  "'e' is defined but never used.")
-		.addError(3,  "'f' is defined but never used.")
+		.addError(1, "'a' is defined but never used.")
+		.addError(2, "'c' is defined but never used.")
+		.addError(2, "'d' is defined but never used.")
+		.addError(3, "'e' is defined but never used.")
+		.addError(3, "'f' is defined but never used.")
 		.test(code, {esnext: true, es5: true, unused: true, undef: true});
+
+	test.done();
+};
+exports.testLetStmt = function (test) {
+	var code = [
+		"let x = 1;",
+		"{",
+		"	let y = 3 ;",
+		"	{",
+		"		let z = 2;",
+		"		print(x + ' ' + y + ' ' + z);",
+		"	}",
+		"	print(x + ' ' + y);",
+		"}",
+		"print(x);"
+	];
+
+	TestRun(test)
+		.test(code, {esnext: true, es5: true, unused: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+exports.testLetStmtOutOfScope = function (test) {
+	var code = [
+		"let x = 1;",
+		"{",
+		"	let y = 3 ;",
+		"	{",
+		"		let z = 2;",
+		"	}",
+		"	print(z);",
+		"}",
+		"print(y);",
+	];
+
+	TestRun(test)
+		.addError(5, "'z' is defined but never used.")
+		.addError(3, "'y' is defined but never used.")
+		.addError(7, "'z' is not defined.")
+		.addError(9, "'y' is not defined.")
+		.test(code, {esnext: true, es5: true, unused: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+exports.testLetStmtInFunctions = function (test) {
+	var code = [
+		"let x = 1;",
+		"function foo() {",
+		"	let y = 3 ;",
+		"	function bar() {",
+		"		let z = 2;",
+		"		print(x);",
+		"		print(z);",
+		"	}",
+		"	print(y);",
+		"	bar();",
+		"}",
+		"foo();"
+	];
+
+	TestRun(test)
+		.test(code, {esnext: true, es5: true, unused: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+exports.testLetStmtInFunctionsOutOfScope = function (test) {
+	var code = [
+		"let x = 1;",
+		"function foo() {",
+		"	let y = 3 ;",
+		"	let bar = function () {",
+		"		print(x);",
+		"		let z = 2;",
+		"	};",
+		"	print(z);",
+		"}",
+		"print(y);",
+		"bar();",
+		"foo();",
+	];
+
+	TestRun(test)
+		.addError(6, "'z' is defined but never used.")
+		.addError(3, "'y' is defined but never used.")
+		.addError(4, "'bar' is defined but never used.")
+		.addError(8, "'z' is not defined.")
+		.addError(10, "'y' is not defined.")
+		.addError(11, "'bar' is not defined.")
+		.test(code, {esnext: true, es5: true, unused: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+
+exports.testLetStmtInForLoop = function (test) {
+	var code = [
+		"var obj={foo: 'bar', bar: 'foo'};",
+		"for ( let [n, v] in Iterator(obj) ) {",
+		"	print('Name: ' + n + ', Value: ' + v);",
+		"}",
+		"for (let i in [1, 2, 3, 4]) {",
+		"	print(i);",
+		"}",
+		"for (let i in [1, 2, 3, 4]) {",
+		"	print(i);",
+		"}",
+		"for (let i = 0; i<15; ++i) {",
+		"	print(i);",
+		"}",
+		"for (let i=i ; i < 10 ; i++ ) {",
+		"print(i);",
+		"}"
+	];
+
+	TestRun(test)
+		.test(code, {esnext: true, es5: true, unused: true, undef: true, predef: ["print", "Iterator"]});
+
+	test.done();
+};
+
+exports.testLetStmtInForLoopDEStmt = function (test) {
+	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
+	var code = [
+		"var people = [",
+		"{",
+		"	name: 'Mike Smith',",
+		"	family: {",
+		"	mother: 'Jane Smith',",
+		"	father: 'Harry Smith',",
+		"	sister: 'Samantha Smith'",
+		"	},",
+		"	age: 35",
+		"},",
+		"{",
+		"	name: 'Tom Jones',",
+		"	family: {",
+		"	mother: 'Norah Jones',",
+		"	father: 'Richard Jones',",
+		"	brother: 'Howard Jones'",
+		"	},",
+		"	age: 25",
+		"}",
+		"];",
+		"for each (let {name: n, family: { father: f } } in people) {",
+		"print('Name: ' + n + ', Father: ' + f);",
+		"}"
+	];
+
+	TestRun(test)
+		.test(code, {esnext: true, es5: true, unused: true, undef: true, predef: ["print", "Iterator"]});
 
 	test.done();
 };
@@ -675,6 +837,21 @@ exports.testDestructuringFunction = function (test) {
 	];
 	TestRun(test)
 		.test(code, {esnext: true, es5: true, unused: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+
+exports.testForEachError = function (test) {
+	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
+	var code = [
+		"for each (let i = 0; i<15; ++i) {",
+		"	print(i);",
+		"}"
+	];
+
+	TestRun(test)
+		.addError(1, "Invalid for each loop.")
+		.test(code, {esnext: true, es5: true, unused: true, undef: true, predef: ["print", "Iterator"]});
 
 	test.done();
 };
