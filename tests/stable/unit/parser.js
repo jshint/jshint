@@ -815,7 +815,7 @@ exports.testLetStmtInForLoopDEStmt = function (test) {
 		"	age: 25",
 		"}",
 		"];",
-		"for each (let {name: n, family: { father: f } } in people) {",
+		"for (let {name: n, family: { father: f } } in people) {",
 		"print('Name: ' + n + ', Father: ' + f);",
 		"}"
 	];
