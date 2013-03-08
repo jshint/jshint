@@ -1864,7 +1864,55 @@ var JSHINT = (function () {
 						(state.tokens.next && (state.tokens.next.value === "." ||
 							state.tokens.next.value === "["))) {
 
-						isundef(funct, "W117", state.tokens.curr, v);
+						// if we're in a list comprehension, variables are declared
+						// locally and used before being defined. So here we check the
+						// three possible states of a variable:
+
+						var l;
+						// When we are in "use" state of the list comp, we enqueue that var
+						if (state.inCompArray === "use") {
+							state.compArrayVariables.push({funct: funct,
+														   token: state.tokens.curr,
+														   value: v,
+														   undef: true,
+														   unused: false});
+						// When we are in "define" state of the list comp,
+						} else if (state.inCompArray === "define") {
+							// check if the variable has been used previously
+							l = state.compArrayVariables.filter(function (elt) {
+								// if it has, change its undef state
+								if (elt.value === v) {
+									elt.undef = false;
+									return v;
+								}
+							}).length;
+							// if not, let's warn about it
+							if (l === 0) {
+								state.compArrayVariables.push({funct: funct,
+																token: state.tokens.curr,
+																value: v,
+																undef: false,
+																unused: true});
+							}
+						// When we are in "filter" state,
+						} else if (state.inCompArray === "filter") {
+							// we check whether current variable has been declared
+							l = state.compArrayVariables.filter(function (elt) {
+								// and if it has been defined
+								if (elt.value === v && !elt.undef) {
+									if (elt.unused === true) {
+										elt.unused = false;
+									}
+									return v;
+								}
+							}).length;
+							// otherwise we warn about it
+							if (l === 0) {
+								isundef(funct, "W117", state.tokens.curr, v);
+							}
+						} else {
+							isundef(funct, "W117", state.tokens.curr, v);
+						}
 					}
 				}
 
@@ -2043,7 +2091,14 @@ var JSHINT = (function () {
 	bitwise("<<", "shiftleft", 120);
 	bitwise(">>", "shiftright", 120);
 	bitwise(">>>", "shiftrightunsigned", 120);
-	infix("in", "in", 120);
+	infix("in", function(left, that) {
+		if (state.inCompArray === "define") {
+			state.inCompArray = "container";
+		}
+		that.left = left;
+		that.right = expression(120);
+		return that;
+	}, 120);
 	infix("instanceof", "instanceof", 120);
 	infix("+", function (left, that) {
 		var right = expression(130);
@@ -2351,7 +2406,53 @@ var JSHINT = (function () {
 		return that;
 	}, 160, true);
 
+	// array comprehension parsing function
+	// parses and defines the three states of the list comprehension in order
+	// to avoid defining global variables, but keeping them to the list comprehension scope
+	// only. The order of the states are as follows:
+	//  * "use" which will be the returned iterative part of the list comprehension
+	//  * "define" which will define the variables local to the list comprehension
+	//  * "filter" which will help filter out values
+	//
+	// TODO imbricated array comprehension
+	// TODO return array contructions
+
+	var ComprehensiveArray = function() {
+		this.first = [];
+		state.inCompArray = "use";
+		state.compArrayVariables = [];
+		expression(0);
+		advance("for");
+		if (state.tokens.next.value === "each") {
+			advance("each");
+		}
+		advance("(");
+		state.inCompArray = "define";
+		expression(0);
+		advance(")");
+		if (state.tokens.next.value === "if") {
+			advance("if");
+			advance("(");
+			state.inCompArray = "filter";
+			expression(0);
+			advance(")");
+		}
+		advance("]");
+		state.compArrayVariables.filter(function (v) {
+			if (v.unused)
+				warning("W098", v.token, v.value);
+			if (v.undef)
+				isundef(v.funct, "W117", v.token, v.value);
+		});
+		delete state.inCompArray;
+		delete state.compArrayVariables;
+		return this;
+	};
+
 	prefix("[", function () {
+		if (state.option.esnext && new lookupBlockType(0).isCompArray) {
+			return new ComprehensiveArray();
+		}
 		var b = state.tokens.curr.line !== state.tokens.next.line;
 		this.first = [];
 		if (b) {
@@ -3597,13 +3698,18 @@ var JSHINT = (function () {
 	FutureReservedWord("transient");
 	FutureReservedWord("volatile");
 
-	var lookupBlockType = function () {
+	var lookupBlockType = function (lookahead) {
 		var pn, pn1;
-		var i = 1; 
+		var i = lookahead;
 		do {
 			pn = peek(i);
 			pn1 = peek(i + 1);
 			i = i + 1;
+			if (pn.value === "for") {
+				this.isCompArray = true;
+				this.notJson = true;
+				break;
+			}
 			if (_.contains(["}", "]"], pn.value) && pn1.value === "=") {
 				this.isDestAssign = true;
 				this.notJson = true;

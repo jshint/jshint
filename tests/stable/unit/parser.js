@@ -885,3 +885,40 @@ exports.testGenerator = function (test) {
 	test.done();
 };
 
+exports.testArrayComprehension = function (test) {
+	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
+	var code = [
+		"function range(begin, end) {",
+		"	for (let i = begin; i < end; ++i) {",
+		"		yield i;",
+		"	}",
+		"}",
+		"var ten_squares = [i * i for each (i in range(0, 10))];",
+		"var evens = [i for each (i in range(0, 21)) if (i % 2 === 0)];",
+		"print('squares:', ten_squares);",
+		"print('evens:', evens);"
+	];
+	TestRun(test)
+		.test(code, {esnext: true, es5: true, unused: true, undef: true, predef: ["print", "Iterator"]});
+
+	test.done();
+};
+
+exports.testArrayComprehensionWithDestArray = function (test) {
+	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
+	var code = [
+		"function range(begin, end) {",
+		"	for (let i = begin; i < end; ++i) {",
+		"		yield i;",
+		"	}",
+		"}",
+		"var ten_squares = [i * i for each (i in range(0, 10))];",
+		"var evens = [i for each (i in range(0, 21)) if (i % 2 === 0)];",
+		"print('squares:', ten_squares);",
+		"print('evens:', evens);"
+	];
+	TestRun(test)
+		.test(code, {esnext: true, es5: true, unused: true, undef: true, predef: ["print", "Iterator"]});
+
+	test.done();
+};
