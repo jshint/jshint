@@ -1080,10 +1080,12 @@ var JSHINT = (function () {
 			case "in":
 			case "instanceof":
 			case "return":
+			case "yield":
 			case "switch":
 			case "throw":
 			case "try":
 			case "var":
+			case "let":
 			case "while":
 			case "with":
 				error("E024", state.tokens.next, state.tokens.next.value);
@@ -1484,7 +1486,6 @@ var JSHINT = (function () {
 					isundef(funct, "W117", tok.token, tok.id);
 				});
 				advance("=");
-				console.log(values);
 				destructuringExpressionMatch(values, expression(0, true));
 				advance(";");
 				return;
@@ -2915,8 +2916,6 @@ var JSHINT = (function () {
 		});
 		varstatement.exps = true;
 		var letstatement = stmt("let", function (prefix) {
-			// JavaScript does not have block scope. It only has function scope. So,
-			// declaring a variable in a block can have unexpected consequences.
 			var tokens, lone, value;
 
 			if (funct["(onevar)"] && state.option.onevar) {
@@ -2982,6 +2981,10 @@ var JSHINT = (function () {
 		});
 		letstatement.exps = true;
 	};
+	var letstatement = stmt("let", function () {
+		warning("W104", state.tokens.curr, "let");
+	});
+	letstatement.exps = true;
 
 	var varstatement = stmt("var", function (prefix) {
 		// JavaScript does not have block scope. It only has function scope. So,
@@ -3580,7 +3583,6 @@ var JSHINT = (function () {
 	FutureReservedWord("import", { es5: true });
 	FutureReservedWord("int");
 	FutureReservedWord("interface");
-	FutureReservedWord("let", { es5: true, strictOnly: true });
 	FutureReservedWord("long");
 	FutureReservedWord("native");
 	FutureReservedWord("package", { es5: true, strictOnly: true });
@@ -3594,7 +3596,6 @@ var JSHINT = (function () {
 	FutureReservedWord("throws");
 	FutureReservedWord("transient");
 	FutureReservedWord("volatile");
-	FutureReservedWord("yield", { es5: true, strictOnly: true });
 
 	var lookupBlockType = function () {
 		var pn, pn1;
@@ -3613,7 +3614,6 @@ var JSHINT = (function () {
 				this.notJson = true;
 			}
 		} while (!_.contains(["}", "]"], pn.value) && pn.id !== "(end)");
-		console.log(this);
 		return this;
 	};
 
