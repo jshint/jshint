@@ -773,65 +773,6 @@ var JSHINT = (function () {
 		}
 	}
 
-	// this function is parsing a let expression (and is almost identical to letstatement)
-	function letexpression() {
-		var tokens, lone, value;
-
-		if (funct["(onevar)"] && state.option.onevar) {
-			warning("W081");
-		} else if (!funct["(global)"]) {
-			funct["(onevar)"] = true;
-		}
-
-		for (;;) {
-			var names = [];
-			nonadjacent(state.tokens.curr, state.tokens.next);
-			if (_.contains(["{", "["], state.tokens.next.value)) {
-				tokens = destructuringExpression();
-				lone = false;
-			} else {
-				tokens = [ { id: identifier(), token: state.tokens.curr.value } ];
-				lone = true;
-			}
-			for (var t in tokens) {
-				t = tokens[t];
-				if (state.option.esnext && funct[t.id] === "const") {
-					warning("E011", null, t.id);
-				}
-				if (funct["(global)"] && predefined[t.id] === false) {
-					warning("W079", t.token, t.id);
-				}
-				if (t.id) {
-					addlabel(t.id, "unused", t.token, true);
-					names.push(t.token);
-				}
-			}
-
-			if (state.tokens.next.id === "=") {
-				nonadjacent(state.tokens.curr, state.tokens.next);
-				advance("=");
-				nonadjacent(state.tokens.curr, state.tokens.next);
-				if (state.tokens.next.id === "undefined") {
-					warning("W080", state.tokens.curr, state.tokens.curr.value);
-				}
-				if (peek(0).id === "=" && state.tokens.next.identifier) {
-					error("E037", state.tokens.next, state.tokens.next.value);
-				}
-				value = expression(0);
-				if (lone) {
-					tokens[0].first = value;
-				} else {
-					destructuringExpressionMatch(names, value);
-				}
-			}
-
-			if (state.tokens.next.id !== ",") {
-				break;
-			}
-			comma();
-		}
-	}
-
 	// This is the heart of JSHINT, the Pratt parser. In addition to parsing, it
 	// is looking for ad hoc lint patterns. We add .fud to Pratt's model, which is
 	// like .nud except that it is only used on the first token of a statement.
@@ -857,7 +798,7 @@ var JSHINT = (function () {
 			funct["(blockscope)"].push(funct["(curblock)"]);
 			advance("let");
 			advance("(");
-			letexpression();
+			state.syntax["let"].fud.call(state.syntax["let"].fud, false);
 			advance(")");
 			if (state.tokens.next.value === "{") {
 				block(true);
@@ -1456,6 +1397,7 @@ var JSHINT = (function () {
 			res = false;
 		}
 
+		// detect a destructuring assignment
 		if (state.option.esnext && _.has(["[", "{"], t.value)) {
 			if (new lookupBlockType().isDestAssign) {
 				values = destructuringExpression();
