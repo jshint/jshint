@@ -922,3 +922,17 @@ exports.testArrayComprehensionWithDestArray = function (test) {
 
 	test.done();
 };
+
+exports.testArrayComprehensionWithDestArray = function (test) {
+	var code = [
+		"[ [i, j] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
+		"var destarray_comparray_1 = [ [i, [j, j] ] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
+		"var destarray_comparray_2 = [ [i, {i: [i, j]} ] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
+	];
+	TestRun(test)
+		.addError(1, "Expected an assignment or function call and instead saw an expression.")
+		.test(code, {esnext: true, es5: true, undef: true, predef: ["print", "Iterator"]});
+
+	test.done();
+};
+
