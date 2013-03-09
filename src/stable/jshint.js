@@ -1789,41 +1789,22 @@ var JSHINT = (function () {
 			if (funct === s || block) {
 				// Change 'unused' to 'var', and reject labels.
 				// the name is in a block scope
-				if (state.option.esnext) {
-					if (block) {
-						switch (block[v]["(type)"]) {
-						case "unused":
-							block[v]["(type)"] = "var";
-							break;
-						case "unction":
-							block[v]["(type)"] = "function";
-							this["function"] = true;
-							break;
-						case "function":
-							this["function"] = true;
-							break;
-						case "label":
-							warning("W037", state.tokens.curr, v);
-							break;
-						}
-					}
-				}
-				if (!block) {
-					switch (funct[v]) {
-					case "unused":
-						funct[v] = "var";
-						break;
-					case "unction":
-						funct[v] = "function";
-						this["function"] = true;
-						break;
-					case "function":
-						this["function"] = true;
-						break;
-					case "label":
-						warning("W037", state.tokens.curr, v);
-						break;
-					}
+				switch (block ? block[v]["(type)"] : funct[v]) {
+				case "unused":
+					if (block) block[v]["(type)"] = "var";
+					else funct[v] = "var";
+					break;
+				case "unction":
+					if (block) block[v]["(type)"] = "function";
+					else funct[v] = "function";
+					this["function"] = true;
+					break;
+				case "function":
+					this["function"] = true;
+					break;
+				case "label":
+					warning("W037", state.tokens.curr, v);
+					break;
 				}
 			} else if (funct["(global)"]) {
 				// The name is not defined in the function.  If we are in the global
