@@ -2339,7 +2339,6 @@ var JSHINT = (function () {
 	//  * "filter" which will help filter out values
 	//
 	// TODO imbricated array comprehension
-	// TODO return array contructions
 
 	var ComprehensiveArray = function() {
 		this.first = [];
