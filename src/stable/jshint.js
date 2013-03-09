@@ -3622,14 +3622,27 @@ var JSHINT = (function () {
 	FutureReservedWord("transient");
 	FutureReservedWord("volatile");
 
-	var lookupBlockType = function (lookahead) {
+	// this function is used to determine wether a squarebracket or a curlybracket
+	// expression is a comprehension array, destructuring assignment or a json value.
+
+	var lookupBlockType = function (ahead) {
 		var pn, pn1;
-		var i = lookahead;
+		var i = ahead || 0;
+		var bracketStack= 0;
+		if (_.contains(["[", "{"], state.tokens.curr.value))
+			bracketStack+= 1;
+		if (_.contains(["[", "{"], state.tokens.next.value))
+			bracketStack+= 1;
 		do {
 			pn = peek(i);
 			pn1 = peek(i + 1);
 			i = i + 1;
-			if (pn.value === "for") {
+			if (_.contains(["[", "{"], pn.value)) {
+				bracketStack+= 1;
+			} else if (_.contains(["]", "}"], pn.value)) {
+				bracketStack-= 1;
+			}
+			if (pn.value === "for" && bracketStack=== 1) {
 				this.isCompArray = true;
 				this.notJson = true;
 				break;
@@ -3643,7 +3656,7 @@ var JSHINT = (function () {
 				this.isBlock = true;
 				this.notJson = true;
 			}
-		} while (!_.contains(["}", "]"], pn.value) && pn.id !== "(end)");
+		} while (bracketStack > 0 && pn.id !== "(end)" && i < 15);
 		return this;
 	};
 
