@@ -1462,7 +1462,6 @@ var JSHINT = (function () {
 					isundef(funct, "W117", tok.token, tok.id);
 				});
 				advance("=");
-				console.log(values);
 				destructuringExpressionMatch(values, expression(0, true));
 				advance(";");
 				return;
@@ -3560,7 +3559,6 @@ var JSHINT = (function () {
 				this.notJson = true;
 			}
 		} while (!_.contains(["}", "]"], pn.value) && pn.id !== "(end)");
-		console.log(this);
 		return this;
 	};
 
