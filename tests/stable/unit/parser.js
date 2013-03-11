@@ -899,7 +899,8 @@ exports.testArrayComprehension = function (test) {
 		"print('evens:', evens);"
 	];
 	TestRun(test)
-		.test(code, {esnext: true, es5: true, unused: true, undef: true, predef: ["print", "Iterator"]});
+		.test(code, {esnext: true, es5: true, unused: true, undef: true, 
+						predef: ["print", "Iterator"]});
 
 	test.done();
 };
@@ -918,7 +919,8 @@ exports.testArrayComprehensionWithDestArray = function (test) {
 		"print('evens:', evens);"
 	];
 	TestRun(test)
-		.test(code, {esnext: true, es5: true, unused: true, undef: true, predef: ["print", "Iterator"]});
+		.test(code, {esnext: true, es5: true, unused: true, undef: true, 
+						predef: ["print", "Iterator"]});
 
 	test.done();
 };
@@ -931,7 +933,21 @@ exports.testArrayComprehensionWithDestArray = function (test) {
 	];
 	TestRun(test)
 		.addError(1, "Expected an assignment or function call and instead saw an expression.")
-		.test(code, {esnext: true, es5: true, undef: true, predef: ["print", "Iterator"]});
+		.test(code, {esnext: true, es5: true, undef: true, 
+						predef: ["print", "Iterator"]});
+
+	test.done();
+};
+
+exports.testArrayComprehensionImbricationWithDestArray = function (test) {
+	var code = [
+		"[ [i, j] for each ([i, j] in [[a, b] for each ([a, b] in [[2,2], [3,4]])]) ];"
+	
+	];
+	TestRun(test)
+		.addError(1, "Expected an assignment or function call and instead saw an expression.")
+		.test(code, {esnext: true, es5: true, undef: true, 
+						predef: ["print", "Iterator"]});
 
 	test.done();
 };
