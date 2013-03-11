@@ -3063,8 +3063,7 @@ var JSHINT = (function () {
 			}
 
 			advance();
-			advance(")");
-
+			
 			funct = {
 				"(name)"     : "(catch)",
 				"(line)"     : state.tokens.next.line,
@@ -3076,12 +3075,20 @@ var JSHINT = (function () {
 				"(statement)": false,
 				"(metrics)"  : createMetrics(state.tokens.next),
 				"(catch)"    : true,
-				"(tokens)"   : {}
+				"(tokens)"   : {},
+				"(blockscope)": funct["(blockscope)"]
 			};
 
 			if (e) {
 				addlabel(e, "exception");
 			}
+
+			if (state.tokens.next.value === "if") {
+				advance("if");
+				expression(0);
+			}
+
+			advance(")");
 
 			state.tokens.curr.funct = funct;
 			functions.push(funct);
