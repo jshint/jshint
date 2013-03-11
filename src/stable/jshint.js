@@ -465,19 +465,6 @@ var JSHINT = (function () {
 		return i;
 	}
 
-	function checkblocklabels() {
-		for (var t in funct["(curblock)"]) {
-			if (funct["(curblock)"][t]["(type)"] === "unused") {
-				if (state.option.unused) {
-					var tkn = funct["(curblock)"][t]["(token)"];
-					var line = tkn.line;
-					var chr  = tkn.character;
-					warningAt("W098", line, chr, t);
-				}
-			}
-		}
-	}
-
 	function addlabel(t, type, tkn, islet) {
 		// Define t in the current function in the current scope.
 		if (type === "exception") {
@@ -500,18 +487,17 @@ var JSHINT = (function () {
 		}
 		if (state.option.esnext) {
 			// a double definition of a let variable in same block throws a TypeError
-			if (funct["(curblock)"] && _.has(funct["(curblock)"], t)) {
+			if (funct["(blockscope)"] && funct["(blockscope)"].current.has(t)) {
 				error("E044", state.tokens.next, t);
 			} else if (!state.option.shadow && funct[t] !== "const") {
-				if (funct["(blockscope)"].getlabelblock(t) || _.has(funct, t))
+				if (funct["(blockscope)"].getlabel(t) || _.has(funct, t))
 					warning("W004", state.tokens.next, t);
 			}
 		}
 
 		// if the identifier is from a let, adds it only to the current blockscope
 		if (state.option.esnext && islet) {
-			funct["(curblock)"][t] = { "(type)" : type,
-									   "(token)": state.tokens.curr };
+			funct["(blockscope)"].current.add(t, type, state.tokens.curr);
 		} else {
 
 			funct[t] = type;
@@ -793,8 +779,7 @@ var JSHINT = (function () {
 		if (state.option.esnext && state.tokens.next.value === "let" && peek(0).value === "(") {
 			isLetExpr = true;
 			// create a new block scope we use only for the current expression
-			funct["(curblock)"] = {};
-			funct["(blockscope)"].push(funct["(curblock)"]);
+			funct["(blockscope)"].stack();
 			advance("let");
 			advance("(");
 			state.syntax["let"].fud.call(state.syntax["let"].fud, false);
@@ -863,9 +848,7 @@ var JSHINT = (function () {
 			}
 		}
 		if (isLetExpr) {
-			checkblocklabels();
-			funct["(blockscope)"].splice(funct["(blockscope)"].length - 1, 1);
-			funct["(curblock)"] = _.last(funct["(blockscope)"]);
+			funct["(blockscope)"].unstack();
 		}
 		return left;
 	}
@@ -1593,8 +1576,7 @@ var JSHINT = (function () {
 			advance("{");
 			if (state.option.esnext) {
 				// create a new block scope
-				funct["(curblock)"] = {};
-				funct["(blockscope)"].push(funct["(curblock)"]);
+				funct["(blockscope)"].stack();
 			}
 			line = state.tokens.curr.line;
 			if (state.tokens.next.id !== "}") {
@@ -1636,9 +1618,7 @@ var JSHINT = (function () {
 			}
 			advance("}", t);
 			if (state.option.esnext) {
-				checkblocklabels();
-				funct["(blockscope)"].splice(funct["(blockscope)"].length - 1, 1);
-				funct["(curblock)"] = _.last(funct["(blockscope)"]);
+				funct["(blockscope)"].unstack();
 			}
 			indent = old_indent;
 		} else if (!ordinary) {
@@ -1724,7 +1704,7 @@ var JSHINT = (function () {
 			}
 			var block;
 			if (state.option.esnext && _.has(funct, "(blockscope)")) {
-				block = funct["(blockscope)"].getlabelblock(v);
+				block = funct["(blockscope)"].getlabel(v);
 			}
 			
 			// The name is in scope and defined in the current function.
@@ -2372,7 +2352,6 @@ var JSHINT = (function () {
 			"(statement)" : statement,
 			"(tokens)"    : {},
 			"(blockscope)": funct["(blockscope)"],
-			"(curscope)"  : funct["(curscope)"]
 		};
 
 		f = funct;
@@ -3265,8 +3244,7 @@ var JSHINT = (function () {
 				advance("let");
 				// create a new block scope
 				letscope = true;
-				funct["(curblock)"] = {};
-				funct["(blockscope)"].push(funct["(curblock)"]);
+				funct["(blockscope)"].stack();
 				state.syntax["let"].fud.call(state.syntax["let"].fud, true);
 			} else {
 				switch (funct[state.tokens.next.value]) {
@@ -3276,7 +3254,7 @@ var JSHINT = (function () {
 				case "var":
 					break;
 				default:
-					if (!funct["(blockscope)"].getlabelblock(state.tokens.next.value))
+					if (!funct["(blockscope)"].getlabel(state.tokens.next.value))
 						warning("W088", state.tokens.next, state.tokens.next.value);
 				}
 				advance();
@@ -3300,8 +3278,7 @@ var JSHINT = (function () {
 					advance("let");
 					// create a new block scope
 					letscope = true;
-					funct["(curblock)"] = {};
-					funct["(blockscope)"].push(funct["(curblock)"]);
+					funct["(blockscope)"].stack();
 					state.syntax["let"].fud.call(state.syntax["let"].fud);
 				} else {
 					for (;;) {
@@ -3342,9 +3319,7 @@ var JSHINT = (function () {
 		}
 		// unstack loop blockscope
 		if (letscope) {
-			checkblocklabels();
-			funct["(blockscope)"].splice(funct["(blockscope)"].length - 1, 1);
-			funct["(curblock)"] = _.last(funct["(blockscope)"]);
+			funct["(blockscope)"].unstack();
 		}
 		return this;
 	}).labelled = true;
@@ -3597,13 +3572,56 @@ var JSHINT = (function () {
 		}
 	}
 
+	var blockScope = function () {
+		var _current = {};
+		var _variables = [_current];
+
+		function _checkBlockLabels() {
+			for (var t in _current) {
+				if (_current[t]["(type)"] === "unused") {
+					if (state.option.unused) {
+						var tkn = _current[t]["(token)"];
+						var line = tkn.line;
+						var chr  = tkn.character;
+						warningAt("W098", line, chr, t);
+					}
+				}
+			}
+		}
+
+		return {stack: function () {
+					_current = {};
+					_variables.push(_current);
+				},
+				unstack: function () {
+					_checkBlockLabels();
+					_variables.splice(_variables.length - 1, 1);
+					_current = _.last(_variables);
+				},
+				getlabel: function (l) {
+					for (var i = _variables.length - 1 ; i >= 0; --i) {
+						if (_.has(_variables[i], l)) {
+							return _variables[i];
+						}
+					}
+				},
+				current: {
+					has: function (t) {
+						return _.has(_current, t);
+					},
+					add: function (t, type, tok) {
+						_current[t] = { "(type)" : type,
+										"(token)": tok };
+					}
+				}
+				};
+	};
 
 	// The actual JSHINT function itself.
 	var itself = function (s, o, g) {
 		var a, i, k, x;
 		var optionKeys;
 		var newOptionObj = {};
-		var globBlock = {};
 
 		state.reset();
 
@@ -3679,15 +3697,7 @@ var JSHINT = (function () {
 			"(loopage)":  0,
 			"(tokens)":   {},
 			"(metrics)":   createMetrics(state.tokens.next),
-			"(curblock)"  : globBlock,
-			"(blockscope)": [globBlock]
-		};
-		funct["(blockscope)"].getlabelblock = function (l) {
-			for (var i = this.length - 1 ; i >= 0; --i) {
-				if (_.has(this[i], l)) {
-					return this[i];
-				}
-			}
+			"(blockscope)": blockScope()
 		};
 		functions = [funct];
 		urls = [];
