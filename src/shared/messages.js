@@ -60,7 +60,7 @@ var errors = {
 	E042: "Stopping.",
 	E043: "Too many errors.",
 	E044: "'{a}' is already defined and can't be redefined.",
-    E045: "Invalid for each loop."
+	E045: "Invalid for each loop."
 };
 
 var warnings = {
