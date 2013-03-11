@@ -952,3 +952,18 @@ exports.testArrayComprehensionImbricationWithDestArray = function (test) {
 	test.done();
 };
 
+exports.testTryCatchFilter = function (test) {
+	var code = [
+		"try {",
+		"	throw {name: 'foo', message: 'bar'};",
+		"}",
+		"catch (e if e.name === 'foo') {",
+		"	print (e.message);",
+		"}"
+	];
+	TestRun(test)
+		.test(code, {esnext: true, es5: true, undef: true, 
+						predef: ["print"]});
+
+	test.done();
+};
