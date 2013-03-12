@@ -1642,7 +1642,23 @@ var JSHINT = (function () {
 			}
 			indent = old_indent;
 		} else if (!ordinary) {
-			error("E021", state.tokens.next, "{", state.tokens.next.value);
+			if (isfunc) {
+				m = {};
+				for (d in state.directive) {
+					if (_.has(state.directive, d)) {
+						m[d] = state.directive[d];
+					}
+				}
+				expression(0);
+
+				if (state.option.strict && funct["(context)"]["(global)"]) {
+					if (!m["use strict"] && !state.directive["use strict"]) {
+						warning("E007");
+					}
+				}
+			} else {
+				error("E021", state.tokens.next, "{", state.tokens.next.value);
+			}
 		} else {
 			if (!stmt || state.option.curly) {
 				warning("W116", state.tokens.next, "{", state.tokens.next.value);
@@ -2428,7 +2444,7 @@ var JSHINT = (function () {
 		funct["(params)"] = functionparams();
 		funct["(metrics)"].verifyMaxParametersPerFunction(funct["(params)"]);
 
-		block(false, false, true);
+		block(false, true, true);
 
 		funct["(metrics)"].verifyMaxStatementsPerFunction();
 		funct["(metrics)"].verifyMaxComplexityPerFunction();
