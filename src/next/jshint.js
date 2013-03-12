@@ -1,6 +1,6 @@
 "use strict";
 
-var _         = require("underscore");
+var _         = require("lodash");
 var parser    = require("esprima");
 var events    = require("events");
 var utils     = require("./utils.js");

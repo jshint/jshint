@@ -22,20 +22,20 @@
 	"main": "./src/stable/jshint.js",
 
 	"dependencies": {
-		"esprima":    "http://github.com/ariya/esprima/tarball/master",
-		"shelljs":    "0.1.x",
-		"underscore": "1.4.x",
-		"peakle":     "0.0.x",
 		"cli":        "0.4.x",
-		"minimatch":  "0.x.x"
+		"esprima":    "http://github.com/ariya/esprima/tarball/master",
+		"lodash":     "1.x.x",
+		"minimatch":  "0.x.x",
+		"peakle":     "0.0.x",
+		"shelljs":    "0.1.x"
 	},
 
 	"devDependencies": {
-		"jshint":     "1.1.0",
-		"shelljs":    "0.1.x",
 		"browserify": "1.16.1",
 		"coveraje":   "0.2.x",
+		"jshint":     "1.1.0",
 		"nodeunit":   "0.7.x",
+		"shelljs":    "0.1.x",
 		"sinon":      "1.6.x"
 	},
 

@@ -1,6 +1,6 @@
 "use strict";
 
-var _ = require("underscore");
+var _ = require("lodash");
 var util = require("util");
 var Peakle = require("peakle").Peakle;
 var warnings = require("./constants.js").warnings;
