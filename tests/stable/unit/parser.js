@@ -952,3 +952,15 @@ exports.testArrayComprehensionImbricationWithDestArray = function (test) {
 	test.done();
 };
 
+exports.testArrayComprehensionDetection = function (test) {
+	var code = [
+		"var foo = []; for each (let i in [1,2,3]) { print(i); }"
+	
+	];
+	TestRun(test)
+		.test(code, {esnext: true, es5: true, undef: true, 
+						predef: ["print"]});
+
+	test.done();
+};
+
