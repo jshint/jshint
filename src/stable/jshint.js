@@ -1423,7 +1423,7 @@ var JSHINT = (function () {
 
 		// detect a destructuring assignment
 		if (state.option.esnext && _.has(["[", "{"], t.value)) {
-			if (new lookupBlockType().isDestAssign) {
+			if (lookupBlockType().isDestAssign) {
 				values = destructuringExpression();
 				values.forEach(function (tok) {
 					isundef(funct, "W117", tok.token, tok.id);
@@ -2315,7 +2315,7 @@ var JSHINT = (function () {
 	};
 
 	prefix("[", function () {
-		if (state.option.esnext && new lookupBlockType(0).isCompArray) {
+		if (state.option.esnext && lookupBlockType(0).isCompArray) {
 			return comprehensiveArrayExpression();
 		}
 		var b = state.tokens.curr.line !== state.tokens.next.line;
@@ -3570,9 +3570,12 @@ var JSHINT = (function () {
 		var pn, pn1;
 		var i = ahead || 0;
 		var bracketStack = 0;
+        var ret = {};
 		if (_.contains(["[", "{"], state.tokens.curr.value))
 			bracketStack += 1;
 		if (_.contains(["[", "{"], state.tokens.next.value))
+			bracketStack += 1;
+		if (_.contains(["]", "}"], state.tokens.next.value))
 			bracketStack += 1;
 		do {
 			pn = peek(i);
@@ -3584,26 +3587,25 @@ var JSHINT = (function () {
 				bracketStack -= 1;
 			}
 			if (pn.value === "for" && bracketStack === 1) {
-				this.isCompArray = true;
-				this.notJson = true;
+				ret.isCompArray = true;
+				ret.notJson = true;
 				break;
 			}
 			if (_.contains(["}", "]"], pn.value) && pn1.value === "=") {
-				this.isDestAssign = true;
-				this.notJson = true;
+				ret.isDestAssign = true;
+				ret.notJson = true;
 				break;
 			}
 			if (pn.value === ";") {
-				this.isBlock = true;
-				this.notJson = true;
+				ret.isBlock = true;
+				ret.notJson = true;
 			}
 		} while (bracketStack > 0 && pn.id !== "(end)" && i < 15);
-		return this;
+		return ret;
 	};
 
 	// Check whether this function has been reached for a destructuring assign with undeclared values
 	function destructuringAssignOrJsonValue() {
-
 		// lookup for the assignment (esnext only)
 		// if it has semicolons, it is a block, so go parse it as a block
 		// or it's not a block, but there are assignments, check for undeclared variables
@@ -3611,7 +3613,7 @@ var JSHINT = (function () {
 		var block = null;
 
 		if (state.option.esnext) {
-			block = new lookupBlockType();
+			block = lookupBlockType();
 		}
 		if (block && block.notJson) {
 			statements();
