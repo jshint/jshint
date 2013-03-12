@@ -3128,17 +3128,27 @@ var JSHINT = (function () {
 
 		block(false);
 
-		if (state.tokens.next.id === "catch") {
-			increaseComplexityCount();
-			doCatch();
-			b = true;
+		if (state.option.esnext) {
+			while (state.tokens.next.id === "catch") {
+				increaseComplexityCount();
+				doCatch();
+				b = true;
+			}
+		} else {
+			if (state.tokens.next.id === "catch") {
+				increaseComplexityCount();
+				doCatch();
+				b = true;
+			}
 		}
 
 		if (state.tokens.next.id === "finally") {
 			advance("finally");
 			block(false);
 			return;
-		} else if (!b) {
+		}
+		
+		if (!b) {
 			error("E021", state.tokens.next, "catch", state.tokens.next.value);
 		}
 
