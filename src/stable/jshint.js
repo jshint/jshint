@@ -799,7 +799,8 @@ var JSHINT = (function () {
 		var left, isArray = false, isObject = false, isLetExpr = false;
 
 		// if current expression is a let expression
-		if (state.option.esnext && state.tokens.next.value === "let" && peek(0).value === "(") {
+		if (state.option.esnext && 
+				!initial && state.tokens.next.value === "let" && peek(0).value === "(") {
 			isLetExpr = true;
 			// create a new block scope we use only for the current expression
 			funct["(blockscope)"].stack();
@@ -807,9 +808,6 @@ var JSHINT = (function () {
 			advance("(");
 			state.syntax["let"].fud.call(state.syntax["let"].fud, false);
 			advance(")");
-			if (state.tokens.next.value === "{") {
-				block(true);
-			}
 		}
 
 		if (state.tokens.next.id === "(end)")
@@ -2861,7 +2859,12 @@ var JSHINT = (function () {
 		});
 		varstatement.exps = true;
 		var letstatement = stmt("let", function (prefix) {
-			var tokens, lone, value;
+			var tokens, lone, value, letblock;
+
+			if (state.tokens.next.value === "(") {
+				advance("(");
+				letblock = true;
+			}
 
 			if (funct["(onevar)"] && state.option.onevar) {
 				warning("W081");
@@ -2922,6 +2925,12 @@ var JSHINT = (function () {
 				}
 				comma();
 			}
+			if (letblock) {
+				advance(")");
+				block(true, true);
+				this.block = true;
+			}
+			
 			return this;
 		});
 		letstatement.exps = true;
