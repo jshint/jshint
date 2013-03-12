@@ -1090,3 +1090,24 @@ exports.testForOf = function (test) {
 	test.done();
 };
 
+exports.TryMultiCatch = function (test) {
+	var code = [
+		"try {",
+		"    print('X');",
+		"",
+		"} catch (err) {",
+		"    print(err);",
+		"",
+		"} catch (err) {",
+		"    print(err);",
+		"",
+		"} finally {",
+		"    print('Z');",
+		"}"
+	];
+	TestRun(test)
+		.test(code, {esnext: true, es5: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+
