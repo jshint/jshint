@@ -1,6 +1,6 @@
 "use strict";
 
-var _ = require("underscore");
+var _ = require("lodash");
 var vars = require("../shared/vars.js");
 
 exports.register = function (linter) {

@@ -1,4 +1,4 @@
-var _ = require("underscore");
+var _ = require("lodash");
 var assert = require("assert");
 var fs = require("fs");
 var path = require("path");
