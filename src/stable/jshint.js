@@ -39,9 +39,9 @@ var reg      = require("./reg.js");
 var state    = require("./state.js").state;
 var style    = require("./style.js");
 
-// We build the application inside a function so that we produce only a single
-// global variable. That function will be invoked immediately, and its return
-// value is the JSHINT function itself.
+// We build the application inside a function so that we produce only a singleton
+// variable. That function will be invoked immediately, and its return value is
+// the JSHINT function itself.
 
 var JSHINT = (function () {
 	"use strict";
@@ -470,7 +470,20 @@ var JSHINT = (function () {
 		return i;
 	}
 
-	function addlabel(t, type, tkn) {
+	function checkblocklabels() {
+		for (var t in funct["(curblock)"]) {
+			if (funct["(curblock)"][t]["(type)"] === "unused") {
+				if (state.option.unused) {
+					var tkn = funct["(curblock)"][t]["(token)"];
+					var line = tkn.line;
+					var chr  = tkn.character;
+					warningAt("W098", line, chr, t);
+				}
+			}
+		}
+	}
+
+	function addlabel(t, type, tkn, islet) {
 		// Define t in the current function in the current scope.
 		if (type === "exception") {
 			if (_.has(funct["(context)"], t)) {
@@ -485,29 +498,43 @@ var JSHINT = (function () {
 				if (state.option.latedef)
 					warning("W003", state.tokens.next, t);
 			} else {
-				if (!state.option.shadow && type !== "exception") {
+				if (!state.option.shadow && type !== "exception" || 
+                        (state.option.esnext && funct["(blockscope)"].getlabel(t))) {
 					warning("W004", state.tokens.next, t);
 				}
 			}
 		}
-
-		funct[t] = type;
-
-		if (tkn) {
-			funct["(tokens)"][t] = tkn;
+		if (state.option.esnext) {
+			// a double definition of a let variable in same block throws a TypeError
+			if (funct["(curblock)"] && _.has(funct["(curblock)"], t)) {
+				error("E044", state.tokens.next, t);
+			}
 		}
 
-		if (funct["(global)"]) {
-			global[t] = funct;
-			if (_.has(implied, t)) {
-				if (state.option.latedef) {
-					warning("W003", state.tokens.next, t);
-				}
-
-				delete implied[t];
-			}
+		// if the identifier is from a let, adds it only to the current blockscope
+		if (state.option.esnext && islet) {
+			funct["(curblock)"][t] = { "(type)" : type,
+									   "(token)": state.tokens.curr };
 		} else {
-			scope[t] = funct;
+
+			funct[t] = type;
+
+			if (tkn) {
+				funct["(tokens)"][t] = tkn;
+			}
+
+			if (funct["(global)"]) {
+				global[t] = funct;
+				if (_.has(implied, t)) {
+					if (state.option.latedef) {
+						warning("W003", state.tokens.next, t);
+					}
+
+					delete implied[t];
+				}
+			} else {
+				scope[t] = funct;
+			}
 		}
 	}
 
@@ -766,7 +793,6 @@ var JSHINT = (function () {
 		}
 	}
 
-
 	// This is the heart of JSHINT, the Pratt parser. In addition to parsing, it
 	// is looking for ad hoc lint patterns. We add .fud to Pratt's model, which is
 	// like .nud except that it is only used on the first token of a statement.
@@ -782,7 +808,22 @@ var JSHINT = (function () {
 	// They are elements of the parsing method called Top Down Operator Precedence.
 
 	function expression(rbp, initial) {
-		var left, isArray = false, isObject = false;
+		var left, isArray = false, isObject = false, isLetExpr = false;
+
+		// if current expression is a let expression
+		if (state.option.esnext && state.tokens.next.value === "let" && peek(0).value === "(") {
+			isLetExpr = true;
+			// create a new block scope we use only for the current expression
+			funct["(curblock)"] = {};
+			funct["(blockscope)"].push(funct["(curblock)"]);
+			advance("let");
+			advance("(");
+			state.syntax["let"].fud.call(state.syntax["let"].fud, false);
+			advance(")");
+			if (state.tokens.next.value === "{") {
+				block(true);
+			}
+		}
 
 		if (state.tokens.next.id === "(end)")
 			error("E006", state.tokens.curr);
@@ -835,12 +876,17 @@ var JSHINT = (function () {
 					warning("W010", state.tokens.curr);
 				}
 
-				if (state.tokens.curr.led) {
+				if (left && state.tokens.curr.led) {
 					left = state.tokens.curr.led(left);
 				} else {
 					error("E033", state.tokens.curr, state.tokens.curr.id);
 				}
 			}
+		}
+		if (isLetExpr) {
+			checkblocklabels();
+			funct["(blockscope)"].splice(funct["(blockscope)"].length - 1, 1);
+			funct["(curblock)"] = _.last(funct["(blockscope)"]);
 		}
 		return left;
 	}
@@ -974,10 +1020,12 @@ var JSHINT = (function () {
 			case "in":
 			case "instanceof":
 			case "return":
+			case "yield":
 			case "switch":
 			case "throw":
 			case "try":
 			case "var":
+			case "let":
 			case "while":
 			case "with":
 				error("E024", state.tokens.next, state.tokens.next.value);
@@ -1170,20 +1218,32 @@ var JSHINT = (function () {
 		return infix(s, function (left, that) {
 			that.left = left;
 
-			if (predefined[left.value] === false &&
-					scope[left.value]["(global)"] === true) {
-				warning("W020", left);
-			} else if (left["function"]) {
-				warning("W021", left, left.value);
-			}
-
 			if (left) {
+				if (predefined[left.value] === false &&
+						scope[left.value]["(global)"] === true) {
+					warning("W020", left);
+				} else if (left["function"]) {
+					warning("W021", left, left.value);
+				}
+
 				if (state.option.esnext && funct[left.value] === "const") {
 					error("E013", left, left.value);
 				}
 
-				if (left.id === "." || left.id === "[") {
+				if (left.id === ".") {
 					if (!left.left || left.left.value === "arguments") {
+						warning("E031", that);
+					}
+					that.right = expression(19);
+					return that;
+				} else if (left.id === "[") {
+					if (state.option.esnext && state.tokens.curr.left.first) {
+						state.tokens.curr.left.first.forEach(function (t) {
+							if (funct[t.value] === "const") {
+								error("E013", t, t.value);
+							}
+						});
+					} else if (!left.left || left.left.value === "arguments") {
 						warning("E031", that);
 					}
 					that.right = expression(19);
@@ -1339,6 +1399,7 @@ var JSHINT = (function () {
 
 
 	function statement(noindent) {
+		var values;
 		var i = indent, r, s = scope, t = state.tokens.next;
 
 		if (t.id === ";") {
@@ -1358,6 +1419,19 @@ var JSHINT = (function () {
 			res = false;
 		}
 
+		// detect a destructuring assignment
+		if (state.option.esnext && _.has(["[", "{"], t.value)) {
+			if (lookupBlockType().isDestAssign) {
+				values = destructuringExpression();
+				values.forEach(function (tok) {
+					isundef(funct, "W117", tok.token, tok.id);
+				});
+				advance("=");
+				destructuringExpressionMatch(values, expression(0, true));
+				advance(";");
+				return;
+			} 
+		}
 		if (t.identifier && !res && peek().id === ":") {
 			advance();
 			advance(":");
@@ -1540,6 +1614,11 @@ var JSHINT = (function () {
 
 		if (state.tokens.next.id === "{") {
 			advance("{");
+			if (state.option.esnext) {
+				// create a new block scope
+				funct["(curblock)"] = {};
+				funct["(blockscope)"].push(funct["(curblock)"]);
+			}
 			line = state.tokens.curr.line;
 			if (state.tokens.next.id !== "}") {
 				indent += state.option.indent;
@@ -1579,6 +1658,11 @@ var JSHINT = (function () {
 				indentation();
 			}
 			advance("}", t);
+			if (state.option.esnext) {
+				checkblocklabels();
+				funct["(blockscope)"].splice(funct["(blockscope)"].length - 1, 1);
+				funct["(curblock)"] = _.last(funct["(blockscope)"]);
+			}
 			indent = old_indent;
 		} else if (!ordinary) {
 			error("E021", state.tokens.next, "{", state.tokens.next.value);
@@ -1661,16 +1745,23 @@ var JSHINT = (function () {
 				s = funct;
 				funct = f;
 			}
-
+			var block;
+			if (state.option.esnext && _.has(funct, "(blockscope)")) {
+				block = funct["(blockscope)"].getlabelblock(v);
+			}
+			
 			// The name is in scope and defined in the current function.
-			if (funct === s) {
+			if (funct === s || block) {
 				// Change 'unused' to 'var', and reject labels.
-				switch (funct[v]) {
+				// the name is in a block scope
+				switch (block ? block[v]["(type)"] : funct[v]) {
 				case "unused":
-					funct[v] = "var";
+					if (block) block[v]["(type)"] = "var";
+					else funct[v] = "var";
 					break;
 				case "unction":
-					funct[v] = "function";
+					if (block) block[v]["(type)"] = "function";
+					else funct[v] = "function";
 					this["function"] = true;
 					break;
 				case "function":
@@ -1695,7 +1786,14 @@ var JSHINT = (function () {
 						(state.tokens.next && (state.tokens.next.value === "." ||
 							state.tokens.next.value === "["))) {
 
-						isundef(funct, "W117", state.tokens.curr, v);
+						// if we're in a list comprehension, variables are declared
+						// locally and used before being defined. So we check 
+						// the presence of the given variable in the comp array
+						// before declaring it undefined.
+
+						if (!(state.option.esnext && state.compArray.check(v))) {
+							isundef(funct, "W117", state.tokens.curr, v);
+						}
 					}
 				}
 
@@ -1874,7 +1972,14 @@ var JSHINT = (function () {
 	bitwise("<<", "shiftleft", 120);
 	bitwise(">>", "shiftright", 120);
 	bitwise(">>>", "shiftrightunsigned", 120);
-	infix("in", "in", 120);
+	infix("in", function (left, that) {
+		if (state.inCompArray === "define") {
+			state.inCompArray = "container";
+		}
+		that.left = left;
+		that.right = expression(120);
+		return that;
+	}, 120);
 	infix("instanceof", "instanceof", 120);
 	infix("+", function (left, that) {
 		var right = expression(130);
@@ -2182,7 +2287,35 @@ var JSHINT = (function () {
 		return that;
 	}, 160, true);
 
+	var comprehensiveArrayExpression = function () {
+		var res = {};
+		state.compArray.stack();
+
+		res.right = expression(0);
+		advance("for");
+		if (state.tokens.next.value === "each") {
+			advance("each");
+		}
+		advance("(");
+		state.compArray.setState("define");
+		res.left = expression(0);
+		advance(")");
+		if (state.tokens.next.value === "if") {
+			advance("if");
+			advance("(");
+			state.compArray.setState("filter");
+			res.filter = expression(0);
+			advance(")");
+		}
+		advance("]");
+		state.compArray.unstack();
+		return res;
+	};
+
 	prefix("[", function () {
+		if (state.option.esnext && lookupBlockType(0).isCompArray) {
+			return comprehensiveArrayExpression();
+		}
 		var b = state.tokens.curr.line !== state.tokens.next.line;
 		this.first = [];
 		if (b) {
@@ -2248,6 +2381,7 @@ var JSHINT = (function () {
 		var next   = state.tokens.next;
 		var params = [];
 		var ident;
+		var tokens = [];
 
 		advance("(");
 		nospace();
@@ -2258,9 +2392,20 @@ var JSHINT = (function () {
 		}
 
 		for (;;) {
-			ident = identifier(true);
-			params.push(ident);
-			addlabel(ident, "unused", state.tokens.curr);
+			if (state.option.esnext && _.contains(["{", "["], state.tokens.next.id)) {
+				tokens = destructuringExpression();
+				for (var t in tokens) {
+					t = tokens[t];
+					if (t.id) {
+						params.push(t.id);
+						addlabel(t.id, "unused", t.token);
+					}
+				}
+			} else {
+				ident = identifier(true);
+				params.push(ident);
+				addlabel(ident, "unused", state.tokens.curr);
+			}
 			if (state.tokens.next.id === ",") {
 				comma();
 			} else {
@@ -2281,16 +2426,18 @@ var JSHINT = (function () {
 		scope  = Object.create(scope);
 
 		funct = {
-			"(name)"     : name || "\"" + anonname + "\"",
-			"(line)"     : state.tokens.next.line,
-			"(character)": state.tokens.next.character,
-			"(context)"  : funct,
-			"(breakage)" : 0,
-			"(loopage)"  : 0,
-			"(metrics)"  : createMetrics(state.tokens.next),
-			"(scope)"    : scope,
-			"(statement)": statement,
-			"(tokens)"   : {}
+			"(name)"      : name || "\"" + anonname + "\"",
+			"(line)"      : state.tokens.next.line,
+			"(character)" : state.tokens.next.character,
+			"(context)"   : funct,
+			"(breakage)"  : 0,
+			"(loopage)"   : 0,
+			"(metrics)"   : createMetrics(state.tokens.next),
+			"(scope)"     : scope,
+			"(statement)" : statement,
+			"(tokens)"    : {},
+			"(blockscope)": funct["(blockscope)"],
+			"(curscope)"  : funct["(curscope)"]
 		};
 
 		f = funct;
@@ -2532,32 +2679,111 @@ var JSHINT = (function () {
 		};
 	}(delim("{")));
 
+	function destructuringExpression() {
+		var id, ids;
+		var identifiers = [];
+		var nextInnerDE = function () {
+			var ident;
+			if (_.contains(["[", "{"], state.tokens.next.value)) {
+				ids = destructuringExpression();
+				for (var id in ids) {
+					id = ids[id];
+					identifiers.push({ id: id.id, token: id.token });
+				}
+			} else if (state.tokens.next.value === ",") {
+				identifiers.push({ id: null, token: state.tokens.curr });
+			} else {
+				ident = identifier();
+				if (ident)
+					identifiers.push({ id: ident, token: state.tokens.curr });
+			}
+		};
+		if (state.tokens.next.value === "[") {
+			advance("[");
+			nextInnerDE();
+			while (state.tokens.next.value !== "]") {
+				advance(",");
+				nextInnerDE();
+			}
+			advance("]");
+		} else if (state.tokens.next.value === "{") {
+			advance("{");
+			id = identifier();
+			if (state.tokens.next.value === ":") {
+				advance(":");
+				nextInnerDE();
+			} else {
+				identifiers.push({ id: id, token: state.tokens.curr });
+			}
+			while (state.tokens.next.value !== "}") {
+				advance(",");
+				id = identifier();
+				if (state.tokens.next.value === ":") {
+					advance(":");
+					nextInnerDE();
+				} else {
+					identifiers.push({ id: id, token: state.tokens.curr });
+				}
+			}
+			advance("}");
+		}
+		return identifiers;
+	}
+	function destructuringExpressionMatch(tokens, value) {
+		if (value.first) {
+			_.zip(tokens, value.first).forEach(function (val) {
+				var token = val[0];
+				var value = val[1];
+				if (token && value) {
+					token.first = value;
+				} else if (token && token.first && !value) {
+					warning("W080", token.first, token.first.value);
+				} /* else {
+					XXX value is discarded: wouldn't it need a warning ?
+				} */
+			});
+		}
+	}
+
 	// This Function is called when esnext option is set to true
 	// it adds the `const` statement to JSHINT
 
 	useESNextSyntax = function () {
 		var conststatement = stmt("const", function (prefix) {
-			var id, name, value;
+			var tokens, lone, value;
 
 			this.first = [];
 			for (;;) {
+				var names = [];
 				nonadjacent(state.tokens.curr, state.tokens.next);
-				id = identifier();
-				if (funct[id] === "const") {
-					warning("E011", null, id);
+				if (_.contains(["{", "["], state.tokens.next.value)) {
+					tokens = destructuringExpression();
+					lone = false;
+				} else {
+					tokens = [ { id: identifier(), token: state.tokens.curr } ];
+					lone = true;
 				}
-				if (funct["(global)"] && predefined[id] === false) {
-					warning("W079", state.tokens.curr, id);
+				for (var t in tokens) {
+					t = tokens[t];
+					if (funct[t.id] === "const") {
+						warning("E011", null, t.id);
+					}
+					if (funct["(global)"] && predefined[t.id] === false) {
+						warning("W079", t.token, t.id);
+					}
+					if (t.id) {
+						addlabel(t.id, "const");
+						names.push(t.token);
+					}
 				}
-				addlabel(id, "const");
 				if (prefix) {
 					break;
 				}
-				name = state.tokens.curr;
-				this.first.push(state.tokens.curr);
+
+				this.first = this.first.concat(names);
 
 				if (state.tokens.next.id !== "=") {
-					warning("E012", state.tokens.curr, id);
+					warning("E012", state.tokens.curr, state.tokens.curr.value);
 				}
 
 				if (state.tokens.next.id === "=") {
@@ -2565,13 +2791,17 @@ var JSHINT = (function () {
 					advance("=");
 					nonadjacent(state.tokens.curr, state.tokens.next);
 					if (state.tokens.next.id === "undefined") {
-						warning("W080", state.tokens.curr, id);
+						warning("W080", state.tokens.curr, state.tokens.curr.value);
 					}
 					if (peek(0).id === "=" && state.tokens.next.identifier) {
 						error("E037", state.tokens.next, state.tokens.next.value);
 					}
 					value = expression(0);
-					name.first = value;
+					if (lone) {
+						tokens[0].first = value;
+					} else {
+						destructuringExpressionMatch(names, value);
+					}
 				}
 
 				if (state.tokens.next.id !== ",") {
@@ -2582,7 +2812,143 @@ var JSHINT = (function () {
 			return this;
 		});
 		conststatement.exps = true;
+		var varstatement = stmt("var", function (prefix) {
+			// JavaScript does not have block scope. It only has function scope. So,
+			// declaring a variable in a block can have unexpected consequences.
+			var tokens, lone, value;
+
+			if (funct["(onevar)"] && state.option.onevar) {
+				warning("W081");
+			} else if (!funct["(global)"]) {
+				funct["(onevar)"] = true;
+			}
+
+			this.first = [];
+			for (;;) {
+				var names = [];
+				nonadjacent(state.tokens.curr, state.tokens.next);
+				if (_.contains(["{", "["], state.tokens.next.value)) {
+					tokens = destructuringExpression();
+					lone = false;
+				} else {
+					tokens = [ { id: identifier(), token: state.tokens.curr } ];
+					lone = true;
+				}
+				for (var t in tokens) {
+					t = tokens[t];
+					if (state.option.esnext && funct[t.id] === "const") {
+						warning("E011", null, t.id);
+					}
+					if (funct["(global)"] && predefined[t.id] === false) {
+						warning("W079", t.token, t.id);
+					}
+					if (t.id) {
+						addlabel(t.id, "unused", t.token);
+						names.push(t.token);
+					}
+				}
+				if (prefix) {
+					break;
+				}
+
+				this.first = this.first.concat(names);
+
+				if (state.tokens.next.id === "=") {
+					nonadjacent(state.tokens.curr, state.tokens.next);
+					advance("=");
+					nonadjacent(state.tokens.curr, state.tokens.next);
+					if (state.tokens.next.id === "undefined") {
+						warning("W080", state.tokens.curr, state.tokens.curr.value);
+					}
+					if (peek(0).id === "=" && state.tokens.next.identifier) {
+						error("E038", state.tokens.next, state.tokens.next.value);
+					}
+					value = expression(0);
+					if (lone) {
+						tokens[0].first = value;
+					} else {
+						destructuringExpressionMatch(names, value);
+					}
+				}
+
+				if (state.tokens.next.id !== ",") {
+					break;
+				}
+				comma();
+			}
+			return this;
+		});
+		varstatement.exps = true;
+		var letstatement = stmt("let", function (prefix) {
+			var tokens, lone, value;
+
+			if (funct["(onevar)"] && state.option.onevar) {
+				warning("W081");
+			} else if (!funct["(global)"]) {
+				funct["(onevar)"] = true;
+			}
+
+			this.first = [];
+			for (;;) {
+				var names = [];
+				nonadjacent(state.tokens.curr, state.tokens.next);
+				if (_.contains(["{", "["], state.tokens.next.value)) {
+					tokens = destructuringExpression();
+					lone = false;
+				} else {
+					tokens = [ { id: identifier(), token: state.tokens.curr.value } ];
+					lone = true;
+				}
+				for (var t in tokens) {
+					t = tokens[t];
+					if (state.option.esnext && funct[t.id] === "const") {
+						warning("E011", null, t.id);
+					}
+					if (funct["(global)"] && predefined[t.id] === false) {
+						warning("W079", t.token, t.id);
+					}
+					if (t.id) {
+						addlabel(t.id, "unused", t.token, true);
+						names.push(t.token);
+					}
+				}
+				if (prefix) {
+					break;
+				}
+
+				this.first = this.first.concat(names);
+
+				if (state.tokens.next.id === "=") {
+					nonadjacent(state.tokens.curr, state.tokens.next);
+					advance("=");
+					nonadjacent(state.tokens.curr, state.tokens.next);
+					if (state.tokens.next.id === "undefined") {
+						warning("W080", state.tokens.curr, state.tokens.curr.value);
+					}
+					if (peek(0).id === "=" && state.tokens.next.identifier) {
+						error("E037", state.tokens.next, state.tokens.next.value);
+					}
+					value = expression(0);
+					if (lone) {
+						tokens[0].first = value;
+					} else {
+						destructuringExpressionMatch(names, value);
+					}
+				}
+
+				if (state.tokens.next.id !== ",") {
+					break;
+				}
+				comma();
+			}
+			return this;
+		});
+		letstatement.exps = true;
 	};
+	var letstatement = stmt("let", function () {
+		warning("W104", state.tokens.curr, "let");
+	});
+	letstatement.exps = true;
 
 	var varstatement = stmt("var", function (prefix) {
 		// JavaScript does not have block scope. It only has function scope. So,
@@ -2825,6 +3191,7 @@ var JSHINT = (function () {
 			switch (state.tokens.next.id) {
 			case "case":
 				switch (funct["(verb)"]) {
+				case "yield":
 				case "break":
 				case "case":
 				case "continue":
@@ -2850,6 +3217,7 @@ var JSHINT = (function () {
 				break;
 			case "default":
 				switch (funct["(verb)"]) {
+				case "yield":
 				case "break":
 				case "continue":
 				case "return":
@@ -2940,16 +3308,39 @@ var JSHINT = (function () {
 
 	blockstmt("for", function () {
 		var s, t = state.tokens.next;
+		var letscope = false;
+		var foreachtok = null;
+
+		if (t.value === "each") {
+			foreachtok = t;
+			advance("each");
+		}
+
 		funct["(breakage)"] += 1;
 		funct["(loopage)"] += 1;
 		increaseComplexityCount();
 		advance("(");
 		nonadjacent(this, t);
 		nospace();
-		if (peek(state.tokens.next.id === "var" ? 1 : 0).id === "in") {
+
+		// if we're in a for (… in …) statement
+		var pn;
+		var i = 0;
+		do {
+			pn = peek(i);
+			++i;
+		} while (pn.id !== "in" && pn.value !== ";" && pn.type !== "(end)");
+		if (pn.id === "in") {
 			if (state.tokens.next.id === "var") {
 				advance("var");
-				varstatement.fud.call(varstatement, true);
+				state.syntax["var"].fud.call(state.syntax["var"].fud, true);
+			} else if (state.option.esnext && state.tokens.next.id === "let") {
+				advance("let");
+				// create a new block scope
+				letscope = true;
+				funct["(curblock)"] = {};
+				funct["(blockscope)"].push(funct["(curblock)"]);
+				state.syntax["let"].fud.call(state.syntax["let"].fud, true);
 			} else {
 				switch (funct[state.tokens.next.value]) {
 				case "unused":
@@ -2958,7 +3349,8 @@ var JSHINT = (function () {
 				case "var":
 					break;
 				default:
-					warning("W088", state.tokens.next, state.tokens.next.value);
+					if (!funct["(blockscope)"].getlabelblock(state.tokens.next.value))
+						warning("W088", state.tokens.next, state.tokens.next.value);
 				}
 				advance();
 			}
@@ -2972,12 +3364,21 @@ var JSHINT = (function () {
 			}
 			funct["(breakage)"] -= 1;
 			funct["(loopage)"] -= 1;
-			return this;
 		} else {
+			if (foreachtok) {
+				error("E045", foreachtok);
+			}
 			if (state.tokens.next.id !== ";") {
 				if (state.tokens.next.id === "var") {
 					advance("var");
-					varstatement.fud.call(varstatement);
+					state.syntax["var"].fud.call(state.syntax["var"].fud);
+				} else if (state.option.esnext && state.tokens.next.id === "let") {
+					advance("let");
+					// create a new block scope
+					letscope = true;
+					funct["(curblock)"] = {};
+					funct["(blockscope)"].push(funct["(curblock)"]);
+					state.syntax["let"].fud.call(state.syntax["let"].fud);
 				} else {
 					for (;;) {
 						expression(0, "for");
@@ -3013,8 +3414,15 @@ var JSHINT = (function () {
 			block(true, true);
 			funct["(breakage)"] -= 1;
 			funct["(loopage)"] -= 1;
-			return this;
+
 		}
+		// unstack loop blockscope
+		if (letscope) {
+			checkblocklabels();
+			funct["(blockscope)"].splice(funct["(blockscope)"].length - 1, 1);
+			funct["(curblock)"] = _.last(funct["(blockscope)"]);
+		}
+		return this;
 	}).labelled = true;
 
 
@@ -3090,6 +3498,28 @@ var JSHINT = (function () {
 		return this;
 	}).exps = true;
 
+	stmt("yield", function () {
+		if (!state.option.esnext) {
+			warning("W104", state.tokens.curr, "yield");
+		}
+		if (this.line === state.tokens.next.line) {
+			if (state.tokens.next.id === "(regexp)")
+				warning("W092");
+
+			if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
+				nonadjacent(state.tokens.curr, state.tokens.next);
+				this.first = expression(0);
+
+				if (this.first.type === "(punctuator)" && this.first.value === "=" && !state.option.boss) {
+					warningAt("W093", this.first.line, this.first.character);
+				}
+			}
+		} else if (!state.option.asi) {
+			nolinebreak(this); // always warn (Line breaking error)
+		}
+		return this;
+	}).exps = true;
+
 
 	stmt("throw", function () {
 		nolinebreak(this);
@@ -3117,7 +3547,6 @@ var JSHINT = (function () {
 	FutureReservedWord("import", { es5: true });
 	FutureReservedWord("int");
 	FutureReservedWord("interface");
-	FutureReservedWord("let", { es5: true, strictOnly: true });
 	FutureReservedWord("long");
 	FutureReservedWord("native");
 	FutureReservedWord("package", { es5: true, strictOnly: true });
@@ -3131,7 +3560,159 @@ var JSHINT = (function () {
 	FutureReservedWord("throws");
 	FutureReservedWord("transient");
 	FutureReservedWord("volatile");
-	FutureReservedWord("yield", { es5: true, strictOnly: true });
+
+	// this function is used to determine wether a squarebracket or a curlybracket
+	// expression is a comprehension array, destructuring assignment or a json value.
+
+	var lookupBlockType = function (ahead) {
+		var pn, pn1;
+		var i = ahead || 0;
+		var bracketStack = 0;
+        var ret = {};
+		if (_.contains(["[", "{"], state.tokens.curr.value))
+			bracketStack += 1;
+		if (_.contains(["[", "{"], state.tokens.next.value))
+			bracketStack += 1;
+		if (_.contains(["]", "}"], state.tokens.next.value))
+			bracketStack -= 1;
+		do {
+			pn = peek(i);
+			pn1 = peek(i + 1);
+			i = i + 1;
+			if (_.contains(["[", "{"], pn.value)) {
+				bracketStack += 1;
+			} else if (_.contains(["]", "}"], pn.value)) {
+				bracketStack -= 1;
+			}
+			if (pn.value === "for" && bracketStack === 1) {
+				ret.isCompArray = true;
+				ret.notJson = true;
+				break;
+			}
+			if (_.contains(["}", "]"], pn.value) && pn1.value === "=") {
+				ret.isDestAssign = true;
+				ret.notJson = true;
+				break;
+			}
+			if (pn.value === ";") {
+				ret.isBlock = true;
+				ret.notJson = true;
+			}
+		} while (bracketStack > 0 && pn.id !== "(end)" && i < 15);
+		return ret;
+	};
+
+	// Check whether this function has been reached for a destructuring assign with undeclared values
+	function destructuringAssignOrJsonValue() {
+		// lookup for the assignment (esnext only)
+		// if it has semicolons, it is a block, so go parse it as a block
+		// or it's not a block, but there are assignments, check for undeclared variables
+
+		var block = null;
+
+		if (state.option.esnext) {
+			block = lookupBlockType();
+		}
+		if (block && block.notJson) {
+			statements();
+		// otherwise parse json value
+		} else {
+			state.option.laxbreak = true;
+			state.jsonMode = true;
+			jsonValue();
+		}
+	}
+
+	// array comprehension parsing function
+	// parses and defines the three states of the list comprehension in order
+	// to avoid defining global variables, but keeping them to the list comprehension scope
+	// only. The order of the states are as follows:
+	//  * "use" which will be the returned iterative part of the list comprehension
+	//  * "define" which will define the variables local to the list comprehension
+	//  * "filter" which will help filter out values
+
+	var arrayComprehension = function () {
+		var CompArray = function () {
+			this.mode = "use";
+			this.variables = [];
+		};
+		var _carrays = [];
+		var _current;
+		function declare(v) {
+			var l = _current.variables.filter(function (elt) {
+				// if it has, change its undef state
+				if (elt.value === v) {
+					elt.undef = false;
+					return v;
+				}
+			}).length;
+			return l !== 0;
+		}
+		function use(v) {
+			var l = _current.variables.filter(function (elt) {
+				// and if it has been defined
+				if (elt.value === v && !elt.undef) {
+					if (elt.unused === true) {
+						elt.unused = false;
+					}
+					return v;
+				}
+			}).length;
+			// otherwise we warn about it
+			return (l === 0);
+		}
+		return {stack: function () {
+					_current = new CompArray();
+					_carrays.push(_current);
+				},
+				unstack: function () {
+					_current.variables.filter(function (v) {
+						if (v.unused)
+							warning("W098", v.token, v.value);
+						if (v.undef)
+							isundef(v.funct, "W117", v.token, v.value);
+					});
+					_carrays.splice(_carrays[_carrays.length - 1], 1);
+					_current = _carrays[_carrays.length - 1];
+				},
+				setState: function (s) {
+					if (_.contains(["use", "define", "filter"], s))
+						_current.mode = s;
+				},
+				check: function (v) {
+					// When we are in "use" state of the list comp, we enqueue that var
+					if (_current && _current.mode === "use") {
+						_current.variables.push({funct: funct,
+													token: state.tokens.curr,
+													value: v,
+													undef: true,
+													unused: false});
+						return true;
+					// When we are in "define" state of the list comp,
+					} else if (_current && _current.mode === "define") {
+						// check if the variable has been used previously
+						if (!declare(v)) {
+							_current.variables.push({funct: funct,
+														token: state.tokens.curr,
+														value: v,
+														undef: false,
+														unused: true});
+						}
+						return true;
+					// When we are in "filter" state,
+					} else if (_current && _current.mode === "filter") {
+						// we check whether current variable has been declared
+						if (use(v)) {
+							// if not we warn about it
+							isundef(funct, "W117", state.tokens.curr, v);
+						}
+						return true;
+					}
+					return false;
+				}
+				};
+	};
+
 
 	// Parse JSON
 
@@ -3229,6 +3810,7 @@ var JSHINT = (function () {
 		var a, i, k, x;
 		var optionKeys;
 		var newOptionObj = {};
+		var globBlock = {};
 
 		state.reset();
 
@@ -3303,7 +3885,16 @@ var JSHINT = (function () {
 			"(breakage)": 0,
 			"(loopage)":  0,
 			"(tokens)":   {},
-			"(metrics)":   createMetrics(state.tokens.next)
+			"(metrics)":   createMetrics(state.tokens.next),
+			"(curblock)"  : globBlock,
+			"(blockscope)": [globBlock]
+		};
+		funct["(blockscope)"].getlabelblock = function (l) {
+			for (var i = this.length - 1 ; i >= 0; --i) {
+				if (_.has(this[i], l)) {
+					return this[i];
+				}
+			}
 		};
 		functions = [funct];
 		urls = [];
@@ -3315,6 +3906,8 @@ var JSHINT = (function () {
 		lookahead = [];
 		warnings = 0;
 		unuseds = [];
+
+		state.compArray = arrayComprehension();
 
 		if (!isString(s) && !Array.isArray(s)) {
 			errorAt("E004", 0);
@@ -3404,9 +3997,7 @@ var JSHINT = (function () {
 			switch (state.tokens.next.id) {
 			case "{":
 			case "[":
-				state.option.laxbreak = true;
-				state.jsonMode = true;
-				jsonValue();
+				destructuringAssignOrJsonValue();
 				break;
 			default:
 				directives();
