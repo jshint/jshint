@@ -897,11 +897,11 @@ exports.testLetStmtJetPack = function (test) {
 exports.testLetStmtLetExpr = function (test) {
 	// Example taken from jetpack/addons sdk library from Mozilla project
 	var code = [
-	"let (x=1, y=2, z=3)",
-	"{",
-	"	let(t=4) print(x, y, z, t);",
-	"	print(let(u=4) u,x);",
-	"}"
+		"let (x=1, y=2, z=3)",
+		"{",
+		"	let(t=4) print(x, y, z, t);",
+		"	print(let(u=4) u,x);",
+		"}"
 	];
 
 	TestRun(test)
@@ -943,7 +943,8 @@ exports.testForEachError = function (test) {
 
 	TestRun(test)
 		.addError(1, "Invalid for each loop.")
-		.test(code, {esnext: true, es5: true, unused: true, undef: true, predef: ["print", "Iterator"]});
+		.test(code, {esnext: true, es5: true, unused: true,
+						undef: true, predef: ["print", "Iterator"]});
 
 	test.done();
 };
@@ -964,7 +965,8 @@ exports.testGenerator = function (test) {
 		"	print(g.next());"
 	];
 	TestRun(test)
-		.test(code, {esnext: true, es5: true, unused: true, undef: true, predef: ["print", "Iterator"]});
+		.test(code, {esnext: true, es5: true, unused: true,
+						undef: true, predef: ["print", "Iterator"]});
 
 	test.done();
 };
