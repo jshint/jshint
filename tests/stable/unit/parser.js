@@ -520,3 +520,18 @@ exports["regression for GH-878"] = function (test) {
 
 	test.done();
 };
+
+exports["regression for GH-910"] = function (test) {
+	var src = "(function () { if (true) { foo.bar + } })();";
+	TestRun(test)
+		.addError(1, "Expected an identifier and instead saw '}'.")
+		.addError(1, "Expected an assignment or function call and instead saw an expression.")
+		.addError(1, "Missing semicolon.")
+		.addError(1, "Expected an identifier and instead saw ')'.")
+		.addError(1, "Unmatched '{'.")
+		.addError(1, "Unmatched '('.")
+		.addError(1, "Expected an assignment or function call and instead saw an expression.")
+		.addError(1, "Missing semicolon.")
+		.test(src, { nonew: true });
+	test.done();
+};

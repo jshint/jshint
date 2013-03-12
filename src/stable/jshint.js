@@ -1395,7 +1395,7 @@ var JSHINT = (function () {
 		if (!t.block) {
 			if (!state.option.expr && (!r || !r.exps)) {
 				warning("W030", state.tokens.curr);
-			} else if (state.option.nonew && r.id === "(" && r.left.id === "new") {
+			} else if (state.option.nonew && r && r.left && r.id === "(" && r.left.id === "new") {
 				warning("W031", t);
 			}
 
