@@ -3338,11 +3338,15 @@ var JSHINT = (function () {
 		// if we're in a for (… in …) statement
 		var pn;
 		var i = 0;
+		var inof = ["in"];
+		if (state.option.esnext) {
+			inof = ["in", "of"];
+		}
 		do {
 			pn = peek(i);
 			++i;
-		} while (!_.contains(["in", "of"], pn.value) && pn.value !== ";" && pn.type !== "(end)");
-		if (_.contains(["in", "of"], pn.value)) {
+		} while (!_.contains(inof, pn.value) && pn.value !== ";" && pn.type !== "(end)");
+		if (_.contains(inof, pn.value)) {
 			if (state.tokens.next.id === "var") {
 				advance("var");
 				state.syntax["var"].fud.call(state.syntax["var"].fud, true);
