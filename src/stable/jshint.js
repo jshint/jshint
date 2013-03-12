@@ -498,7 +498,8 @@ var JSHINT = (function () {
 				if (state.option.latedef)
 					warning("W003", state.tokens.next, t);
 			} else {
-				if (!state.option.shadow && type !== "exception") {
+				if (!state.option.shadow && type !== "exception" || 
+                        (state.option.esnext && funct["(blockscope)"].getlabel(t))) {
 					warning("W004", state.tokens.next, t);
 				}
 			}
@@ -507,9 +508,6 @@ var JSHINT = (function () {
 			// a double definition of a let variable in same block throws a TypeError
 			if (funct["(curblock)"] && _.has(funct["(curblock)"], t)) {
 				error("E044", state.tokens.next, t);
-			} else if (!state.option.shadow && funct[t] !== "const") {
-				if (funct["(blockscope)"].getlabelblock(t) || _.has(funct, t))
-					warning("W004", state.tokens.next, t);
 			}
 		}
 

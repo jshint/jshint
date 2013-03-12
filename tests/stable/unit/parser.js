@@ -521,6 +521,62 @@ exports["regression for GH-878"] = function (test) {
 	test.done();
 };
 
+exports.testDestructuringVarFuncScope = function (test) {
+	var code = [
+		"function foobar() {",
+		"	var [ a, b, c ] = [ 1, 2, 3 ];",
+		"	var [ a ] = [ 1 ];",
+		"	var [ a ] = [ z ];",
+		"	var [ h, w ] = [ 'hello', 'world' ]; ",
+		"	var [ o ] = [ { o : 1 } ];",
+		"	var [ a, [ [ [ b ], c ], d ] ] = [ 1, [ [ [ 2 ], 3], 4 ] ];",
+		"	var { foo : bar } = { foo : 1 };",
+		"	var [ a, { foo : bar } ] = [ 2, { foo : 1 } ];",
+		"	var [ 1 ] = [ a ];",
+		"	var [ a, b; c ] = [ 1, 2, 3 ];",
+		"	var [ a, b, c ] = [ 1, 2; 3 ];",
+		"}"
+	];
+
+	TestRun(test)
+		.addError(1,  "'foobar' is defined but never used.")
+		.addError(3,  "'a' is already defined.")
+		.addError(4,  "'a' is already defined.")
+		.addError(7,  "'a' is already defined.")
+		.addError(7,  "'b' is already defined.")
+		.addError(7,  "'c' is already defined.")
+		.addError(9,  "'a' is already defined.")
+		.addError(9,  "'bar' is already defined.")
+		.addError(10,  "Expected an identifier and instead saw '1'.")
+		.addError(10,  "Expected ',' and instead saw '1'.")
+		.addError(10,  "Expected an identifier and instead saw ']'.")
+		.addError(11, "Expected ',' and instead saw ';'.")
+		.addError(11, "'a' is already defined.")
+		.addError(11, "'b' is already defined.")
+		.addError(11, "'c' is already defined.")
+		.addError(12, "'a' is already defined.")
+		.addError(12, "'b' is already defined.")
+		.addError(12, "'c' is already defined.")
+		.addError(12, "Expected ']' to match '[' from line 12 and instead saw ';'.")
+		.addError(12, "Missing semicolon.")
+		.addError(12, "Expected an assignment or function call and instead saw an expression.")
+		.addError(12, "Missing semicolon.")
+		.addError(12, "Expected an identifier and instead saw ']'.")
+		.addError(12, "Expected an assignment or function call and instead saw an expression.")
+		.addError(4,  "'z' is not defined.")
+		.addError(12, "'a' is defined but never used.")
+		.addError(12, "'b' is defined but never used.")
+		.addError(12, "'c' is defined but never used.")
+		.addError(5,  "'h' is defined but never used.")
+		.addError(5,  "'w' is defined but never used.")
+		.addError(6,  "'o' is defined but never used.")
+		.addError(7,  "'d' is defined but never used.")
+		.addError(9,  "'bar' is defined but never used.")
+		.test(code, {esnext: true, unused: true, undef: true});
+
+	test.done();
+};
+
 exports.testDestructuringVar = function (test) {
 	var code = [
 		"var [ a, b, c ] = [ 1, 2, 3 ];",
@@ -537,23 +593,10 @@ exports.testDestructuringVar = function (test) {
 	];
 
 	TestRun(test)
-		.addError(2,  "'a' is already defined.")
-		.addError(3,  "'a' is already defined.")
-		.addError(6,  "'a' is already defined.")
-		.addError(6,  "'b' is already defined.")
-		.addError(6,  "'c' is already defined.")
-		.addError(8,  "'a' is already defined.")
-		.addError(8,  "'bar' is already defined.")
 		.addError(9,  "Expected an identifier and instead saw '1'.")
 		.addError(9,  "Expected ',' and instead saw '1'.")
 		.addError(9,  "Expected an identifier and instead saw ']'.")
 		.addError(10, "Expected ',' and instead saw ';'.")
-		.addError(10, "'a' is already defined.")
-		.addError(10, "'b' is already defined.")
-		.addError(10, "'c' is already defined.")
-		.addError(11, "'a' is already defined.")
-		.addError(11, "'b' is already defined.")
-		.addError(11, "'c' is already defined.")
 		.addError(11, "Expected ']' to match '[' from line 11 and instead saw ';'.")
 		.addError(11, "Missing semicolon.")
 		.addError(11, "Expected an assignment or function call and instead saw an expression.")
