@@ -827,6 +827,47 @@ exports.testLetStmtInForLoopDEStmt = function (test) {
 	test.done();
 };
 
+exports.testLetStmtJetPack = function (test) {
+	// Example taken from jetpack/addons sdk library from Mozilla project
+	var code = [
+		"const { Cc, Ci } = require('chrome');",
+		"// add a text/unicode flavor (html converted to plain text)",
+		"let (str = Cc['@mozilla.org/supports-string;1'].",
+		"            createInstance(Ci.nsISupportsString),",
+		"    converter = Cc['@mozilla.org/feed-textconstruct;1'].",
+		"                createInstance(Ci.nsIFeedTextConstruct))",
+		"{",
+		"converter.type = 'html';",
+		"converter.text = options.data;",
+		"str.data = converter.plainText();",
+		"xferable.addDataFlavor('text/unicode');",
+		"xferable.setTransferData('text/unicode', str, str.data.length * 2);",
+		"}"
+	];
+
+	TestRun(test)
+		.test(code, {esnext: true, es5: true, unused: true, 
+					 undef: true, predef: ["require", "xferable", "options"]});
+	test.done();
+};
+
+exports.testLetStmtLetExpr = function (test) {
+	// Example taken from jetpack/addons sdk library from Mozilla project
+	var code = [
+	"let (x=1, y=2, z=3)",
+	"{",
+	"	let(t=4) print(x, y, z, t);",
+	"	print(let(u=4) u,x);",
+	"}"
+	];
+
+	TestRun(test)
+		.test(code, {esnext: true, es5: true, unused: true, 
+					 undef: true, predef: ["print"]});
+	test.done();
+};
+
+
 exports.testDestructuringFunction = function (test) {
 	// Example from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
 	var code = [
