@@ -3558,7 +3558,7 @@ var JSHINT = (function () {
 		var pn, pn1;
 		var i = ahead || 0;
 		var bracketStack = 0;
-        var ret = {};
+		var ret = {};
 		if (_.contains(["[", "{"], state.tokens.curr.value))
 			bracketStack += 1;
 		if (_.contains(["[", "{"], state.tokens.next.value))
