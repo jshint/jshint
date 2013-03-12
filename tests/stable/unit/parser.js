@@ -1077,3 +1077,16 @@ exports.testFunctionExpressionClosure = function (test) {
 	test.done();
 };
 
+exports.testForOf = function (test) {
+	var code = [
+		"for (let x of [1,2,3,4]) {",
+		"    print(x);",
+		"}",
+		"for (let x of [1,2,3,4]) print(x);"
+	];
+	TestRun(test)
+		.test(code, {esnext: true, es5: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+

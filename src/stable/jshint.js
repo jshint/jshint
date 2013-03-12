@@ -3342,8 +3342,8 @@ var JSHINT = (function () {
 		do {
 			pn = peek(i);
 			++i;
-		} while (pn.id !== "in" && pn.value !== ";" && pn.type !== "(end)");
-		if (pn.id === "in") {
+		} while (!_.contains(["in", "of"], pn.value) && pn.value !== ";" && pn.type !== "(end)");
+		if (_.contains(["in", "of"], pn.value)) {
 			if (state.tokens.next.id === "var") {
 				advance("var");
 				state.syntax["var"].fud.call(state.syntax["var"].fud, true);
@@ -3366,7 +3366,7 @@ var JSHINT = (function () {
 				}
 				advance();
 			}
-			advance("in");
+			advance(pn.value);
 			expression(20);
 			advance(")", t);
 			s = block(true, true);
