@@ -2799,6 +2799,7 @@ var JSHINT = (function () {
 
 			if (state.tokens.next.value === "(") {
 				advance("(");
+				funct["(blockscope)"].stack();
 				letblock = true;
 			}
 
@@ -2865,6 +2866,7 @@ var JSHINT = (function () {
 				advance(")");
 				block(true, true);
 				this.block = true;
+				funct["(blockscope)"].unstack();
 			}
 			
 			return this;
