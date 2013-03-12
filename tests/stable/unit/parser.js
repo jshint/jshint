@@ -1064,3 +1064,16 @@ exports.testArrayComprehensionDetection = function (test) {
 
 	test.done();
 };
+
+exports.testFunctionExpressionClosure = function (test) {
+	var code = [
+		"let (arr = [1,2,3]) {",
+		"	arr.every(function (o) o instanceof Object);",
+		"}"
+	];
+	TestRun(test)
+		.test(code, {esnext: true, es5: true, undef: true});
+
+	test.done();
+};
+
