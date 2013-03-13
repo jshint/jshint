@@ -378,20 +378,19 @@ var exports = {
 			verbose: options.verbose
 		});
 
-		// Avoid stdout cutoff in Node 0.4.x, also supports 0.5.x.
-		// See https://github.com/joyent/node/issues/1669
-
-		function exit() { process.exit(passed ? 0 : 2); }
-
-		try {
-			if (!process.stdout.flush()) {
-				process.stdout.once("drain", exit);
-			} else {
-				exit();
-			}
-		} catch (err) {
-			exit();
-		}
+    // smozely patch as per https://github.com/visionmedia/mocha/issues/333
+    // fixes issues with piped output on Windows.
+    // Root issue is here https://github.com/joyent/node/issues/3584
+    function exit() { process.exit(passed ? 0 : 2); }
+    try {
+        if (process.stdout.bufferSize) {
+          process.stdout.once('drain', exit);
+        } else {
+          exit();
+        }
+      } catch (err) {
+        exit();
+      }
 	}
 };
 
