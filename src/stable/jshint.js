@@ -82,6 +82,7 @@ var JSHINT = (function () {
 			eqnull      : true, // if == null comparisons should be tolerated
 			es5         : true, // if ES5 syntax should be allowed
 			esnext      : true, // if es.next specific syntax should be allowed
+			moz         : true, // if mozilla specific syntax should be allowed
 			evil        : true, // if eval should be allowed
 			expr        : true, // if ExpressionStatement should be allowed as Programs
 			forin       : true, // if for in statements must filter
