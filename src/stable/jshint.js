@@ -798,15 +798,18 @@ var JSHINT = (function () {
 		var left, isArray = false, isObject = false, isLetExpr = false;
 
 		// if current expression is a let expression
-		if (state.option.esnext && 
-				!initial && state.tokens.next.value === "let" && peek(0).value === "(") {
-			isLetExpr = true;
-			// create a new block scope we use only for the current expression
-			funct["(blockscope)"].stack();
-			advance("let");
-			advance("(");
-			state.syntax["let"].fud.call(state.syntax["let"].fud, false);
-			advance(")");
+		if (!initial && state.tokens.next.value === "let" && peek(0).value === "(") {
+			if (state.option.moz) {
+				isLetExpr = true;
+				// create a new block scope we use only for the current expression
+				funct["(blockscope)"].stack();
+				advance("let");
+				advance("(");
+				state.syntax["let"].fud.call(state.syntax["let"].fud, false);
+				advance(")");
+			} else {
+				warning("W118", state.tokens.next);
+			}
 		}
 
 		if (state.tokens.next.id === "(end)")
@@ -2308,7 +2311,7 @@ var JSHINT = (function () {
 	};
 
 	prefix("[", function () {
-		if (state.option.esnext && lookupBlockType(0).isCompArray) {
+		if (state.option.moz && lookupBlockType(0).isCompArray) {
 			return comprehensiveArrayExpression();
 		}
 		var b = state.tokens.curr.line !== state.tokens.next.line;
@@ -2446,7 +2449,12 @@ var JSHINT = (function () {
 		funct["(params)"] = functionparams();
 		funct["(metrics)"].verifyMaxParametersPerFunction(funct["(params)"]);
 
-		block(false, true, true);
+		// if mozilla extensions is enabled, function oneliner is enabled
+		if (state.option.moz) {
+			block(false, true, true);
+		} else {
+			block(false, false, true);
+		}
 
 		funct["(metrics)"].verifyMaxStatementsPerFunction();
 		funct["(metrics)"].verifyMaxComplexityPerFunction();
@@ -2877,9 +2885,13 @@ var JSHINT = (function () {
 			var tokens, lone, value, letblock;
 
 			if (state.tokens.next.value === "(") {
-				advance("(");
-				funct["(blockscope)"].stack();
-				letblock = true;
+				if (state.option.moz) {
+					advance("(");
+					funct["(blockscope)"].stack();
+					letblock = true;
+				} else {
+					warning("W118", state.tokens.next);
+				}
 			}
 
 			if (funct["(onevar)"] && state.option.onevar) {
@@ -3110,8 +3122,12 @@ var JSHINT = (function () {
 			}
 
 			if (state.tokens.next.value === "if") {
-				advance("if");
-				expression(0);
+				if (state.option.moz) {
+					advance("if");
+					expression(0);
+				} else {
+					warning("W118", state.tokens.current);
+				}
 			}
 
 			advance(")");
@@ -3130,7 +3146,7 @@ var JSHINT = (function () {
 
 		block(false);
 
-		if (state.option.esnext) {
+		if (state.option.moz) {
 			while (state.tokens.next.id === "catch") {
 				increaseComplexityCount();
 				doCatch();
@@ -3336,8 +3352,12 @@ var JSHINT = (function () {
 		var foreachtok = null;
 
 		if (t.value === "each") {
-			foreachtok = t;
-			advance("each");
+			if (state.option.moz) {
+				foreachtok = t;
+				advance("each");
+			} else {
+				warning("W118", state.tokens.next);
+			}
 		}
 
 		funct["(breakage)"] += 1;
