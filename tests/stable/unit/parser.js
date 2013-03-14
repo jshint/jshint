@@ -655,7 +655,7 @@ exports.testDestructuringConst = function (test) {
 	test.done();
 };
 
-exports.testDestructuringNone = function (test) {
+exports.testDestructuringGlobals = function (test) {
 	var code = [
 		"var a, b, c, d, h, w, o;",
 		"[ a, b, c ] = [ 1, 2, 3 ];",
@@ -677,8 +677,8 @@ exports.testDestructuringNone = function (test) {
 		.addError(10, "Expected an assignment or function call and instead saw an expression.")
 		.addError(10, "Missing semicolon.")
 		.addError(10, "Expected an identifier and instead saw ']'.")
-		.addError(10, "Bad assignment.")
-		.addError(10, "Expected ']' to match '[' from line 10 and instead saw ','.")
+		.addError(10, "Expected an operator and instead saw '='.")
+		.addError(10, "Expected an operator and instead saw '['.")
 		.addError(10, "Expected an assignment or function call and instead saw an expression.")
 		.addError(10, "Missing semicolon.")
 		.addError(10, "Expected an assignment or function call and instead saw an expression.")
@@ -698,7 +698,7 @@ exports.testDestructuringNone = function (test) {
 	test.done();
 };
 
-exports.testDestructuringNone = function (test) {
+exports.testDestructuringEmptyValues = function (test) {
 	var code = [
 		"var [ a ] = [ 1, 2 ];",
 		"var [ c, d ] = [ 1 ];",
