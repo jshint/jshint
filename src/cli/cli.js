@@ -320,6 +320,14 @@ var exports = {
 		return results.length === 0;
 	},
 
+	/** 
+	 * Helper exposed for testing.
+	 * Used to determine is stdout has any buffered output before exiting the program
+	 */
+	getProcessStdOutBufferSize: function () {
+		return process.stdout.bufferSize; 
+	},
+	
 	/**
 	 * Main entrance function. Parses arguments and calls 'run' when
 	 * its done. This function is called from bin/jshint file.
@@ -378,19 +386,19 @@ var exports = {
 			verbose: options.verbose
 		});
 
-    // smozely patch as per https://github.com/visionmedia/mocha/issues/333
-    // fixes issues with piped output on Windows.
-    // Root issue is here https://github.com/joyent/node/issues/3584
-    function exit() { process.exit(passed ? 0 : 2); }
-    try {
-        if (process.stdout.bufferSize) {
-          process.stdout.once('drain', exit);
-        } else {
-          exit();
-        }
-      } catch (err) {
-        exit();
-      }
+		// Patch as per https://github.com/visionmedia/mocha/issues/333
+		// fixes issues with piped output on Windows.
+		// Root issue is here https://github.com/joyent/node/issues/3584
+		function exit() { process.exit(passed ? 0 : 2); }    
+		try {
+			if (exports.getProcessStdOutBufferSize()) {
+				process.stdout.once('drain', exit);
+			} else {
+				exit();
+			}
+		} catch (err) {
+			exit();
+		}
 	}
 };
 
