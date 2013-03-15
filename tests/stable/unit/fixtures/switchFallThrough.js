@@ -25,6 +25,10 @@ case 1:
     /* falls through */
 case 2:
     /* falls through */
+case 3:
+    /* fall through */
+case 4:
+    /* fall through */
 default:
     doSomething();
 }
