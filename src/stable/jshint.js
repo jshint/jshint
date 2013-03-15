@@ -399,7 +399,7 @@ var JSHINT = (function () {
 			msg = messages.warnings[code];
 		} else if (/E\d{3}/.test(code)) {
 			msg = messages.errors[code];
-		} else if (/I\d{3}/.test(code)) {
+		} else if (/I[WE]?\d{3}/.test(code)) {
 			msg = messages.info[code];
 		}
 
@@ -1289,7 +1289,7 @@ var JSHINT = (function () {
 		if (fnparam && val === "undefined") {
 			return val;
 		}
-
+		warning("IW024");
 		warning("W024", state.tokens.curr, state.tokens.curr.id);
 		return val;
 	}
