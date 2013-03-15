@@ -1289,7 +1289,7 @@ var JSHINT = (function () {
 		if (fnparam && val === "undefined") {
 			return val;
 		}
-
+		warning("IW024");
 		warning("W024", state.tokens.curr, state.tokens.curr.id);
 		return val;
 	}
