@@ -2740,12 +2740,16 @@ var JSHINT = (function () {
 		}
 	}
 
-	// This Function is called when esnext option is set to true
+	// This Function is called when esnext option is set to true:
 	// it adds the `const` statement to JSHINT
+	// it adds the `let` statement to JSHINT
+	// it updates the `var` statement with destructuring arrays JSHINT
 
 	useESNextSyntax = function () {
 		var conststatement = stmt("const", function (prefix) {
-			var tokens, lone, value;
+			var tokens, value;
+            // state variable to know if it is a lone identifier, or a destructuring statement.
+            var lone;
 
 			this.first = [];
 			for (;;) {
@@ -3360,18 +3364,21 @@ var JSHINT = (function () {
 		nonadjacent(this, t);
 		nospace();
 
-		// if we're in a for (… in …) statement
-		var pn;
+		// what kind of for(…) statement it is? for(…of…)? for(…in…)? for(…;…;…)?
+		var nextop; // contains the token of the "in" or "of" operator
 		var i = 0;
 		var inof = ["in"];
 		if (state.option.esnext) {
 			inof = ["in", "of"];
 		}
 		do {
-			pn = peek(i);
+			nextop = peek(i);
 			++i;
-		} while (!_.contains(inof, pn.value) && pn.value !== ";" && pn.type !== "(end)");
-		if (_.contains(inof, pn.value)) {
+		} while (!_.contains(inof, nextop.value) && nextop.value !== ";" 
+					&& nextop.type !== "(end)");
+
+		// if we're in a for (… in|of …) statement
+		if (_.contains(inof, nextop.value)) {
 			if (state.tokens.next.id === "var") {
 				advance("var");
 				state.syntax["var"].fud.call(state.syntax["var"].fud, true);
@@ -3394,7 +3401,7 @@ var JSHINT = (function () {
 				}
 				advance();
 			}
-			advance(pn.value);
+			advance(nextop.value);
 			expression(20);
 			advance(")", t);
 			s = block(true, true);
