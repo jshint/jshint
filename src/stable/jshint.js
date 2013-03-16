@@ -2428,7 +2428,7 @@ var JSHINT = (function () {
 			"(statement)" : statement,
 			"(tokens)"    : {},
 			"(blockscope)": funct["(blockscope)"],
-            "(comparray)" : funct["(comparray)"]
+			"(comparray)" : funct["(comparray)"]
 		};
 
 		f = funct;
@@ -2749,8 +2749,8 @@ var JSHINT = (function () {
 	useESNextSyntax = function () {
 		var conststatement = stmt("const", function (prefix) {
 			var tokens, value;
-            // state variable to know if it is a lone identifier, or a destructuring statement.
-            var lone;
+			// state variable to know if it is a lone identifier, or a destructuring statement.
+			var lone;
 
 			this.first = [];
 			for (;;) {
@@ -3113,7 +3113,7 @@ var JSHINT = (function () {
 				"(catch)"    : true,
 				"(tokens)"   : {},
 				"(blockscope)": funct["(blockscope)"],
-                "(comparray)": funct["(comparray)"]
+				"(comparray)": funct["(comparray)"]
 			};
 
 			if (e) {
@@ -3376,8 +3376,8 @@ var JSHINT = (function () {
 		do {
 			nextop = peek(i);
 			++i;
-		} while (!_.contains(inof, nextop.value) && nextop.value !== ";" 
-					&& nextop.type !== "(end)");
+		} while (!_.contains(inof, nextop.value) && nextop.value !== ";" &&
+					nextop.type !== "(end)");
 
 		// if we're in a for (… in|of …) statement
 		if (_.contains(inof, nextop.value)) {
@@ -3976,7 +3976,7 @@ var JSHINT = (function () {
 			"(tokens)":   {},
 			"(metrics)":   createMetrics(state.tokens.next),
 			"(blockscope)": blockScope(),
-            "(comparray)": arrayComprehension()
+			"(comparray)": arrayComprehension()
 		};
 		functions = [funct];
 		urls = [];
