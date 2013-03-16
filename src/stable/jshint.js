@@ -1970,14 +1970,7 @@ var JSHINT = (function () {
 	bitwise("<<", "shiftleft", 120);
 	bitwise(">>", "shiftright", 120);
 	bitwise(">>>", "shiftrightunsigned", 120);
-	infix("in", function (left, that) {
-		if (state.inCompArray === "define") {
-			state.inCompArray = "container";
-		}
-		that.left = left;
-		that.right = expression(120);
-		return that;
-	}, 120);
+	infix("in", "in", 120);
 	infix("instanceof", "instanceof", 120);
 	infix("+", function (left, that) {
 		var right = expression(130);
