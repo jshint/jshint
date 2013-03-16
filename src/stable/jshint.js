@@ -1788,7 +1788,7 @@ var JSHINT = (function () {
 						// the presence of the given variable in the comp array
 						// before declaring it undefined.
 
-						if (!(state.option.esnext && state.compArray.check(v))) {
+						if (!(state.option.esnext && funct["(comparray)"].check(v))) {
 							isundef(funct, "W117", state.tokens.curr, v);
 						}
 					}
@@ -2279,7 +2279,7 @@ var JSHINT = (function () {
 
 	var comprehensiveArrayExpression = function () {
 		var res = {};
-		state.compArray.stack();
+		funct["(comparray)"].stack();
 
 		res.right = expression(0);
 		advance("for");
@@ -2287,18 +2287,18 @@ var JSHINT = (function () {
 			advance("each");
 		}
 		advance("(");
-		state.compArray.setState("define");
+		funct["(comparray)"].setState("define");
 		res.left = expression(0);
 		advance(")");
 		if (state.tokens.next.value === "if") {
 			advance("if");
 			advance("(");
-			state.compArray.setState("filter");
+			funct["(comparray)"].setState("filter");
 			res.filter = expression(0);
 			advance(")");
 		}
 		advance("]");
-		state.compArray.unstack();
+		funct["(comparray)"].unstack();
 		return res;
 	};
 
@@ -2427,6 +2427,7 @@ var JSHINT = (function () {
 			"(statement)" : statement,
 			"(tokens)"    : {},
 			"(blockscope)": funct["(blockscope)"],
+            "(comparray)" : funct["(comparray)"]
 		};
 
 		f = funct;
@@ -3110,7 +3111,8 @@ var JSHINT = (function () {
 				"(metrics)"  : createMetrics(state.tokens.next),
 				"(catch)"    : true,
 				"(tokens)"   : {},
-				"(blockscope)": funct["(blockscope)"]
+				"(blockscope)": funct["(blockscope)"],
+                "(comparray)": funct["(comparray)"]
 			};
 
 			if (e) {
@@ -3972,7 +3974,8 @@ var JSHINT = (function () {
 			"(loopage)":  0,
 			"(tokens)":   {},
 			"(metrics)":   createMetrics(state.tokens.next),
-			"(blockscope)": blockScope()
+			"(blockscope)": blockScope(),
+            "(comparray)": arrayComprehension()
 		};
 		functions = [funct];
 		urls = [];
@@ -3984,8 +3987,6 @@ var JSHINT = (function () {
 		lookahead = [];
 		warnings = 0;
 		unuseds = [];
-
-		state.compArray = arrayComprehension();
 
 		if (!isString(s) && !Array.isArray(s)) {
 			errorAt("E004", 0);
