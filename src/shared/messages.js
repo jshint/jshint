@@ -58,7 +58,9 @@ var errors = {
 	E040: "Each value should have its own case label.",
 	E041: "Unrecoverable syntax error.",
 	E042: "Stopping.",
-	E043: "Too many errors."
+	E043: "Too many errors.",
+	E044: "'{a}' is already defined and can't be redefined.",
+	E045: "Invalid for each loop."
 };
 
 var warnings = {
@@ -183,6 +185,7 @@ var warnings = {
 	W115: "Octal literals are not allowed in strict mode.",
 	W116: "Expected '{a}' and instead saw '{b}'.",
 	W117: "'{a}' is not defined.",
+	W118: "This syntax is only available in Mozilla extensions.",
 };
 
 var info = {

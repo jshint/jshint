@@ -527,11 +527,13 @@ exports.testReserved = function (test) {
 
 	TestRun(test)
 		.addError(1, "Expected an identifier and instead saw 'volatile' (a reserved word).")
+		.addError(5, "Expected an identifier and instead saw 'let' (a reserved word).")
 		.addError(10, "Expected an identifier and instead saw 'let' (a reserved word).")
 		.addError(14, "Expected an identifier and instead saw 'else' (a reserved word).")
 		.test(src);
 
 	TestRun(test)
+		.addError(5, "Expected an identifier and instead saw 'let' (a reserved word).")
 		.addError(10, "Expected an identifier and instead saw 'let' (a reserved word).")
 		.test(src, { es5: true });
 
