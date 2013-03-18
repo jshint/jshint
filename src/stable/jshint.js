@@ -370,6 +370,9 @@ var JSHINT = (function () {
 		}
 	}
 
+	function isMozOrESNext() {
+		return state.option.moz || state.option.esnext;
+	}
 
 	// Produce an error warning.
 	function quit(code, line, chr) {
@@ -486,13 +489,13 @@ var JSHINT = (function () {
 				if (state.option.latedef)
 					warning("W003", state.tokens.next, t);
 			} else {
-				if (!state.option.shadow && type !== "exception" || 
-                        (state.option.esnext && funct["(blockscope)"].getlabel(t))) {
+				if (!state.option.shadow && type !== "exception" ||
+							(isMozOrESNext() && funct["(blockscope)"].getlabel(t))) {
 					warning("W004", state.tokens.next, t);
 				}
 			}
 		}
-		if (state.option.esnext) {
+		if (isMozOrESNext()) {
 			// a double definition of a let variable in same block throws a TypeError
 			if (funct["(blockscope)"] && funct["(blockscope)"].current.has(t)) {
 				error("E044", state.tokens.next, t);
@@ -500,7 +503,7 @@ var JSHINT = (function () {
 		}
 
 		// if the identifier is from a let, adds it only to the current blockscope
-		if (state.option.esnext && islet) {
+		if (isMozOrESNext() && islet) {
 			funct["(blockscope)"].current.add(t, type, state.tokens.curr);
 		} else {
 
@@ -1211,7 +1214,7 @@ var JSHINT = (function () {
 					warning("W021", left, left.value);
 				}
 
-				if (state.option.esnext && funct[left.value] === "const") {
+				if (isMozOrESNext() && funct[left.value] === "const") {
 					error("E013", left, left.value);
 				}
 
@@ -1222,7 +1225,7 @@ var JSHINT = (function () {
 					that.right = expression(19);
 					return that;
 				} else if (left.id === "[") {
-					if (state.option.esnext && state.tokens.curr.left.first) {
+					if (isMozOrESNext() && state.tokens.curr.left.first) {
 						state.tokens.curr.left.first.forEach(function (t) {
 							if (funct[t.value] === "const") {
 								error("E013", t, t.value);
@@ -1405,7 +1408,7 @@ var JSHINT = (function () {
 		}
 
 		// detect a destructuring assignment
-		if (state.option.esnext && _.has(["[", "{"], t.value)) {
+		if (isMozOrESNext() && _.has(["[", "{"], t.value)) {
 			if (lookupBlockType().isDestAssign) {
 				values = destructuringExpression();
 				values.forEach(function (tok) {
@@ -1415,7 +1418,7 @@ var JSHINT = (function () {
 				destructuringExpressionMatch(values, expression(0, true));
 				advance(";");
 				return;
-			} 
+			}
 		}
 		if (t.identifier && !res && peek().id === ":") {
 			advance();
@@ -1599,7 +1602,7 @@ var JSHINT = (function () {
 
 		if (state.tokens.next.id === "{") {
 			advance("{");
-			if (state.option.esnext) {
+			if (isMozOrESNext()) {
 				// create a new block scope
 				funct["(blockscope)"].stack();
 			}
@@ -1642,7 +1645,7 @@ var JSHINT = (function () {
 				indentation();
 			}
 			advance("}", t);
-			if (state.option.esnext) {
+			if (isMozOrESNext()) {
 				funct["(blockscope)"].unstack();
 			}
 			indent = old_indent;
@@ -1744,10 +1747,10 @@ var JSHINT = (function () {
 				funct = f;
 			}
 			var block;
-			if (state.option.esnext && _.has(funct, "(blockscope)")) {
+			if (isMozOrESNext() && _.has(funct, "(blockscope)")) {
 				block = funct["(blockscope)"].getlabel(v);
 			}
-			
+
 			// The name is in scope and defined in the current function.
 			if (funct === s || block) {
 				// Change 'unused' to 'var', and reject labels.
@@ -1785,11 +1788,11 @@ var JSHINT = (function () {
 							state.tokens.next.value === "["))) {
 
 						// if we're in a list comprehension, variables are declared
-						// locally and used before being defined. So we check 
+						// locally and used before being defined. So we check
 						// the presence of the given variable in the comp array
 						// before declaring it undefined.
 
-						if (!(state.option.esnext && funct["(comparray)"].check(v))) {
+						if (!(isMozOrESNext() && funct["(comparray)"].check(v))) {
 							isundef(funct, "W117", state.tokens.curr, v);
 						}
 					}
@@ -2278,14 +2281,18 @@ var JSHINT = (function () {
 		return that;
 	}, 160, true);
 
-	var comprehensiveArrayExpression = function () {
+	function comprehensiveArrayExpression() {
 		var res = {};
 		funct["(comparray)"].stack();
 
 		res.right = expression(0);
 		advance("for");
 		if (state.tokens.next.value === "each") {
-			advance("each");
+			if (state.option.moz && !state.option.esnext) {
+				advance("each");
+			} else {
+				warning("W104", state.tokens.curr, "for each");
+			}
 		}
 		advance("(");
 		funct["(comparray)"].setState("define");
@@ -2383,7 +2390,7 @@ var JSHINT = (function () {
 		}
 
 		for (;;) {
-			if (state.option.esnext && _.contains(["{", "["], state.tokens.next.id)) {
+			if (isMozOrESNext() && _.contains(["{", "["], state.tokens.next.id)) {
 				tokens = destructuringExpression();
 				for (var t in tokens) {
 					t = tokens[t];
@@ -2836,7 +2843,7 @@ var JSHINT = (function () {
 				}
 				for (var t in tokens) {
 					t = tokens[t];
-					if (state.option.esnext && funct[t.id] === "const") {
+					if (isMozOrESNext() && funct[t.id] === "const") {
 						warning("E011", null, t.id);
 					}
 					if (funct["(global)"] && predefined[t.id] === false) {
@@ -2911,7 +2918,7 @@ var JSHINT = (function () {
 				}
 				for (var t in tokens) {
 					t = tokens[t];
-					if (state.option.esnext && funct[t.id] === "const") {
+					if (isMozOrESNext() && funct[t.id] === "const") {
 						warning("E011", null, t.id);
 					}
 					if (funct["(global)"] && predefined[t.id] === false) {
@@ -2957,7 +2964,7 @@ var JSHINT = (function () {
 				this.block = true;
 				funct["(blockscope)"].unstack();
 			}
-			
+
 			return this;
 		});
 		letstatement.exps = true;
@@ -2984,7 +2991,7 @@ var JSHINT = (function () {
 			nonadjacent(state.tokens.curr, state.tokens.next);
 			id = identifier();
 
-			if (state.option.esnext && funct[id] === "const") {
+			if (isMozOrESNext() && funct[id] === "const") {
 				warning("E011", null, id);
 			}
 
@@ -3029,7 +3036,7 @@ var JSHINT = (function () {
 
 		}
 		var i = identifier();
-		if (state.option.esnext && funct[i] === "const") {
+		if (isMozOrESNext() && funct[i] === "const") {
 			warning("E011", null, i);
 		}
 		adjacent(state.tokens.curr, state.tokens.next);
@@ -3099,7 +3106,7 @@ var JSHINT = (function () {
 			}
 
 			advance();
-			
+
 			funct = {
 				"(name)"     : "(catch)",
 				"(line)"     : state.tokens.next.line,
@@ -3122,8 +3129,12 @@ var JSHINT = (function () {
 
 			if (state.tokens.next.value === "if") {
 				if (state.option.moz) {
-					advance("if");
-					expression(0);
+					if (!state.option.esnext) {
+						advance("if");
+						expression(0);
+					} else {
+						warning("W104", state.tokens.curr, "catch filter");
+					}
 				} else {
 					warning("W118", state.tokens.current);
 				}
@@ -3145,7 +3156,7 @@ var JSHINT = (function () {
 
 		block(false);
 
-		if (state.option.moz) {
+		if (state.option.moz && !state.option.esnext) {
 			while (state.tokens.next.id === "catch") {
 				increaseComplexityCount();
 				doCatch();
@@ -3164,7 +3175,7 @@ var JSHINT = (function () {
 			block(false);
 			return;
 		}
-		
+
 		if (!b) {
 			error("E021", state.tokens.next, "catch", state.tokens.next.value);
 		}
@@ -3352,8 +3363,12 @@ var JSHINT = (function () {
 
 		if (t.value === "each") {
 			if (state.option.moz) {
-				foreachtok = t;
-				advance("each");
+				if (!state.option.esnext) {
+					foreachtok = t;
+					advance("each");
+				} else {
+					warning("W104", state.tokens.curr, "for each");
+				}
 			} else {
 				warning("W118", state.tokens.next);
 			}
@@ -3370,8 +3385,8 @@ var JSHINT = (function () {
 		var nextop; // contains the token of the "in" or "of" operator
 		var i = 0;
 		var inof = ["in"];
-		if (state.option.esnext) {
-			inof = ["in", "of"];
+		if (isMozOrESNext()) {
+			inof.push("of");
 		}
 		do {
 			nextop = peek(i);
@@ -3384,7 +3399,7 @@ var JSHINT = (function () {
 			if (state.tokens.next.id === "var") {
 				advance("var");
 				state.syntax["var"].fud.call(state.syntax["var"].fud, true);
-			} else if (state.option.esnext && state.tokens.next.id === "let") {
+			} else if (isMozOrESNext() && state.tokens.next.id === "let") {
 				advance("let");
 				// create a new block scope
 				letscope = true;
@@ -3421,7 +3436,7 @@ var JSHINT = (function () {
 				if (state.tokens.next.id === "var") {
 					advance("var");
 					state.syntax["var"].fud.call(state.syntax["var"].fud);
-				} else if (state.option.esnext && state.tokens.next.id === "let") {
+				} else if (isMozOrESNext() && state.tokens.next.id === "let") {
 					advance("let");
 					// create a new block scope
 					letscope = true;
@@ -3545,7 +3560,7 @@ var JSHINT = (function () {
 	}).exps = true;
 
 	stmt("yield", function () {
-		if (!state.option.esnext) {
+		if (!state.option.moz) {
 			warning("W104", state.tokens.curr, "yield");
 		}
 		if (this.line === state.tokens.next.line) {
@@ -3656,7 +3671,7 @@ var JSHINT = (function () {
 
 		var block = null;
 
-		if (state.option.esnext) {
+		if (isMozOrESNext()) {
 			block = lookupBlockType();
 		}
 		if (block && block.notJson) {
