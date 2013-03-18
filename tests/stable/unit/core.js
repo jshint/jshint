@@ -526,7 +526,6 @@ exports.testReserved = function (test) {
 	var src = fs.readFileSync(__dirname + "/fixtures/reserved.js", "utf8");
 
 	TestRun(test)
-		.addError(1, "Expected an identifier and instead saw 'volatile' (a reserved word).")
 		.addError(5, "Expected an identifier and instead saw 'let' (a reserved word).")
 		.addError(10, "Expected an identifier and instead saw 'let' (a reserved word).")
 		.addError(14, "Expected an identifier and instead saw 'else' (a reserved word).")
