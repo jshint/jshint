@@ -880,7 +880,7 @@ exports.testLetStmtInForLoopDEStmt = function (test) {
 	];
 
 	TestRun(test)
-		.test(code, {esnext: true, es5: true, unused: true, 
+		.test(code, {esnext: true, es5: true, unused: true,
 					 undef: true, predef: ["print", "Iterator"]});
 
 	test.done();
@@ -905,7 +905,7 @@ exports.testLetStmtJetPack = function (test) {
 	];
 
 	TestRun(test)
-		.test(code, {moz: true, esnext: true, es5: true, unused: true, 
+		.test(code, {moz: true, es5: true, unused: true,
 					 undef: true, predef: ["require", "xferable", "options"]});
 	test.done();
 };
@@ -921,7 +921,7 @@ exports.testLetStmtLetExpr = function (test) {
 	];
 
 	TestRun(test)
-		.test(code, {moz: true, esnext: true, es5: true, unused: true, 
+		.test(code, {moz: true, esnext: true, es5: true, unused: true,
 					 undef: true, predef: ["print"]});
 	test.done();
 };
@@ -959,7 +959,7 @@ exports.testForEachError = function (test) {
 
 	TestRun(test)
 		.addError(1, "Invalid for each loop.")
-		.test(code, {moz: true, esnext: true, es5: true, unused: true,
+		.test(code, {moz: true, es5: true, unused: true,
 						undef: true, predef: ["print", "Iterator"]});
 
 	test.done();
@@ -981,7 +981,7 @@ exports.testGenerator = function (test) {
 		"	print(g.next());"
 	];
 	TestRun(test)
-		.test(code, {esnext: true, es5: true, unused: true,
+		.test(code, {moz: true, esnext: true, es5: true, unused: true,
 						undef: true, predef: ["print", "Iterator"]});
 
 	test.done();
@@ -1001,11 +1001,30 @@ exports.testArrayComprehension = function (test) {
 		"print('evens:', evens);"
 	];
 	TestRun(test)
-		.test(code, {moz: true, esnext: true, es5: true, unused: true, undef: true, 
-						predef: ["print", "Iterator"]});
+		// .addError(6, "'for each' is only available in JavaScript 1.7.")
+		// .addError(7, "'for each' is only available in JavaScript 1.7.")
+		.test(code, {moz: true, es5: true, unused: true, undef: true,
+						predef: ["print"]});
 
 	test.done();
 };
+exports.testESNextOverridesMoz = function (test) {
+	var code = [
+		"[i * i for each (i in [1, 2, 3, 4, 5])];"
+	];
+	TestRun(test)
+		.addError(1, "'for each' is only available in JavaScript 1.7.")
+		.addError(1, "Expected '(' and instead saw 'each'.")
+		.addError(1, "Expected ')' and instead saw ']'.")
+		.addError(1, "Expected ']' and instead saw ';'.")
+		.addError(1, "Expected an assignment or function call and instead saw an expression.")
+		.addError(1, "Missing semicolon.")
+		.test(code, {moz: true, esnext: true, es5: true, unused: true, undef: true,
+						predef: ["print"]});
+
+	test.done();
+};
+
 
 exports.testArrayComprehensionWithDestArray = function (test) {
 	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
@@ -1021,7 +1040,7 @@ exports.testArrayComprehensionWithDestArray = function (test) {
 		"print('evens:', evens);"
 	];
 	TestRun(test)
-		.test(code, {moz: true, esnext: true, es5: true, unused: true, undef: true, 
+		.test(code, {moz: true, es5: true, unused: true, undef: true,
 						predef: ["print", "Iterator"]});
 
 	test.done();
@@ -1035,7 +1054,7 @@ exports.testArrayComprehensionWithDestArrayGlobScope = function (test) {
 	];
 	TestRun(test)
 		.addError(1, "Expected an assignment or function call and instead saw an expression.")
-		.test(code, {moz: true, esnext: true, es5: true, undef: true, 
+		.test(code, {moz: true, es5: true, undef: true,
 						predef: ["print", "Iterator"]});
 
 	test.done();
@@ -1044,11 +1063,11 @@ exports.testArrayComprehensionWithDestArrayGlobScope = function (test) {
 exports.testArrayComprehensionImbricationWithDestArray = function (test) {
 	var code = [
 		"[ [i, j] for each ([i, j] in [[a, b] for each ([a, b] in [[2,2], [3,4]])]) ];"
-	
+
 	];
 	TestRun(test)
 		.addError(1, "Expected an assignment or function call and instead saw an expression.")
-		.test(code, {moz: true, esnext: true, es5: true, undef: true, 
+		.test(code, {moz: true, es5: true, undef: true,
 						predef: ["print", "Iterator"]});
 
 	test.done();
@@ -1064,8 +1083,29 @@ exports.testTryCatchFilter = function (test) {
 		"}"
 	];
 	TestRun(test)
-		.test(code, {moz: true, esnext: true, es5: true, undef: true, 
+		.test(code, {moz: true, es5: true, undef: true,
 						predef: ["print"]});
+
+	test.done();
+};
+exports.testESNextOverridesTryCatchFilter = function (test) {
+	var code = [
+		"try {",
+		"	throw {name: 'foo', message: 'bar'};",
+		"}",
+		"catch (e if e.name === 'foo') {}"
+	];
+	TestRun(test)
+		.addError(4, "'catch filter' is only available in JavaScript 1.7.")
+		.addError(4, "Expected ')' and instead saw 'if'.")
+		.addError(4, "Expected '{' and instead saw 'e'.")
+		.addError(4, "Expected an assignment or function call and instead saw an expression.")
+		.addError(4, "Missing semicolon.")
+		.addError(4, "Expected an identifier and instead saw ')'.")
+		.addError(4, "Expected an assignment or function call and instead saw an expression.")
+		.addError(4, "Missing semicolon.")
+		.addError(4, "'e' is not defined.")
+		.test(code, {moz: true, esnext: true, es5: true, undef: true});
 
 	test.done();
 };
@@ -1075,8 +1115,24 @@ exports.testArrayComprehensionDetection = function (test) {
 		"var foo = []; for each (let i in [1,2,3]) { print(i); }"
 	];
 	TestRun(test)
-		.test(code, {moz: true, esnext: true, es5: true, undef: true, 
+		.test(code, {moz: true, es5: true, undef: true,
 						predef: ["print"]});
+
+	test.done();
+};
+
+
+exports.testESNextOverridesArrayComprehensionDetection = function (test) {
+	var code = [
+		"var foo = []; for each (let i in [1,2,3]) {}"
+	];
+	TestRun(test)
+		.addError(1, "'for each' is only available in JavaScript 1.7.")
+		.addError(1, "Expected '(' and instead saw 'each'.")
+		.addError(1, "Creating global 'for' variable. Should be 'for (var ( ...'.")
+		.addError(1, "Expected 'in' and instead saw 'let'.")
+		.addError(1, "'i' is not defined.")
+		.test(code, {moz: true, esnext: true, es5: true, undef: true });
 
 	test.done();
 };
@@ -1110,18 +1166,47 @@ exports.testTryMultiCatch = function (test) {
 	var code = [
 		"try {",
 		"    print('X');",
-		"",
 		"} catch (err) {",
 		"    print(err);",
-		"",
 		"} catch (err) {",
 		"    print(err);",
-		"",
 		"} finally {",
 		"    print('Z');",
 		"}"
 	];
 	TestRun(test)
+		.test(code, {moz: true, es5: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+
+exports.testESNextOverridesTryMultiCatch = function (test) {
+	var code = [
+		"try {",
+		"    print('X');",
+		"} catch (err) {",
+		"    print(err);",
+		"} catch (err) {",
+		"    print(err);",
+		"} finally {",
+		"    print('Z');",
+		"}"
+	];
+	TestRun(test)
+		.addError(5, "Expected an identifier and instead saw 'catch'.")
+		.addError(5, "Expected an operator and instead saw '('.")
+		.addError(5, "Expected an assignment or function call and instead saw an expression.")
+		.addError(5, "Missing semicolon.")
+		.addError(5, "Expected an assignment or function call and instead saw an expression.")
+		.addError(5, "Missing semicolon.")
+		.addError(5, "Expected an identifier and instead saw ')'.")
+		.addError(5, "Expected an assignment or function call and instead saw an expression.")
+		.addError(5, "Missing semicolon.")
+		.addError(7, "Expected an identifier and instead saw 'finally'.")
+		.addError(7, "Expected an assignment or function call and instead saw an expression.")
+		.addError(7, "Missing semicolon.")
+		.addError(5, "'err' is not defined.")
+		.addError(6, "'err' is not defined.")
 		.test(code, {moz: true, esnext: true, es5: true, undef: true, predef: ["print"]});
 
 	test.done();
