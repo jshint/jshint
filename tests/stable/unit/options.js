@@ -110,7 +110,7 @@ exports['combination of latedef and undef'] = function (test) {
 		.addError(41, "'q' was used before it was defined.")
 		.addError(46, "'h' was used before it was defined.")
 		.test(src, { latedef: true, latedef_func: true, undef: false });
-    // But we get all the functions warning if we disable latedef func
+	// But we get all the functions warning if we disable latedef func
 	TestRun(test)
 		.addError(41, "'q' was used before it was defined.")
 		.addError(46, "'h' was used before it was defined.")
@@ -129,7 +129,7 @@ exports['combination of latedef and undef'] = function (test) {
 		.addError(46, "'h' was used before it was defined.")
 		.test(src, { latedef: true, latedef_func: true, undef: true });
 
-    // If we remove latedef_func, we don't get the functions warning
+	// If we remove latedef_func, we don't get the functions warning
 	TestRun(test)
 		.addError(29, "'hello' is not defined.")
 		.addError(35, "'world' is not defined.")
