@@ -965,7 +965,122 @@ exports.testForEachError = function (test) {
 	test.done();
 };
 
-exports.testGenerator = function (test) {
+exports.testGeneratorES5 = function (test) {
+	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
+	var code = [
+		"function fib() {",
+		"	var i = 0, j = 1;",
+		"	while (true) {",
+		"		yield i;",
+		"		[i, j] = [j, i + j];",
+		"	}",
+		"}",
+
+		"var g = fib();",
+		"for (var i = 0; i < 10; i++)",
+		"	print(g.next());"
+	];
+	TestRun(test)
+		.addError(4, "'yield' is only available in JavaScript 1.7.")
+		.addError(5, "Bad assignment.")
+		.test(code, {moz: false, esnext: false, es5: true, unused: true,
+						undef: true, predef: ["print"]});
+
+	test.done();
+};
+
+exports.testGeneratorEsNextError = function (test) {
+	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
+	var code = [
+		"function fib() {",
+		"	var i = 0, j = 1;",
+		"	while (true) {",
+		"		yield i;",
+		"		[i, j] = [j, i + j];",
+		"	}",
+		"}",
+
+		"var g = fib();",
+		"for (var i = 0; i < 10; i++)",
+		"	print(g.next());"
+	];
+	TestRun(test)
+		.addError(4, "A yield statement shall be within a generator function (with syntax: `function*`)")
+		.test(code, {moz: false, esnext: true, es5: true, unused: true,
+						undef: true, predef: ["print"]});
+
+	test.done();
+};
+
+exports.testGeneratorMozError = function (test) {
+	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
+	var code = [
+		"function* fib() {",
+		"	var i = 0, j = 1;",
+		"	while (true) {",
+		"		yield i;",
+		"		[i, j] = [j, i + j];",
+		"	}",
+		"}",
+
+		"var g = fib();",
+		"for (var i = 0; i < 10; i++)",
+		"	print(g.next());"
+	];
+	TestRun(test)
+		.addError(1, "'function*' is only available in ESNext extensions.")
+		.test(code, {moz: true, esnext: false, es5: true, unused: true,
+						undef: true, predef: ["print"]});
+
+	test.done();
+};
+
+exports.testGeneratorEsNextNoYield = function (test) {
+	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
+	var code = [
+		"function* fib() {",
+		"	var i = 0, j = 1;",
+		"	while (true) {",
+		"		[i, j] = [j, i + j];",
+		"		return i;",
+		"	}",
+		"}",
+
+		"var g = fib();",
+		"for (let i = 0; i < 10; i++)",
+		"	print(g.next());"
+	];
+	TestRun(test)
+		.addError(7, "A generator function shall contain a yield statement.")
+		.test(code, {moz: false, esnext: true, es5: true, unused: true,
+						undef: true, predef: ["print", "Iterator"]});
+
+	test.done();
+};
+
+exports.testGeneratorEsNext = function (test) {
+	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
+	var code = [
+		"function* fib() {",
+		"	var i = 0, j = 1;",
+		"	while (true) {",
+		"		yield i;",
+		"		[i, j] = [j, i + j];",
+		"	}",
+		"}",
+
+		"var g = fib();",
+		"for (let i = 0; i < 10; i++)",
+		"	print(g.next());"
+	];
+	TestRun(test)
+		.test(code, {moz: false, esnext: true, es5: true, unused: true,
+						undef: true, predef: ["print", "Iterator"]});
+
+	test.done();
+};
+
+exports.testGeneratorMoz = function (test) {
 	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
 	var code = [
 		"function fib() {",
@@ -981,7 +1096,7 @@ exports.testGenerator = function (test) {
 		"	print(g.next());"
 	];
 	TestRun(test)
-		.test(code, {moz: true, esnext: true, es5: true, unused: true,
+		.test(code, {moz: true, esnext: false, es5: true, unused: true,
 						undef: true, predef: ["print", "Iterator"]});
 
 	test.done();
