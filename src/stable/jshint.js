@@ -2461,6 +2461,10 @@ var JSHINT = (function () {
 			block(false, false, true);
 		}
 
+		if (generator && funct["(generator)"] !== "yielded") {
+			error("E047", state.tokens.curr);
+		}
+
 		funct["(metrics)"].verifyMaxStatementsPerFunction();
 		funct["(metrics)"].verifyMaxComplexityPerFunction();
 		funct["(unusedOption)"] = state.option.unused;
@@ -3583,6 +3587,7 @@ var JSHINT = (function () {
 		} else if (!isMozOrESNext()) {
 			warning("W104", state.tokens.curr, "yield");
 		}
+		funct["(generator)"] = "yielded"
 		if (this.line === state.tokens.next.line) {
 			if (state.tokens.next.id === "(regexp)")
 				warning("W092");
