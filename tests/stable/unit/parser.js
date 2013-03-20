@@ -981,8 +981,8 @@ exports.testGeneratorES5 = function (test) {
 		"	print(g.next());"
 	];
 	TestRun(test)
-        .addError(4, "'yield' is only available in JavaScript 1.7.")
-        .addError(5, "Bad assignment.")
+		.addError(4, "'yield' is only available in JavaScript 1.7.")
+		.addError(5, "Bad assignment.")
 		.test(code, {moz: false, esnext: false, es5: true, unused: true,
 						undef: true, predef: ["print"]});
 
@@ -1005,7 +1005,7 @@ exports.testGeneratorEsNextError = function (test) {
 		"	print(g.next());"
 	];
 	TestRun(test)
-        .addError(4, "A yield statement shall be within a generator function (with syntax: `function*`)")
+		.addError(4, "A yield statement shall be within a generator function (with syntax: `function*`)")
 		.test(code, {moz: false, esnext: true, es5: true, unused: true,
 						undef: true, predef: ["print"]});
 
@@ -1028,7 +1028,7 @@ exports.testGeneratorMozError = function (test) {
 		"	print(g.next());"
 	];
 	TestRun(test)
-        .addError(1, "'function*' is only available in ESNext extensions.")
+		.addError(1, "'function*' is only available in ESNext extensions.")
 		.test(code, {moz: true, esnext: false, es5: true, unused: true,
 						undef: true, predef: ["print"]});
 
@@ -1051,7 +1051,7 @@ exports.testGeneratorEsNextNoYield = function (test) {
 		"	print(g.next());"
 	];
 	TestRun(test)
-        .addError(7, "A generator function shall contain a yield statement.")
+		.addError(7, "A generator function shall contain a yield statement.")
 		.test(code, {moz: false, esnext: true, es5: true, unused: true,
 						undef: true, predef: ["print", "Iterator"]});
 
