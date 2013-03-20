@@ -94,6 +94,7 @@ var JSHINT = (function () {
 			lastsemic   : true, // if semicolons may be ommitted for the trailing
 			                    // statements inside of a one-line blocks.
 			latedef     : true, // if the use before definition should not be tolerated
+			latedef_func: true, // if the use before definition should not be tolerated for functions (depends on latedef option)
 			laxbreak    : true, // if line breaks should not be checked
 			laxcomma    : true, // if line breaks should not be checked around commas
 			loopfunc    : true, // if functions should be allowed to be defined within
@@ -486,7 +487,10 @@ var JSHINT = (function () {
 		if (_.has(funct, t) && !funct["(global)"]) {
 			if (funct[t] === true) {
 				if (state.option.latedef)
-					warning("W003", state.tokens.next, t);
+						if (state.option.latedef_func && _.contains([funct[t], type], "unction")
+								|| !_.contains([funct[t], type], "unction")) {
+							warning("W003", state.tokens.next, t);
+						}
 			} else {
 				if (!state.option.shadow && type !== "exception" ||
 							(isMozOrESNext() && funct["(blockscope)"].getlabel(t))) {
@@ -516,7 +520,10 @@ var JSHINT = (function () {
 				global[t] = funct;
 				if (_.has(implied, t)) {
 					if (state.option.latedef) {
-						warning("W003", state.tokens.next, t);
+						if (state.option.latedef_func && _.contains([funct[t], type], "unction")
+								|| !_.contains([funct[t], type], "unction")) {
+							warning("W003", state.tokens.next, t);
+						}
 					}
 
 					delete implied[t];

@@ -70,11 +70,17 @@ exports.latedef = function (test) {
 
 	// When latedef is true, JSHint must not tolerate the use before definition
 	TestRun(test)
+		.addError(10, "'vr' was used before it was defined.")
+		.addError(18, "Inner functions should be listed at the top of the outer function.")
+		.test(src, { latedef: true });
+
+	// When latedef_func is true, JSHint must not tolerate the use before definition for functions
+	TestRun(test)
 		.addError(2, "'fn' was used before it was defined.")
 		.addError(6, "'fn1' was used before it was defined.")
 		.addError(10, "'vr' was used before it was defined.")
 		.addError(18, "Inner functions should be listed at the top of the outer function.")
-		.test(src, { latedef: true });
+		.test(src, { latedef: true, latedef_func: true });
 
 	test.done();
 };
@@ -103,6 +109,11 @@ exports['combination of latedef and undef'] = function (test) {
 		.addError(34, "'fn' was used before it was defined.")
 		.addError(41, "'q' was used before it was defined.")
 		.addError(46, "'h' was used before it was defined.")
+		.test(src, { latedef: true, latedef_func: true, undef: false });
+    // But we get all the functions warning if we disable latedef func
+	TestRun(test)
+		.addError(41, "'q' was used before it was defined.")
+		.addError(46, "'h' was used before it was defined.")
 		.test(src, { latedef: true, undef: false });
 
 	// If we warn on both options we get all the warnings.
@@ -113,6 +124,14 @@ exports['combination of latedef and undef'] = function (test) {
 		.addError(26, "'baz' was used before it was defined.")
 		.addError(29, "'hello' is not defined.")
 		.addError(34, "'fn' was used before it was defined.")
+		.addError(35, "'world' is not defined.")
+		.addError(41, "'q' was used before it was defined.")
+		.addError(46, "'h' was used before it was defined.")
+		.test(src, { latedef: true, latedef_func: true, undef: true });
+
+    // If we remove latedef_func, we don't get the functions warning
+	TestRun(test)
+		.addError(29, "'hello' is not defined.")
 		.addError(35, "'world' is not defined.")
 		.addError(41, "'q' was used before it was defined.")
 		.addError(46, "'h' was used before it was defined.")
