@@ -487,10 +487,10 @@ var JSHINT = (function () {
 		if (_.has(funct, t) && !funct["(global)"]) {
 			if (funct[t] === true) {
 				if (state.option.latedef)
-						if (state.option.latedef_func && _.contains([funct[t], type], "unction")
-								|| !_.contains([funct[t], type], "unction")) {
-							warning("W003", state.tokens.next, t);
-						}
+					if (state.option.latedef_func && _.contains([funct[t], type], "unction")
+							|| !_.contains([funct[t], type], "unction")) {
+						warning("W003", state.tokens.next, t);
+					}
 			} else {
 				if (!state.option.shadow && type !== "exception" ||
 							(isMozOrESNext() && funct["(blockscope)"].getlabel(t))) {
