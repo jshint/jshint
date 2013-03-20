@@ -2414,7 +2414,7 @@ var JSHINT = (function () {
 	}
 
 
-	function doFunction(name, statement) {
+	function doFunction(name, statement, generator) {
 		var f;
 		var oldOption = state.option;
 		var oldScope  = scope;
@@ -2436,6 +2436,10 @@ var JSHINT = (function () {
 			"(blockscope)": funct["(blockscope)"],
 			"(comparray)" : funct["(comparray)"]
 		};
+
+		if (generator) {
+			funct["(generator)"] = true;
+		}
 
 		f = funct;
 		state.tokens.curr.funct = funct;
@@ -3030,6 +3034,15 @@ var JSHINT = (function () {
 	varstatement.exps = true;
 
 	blockstmt("function", function () {
+		var generator = false;
+		if (state.tokens.next.value === "*") {
+			advance("*");
+			if (state.option.esnext && !state.option.moz) {
+				generator = true;
+			} else {
+				warning("W119", state.tokens.curr, "function*");
+			}
+		}
 		if (inblock) {
 			warning("W082", state.tokens.curr);
 
@@ -3041,7 +3054,7 @@ var JSHINT = (function () {
 		adjacent(state.tokens.curr, state.tokens.next);
 		addlabel(i, "unction", state.tokens.curr);
 
-		doFunction(i, { statement: true });
+		doFunction(i, { statement: true }, generator);
 		if (state.tokens.next.id === "(" && state.tokens.next.line === state.tokens.curr.line) {
 			error("E039");
 		}
@@ -3049,13 +3062,18 @@ var JSHINT = (function () {
 	});
 
 	prefix("function", function () {
+		var generator = false;
+		if (state.option.esnext && state.tokens.next.value === "*") {
+			advance("*");
+			generator = true;
+		}
 		var i = optionalidentifier();
 		if (i || state.option.gcl) {
 			adjacent(state.tokens.curr, state.tokens.next);
 		} else {
 			nonadjacent(state.tokens.curr, state.tokens.next);
 		}
-		doFunction(i);
+		doFunction(i, undefined, generator);
 		if (!state.option.loopfunc && funct["(loopage)"]) {
 			warning("W083");
 		}
@@ -3559,7 +3577,9 @@ var JSHINT = (function () {
 	}).exps = true;
 
 	stmt("yield", function () {
-		if (!state.option.moz) {
+		if (state.option.esnext && funct["(generator)"] !== true) {
+			error("E046", state.tokens.curr, "yield")
+		} else if (!isMozOrESNext()) {
 			warning("W104", state.tokens.curr, "yield");
 		}
 		if (this.line === state.tokens.next.line) {
