@@ -61,8 +61,8 @@ var errors = {
 	E043: "Too many errors.",
 	E044: "'{a}' is already defined and can't be redefined.",
 	E045: "Invalid for each loop.",
-    E046: "A yield statement shall be within a generator function (with syntax: `function*`)",
-    E047: "A generator function shall contain a yield statement."
+	E046: "A yield statement shall be within a generator function (with syntax: `function*`)",
+	E047: "A generator function shall contain a yield statement."
 };
 
 var warnings = {
