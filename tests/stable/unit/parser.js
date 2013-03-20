@@ -1035,6 +1035,29 @@ exports.testGeneratorMozError = function (test) {
 	test.done();
 };
 
+exports.testGeneratorEsNextNoYield = function (test) {
+	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
+	var code = [
+		"function* fib() {",
+		"	var i = 0, j = 1;",
+		"	while (true) {",
+		"		[i, j] = [j, i + j];",
+		"		return i;",
+		"	}",
+		"}",
+
+		"var g = fib();",
+		"for (let i = 0; i < 10; i++)",
+		"	print(g.next());"
+	];
+	TestRun(test)
+        .addError(7, "A generator function shall contain a yield statement.")
+		.test(code, {moz: false, esnext: true, es5: true, unused: true,
+						undef: true, predef: ["print", "Iterator"]});
+
+	test.done();
+};
+
 exports.testGeneratorEsNext = function (test) {
 	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
 	var code = [
