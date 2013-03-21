@@ -1126,7 +1126,7 @@ exports.testESNextOverridesMoz = function (test) {
 		"[i * i for each (i in [1, 2, 3, 4, 5])];"
 	];
 	TestRun(test)
-		.addError(1, "'for each' is only available in Mozilla extensions.")
+		//.addError(1, "'for each' is only available in Mozilla extensions.")
 		.addError(1, "'array comprehension' is only available in Mozilla extensions.")
 		.test(code, {moz: true, esnext: true, es5: true, unused: true, undef: true,
 						predef: ["print"]});
@@ -1203,7 +1203,7 @@ exports.testESNextOverridesTryCatchFilter = function (test) {
 		"catch (e if e.name === 'foo') {}"
 	];
 	TestRun(test)
-		.addError(4, "'catch filter' is only available in Mozilla extensions.")
+		//.addError(4, "'catch filter' is only available in Mozilla extensions.")
 		.test(code, {moz: true, esnext: true, es5: true, undef: true});
 
 	test.done();
@@ -1226,7 +1226,7 @@ exports.testESNextOverridesArrayComprehensionDetection = function (test) {
 		"var foo = []; for each (let i in [1,2,3]) {}"
 	];
 	TestRun(test)
-		.addError(1, "'for each' is only available in Mozilla extensions.")
+		//.addError(1, "'for each' is only available in Mozilla extensions.")
 		.test(code, {moz: true, esnext: true, es5: true, undef: true });
 
 	test.done();
@@ -1288,7 +1288,7 @@ exports.testESNextOverridesTryMultiCatch = function (test) {
 		"}"
 	];
 	TestRun(test)
-        .addError(5, "'multiple catch blocks' is only available in Mozilla extensions.")
+        //.addError(5, "'multiple catch blocks' is only available in Mozilla extensions.")
 		.test(code, {moz: true, esnext: true, es5: true, undef: true, predef: ["print"]});
 
 	test.done();
