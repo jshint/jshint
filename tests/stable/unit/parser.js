@@ -1204,14 +1204,6 @@ exports.testESNextOverridesTryCatchFilter = function (test) {
 	];
 	TestRun(test)
 		.addError(4, "'catch filter' is only available in Mozilla extensions.")
-		.addError(4, "Expected ')' and instead saw 'if'.")
-		.addError(4, "Expected '{' and instead saw 'e'.")
-		.addError(4, "Expected an assignment or function call and instead saw an expression.")
-		.addError(4, "Missing semicolon.")
-		.addError(4, "Expected an identifier and instead saw ')'.")
-		.addError(4, "Expected an assignment or function call and instead saw an expression.")
-		.addError(4, "Missing semicolon.")
-		.addError(4, "'e' is not defined.")
 		.test(code, {moz: true, esnext: true, es5: true, undef: true});
 
 	test.done();
@@ -1296,20 +1288,7 @@ exports.testESNextOverridesTryMultiCatch = function (test) {
 		"}"
 	];
 	TestRun(test)
-		.addError(5, "Expected an identifier and instead saw 'catch'.")
-		.addError(5, "Expected an operator and instead saw '('.")
-		.addError(5, "Expected an assignment or function call and instead saw an expression.")
-		.addError(5, "Missing semicolon.")
-		.addError(5, "Expected an assignment or function call and instead saw an expression.")
-		.addError(5, "Missing semicolon.")
-		.addError(5, "Expected an identifier and instead saw ')'.")
-		.addError(5, "Expected an assignment or function call and instead saw an expression.")
-		.addError(5, "Missing semicolon.")
-		.addError(7, "Expected an identifier and instead saw 'finally'.")
-		.addError(7, "Expected an assignment or function call and instead saw an expression.")
-		.addError(7, "Missing semicolon.")
-		.addError(5, "'err' is not defined.")
-		.addError(6, "'err' is not defined.")
+        .addError(5, "'multiple catch blocks' is only available in Mozilla extensions.")
 		.test(code, {moz: true, esnext: true, es5: true, undef: true, predef: ["print"]});
 
 	test.done();
