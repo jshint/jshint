@@ -2295,10 +2295,9 @@ var JSHINT = (function () {
 		res.right = expression(0);
 		advance("for");
 		if (state.tokens.next.value === "each") {
-			if (state.option.moz && !state.option.esnext) {
-				advance("each");
-			} else {
-				warning("W104", state.tokens.curr, "for each");
+			advance("each");
+			if (state.option.esnext || !state.option.moz) {
+				warning("W118", state.tokens.curr, "for each");
 			}
 		}
 		advance("(");
@@ -3391,15 +3390,10 @@ var JSHINT = (function () {
 		var foreachtok = null;
 
 		if (t.value === "each") {
-			if (state.option.moz) {
-				if (!state.option.esnext) {
-					foreachtok = t;
-					advance("each");
-				} else {
-					warning("W104", state.tokens.curr, "for each");
-				}
-			} else {
-				warning("W118", state.tokens.next);
+			foreachtok = t;
+			advance("each");
+			if (state.option.esnext || !state.option.moz) {
+				warning("W118", state.tokens.curr, "for each");
 			}
 		}
 
