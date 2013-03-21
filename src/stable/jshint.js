@@ -2293,7 +2293,7 @@ var JSHINT = (function () {
 		advance("for");
 		if (state.tokens.next.value === "each") {
 			advance("each");
-			if (state.option.esnext || !state.option.moz) {
+			if (!state.option.moz) {
 				warning("W118", state.tokens.curr, "for each");
 			}
 		}
@@ -3100,7 +3100,7 @@ var JSHINT = (function () {
 			}
 
 			if (state.tokens.next.value === "if") {
-				if (state.option.esnext || !state.option.moz) {
+				if (!state.option.moz) {
 					warning("W118", state.tokens.curr, "catch filter");
 				}
 				advance("if");
@@ -3125,7 +3125,7 @@ var JSHINT = (function () {
 
 		while (state.tokens.next.id === "catch") {
 			increaseComplexityCount();
-			if (b && (state.option.esnext || !state.option.moz)) {
+			if (b && (!state.option.moz)) {
 				warning("W118", state.tokens.next, "multiple catch blocks")
 			}
 			doCatch();
@@ -3326,7 +3326,7 @@ var JSHINT = (function () {
 		if (t.value === "each") {
 			foreachtok = t;
 			advance("each");
-			if (state.option.esnext || !state.option.moz) {
+			if (!state.option.moz) {
 				warning("W118", state.tokens.curr, "for each");
 			}
 		}
