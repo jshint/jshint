@@ -1132,7 +1132,6 @@ exports.testESNextOverridesMoz = function (test) {
 		.addError(1, "Expected '(' and instead saw 'each'.")
 		.addError(1, "Expected ')' and instead saw ']'.")
 		.addError(1, "Expected ']' and instead saw ';'.")
-		.addError(1, "Expected an assignment or function call and instead saw an expression.")
 		.addError(1, "Missing semicolon.")
 		.test(code, {moz: true, esnext: true, es5: true, unused: true, undef: true,
 						predef: ["print"]});
@@ -1168,7 +1167,6 @@ exports.testArrayComprehensionWithDestArrayGlobScope = function (test) {
 		"var destarray_comparray_2 = [ [i, {i: [i, j]} ] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
 	];
 	TestRun(test)
-		.addError(1, "Expected an assignment or function call and instead saw an expression.")
 		.test(code, {moz: true, es5: true, undef: true,
 						predef: ["print", "Iterator"]});
 
@@ -1181,7 +1179,6 @@ exports.testArrayComprehensionImbricationWithDestArray = function (test) {
 
 	];
 	TestRun(test)
-		.addError(1, "Expected an assignment or function call and instead saw an expression.")
 		.test(code, {moz: true, es5: true, undef: true,
 						predef: ["print", "Iterator"]});
 

@@ -2289,6 +2289,7 @@ var JSHINT = (function () {
 
 	function comprehensiveArrayExpression() {
 		var res = {};
+		res.exps = true;
 		funct["(comparray)"].stack();
 
 		res.right = expression(0);
