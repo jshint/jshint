@@ -537,6 +537,17 @@ exports["regression for GH-910"] = function (test) {
 	test.done();
 };
 
+exports.testHtml = function (test) {
+	var html = "<html><body>Hello World</body></html>";
+	TestRun(test)
+		.addError(1, "Expected an identifier and instead saw '<'.")
+		.addError(1, "Expected an assignment or function call and instead saw an expression.")
+		.addError(1, "Missing semicolon.")
+		.addError(1, "Expected an identifier and instead saw '<'.")
+		.test(html, {});
+	test.done();
+};
+
 exports.testDestructuringVarFuncScope = function (test) {
 	var code = [
 		"function foobar() {",
