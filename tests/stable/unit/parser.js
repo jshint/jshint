@@ -1116,8 +1116,6 @@ exports.testArrayComprehension = function (test) {
 		"print('evens:', evens);"
 	];
 	TestRun(test)
-		// .addError(6, "'for each' is only available in JavaScript 1.7.")
-		// .addError(7, "'for each' is only available in JavaScript 1.7.")
 		.test(code, {moz: true, es5: true, unused: true, undef: true,
 						predef: ["print"]});
 
@@ -1128,11 +1126,8 @@ exports.testESNextOverridesMoz = function (test) {
 		"[i * i for each (i in [1, 2, 3, 4, 5])];"
 	];
 	TestRun(test)
-		.addError(1, "'for each' is only available in JavaScript 1.7.")
-		.addError(1, "Expected '(' and instead saw 'each'.")
-		.addError(1, "Expected ')' and instead saw ']'.")
-		.addError(1, "Expected ']' and instead saw ';'.")
-		.addError(1, "Missing semicolon.")
+		.addError(1, "'for each' is only available in Mozilla extensions.")
+		.addError(1, "'array comprehension' is only available in Mozilla extensions.")
 		.test(code, {moz: true, esnext: true, es5: true, unused: true, undef: true,
 						predef: ["print"]});
 
@@ -1208,7 +1203,7 @@ exports.testESNextOverridesTryCatchFilter = function (test) {
 		"catch (e if e.name === 'foo') {}"
 	];
 	TestRun(test)
-		.addError(4, "'catch filter' is only available in JavaScript 1.7.")
+		.addError(4, "'catch filter' is only available in Mozilla extensions.")
 		.addError(4, "Expected ')' and instead saw 'if'.")
 		.addError(4, "Expected '{' and instead saw 'e'.")
 		.addError(4, "Expected an assignment or function call and instead saw an expression.")
@@ -1239,11 +1234,7 @@ exports.testESNextOverridesArrayComprehensionDetection = function (test) {
 		"var foo = []; for each (let i in [1,2,3]) {}"
 	];
 	TestRun(test)
-		.addError(1, "'for each' is only available in JavaScript 1.7.")
-		.addError(1, "Expected '(' and instead saw 'each'.")
-		.addError(1, "Creating global 'for' variable. Should be 'for (var ( ...'.")
-		.addError(1, "Expected 'in' and instead saw 'let'.")
-		.addError(1, "'i' is not defined.")
+		.addError(1, "'for each' is only available in Mozilla extensions.")
 		.test(code, {moz: true, esnext: true, es5: true, undef: true });
 
 	test.done();
