@@ -3100,16 +3100,11 @@ var JSHINT = (function () {
 			}
 
 			if (state.tokens.next.value === "if") {
-				if (state.option.moz) {
-					if (!state.option.esnext) {
-						advance("if");
-						expression(0);
-					} else {
-						warning("W118", state.tokens.curr, "catch filter");
-					}
-				} else {
+				if (state.option.esnext || !state.option.moz) {
 					warning("W118", state.tokens.curr, "catch filter");
 				}
+				advance("if");
+				expression(0);
 			}
 
 			advance(")");
@@ -3128,18 +3123,13 @@ var JSHINT = (function () {
 
 		block(false);
 
-		if (state.option.moz && !state.option.esnext) {
-			while (state.tokens.next.id === "catch") {
-				increaseComplexityCount();
-				doCatch();
-				b = true;
+		while (state.tokens.next.id === "catch") {
+			increaseComplexityCount();
+			if (b && (state.option.esnext || !state.option.moz)) {
+				warning("W118", state.tokens.next, "multiple catch blocks")
 			}
-		} else {
-			if (state.tokens.next.id === "catch") {
-				increaseComplexityCount();
-				doCatch();
-				b = true;
-			}
+			doCatch();
+			b = true;
 		}
 
 		if (state.tokens.next.id === "finally") {
