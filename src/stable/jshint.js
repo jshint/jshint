@@ -3590,37 +3590,25 @@ var JSHINT = (function () {
 		return this;
 	}).exps = true;
 
-	// Future Reserved Words
-
-	FutureReservedWord("abstract");
-	FutureReservedWord("boolean");
-	FutureReservedWord("byte");
-	FutureReservedWord("char");
+	// ES-262, 5.1 - 7.6.1.2 Future Reserved Words
 	FutureReservedWord("class", { es5: true });
-	FutureReservedWord("double");
+	// FutureReservedWord("const", { es5: true });
 	FutureReservedWord("enum", { es5: true });
 	FutureReservedWord("export", { es5: true });
 	FutureReservedWord("extends", { es5: true });
-	FutureReservedWord("final");
-	FutureReservedWord("float");
-	FutureReservedWord("goto");
-	FutureReservedWord("implements", { es5: true, strictOnly: true });
 	FutureReservedWord("import", { es5: true });
-	FutureReservedWord("int");
-	FutureReservedWord("interface");
-	FutureReservedWord("long");
-	FutureReservedWord("native");
+	FutureReservedWord("super", { es5: true });
+
+	// ES-262, 5.1 - 7.6.1.2 Future Reserved Words, Strict Mode Only
+	FutureReservedWord("implements", { es5: true, strictOnly: true });
+	FutureReservedWord("interface", { es5: true, strictOnly: true });
+	// FutureReservedWord("let", { es5: true, strictOnly: true });
 	FutureReservedWord("package", { es5: true, strictOnly: true });
 	FutureReservedWord("private", { es5: true, strictOnly: true });
 	FutureReservedWord("protected", { es5: true, strictOnly: true });
 	FutureReservedWord("public", { es5: true, strictOnly: true });
-	FutureReservedWord("short");
 	FutureReservedWord("static", { es5: true, strictOnly: true });
-	FutureReservedWord("super", { es5: true });
-	FutureReservedWord("synchronized");
-	FutureReservedWord("throws");
-	FutureReservedWord("transient");
-	FutureReservedWord("volatile");
+	// FutureReservedWord("yield", { es5: true, strictOnly: true });
 
 	// this function is used to determine wether a squarebracket or a curlybracket
 	// expression is a comprehension array, destructuring assignment or a json value.
