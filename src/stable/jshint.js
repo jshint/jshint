@@ -46,10 +46,10 @@ var style    = require("./style.js");
 var JSHINT = (function () {
 	"use strict";
 
-	var anonname,		// The guessed name for anonymous functions.
+	var anonname, // The guessed name for anonymous functions.
+		api, // Extension API
 
-// These are operators that should not be used with the ! operator.
-
+		// These are operators that should not be used with the ! operator.
 		bang = {
 			"<"  : true,
 			"<=" : true,
@@ -1338,6 +1338,13 @@ var JSHINT = (function () {
 			return val;
 		}
 
+		// Display an info message about reserved words as properties
+		// and ES5 but do it only once.
+		if (prop && !api.getCache("displayed:I002")) {
+			api.setCache("displayed:I002", true);
+			warning("I002");
+		}
+
 		warning("W024", state.tokens.curr, state.tokens.curr.id);
 		return val;
 	}
@@ -2308,7 +2315,7 @@ var JSHINT = (function () {
 		advance("]");
 		funct["(comparray)"].unstack();
 		return res;
-	};
+	}
 
 	prefix("[", function () {
 		if (state.option.moz && lookupBlockType(0).isCompArray) {
@@ -4013,7 +4020,7 @@ var JSHINT = (function () {
 			return false;
 		}
 
-		var api = {
+		api = {
 			get isJSON() {
 				return state.jsonMode;
 			},

@@ -530,6 +530,7 @@ exports.testReserved = function (test) {
 		.addError(5, "Expected an identifier and instead saw 'let' (a reserved word).")
 		.addError(10, "Expected an identifier and instead saw 'let' (a reserved word).")
 		.addError(14, "Expected an identifier and instead saw 'else' (a reserved word).")
+		.addError(14, "Reserved words as properties can be used under the 'es5' option.")
 		.test(src);
 
 	TestRun(test)
@@ -547,6 +548,7 @@ exports.testES5Reserved = function (test) {
 
 	TestRun(test)
 		.addError(2, "Expected an identifier and instead saw 'default' (a reserved word).")
+		.addError(2, "Reserved words as properties can be used under the 'es5' option.")
 		.addError(3, "Unexpected 'in'.")
 		.addError(3, "Expected an identifier and instead saw 'in' (a reserved word).")
 		.addError(6, "Expected an identifier and instead saw 'default' (a reserved word).")
