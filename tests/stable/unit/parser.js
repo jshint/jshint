@@ -1288,24 +1288,35 @@ exports.testESNextOverridesTryMultiCatch = function (test) {
 		"}"
 	];
 	TestRun(test)
-        //.addError(5, "'multiple catch blocks' is only available in Mozilla extensions.")
 		.test(code, {moz: true, esnext: true, es5: true, undef: true, predef: ["print"]});
 
 	test.done();
 };
 
-exports.testNoLetInIfStmt = function (test) {
+exports["test: no let not directly within a block"] = function (test) {
     var code = [
-        "if (true) let x = 1;",
-        "function foo() {",
-        "   if (true)",
-        "       let x = 1;",
-        "}",
-        "if (true) let (x = 1) print(x);",
+		"if (true) let x = 1;",
+		"function foo() {",
+		"   if (true)",
+		"       let x = 1;",
+		"}",
+		"if (true) let (x = 1) print(x);",
+		"for (let x = 0; x < 42; ++x) let a = 1;",
+		"for (let x in [,,,] ) let a = 1;",
+		"for (let x of [1, 2, 3, 4] ) let a = 1;",
+		"while (true) let a = 1;",
+		"if (false) let a = 1; else if (true) let a = 1; else let a = 2;"
     ];
     TestRun(test)
         .addError(1, "Let declaration not directly within block.")
         .addError(4, "Let declaration not directly within block.")
+		.addError(7, "Let declaration not directly within block.")
+		.addError(8, "Let declaration not directly within block.")
+		.addError(9, "Let declaration not directly within block.")
+		.addError(10, "Let declaration not directly within block.")
+		.addError(11, "Let declaration not directly within block.")
+		.addError(11, "Let declaration not directly within block.")
+		.addError(11, "Let declaration not directly within block.")
         .test(code, {moz: true, esnext: true, es5: true, predef: ["print"]});
 
     test.done();
