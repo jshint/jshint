@@ -2949,7 +2949,7 @@ var JSHINT = (function () {
 				if (funct["(global)"] && predefined[t.id] === false) {
 					warning("W079", t.token, t.id);
 				}
-				if (t.id) {
+				if (t.id && !funct["(nolet)"]) {
 					addlabel(t.id, "unused", t.token, true);
 					names.push(t.token);
 				}
