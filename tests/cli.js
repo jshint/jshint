@@ -416,7 +416,7 @@ exports.group = {
 	testDrainCalledWhenThereIsBufferedOutput: function (test) {
 		var dir = __dirname + "/../examples/";
 		sinon.stub(cli, "run").returns(false);
-		sinon.stub(cli, "getProcessStdOutBufferSize").returns(1);
+		sinon.stub(cli, "getBufferSize").returns(1);
 		sinon.stub(process, "cwd").returns(dir);		
 		sinon.stub(process.stdout, "on", function (name, func) {
 			func();
@@ -433,7 +433,7 @@ exports.group = {
 		process.cwd.restore();
 		process.stdout.on.restore();
 		cli.run.restore();
-		cli.getProcessStdOutBufferSize.restore();
+		cli.getBufferSize.restore();
 
 		test.done();
 	},
@@ -441,7 +441,7 @@ exports.group = {
 	testDrainNotCalledWhenThereIsNoBufferedOutput: function (test) {
 		var dir = __dirname + "/../examples/";
 		sinon.stub(cli, "run").returns(false);
-		sinon.stub(cli, "getProcessStdOutBufferSize").returns(0);
+		sinon.stub(cli, "getBufferSize").returns(0);
 		sinon.stub(process, "cwd").returns(dir);		
 		sinon.stub(process.stdout, "on", function (name, func) {
 			func();
@@ -457,7 +457,7 @@ exports.group = {
 		process.cwd.restore();
 		process.stdout.on.restore();
 		cli.run.restore();
-		cli.getProcessStdOutBufferSize.restore();
+		cli.getBufferSize.restore();
 
 		test.done();
 	}
