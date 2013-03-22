@@ -189,7 +189,8 @@ var warnings = {
 };
 
 var info = {
-	I001: "Comma warnings can be turned off with 'laxcomma'."
+	I001:   "Comma warnings can be turned off with 'laxcomma'.",
+	IW024:  "Properties as reserved words can be used under 'es5' flag"
 };
 
 exports.errors = {};
