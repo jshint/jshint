@@ -1671,6 +1671,9 @@ var JSHINT = (function () {
 				error("E021", state.tokens.next, "{", state.tokens.next.value);
 			}
 		} else {
+			// check to avoid let declaration not within a block
+			funct["(nolet)"] = true;
+
 			if (!stmt || state.option.curly) {
 				warning("W116", state.tokens.next, "{", state.tokens.next.value);
 			}
@@ -1681,6 +1684,8 @@ var JSHINT = (function () {
 			a = [statement(state.tokens.next.line === state.tokens.curr.line)];
 			indent -= state.option.indent;
 			noreach = false;
+
+			delete funct["(nolet)"];
 		}
 		funct["(verb)"] = null;
 		if (!ordinary || !state.option.funcscope) scope = s;
@@ -2916,6 +2921,8 @@ var JSHINT = (function () {
 			} else {
 				warning("W118", state.tokens.next);
 			}
+		} else if (funct["(nolet)"]) {
+			error("E048", state.tokens.curr);
 		}
 
 		if (funct["(onevar)"] && state.option.onevar) {
