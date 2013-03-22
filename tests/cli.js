@@ -413,11 +413,11 @@ exports.group = {
 		test.done();
 	},
 
-	testDrain: function (test) {
+	testDrainCalledWhenThereIsBufferedOutput: function (test) {
 		var dir = __dirname + "/../examples/";
 		sinon.stub(cli, "run").returns(false);
-		sinon.stub(process, "cwd").returns(dir);
-		sinon.stub(process.stdout, "flush").returns(false);
+		sinon.stub(cli, "getProcessStdOutBufferSize").returns(1);
+		sinon.stub(process, "cwd").returns(dir);		
 		sinon.stub(process.stdout, "on", function (name, func) {
 			func();
 		});
@@ -426,13 +426,38 @@ exports.group = {
 		sinon.stub(process, "exit");
 
 		cli.interpret(["node", "jshint", "reporter.js"]);
+		test.equal(process.stdout.on.callCount, 1);
 		test.equal(process.stdout.on.args[0][0], "drain");
 		test.strictEqual(process.exit.args[0][0], 2);
 
 		process.cwd.restore();
-		process.stdout.flush.restore();
 		process.stdout.on.restore();
 		cli.run.restore();
+		cli.getProcessStdOutBufferSize.restore();
+
+		test.done();
+	},
+	
+	testDrainNotCalledWhenThereIsNoBufferedOutput: function (test) {
+		var dir = __dirname + "/../examples/";
+		sinon.stub(cli, "run").returns(false);
+		sinon.stub(cli, "getProcessStdOutBufferSize").returns(0);
+		sinon.stub(process, "cwd").returns(dir);		
+		sinon.stub(process.stdout, "on", function (name, func) {
+			func();
+		});
+
+		process.exit.restore();
+		sinon.stub(process, "exit");
+
+		cli.interpret(["node", "jshint", "reporter.js"]);
+		test.equal(process.stdout.on.callCount, 0);
+		test.strictEqual(process.exit.args[0][0], 2);
+
+		process.cwd.restore();
+		process.stdout.on.restore();
+		cli.run.restore();
+		cli.getProcessStdOutBufferSize.restore();
 
 		test.done();
 	}
