@@ -287,6 +287,30 @@ function lint(file, results, config, data) {
 
 var exports = {
 	/**
+	 * Gathers all files that need to be linted
+	 *
+	 * @param {object} post-processed options from 'interpret':
+	 *								   args     - CLI arguments
+	 *								   ignores  - A list of files/dirs to ignore (defaults to .jshintignores)
+	 *								   extensions - A list of non-dot-js extensions to check
+	 */
+	gather: function (opts) {
+		var files = [];
+		var reg = new RegExp("\\.(js" +
+			(opts.extensions === "" ? "" : "|" +
+				opts.extensions.replace(/,/g, "|").replace(/[\. ]/g, "")) + ")$");
+		var ignores = !opts.ignores ? loadIgnores() : opts.ignores.map(function (target) {
+			return path.resolve(target);
+		});
+
+		opts.args.forEach(function (target) {
+			collect(target, files, ignores, reg);
+		});
+
+		return files;
+	},
+
+	/**
 	 * Gathers all files that need to be linted, lints them, sends them to
 	 * a reporter and returns the overall result.
 	 *
@@ -300,16 +324,9 @@ var exports = {
 	 * @returns {bool} 'true' if all files passed and 'false' otherwise.
 	 */
 	run: function (opts) {
-		var files = [];
+		var files = exports.gather(opts);
 		var results = [];
 		var data = [];
-		var reg = new RegExp("\\.(js" +
-			(opts.extensions === "" ? "" : "|" +
-				opts.extensions.replace(/,/g, "|").replace(/[\. ]/g, "")) + ")$");
-
-		opts.args.forEach(function (target) {
-			collect(target, files, opts.ignores, reg);
-		});
 
 		files.forEach(function (file) {
 			lint(file, results, opts.config, data);
