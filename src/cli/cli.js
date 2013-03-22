@@ -102,7 +102,7 @@ function loadConfig(fp) {
 function findConfig() {
 	var name = ".jshintrc";
 	var proj = findFile(name);
-	var home = path.normalize(path.join(process.env.HOME, name));
+	var home = path.normalize(path.join(process.env.HOME || process.env.HOMEPATH, name));
 
 	if (proj) {
 		return proj;
