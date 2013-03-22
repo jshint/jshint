@@ -976,7 +976,122 @@ exports.testForEachError = function (test) {
 	test.done();
 };
 
-exports.testGenerator = function (test) {
+exports.testGeneratorES5 = function (test) {
+	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
+	var code = [
+		"function fib() {",
+		"	var i = 0, j = 1;",
+		"	while (true) {",
+		"		yield i;",
+		"		[i, j] = [j, i + j];",
+		"	}",
+		"}",
+
+		"var g = fib();",
+		"for (var i = 0; i < 10; i++)",
+		"	print(g.next());"
+	];
+	TestRun(test)
+		.addError(4, "'yield' is only available in JavaScript 1.7.")
+		.addError(5, "Bad assignment.")
+		.test(code, {moz: false, esnext: false, es5: true, unused: true,
+						undef: true, predef: ["print"]});
+
+	test.done();
+};
+
+exports.testGeneratorEsNextError = function (test) {
+	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
+	var code = [
+		"function fib() {",
+		"	var i = 0, j = 1;",
+		"	while (true) {",
+		"		yield i;",
+		"		[i, j] = [j, i + j];",
+		"	}",
+		"}",
+
+		"var g = fib();",
+		"for (var i = 0; i < 10; i++)",
+		"	print(g.next());"
+	];
+	TestRun(test)
+		.addError(4, "A yield statement shall be within a generator function (with syntax: `function*`)")
+		.test(code, {moz: false, esnext: true, es5: true, unused: true,
+						undef: true, predef: ["print"]});
+
+	test.done();
+};
+
+exports.testGeneratorMozError = function (test) {
+	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
+	var code = [
+		"function* fib() {",
+		"	var i = 0, j = 1;",
+		"	while (true) {",
+		"		yield i;",
+		"		[i, j] = [j, i + j];",
+		"	}",
+		"}",
+
+		"var g = fib();",
+		"for (var i = 0; i < 10; i++)",
+		"	print(g.next());"
+	];
+	TestRun(test)
+		.addError(1, "'function*' is only available in ES6.")
+		.test(code, {moz: true, esnext: false, es5: true, unused: true,
+						undef: true, predef: ["print"]});
+
+	test.done();
+};
+
+exports.testGeneratorEsNextNoYield = function (test) {
+	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
+	var code = [
+		"function* fib() {",
+		"	var i = 0, j = 1;",
+		"	while (true) {",
+		"		[i, j] = [j, i + j];",
+		"		return i;",
+		"	}",
+		"}",
+
+		"var g = fib();",
+		"for (let i = 0; i < 10; i++)",
+		"	print(g.next());"
+	];
+	TestRun(test)
+		.addError(7, "A generator function shall contain a yield statement.")
+		.test(code, {moz: false, esnext: true, es5: true, unused: true,
+						undef: true, predef: ["print", "Iterator"]});
+
+	test.done();
+};
+
+exports.testGeneratorEsNext = function (test) {
+	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
+	var code = [
+		"function* fib() {",
+		"	var i = 0, j = 1;",
+		"	while (true) {",
+		"		yield i;",
+		"		[i, j] = [j, i + j];",
+		"	}",
+		"}",
+
+		"var g = fib();",
+		"for (let i = 0; i < 10; i++)",
+		"	print(g.next());"
+	];
+	TestRun(test)
+		.test(code, {moz: false, esnext: true, es5: true, unused: true,
+						undef: true, predef: ["print", "Iterator"]});
+
+	test.done();
+};
+
+exports.testGeneratorMoz = function (test) {
 	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
 	var code = [
 		"function fib() {",
@@ -992,7 +1107,7 @@ exports.testGenerator = function (test) {
 		"	print(g.next());"
 	];
 	TestRun(test)
-		.test(code, {moz: true, esnext: true, es5: true, unused: true,
+		.test(code, {moz: true, esnext: false, es5: true, unused: true,
 						undef: true, predef: ["print", "Iterator"]});
 
 	test.done();
@@ -1012,8 +1127,6 @@ exports.testArrayComprehension = function (test) {
 		"print('evens:', evens);"
 	];
 	TestRun(test)
-		// .addError(6, "'for each' is only available in JavaScript 1.7.")
-		// .addError(7, "'for each' is only available in JavaScript 1.7.")
 		.test(code, {moz: true, es5: true, unused: true, undef: true,
 						predef: ["print"]});
 
@@ -1024,12 +1137,8 @@ exports.testESNextOverridesMoz = function (test) {
 		"[i * i for each (i in [1, 2, 3, 4, 5])];"
 	];
 	TestRun(test)
-		.addError(1, "'for each' is only available in JavaScript 1.7.")
-		.addError(1, "Expected '(' and instead saw 'each'.")
-		.addError(1, "Expected ')' and instead saw ']'.")
-		.addError(1, "Expected ']' and instead saw ';'.")
-		.addError(1, "Expected an assignment or function call and instead saw an expression.")
-		.addError(1, "Missing semicolon.")
+		//.addError(1, "'for each' is only available in Mozilla extensions.")
+		.addError(1, "'array comprehension' is only available in Mozilla extensions.")
 		.test(code, {moz: true, esnext: true, es5: true, unused: true, undef: true,
 						predef: ["print"]});
 
@@ -1064,7 +1173,6 @@ exports.testArrayComprehensionWithDestArrayGlobScope = function (test) {
 		"var destarray_comparray_2 = [ [i, {i: [i, j]} ] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
 	];
 	TestRun(test)
-		.addError(1, "Expected an assignment or function call and instead saw an expression.")
 		.test(code, {moz: true, es5: true, undef: true,
 						predef: ["print", "Iterator"]});
 
@@ -1077,7 +1185,6 @@ exports.testArrayComprehensionImbricationWithDestArray = function (test) {
 
 	];
 	TestRun(test)
-		.addError(1, "Expected an assignment or function call and instead saw an expression.")
 		.test(code, {moz: true, es5: true, undef: true,
 						predef: ["print", "Iterator"]});
 
@@ -1107,15 +1214,7 @@ exports.testESNextOverridesTryCatchFilter = function (test) {
 		"catch (e if e.name === 'foo') {}"
 	];
 	TestRun(test)
-		.addError(4, "'catch filter' is only available in JavaScript 1.7.")
-		.addError(4, "Expected ')' and instead saw 'if'.")
-		.addError(4, "Expected '{' and instead saw 'e'.")
-		.addError(4, "Expected an assignment or function call and instead saw an expression.")
-		.addError(4, "Missing semicolon.")
-		.addError(4, "Expected an identifier and instead saw ')'.")
-		.addError(4, "Expected an assignment or function call and instead saw an expression.")
-		.addError(4, "Missing semicolon.")
-		.addError(4, "'e' is not defined.")
+		//.addError(4, "'catch filter' is only available in Mozilla extensions.")
 		.test(code, {moz: true, esnext: true, es5: true, undef: true});
 
 	test.done();
@@ -1138,11 +1237,7 @@ exports.testESNextOverridesArrayComprehensionDetection = function (test) {
 		"var foo = []; for each (let i in [1,2,3]) {}"
 	];
 	TestRun(test)
-		.addError(1, "'for each' is only available in JavaScript 1.7.")
-		.addError(1, "Expected '(' and instead saw 'each'.")
-		.addError(1, "Creating global 'for' variable. Should be 'for (var ( ...'.")
-		.addError(1, "Expected 'in' and instead saw 'let'.")
-		.addError(1, "'i' is not defined.")
+		//.addError(1, "'for each' is only available in Mozilla extensions.")
 		.test(code, {moz: true, esnext: true, es5: true, undef: true });
 
 	test.done();
@@ -1204,21 +1299,37 @@ exports.testESNextOverridesTryMultiCatch = function (test) {
 		"}"
 	];
 	TestRun(test)
-		.addError(5, "Expected an identifier and instead saw 'catch'.")
-		.addError(5, "Expected an operator and instead saw '('.")
-		.addError(5, "Expected an assignment or function call and instead saw an expression.")
-		.addError(5, "Missing semicolon.")
-		.addError(5, "Expected an assignment or function call and instead saw an expression.")
-		.addError(5, "Missing semicolon.")
-		.addError(5, "Expected an identifier and instead saw ')'.")
-		.addError(5, "Expected an assignment or function call and instead saw an expression.")
-		.addError(5, "Missing semicolon.")
-		.addError(7, "Expected an identifier and instead saw 'finally'.")
-		.addError(7, "Expected an assignment or function call and instead saw an expression.")
-		.addError(7, "Missing semicolon.")
-		.addError(5, "'err' is not defined.")
-		.addError(6, "'err' is not defined.")
 		.test(code, {moz: true, esnext: true, es5: true, undef: true, predef: ["print"]});
 
 	test.done();
 };
+
+exports["test: no let not directly within a block"] = function (test) {
+    var code = [
+		"if (true) let x = 1;",
+		"function foo() {",
+		"   if (true)",
+		"       let x = 1;",
+		"}",
+		"if (true) let (x = 1) print(x);",
+		"for (let x = 0; x < 42; ++x) let a = 1;",
+		"for (let x in [,,,] ) let a = 1;",
+		"for (let x of [1, 2, 3, 4] ) let a = 1;",
+		"while (true) let a = 1;",
+		"if (false) let a = 1; else if (true) let a = 1; else let a = 2;"
+    ];
+    TestRun(test)
+        .addError(1, "Let declaration not directly within block.")
+        .addError(4, "Let declaration not directly within block.")
+		.addError(7, "Let declaration not directly within block.")
+		.addError(8, "Let declaration not directly within block.")
+		.addError(9, "Let declaration not directly within block.")
+		.addError(10, "Let declaration not directly within block.")
+		.addError(11, "Let declaration not directly within block.")
+		.addError(11, "Let declaration not directly within block.")
+		.addError(11, "Let declaration not directly within block.")
+        .test(code, {moz: true, esnext: true, es5: true, predef: ["print"]});
+
+    test.done();
+}
+

@@ -40,7 +40,8 @@
     "eqnull"        : false,     // true: Tolerate use of `== null`
     "es5"           : false,     // true: Allow ES5 syntax (ex: getters and setters)
     "esnext"        : false,     // true: Allow ES.next (ES6) syntax (ex: `const`)
-    "moz"           : false,     // true: Allow Mozilla specific syntax (ex: `for each`, multiple try/catch, function expression…)
+    "moz"           : false,     // true: Allow Mozilla specific syntax (extends and overrides esnext features)
+                                 // (ex: `for each`, multiple try/catch, function expression…)
     "evil"          : false,     // true: Tolerate use of `eval` and `new Function()`
     "expr"          : false,     // true: Tolerate `ExpressionStatement` as Programs
     "funcscope"     : false,     // true: Tolerate defining variables inside control statements"
