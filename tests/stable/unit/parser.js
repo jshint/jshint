@@ -1028,7 +1028,7 @@ exports.testGeneratorMozError = function (test) {
 		"	print(g.next());"
 	];
 	TestRun(test)
-		.addError(1, "'function*' is only available in ESNext extensions.")
+		.addError(1, "'function*' is only available in ES6.")
 		.test(code, {moz: true, esnext: false, es5: true, unused: true,
 						undef: true, predef: ["print"]});
 

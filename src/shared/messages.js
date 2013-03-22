@@ -63,7 +63,7 @@ var errors = {
 	E045: "Invalid for each loop.",
 	E046: "A yield statement shall be within a generator function (with syntax: `function*`)",
 	E047: "A generator function shall contain a yield statement.",
-    E048: "Let declaration not directly within block."
+	E048: "Let declaration not directly within block."
 };
 
 var warnings = {
@@ -189,7 +189,7 @@ var warnings = {
 	W116: "Expected '{a}' and instead saw '{b}'.",
 	W117: "'{a}' is not defined.",
 	W118: "'{a}' is only available in Mozilla extensions.",
-	W119: "'{a}' is only available in ESNext extensions."
+	W119: "'{a}' is only available in ES6."
 };
 
 var info = {
