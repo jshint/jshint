@@ -1293,3 +1293,21 @@ exports.testESNextOverridesTryMultiCatch = function (test) {
 
 	test.done();
 };
+
+exports.testNoLetInIfStmt = function (test) {
+    var code = [
+        "if (true) let x = 1;",
+        "function foo() {",
+        "   if (true)",
+        "       let x = 1;",
+        "}",
+        "if (true) let (x = 1) print(x);",
+    ];
+    TestRun(test)
+        .addError(1, "Let declaration not directly within block.")
+        .addError(4, "Let declaration not directly within block.")
+        .test(code, {moz: true, esnext: true, es5: true, predef: ["print"]});
+
+    test.done();
+}
+
