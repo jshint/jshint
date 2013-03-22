@@ -324,7 +324,7 @@ var exports = {
 	 * Helper exposed for testing.
 	 * Used to determine is stdout has any buffered output before exiting the program
 	 */
-	getProcessStdOutBufferSize: function () {
+	getBufferSize: function () {
 		return process.stdout.bufferSize; 
 	},
 	
@@ -391,7 +391,7 @@ var exports = {
 		// Root issue is here https://github.com/joyent/node/issues/3584
 		function exit() { process.exit(passed ? 0 : 2); }    
 		try {
-			if (exports.getProcessStdOutBufferSize()) {
+			if (exports.getBufferSize()) {
 				process.stdout.once('drain', exit);
 			} else {
 				exit();
