@@ -22,7 +22,7 @@
 	"main": "./src/stable/jshint.js",
 
 	"dependencies": {
-		"esprima":    "http://github.com/ariya/esprima/tarball/master",
+		"esprima":    "https://github.com/ariya/esprima/archive/master.tar.gz",
 		"shelljs":    "0.1.x",
 		"underscore": "1.4.x",
 		"peakle":     "0.0.x",
