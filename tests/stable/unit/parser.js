@@ -2820,3 +2820,51 @@ exports["regression test for GH-890"] = function (test) {
 
 	test.done();
 };
+
+exports["automatic comma insertion GH-950"] = function (test) {
+	var code = [
+		"var a = b",
+		"instanceof c;",
+
+		"var a = { b: 'X' }",
+		"delete a.b",
+
+		"var y = true",
+		"           && true && false;",
+
+		"function test() {",
+		"  return",
+		"      { a: 1 }",
+		"}",
+	];
+
+	var run = TestRun(test)
+		.addError(2, "Bad line breaking before 'instanceof'.")
+		.addError(6, "Bad line breaking before '&&'.")
+		.addError(9, "Label 'a' on 1 statement.")
+		.addError(9, "Expected an assignment or function call and instead saw an expression.");
+	
+	run.test(code, {asi: true});
+	run.test(code, {es5: true, asi: true});
+	run.test(code, {esnext: true, asi: true});
+	run.test(code, {moz: true, asi: true});
+
+	var run = TestRun(test)
+		.addError(2, "Bad line breaking before 'instanceof'.")
+		.addError(3, "Missing semicolon.")
+		.addError(4, "Missing semicolon.")
+		.addError(6, "Bad line breaking before '&&'.")
+		.addError(8, "Line breaking error 'return'.")
+		.addError(8, "Missing semicolon.")
+		.addError(9, "Label 'a' on 1 statement.")
+		.addError(9, "Expected an assignment or function call and instead saw an expression.")
+		.addError(9, "Missing semicolon.");
+
+	run.test(code, {asi: false});
+	run.test(code, {es5: true, asi: false});
+	run.test(code, {esnext: true, asi: false});
+	run.test(code, {moz: true, asi: false});
+
+	test.done();
+};
+
