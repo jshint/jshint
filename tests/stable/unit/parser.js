@@ -2841,6 +2841,7 @@ exports["automatic comma insertion GH-950"] = function (test) {
 	var run = TestRun(test)
 		.addError(2, "Bad line breaking before 'instanceof'.")
 		.addError(6, "Bad line breaking before '&&'.")
+		.addError(8, "Line breaking error 'return'.")
 		.addError(9, "Label 'a' on 1 statement.")
 		.addError(9, "Expected an assignment or function call and instead saw an expression.");
 	

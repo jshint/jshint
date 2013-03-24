@@ -338,6 +338,8 @@ exports.asi = function (test) {
 
 	TestRun(test, 2)
 		.addError(2, "Missing semicolon.") // throw on "use strict", even option asi is used
+		.addError(4, "Line breaking error 'return'.")
+		.addError(17, "Line breaking error 'return'.")
 		.test(src, { asi: true });
 
 	test.done();

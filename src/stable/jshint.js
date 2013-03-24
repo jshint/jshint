@@ -3564,7 +3564,7 @@ var JSHINT = (function () {
 					warningAt("W093", this.first.line, this.first.character);
 				}
 			}
-		} else if (!state.option.asi) {
+		} else {
 			nolinebreak(this); // always warn (Line breaking error)
 		}
 		reachable("return");
