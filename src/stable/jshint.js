@@ -867,7 +867,10 @@ var JSHINT = (function () {
 				error("E030", state.tokens.curr, state.tokens.curr.id);
 			}
 
-			while (rbp < state.tokens.next.lbp) {
+			var end_of_expr = state.tokens.next.identifier &&
+									!state.tokens.curr.led &&
+									state.tokens.curr.line !== state.tokens.next.line;
+			while (rbp < state.tokens.next.lbp && !end_of_expr) {
 				isArray = state.tokens.curr.value === "Array";
 				isObject = state.tokens.curr.value === "Object";
 
