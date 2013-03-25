@@ -1,5 +1,6 @@
 // Author: Boy Baukema
 // http://github.com/relaxnow
+/*global print*/
 module.exports =
 {
 	reporter: function (results, data)
@@ -102,6 +103,10 @@ module.exports =
 
 		out.push("</checkstyle>");
 
-		process.stdout.write(out.join("\n") + "\n");
+		if (typeof process !== "undefined" && process.stdout) {
+			process.stdout.write(out.join("\n") + "\n");
+		} else {
+			print(out.join("\n") + "\n");
+		}
 	}
 };

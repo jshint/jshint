@@ -1,17 +1,49 @@
 /*jshint boss: true, rhino: true, unused: true, undef: true, white: true, quotmark: double */
 /*global JSHINT */
+/*global checkstyleReporter */
+
+var reportWithReporter = function (reporter, file) {
+	"use strict";
+
+	var results = [];
+	var data = [];
+	var lintData;
+  
+	JSHINT.errors.forEach(function (err) {
+		if (err) {
+			results.push({ file: file, error: err });
+		}
+	});
+	
+	lintData = JSHINT.data();
+	if (lintData) {
+		lintData.file = file;
+		data.push(lintData);
+	}
+	
+	if (reporter) {
+		reporter(results, data, { verbose: true});
+	}
+	
+};
 
 (function (args) {
 	"use strict";
 
 	var filenames = [];
-	var optstr; // arg1=val1,arg2=val2,...
+	var reporter; // only "checkstyle" is recognized
+	var optstr; // arg1=val1,arg2=val2,... or reporter=<reporter>
 	var predef; // global1=true,global2,global3,...
 	var opts   = {};
 	var retval = 0;
 
 	args.forEach(function (arg) {
 		if (arg.indexOf("=") > -1) {
+			// Check first for reporter option
+			if (arg.split("=")[0] === "reporter") {
+				reporter = arg.split("=")[1];
+				return;
+			}
 			if (!optstr) {
 				// First time it's the options.
 				optstr = arg;
@@ -73,10 +105,15 @@
 		}
 
 		if (!JSHINT(input, opts)) {
-			for (var i = 0, err; err = JSHINT.errors[i]; i += 1) {
-				print(err.reason + " (" + name + ":" + err.line + ":" + err.character + ")");
-				print("> " + (err.evidence || "").replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"));
-				print("");
+			if (reporter === "checkstyle" && typeof checkstyleReporter !== "undefined") {
+				reportWithReporter(checkstyleReporter, name);
+			}
+			else {
+				for (var i = 0, err; err = JSHINT.errors[i]; i += 1) {
+					print(err.reason + " (" + name + ":" + err.line + ":" + err.character + ")");
+					print("> " + (err.evidence || "").replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"));
+					print("");
+				}
 			}
 			retval = 1;
 		}
