@@ -311,6 +311,7 @@ var exports = {
 		var reg = new RegExp("\\.(js" +
 			(opts.extensions === "" ? "" : "|" +
 				opts.extensions.replace(/,/g, "|").replace(/[\. ]/g, "")) + ")$");
+
 		var ignores = !opts.ignores ? loadIgnores() : opts.ignores.map(function (target) {
 			return path.resolve(target);
 		});

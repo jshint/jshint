@@ -420,7 +420,7 @@ exports.group = {
 
 		test.equal(args.args.length, 1);
 		test.equal(args.args[0], "examples");
-		test.equal(args.ignores, undefined);
+		test.equal(args.ignores.length, 0);
 
 		shjs.cat.restore();
 
