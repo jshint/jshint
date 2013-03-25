@@ -93,8 +93,6 @@ var JSHINT = (function () {
 			jquery      : true, // if jQuery globals should be predefined
 			lastsemic   : true, // if semicolons may be ommitted for the trailing
 			                    // statements inside of a one-line blocks.
-			latedef     : true, // if the use before definition should not be tolerated
-			latedef_func: true, // if the use before definition should not be tolerated for functions
 			laxbreak    : true, // if line breaks should not be checked
 			laxcomma    : true, // if line breaks should not be checked around commas
 			loopfunc    : true, // if functions should be allowed to be defined within
@@ -159,11 +157,15 @@ var JSHINT = (function () {
 			maxdepth     : false, // {int} max nested block depth per function
 			maxparams    : false, // {int} max params per function
 			maxcomplexity: false, // {int} max cyclomatic complexity per function
-			unused       : true  // warn if variables are unused. Available options:
-			                     //   false    - don't check for unused variables
-			                     //   true     - "vars" + check last function param
-			                     //   "vars"   - skip checking unused function params
-			                     //   "strict" - "vars" + check all function params
+			unused       : true,  // warn if variables are unused. Available options:
+			                      //   false    - don't check for unused variables
+			                      //   true     - "vars" + check last function param
+			                      //   "vars"   - skip checking unused function params
+			                      //   "strict" - "vars" + check all function params
+			latedef      : false  // warn if the variable is used before its definition
+			                      //   false    - don't emit any warnings
+			                      //   true     - warn if any variable is used before its definition
+			                      //   "nofunc" - warn for any variable but function declarations
 		},
 
 		// These are JSHint boolean options which are shared with JSLint
@@ -481,11 +483,12 @@ var JSHINT = (function () {
 
 		if (_.has(funct, t) && !funct["(global)"]) {
 			if (funct[t] === true) {
-				if (state.option.latedef)
-					if (state.option.latedef_func && _.contains([funct[t], type], "unction") ||
+				if (state.option.latedef) {
+					if ((state.option.latedef === true && _.contains([funct[t], type], "unction")) ||
 							!_.contains([funct[t], type], "unction")) {
 						warning("W003", state.tokens.next, t);
 					}
+				}
 			} else {
 				if (!state.option.shadow && type !== "exception" ||
 							(isMozOrESNext() && funct["(blockscope)"].getlabel(t))) {
@@ -493,6 +496,7 @@ var JSHINT = (function () {
 				}
 			}
 		}
+
 		if (isMozOrESNext()) {
 			// a double definition of a let variable in same block throws a TypeError
 			if (funct["(blockscope)"] && funct["(blockscope)"].current.has(t)) {
@@ -515,7 +519,7 @@ var JSHINT = (function () {
 				global[t] = funct;
 				if (_.has(implied, t)) {
 					if (state.option.latedef) {
-						if (state.option.latedef_func && _.contains([funct[t], type], "unction") ||
+						if ((state.option.latedef === true && _.contains([funct[t], type], "unction")) ||
 								!_.contains([funct[t], type], "unction")) {
 							warning("W003", state.tokens.next, t);
 						}
@@ -667,6 +671,23 @@ var JSHINT = (function () {
 					case "vars":
 					case "strict":
 						state.option.unused = val;
+						break;
+					default:
+						error("E002", nt);
+					}
+					return;
+				}
+
+				if (key === "latedef") {
+					switch (val) {
+					case "true":
+						state.option.latedef = true;
+						break;
+					case "false":
+						state.option.latedef = false;
+						break;
+					case "nofunc":
+						state.option.latedef = "nofunc";
 						break;
 					default:
 						error("E002", nt);
