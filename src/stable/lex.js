@@ -1357,7 +1357,7 @@ Lexer.prototype = {
 
 		if (state.option.smarttabs) {
 			// Negative look-behind for "//"
-			match = this.input.match(/(\/\/)? \t/);
+			match = this.input.match(/(\/\/|^\s?\*)? \t/);
 			at = match && !match[1] ? 0 : -1;
 		} else {
 			at = this.input.search(/ \t|\t [^\*]/);
