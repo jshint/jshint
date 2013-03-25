@@ -1,5 +1,31 @@
 /*jshint boss: true, rhino: true, unused: true, undef: true, white: true, quotmark: double */
 /*global JSHINT */
+/*global checkstyleReporter */
+
+var reportWithReporter = function (reporter, file) {
+	"use strict";
+
+	var results = [];
+	var data = [];
+	var lintData;
+  
+	JSHINT.errors.forEach(function (err) {
+		if (err) {
+			results.push({ file: file, error: err });
+		}
+	});
+	
+	lintData = JSHINT.data();
+	if (lintData) {
+		lintData.file = file;
+		data.push(lintData);
+	}
+	
+	if (reporter) {
+		reporter(results, data, { verbose: true});
+	}
+	
+};
 
 (function (args) {
 	"use strict";
@@ -73,10 +99,15 @@
 		}
 
 		if (!JSHINT(input, opts)) {
-			for (var i = 0, err; err = JSHINT.errors[i]; i += 1) {
-				print(err.reason + " (" + name + ":" + err.line + ":" + err.character + ")");
-				print("> " + (err.evidence || "").replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"));
-				print("");
+			if (typeof checkstyleReporter !== "undefined") {
+				reportWithReporter(checkstyleReporter, name);
+			}
+			else {
+				for (var i = 0, err; err = JSHINT.errors[i]; i += 1) {
+					print(err.reason + " (" + name + ":" + err.line + ":" + err.character + ")");
+					print("> " + (err.evidence || "").replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"));
+					print("");
+				}
 			}
 			retval = 1;
 		}
