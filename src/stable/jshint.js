@@ -94,6 +94,7 @@ var JSHINT = (function () {
 			lastsemic   : true, // if semicolons may be ommitted for the trailing
 			                    // statements inside of a one-line blocks.
 			latedef     : true, // if the use before definition should not be tolerated
+			latedef_func: true, // if the use before definition should not be tolerated for functions (depends on latedef option)
 			laxbreak    : true, // if line breaks should not be checked
 			laxcomma    : true, // if line breaks should not be checked around commas
 			loopfunc    : true, // if functions should be allowed to be defined within
@@ -356,10 +357,6 @@ var JSHINT = (function () {
 			combine(predefined, vars.wsh);
 		}
 
-		if (state.option.esnext) {
-			useESNextSyntax();
-		}
-
 		if (state.option.globalstrict && state.option.strict !== false) {
 			state.option.strict = true;
 		}
@@ -486,7 +483,10 @@ var JSHINT = (function () {
 		if (_.has(funct, t) && !funct["(global)"]) {
 			if (funct[t] === true) {
 				if (state.option.latedef)
-					warning("W003", state.tokens.next, t);
+					if (state.option.latedef_func && _.contains([funct[t], type], "unction")
+							|| !_.contains([funct[t], type], "unction")) {
+						warning("W003", state.tokens.next, t);
+					}
 			} else {
 				if (!state.option.shadow && type !== "exception" ||
 							(isMozOrESNext() && funct["(blockscope)"].getlabel(t))) {
@@ -516,7 +516,10 @@ var JSHINT = (function () {
 				global[t] = funct;
 				if (_.has(implied, t)) {
 					if (state.option.latedef) {
-						warning("W003", state.tokens.next, t);
+						if (state.option.latedef_func && _.contains([funct[t], type], "unction")
+								|| !_.contains([funct[t], type], "unction")) {
+							warning("W003", state.tokens.next, t);
+						}
 					}
 
 					delete implied[t];
@@ -1674,6 +1677,9 @@ var JSHINT = (function () {
 				error("E021", state.tokens.next, "{", state.tokens.next.value);
 			}
 		} else {
+			// check to avoid let declaration not within a block
+			funct["(nolet)"] = true;
+
 			if (!stmt || state.option.curly) {
 				warning("W116", state.tokens.next, "{", state.tokens.next.value);
 			}
@@ -1684,6 +1690,8 @@ var JSHINT = (function () {
 			a = [statement(state.tokens.next.line === state.tokens.curr.line)];
 			indent -= state.option.indent;
 			noreach = false;
+
+			delete funct["(nolet)"];
 		}
 		funct["(verb)"] = null;
 		if (!ordinary || !state.option.funcscope) scope = s;
@@ -2289,15 +2297,15 @@ var JSHINT = (function () {
 
 	function comprehensiveArrayExpression() {
 		var res = {};
+		res.exps = true;
 		funct["(comparray)"].stack();
 
 		res.right = expression(0);
 		advance("for");
 		if (state.tokens.next.value === "each") {
-			if (state.option.moz && !state.option.esnext) {
-				advance("each");
-			} else {
-				warning("W104", state.tokens.curr, "for each");
+			advance("each");
+			if (!state.option.moz) {
+				warning("W118", state.tokens.curr, "for each");
 			}
 		}
 		advance("(");
@@ -2317,7 +2325,10 @@ var JSHINT = (function () {
 	}
 
 	prefix("[", function () {
-		if (state.option.moz && lookupBlockType(0).isCompArray) {
+		if (lookupBlockType(true).isCompArray) {
+			if (state.option.esnext || !state.option.moz) {
+				warning("W118", state.tokens.curr, "array comprehension")
+			}
 			return comprehensiveArrayExpression();
 		}
 		var b = state.tokens.curr.line !== state.tokens.next.line;
@@ -2421,7 +2432,7 @@ var JSHINT = (function () {
 	}
 
 
-	function doFunction(name, statement) {
+	function doFunction(name, statement, generator) {
 		var f;
 		var oldOption = state.option;
 		var oldScope  = scope;
@@ -2444,6 +2455,10 @@ var JSHINT = (function () {
 			"(comparray)" : funct["(comparray)"]
 		};
 
+		if (generator) {
+			funct["(generator)"] = true;
+		}
+
 		f = funct;
 		state.tokens.curr.funct = funct;
 
@@ -2461,6 +2476,10 @@ var JSHINT = (function () {
 			block(false, true, true);
 		} else {
 			block(false, false, true);
+		}
+
+		if (generator && funct["(generator)"] !== "yielded") {
+			error("E047", state.tokens.curr);
 		}
 
 		funct["(metrics)"].verifyMaxStatementsPerFunction();
@@ -2691,6 +2710,9 @@ var JSHINT = (function () {
 	function destructuringExpression() {
 		var id, ids;
 		var identifiers = [];
+		if (!isMozOrESNext()) {
+			warning("W104", state.tokens.curr, "destructuring expression");
+		}
 		var nextInnerDE = function () {
 			var ident;
 			if (_.contains(["[", "{"], state.tokens.next.value)) {
@@ -2754,236 +2776,79 @@ var JSHINT = (function () {
 		}
 	}
 
-	// This Function is called when esnext option is set to true:
-	// it adds the `const` statement to JSHINT
-	// it adds the `let` statement to JSHINT
-	// it updates the `var` statement with destructuring arrays JSHINT
+	var conststatement = stmt("const", function (prefix) {
+		var tokens, value;
+		// state variable to know if it is a lone identifier, or a destructuring statement.
+		var lone;
 
-	useESNextSyntax = function () {
-		var conststatement = stmt("const", function (prefix) {
-			var tokens, value;
-			// state variable to know if it is a lone identifier, or a destructuring statement.
-			var lone;
+		if (!isMozOrESNext()) {
+			warning("W104", state.tokens.curr, "const");
+		}
 
-			this.first = [];
-			for (;;) {
-				var names = [];
+		this.first = [];
+		for (;;) {
+			var names = [];
+			nonadjacent(state.tokens.curr, state.tokens.next);
+			if (_.contains(["{", "["], state.tokens.next.value)) {
+				tokens = destructuringExpression();
+				lone = false;
+			} else {
+				tokens = [ { id: identifier(), token: state.tokens.curr } ];
+				lone = true;
+			}
+			for (var t in tokens) {
+				t = tokens[t];
+				if (funct[t.id] === "const") {
+					warning("E011", null, t.id);
+				}
+				if (funct["(global)"] && predefined[t.id] === false) {
+					warning("W079", t.token, t.id);
+				}
+				if (t.id) {
+					addlabel(t.id, "const");
+					names.push(t.token);
+				}
+			}
+			if (prefix) {
+				break;
+			}
+
+			this.first = this.first.concat(names);
+
+			if (state.tokens.next.id !== "=") {
+				warning("E012", state.tokens.curr, state.tokens.curr.value);
+			}
+
+			if (state.tokens.next.id === "=") {
 				nonadjacent(state.tokens.curr, state.tokens.next);
-				if (_.contains(["{", "["], state.tokens.next.value)) {
-					tokens = destructuringExpression();
-					lone = false;
-				} else {
-					tokens = [ { id: identifier(), token: state.tokens.curr } ];
-					lone = true;
-				}
-				for (var t in tokens) {
-					t = tokens[t];
-					if (funct[t.id] === "const") {
-						warning("E011", null, t.id);
-					}
-					if (funct["(global)"] && predefined[t.id] === false) {
-						warning("W079", t.token, t.id);
-					}
-					if (t.id) {
-						addlabel(t.id, "const");
-						names.push(t.token);
-					}
-				}
-				if (prefix) {
-					break;
-				}
-
-				this.first = this.first.concat(names);
-
-				if (state.tokens.next.id !== "=") {
-					warning("E012", state.tokens.curr, state.tokens.curr.value);
-				}
-
-				if (state.tokens.next.id === "=") {
-					nonadjacent(state.tokens.curr, state.tokens.next);
-					advance("=");
-					nonadjacent(state.tokens.curr, state.tokens.next);
-					if (state.tokens.next.id === "undefined") {
-						warning("W080", state.tokens.curr, state.tokens.curr.value);
-					}
-					if (peek(0).id === "=" && state.tokens.next.identifier) {
-						error("E037", state.tokens.next, state.tokens.next.value);
-					}
-					value = expression(0);
-					if (lone) {
-						tokens[0].first = value;
-					} else {
-						destructuringExpressionMatch(names, value);
-					}
-				}
-
-				if (state.tokens.next.id !== ",") {
-					break;
-				}
-				comma();
-			}
-			return this;
-		});
-		conststatement.exps = true;
-		var varstatement = stmt("var", function (prefix) {
-			// JavaScript does not have block scope. It only has function scope. So,
-			// declaring a variable in a block can have unexpected consequences.
-			var tokens, lone, value;
-
-			if (funct["(onevar)"] && state.option.onevar) {
-				warning("W081");
-			} else if (!funct["(global)"]) {
-				funct["(onevar)"] = true;
-			}
-
-			this.first = [];
-			for (;;) {
-				var names = [];
+				advance("=");
 				nonadjacent(state.tokens.curr, state.tokens.next);
-				if (_.contains(["{", "["], state.tokens.next.value)) {
-					tokens = destructuringExpression();
-					lone = false;
+				if (state.tokens.next.id === "undefined") {
+					warning("W080", state.tokens.curr, state.tokens.curr.value);
+				}
+				if (peek(0).id === "=" && state.tokens.next.identifier) {
+					error("E037", state.tokens.next, state.tokens.next.value);
+				}
+				value = expression(0);
+				if (lone) {
+					tokens[0].first = value;
 				} else {
-					tokens = [ { id: identifier(), token: state.tokens.curr } ];
-					lone = true;
-				}
-				for (var t in tokens) {
-					t = tokens[t];
-					if (isMozOrESNext() && funct[t.id] === "const") {
-						warning("E011", null, t.id);
-					}
-					if (funct["(global)"] && predefined[t.id] === false) {
-						warning("W079", t.token, t.id);
-					}
-					if (t.id) {
-						addlabel(t.id, "unused", t.token);
-						names.push(t.token);
-					}
-				}
-				if (prefix) {
-					break;
-				}
-
-				this.first = this.first.concat(names);
-
-				if (state.tokens.next.id === "=") {
-					nonadjacent(state.tokens.curr, state.tokens.next);
-					advance("=");
-					nonadjacent(state.tokens.curr, state.tokens.next);
-					if (state.tokens.next.id === "undefined") {
-						warning("W080", state.tokens.curr, state.tokens.curr.value);
-					}
-					if (peek(0).id === "=" && state.tokens.next.identifier) {
-						error("E038", state.tokens.next, state.tokens.next.value);
-					}
-					value = expression(0);
-					if (lone) {
-						tokens[0].first = value;
-					} else {
-						destructuringExpressionMatch(names, value);
-					}
-				}
-
-				if (state.tokens.next.id !== ",") {
-					break;
-				}
-				comma();
-			}
-			return this;
-		});
-		varstatement.exps = true;
-		var letstatement = stmt("let", function (prefix) {
-			var tokens, lone, value, letblock;
-
-			if (state.tokens.next.value === "(") {
-				if (state.option.moz) {
-					advance("(");
-					funct["(blockscope)"].stack();
-					letblock = true;
-				} else {
-					warning("W118", state.tokens.next);
+					destructuringExpressionMatch(names, value);
 				}
 			}
 
-			if (funct["(onevar)"] && state.option.onevar) {
-				warning("W081");
-			} else if (!funct["(global)"]) {
-				funct["(onevar)"] = true;
+			if (state.tokens.next.id !== ",") {
+				break;
 			}
-
-			this.first = [];
-			for (;;) {
-				var names = [];
-				nonadjacent(state.tokens.curr, state.tokens.next);
-				if (_.contains(["{", "["], state.tokens.next.value)) {
-					tokens = destructuringExpression();
-					lone = false;
-				} else {
-					tokens = [ { id: identifier(), token: state.tokens.curr.value } ];
-					lone = true;
-				}
-				for (var t in tokens) {
-					t = tokens[t];
-					if (isMozOrESNext() && funct[t.id] === "const") {
-						warning("E011", null, t.id);
-					}
-					if (funct["(global)"] && predefined[t.id] === false) {
-						warning("W079", t.token, t.id);
-					}
-					if (t.id) {
-						addlabel(t.id, "unused", t.token, true);
-						names.push(t.token);
-					}
-				}
-				if (prefix) {
-					break;
-				}
-
-				this.first = this.first.concat(names);
-
-				if (state.tokens.next.id === "=") {
-					nonadjacent(state.tokens.curr, state.tokens.next);
-					advance("=");
-					nonadjacent(state.tokens.curr, state.tokens.next);
-					if (state.tokens.next.id === "undefined") {
-						warning("W080", state.tokens.curr, state.tokens.curr.value);
-					}
-					if (peek(0).id === "=" && state.tokens.next.identifier) {
-						error("E037", state.tokens.next, state.tokens.next.value);
-					}
-					value = expression(0);
-					if (lone) {
-						tokens[0].first = value;
-					} else {
-						destructuringExpressionMatch(names, value);
-					}
-				}
-
-				if (state.tokens.next.id !== ",") {
-					break;
-				}
-				comma();
-			}
-			if (letblock) {
-				advance(")");
-				block(true, true);
-				this.block = true;
-				funct["(blockscope)"].unstack();
-			}
-
-			return this;
-		});
-		letstatement.exps = true;
-	};
-	var letstatement = stmt("let", function () {
-		warning("W104", state.tokens.curr, "let");
+			comma();
+		}
+		return this;
 	});
-	letstatement.exps = true;
-
+	conststatement.exps = true;
 	var varstatement = stmt("var", function (prefix) {
 		// JavaScript does not have block scope. It only has function scope. So,
 		// declaring a variable in a block can have unexpected consequences.
-		var id, name, value;
+		var tokens, lone, value;
 
 		if (funct["(onevar)"] && state.option.onevar) {
 			warning("W081");
@@ -2992,41 +2857,53 @@ var JSHINT = (function () {
 		}
 
 		this.first = [];
-
 		for (;;) {
+			var names = [];
 			nonadjacent(state.tokens.curr, state.tokens.next);
-			id = identifier();
-
-			if (isMozOrESNext() && funct[id] === "const") {
-				warning("E011", null, id);
+			if (_.contains(["{", "["], state.tokens.next.value)) {
+				tokens = destructuringExpression();
+				lone = false;
+			} else {
+				tokens = [ { id: identifier(), token: state.tokens.curr } ];
+				lone = true;
 			}
-
-			if (funct["(global)"] && predefined[id] === false) {
-				warning("W079", state.tokens.curr, id);
+			for (var t in tokens) {
+				t = tokens[t];
+				if (isMozOrESNext() && funct[t.id] === "const") {
+					warning("E011", null, t.id);
+				}
+				if (funct["(global)"] && predefined[t.id] === false) {
+					warning("W079", t.token, t.id);
+				}
+				if (t.id) {
+					addlabel(t.id, "unused", t.token);
+					names.push(t.token);
+				}
 			}
-
-			addlabel(id, "unused", state.tokens.curr);
-
 			if (prefix) {
 				break;
 			}
 
-			name = state.tokens.curr;
-			this.first.push(state.tokens.curr);
+			this.first = this.first.concat(names);
 
 			if (state.tokens.next.id === "=") {
 				nonadjacent(state.tokens.curr, state.tokens.next);
 				advance("=");
 				nonadjacent(state.tokens.curr, state.tokens.next);
 				if (state.tokens.next.id === "undefined") {
-					warning("W080", state.tokens.curr, id);
+					warning("W080", state.tokens.curr, state.tokens.curr.value);
 				}
 				if (peek(0).id === "=" && state.tokens.next.identifier) {
 					error("E038", state.tokens.next, state.tokens.next.value);
 				}
 				value = expression(0);
-				name.first = value;
+				if (lone) {
+					tokens[0].first = value;
+				} else {
+					destructuringExpressionMatch(names, value);
+				}
 			}
+
 			if (state.tokens.next.id !== ",") {
 				break;
 			}
@@ -3035,8 +2912,105 @@ var JSHINT = (function () {
 		return this;
 	});
 	varstatement.exps = true;
+	var letstatement = stmt("let", function (prefix) {
+		var tokens, lone, value, letblock;
+
+		if (!isMozOrESNext()) {
+			warning("W104", state.tokens.curr, "let");
+		}
+
+		if (state.tokens.next.value === "(") {
+			if (state.option.moz) {
+				advance("(");
+				funct["(blockscope)"].stack();
+				letblock = true;
+			} else {
+				warning("W118", state.tokens.next);
+			}
+		} else if (funct["(nolet)"]) {
+			error("E048", state.tokens.curr);
+		}
+
+		if (funct["(onevar)"] && state.option.onevar) {
+			warning("W081");
+		} else if (!funct["(global)"]) {
+			funct["(onevar)"] = true;
+		}
+
+		this.first = [];
+		for (;;) {
+			var names = [];
+			nonadjacent(state.tokens.curr, state.tokens.next);
+			if (_.contains(["{", "["], state.tokens.next.value)) {
+				tokens = destructuringExpression();
+				lone = false;
+			} else {
+				tokens = [ { id: identifier(), token: state.tokens.curr.value } ];
+				lone = true;
+			}
+			for (var t in tokens) {
+				t = tokens[t];
+				if (isMozOrESNext() && funct[t.id] === "const") {
+					warning("E011", null, t.id);
+				}
+				if (funct["(global)"] && predefined[t.id] === false) {
+					warning("W079", t.token, t.id);
+				}
+				if (t.id && !funct["(nolet)"]) {
+					addlabel(t.id, "unused", t.token, true);
+					names.push(t.token);
+				}
+			}
+			if (prefix) {
+				break;
+			}
+
+			this.first = this.first.concat(names);
+
+			if (state.tokens.next.id === "=") {
+				nonadjacent(state.tokens.curr, state.tokens.next);
+				advance("=");
+				nonadjacent(state.tokens.curr, state.tokens.next);
+				if (state.tokens.next.id === "undefined") {
+					warning("W080", state.tokens.curr, state.tokens.curr.value);
+				}
+				if (peek(0).id === "=" && state.tokens.next.identifier) {
+					error("E037", state.tokens.next, state.tokens.next.value);
+				}
+				value = expression(0);
+				if (lone) {
+					tokens[0].first = value;
+				} else {
+					destructuringExpressionMatch(names, value);
+				}
+			}
+
+			if (state.tokens.next.id !== ",") {
+				break;
+			}
+			comma();
+		}
+		if (letblock) {
+			advance(")");
+			block(true, true);
+			this.block = true;
+			funct["(blockscope)"].unstack();
+		}
+
+		return this;
+	});
+	letstatement.exps = true;
 
 	blockstmt("function", function () {
+		var generator = false;
+		if (state.tokens.next.value === "*") {
+			advance("*");
+			if (state.option.esnext && !state.option.moz) {
+				generator = true;
+			} else {
+				warning("W119", state.tokens.curr, "function*");
+			}
+		}
 		if (inblock) {
 			warning("W082", state.tokens.curr);
 
@@ -3048,7 +3022,7 @@ var JSHINT = (function () {
 		adjacent(state.tokens.curr, state.tokens.next);
 		addlabel(i, "unction", state.tokens.curr);
 
-		doFunction(i, { statement: true });
+		doFunction(i, { statement: true }, generator);
 		if (state.tokens.next.id === "(" && state.tokens.next.line === state.tokens.curr.line) {
 			error("E039");
 		}
@@ -3056,13 +3030,18 @@ var JSHINT = (function () {
 	});
 
 	prefix("function", function () {
+		var generator = false;
+		if (state.option.esnext && state.tokens.next.value === "*") {
+			advance("*");
+			generator = true;
+		}
 		var i = optionalidentifier();
 		if (i || state.option.gcl) {
 			adjacent(state.tokens.curr, state.tokens.next);
 		} else {
 			nonadjacent(state.tokens.curr, state.tokens.next);
 		}
-		doFunction(i);
+		doFunction(i, undefined, generator);
 		if (!state.option.loopfunc && funct["(loopage)"]) {
 			warning("W083");
 		}
@@ -3134,16 +3113,11 @@ var JSHINT = (function () {
 			}
 
 			if (state.tokens.next.value === "if") {
-				if (state.option.moz) {
-					if (!state.option.esnext) {
-						advance("if");
-						expression(0);
-					} else {
-						warning("W104", state.tokens.curr, "catch filter");
-					}
-				} else {
-					warning("W118", state.tokens.current);
+				if (!state.option.moz) {
+					warning("W118", state.tokens.curr, "catch filter");
 				}
+				advance("if");
+				expression(0);
 			}
 
 			advance(")");
@@ -3162,18 +3136,13 @@ var JSHINT = (function () {
 
 		block(false);
 
-		if (state.option.moz && !state.option.esnext) {
-			while (state.tokens.next.id === "catch") {
-				increaseComplexityCount();
-				doCatch();
-				b = true;
+		while (state.tokens.next.id === "catch") {
+			increaseComplexityCount();
+			if (b && (!state.option.moz)) {
+				warning("W118", state.tokens.next, "multiple catch blocks")
 			}
-		} else {
-			if (state.tokens.next.id === "catch") {
-				increaseComplexityCount();
-				doCatch();
-				b = true;
-			}
+			doCatch();
+			b = true;
 		}
 
 		if (state.tokens.next.id === "finally") {
@@ -3368,15 +3337,10 @@ var JSHINT = (function () {
 		var foreachtok = null;
 
 		if (t.value === "each") {
-			if (state.option.moz) {
-				if (!state.option.esnext) {
-					foreachtok = t;
-					advance("each");
-				} else {
-					warning("W104", state.tokens.curr, "for each");
-				}
-			} else {
-				warning("W118", state.tokens.next);
+			foreachtok = t;
+			advance("each");
+			if (!state.option.moz) {
+				warning("W118", state.tokens.curr, "for each");
 			}
 		}
 
@@ -3566,9 +3530,12 @@ var JSHINT = (function () {
 	}).exps = true;
 
 	stmt("yield", function () {
-		if (!state.option.moz) {
+		if (state.option.esnext && funct["(generator)"] !== true) {
+			error("E046", state.tokens.curr, "yield")
+		} else if (!isMozOrESNext()) {
 			warning("W104", state.tokens.curr, "yield");
 		}
+		funct["(generator)"] = "yielded"
 		if (this.line === state.tokens.next.line) {
 			if (state.tokens.next.id === "(regexp)")
 				warning("W092");
@@ -3631,11 +3598,13 @@ var JSHINT = (function () {
 	// this function is used to determine wether a squarebracket or a curlybracket
 	// expression is a comprehension array, destructuring assignment or a json value.
 
-	var lookupBlockType = function (ahead) {
+	var lookupBlockType = function (notjson) {
 		var pn, pn1;
-		var i = ahead || 0;
+		var i = 0;
 		var bracketStack = 0;
 		var ret = {};
+		state.jsonMode = "probing";
+		state.jsonWarnings = [];
 		if (_.contains(["[", "{"], state.tokens.curr.value))
 			bracketStack += 1;
 		if (_.contains(["[", "{"], state.tokens.next.value))
@@ -3666,6 +3635,14 @@ var JSHINT = (function () {
 				ret.notJson = true;
 			}
 		} while (bracketStack > 0 && pn.id !== "(end)" && i < 15);
+		if (!ret.notJson && !notjson) {
+			for (var w in state.jsonWarnings) {
+				w = state.jsonWarnings[w];
+				warningAt(w.code, w.line, w.character, w.data && w.data[0])
+			}
+		}
+		state.jsonMode = false;
+		delete state.jsonWarnings;
 		return ret;
 	};
 
@@ -3675,12 +3652,15 @@ var JSHINT = (function () {
 		// if it has semicolons, it is a block, so go parse it as a block
 		// or it's not a block, but there are assignments, check for undeclared variables
 
-		var block = null;
-
-		if (isMozOrESNext()) {
-			block = lookupBlockType();
-		}
-		if (block && block.notJson) {
+		var block = lookupBlockType();
+		if (block.notJson) {
+			if (!isMozOrESNext()) {
+				if (!state.option.moz && block.isCompArray) {
+					warning("W118", state.tokens.curr, "Comprehension array");
+				} else if (block.isDestAssign) {
+					warning("W104", state.tokens.curr, "Destructuring assignment");
+				}
+			}
 			statements();
 		// otherwise parse json value
 		} else {
