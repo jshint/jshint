@@ -178,7 +178,7 @@ exports.switchFallThrough = function (test) {
 	TestRun(test)
 		.addError(3, "Expected a 'break' statement before 'case'.")
 		.addError(18, "Expected a 'break' statement before 'default'.")
-		.addError(36, "Unexpected ':'.")
+		.addError(40, "Unexpected ':'.")
 		.test(src);
 
 	test.done();
