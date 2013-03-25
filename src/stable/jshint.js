@@ -182,7 +182,8 @@ var JSHINT = (function () {
 
 			// Inverted and renamed, use JSHint name here
 			eqeqeq  : true,
-			onevar  : true
+			onevar  : true,
+			strict  : true
 		},
 
 		// These are JSHint boolean options which are shared with JSLint
@@ -190,7 +191,8 @@ var JSHINT = (function () {
 		renamedOptions = {
 			eqeq   : "eqeqeq",
 			vars   : "onevar",
-			windows: "wsh"
+			windows: "wsh",
+			sloppy : "strict"
 		},
 
 		declared, // Globals that were declared using /*global ... */ syntax.
