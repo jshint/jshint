@@ -2182,7 +2182,7 @@ var JSHINT = (function () {
 		}
 
 		nospace();
-		if (state.option.immed && !left.immed && left.id === "function") {
+		if (state.option.immed && left && !left.immed && left.id === "function") {
 			warning("W062");
 		}
 
