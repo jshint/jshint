@@ -31,4 +31,4 @@ exports.identifier = /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/;
 exports.javascriptURL = /^(?:javascript|jscript|ecmascript|vbscript|mocha|livescript)\s*:/i;
 
 // Catches /* falls through */ comments (ft)
-exports.fallsThrough = /^\s*\/\*\s*falls\sthrough\s*\*\/\s*$/;
+exports.fallsThrough = /^\s*\/\*\s*falls?\sthrough\s*\*\/\s*$/;
