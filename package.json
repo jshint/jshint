@@ -36,8 +36,7 @@
 		"browserify": "1.16.1",
 		"coveraje":   "0.2.x",
 		"nodeunit":   "0.7.x",
-		"sinon":      "1.6.x",
-		"console-browserify": "0.1.x"
+		"sinon":      "1.6.x"
 	},
 
 	"preferGlobal": true
