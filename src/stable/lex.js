@@ -944,12 +944,20 @@ Lexer.prototype = {
 		}
 
 		// In JSON strings must always use double quotes.
-		if (state.jsonMode && quote !== "\"") {
-			this.trigger("warning", {
-				code: "W108",
-				line: this.line,
-				character: this.char // +1?
-			});
+		if (quote !== "\"") {
+			if (state.jsonMode === "probing") {
+				state.jsonWarnings.push({
+					code: "W108",
+					line: this.line,
+					character: this.char // +1?
+				});
+			} else if (state.jsonMode) {
+				this.trigger("warning", {
+					code: "W108",
+					line: this.line,
+					character: this.char // +1?
+				});
+			}
 		}
 
 		var value = "";
@@ -984,6 +992,12 @@ Lexer.prototype = {
 					if (!state.option.multistr) {
 						this.trigger("warning", {
 							code: "W043",
+							line: this.line,
+							character: this.char
+						});
+					} else if (state.jsonMode === "probing") {
+						state.jsonWarnings.push({
+							code: "W042",
 							line: this.line,
 							character: this.char
 						});
@@ -1038,7 +1052,14 @@ Lexer.prototype = {
 
 				switch (char) {
 				case "'":
-					if (state.jsonMode) {
+					if (state.jsonMode === "probing") {
+						state.jsonWarnings.push({
+							code: "W114",
+							line: this.line,
+							character: this.char,
+							data: [ "\\'" ]
+						});
+					} else if (state.jsonMode) {
 						this.trigger("warning", {
 							code: "W114",
 							line: this.line,
@@ -1081,7 +1102,14 @@ Lexer.prototype = {
 					jump = 5;
 					break;
 				case "v":
-					if (state.jsonMode) {
+					if (state.jsonMode === "probing") {
+						state.jsonWarnings.push({
+							code: "W114",
+							line: this.line,
+							character: this.char,
+							data: [ "\\v" ]
+						});
+					} else if (state.jsonMode) {
 						this.trigger("warning", {
 							code: "W114",
 							line: this.line,
@@ -1095,7 +1123,14 @@ Lexer.prototype = {
 				case "x":
 					var	x = parseInt(this.input.substr(1, 2), 16);
 
-					if (state.jsonMode) {
+					if (state.jsonMode === "probing") {
+						state.jsonWarnings.push({
+							code: "W114",
+							line: this.line,
+							character: this.char,
+							data: [ "\\x-" ]
+						});
+					} else if (state.jsonMode) {
 						this.trigger("warning", {
 							code: "W114",
 							line: this.line,
@@ -1589,13 +1624,22 @@ Lexer.prototype = {
 					});
 				}
 
-				if (state.jsonMode && token.base === 16) {
-					this.trigger("warning", {
-						code: "W114",
-						line: this.line,
-						character: this.char,
-						data: [ "0x-" ]
-					});
+				if (token.base === 16) {
+					if (state.jsonMode === "probing") {
+						state.jsonWarnings.push({
+							code: "W114",
+							line: this.line,
+							character: this.char,
+							data: [ "0x-" ]
+						});
+					} else if (state.jsonMode) {
+						this.trigger("warning", {
+							code: "W114",
+							line: this.line,
+							character: this.char,
+							data: [ "0x-" ]
+						});
+					}
 				}
 
 				if (state.directive["use strict"] && token.base === 8) {
