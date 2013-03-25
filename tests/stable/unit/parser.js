@@ -1016,9 +1016,10 @@ exports.testGeneratorEsNextError = function (test) {
 		"	print(g.next());"
 	];
 	TestRun(test)
-		.addError(4, "A yield statement shall be within a generator function (with syntax: `function*`)")
+		.addError(4, "A yield statement shall be within a generator function " +
+			"(with syntax: `function*`)")
 		.test(code, {moz: false, esnext: true, es5: true, unused: true,
-						undef: true, predef: ["print"]});
+			undef: true, predef: ["print"]});
 
 	test.done();
 };
@@ -1039,7 +1040,7 @@ exports.testGeneratorMozError = function (test) {
 		"	print(g.next());"
 	];
 	TestRun(test)
-		.addError(1, "'function*' is only available in ES6.")
+		.addError(1, "'function*' is only available in ES6 (use esnext option).")
 		.test(code, {moz: true, esnext: false, es5: true, unused: true,
 						undef: true, predef: ["print"]});
 
@@ -1137,8 +1138,8 @@ exports.testESNextOverridesMoz = function (test) {
 		"[i * i for each (i in [1, 2, 3, 4, 5])];"
 	];
 	TestRun(test)
-		//.addError(1, "'for each' is only available in Mozilla extensions.")
-		.addError(1, "'array comprehension' is only available in Mozilla extensions.")
+		.addError(1, "'array comprehension' is only available in Mozilla " +
+			"JavaScript extensions (use moz option).")
 		.test(code, {moz: true, esnext: true, es5: true, unused: true, undef: true,
 						predef: ["print"]});
 
@@ -1305,7 +1306,7 @@ exports.testESNextOverridesTryMultiCatch = function (test) {
 };
 
 exports["test: no let not directly within a block"] = function (test) {
-    var code = [
+	var code = [
 		"if (true) let x = 1;",
 		"function foo() {",
 		"   if (true)",
@@ -1317,19 +1318,20 @@ exports["test: no let not directly within a block"] = function (test) {
 		"for (let x of [1, 2, 3, 4] ) let a = 1;",
 		"while (true) let a = 1;",
 		"if (false) let a = 1; else if (true) let a = 1; else let a = 2;"
-    ];
-    TestRun(test)
-        .addError(1, "Let declaration not directly within block.")
-        .addError(4, "Let declaration not directly within block.")
-		.addError(7, "Let declaration not directly within block.")
-		.addError(8, "Let declaration not directly within block.")
-		.addError(9, "Let declaration not directly within block.")
-		.addError(10, "Let declaration not directly within block.")
-		.addError(11, "Let declaration not directly within block.")
-		.addError(11, "Let declaration not directly within block.")
-		.addError(11, "Let declaration not directly within block.")
-        .test(code, {moz: true, esnext: true, es5: true, predef: ["print"]});
+	];
 
-    test.done();
-}
+	TestRun(test)
+		.addError(1, "Let declaration not directly within block.")
+		.addError(4, "Let declaration not directly within block.")
+	.addError(7, "Let declaration not directly within block.")
+	.addError(8, "Let declaration not directly within block.")
+	.addError(9, "Let declaration not directly within block.")
+	.addError(10, "Let declaration not directly within block.")
+	.addError(11, "Let declaration not directly within block.")
+	.addError(11, "Let declaration not directly within block.")
+	.addError(11, "Let declaration not directly within block.")
+		.test(code, {moz: true, esnext: true, es5: true, predef: ["print"]});
+
+	test.done();
+};
 
