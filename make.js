@@ -112,8 +112,17 @@ target.build = function () {
 
 	bundle.append("JSHINT = require('/src/stable/jshint.js').JSHINT;");
 
+	var fakeConsole = "var console = {" +
+		"  error: function (txt) {" +
+		"	 print('CONSOLE.error: ' + txt);" +
+		"  }," +
+		"  trace: function () {" +
+		"  }" +
+		"};";
+
 	[ "// " + pkg.version,
 		"var JSHINT;",
+        fakeConsole,
 		bundle.bundle()
 	].join("\n").to("./dist/jshint-" + pkg.version + ".js");
 
@@ -133,6 +142,7 @@ target.build = function () {
 	[ "// " + pkg.version,
 		"var JSHINT;",
         "var checkstyleReporter;",
+        fakeConsole,
 		bundle.bundle()
 	].join("\n").to("./dist/jshint-cs-" + pkg.version + ".js");
 	cli.ok("Bundle checkstyle");
