@@ -3539,7 +3539,8 @@ var JSHINT = (function () {
 				nonadjacent(state.tokens.curr, state.tokens.next);
 				this.first = expression(0);
 
-				if (this.first.type === "(punctuator)" && this.first.value === "=" && !state.option.boss) {
+				if (this.first &&
+						this.first.type === "(punctuator)" && this.first.value === "=" && !state.option.boss) {
 					warningAt("W093", this.first.line, this.first.character);
 				}
 			}

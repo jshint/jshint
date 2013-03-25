@@ -1299,6 +1299,7 @@ exports.testESNextOverridesTryMultiCatch = function (test) {
 		"    print('Z');",
 		"}"
 	];
+
 	TestRun(test)
 		.test(code, {moz: true, esnext: true, es5: true, undef: true, predef: ["print"]});
 
@@ -1323,15 +1324,30 @@ exports["test: no let not directly within a block"] = function (test) {
 	TestRun(test)
 		.addError(1, "Let declaration not directly within block.")
 		.addError(4, "Let declaration not directly within block.")
-	.addError(7, "Let declaration not directly within block.")
-	.addError(8, "Let declaration not directly within block.")
-	.addError(9, "Let declaration not directly within block.")
-	.addError(10, "Let declaration not directly within block.")
-	.addError(11, "Let declaration not directly within block.")
-	.addError(11, "Let declaration not directly within block.")
-	.addError(11, "Let declaration not directly within block.")
+		.addError(7, "Let declaration not directly within block.")
+		.addError(8, "Let declaration not directly within block.")
+		.addError(9, "Let declaration not directly within block.")
+		.addError(10, "Let declaration not directly within block.")
+		.addError(11, "Let declaration not directly within block.")
+		.addError(11, "Let declaration not directly within block.")
+		.addError(11, "Let declaration not directly within block.")
 		.test(code, {moz: true, esnext: true, es5: true, predef: ["print"]});
 
 	test.done();
 };
 
+exports["regression test for crash from GH-964"] = function (test) {
+	var code = [
+		"function test(a, b) {",
+		"  return a[b] || a[b] = new A();",
+		"}"
+	];
+
+	TestRun(test)
+		.addError(2, "Bad assignment.")
+		.addError(2, "Expected an operator and instead saw 'new'.")
+		.addError(2, "Missing semicolon.")
+		.test(code);
+
+	test.done();
+};
