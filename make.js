@@ -126,4 +126,14 @@ target.build = function () {
 	exec("chmod +x dist/jshint-rhino-" + pkg.version + ".js");
 	cli.ok("Rhino");
 	echo("\n");
+
+	// Rhino with checkstyle
+	var rhinocs = cat("./dist/jshint-" + pkg.version + ".js",
+                      "./src/reporters/checkstyle.js",
+                      "./src/platforms/rhino.js");
+	rhinocs = "#!/usr/bin/env rhino\n\n" + rhinocs;
+	rhinocs.to("./dist/jshint-rhino-cs-" + pkg.version + ".js");
+	exec("chmod +x dist/jshint-rhino-cs-" + pkg.version + ".js");
+	cli.ok("Rhino Checkstyle");
+	echo("\n");
 };
