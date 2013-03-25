@@ -68,19 +68,19 @@ exports.latedef = function (test) {
 		.addError(10, "'foo' is already defined.")
 		.test(src1);
 
-	// When latedef is true, JSHint must not tolerate the use before definition
+	// When latedef is "nofunc", JSHint must not tolerate the use before definition
 	TestRun(test)
 		.addError(10, "'vr' was used before it was defined.")
 		.addError(18, "Inner functions should be listed at the top of the outer function.")
-		.test(src, { latedef: true });
+		.test(src, { latedef: "nofunc" });
 
-	// When latedef_func is true, JSHint must not tolerate the use before definition for functions
+	// When latedef is true, JSHint must not tolerate the use before definition for functions
 	TestRun(test)
 		.addError(2, "'fn' was used before it was defined.")
 		.addError(6, "'fn1' was used before it was defined.")
 		.addError(10, "'vr' was used before it was defined.")
 		.addError(18, "Inner functions should be listed at the top of the outer function.")
-		.test(src, { latedef: true, latedef_func: true });
+		.test(src, { latedef: true });
 
 	test.done();
 };
@@ -109,12 +109,13 @@ exports['combination of latedef and undef'] = function (test) {
 		.addError(34, "'fn' was used before it was defined.")
 		.addError(41, "'q' was used before it was defined.")
 		.addError(46, "'h' was used before it was defined.")
-		.test(src, { latedef: true, latedef_func: true, undef: false });
+		.test(src, { latedef: true, undef: false });
+
 	// But we get all the functions warning if we disable latedef func
 	TestRun(test)
 		.addError(41, "'q' was used before it was defined.")
 		.addError(46, "'h' was used before it was defined.")
-		.test(src, { latedef: true, undef: false });
+		.test(src, { latedef: "nofunc", undef: false });
 
 	// If we warn on both options we get all the warnings.
 	TestRun(test)
@@ -127,15 +128,15 @@ exports['combination of latedef and undef'] = function (test) {
 		.addError(35, "'world' is not defined.")
 		.addError(41, "'q' was used before it was defined.")
 		.addError(46, "'h' was used before it was defined.")
-		.test(src, { latedef: true, latedef_func: true, undef: true });
+		.test(src, { latedef: true, undef: true });
 
-	// If we remove latedef_func, we don't get the functions warning
+	// If we use latedef: "nofunc", we don't get the functions warning
 	TestRun(test)
 		.addError(29, "'hello' is not defined.")
 		.addError(35, "'world' is not defined.")
 		.addError(41, "'q' was used before it was defined.")
 		.addError(46, "'h' was used before it was defined.")
-		.test(src, { latedef: true, undef: true });
+		.test(src, { latedef: "nofunc", undef: true });
 
 	test.done();
 };
