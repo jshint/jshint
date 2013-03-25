@@ -188,8 +188,8 @@ var warnings = {
 	W115: "Octal literals are not allowed in strict mode.",
 	W116: "Expected '{a}' and instead saw '{b}'.",
 	W117: "'{a}' is not defined.",
-	W118: "'{a}' is only available in Mozilla extensions.",
-	W119: "'{a}' is only available in ES6."
+	W118: "'{a}' is only available in Mozilla JavaScript extensions (use moz option).",
+	W119: "'{a}' is only available in ES6 (use esnext option)."
 };
 
 var info = {

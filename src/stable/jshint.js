@@ -94,7 +94,7 @@ var JSHINT = (function () {
 			lastsemic   : true, // if semicolons may be ommitted for the trailing
 			                    // statements inside of a one-line blocks.
 			latedef     : true, // if the use before definition should not be tolerated
-			latedef_func: true, // if the use before definition should not be tolerated for functions (depends on latedef option)
+			latedef_func: true, // if the use before definition should not be tolerated for functions
 			laxbreak    : true, // if line breaks should not be checked
 			laxcomma    : true, // if line breaks should not be checked around commas
 			loopfunc    : true, // if functions should be allowed to be defined within
@@ -218,7 +218,6 @@ var JSHINT = (function () {
 		stack,
 		unuseds,
 		urls,
-		useESNextSyntax,
 		warnings,
 
 		extraModules = [],
@@ -483,8 +482,8 @@ var JSHINT = (function () {
 		if (_.has(funct, t) && !funct["(global)"]) {
 			if (funct[t] === true) {
 				if (state.option.latedef)
-					if (state.option.latedef_func && _.contains([funct[t], type], "unction")
-							|| !_.contains([funct[t], type], "unction")) {
+					if (state.option.latedef_func && _.contains([funct[t], type], "unction") ||
+							!_.contains([funct[t], type], "unction")) {
 						warning("W003", state.tokens.next, t);
 					}
 			} else {
@@ -516,8 +515,8 @@ var JSHINT = (function () {
 				global[t] = funct;
 				if (_.has(implied, t)) {
 					if (state.option.latedef) {
-						if (state.option.latedef_func && _.contains([funct[t], type], "unction")
-								|| !_.contains([funct[t], type], "unction")) {
+						if (state.option.latedef_func && _.contains([funct[t], type], "unction") ||
+								!_.contains([funct[t], type], "unction")) {
 							warning("W003", state.tokens.next, t);
 						}
 					}
@@ -2327,7 +2326,7 @@ var JSHINT = (function () {
 	prefix("[", function () {
 		if (lookupBlockType(true).isCompArray) {
 			if (state.option.esnext || !state.option.moz) {
-				warning("W118", state.tokens.curr, "array comprehension")
+				warning("W118", state.tokens.curr, "array comprehension");
 			}
 			return comprehensiveArrayExpression();
 		}
@@ -3139,7 +3138,7 @@ var JSHINT = (function () {
 		while (state.tokens.next.id === "catch") {
 			increaseComplexityCount();
 			if (b && (!state.option.moz)) {
-				warning("W118", state.tokens.next, "multiple catch blocks")
+				warning("W118", state.tokens.next, "multiple catch blocks");
 			}
 			doCatch();
 			b = true;
@@ -3531,11 +3530,13 @@ var JSHINT = (function () {
 
 	stmt("yield", function () {
 		if (state.option.esnext && funct["(generator)"] !== true) {
-			error("E046", state.tokens.curr, "yield")
+			error("E046", state.tokens.curr, "yield");
 		} else if (!isMozOrESNext()) {
 			warning("W104", state.tokens.curr, "yield");
 		}
-		funct["(generator)"] = "yielded"
+
+		funct["(generator)"] = "yielded";
+
 		if (this.line === state.tokens.next.line) {
 			if (state.tokens.next.id === "(regexp)")
 				warning("W092");
@@ -3638,7 +3639,7 @@ var JSHINT = (function () {
 		if (!ret.notJson && !notjson) {
 			for (var w in state.jsonWarnings) {
 				w = state.jsonWarnings[w];
-				warningAt(w.code, w.line, w.character, w.data && w.data[0])
+				warningAt(w.code, w.line, w.character, w.data && w.data[0]);
 			}
 		}
 		state.jsonMode = false;
