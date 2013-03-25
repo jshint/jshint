@@ -277,6 +277,15 @@ exports.jslintRenamed = function (test) {
 	test.done();
 };
 
+exports.jslintSloppy = function (test) {
+	var src = "/*jslint sloppy:true */ function test() { return 1; }";
+
+	TestRun(test)
+		.test(src);
+
+	test.done();
+};
+
 exports.caseExpressions = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/caseExpressions.js', 'utf8');
 	TestRun(test)
