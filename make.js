@@ -120,8 +120,12 @@ target.build = function () {
 		"  }" +
 		"};";
 
+	bundle.addEntry("./src/reporters/checkstyle.js");
+	bundle.append("checkstyleReporter = require('./src/reporters/checkstyle.js').reporter;");
+
 	[ "// " + pkg.version,
 		"var JSHINT;",
+        "var checkstyleReporter;",
         fakeConsole,
 		bundle.bundle()
 	].join("\n").to("./dist/jshint-" + pkg.version + ".js");
@@ -136,21 +140,4 @@ target.build = function () {
 	cli.ok("Rhino");
 	echo("\n");
 
-	// Rhino with checkstyle
-	bundle.addEntry("./src/reporters/checkstyle.js");
-	bundle.append("checkstyleReporter = require('./src/reporters/checkstyle.js').reporter;");
-	[ "// " + pkg.version,
-		"var JSHINT;",
-        "var checkstyleReporter;",
-        fakeConsole,
-		bundle.bundle()
-	].join("\n").to("./dist/jshint-cs-" + pkg.version + ".js");
-	cli.ok("Bundle checkstyle");
-
-	var rhinocs = cat("./dist/jshint-cs-" + pkg.version + ".js", "./src/platforms/rhino.js");
-	rhinocs = "#!/usr/bin/env rhino\n\n" + rhinocs;
-	rhinocs.to("./dist/jshint-rhino-cs-" + pkg.version + ".js");
-	exec("chmod +x dist/jshint-rhino-cs-" + pkg.version + ".js");
-	cli.ok("Rhino checkstyle");
-	echo("\n");
 };

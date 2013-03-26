@@ -31,13 +31,19 @@ var reportWithReporter = function (reporter, file) {
 	"use strict";
 
 	var filenames = [];
-	var optstr; // arg1=val1,arg2=val2,...
+	var reporter; // only "checkstyle" is recognized
+	var optstr; // arg1=val1,arg2=val2,... or reporter=<reporter>
 	var predef; // global1=true,global2,global3,...
 	var opts   = {};
 	var retval = 0;
 
 	args.forEach(function (arg) {
 		if (arg.indexOf("=") > -1) {
+			// Check first for reporter option
+			if (arg.split("=")[0] === "reporter") {
+				reporter = arg.split("=")[1];
+				return;
+			}
 			if (!optstr) {
 				// First time it's the options.
 				optstr = arg;
@@ -99,7 +105,7 @@ var reportWithReporter = function (reporter, file) {
 		}
 
 		if (!JSHINT(input, opts)) {
-			if (typeof checkstyleReporter !== "undefined") {
+			if (reporter === "checkstyle" && typeof checkstyleReporter !== "undefined") {
 				reportWithReporter(checkstyleReporter, name);
 			}
 			else {
