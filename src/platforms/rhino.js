@@ -2,41 +2,19 @@
 /*global JSHINT */
 /*global checkstyleReporter */
 
-var reportWithReporter = function (reporter, file) {
-	"use strict";
-
-	var results = [];
-	var data = [];
-	var lintData;
-  
-	JSHINT.errors.forEach(function (err) {
-		if (err) {
-			results.push({ file: file, error: err });
-		}
-	});
-	
-	lintData = JSHINT.data();
-	if (lintData) {
-		lintData.file = file;
-		data.push(lintData);
-	}
-	
-	if (reporter) {
-		reporter(results, data, { verbose: true});
-	}
-	
-};
-
 (function (args) {
 	"use strict";
-
+    
 	var filenames = [];
 	var reporter; // only "checkstyle" is recognized
 	var optstr; // arg1=val1,arg2=val2,... or reporter=<reporter>
 	var predef; // global1=true,global2,global3,...
 	var opts   = {};
 	var retval = 0;
-
+	var results = [];
+	var data = [];
+	var lintData;
+    
 	args.forEach(function (arg) {
 		if (arg.indexOf("=") > -1) {
 			// Check first for reporter option
@@ -96,28 +74,42 @@ var reportWithReporter = function (reporter, file) {
 		});
 	}
 
-	filenames.forEach(function (name) {
-		var input = readFile(name);
-
+	filenames.forEach(function (file) {
+		var input = readFile(file);
+		
 		if (!input) {
-			print("jshint: Couldn't open file " + name);
+			print("jshint: Couldn't open file " + file);
 			quit(1);
 		}
-
+		
 		if (!JSHINT(input, opts)) {
-			if (reporter === "checkstyle" && typeof checkstyleReporter !== "undefined") {
-				reportWithReporter(checkstyleReporter, name);
-			}
-			else {
-				for (var i = 0, err; err = JSHINT.errors[i]; i += 1) {
-					print(err.reason + " (" + name + ":" + err.line + ":" + err.character + ")");
-					print("> " + (err.evidence || "").replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"));
-					print("");
+			JSHINT.errors.forEach(function (err) {
+				if (err) {
+					results.push({ file: file, error: err });
 				}
-			}
+			});
 			retval = 1;
 		}
+
+		lintData = JSHINT.data();
+
+		if (lintData) {
+			lintData.file = file;
+			data.push(lintData);
+		}
 	});
+	   
+	if (reporter === "checkstyle" && typeof checkstyleReporter !== "undefined") {
+		checkstyleReporter(results, data, { verbose: true});
+	} else {
+		for (var i = 0; i < results.length; i += 1) {
+			var file = results[i].file;
+			var err = results[i].error;
+			print(err.reason + " (" + file + ":" + err.line + ":" + err.character + ")");
+			print("> " + (err.evidence || "").replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"));
+			print("");
+		}
+	}
 
 	quit(retval);
 }(arguments));
