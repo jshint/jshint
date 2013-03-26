@@ -100,7 +100,7 @@
 	});
 	   
 	if (reporter === "checkstyle" && typeof checkstyleReporter !== "undefined") {
-		checkstyleReporter(results, data, { verbose: true});
+		checkstyleReporter(results, data);
 	} else {
 		for (var i = 0; i < results.length; i += 1) {
 			var file = results[i].file;
