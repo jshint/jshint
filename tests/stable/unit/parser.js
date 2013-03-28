@@ -2865,3 +2865,51 @@ exports["automatic comma insertion GH-950"] = function (test) {
 	test.done();
 };
 
+exports["fat arrows support"] = function (test) {
+	var code = [
+		"let empty = () => {};",
+		"let identity = x => x;",
+		"let square = x => x * x;",
+		"let key_maker = val => ({key: val});",
+		"let odds = evens.map(v => v + 1);",
+		"let fives = []; nats.forEach(v => { if (v % 5 === 0) fives.push(v); });",
+
+		"let block = (x,y,{z: t}) => {",
+		"	print(x,y,z);",
+		"	print(j, t);",
+		"};",
+
+		// using lexical this
+		"const obj = {",
+		"  method: function () {",
+		"    return () => this;",
+		"  }",
+		"};",
+	];
+	var run = TestRun(test);
+	run.test(code, {esnext: true});
+	run.test(code, {moz: true});
+
+	var run = TestRun(test)
+				.addError(1, "'let' is only available in JavaScript 1.7.")
+				.addError(1, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+				.addError(2, "'let' is only available in JavaScript 1.7.")
+				.addError(2, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+				.addError(3, "'let' is only available in JavaScript 1.7.")
+				.addError(3, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+				.addError(4, "'let' is only available in JavaScript 1.7.")
+				.addError(4, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+				.addError(5, "'let' is only available in JavaScript 1.7.")
+				.addError(5, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+				.addError(6, "'let' is only available in JavaScript 1.7.")
+				.addError(6, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+				.addError(7, "'let' is only available in JavaScript 1.7.")
+				.addError(7, "'destructuring expression' is only available in JavaScript 1.7.")
+				.addError(7, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+				.addError(11, "'const' is only available in JavaScript 1.7.")
+				.addError(13, "'arrow function syntax (=>)' is only available in JavaScript 1.7.");
+	run.test(code); // es5
+	run.test(code, {es3: true});
+
+	test.done();
+}

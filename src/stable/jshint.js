@@ -1219,6 +1219,25 @@ var JSHINT = (function () {
 		return x;
 	}
 
+
+	function application(s) {
+		var x = symbol(s, 42);
+
+		x.led = function(left) {
+			if (!state.option.inESNext()) {
+				warning("W104", state.tokens.curr, "arrow function syntax (=>)")
+			}
+
+			nobreaknonadjacent(state.tokens.prev, state.tokens.curr);
+			nonadjacent(state.tokens.curr, state.tokens.next);
+
+			this.left = left;
+			this.right = doFunction(undefined, undefined, false, left);
+			return this;
+		};
+		return x;
+	}
+
 	function relation(s, f) {
 		var x = symbol(s, 100);
 
@@ -1650,7 +1669,7 @@ var JSHINT = (function () {
 	 * stmt		- true if block can be a single statement (e.g. in if/for/while).
 	 * isfunc	- true if block is a function body
 	 */
-	function block(ordinary, stmt, isfunc) {
+	function block(ordinary, stmt, isfunc, isfatarrow) {
 		var a,
 			b = inblock,
 			old_indent = indent,
@@ -1723,14 +1742,16 @@ var JSHINT = (function () {
 			indent = old_indent;
 		} else if (!ordinary) {
 			if (isfunc) {
-				if (stmt && !state.option.inMoz(true)) {
+				if (stmt && !isfatarrow && !state.option.inMoz(true)) {
 					error("W118", state.tokens.curr, "function closure expressions");
 				}
 
-				m = {};
-				for (d in state.directive) {
-					if (_.has(state.directive, d)) {
-						m[d] = state.directive[d];
+				if (!stmt) {
+					m = {};
+					for (d in state.directive) {
+						if (_.has(state.directive, d)) {
+							m[d] = state.directive[d];
+						}
 					}
 				}
 				expression(0);
@@ -2304,7 +2325,17 @@ var JSHINT = (function () {
 	}, 155, true).exps = true;
 
 	prefix("(", function () {
+
 		nospace();
+		var params, bracket, brackets = [];
+
+		var pn, pn1, i=0;
+		do {
+			pn = peek(i);
+			i += 1
+			pn1 = peek(i);
+			i += 1
+		} while (pn.value !== ")" && pn1.value !== "=>" && pn1.value !== ";" && pn1.type !== "(end)");
 
 		if (state.tokens.next.id === "function") {
 			state.tokens.next.immed = true;
@@ -2314,7 +2345,16 @@ var JSHINT = (function () {
 
 		if (state.tokens.next.id !== ")") {
 			for (;;) {
-				exprs.push(expression(0));
+				if (pn1.value === "=>" && state.tokens.next.value === "{") {
+					bracket = state.tokens.next;
+					bracket.left = destructuringExpression();
+					brackets.push(bracket);
+					for (var t in bracket.left) {
+						exprs.push(bracket.left[t].token);
+					}
+				} else {
+					exprs.push(expression(0));
+				}
 				if (state.tokens.next.id !== ",") {
 					break;
 				}
@@ -2331,8 +2371,13 @@ var JSHINT = (function () {
 			}
 		}
 
+		if (state.tokens.next.value === "=>") {
+			return exprs;
+		}
 		return exprs[0];
 	});
+
+	application("=>");
 
 	infix("[", function (left, that) {
 		nobreak(state.tokens.prev, state.tokens.curr);
@@ -2463,11 +2508,38 @@ var JSHINT = (function () {
 	}
 
 
-	function functionparams() {
-		var next   = state.tokens.next;
+	function functionparams(parsed) {
+		var curr, next;
 		var params = [];
 		var ident;
 		var tokens = [];
+
+		if (parsed) {
+			if (parsed instanceof Array) {
+				for (var i in parsed) {
+					curr = parsed[i];
+					if (_.contains(["{", "["], curr.id)) {
+						for (var t in curr.left) {
+							t = tokens[t];
+							if (t.id) {
+								params.push(t.id);
+								addlabel(t.id, "unused", t.token);
+							}
+						}
+					} else {
+						addlabel(curr.value, "unused", curr);
+					}
+				}
+				return params;
+			} else {
+				if (parsed.identifier === true) {
+					addlabel(parsed.value, "unused", parsed);
+					return [parsed];
+				}
+			}
+		}
+
+		next = state.tokens.next;
 
 		advance("(");
 		nospace();
@@ -2503,7 +2575,7 @@ var JSHINT = (function () {
 	}
 
 
-	function doFunction(name, statement, generator) {
+	function doFunction(name, statement, generator, fatarrowparams) {
 		var f;
 		var oldOption = state.option;
 		var oldScope  = scope;
@@ -2539,10 +2611,11 @@ var JSHINT = (function () {
 			addlabel(name, "function");
 		}
 
-		funct["(params)"] = functionparams();
+		funct["(params)"] = functionparams(fatarrowparams);
+
 		funct["(metrics)"].verifyMaxParametersPerFunction(funct["(params)"]);
 
-		block(false, true, true);
+		block(false, true, true, fatarrowparams ? true:false);
 
 		if (generator && funct["(generator)"] !== "yielded") {
 			error("E047", state.tokens.curr);
