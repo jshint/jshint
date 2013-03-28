@@ -828,6 +828,10 @@ var JSHINT = (function () {
 				return;
 			}
 
+			if (state.tokens.next.check) {
+				state.tokens.next.check();
+			}
+
 			if (state.tokens.next.isSpecial) {
 				doOption();
 			} else {
@@ -3667,8 +3671,6 @@ var JSHINT = (function () {
 		var i = 0;
 		var bracketStack = 0;
 		var ret = {};
-		state.jsonMode = "probing";
-		state.jsonWarnings = [];
 		if (_.contains(["[", "{"], state.tokens.curr.value))
 			bracketStack += 1;
 		if (_.contains(["[", "{"], state.tokens.next.value))
@@ -3699,14 +3701,6 @@ var JSHINT = (function () {
 				ret.notJson = true;
 			}
 		} while (bracketStack > 0 && pn.id !== "(end)" && i < 15);
-		if (!ret.notJson && !notjson) {
-			for (var w in state.jsonWarnings) {
-				w = state.jsonWarnings[w];
-				warningAt(w.code, w.line, w.character, w.data && w.data[0]);
-			}
-		}
-		state.jsonMode = false;
-		delete state.jsonWarnings;
 		return ret;
 	};
 
