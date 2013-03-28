@@ -399,6 +399,14 @@ Lexer.prototype = {
 			};
 		}
 
+		// Fat arrow punctuator
+		if (ch1 === "=" && ch2 === ">") {
+			return {
+				type: Token.Punctuator,
+				value: ch1 + ch2
+			};
+		}
+
 		// 2-character punctuators: <= >= == != ++ -- << >> && ||
 		// += -= *= %= &= |= ^= (but not /=, see below)
 		if (ch1 === ch2 && ("+-<>&|".indexOf(ch1) >= 0)) {
