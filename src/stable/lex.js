@@ -163,10 +163,8 @@ function asyncTrigger() {
 		},
 		push: function (fn) {
 			_checks.push(fn);
-			// console.log("growing…", id, _checks);
 		},
 		check: function () {
-			// console.log("checking…", id, _checks);
 			for (var check in _checks) {
 				_checks[check]();
 			}
@@ -1637,7 +1635,6 @@ Lexer.prototype = {
 					line: this.line,
 					character: this.char
 				}, checks, function () {
-					// console.log("W115", state.directive["use strict"], token.base === 8);
 					return state.directive["use strict"] && token.base === 8; 
 				});
 

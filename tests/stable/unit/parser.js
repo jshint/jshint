@@ -2913,3 +2913,32 @@ exports["fat arrows support"] = function (test) {
 
 	test.done();
 }
+
+exports["consise methods support"] = function (test) {
+	var code = [
+		"var foobar = {",
+		"	foo () {",
+		"		return 'foo';",
+		"	},",
+		"	*bar () {",
+		"		yield 'bar';",
+		"	}",
+		"};"
+	];
+
+	var run = TestRun(test);
+	run.test(code, {esnext: true});
+	run.test(code, {moz: true});
+
+	var run = TestRun(test)
+				.addError(2, "'concise methods' is only available in JavaScript 1.7.")
+				.addError(5, "'generator functions' is only available in JavaScript 1.7.")
+				.addError(5, "'concise methods' is only available in JavaScript 1.7.")
+				.addError(6, "'yield' is only available in JavaScript 1.7.");
+	run.test(code); // es5
+	run.test(code, {es3: true});
+
+	test.done();
+
+};
+
