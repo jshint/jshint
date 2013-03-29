@@ -2147,6 +2147,17 @@ var JSHINT = (function () {
 		return this;
 	});
 
+	prefix("...", function () {
+		if (!state.option.inESNext()) {
+			warning("W104", this, "spread/rest operator")
+		}
+		if (!state.tokens.next.identifier) {
+			error("E030", state.tokens.next, state.tokens.next.value);
+		}
+		expression(150);
+		return this;
+	});
+
 	prefix("!", function () {
 		this.right = expression(150);
 		this.arity = "unary";
@@ -2526,6 +2537,11 @@ var JSHINT = (function () {
 								addlabel(t.id, "unused", t.token);
 							}
 						}
+					} else if (curr.value === "...") {
+						if (!state.option.inESNext()) {
+							warning("W104", curr, "spread/rest operator")
+						}
+						continue;
 					} else {
 						addlabel(curr.value, "unused", curr);
 					}
@@ -2559,6 +2575,15 @@ var JSHINT = (function () {
 						addlabel(t.id, "unused", t.token);
 					}
 				}
+			} else if (state.tokens.next.value === "...") {
+				if (!state.option.inESNext()) {
+					warning("W104", state.tokens.next, "spread/rest operator")
+				}
+				advance("...");
+				nospace();
+				ident = identifier(true);
+				params.push(ident);
+				addlabel(ident, "unused", state.tokens.curr);
 			} else {
 				ident = identifier(true);
 				params.push(ident);

@@ -2930,7 +2930,7 @@ exports["consise methods support"] = function (test) {
 	run.test(code, {esnext: true});
 	run.test(code, {moz: true});
 
-	var run = TestRun(test)
+	run = TestRun(test)
 				.addError(2, "'concise methods' is only available in JavaScript 1.7.")
 				.addError(5, "'generator functions' is only available in JavaScript 1.7.")
 				.addError(5, "'concise methods' is only available in JavaScript 1.7.")
@@ -2939,6 +2939,45 @@ exports["consise methods support"] = function (test) {
 	run.test(code, {es3: true});
 
 	test.done();
+};
 
+exports["spread rest operator support"] = function (test) {
+	var code = [
+		// spread operator
+		"function foo(a, b, c) {",
+		"    console.log(a, b, c); ",
+		"}",
+		"var args = [ 0, 1, 2 ];",
+		"foo(...args);",
+
+		// spread operator
+		"let initial = [ 1, 2, 3, 4, 5 ];",
+		"let extended = [ ...initial, 6, 7, 8, 9 ];",
+
+		// rest operator
+		"(function foo(i, j, ...args) {",
+		"    return args;",
+		"}());",
+
+		// rest operator on a fat arrow function
+		"let bar = (...args) => args;"
+	];
+
+	var run = TestRun(test);
+	run.test(code, {esnext: true});
+	run.test(code, {moz: true});
+
+	var run = TestRun(test)
+	     .addError(5, "'spread/rest operator' is only available in JavaScript 1.7.")
+	     .addError(6, "'let' is only available in JavaScript 1.7.")
+	     .addError(7, "'let' is only available in JavaScript 1.7.")
+	     .addError(7, "'spread/rest operator' is only available in JavaScript 1.7.")
+	     .addError(8, "'spread/rest operator' is only available in JavaScript 1.7.")
+		 .addError(11, "'let' is only available in JavaScript 1.7.")
+		 .addError(11, "'spread/rest operator' is only available in JavaScript 1.7.")
+		 .addError(11, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		 .addError(11, "'spread/rest operator' is only available in JavaScript 1.7.");
+
+	test.done();
 };
 
