@@ -35,7 +35,7 @@ exports.testCustomGlobals = function (test) {
 	TestRun(test)
 		.addError(2, "Read only.")
 		.addError(3, "Read only.")
-		.test(code, { unused: true, predef: { foo: false }});
+		.test(code, { es3: true, unused: true, predef: { foo: false }});
 
 	test.done();
 };
@@ -45,7 +45,7 @@ exports.testUnusedDefinedGlobals = function (test) {
 
 	TestRun(test)
 		.addError(2, "'bar' is defined but never used.")
-		.test(src, { unused: true });
+		.test(src, { es3: true, unused: true });
 
 	test.done();
 };
@@ -225,7 +225,7 @@ exports.testMissingSpaces = function (test) {
 		.addError(8, "Missing space after '+'.", { character: 21 })
 		.addError(8, "Missing space after '/likes?access_token='.", { character: 43 })
 		.addError(8, "Missing space after '+'.", { character: 44 })
-		.test(src, { white: true });
+		.test(src, { es3: true, white: true });
 
 	test.done();
 };
@@ -235,10 +235,10 @@ exports.testGoogleClosureLinterCompatibility = function (test) {
 
 	TestRun(test)
 		.addError(1, "Missing space after 'function'.")
-		.test(code, { white: true });
+		.test(code, { es3: true, white: true });
 
 	TestRun(test)
-		.test(code, { white: true, gcl: true });
+		.test(code, { es3: true, white: true, gcl: true });
 
 	test.done();
 };
@@ -300,7 +300,7 @@ exports.returnStatement = function (test) {
 	TestRun(test)
 		.addError(3, "Did you mean to return a conditional instead of an assignment?")
 		.addError(38, "Line breaking error 'return'.")
-		.test(src, { maxerr: 2 });
+		.test(src, { es3: true, maxerr: 2 });
 
 	test.done();
 };
@@ -309,7 +309,7 @@ exports.globalDeclarations = function (test) {
 	var src = 'exports = module.exports = function (test) {};';
 
 	// Test should pass
-	TestRun(test).test(src, { node: true }, { exports: true });
+	TestRun(test).test(src, { es3: true, node: true }, { exports: true });
 
 	// Test should pass as well
 	src = [
@@ -329,7 +329,7 @@ exports.argsInCatchReused = function (test) {
 		.addError(6, "'e' is already defined.")
 		.addError(12, "Do not assign to the exception parameter.")
 		.addError(23, "'e' is not defined.")
-		.test(src, { undef: true });
+		.test(src, { es3: true, undef: true });
 
 	test.done();
 };
@@ -351,13 +351,13 @@ exports.yesEmptyStmt = function (test) {
 		.addError(6, "Expected an assignment or function call and instead saw an expression.")
 		.addError(10, "Unnecessary semicolon.")
 		.addError(17, "Unnecessary semicolon.")
-		.test(src, { curly: false });
+		.test(src, { es3: true, curly: false });
 
 	TestRun(test)
 		.addError(1, "Expected an identifier and instead saw ';'.")
 		.addError(10, "Unnecessary semicolon.")
 		.addError(17, "Unnecessary semicolon.")
-		.test(src, { curly: false, expr: true });
+		.test(src, { es3: true, curly: false, expr: true });
 
 	test.done();
 };
@@ -383,7 +383,7 @@ exports.insideEval = function (test) {
 		.addError(1, "Expected ')' and instead saw ''.")
 		.addError(1, "Missing semicolon.")
 
-		.test(src, { evil: false });
+		.test(src, { es3: true, evil: false });
 
 	// Regression test for bug GH-714.
 	JSHINT(src, { evil: false, maxerr: 1 });
@@ -406,7 +406,7 @@ exports.noExcOnTooManyUndefined = function (test) {
 
 	TestRun(test)
 		.addError(1, "'a' is not defined.")
-		.test(code, { undef: true, maxerr: 1 });
+		.test(code, { es3: true, undef: true, maxerr: 1 });
 
 	test.done();
 };
@@ -417,7 +417,7 @@ exports.defensiveSemicolon = function (test) {
 	TestRun(test)
 		.addError(16, "Unnecessary semicolon.")
 		.addError(17, "Unnecessary semicolon.")
-		.test(src, { expr: true, laxbreak: true });
+		.test(src, { es3: true, expr: true, laxbreak: true });
 
 	test.done();
 };
@@ -439,7 +439,7 @@ exports.iife = function (test) {
 exports.invalidOptions = function (test) {
 	TestRun(test)
 		.addError(0, "Bad option: 'invalid'.")
-		.test("function test() {}", { devel: true, invalid: true });
+		.test("function test() {}", { es3: true, devel: true, invalid: true });
 
 	test.done();
 };
@@ -463,13 +463,13 @@ exports.testInvalidSource = function (test) {
 
 	TestRun(test)
 		.addError(0, "Input is neither a string nor an array of strings.")
-		.test({});
+		.test({}, {es3: true});
 
 	TestRun(test)
-		.test("");
+		.test("", {es3: true});
 
 	TestRun(test)
-		.test([]);
+		.test([], {es3: true});
 
 	test.done();
 };
@@ -481,7 +481,7 @@ exports.testConstructor = function (test) {
 		.addError(1, "Do not use Number as a constructor.", {
 			character: 1
 		})
-		.test(code);
+		.test(code, {es3: true});
 
 	test.done();
 };
@@ -493,23 +493,23 @@ exports.missingRadix = function (test) {
 		.addError(1, "Missing radix parameter.", {
 			character: 12
 		})
-		.test(code);
+		.test(code, {es3: true});
 
 	test.done();
 };
 
 exports.NumberNaN = function (test) {
 	var code = "(function (test) { return Number.NaN; })();";
-	TestRun(test).test(code);
+	TestRun(test).test(code, {es3: true});
 
 	test.done();
 };
 
 exports.htmlEscapement = function (test) {
-	TestRun(test).test("var a = '<\\!--';");
+	TestRun(test).test("var a = '<\\!--';", {es3: true});
 	TestRun(test)
 		.addError(1, "Bad or unnecessary escaping.")
-		.test("var a = '\\!';");
+		.test("var a = '\\!';", {es3: true});
 
 	test.done();
 };
@@ -523,10 +523,10 @@ exports.testSparseArrays = function (test) {
 		.addError(1, "Extra comma. (it breaks older versions of IE)")
 		.addError(1, "Extra comma. (it breaks older versions of IE)")
 		.addError(1, "Extra comma. (it breaks older versions of IE)")
-		.test(src);
+		.test(src, {es3: true});
 
 	TestRun(test)
-		.test(src, { es5: true });
+		.test(src, {}); // es5
 
 	test.done();
 };
@@ -540,12 +540,12 @@ exports.testReserved = function (test) {
 		.addError(10, "Expected an identifier and instead saw 'let' (a reserved word).")
 		.addError(14, "Expected an identifier and instead saw 'else' (a reserved word).")
 		.addError(14, "Reserved words as properties can be used under the 'es5' option.")
-		.test(src);
+		.test(src, {es3: true});
 
 	TestRun(test)
 		.addError(5, "Expected an identifier and instead saw 'let' (a reserved word).")
 		.addError(10, "Expected an identifier and instead saw 'let' (a reserved word).")
-		.test(src, { es5: true });
+		.test(src, {}); // es5
 
 	test.done();
 };
@@ -566,14 +566,14 @@ exports.testES5Reserved = function (test) {
 		.addError(9, "Expected an identifier and instead saw 'default' (a reserved word).")
 		.addError(10, "Expected an identifier and instead saw 'in' (a reserved word).")
 		.addError(11, "Expected an identifier and instead saw 'in' (a reserved word).")
-		.test(src);
+		.test(src, {es3: true});
 
 	TestRun(test)
 		.addError(6, "Expected an identifier and instead saw 'default' (a reserved word).")
 		.addError(7, "Expected an identifier and instead saw 'new' (a reserved word).")
 		.addError(8, "Expected an identifier and instead saw 'class' (a reserved word).")
 		.addError(11, "Expected an identifier and instead saw 'in' (a reserved word).")
-		.test(src, { es5: true });
+		.test(src, {}); // es5
 
 	test.done();
 };
@@ -583,16 +583,16 @@ exports.testCatchBlocks = function (test) {
 
 	TestRun(test)
 		.addError(11, "'w' is not defined.")
-		.test(src, { undef: true, devel: true });
+		.test(src, { es3: true, undef: true, devel: true });
 
 	src = fs.readFileSync(__dirname + '/fixtures/gh618.js', 'utf8');
 
 	TestRun(test)
 		.addError(5, "Value of 'x' may be overwritten in IE.")
-		.test(src, { undef: true, devel: true });
+		.test(src, { es3: true, undef: true, devel: true });
 
 	TestRun(test)
-		.test(src, { undef: true, devel: true, node: true });
+		.test(src, { es3: true, undef: true, devel: true, node: true });
 
 	test.done();
 };
@@ -616,7 +616,7 @@ exports.testForIn = function (test) {
 	];
 
 	TestRun(test)
-		.test(src);
+		.test(src, {es3: true});
 
 	src = [
 		"(function (o) {",
@@ -626,7 +626,7 @@ exports.testForIn = function (test) {
 
 	TestRun(test)
 		.addError(2, "Creating global 'for' variable. Should be 'for (var i ...'.")
-		.test(src);
+		.test(src, {es3: true});
 
 	test.done();
 };
@@ -635,7 +635,7 @@ exports.testRegexArray = function (test) {
 	var src = fs.readFileSync(__dirname + "/fixtures/regex_array.js", "utf8");
 
 	TestRun(test)
-		.test(src);
+		.test(src, {es3: true});
 
 	test.done();
 };
