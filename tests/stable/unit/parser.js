@@ -1944,7 +1944,8 @@ exports["test: let block and let expression as esnext"] = function (test) {
 	TestRun(test)
 		.addError(1, "'let block' is only available in Mozilla JavaScript extensions (use moz option).")
 		.addError(3, "'let block' is only available in Mozilla JavaScript extensions (use moz option).")
-		.addError(4, "'let expressions' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(4, "'let expressions' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
 		.test(code, {esnext: true, unused: true, undef: true, predef: ["print"]});
 	test.done();
 };
@@ -1963,7 +1964,8 @@ exports["test: let block and let expression as es5"] = function (test) {
 		.addError(1, "'let block' is only available in Mozilla JavaScript extensions (use moz option).")
 		.addError(3, "'let' is only available in JavaScript 1.7.")
 		.addError(3, "'let block' is only available in Mozilla JavaScript extensions (use moz option).")
-		.addError(4, "'let expressions' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(4, "'let expressions' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
 		.addError(4, "'let' is only available in JavaScript 1.7.")
 		.test(code, {es5: true, unused: true, undef: true, predef: ["print"]});
 	test.done();
@@ -1983,7 +1985,8 @@ exports["test: let block and let expression as legacy JS"] = function (test) {
 		.addError(1, "'let block' is only available in Mozilla JavaScript extensions (use moz option).")
 		.addError(3, "'let' is only available in JavaScript 1.7.")
 		.addError(3, "'let block' is only available in Mozilla JavaScript extensions (use moz option).")
-		.addError(4, "'let expressions' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(4, "'let expressions' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
 		.addError(4, "'let' is only available in JavaScript 1.7.")
 		.test(code, {unused: true, undef: true, predef: ["print"]});
 	test.done();
@@ -2357,11 +2360,13 @@ exports["test: array comprehension as esnext"] = function (test) {
 		"print('evens:', evens);"
 	];
 	TestRun(test)
-		.addError(3, 
-		 "A yield statement shall be within a generator function (with syntax: `function*`)")
-		.addError(6, "'array comprehension' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(3, "A yield statement shall be within a generator function (with syntax: " +
+			"`function*`)")
+		.addError(6, "'array comprehension' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
 		.addError(6, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
-		.addError(7, "'array comprehension' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(7, "'array comprehension' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
 		.addError(7, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
 		.test(code, {esnext: true, unused: true, undef: true, predef: ["print"]});
 
@@ -2383,9 +2388,11 @@ exports["test: array comprehension as es5"] = function (test) {
 	TestRun(test)
 		.addError(2, "'let' is only available in JavaScript 1.7.")
 		.addError(3, "'yield' is only available in JavaScript 1.7.")
-		.addError(6, "'array comprehension' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(6, "'array comprehension' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
 		.addError(6, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
-		.addError(7, "'array comprehension' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(7, "'array comprehension' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
 		.addError(7, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
 		.test(code, {es5: true, unused: true, undef: true, predef: ["print"]});
 
@@ -2407,9 +2414,11 @@ exports["test: array comprehension as legacy JS"] = function (test) {
 	TestRun(test)
 		.addError(2, "'let' is only available in JavaScript 1.7.")
 		.addError(3, "'yield' is only available in JavaScript 1.7.")
-		.addError(6, "'array comprehension' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(6, "'array comprehension' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
 		.addError(6, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
-		.addError(7, "'array comprehension' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(7, "'array comprehension' is only available in Mozilla JavaScript extensions (use " +
+			"moz option).")
 		.addError(7, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
 		.test(code, {unused: true, undef: true, predef: ["print"]});
 
@@ -2434,11 +2443,14 @@ exports['test array comprehension with dest array at global scope as esnext'] = 
 		"var destarray_comparray_2 = [ [i, {i: [i, j]} ] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
 	];
 	TestRun(test)
-		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
 		.addError(1, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
-		.addError(2, "'array comprehension' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(2, "'array comprehension' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
 		.addError(2, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
-		.addError(3, "'array comprehension' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(3, "'array comprehension' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
 		.addError(3, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
 		.test(code, {esnext: true, undef: true, predef: ["print"]});
 
@@ -2451,11 +2463,14 @@ exports['test array comprehension with dest array at global scope as es5'] = fun
 		"var destarray_comparray_2 = [ [i, {i: [i, j]} ] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
 	];
 	TestRun(test)
-		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
 		.addError(1, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
-		.addError(2, "'array comprehension' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(2, "'array comprehension' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
 		.addError(2, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
-		.addError(3, "'array comprehension' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(3, "'array comprehension' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
 		.addError(3, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
 		.test(code, {es5: true, undef: true, predef: ["print"]});
 
@@ -2468,11 +2483,14 @@ exports['test array comprehension with dest array at global scope as JS legacy']
 		"var destarray_comparray_2 = [ [i, {i: [i, j]} ] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
 	];
 	TestRun(test)
-		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
 		.addError(1, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
-		.addError(2, "'array comprehension' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(2, "'array comprehension' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
 		.addError(2, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
-		.addError(3, "'array comprehension' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(3, "'array comprehension' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
 		.addError(3, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
 		.test(code, {undef: true, predef: ["print"]});
 
@@ -2494,8 +2512,10 @@ exports["test: array comprehension imbrication with dest array as esnext"] = fun
 		"[ [i, j] for each ([i, j] in [[a, b] for each ([a, b] in [[2,2], [3,4]])]) ];"
 	];
 	TestRun(test)
-		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions (use moz option).")
-		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
+		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
 		.addError(1, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
 		.test(code, {esnext: true, undef: true, predef: ["print"]});
 
@@ -2507,8 +2527,10 @@ exports["test: array comprehension imbrication with dest array as es5"] = functi
 
 	];
 	TestRun(test)
-		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions (use moz option).")
-		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
+		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
 		.addError(1, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
 		.test(code, {es5: true, undef: true, predef: ["print"]});
 
@@ -2520,8 +2542,10 @@ exports["test: array comprehension imbrication with dest array as legacy JS"] = 
 
 	];
 	TestRun(test)
-		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions (use moz option).")
-		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
+		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
 		.addError(1, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
 		.test(code, {undef: true, predef: ["print"]});
 
@@ -2562,7 +2586,8 @@ exports["try catch filters as esnext"] = function (test) {
 		"}"
 	];
 	TestRun(test)
-		.addError(4, "'catch filter' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(4, "'catch filter' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
 		.test(code, {esnext: true, undef: true, predef: ["print"]});
 
 	test.done();
@@ -2577,7 +2602,8 @@ exports["try catch filters as es5"] = function (test) {
 		"}"
 	];
 	TestRun(test)
-		.addError(4, "'catch filter' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(4, "'catch filter' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
 		.test(code, {es5: true, undef: true, predef: ["print"]});
 
 	test.done();
@@ -2592,7 +2618,8 @@ exports["try catch filters as legacy JS"] = function (test) {
 		"}"
 	];
 	TestRun(test)
-		.addError(4, "'catch filter' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(4, "'catch filter' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
 		.test(code, {undef: true, predef: ["print"]});
 
 	test.done();
@@ -2615,7 +2642,8 @@ exports["test: function closure expression as esnext"] = function (test) {
 		"arr.every(function (o) o instanceof Object);",
 	];
 	TestRun(test)
-		.addError(2, "'function closure expressions' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(2, "'function closure expressions' is only available in Mozilla JavaScript " +
+			"extensions (use moz option).")
 		.test(code, {esnext: true, undef: true});
 
 	test.done();
@@ -2626,7 +2654,8 @@ exports["test: function closure expression as es5"] = function (test) {
 		"arr.every(function (o) o instanceof Object);",
 	];
 	TestRun(test)
-		.addError(2, "'function closure expressions' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(2, "'function closure expressions' is only available in Mozilla JavaScript " +
+			"extensions (use moz option).")
 		.test(code, {es5: true, undef: true});
 
 	test.done();
@@ -2637,7 +2666,8 @@ exports["test: function closure expression as legacy JS"] = function (test) {
 		"arr.every(function (o) o instanceof Object);",
 	];
 	TestRun(test)
-		.addError(2, "'function closure expressions' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(2, "'function closure expressions' is only available in Mozilla JavaScript " +
+			"extensions (use moz option).")
 		.test(code, {undef: true});
 
 	test.done();
@@ -2718,7 +2748,8 @@ exports["test: try multi-catch as esnext"] = function (test) {
 		"}"
 	];
 	TestRun(test)
-		.addError(5, "'multiple catch blocks' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(5, "'multiple catch blocks' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
 		.test(code, {esnext: true, undef: true, predef: ["print"]});
 
 	test.done();
@@ -2736,7 +2767,8 @@ exports["test: try multi-catch as es5"] = function (test) {
 		"}"
 	];
 	TestRun(test)
-		.addError(5, "'multiple catch blocks' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(5, "'multiple catch blocks' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
 		.test(code, {es5: true, undef: true, predef: ["print"]});
 
 	test.done();
@@ -2755,7 +2787,8 @@ exports["test: try multi-catch as legacy JS"] = function (test) {
 	];
 
 	TestRun(test)
-		.addError(5, "'multiple catch blocks' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(5, "'multiple catch blocks' is only available in Mozilla JavaScript extensions " +
+			"(use moz option).")
 		.test(code, {undef: true, predef: ["print"]});
 
 	test.done();
@@ -2850,7 +2883,7 @@ exports["automatic comma insertion GH-950"] = function (test) {
 	run.test(code, {esnext: true, asi: true});
 	run.test(code, {moz: true, asi: true});
 
-	var run = TestRun(test)
+	run = TestRun(test)
 		.addError(2, "Bad line breaking before 'instanceof'.")
 		.addError(3, "Missing semicolon.")
 		.addError(4, "Missing semicolon.")
