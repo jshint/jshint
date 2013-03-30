@@ -153,6 +153,27 @@ for (var i = 0; i < 128; i++) {
 		i >= 48 && i <= 57;        // 0-9
 }
 
+// Object that handles postponed lexing verifications that checks the parsed
+// environment state.
+
+function asyncTrigger() {
+	var _checks = [];
+
+	return {
+		push: function (fn) {
+			_checks.push(fn);
+		},
+
+		check: function () {
+			for (var check in _checks) {
+				_checks[check]();
+			}
+
+			_checks.splice(0, _checks.length);
+		}
+	};
+}
+
 /*
  * Lexer for JSHint.
  *
@@ -265,6 +286,21 @@ Lexer.prototype = {
 	},
 
 	/*
+	 * Postpone a token event. the checking condition is set as
+	 * last parameter, and the trigger function is called in a
+	 * stored callback. To be later called using the check() function
+	 * by the parser. This avoids parser's peek() to give the lexer
+	 * a false context.
+	 */
+	triggerAsync: function (type, args, checks, fn) {
+		checks.push(function () {
+			if (fn()) {
+				this.trigger(type, args);
+			}
+		}.bind(this));
+	},
+
+	/*
 	 * Extract a punctuator out of the next sequence of characters
 	 * or return 'null' if its not possible.
 	 *
@@ -360,6 +396,14 @@ Lexer.prototype = {
 			return {
 				type: Token.Punctuator,
 				value: "<<="
+			};
+		}
+
+		// Fat arrow punctuator
+		if (ch1 === "=" && ch2 === ">") {
+			return {
+				type: Token.Punctuator,
+				value: ch1 + ch2
 			};
 		}
 
@@ -935,7 +979,8 @@ Lexer.prototype = {
 	 *   var str = "hello\
 	 *   world";
    */
-	scanStringLiteral: function () {
+	scanStringLiteral: function (checks) {
+		/*jshint loopfunc:true */
 		var quote = this.peek();
 
 		// String must start with a quote.
@@ -944,21 +989,11 @@ Lexer.prototype = {
 		}
 
 		// In JSON strings must always use double quotes.
-		if (quote !== "\"") {
-			if (state.jsonMode === "probing") {
-				state.jsonWarnings.push({
-					code: "W108",
-					line: this.line,
-					character: this.char // +1?
-				});
-			} else if (state.jsonMode) {
-				this.trigger("warning", {
-					code: "W108",
-					line: this.line,
-					character: this.char // +1?
-				});
-			}
-		}
+		this.triggerAsync("warning", {
+			code: "W108",
+			line: this.line,
+			character: this.char // +1?
+		}, checks, function () { return state.jsonMode && quote !== "\""; });
 
 		var value = "";
 		var startLine = this.line;
@@ -989,25 +1024,17 @@ Lexer.prototype = {
 					// Otherwise show a warning if multistr option was not set.
 					// For JSON, show warning no matter what.
 
-					if (!state.option.multistr) {
-						this.trigger("warning", {
-							code: "W043",
-							line: this.line,
-							character: this.char
-						});
-					} else if (state.jsonMode === "probing") {
-						state.jsonWarnings.push({
-							code: "W042",
-							line: this.line,
-							character: this.char
-						});
-					} else if (state.jsonMode) {
-						this.trigger("warning", {
-							code: "W042",
-							line: this.line,
-							character: this.char
-						});
-					}
+					this.triggerAsync("warning", {
+						code: "W043",
+						line: this.line,
+						character: this.char
+					}, checks, function () { return !state.option.multistr; });
+
+					this.triggerAsync("warning", {
+						code: "W042",
+						line: this.line,
+						character: this.char
+					}, checks, function () { return state.jsonMode && state.option.multistr; });
 				}
 
 				// If we get an EOF inside of an unclosed string, show an
@@ -1052,21 +1079,12 @@ Lexer.prototype = {
 
 				switch (char) {
 				case "'":
-					if (state.jsonMode === "probing") {
-						state.jsonWarnings.push({
-							code: "W114",
-							line: this.line,
-							character: this.char,
-							data: [ "\\'" ]
-						});
-					} else if (state.jsonMode) {
-						this.trigger("warning", {
-							code: "W114",
-							line: this.line,
-							character: this.char,
-							data: [ "\\'" ]
-						});
-					}
+					this.triggerAsync("warning", {
+						code: "W114",
+						line: this.line,
+						character: this.char,
+						data: [ "\\'" ]
+					}, checks, function () {return state.jsonMode; });
 					break;
 				case "b":
 					char = "\b";
@@ -1089,55 +1107,36 @@ Lexer.prototype = {
 					// Octal literals fail in strict mode.
 					// Check if the number is between 00 and 07.
 					var n = parseInt(this.peek(1), 10);
-					if (n >= 0 && n <= 7 && state.directive["use strict"]) {
-						this.trigger("warning", {
-							code: "W115",
-							line: this.line,
-							character: this.char
-						});
-					}
+					this.triggerAsync("warning", {
+						code: "W115",
+						line: this.line,
+						character: this.char
+					}, checks,
+					function () { return n >= 0 && n <= 7 && state.directive["use strict"]; });
 					break;
 				case "u":
 					char = String.fromCharCode(parseInt(this.input.substr(1, 4), 16));
 					jump = 5;
 					break;
 				case "v":
-					if (state.jsonMode === "probing") {
-						state.jsonWarnings.push({
-							code: "W114",
-							line: this.line,
-							character: this.char,
-							data: [ "\\v" ]
-						});
-					} else if (state.jsonMode) {
-						this.trigger("warning", {
-							code: "W114",
-							line: this.line,
-							character: this.char,
-							data: [ "\\v" ]
-						});
-					}
+					this.triggerAsync("warning", {
+						code: "W114",
+						line: this.line,
+						character: this.char,
+						data: [ "\\v" ]
+					}, checks, function () { return state.jsonMode; });
 
 					char = "\v";
 					break;
 				case "x":
 					var	x = parseInt(this.input.substr(1, 2), 16);
 
-					if (state.jsonMode === "probing") {
-						state.jsonWarnings.push({
-							code: "W114",
-							line: this.line,
-							character: this.char,
-							data: [ "\\x-" ]
-						});
-					} else if (state.jsonMode) {
-						this.trigger("warning", {
-							code: "W114",
-							line: this.line,
-							character: this.char,
-							data: [ "\\x-" ]
-						});
-					}
+					this.triggerAsync("warning", {
+						code: "W114",
+						line: this.line,
+						character: this.char,
+						data: [ "\\x-" ]
+					}, checks, function () { return state.jsonMode; });
 
 					char = String.fromCharCode(x);
 					jump = 3;
@@ -1377,7 +1376,7 @@ Lexer.prototype = {
 	 * Produce the next raw token or return 'null' if no tokens can be matched.
 	 * This method skips over all space characters.
 	 */
-	next: function () {
+	next: function (checks) {
 		this.from = this.char;
 
 		// Move to the next non-space character.
@@ -1401,7 +1400,7 @@ Lexer.prototype = {
 		// character pointer.
 
 		var match = this.scanComments() ||
-			this.scanStringLiteral();
+			this.scanStringLiteral(checks);
 
 		if (match) {
 			return match;
@@ -1478,6 +1477,8 @@ Lexer.prototype = {
 	 * the next token. It retuns a token in a JSLint-compatible format.
 	 */
 	token: function () {
+		/*jshint loopfunc:true */
+		var checks = asyncTrigger();
 		var token;
 
 		function isReserved(token, isProperty) {
@@ -1487,7 +1488,7 @@ Lexer.prototype = {
 
 			if (token.meta && token.meta.isFutureReservedWord) {
 				// ES3 FutureReservedWord in an ES5 environment.
-				if (state.option.es5 && !token.meta.es5) {
+				if (state.option.inES5(true) && !token.meta.es5) {
 					return false;
 				}
 
@@ -1562,6 +1563,8 @@ Lexer.prototype = {
 				obj.isProperty = isProperty;
 			}
 
+			obj.check = checks.check;
+
 			return obj;
 		}.bind(this);
 
@@ -1570,7 +1573,7 @@ Lexer.prototype = {
 				return create(this.nextLine() ? "(endline)" : "(end)", "");
 			}
 
-			token = this.next();
+			token = this.next(checks);
 
 			if (!token) {
 				if (this.input.length) {
@@ -1590,13 +1593,13 @@ Lexer.prototype = {
 
 			switch (token.type) {
 			case Token.StringLiteral:
-				this.trigger("String", {
+				this.triggerAsync("String", {
 					line: this.line,
 					char: this.char,
 					from: this.from,
 					value: token.value,
 					quote: token.quote
-				});
+				}, checks, function () { return true; });
 
 				return create("(string)", token.value);
 			case Token.Identifier:
@@ -1624,31 +1627,21 @@ Lexer.prototype = {
 					});
 				}
 
-				if (token.base === 16) {
-					if (state.jsonMode === "probing") {
-						state.jsonWarnings.push({
-							code: "W114",
-							line: this.line,
-							character: this.char,
-							data: [ "0x-" ]
-						});
-					} else if (state.jsonMode) {
-						this.trigger("warning", {
-							code: "W114",
-							line: this.line,
-							character: this.char,
-							data: [ "0x-" ]
-						});
-					}
-				}
+				this.triggerAsync("warning", {
+					code: "W114",
+					line: this.line,
+					character: this.char,
+					data: [ "0x-" ]
+				}, checks, function () { return token.base === 16 && state.jsonMode; });
 
-				if (state.directive["use strict"] && token.base === 8) {
-					this.trigger("warning", {
-						code: "W115",
-						line: this.line,
-						character: this.char
-					});
-				}
+				this.triggerAsync("warning", {
+					code: "W115",
+					line: this.line,
+					character: this.char
+				}, checks, function () {
+					// console.log("W115", state.directive["use strict"], token.base === 8);
+					return state.directive["use strict"] && token.base === 8; 
+				});
 
 				this.trigger("Number", {
 					line: this.line,
