@@ -28,11 +28,11 @@ exports.shadow = function (test) {
 	TestRun(test)
 		.addError(5, "'a' is already defined.")
 		.addError(10, "'foo' is already defined.")
-		.test(src);
+		.test(src, {es3: true});
 
 	// Allow variable shadowing when shadow is true
 	TestRun(test)
-		.test(src, { shadow: true });
+		.test(src, { es3: true, shadow: true });
 
 	test.done();
 };
@@ -55,32 +55,32 @@ exports.latedef = function (test) {
 
 	// By default, tolerate the use of variable before its definition
 	TestRun(test)
-		.test(src);
+		.test(src, {es3: true});
 
 	// However, JSHint must complain if variable is actually missing
 	TestRun(test)
 		.addError(1, "'fn' is not defined.")
-		.test('fn();', { undef: true });
+		.test('fn();', { es3: true, undef: true });
 
 	// And it also must complain about the redefinition (see option `shadow`)
 	TestRun(test)
 		.addError(5, "'a' is already defined.")
 		.addError(10, "'foo' is already defined.")
-		.test(src1);
+		.test(src1, { es3: true });
 
-	// When latedef is "nofunc", JSHint must not tolerate the use before definition
+	// When latedef is true, JSHint must not tolerate the use before definition
 	TestRun(test)
 		.addError(10, "'vr' was used before it was defined.")
 		.addError(18, "Inner functions should be listed at the top of the outer function.")
-		.test(src, { latedef: "nofunc" });
+		.test(src, { es3: true, latedef: "nofunc" });
 
-	// When latedef is true, JSHint must not tolerate the use before definition for functions
+	// When latedef_func is true, JSHint must not tolerate the use before definition for functions
 	TestRun(test)
 		.addError(2, "'fn' was used before it was defined.")
 		.addError(6, "'fn1' was used before it was defined.")
 		.addError(10, "'vr' was used before it was defined.")
 		.addError(18, "Inner functions should be listed at the top of the outer function.")
-		.test(src, { latedef: true });
+		.test(src, { es3: true, latedef: true });
 
 	test.done();
 };
@@ -93,11 +93,11 @@ exports['combination of latedef and undef'] = function (test) {
 	TestRun(test)
 		.addError(29, "'hello' is not defined.")
 		.addError(35, "'world' is not defined.")
-		.test(src, { latedef: false, undef: true });
+		.test(src, { es3: true, latedef: false, undef: true });
 
 	// When we suppress `latedef` and `undef` then we get no warnings.
 	TestRun(test)
-		.test(src, { latedef: false, undef: false });
+		.test(src, { es3: true, latedef: false, undef: false });
 
 	// If we warn on `latedef` but supress `undef` we only get the
 	// late definition warnings.
@@ -109,13 +109,13 @@ exports['combination of latedef and undef'] = function (test) {
 		.addError(34, "'fn' was used before it was defined.")
 		.addError(41, "'q' was used before it was defined.")
 		.addError(46, "'h' was used before it was defined.")
-		.test(src, { latedef: true, undef: false });
+		.test(src, { es3: true, latedef: true, undef: false });
 
 	// But we get all the functions warning if we disable latedef func
 	TestRun(test)
 		.addError(41, "'q' was used before it was defined.")
 		.addError(46, "'h' was used before it was defined.")
-		.test(src, { latedef: "nofunc", undef: false });
+		.test(src, { es3: true, latedef: "nofunc", undef: false });
 
 	// If we warn on both options we get all the warnings.
 	TestRun(test)
@@ -128,22 +128,22 @@ exports['combination of latedef and undef'] = function (test) {
 		.addError(35, "'world' is not defined.")
 		.addError(41, "'q' was used before it was defined.")
 		.addError(46, "'h' was used before it was defined.")
-		.test(src, { latedef: true, undef: true });
+		.test(src, { es3: true, latedef: true, undef: true });
 
-	// If we use latedef: "nofunc", we don't get the functions warning
+	// If we remove latedef_func, we don't get the functions warning
 	TestRun(test)
 		.addError(29, "'hello' is not defined.")
 		.addError(35, "'world' is not defined.")
 		.addError(41, "'q' was used before it was defined.")
 		.addError(46, "'h' was used before it was defined.")
-		.test(src, { latedef: "nofunc", undef: true });
+		.test(src, { es3: true, latedef: "nofunc", undef: true });
 
 	test.done();
 };
 
 exports.undefwstrict = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/undefstrict.js', 'utf8');
-	TestRun(test).test(src, { undef: false });
+	TestRun(test).test(src, { es3: true, undef: false });
 
 	test.done();
 };
@@ -153,7 +153,7 @@ exports["implied and unused should respect hoisting"] = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/gh431.js', 'utf8');
 	TestRun(test)
 		.addError(14, "'fun4' is not defined.")
-		.test(src, { undef: true });
+		.test(src, { undef: true }); // es5
 
 	JSHINT.flag = true;
 	JSHINT(src, { undef: true });
@@ -185,17 +185,17 @@ exports.testProtoAndIterator = function (test) {
 		.addError(27, "'__iterator__' is only available in JavaScript 1.7.")
 		.addError(33, "The '__proto__' property is deprecated.")
 		.addError(37, "The '__proto__' property is deprecated.")
-		.test(source);
+		.test(source, {es3: true});
 
 	TestRun(test)
 		.addError(1, "The '__proto__' key may produce unexpected results.")
 		.addError(1, "The '__iterator__' key may produce unexpected results.")
-		.test(json);
+		.test(json, {es3: true});
 
 	// Should not report any errors when proto and iterator
 	// options are on
-	TestRun("source").test(source, { proto: true, iterator: true });
-	TestRun("json").test(json, { proto: true, iterator: true });
+	TestRun("source").test(source, { es3: true, proto: true, iterator: true });
+	TestRun("json").test(json, { es3: true, proto: true, iterator: true });
 
 	test.done();
 };
@@ -208,7 +208,7 @@ exports.testCamelcase = function (test) {
 
 	// By default, tolerate arbitrary identifiers
 	TestRun(test)
-		.test(source);
+		.test(source, {es3: true});
 
 	// Require identifiers in camel case if camelcase is true
 	TestRun(test)
@@ -217,7 +217,7 @@ exports.testCamelcase = function (test) {
 		.addError(6, "Identifier 'test_me' is not in camel case.")
 		.addError(6, "Identifier 'test_me' is not in camel case.")
 		.addError(13, "Identifier 'test_1' is not in camel case.")
-		.test(source, { camelcase: true });
+		.test(source, { es3: true, camelcase: true });
 
 
 	test.done();
@@ -239,17 +239,17 @@ exports.curly = function (test) {
 		src1 = fs.readFileSync(__dirname + '/fixtures/curly2.js', 'utf8');
 
 	// By default, tolerate one-line blocks since they are valid JavaScript
-	TestRun(test).test(src);
-	TestRun(test).test(src1);
+	TestRun(test).test(src, {es3: true});
+	TestRun(test).test(src1, {es3: true});
 
 	// Require all blocks to be wrapped with curly braces if curly is true
 	TestRun(test)
 		.addError(2, "Expected '{' and instead saw 'return'.")
 		.addError(5, "Expected '{' and instead saw 'doSomething'.")
 		.addError(8, "Expected '{' and instead saw 'doSomething'.")
-		.test(src, { curly: true });
+		.test(src, { es3: true, curly: true });
 
-	TestRun(test).test(src1, { curly: true });
+	TestRun(test).test(src1, { es3: true, curly: true });
 
 	test.done();
 };
@@ -259,12 +259,12 @@ exports.noempty = function (test) {
 	var code = 'for (;;) {}';
 
 	// By default, tolerate empty blocks since they are valid JavaScript
-	TestRun(test).test(code);
+	TestRun(test).test(code, { es3: true });
 
 	// Do not tolerate, when noempty is true
 	TestRun(test)
 		.addError(1, 'Empty block.')
-		.test(code, { noempty: true });
+		.test(code, { es3: true, noempty: true });
 
 	test.done();
 };
@@ -280,13 +280,13 @@ exports.noarg = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/noarg.js', 'utf8');
 
 	// By default, tolerate both arguments.callee and arguments.caller
-	TestRun(test).test(src);
+	TestRun(test).test(src, { es3: true });
 
 	// Do not tolerate both .callee and .caller when noarg is true
 	TestRun(test)
 		.addError(2, 'Avoid arguments.callee.')
 		.addError(6, 'Avoid arguments.caller.')
-		.test(src, { noarg: true });
+		.test(src, { es3: true, noarg: true });
 
 	test.done();
 };
@@ -296,14 +296,14 @@ exports.nonew = function (test) {
 	var code  = "new Thing();",
 		code1 = "var obj = new Thing();";
 
-	TestRun(test).test(code);
-	TestRun(test).test(code1);
+	TestRun(test).test(code, { es3: true });
+	TestRun(test).test(code1, { es3: true });
 
 	TestRun(test)
 		.addError(1, "Do not use 'new' for side effects.", {
 			character: 1
 		})
-		.test(code, { nonew: true });
+		.test(code, { es3: true, nonew: true });
 
 	test.done();
 };
@@ -334,13 +334,13 @@ exports.asi = function (test) {
 		.addError(26, "Missing semicolon.", { character: 10 })
 		.addError(27, "Missing semicolon.", { character: 12 })
 		.addError(28, "Missing semicolon.", { character: 12 })
-		.test(src);
+		.test(src, { es3: true });
 
 	TestRun(test, 2)
 		.addError(2, "Missing semicolon.") // throw on "use strict", even option asi is used
 		.addError(4, "Line breaking error 'return'.")
 		.addError(17, "Line breaking error 'return'.")
-		.test(src, { asi: true });
+		.test(src, { es3: true, asi: true });
 
 	test.done();
 };
@@ -355,18 +355,18 @@ exports.lastsemic = function (test) {
 		.addError(2, "Missing semicolon.") // missing semicolon in the middle of a block
 		.addError(4, "Missing semicolon.") // missing semicolon in a one-liner function
 		.addError(5, "Missing semicolon.") // missing semicolon at the end of a block
-		.test(src);
+		.test(src, {es3: true});
 
 	// with lastsemic
 	TestRun(test)
 		.addError(2, "Missing semicolon.")
 		.addError(5, "Missing semicolon.")
-		.test(src, { lastsemic: true });
+		.test(src, { es3: true, lastsemic: true });
 	// this line is valid now: [1, 2, 3].forEach(function(i) { print(i) });
 	// line 5 isn't, because the block doesn't close on the same line
 
 	// it shouldn't interfere with asi option
-	TestRun(test).test(src, { lastsemic: true, asi: true });
+	TestRun(test).test(src, { es3: true, lastsemic: true, asi: true });
 
 	test.done();
 };
@@ -391,11 +391,11 @@ exports.expr = function (test) {
 	for (var i = 0, exp; exp = exps[i]; i += 1) {
 		TestRun(test)
 			.addError(1, 'Expected an assignment or function call and instead saw an expression.')
-			.test(exp);
+			.test(exp, { es3: true });
 	}
 
 	for (i = 0, exp = null; exp = exps[i]; i += 1) {
-		TestRun(test).test(exp, { expr: true });
+		TestRun(test).test(exp, { es3: true, expr: true });
 	}
 
 	test.done();
@@ -406,7 +406,7 @@ exports.undef = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/undef.js', 'utf8');
 
 	// Make sure there are no other errors
-	TestRun(test).test(src);
+	TestRun(test).test(src, { es3: true });
 
 	// Make sure it fails when undef is true
 	TestRun(test)
@@ -420,7 +420,7 @@ exports.undef = function (test) {
 		.addError(19, "'localUndef' is not defined.")
 		.addError(21, "'localUndef' is not defined.")
 		.addError(22, "'localUndef' is not defined.")
-		.test(src, { undef: true });
+		.test(src, { es3: true, undef: true });
 
 	// Regression test for GH-668.
 	src = fs.readFileSync(__dirname + "/fixtures/gh668.js", "utf8");
@@ -436,7 +436,7 @@ exports.undef = function (test) {
 exports.unused = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/unused.js', 'utf8');
 
-	TestRun(test).test(src);
+	TestRun(test).test(src, { es3: true });
 
 	var var_errors = [
 		[1, "'a' is defined but never used."],
@@ -447,14 +447,14 @@ exports.unused = function (test) {
 
 	var last_param_errors = [[6, "'f' is defined but never used."]];
 	var all_param_errors = [[15, "'err' is defined but never used."]];
-	var true_run = TestRun(test);
+	var true_run = TestRun(test, {es3: true});
 
 	var_errors.concat(last_param_errors).forEach(function (e) {
 		true_run.addError.apply(true_run, e);
 	});
 
 	true_run.test(src, { unused: true });
-	test.ok(!JSHINT(src, { unused: true }));
+	test.ok(!JSHINT(src, { es3: true, unused: true }));
 
 	// Test checking all function params via unused="strict"
 	var all_run = TestRun(test);
@@ -462,12 +462,12 @@ exports.unused = function (test) {
 		all_run.addError.apply(true_run, e);
 	});
 
-	all_run.test(src, {unused: "strict"});
+	all_run.test(src, { es3: true, unused: "strict"});
 
 	// Test checking everything except function params
 	var vars_run = TestRun(test);
 	var_errors.forEach(function (e) { vars_run.addError.apply(vars_run, e); });
-	vars_run.test(src, {unused: "vars"});
+	vars_run.test(src, { unused: "vars"});
 
 	var unused = JSHINT.data().unused;
 	test.equal(6, unused.length);
@@ -484,33 +484,33 @@ exports['unused overrides'] = function (test) {
 	var code;
 	
 	code = ['function foo(a) {', '/*jshint unused:false */', '}', 'foo();'];
-	TestRun(test).test(code, {unused: true});
+	TestRun(test).test(code, {es3: true, unused: true});
 	
 	code = ['function foo(a, b) {', '/*jshint unused:vars */', 'var i = 3;', '}', 'foo();'];
 	TestRun(test)
 		.addError(3, "'i' is defined but never used.")
-		.test(code, {unused: true});
+		.test(code, {es3: true, unused: true});
 
 	code = ['function foo(a, b) {', '/*jshint unused:true */', 'var i = 3;', '}', 'foo();'];
 	TestRun(test)
 		.addError(1, "'b' is defined but never used.")
 		.addError(3, "'i' is defined but never used.")
-		.test(code, {unused: "strict"});
+		.test(code, {es3: true, unused: "strict"});
 
 	code = ['function foo(a, b) {', '/*jshint unused:strict */', 'var i = 3;', '}', 'foo();'];
 	TestRun(test)
 		.addError(1, "'a' is defined but never used.")
 		.addError(1, "'b' is defined but never used.")
 		.addError(3, "'i' is defined but never used.")
-		.test(code, {unused: true});
+		.test(code, {es3: true, unused: true});
 
 	code = ['/*jshint unused:vars */', 'function foo(a, b) {}', 'foo();'];
-	TestRun(test).test(code, {unused: "strict"});
+	TestRun(test).test(code, {es3: true, unused: "strict"});
 	
 	code = ['/*jshint unused:vars */', 'function foo(a, b) {', 'var i = 3;', '}', 'foo();'];
 	TestRun(test)
 		.addError(3, "'i' is defined but never used.")
-		.test(code, {unused: "strict"});
+		.test(code, {es3: true, unused: "strict"});
 
 	test.done();
 };
@@ -520,8 +520,8 @@ exports['undef in a function scope'] = function (test) {
 	var src = fixture('undef_func.js');
 
 	// Make sure that the lint is clean with and without undef.
-	TestRun(test).test(src);
-	TestRun(test).test(src, { undef: true });
+	TestRun(test).test(src, {es3: true});
+	TestRun(test).test(src, {es3: true, undef: true });
 
 	test.done();
 };
@@ -539,20 +539,20 @@ exports.scripturl = function (test) {
 		.addError(1, "Script URL.")
 		.addError(2, "Script URL.") // 2 times?
 		.addError(2, "JavaScript URL.")
-		.test(code);
+		.test(code, {es3: true});
 
 	// Make sure the error goes away when javascript URLs are tolerated
-	TestRun(test).test(code, { scripturl: true });
+	TestRun(test).test(code, { es3: true, scripturl: true });
 
 	// Make sure an error exists for labels that look like URLs
 	TestRun(test)
 		.addError(2, "Label 'javascript' looks like a javascript url.")
-		.test(src);
+		.test(src, {es3: true});
 
 	// Make sure the label error exists even if javascript URLs are tolerated
 	TestRun(test)
 		.addError(2, "Label 'javascript' looks like a javascript url.")
-		.test(src, { scripturl: true });
+		.test(src, { es3: true, scripturl: true });
 
 	test.done();
 };
@@ -571,12 +571,12 @@ exports.forin = function (test) {
 			  'properties from the prototype.';
 
 	// Make sure there are no other errors
-	TestRun(test).test(src);
+	TestRun(test).test(src, {es3: true});
 
 	// Make sure it fails when forin is true
 	TestRun(test)
 		.addError(13, msg)
-		.test(src, { forin: true });
+		.test(src, { es3: true, forin: true });
 
 	test.done();
 };
@@ -598,14 +598,14 @@ exports.loopfunc = function (test) {
 		.addError(6, "Don't make functions within a loop.")
 		.addError(10, "Function declarations should not be placed in blocks. Use a function " +
 					  "expression or move the statement to the top of the outer function.")
-		.test(src);
+		.test(src, {es3: true});
 
 	// When loopfunc is true, only function declaration should fail.
 	// Expressions are okay.
 	TestRun(test)
 		.addError(10, "Function declarations should not be placed in blocks. Use a function " +
 					  "expression or move the statement to the top of the outer function.")
-		.test(src, { loopfunc: true });
+		.test(src, { es3: true, loopfunc: true });
 
 	test.done();
 };
@@ -630,10 +630,10 @@ exports.boss = function (test) {
 		// GH-670
 		.addError(28, "Did you mean to return a conditional instead of an assignment?")
 		.addError(32, "Did you mean to return a conditional instead of an assignment?")
-		.test(src);
+		.test(src, {es3: true});
 
 	// But if you are the boss, all is good
-	TestRun(test).test(src, { boss: true });
+	TestRun(test).test(src, { es3: true, boss: true });
 
 	test.done();
 };
@@ -656,13 +656,13 @@ exports.eqnull = function (test) {
 		.addError(2, "Use '===' to compare with 'null'.")
 		.addError(3, "Use '!==' to compare with 'null'.")
 		.addError(4, "Use '!==' to compare with 'null'.")
-		.test(code);
+		.test(code, {es3: true});
 
 	// But when `eqnull` is true, no questions asked
-	TestRun(test).test(code, { eqnull: true });
+	TestRun(test).test(code, { es3: true, eqnull: true });
 
 	// Make sure that `eqnull` has precedence over `eqeqeq`
-	TestRun(test).test(code, { eqeqeq: true, eqnull: true });
+	TestRun(test).test(code, { es3: true, eqeqeq: true, eqnull: true });
 
 	test.done();
 };
@@ -684,9 +684,9 @@ exports.supernew = function (test) {
 		.addError(11, "Missing '()' invoking a constructor.", {
 			character: 13
 		})
-		.test(src);
+		.test(src, {es3: true});
 
-	TestRun(test).test(src, { supernew: true });
+	TestRun(test).test(src, { es3: true, supernew: true });
 
 	test.done();
 };
@@ -701,19 +701,19 @@ exports.bitwise = function (test) {
 
 	// By default allow bitwise operators
 	for (var i = 0, op; op = ops[i]; i += 1) {
-		TestRun(test).test('var c = a ' + op + ' b;');
+		TestRun(test).test('var c = a ' + op + ' b;', {es3: true});
 	}
-	TestRun(test).test(moreTests);
+	TestRun(test).test(moreTests, {es3: true});
 
 	for (i = 0, op = null; op = ops[i]; i += 1) {
 		TestRun(test)
 			.addError(1, "Unexpected use of '" + op + "'.")
-			.test('var c = a ' + op + ' b;', { bitwise: true });
+			.test('var c = a ' + op + ' b;', { es3: true, bitwise: true });
 	}
 	TestRun(test)
 		.addError(1, "Unexpected '~'.")
 		.addError(2, "Unexpected use of '&='.")
-		.test(moreTests, { bitwise: true });
+		.test(moreTests, { es3: true, bitwise: true });
 
 	test.done();
 };
@@ -725,10 +725,10 @@ exports.debug = function (test) {
 	// By default disallow debugger statements.
 	TestRun(test)
 		.addError(1, "Forgotten 'debugger' statement?")
-		.test(code);
+		.test(code, {es3: true});
 
 	// But allow them if debug is true.
-	TestRun(test).test(code, { debug: true });
+	TestRun(test).test(code, { es3: true, debug: true });
 
 	test.done();
 };
@@ -739,13 +739,13 @@ exports.eqeqeq = function (test) {
 
 	TestRun(test)
 		.addError(8, "Use '===' to compare with 'null'.")
-		.test(src);
+		.test(src, {es3: true});
 
 	TestRun(test)
 		.addError(2, "Expected '===' and instead saw '=='.")
 		.addError(5, "Expected '!==' and instead saw '!='.")
 		.addError(8, "Expected '===' and instead saw '=='.")
-		.test(src, { eqeqeq: true });
+		.test(src, { es3: true, eqeqeq: true });
 
 	test.done();
 };
@@ -772,9 +772,9 @@ exports.evil = function (test) {
 		.addError(6, "Implied eval. Consider passing a function instead of a string.")
 		.addError(7, "Implied eval. Consider passing a function instead of a string.")
 		.addError(8, "eval can be harmful.")
-		.test(src, { browser: true });
+		.test(src, { es3: true, browser: true });
 
-	TestRun(test).test(src, { evil: true, browser: true });
+	TestRun(test).test(src, { es3: true, evil: true, browser: true });
 
 	test.done();
 };
@@ -795,14 +795,14 @@ exports.evil = function (test) {
 exports.immed = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/immed.js', 'utf8');
 
-	TestRun(test).test(src);
+	TestRun(test).test(src, {es3: true});
 
 	TestRun(test)
 		.addError(3, "Wrap an immediate function invocation in parens " +
 					 "to assist the reader in understanding that the expression " +
 					 "is the result of a function, and not the function itself.")
 		.addError(13, "Wrapping non-IIFE function literals in parens is unnecessary.")
-		.test(src, { immed: true });
+		.test(src, { es3: true, immed: true });
 
 	// Regression for GH-900
 	TestRun(test)
@@ -815,7 +815,7 @@ exports.immed = function (test) {
 		.addError(1, "Wrapping non-IIFE function literals in parens is unnecessary.")
 		.addError(1, "Expected an assignment or function call and instead saw an expression.")
 		.addError(1, "Missing semicolon.")
-		.test("(function () { if (true) { }());", { immed: true });
+		.test("(function () { if (true) { }());", { es3: true, immed: true });
 
 	test.done();
 };
@@ -825,29 +825,29 @@ exports.nomen = function (test) {
 	var names = [ '_hey', 'hey_' ];
 
 	for (var i = 0, name; name = names[i]; i += 1) {
-		TestRun(test).test('var ' + name + ';');
+		TestRun(test).test('var ' + name + ';', {es3: true});
 	}
 
 	for (i = 0, name = null; name = names[i]; i += 1) {
 		TestRun(test)
 			.addError(1, "Unexpected dangling '_' in '" + name + "'.")
-			.test('var ' + name + ';', { nomen: true });
+			.test('var ' + name + ';', { es3: true, nomen: true });
 	}
 
 	// Normal names should pass all the time
 	TestRun(test).test('var hey;');
-	TestRun(test).test('var hey;', { nomen: true });
+	TestRun(test).test('var hey;', { es3: true, nomen: true });
 
 	// Node globals
 	TestRun(test)
 		.addError(1, "Unexpected dangling '_' in '_x'.")
-		.test('var x = top._x + __dirname + __filename;', { node: true, nomen: true });
+		.test('var x = top._x + __dirname + __filename;', { es3: true, node: true, nomen: true });
 
 	// Underscore.js global should be fine
-	TestRun(test).test("_.defer();", { nomen: true });
+	TestRun(test).test("_.defer();", { es3: true, nomen: true });
 	TestRun(test)
 		.addError(1, "Unexpected dangling '_' in '__'.")
-		.test("var __;", { nomen: true });
+		.test("var __;", { es3: true, nomen: true });
 
 	test.done();
 };
@@ -864,11 +864,11 @@ exports.passfail = function (test) {
 		.addError(1, "Missing semicolon.")
 		.addError(2, "Missing semicolon.")
 		.addError(3, "Missing semicolon.")
-		.test(code);
+		.test(code, { es3: true });
 
 	TestRun(test)
 		.addError(1, "Missing semicolon.")
-		.test(code, { passfail: true });
+		.test(code, { es3: true, passfail: true });
 
 	test.done();
 };
@@ -880,10 +880,10 @@ exports.passfail = function (test) {
 exports.onevar = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/onevar.js', 'utf8');
 
-	TestRun(test).test(src);
+	TestRun(test).test(src, {es3: true});
 	TestRun(test)
 		.addError(10, "Too many var statements.")
-		.test(src, { onevar: true });
+		.test(src, { es3: true, onevar: true });
 
 	test.done();
 };
@@ -893,18 +893,18 @@ exports.plusplus = function (test) {
 	var ops = [ '++', '--' ];
 
 	for (var i = 0, op; op = ops[i]; i += 1) {
-		TestRun(test).test('var i = j' + op + ';');
-		TestRun(test).test('var i = ' + op + 'j;');
+		TestRun(test).test('var i = j' + op + ';', {es3: true});
+		TestRun(test).test('var i = ' + op + 'j;', {es3: true});
 	}
 
 	for (i = 0, op = null; op = ops[i]; i += 1) {
 		TestRun(test)
 			.addError(1, "Unexpected use of '" + op + "'.")
-			.test('var i = j' + op + ';', { plusplus: true });
+			.test('var i = j' + op + ';', { es3: true, plusplus: true });
 
 		TestRun(test)
 			.addError(1, "Unexpected use of '" + op + "'.")
-			.test('var i = ' + op + 'j;', { plusplus: true });
+			.test('var i = ' + op + 'j;', { es3: true, plusplus: true });
 	}
 
 	test.done();
@@ -925,14 +925,14 @@ exports.plusplus = function (test) {
 exports.newcap = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/newcap.js', 'utf8');
 
-	TestRun(test).test(src); // By default, everything is fine
+	TestRun(test).test(src, {es3: true}); // By default, everything is fine
 
 	// When newcap is true, enforce the conventions
 	TestRun(test)
 		.addError(1, 'A constructor name should start with an uppercase letter.')
 		.addError(5, "Missing 'new' prefix when invoking a constructor.")
 		.addError(10, "A constructor name should start with an uppercase letter.")
-		.test(src, { newcap: true });
+		.test(src, { es3: true, newcap: true });
 
 	test.done();
 };
@@ -943,9 +943,9 @@ exports.sub = function (test) {
 		.addError(1, "['prop'] is better written in dot notation.", {
 			character: 17
 		})
-		.test("window.obj = obj['prop'];");
+		.test("window.obj = obj['prop'];", {es3: true});
 
-	TestRun(test).test("window.obj = obj['prop'];", { sub: true });
+	TestRun(test).test("window.obj = obj['prop'];", { es3: true, sub: true });
 
 	test.done();
 };
@@ -958,34 +958,34 @@ exports.strict = function (test) {
 	var src2 = fs.readFileSync(__dirname + '/fixtures/strict_incorrect.js', 'utf8');
 	var src3 = fs.readFileSync(__dirname + '/fixtures/strict_newcap.js', 'utf8');
 
-	TestRun(test).test(code);
-	TestRun(test).test(code1);
+	TestRun(test).test(code, {es3: true});
+	TestRun(test).test(code1, {es3: true});
 
 	TestRun(test)
 		.addError(1, 'Missing "use strict" statement.')
-		.test(code, { strict: true });
+		.test(code, { es3: true, strict: true });
 
-	TestRun(test).test(code1, { strict: true });
+	TestRun(test).test(code1, { es3: true, strict: true });
 
 	// Test for strict mode violations
 	TestRun(test)
 		.addError(4, 'Possible strict violation.')
 		.addError(7, 'Strict violation.')
 		.addError(8, 'Strict violation.')
-		.test(src, { strict: true });
+		.test(src, { es3: true, strict: true });
 
 	TestRun(test)
 		.addError(4, 'Expected an assignment or function call and instead saw an expression.')
 		.addError(9, 'Missing semicolon.')
 		.addError(28, 'Expected an assignment or function call and instead saw an expression.')
 		.addError(53, 'Expected an assignment or function call and instead saw an expression.')
-		.test(src2, { strict: false });
+		.test(src2, { es3: true, strict: false });
 
 	TestRun(test)
 		.addError(6, "Missing 'new' prefix when invoking a constructor.")
-		.test(src3, {});
+		.test(src3, {es3 : true});
 
-	TestRun(test).test("var obj = Object({ foo: 'bar' });", { strict: true });
+	TestRun(test).test("var obj = Object({ foo: 'bar' });", { es3: true, strict: true });
 
 	test.done();
 };
@@ -999,17 +999,17 @@ exports.globalstrict = function (test) {
 
 	TestRun(test)
 		.addError(1, 'Use the function form of "use strict".')
-		.test(code, { strict: true });
+		.test(code, { es3: true, strict: true });
 
-	TestRun(test).test(code, { globalstrict: true });
+	TestRun(test).test(code, { es3: true, globalstrict: true });
 
 	// Check that globalstrict also enabled strict
 	TestRun(test)
 		.addError(1, 'Missing "use strict" statement.')
-		.test(code[1], { globalstrict: true });
+		.test(code[1], { es3: true, globalstrict: true });
 
 	// Don't enforce "use strict"; if strict has been explicitly set to false
-	TestRun(test).test(code[1], { globalstrict: true, strict: false });
+	TestRun(test).test(code[1], { es3: true, globalstrict: true, strict: false });
 
 	test.done();
 };
@@ -1022,7 +1022,7 @@ exports.laxbreak = function (test) {
 		.addError(2, "Bad line breaking before ','.")
 		.addError(3, "Comma warnings can be turned off with 'laxcomma'.")
 		.addError(12, "Bad line breaking before ','.")
-		.test(src);
+		.test(src, { es3: true });
 
 	var ops = [ '||', '&&', '*', '/', '%', '+', '-', '>=',
 				'==', '===', '!=', '!==', '>', '<', '<=', 'instanceof' ];
@@ -1031,17 +1031,17 @@ exports.laxbreak = function (test) {
 		code = ['var a = b ', op + ' c;'];
 		TestRun(test)
 			.addError(2, "Bad line breaking before '" + op + "'.")
-			.test(code);
+			.test(code, { es3: true });
 
-		TestRun(test).test(code, { laxbreak: true });
+		TestRun(test).test(code, { es3: true, laxbreak: true });
 	}
 
 	code = [ 'var a = b ', '? c : d;' ];
 	TestRun(test)
 		.addError(2, "Bad line breaking before '?'.")
-		.test(code);
+		.test(code, { es3: true });
 
-	TestRun(test).test(code, { laxbreak: true });
+	TestRun(test).test(code, { es3: true, laxbreak: true });
 
 	test.done();
 };
@@ -1049,7 +1049,7 @@ exports.laxbreak = function (test) {
 exports.white = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/white.js', 'utf8');
 
-	TestRun(test).test(src);
+	TestRun(test).test(src, {es3: true});
 	TestRun(test)
 		.addError(1, "Unexpected space after 'hello'.", { character: 15 })
 		.addError(2, "Unexpected space after 'true'.", { character: 16 })
@@ -1068,7 +1068,7 @@ exports.white = function (test) {
 		.addError(62, "Expected 'var' to have an indentation at 1 instead at 2.")
 		.addError(64, "Unexpected space after 'nodblwarnings'.", { character: 23 })
 		.addError(64, "Unexpected space after '('.", { character: 25 })
-		.test(src, { white: true });
+		.test(src, { es3: true, white: true });
 
 	test.done();
 };
@@ -1076,12 +1076,12 @@ exports.white = function (test) {
 exports.trailing = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/white.js', 'utf8');
 
-	TestRun(test).test(src);
+	TestRun(test).test(src, {es3: true});
 
 	TestRun(test)
 		.addError(8, "Trailing whitespace.", { character: 16 })
 		.addError(9, "Trailing whitespace.", { character: 6 })
-		.test(src, { trailing: true });
+		.test(src, { es3: true, trailing: true });
 
 	test.done();
 };
@@ -1093,22 +1093,22 @@ exports.validthis = function (test) {
 		.addError(8, "Possible strict violation.")
 		.addError(9, "Possible strict violation.")
 		.addError(11, "Possible strict violation.")
-		.test(src);
+		.test(src, {es3: true});
 
 	src = fs.readFileSync(__dirname + '/fixtures/strict_this2.js', 'utf8');
-	TestRun(test).test(src);
+	TestRun(test).test(src, {es3: true});
 
 	// Test for erroneus use of validthis
 
 	var code = ['/*jshint validthis:true */', 'hello();'];
 	TestRun(test)
 		.addError(1, "Option 'validthis' can't be used in a global scope.")
-		.test(code);
+		.test(code, {es3: true});
 
 	code = ['function x() {', '/*jshint validthis:heya */', 'hello();', '}'];
 	TestRun(test)
 		.addError(2, "Bad option value.")
-		.test(code);
+		.test(code, {es3: true});
 
 	test.done();
 };
@@ -1119,7 +1119,7 @@ exports.indentation = function (test) {
 	TestRun(test)
 		.addError(5, "Mixed spaces and tabs.")
 		.addError(6, "Mixed spaces and tabs.")
-		.test(src);
+		.test(src, {es3: true});
 
 	TestRun(test)
 		.addError(5, "Mixed spaces and tabs.")
@@ -1127,7 +1127,7 @@ exports.indentation = function (test) {
 		.addError(10, "Unexpected space after 'hello'.")
 		.addError(11, "Unexpected space after '('.")
 		.addError(11, "Unexpected space after 'Hello World'.")
-		.test(src, { indent: 4, white: true });
+		.test(src, { es3: true, indent: 4, white: true });
 
 	TestRun(test)
 		.addError(5, "Mixed spaces and tabs.")
@@ -1135,7 +1135,7 @@ exports.indentation = function (test) {
 		.addError(6, "Mixed spaces and tabs.")
 		.addError(6, "Expected 'var' to have an indentation at 5 instead at 7.")
 		.addError(7, "Expected '}' to have an indentation at 3 instead at 5.")
-		.test(src, { indent: 2 });
+		.test(src, { es3: true, indent: 2 });
 
 	test.done();
 };
@@ -1152,7 +1152,7 @@ exports.strings = function (test) {
 		.addError(10, "Unclosed string.")
 		.addError(15, "Unclosed string.")
 		.addError(23, "Octal literals are not allowed in strict mode.")
-		.test(src, { multistr: true });
+		.test(src, { es3: true, multistr: true });
 
 	TestRun(test)
 		.addError(3, "Bad escaping of EOL. Use option multistr if needed.")
@@ -1162,7 +1162,7 @@ exports.strings = function (test) {
 		.addError(14, "Bad escaping of EOL. Use option multistr if needed.")
 		.addError(15, "Unclosed string.")
 		.addError(23, "Octal literals are not allowed in strict mode.")
-		.test(src);
+		.test(src, { es3: true });
 
 	test.done();
 };
@@ -1176,26 +1176,26 @@ exports.quotes = function (test) {
 	var src2 = fs.readFileSync(__dirname + '/fixtures/quotes2.js', 'utf8');
 
 	TestRun(test)
-		.test(src);
+		.test(src, { es3: true });
 
 	TestRun(test)
 		.addError(3, "Mixed double and single quotes.")
-		.test(src, { quotmark: true });
+		.test(src, { es3: true, quotmark: true });
 
 	TestRun(test)
 		.addError(3, "Strings must use singlequote.")
-		.test(src, { quotmark: 'single' });
+		.test(src, { es3: true, quotmark: 'single' });
 
 	TestRun(test)
 		.addError(2, "Strings must use doublequote.")
-		.test(src, { quotmark: 'double' });
+		.test(src, { es3: true, quotmark: 'double' });
 
 	// test multiple runs (must have the same result)
 	var run = TestRun(test);
 	run.addError(3, "Mixed double and single quotes.")
-		.test(src, { quotmark: true });
+		.test(src, { es3: true, quotmark: true });
 	run.addError(3, "Mixed double and single quotes.")
-		.test(src2, { quotmark: true });
+		.test(src2, { es3: true, quotmark: true });
 
 	test.done();
 };
@@ -1222,12 +1222,12 @@ exports.scope = function (test) {
 		.addError(27, "'bb' used out of scope.")
 		.addError(37, "'cc' is not defined.")
 		.addError(42, "'bb' is not defined.")
-		.test(src);
+		.test(src, {es3: true});
 
 	TestRun(test, 2)
 		.addError(37, "'cc' is not defined.")
 		.addError(42, "'bb' is not defined.")
-		.test(src, { funcscope: true });
+		.test(src, { es3: true, funcscope: true });
 
 	test.done();
 };
@@ -1265,7 +1265,7 @@ exports.maxlen = function (test) {
 
 	TestRun(test)
 		.addError(3, "Line is too long.")
-		.test(src, { maxlen: 23 });
+		.test(src, { es3: true, maxlen: 23 });
 
 	test.done();
 };
@@ -1277,11 +1277,11 @@ exports.smarttabs = function (test) {
 		.addError(4, "Mixed spaces and tabs.")
 		.addError(5, "Mixed spaces and tabs.")
 		.addError(13, "Mixed spaces and tabs.")
-		.test(src);
+		.test(src, {es3: true});
 
 	TestRun(test)
 		.addError(5, "Mixed spaces and tabs.")
-		.test(src, { smarttabs: true });
+		.test(src, {es3: true, smarttabs: true });
 
 	test.done();
 };
@@ -1300,7 +1300,7 @@ exports.laxcomma = function (test) {
 		.addError(6, "Bad line breaking before ','.")
 		.addError(10, "Bad line breaking before '&&'.")
 		.addError(15, "Bad line breaking before '?'.")
-		.test(src);
+		.test(src, {es3: true});
 
 	// Allows bad line breaking, but not on commas.
 	TestRun(test)
@@ -1308,16 +1308,16 @@ exports.laxcomma = function (test) {
 		.addError(2, "Comma warnings can be turned off with 'laxcomma'.")
 		.addError(2, "Bad line breaking before ','.")
 		.addError(6, "Bad line breaking before ','.")
-		.test(src, { laxbreak: true });
+		.test(src, {es3: true, laxbreak: true });
 
 	// Allows comma-first style but warns on bad line breaking
 	TestRun(test)
 		.addError(10, "Bad line breaking before '&&'.")
 		.addError(15, "Bad line breaking before '?'.")
-		.test(src, { laxcomma: true });
+		.test(src, {es3: true, laxcomma: true });
 
 	// No errors if both laxbreak and laxcomma are turned on
-	TestRun(test).test(src, { laxbreak: true, laxcomma: true });
+	TestRun(test).test(src, {es3: true, laxbreak: true, laxcomma: true });
 
 	test.done();
 };
@@ -1336,9 +1336,9 @@ exports.browser = function (test) {
 		.addError(14, "'NodeFilter' is not defined.")
 		.addError(15, "'Node' is not defined.")
 		.addError(18, "'MutationObserver' is not defined.")
-		.test(src, { undef: true });
+		.test(src, {es3: true, undef: true });
 
-	TestRun(test).test(src, { browser: true, undef: true });
+	TestRun(test).test(src, {es3: true, browser: true, undef: true });
 
 	test.done();
 };
@@ -1352,11 +1352,11 @@ exports.unnecessarysemicolon = function (test) {
 
 	TestRun(test)
 		.addError(2, "Unnecessary semicolon.")
-		.test(code);
+		.test(code, {es3: true});
 
 	TestRun(test)
 		.addError(2, "Unnecessary semicolon.")
-		.test(code, { white: true });
+		.test(code, {es3: true, white: true });
 
 	test.done();
 };
@@ -1373,7 +1373,7 @@ exports.blacklist = function (test) {
 	];
 
 	// make sure everything is ok
-	TestRun(test).test(src, { undef: true, browser: true });
+	TestRun(test).test(src, { es3: true, undef: true, browser: true });
 
 	// disallow Node in a predef Object
 	TestRun(test)
@@ -1397,7 +1397,7 @@ exports.blacklist = function (test) {
 		.addError(3, "'event' is not defined.")
 		.addError(4, "'foo' is not defined.")
 		.addError(5, "'btoa' is not defined.")
-		.test(code, { undef: true });
+		.test(code, { es3: true, undef: true });
 
 	test.done();
 };
@@ -1410,13 +1410,13 @@ exports.maxstatements = function (test) {
 
 	TestRun(test)
 		.addError(1, "This function has too many statements. (8)")
-		.test(src, { maxstatements: 7 });
+		.test(src, { es3: true, maxstatements: 7 });
 
 	TestRun(test)
-		.test(src, { maxstatements: 8 });
+		.test(src, { es3: true, maxstatements: 8 });
 
 	TestRun(test)
-		.test(src, {});
+		.test(src, { es3: true });
 
 	test.done();
 };
@@ -1431,17 +1431,17 @@ exports.maxdepth = function (test) {
 	TestRun(test)
 		.addError(5, "Blocks are nested too deeply. (2)")
 		.addError(14, "Blocks are nested too deeply. (2)")
-		.test(src, { maxdepth: 1 });
+		.test(src, { es3: true, maxdepth: 1 });
 
 	TestRun(test)
 		.addError(9, "Blocks are nested too deeply. (3)")
-		.test(src, { maxdepth: 2 });
+		.test(src, { es3: true, maxdepth: 2 });
 
 	TestRun(test)
-		.test(src, { maxdepth: 3 });
+		.test(src, { es3: true, maxdepth: 3 });
 
 	TestRun(test)
-		.test(src, {});
+		.test(src, { es3: true });
 
 	test.done();
 };
@@ -1455,13 +1455,13 @@ exports.maxparams = function (test) {
 
 	TestRun(test)
 		.addError(4, "This function has too many parameters. (3)")
-		.test(src, { maxparams: 2 });
+		.test(src, { es3: true, maxparams: 2 });
 
 	TestRun(test)
-		.test(src, { maxparams: 3 });
+		.test(src, { es3: true, maxparams: 3 });
 
 	TestRun(test)
-		.test(src, {});
+		.test(src, { es3: true });
 
 	test.done();
 };
@@ -1478,14 +1478,14 @@ exports.maxcomplexity = function (test) {
 		.addError(15, "This function's cyclomatic complexity is too high. (2)")
 		.addError(25, "This function's cyclomatic complexity is too high. (2)")
 		.addError(47, "This function's cyclomatic complexity is too high. (8)")
-		.test(src, { maxcomplexity: 1 });
+		.test(src, { es3: true, maxcomplexity: 1 });
 
 	TestRun(test)
-		.test(src, { maxcomplexity: 8 });
+		.test(src, { es3: true, maxcomplexity: 8 });
 
 
 	TestRun(test)
-		.test(src, {});
+		.test(src, { es3: true });
 
 	test.done();
 };
@@ -1498,10 +1498,10 @@ exports.ignored = function (test) {
 
 	TestRun(test)
 		.addError(4, "A trailing decimal point can be confused with a dot: '12.'.")
-		.test(src);
+		.test(src, { es3: true });
 
 	TestRun(test)
-		.test(src, { "-W047": true });
+		.test(src, { es3: true, "-W047": true });
 
 	test.done();
 };
