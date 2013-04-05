@@ -630,7 +630,11 @@ var JSHINT = (function () {
 					val = +val;
 
 					if (typeof val !== "number" || !isFinite(val) || val <= 0 || Math.floor(val) !== val) {
-						error("E032", nt, g[1].trim());
+						if (val !== 0 || key !== "indent") {
+							error("E032", nt, g[1].trim());
+						} else if (key === "indent") {
+							state.option["(explicitIndent)"] = false;
+						}
 						return;
 					}
 
