@@ -205,7 +205,7 @@ exports.group = {
 
 	testRcFile: function (test) {
 		sinon.stub(process, "cwd").returns(__dirname);
-		var localRc = __dirname + "/.jshintrc";
+		var localRc = path.normalize(__dirname + "/.jshintrc");
 		var testStub = sinon.stub(shjs, "test");
 		var catStub = sinon.stub(shjs, "cat");
 
@@ -229,7 +229,7 @@ exports.group = {
 	},
 
 	testHomeRcFile: function (test) {
-		var homeRc = path.join(process.env.HOME, ".jshintrc");
+		var homeRc = path.join(process.env.HOME || process.env.HOMEPATH, ".jshintrc");
 		var testStub = sinon.stub(shjs, "test");
 		var catStub = sinon.stub(shjs, "cat");
 
@@ -281,8 +281,9 @@ exports.group = {
 	},
 
 	testTargetRelativeRcLookup: function (test) {
-		sinon.stub(process, "cwd").returns(process.env.HOME); // working from outside the project
-		var projectRc = __dirname + "/.jshintrc";
+		// working from outside the project
+		sinon.stub(process, "cwd").returns(process.env.HOME || process.env.HOMEPATH);
+		var projectRc = path.normalize(__dirname + "/.jshintrc");
 		var srcFile = __dirname + "/sub/file.js";
 		var testStub = sinon.stub(shjs, "test");
 		var catStub = sinon.stub(shjs, "cat");
