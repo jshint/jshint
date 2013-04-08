@@ -1,6 +1,6 @@
 {
 	"name":     "jshint",
-	"version":  "1.1.0",
+	"version":  "1.1.1",
 	"homepage": "http://jshint.com/",
 	"description": "Static analysis tool for JavaScript",
 
@@ -36,8 +36,7 @@
 		"browserify": "1.16.1",
 		"coveraje":   "0.2.x",
 		"nodeunit":   "0.7.x",
-		"sinon":      "1.6.x",
-		"console-browserify": "0.1.x"
+		"sinon":      "1.6.x"
 	},
 
 	"licenses": [

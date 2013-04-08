@@ -112,8 +112,25 @@ target.build = function () {
 
 	bundle.append("JSHINT = require('/src/stable/jshint.js').JSHINT;");
 
+	var fakeConsole = "if (typeof console === \"undefined\") {" + "\n" +
+        "  var console = {" + "\n" +
+		"    error: function (txt) {" + "\n" +
+        "      if (typeof Packages !== \"undefined\") { // rhino" + "\n" +
+		"	     java.lang.System.err.println('CONSOLE.error: ' + txt);" + "\n" +
+        "      }" + "\n" +
+		"    }," + "\n" +
+		"    trace: function () {" + "\n" +
+		"    }" + "\n" +
+		"  };" + "\n" +
+        "}" + "\n";
+
+	bundle.addEntry("./src/reporters/checkstyle.js");
+	bundle.append("checkstyleReporter = require('./src/reporters/checkstyle.js').reporter;");
+
 	[ "// " + pkg.version,
 		"var JSHINT;",
+        "var checkstyleReporter;",
+        fakeConsole,
 		bundle.bundle()
 	].join("\n").to("./dist/jshint-" + pkg.version + ".js");
 
@@ -126,4 +143,5 @@ target.build = function () {
 	exec("chmod +x dist/jshint-rhino-" + pkg.version + ".js");
 	cli.ok("Rhino");
 	echo("\n");
+
 };
