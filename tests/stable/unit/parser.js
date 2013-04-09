@@ -2924,30 +2924,31 @@ exports["fat arrows support"] = function (test) {
 	run.test(code, {moz: true});
 
 	run = TestRun(test)
-				.addError(1, "'let' is only available in JavaScript 1.7.")
-				.addError(1, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
-				.addError(2, "'let' is only available in JavaScript 1.7.")
-				.addError(2, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
-				.addError(3, "'let' is only available in JavaScript 1.7.")
-				.addError(3, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
-				.addError(4, "'let' is only available in JavaScript 1.7.")
-				.addError(4, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
-				.addError(5, "'let' is only available in JavaScript 1.7.")
-				.addError(5, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
-				.addError(6, "'let' is only available in JavaScript 1.7.")
-				.addError(6, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
-				.addError(7, "'let' is only available in JavaScript 1.7.")
-				.addError(7, "'destructuring expression' is only available in JavaScript 1.7.")
-				.addError(7, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
-				.addError(11, "'const' is only available in JavaScript 1.7.")
-				.addError(13, "'arrow function syntax (=>)' is only available in JavaScript 1.7.");
+		.addError(1, "'let' is only available in JavaScript 1.7.")
+		.addError(1, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(2, "'let' is only available in JavaScript 1.7.")
+		.addError(2, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(3, "'let' is only available in JavaScript 1.7.")
+		.addError(3, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(4, "'let' is only available in JavaScript 1.7.")
+		.addError(4, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(5, "'let' is only available in JavaScript 1.7.")
+		.addError(5, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(6, "'let' is only available in JavaScript 1.7.")
+		.addError(6, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(7, "'let' is only available in JavaScript 1.7.")
+		.addError(7, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(7, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(11, "'const' is only available in JavaScript 1.7.")
+		.addError(13, "'arrow function syntax (=>)' is only available in JavaScript 1.7.");
+
 	run.test(code); // es5
 	run.test(code, {es3: true});
 
 	test.done();
 };
 
-exports["consise methods support"] = function (test) {
+exports["concise methods support"] = function (test) {
 	var code = [
 		"var foobar = {",
 		"	foo () {",
@@ -2973,6 +2974,45 @@ exports["consise methods support"] = function (test) {
 	run.test(code, {es3: true});
 
 	test.done();
+};
 
+exports["spread rest operator support"] = function (test) {
+	var code = [
+		// spread operator
+		"function foo(a, b, c) {",
+		"    console.log(a, b, c); ",
+		"}",
+		"var args = [ 0, 1, 2 ];",
+		"foo(...args);",
+
+		// spread operator
+		"let initial = [ 1, 2, 3, 4, 5 ];",
+		"let extended = [ ...initial, 6, 7, 8, 9 ];",
+
+		// rest operator
+		"(function foo(i, j, ...args) {",
+		"    return args;",
+		"}());",
+
+		// rest operator on a fat arrow function
+		"let bar = (...args) => args;"
+	];
+
+	var run = TestRun(test);
+	run.test(code, {esnext: true});
+	run.test(code, {moz: true});
+
+	run = TestRun(test)
+	     .addError(5, "'spread/rest operator' is only available in JavaScript 1.7.")
+	     .addError(6, "'let' is only available in JavaScript 1.7.")
+	     .addError(7, "'let' is only available in JavaScript 1.7.")
+	     .addError(7, "'spread/rest operator' is only available in JavaScript 1.7.")
+	     .addError(8, "'spread/rest operator' is only available in JavaScript 1.7.")
+		 .addError(11, "'let' is only available in JavaScript 1.7.")
+		 .addError(11, "'spread/rest operator' is only available in JavaScript 1.7.")
+		 .addError(11, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		 .addError(11, "'spread/rest operator' is only available in JavaScript 1.7.");
+
+	test.done();
 };
 
