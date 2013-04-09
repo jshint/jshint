@@ -47,7 +47,7 @@ var errors = {
 	// Everything else
 	E030: "Expected an identifier and instead saw '{a}'.",
 	E031: "Bad assignment.", // FIXME: Rephrase
-	E032: "Expected a small integer and instead saw '{a}'.",
+	E032: "Expected a small integer or 'false' and instead saw '{a}'.",
 	E033: "Expected an operator and instead saw '{a}'.",
 	E034: "get/set are ES5 features.",
 	E035: "Missing property name.",
