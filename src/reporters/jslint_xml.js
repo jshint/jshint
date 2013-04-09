@@ -1,5 +1,7 @@
 // Author: Vasili Sviridov
 // http://github.com/vsviridov
+var path = require("path");
+
 module.exports =
 {
 	reporter: function (results)
@@ -28,7 +30,7 @@ module.exports =
 
 
 		results.forEach(function (result) {
-			result.file = result.file.replace(/^\.\//, '');
+			result.file = path.join(process.cwd(), result.file);
 			if (!files[result.file]) {
 				files[result.file] = [];
 			}
