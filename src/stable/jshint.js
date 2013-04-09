@@ -2703,7 +2703,7 @@ var JSHINT = (function () {
 
 	(function (x) {
 		x.nud = function () {
-			var b, f, i, p, t;
+			var b, f, i, p, t, g;
 			var props = {}; // All properties, including accessors
 
 			function saveProperty(name, tkn) {
@@ -2802,6 +2802,14 @@ var JSHINT = (function () {
 						warning("W077", t, i);
 					}
 				} else {
+					g = false;
+					if (state.tokens.next.value === "*" && state.tokens.next.type === "(punctuator)") {
+						if (!state.option.inESNext()) {
+							warning("W104", state.tokens.next, "generator functions");
+						}
+						advance("*");
+						g = true;
+					}
 					i = property_name();
 					saveProperty(i, state.tokens.next);
 
@@ -2809,9 +2817,16 @@ var JSHINT = (function () {
 						break;
 					}
 
-					advance(":");
-					nonadjacent(state.tokens.curr, state.tokens.next);
-					expression(10);
+					if (state.tokens.next.value === "(") {
+						if (!state.option.inESNext()) {
+							warning("W104", state.tokens.curr, "concise methods");
+						}
+						doFunction(i, undefined, g);
+					} else {
+						advance(":");
+						nonadjacent(state.tokens.curr, state.tokens.next);
+						expression(10);
+					}
 				}
 
 				countMember(i);

@@ -1639,7 +1639,6 @@ Lexer.prototype = {
 					line: this.line,
 					character: this.char
 				}, checks, function () {
-					// console.log("W115", state.directive["use strict"], token.base === 8);
 					return state.directive["use strict"] && token.base === 8; 
 				});
 
