@@ -400,7 +400,7 @@ Lexer.prototype = {
 		if (ch1 === ">" && ch2 === ">" && ch3 === "=") {
 			return {
 				type: Token.Punctuator,
-				value: "<<="
+				value: ">>="
 			};
 		}
 
