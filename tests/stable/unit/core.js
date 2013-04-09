@@ -599,10 +599,10 @@ exports.testCatchBlocks = function (test) {
 
 exports.testNumericParams = function (test) {
 	TestRun(test)
-		.test("/*jshint maxparams:4, indent:3 */");
+		.test("/*jshint maxparams:4, indent:3, maxlen:false */");
 
 	TestRun(test)
-		.addError(1, "Expected a small integer and instead saw 'face'.")
+		.addError(1, "Expected a small integer or 'false' and instead saw 'face'.")
 		.test("/*jshint maxparams:face */");
 
 	test.done();
