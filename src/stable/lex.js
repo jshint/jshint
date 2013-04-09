@@ -317,7 +317,12 @@ Lexer.prototype = {
 			if ((/^[0-9]$/).test(this.peek(1))) {
 				return null;
 			}
-
+			if (this.peek(1) === "." && this.peek(2) === ".") {
+				return {
+					type: Token.Punctuator,
+					value: "..."
+				};
+			}
 			/* falls through */
 		case "(":
 		case ")":
