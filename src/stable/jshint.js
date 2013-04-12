@@ -238,7 +238,7 @@ var JSHINT = (function () {
 	function checkOption(name, t) {
 		name = name.trim();
 
-		if (/^-W\d{3}$/g.test(name)) {
+		if (/^[+-]W\d{3}$/g.test(name)) {
 			return true;
 		}
 
@@ -728,8 +728,10 @@ var JSHINT = (function () {
 					return;
 				}
 
-				if (/^-W\d{3}$/g.test(key)) {
-					ignored[key.slice(1)] = true;
+				var match = /^([+-])(W\d{3})$/g.exec(key);
+				if (match) {
+					// ignore for -W..., unignore for +W...
+					ignored[match[2]] = (match[1] === "-");
 					return;
 				}
 
