@@ -15,6 +15,7 @@
 	},
 
 	"scripts": {
+		"build": "node ./make.js build",
 		"test": "node ./make.js test",
 		"lint": "node ./make.js lint"
 	},
