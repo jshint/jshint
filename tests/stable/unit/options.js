@@ -482,10 +482,10 @@ exports.unused = function (test) {
 // Regressions for "unused" getting overwritten via comment (GH-778)
 exports['unused overrides'] = function (test) {
 	var code;
-	
+
 	code = ['function foo(a) {', '/*jshint unused:false */', '}', 'foo();'];
 	TestRun(test).test(code, {es3: true, unused: true});
-	
+
 	code = ['function foo(a, b) {', '/*jshint unused:vars */', 'var i = 3;', '}', 'foo();'];
 	TestRun(test)
 		.addError(3, "'i' is defined but never used.")
@@ -506,7 +506,7 @@ exports['unused overrides'] = function (test) {
 
 	code = ['/*jshint unused:vars */', 'function foo(a, b) {}', 'foo();'];
 	TestRun(test).test(code, {es3: true, unused: "strict"});
-	
+
 	code = ['/*jshint unused:vars */', 'function foo(a, b) {', 'var i = 3;', '}', 'foo();'];
 	TestRun(test)
 		.addError(3, "'i' is defined but never used.")
@@ -1502,6 +1502,19 @@ exports.ignored = function (test) {
 
 	TestRun(test)
 		.test(src, { es3: true, "-W047": true });
+
+	test.done();
+};
+
+/*
+ * Tests ignored warnings being unignored.
+ */
+exports.unignored = function (test) {
+	var src = fs.readFileSync(__dirname + "/fixtures/unignored.js", "utf-8");
+
+	TestRun(test)
+		.addError(5, "A leading decimal point can be confused with a dot: '.12'.")
+		.test(src, { es3: true });
 
 	test.done();
 };
