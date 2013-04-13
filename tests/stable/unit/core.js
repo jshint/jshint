@@ -286,6 +286,16 @@ exports.jslintSloppy = function (test) {
 	test.done();
 };
 
+/** JSHint should ignore unrecognized jslint options */
+exports.jslintUnrecognized = function (test) {
+	var src = "/*jslint closure:true */ function test() { return 1; }";
+
+	TestRun(test)
+		.test(src);
+
+	test.done();
+};
+
 exports.caseExpressions = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/caseExpressions.js', 'utf8');
 	TestRun(test)
