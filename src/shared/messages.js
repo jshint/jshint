@@ -95,7 +95,6 @@ var warnings = {
 	W026: "Inner functions should be listed at the top of the outer function.",
 	W027: "Unreachable '{a}' after '{b}'.",
 	W028: "Label '{a}' on {b} statement.",
-	W029: "Label '{a}' looks like a javascript url.",
 	W030: "Expected an assignment or function call and instead saw an expression.",
 	W031: "Do not use 'new' for side effects.",
 	W032: "Unnecessary semicolon.",

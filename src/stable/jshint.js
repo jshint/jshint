@@ -1523,10 +1523,6 @@ var JSHINT = (function () {
 				warning("W028", state.tokens.next, t.value, state.tokens.next.value);
 			}
 
-			if (reg.javascriptURL.test(t.value + ":")) {
-				warning("W029", t, t.value);
-			}
-
 			state.tokens.next.label = t.value;
 			t = state.tokens.next;
 		}
