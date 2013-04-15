@@ -3003,16 +3003,30 @@ exports["spread rest operator support"] = function (test) {
 	run.test(code, {moz: true});
 
 	run = TestRun(test)
-	     .addError(5, "'spread/rest operator' is only available in JavaScript 1.7.")
-	     .addError(6, "'let' is only available in JavaScript 1.7.")
-	     .addError(7, "'let' is only available in JavaScript 1.7.")
-	     .addError(7, "'spread/rest operator' is only available in JavaScript 1.7.")
-	     .addError(8, "'spread/rest operator' is only available in JavaScript 1.7.")
+		.addError(5, "'spread/rest operator' is only available in JavaScript 1.7.")
+		.addError(6, "'let' is only available in JavaScript 1.7.")
+		.addError(7, "'let' is only available in JavaScript 1.7.")
+		.addError(7, "'spread/rest operator' is only available in JavaScript 1.7.")
+		.addError(8, "'spread/rest operator' is only available in JavaScript 1.7.")
 		 .addError(11, "'let' is only available in JavaScript 1.7.")
 		 .addError(11, "'spread/rest operator' is only available in JavaScript 1.7.")
 		 .addError(11, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
 		 .addError(11, "'spread/rest operator' is only available in JavaScript 1.7.");
 
 	test.done();
+};
+
+exports["test for GH-1010"] = function (test) {
+    var code = [
+        "var x = 20, y, z; if(x < 30) y=7, z=2; else y=5;"
+    ];
+
+    var run = TestRun(test)
+    run.test(code, {es3: true});
+    run.test(code, {}); // es5
+    run.test(code, {esnext: true});
+    run.test(code, {moz: true});
+
+    test.done();
 };
 

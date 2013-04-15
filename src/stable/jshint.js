@@ -1080,7 +1080,7 @@ var JSHINT = (function () {
 			case "while":
 			case "with":
 				error("E024", state.tokens.next, state.tokens.next.value);
-				return;
+				return false;
 			}
 		}
 
@@ -1090,14 +1090,16 @@ var JSHINT = (function () {
 			case "]":
 			case ",":
 				if (opts.allowTrailing) {
-					return;
+					return true;
 				}
 
 				/* falls through */
 			case ")":
 				error("E024", state.tokens.next, state.tokens.next.value);
+				return false;
 			}
 		}
+		return true;
 	}
 
 	// Functional constructors for making the symbols that will be inherited by
@@ -1553,8 +1555,12 @@ var JSHINT = (function () {
 				warning("W031", t);
 			}
 
-			if (state.tokens.next.id === ",") {
-				return comma();
+			while (state.tokens.next.id === ",") {
+				if (comma()) {
+					r = expression(0, true);
+				} else {
+					return;
+				}
 			}
 
 			if (state.tokens.next.id !== ";") {
