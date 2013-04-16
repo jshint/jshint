@@ -3017,16 +3017,16 @@ exports["spread rest operator support"] = function (test) {
 };
 
 exports["test for GH-1010"] = function (test) {
-    var code = [
-        "var x = 20, y, z; if(x < 30) y=7, z=2; else y=5;"
-    ];
+	var code = [
+		"var x = 20, y, z; if(x < 30) y=7, z=2; else y=5;"
+	];
 
-    var run = TestRun(test)
-    run.test(code, {es3: true});
-    run.test(code, {}); // es5
-    run.test(code, {esnext: true});
-    run.test(code, {moz: true});
+	var run = TestRun(test);
+	run.test(code, {es3: true});
+	run.test(code, {}); // es5
+	run.test(code, {esnext: true});
+	run.test(code, {moz: true});
 
-    test.done();
+	test.done();
 };
 
