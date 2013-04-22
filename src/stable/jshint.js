@@ -1301,9 +1301,12 @@ var JSHINT = (function () {
 				}
 
 				if (left.id === ".") {
-					if (!left.left || left.left.value === "arguments") {
+					if (!left.left) {
+						warning("E031", that);
+					} else if (left.left.value === "arguments" && !state.directive["use strict"]) {
 						warning("E031", that);
 					}
+
 					that.right = expression(19);
 					return that;
 				} else if (left.id === "[") {
@@ -1313,7 +1316,9 @@ var JSHINT = (function () {
 								error("E013", t, t.value);
 							}
 						});
-					} else if (!left.left || left.left.value === "arguments") {
+					} else if (!left.left) {
+						warning("E031", that);
+					} else if (left.left.value === "arguments" && !state.directive["use strict"]) {
 						warning("E031", that);
 					}
 					that.right = expression(19);
