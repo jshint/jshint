@@ -91,15 +91,25 @@ exports.plusplus = function (test) {
 
 exports.assignment = function (test) {
 	var code = [
+		"function test() {",
 		"arguments.length = 2;",
+		"arguments[0] = 3;",
+		"}",
+		"function test2() {",
+		"\"use strict\";",
+		"arguments.length = 2;",
+		"arguments[0] = 3;",
+		"}",
 		"a() = 2;",
 	];
 
 	var run = TestRun(test)
-		.addError(1, "Bad assignment.")
 		.addError(2, "Bad assignment.")
-		.addError(2, "Expected an assignment or function call and instead saw an expression.")
-		.addError(2, "Missing semicolon.");
+		.addError(3, "Bad assignment.")
+		.addError(10, "Bad assignment.")
+		.addError(10, "Expected an assignment or function call and instead saw an expression.")
+		.addError(10, "Missing semicolon.");
+
 	run.test(code, { plusplus: true, es3: true });
 	run.test(code, { plusplus: true }); // es5
 	run.test(code, { plusplus: true, esnext: true });
