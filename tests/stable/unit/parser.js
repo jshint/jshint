@@ -3048,11 +3048,13 @@ exports["test for GH-1010"] = function (test) {
 
 exports.classes = function (test) {
 	var code = [
-		"class Foo1 extends interface {}",
+		// class declarations
+		"class Foo0 {}",
+		"class Foo1 extends Bar {}",
 		"class protected {",
 		"  constructor(package) {}",
 		"}",
-		"class Foo3 extends Bar {",
+		"class Foo3 extends interface {",
 		"  constructor() {}",
 		"}",
 		"class Foo4 extends Bar {",
@@ -3073,22 +3075,58 @@ exports.classes = function (test) {
 		"  static create() {",
 		"  }",
 		"}",
-		"let static = class a {};",
-		"var Foo8 = class {};",
-		"let Foo9 = class extends Bar {};"
+
+		// class expressions
+		"let static = class {};",
+		"let Foo8 = class extends Bar {};",
+		"let Foo9 = class protected {",
+		"  constructor(package) {}",
+		"};",
+		"var Foo10 = class extends interface {",
+		"  constructor() {}",
+		"};",
+		"var Foo11 = class extends Bar {",
+		"  constructor() {",
+		"    super();",
+		"  }",
+		"};",
+		"var Foo12 = class {",
+		"  constructor() {",
+		"  }",
+		"  static create() {",
+		"  }",
+		"};",
+		"let Foo13 = class extends Bar {",
+		"  constructor() {",
+		"    super();",
+		"  }",
+		"  static create() {",
+		"  }",
+		"};",
+		// mark these as used
+		"void (Foo1, Foo3, Foo4, Foo5, Foo6, Foo7, Foo8, Foo9, Foo11, Foo12, Foo13);",
 	];
 	var run = TestRun(test)
-		.addError(1, "Expected an identifier and instead saw 'interface' (a reserved word).")
-		.addError(2, "Expected an identifier and instead saw 'protected' (a reserved word).")
-		.addError(3, "Expected an identifier and instead saw 'package' (a reserved word).");
+		.addError(3, "Expected an identifier and instead saw 'protected' (a reserved word).")
+		.addError(4, "Expected an identifier and instead saw 'package' (a reserved word).")
+		.addError(6, "Expected an identifier and instead saw 'interface' (a reserved word).")
+		.addError(29, "Expected an identifier and instead saw 'protected' (a reserved word).")
+		.addError(30, "Expected an identifier and instead saw 'package' (a reserved word).")
+		.addError(32, "Expected an identifier and instead saw 'interface' (a reserved word).");
 
 	run.test(code, {esnext: true});
 	run.test(code, {moz: true});
 
-	run.addError(26, "Expected an identifier and instead saw 'static' (a reserved word).");
+	run
+		.addError(1, "'Foo0' is defined but never used.")
+		.addError(3, "'protected' is defined but never used.")
+		.addError(4, "'package' is defined but never used.")
+		.addError(32, "'Foo10' is defined but never used.")
+		.addError(30, "'package' is defined but never used.")
+		.addError(27, "Expected an identifier and instead saw 'static' (a reserved word).");
 
-	run.test(code, {esnext: true, strict: true});
-	run.test(code, {moz: true, strict: true});
+	run.test(code, {unused: true, strict: true, esnext: true});
+	run.test(code, {unused: true, strict: true, moz: true});
 
 	test.done();
 };
