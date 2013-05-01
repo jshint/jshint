@@ -3091,4 +3091,4 @@ exports.classes = function (test) {
 	run.test(code, {moz: true, strict: true});
 
 	test.done();
-}
+};
