@@ -3200,6 +3200,7 @@ var JSHINT = (function () {
 		return this;
 	});
 	letstatement.exps = true;
+
 	blockstmt("class", function () {
 		return classdef.call(this, true);
 	});
