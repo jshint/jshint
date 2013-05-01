@@ -1330,6 +1330,7 @@ exports.browser = function (test) {
 		.addError(14, "'NodeFilter' is not defined.")
 		.addError(15, "'Node' is not defined.")
 		.addError(18, "'MutationObserver' is not defined.")
+		.addError(21, "'SVGElement' is not defined.")
 		.test(src, {es3: true, undef: true });
 
 	TestRun(test).test(src, {es3: true, browser: true, undef: true });
