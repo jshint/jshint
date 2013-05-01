@@ -3225,6 +3225,7 @@ var JSHINT = (function () {
 
 	function classtail(c) {
 		var strict = state.directive["use strict"];
+		state.directive["use strict"] = true;
 		var ce;
 		// ClassHeritage(opt)
 		if (state.tokens.next.value === "extends") {
