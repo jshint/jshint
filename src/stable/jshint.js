@@ -646,18 +646,28 @@ var JSHINT = (function () {
 				}
 
 				if (numvals.indexOf(key) >= 0) {
-					val = +val;
 
-					if (typeof val !== "number" || !isFinite(val) || val <= 0 || Math.floor(val) !== val) {
-						error("E032", nt, g[1].trim());
-						return;
+					// GH988 - numeric options can be disabled by setting them to `false`
+					if (val !== "false") {
+						val = +val;
+
+						if (typeof val !== "number" || !isFinite(val) || val <= 0 || Math.floor(val) !== val) {
+							error("E032", nt, g[1].trim());
+							return;
+						}
+
+						if (key === "indent") {
+							state.option["(explicitIndent)"] = true;
+						}
+						state.option[key] = val;
+					} else {
+						if (key === "indent") {
+							state.option["(explicitIndent)"] = false;
+						} else {
+							state.option[key] = false;
+						}
 					}
 
-					if (key === "indent") {
-						state.option["(explicitIndent)"] = true;
-					}
-
-					state.option[key] = val;
 					return;
 				}
 
