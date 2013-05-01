@@ -2826,7 +2826,7 @@ var JSHINT = (function () {
 						error("E035");
 					}
 
-					if (i === "constructor") {
+					if (classdef && i === "constructor") {
 						error("E049", "getter", i);
 					}
 
@@ -2853,7 +2853,7 @@ var JSHINT = (function () {
 						error("E035");
 					}
 
-					if (i === "constructor") {
+					if (classdef && i === "constructor") {
 						error("E049", "setter", i);
 					}
 
