@@ -1115,6 +1115,12 @@ exports.indentation = function (test) {
 		.addError(6, "Mixed spaces and tabs.")
 		.test(src, {es3: true});
 
+	// indent:false shouldn't trigger indent (GH-1035)
+	TestRun(test)
+		.addError(5, "Mixed spaces and tabs.")
+		.addError(6, "Mixed spaces and tabs.")
+		.test(src, {es3: true, indent: false});
+
 	TestRun(test)
 		.addError(5, "Mixed spaces and tabs.")
 		.addError(6, "Mixed spaces and tabs.")

@@ -4148,7 +4148,7 @@ var JSHINT = (function () {
 						newOptionObj["(explicitNewcap)"] = true;
 
 					if (optionKeys[x] === "indent")
-						newOptionObj["(explicitIndent)"] = true;
+						newOptionObj["(explicitIndent)"] = o[optionKeys[x]] === false ? false : true;
 				}
 			}
 		}
