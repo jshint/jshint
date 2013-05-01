@@ -1179,12 +1179,14 @@ var JSHINT = (function () {
 	}
 
 	function FutureReservedWord(name, meta) {
-		var x = type(name, function () {
-			return this;
-		});
+		var x;
 
 		meta = meta || {};
 		meta.isFutureReservedWord = true;
+
+		x = type(name, meta.nud || function () {
+			return this;
+		});
 
 		x.value = name;
 		x.identifier = true;
@@ -3209,6 +3211,18 @@ var JSHINT = (function () {
 		return this;
 	});
 
+	function classexpression() {
+		if (!state.option.inESNext()) {
+			warning("W104", state.tokens.curr, "class");
+		}
+		// BindingIdentifier(opt)
+		if (state.tokens.next.identifier && state.tokens.next.value !== "extends") {
+			this.name = identifier();
+		}
+		classtail(this);
+		return this;
+	}
+
 	function classtail(c) {
 		var strict = state.directive["use strict"];
 		var ce;
@@ -3796,7 +3810,7 @@ var JSHINT = (function () {
 	FutureReservedWord("boolean");
 	FutureReservedWord("byte");
 	FutureReservedWord("char");
-	FutureReservedWord("class", { es5: true, esnextReserved: true });
+	FutureReservedWord("class", { es5: true, esnextReserved: true, nud: classexpression });
 	FutureReservedWord("double");
 	FutureReservedWord("enum", { es5: true });
 	FutureReservedWord("export", { es5: true, esnextReserved: true });
