@@ -216,7 +216,6 @@ var JSHINT = (function () {
 		functions, // All of the functions
 
 		global, // The global scope
-		ignored, // Ignored warnings
 		implied, // Implied globals
 		inblock,
 		indent,
@@ -429,9 +428,8 @@ var JSHINT = (function () {
 		var ch, l, w, msg;
 
 		if (/^W\d{3}$/.test(code)) {
-			if (ignored[code]) {
+			if (state.ignored[code])
 				return;
-			}
 
 			msg = messages.warnings[code];
 		} else if (/E\d{3}/.test(code)) {
@@ -732,7 +730,7 @@ var JSHINT = (function () {
 				var match = /^([+-])(W\d{3})$/g.exec(key);
 				if (match) {
 					// ignore for -W..., unignore for +W...
-					ignored[match[2]] = (match[1] === "-");
+					state.ignored[match[2]] = (match[1] === "-");
 					return;
 				}
 
@@ -2611,9 +2609,11 @@ var JSHINT = (function () {
 	function doFunction(name, statement, generator, fatarrowparams) {
 		var f;
 		var oldOption = state.option;
+		var oldIgnored = state.ignored;
 		var oldScope  = scope;
 
 		state.option = Object.create(state.option);
+		state.ignored = Object.create(state.ignored);
 		scope  = Object.create(scope);
 
 		funct = {
@@ -2660,6 +2660,7 @@ var JSHINT = (function () {
 
 		scope = oldScope;
 		state.option = oldOption;
+		state.ignored = oldIgnored;
 		funct["(last)"] = state.tokens.curr.line;
 		funct["(lastcharacter)"] = state.tokens.curr.character;
 		funct = funct["(context)"];
@@ -4081,6 +4082,7 @@ var JSHINT = (function () {
 		var a, i, k, x;
 		var optionKeys;
 		var newOptionObj = {};
+		var newIgnoredObj = {};
 
 		state.reset();
 
@@ -4102,7 +4104,6 @@ var JSHINT = (function () {
 
 		declared = Object.create(null);
 		exported = Object.create(null);
-		ignored = Object.create(null);
 
 		if (o) {
 			a = o.predef;
@@ -4127,7 +4128,7 @@ var JSHINT = (function () {
 			optionKeys = Object.keys(o);
 			for (x = 0; x < optionKeys.length; x++) {
 				if (/^-W\d{3}$/g.test(optionKeys[x])) {
-					ignored[optionKeys[x].slice(1)] = true;
+					newIgnoredObj[optionKeys[x].slice(1)] = true;
 				} else {
 					newOptionObj[optionKeys[x]] = o[optionKeys[x]];
 
@@ -4141,6 +4142,7 @@ var JSHINT = (function () {
 		}
 
 		state.option = newOptionObj;
+		state.ignored = newIgnoredObj;
 
 		state.option.indent = state.option.indent || 4;
 		state.option.maxerr = state.option.maxerr || 50;
