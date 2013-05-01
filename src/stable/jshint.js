@@ -3204,9 +3204,13 @@ var JSHINT = (function () {
 	});
 
 	function classdef(stmt) {
+		var strict;
+
 		if (!state.option.inESNext()) {
 			warning("W104", state.tokens.curr, "class");
 		}
+		strict = state.directive["use strict"];
+		state.directive["use strict"] = true;
 		if (stmt) {
 			// BindingIdentifier
 			this.name = identifier();
@@ -3216,12 +3220,11 @@ var JSHINT = (function () {
 			this.name = identifier();
 		}
 		classtail(this);
+		state.directive["use strict"] = strict;
 		return this;
 	}
 
 	function classtail(c) {
-		var strict = state.directive["use strict"];
-		state.directive["use strict"] = true;
 		var ce;
 		// ClassHeritage(opt)
 		if (state.tokens.next.value === "extends") {
@@ -3232,7 +3235,6 @@ var JSHINT = (function () {
 		advance("{");
 		// ClassBody(opt)
 		c.body = state.syntax["{"].nud(true);
-		state.directive["use strict"] = strict;
 	}
 
 	blockstmt("function", function () {
