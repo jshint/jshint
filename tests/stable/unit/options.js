@@ -544,15 +544,9 @@ exports.scripturl = function (test) {
 	// Make sure the error goes away when javascript URLs are tolerated
 	TestRun(test).test(code, { es3: true, scripturl: true });
 
-	// Make sure an error exists for labels that look like URLs
+	// Make sure an error does not exist for labels that look like URLs (GH-1013)
 	TestRun(test)
-		.addError(2, "Label 'javascript' looks like a javascript url.")
 		.test(src, {es3: true});
-
-	// Make sure the label error exists even if javascript URLs are tolerated
-	TestRun(test)
-		.addError(2, "Label 'javascript' looks like a javascript url.")
-		.test(src, { es3: true, scripturl: true });
 
 	test.done();
 };
