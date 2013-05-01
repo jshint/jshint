@@ -16,3 +16,6 @@ var elementNode = Node.ELEMENT_NODE;
 
 // MutationObserver
 var mutationObserver = new MutationObserver(/* callback */);
+
+// SVGElement
+var svgProto = SVGElement.prototype;
