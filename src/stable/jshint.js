@@ -2826,6 +2826,8 @@ var JSHINT = (function () {
 						error("E035");
 					}
 
+					// It is a Syntax Error if PropName of MethodDefinition is
+					// "constructor" and SpecialMethod of MethodDefinition is true.
 					if (classdef && i === "constructor") {
 						error("E049", "getter", i);
 					}
@@ -2853,6 +2855,8 @@ var JSHINT = (function () {
 						error("E035");
 					}
 
+					// It is a Syntax Error if PropName of MethodDefinition is
+					// "constructor" and SpecialMethod of MethodDefinition is true.
 					if (classdef && i === "constructor") {
 						error("E049", "setter", i);
 					}
@@ -2893,6 +2897,7 @@ var JSHINT = (function () {
 						expression(10);
 					}
 				}
+				// It is a Syntax Error if PropName of MethodDefinition is "prototype".
 				if (classdef && i === "prototype") {
 						error("E049", "class method", i);
 				}
@@ -3247,7 +3252,8 @@ var JSHINT = (function () {
 			// BindingIdentifier(opt)
 			this.name = identifier();
 		}
-		// It is a Syntax Error if BoundNames of BindingIdentifier contains either "eval" or "arguments"
+		// It is a Syntax Error if BoundNames of BindingIdentifier contains either
+		// "eval" or "arguments"
 		if (this.name && ["eval", "arguments"].indexOf(this.name) !== -1) {
 			error("E049", "class", this.name);
 		}
