@@ -3201,22 +3201,19 @@ var JSHINT = (function () {
 	});
 	letstatement.exps = true;
 	var classstatement = blockstmt("class", function () {
-		if (!state.option.inESNext()) {
-			warning("W104", state.tokens.curr, "class");
-		}
-		// BindingIdentifier
-		this.name = identifier();
-		addlabel(this.name, "unused", state.tokens.curr);
-		classtail(this);
-		return this;
+		return classdef.call(this, true);
 	});
 
-	function classexpression() {
+	function classdef(stmt) {
 		if (!state.option.inESNext()) {
 			warning("W104", state.tokens.curr, "class");
 		}
-		// BindingIdentifier(opt)
-		if (state.tokens.next.identifier && state.tokens.next.value !== "extends") {
+		if (stmt) {
+			// BindingIdentifier
+			this.name = identifier();
+			addlabel(this.name, "unused", state.tokens.curr);
+		} else if (state.tokens.next.identifier && state.tokens.next.value !== "extends") {
+			// BindingIdentifier(opt)
 			this.name = identifier();
 		}
 		classtail(this);
@@ -3811,7 +3808,7 @@ var JSHINT = (function () {
 	FutureReservedWord("boolean");
 	FutureReservedWord("byte");
 	FutureReservedWord("char");
-	FutureReservedWord("class", { es5: true, esnextReserved: true, nud: classexpression });
+	FutureReservedWord("class", { es5: true, esnextReserved: true, nud: classdef });
 	FutureReservedWord("double");
 	FutureReservedWord("enum", { es5: true });
 	FutureReservedWord("export", { es5: true, esnextReserved: true });
