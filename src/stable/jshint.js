@@ -2738,7 +2738,7 @@ var JSHINT = (function () {
 
 
 	(function (x) {
-		x.nud = function () {
+		x.nud = function (classdef) {
 			var b, f, i, p, t, g;
 			var props = {}; // All properties, including accessors
 
@@ -2793,10 +2793,14 @@ var JSHINT = (function () {
 					indentation();
 				}
 
+				if (state.tokens.next.value === "static") {
+					advance("static");
+				}
+
 				if (state.tokens.next.value === "get" && peek().id !== ":") {
 					advance("get");
 
-					if (!state.option.inES5(true)) {
+					if (!state.option.inES5(!classdef)) {
 						error("E034");
 					}
 
@@ -2819,7 +2823,7 @@ var JSHINT = (function () {
 				} else if (state.tokens.next.value === "set" && peek().id !== ":") {
 					advance("set");
 
-					if (!state.option.inES5(true)) {
+					if (!state.option.inES5(!classdef)) {
 						error("E034");
 					}
 
@@ -2858,7 +2862,7 @@ var JSHINT = (function () {
 							warning("W104", state.tokens.curr, "concise methods");
 						}
 						doFunction(i, undefined, g);
-					} else {
+					} else if(!classdef) {
 						advance(":");
 						nonadjacent(state.tokens.curr, state.tokens.next);
 						expression(10);
@@ -2866,6 +2870,9 @@ var JSHINT = (function () {
 				}
 
 				countMember(i);
+				if (classdef) {
+					continue;
+				}
 				if (state.tokens.next.id === ",") {
 					comma({ allowTrailing: true });
 					if (state.tokens.next.id === ",") {
@@ -3190,6 +3197,31 @@ var JSHINT = (function () {
 		return this;
 	});
 	letstatement.exps = true;
+	var classstatement = blockstmt("class", function () {
+		if (!state.option.inESNext()) {
+			warning("W104", state.tokens.curr, "class");
+		}
+		// BindingIdentifier
+		this.name = identifier();
+		addlabel(this.name, "unused", state.tokens.curr);
+		classtail(this);
+		return this;
+	});
+
+	function classtail(c) {
+		var strict = state.directive["use strict"];
+		var ce;
+		// ClassHeritage(opt)
+		if (state.tokens.next.value === "extends") {
+			advance("extends");
+			c.heritage = identifier();
+		}
+
+		advance("{");
+		// ClassBody(opt)
+		c.body = state.syntax["{"].nud(true);
+		state.directive["use strict"] = strict;
+	}
 
 	blockstmt("function", function () {
 		var generator = false;
