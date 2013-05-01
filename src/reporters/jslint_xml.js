@@ -1,5 +1,3 @@
-// Author: Vasili Sviridov
-// http://github.com/vsviridov
 module.exports =
 {
 	reporter: function (results)
@@ -42,9 +40,12 @@ module.exports =
 			out.push("\t<file name=\"" + file + "\">");
 			for (i = 0; i < files[file].length; i++) {
 				issue = files[file][i];
-				out.push("\t\t<issue line=\"" + issue.line + "\" char=\"" +
-					issue.character + "\" reason=\"" + encode(issue.reason) +
-					"\" evidence=\"" + encode(issue.evidence) + "\" />");
+				out.push("\t\t<issue line=\"" + issue.line +
+					"\" char=\"" + issue.character +
+					"\" reason=\"" + encode(issue.reason) +
+					"\" evidence=\"" + encode(issue.evidence) +
+					(issue.code ? "\" severity=\"" + encode(issue.code.charAt(0)) : "") +
+					"\" />");
 			}
 			out.push("\t</file>");
 		}

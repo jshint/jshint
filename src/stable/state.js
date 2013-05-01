@@ -11,6 +11,7 @@ var state = {
 		},
 
 		this.option = {};
+		this.ignored = {};
 		this.directive = {};
 		this.jsonMode = false;
 		this.jsonWarnings = [];

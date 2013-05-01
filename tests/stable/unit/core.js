@@ -286,6 +286,16 @@ exports.jslintSloppy = function (test) {
 	test.done();
 };
 
+/** JSHint should ignore unrecognized jslint options */
+exports.jslintUnrecognized = function (test) {
+	var src = "/*jslint closure:true */ function test() { return 1; }";
+
+	TestRun(test)
+		.test(src);
+
+	test.done();
+};
+
 exports.caseExpressions = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/caseExpressions.js', 'utf8');
 	TestRun(test)
@@ -599,10 +609,10 @@ exports.testCatchBlocks = function (test) {
 
 exports.testNumericParams = function (test) {
 	TestRun(test)
-		.test("/*jshint maxparams:4, indent:3 */");
+		.test("/*jshint maxparams:4, indent:3, maxlen:false */");
 
 	TestRun(test)
-		.addError(1, "Expected a small integer and instead saw 'face'.")
+		.addError(1, "Expected a small integer or 'false' and instead saw 'face'.")
 		.test("/*jshint maxparams:face */");
 
 	test.done();
