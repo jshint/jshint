@@ -277,6 +277,10 @@ var JSHINT = (function () {
 				return false;
 			}
 
+			if (state.option.inESNext(true) && token.meta.esnextReserved) {
+				return true;
+			}
+
 			// Some ES5 FutureReservedWord identifiers are active only
 			// within a strict mode environment.
 			if (token.meta.strictOnly) {
@@ -1496,7 +1500,8 @@ var JSHINT = (function () {
 		// a FutureReservedWord as a label, we warn but proceed
 		// anyway.
 
-		if (res && t.meta && t.meta.isFutureReservedWord) {
+		if (res && t.meta && t.meta.isFutureReservedWord &&
+				!(state.option.inESNext() && t.meta.esnextReserved)) {
 			warning("W024", t, t.id);
 			res = false;
 		}
@@ -3758,16 +3763,16 @@ var JSHINT = (function () {
 	FutureReservedWord("boolean");
 	FutureReservedWord("byte");
 	FutureReservedWord("char");
-	FutureReservedWord("class", { es5: true });
+	FutureReservedWord("class", { es5: true, esnextReserved: true });
 	FutureReservedWord("double");
 	FutureReservedWord("enum", { es5: true });
-	FutureReservedWord("export", { es5: true });
-	FutureReservedWord("extends", { es5: true });
+	FutureReservedWord("export", { es5: true, esnextReserved: true });
+	FutureReservedWord("extends", { es5: true, esnextReserved: true });
 	FutureReservedWord("final");
 	FutureReservedWord("float");
 	FutureReservedWord("goto");
 	FutureReservedWord("implements", { es5: true, strictOnly: true });
-	FutureReservedWord("import", { es5: true });
+	FutureReservedWord("import", { es5: true, esnextReserved: true });
 	FutureReservedWord("int");
 	FutureReservedWord("interface");
 	FutureReservedWord("long");
@@ -3778,7 +3783,7 @@ var JSHINT = (function () {
 	FutureReservedWord("public", { es5: true, strictOnly: true });
 	FutureReservedWord("short");
 	FutureReservedWord("static", { es5: true, strictOnly: true });
-	FutureReservedWord("super", { es5: true });
+	FutureReservedWord("super", { es5: true, esnextReserved: true });
 	FutureReservedWord("synchronized");
 	FutureReservedWord("throws");
 	FutureReservedWord("transient");
