@@ -2740,7 +2740,7 @@ var JSHINT = (function () {
 
 
 	(function (x) {
-		x.nud = function (classdef) {
+		x.nud = function (isclassdef) {
 			var b, f, i, p, t, g;
 			var props = {}; // All properties, including accessors
 
@@ -2802,7 +2802,7 @@ var JSHINT = (function () {
 				if (state.tokens.next.value === "get" && peek().id !== ":") {
 					advance("get");
 
-					if (!state.option.inES5(!classdef)) {
+					if (!state.option.inES5(!isclassdef)) {
 						error("E034");
 					}
 
@@ -2825,7 +2825,7 @@ var JSHINT = (function () {
 				} else if (state.tokens.next.value === "set" && peek().id !== ":") {
 					advance("set");
 
-					if (!state.option.inES5(!classdef)) {
+					if (!state.option.inES5(!isclassdef)) {
 						error("E034");
 					}
 
@@ -2864,7 +2864,7 @@ var JSHINT = (function () {
 							warning("W104", state.tokens.curr, "concise methods");
 						}
 						doFunction(i, undefined, g);
-					} else if(!classdef) {
+					} else if(!isclassdef) {
 						advance(":");
 						nonadjacent(state.tokens.curr, state.tokens.next);
 						expression(10);
@@ -2872,7 +2872,7 @@ var JSHINT = (function () {
 				}
 
 				countMember(i);
-				if (classdef) {
+				if (isclassdef) {
 					continue;
 				}
 				if (state.tokens.next.id === ",") {
