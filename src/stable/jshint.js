@@ -2756,6 +2756,7 @@ var JSHINT = (function () {
 		x.nud = function (isclassdef) {
 			var b, f, i, p, t, g;
 			var props = {}; // All properties, including accessors
+			var tag = "";
 
 			function saveProperty(name, tkn) {
 				if (props[name] && _.has(props, name))
@@ -2808,8 +2809,9 @@ var JSHINT = (function () {
 					indentation();
 				}
 
-				if (state.tokens.next.value === "static") {
+				if (isclassdef && state.tokens.next.value === "static") {
 					advance("static");
+					tag = "static ";
 				}
 
 				if (state.tokens.next.value === "get" && peek().id !== ":") {
@@ -2824,7 +2826,7 @@ var JSHINT = (function () {
 						error("E035");
 					}
 
-					saveGetter(i);
+					saveGetter(tag + i);
 					t = state.tokens.next;
 					adjacent(state.tokens.curr, state.tokens.next);
 					f = doFunction();
@@ -2847,7 +2849,7 @@ var JSHINT = (function () {
 						error("E035");
 					}
 
-					saveSetter(i, state.tokens.next);
+					saveSetter(tag + i, state.tokens.next);
 					t = state.tokens.next;
 					adjacent(state.tokens.curr, state.tokens.next);
 					f = doFunction();
@@ -2866,7 +2868,7 @@ var JSHINT = (function () {
 						g = true;
 					}
 					i = property_name();
-					saveProperty(i, state.tokens.next);
+					saveProperty(tag + i, state.tokens.next);
 
 					if (typeof i !== "string") {
 						break;
@@ -2886,6 +2888,7 @@ var JSHINT = (function () {
 
 				countMember(i);
 				if (isclassdef) {
+					tag = "";
 					continue;
 				}
 				if (state.tokens.next.id === ",") {
