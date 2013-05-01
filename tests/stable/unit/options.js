@@ -1498,9 +1498,11 @@ exports.ignored = function (test) {
 
 	TestRun(test)
 		.addError(4, "A trailing decimal point can be confused with a dot: '12.'.")
+		.addError(12, "Missing semicolon.")
 		.test(src, { es3: true });
 
 	TestRun(test)
+		.addError(12, "Missing semicolon.")
 		.test(src, { es3: true, "-W047": true });
 
 	test.done();
