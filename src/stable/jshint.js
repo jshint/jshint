@@ -2900,7 +2900,7 @@ var JSHINT = (function () {
 				}
 				// It is a Syntax Error if PropName of MethodDefinition is "prototype".
 				if (classdef && i === "prototype") {
-						error("E049", "class method", i);
+					error("E049", "class method", i);
 				}
 
 				countMember(i);
