@@ -544,15 +544,9 @@ exports.scripturl = function (test) {
 	// Make sure the error goes away when javascript URLs are tolerated
 	TestRun(test).test(code, { es3: true, scripturl: true });
 
-	// Make sure an error exists for labels that look like URLs
+	// Make sure an error does not exist for labels that look like URLs (GH-1013)
 	TestRun(test)
-		.addError(2, "Label 'javascript' looks like a javascript url.")
 		.test(src, {es3: true});
-
-	// Make sure the label error exists even if javascript URLs are tolerated
-	TestRun(test)
-		.addError(2, "Label 'javascript' looks like a javascript url.")
-		.test(src, { es3: true, scripturl: true });
 
 	test.done();
 };
@@ -1121,6 +1115,12 @@ exports.indentation = function (test) {
 		.addError(6, "Mixed spaces and tabs.")
 		.test(src, {es3: true});
 
+	// indent:false shouldn't trigger indent (GH-1035)
+	TestRun(test)
+		.addError(5, "Mixed spaces and tabs.")
+		.addError(6, "Mixed spaces and tabs.")
+		.test(src, {es3: true, indent: false});
+
 	TestRun(test)
 		.addError(5, "Mixed spaces and tabs.")
 		.addError(6, "Mixed spaces and tabs.")
@@ -1336,6 +1336,7 @@ exports.browser = function (test) {
 		.addError(14, "'NodeFilter' is not defined.")
 		.addError(15, "'Node' is not defined.")
 		.addError(18, "'MutationObserver' is not defined.")
+		.addError(21, "'SVGElement' is not defined.")
 		.test(src, {es3: true, undef: true });
 
 	TestRun(test).test(src, {es3: true, browser: true, undef: true });
@@ -1498,9 +1499,11 @@ exports.ignored = function (test) {
 
 	TestRun(test)
 		.addError(4, "A trailing decimal point can be confused with a dot: '12.'.")
+		.addError(12, "Missing semicolon.")
 		.test(src, { es3: true });
 
 	TestRun(test)
+		.addError(12, "Missing semicolon.")
 		.test(src, { es3: true, "-W047": true });
 
 	test.done();

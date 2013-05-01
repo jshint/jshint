@@ -47,7 +47,7 @@ var errors = {
 	// Everything else
 	E030: "Expected an identifier and instead saw '{a}'.",
 	E031: "Bad assignment.", // FIXME: Rephrase
-	E032: "Expected a small integer and instead saw '{a}'.",
+	E032: "Expected a small integer or 'false' and instead saw '{a}'.",
 	E033: "Expected an operator and instead saw '{a}'.",
 	E034: "get/set are ES5 features.",
 	E035: "Missing property name.",
@@ -95,7 +95,6 @@ var warnings = {
 	W026: "Inner functions should be listed at the top of the outer function.",
 	W027: "Unreachable '{a}' after '{b}'.",
 	W028: "Label '{a}' on {b} statement.",
-	W029: "Label '{a}' looks like a javascript url.",
 	W030: "Expected an assignment or function call and instead saw an expression.",
 	W031: "Do not use 'new' for side effects.",
 	W032: "Unnecessary semicolon.",
