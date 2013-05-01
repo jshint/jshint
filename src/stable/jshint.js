@@ -2830,7 +2830,7 @@ var JSHINT = (function () {
 					// It is a Syntax Error if PropName of MethodDefinition is
 					// "constructor" and SpecialMethod of MethodDefinition is true.
 					if (classdef && i === "constructor") {
-						error("E049", "getter", i);
+						error("E049", state.tokens.next, "getter", i);
 					}
 
 					saveGetter(tag + i);
@@ -2859,7 +2859,7 @@ var JSHINT = (function () {
 					// It is a Syntax Error if PropName of MethodDefinition is
 					// "constructor" and SpecialMethod of MethodDefinition is true.
 					if (classdef && i === "constructor") {
-						error("E049", "setter", i);
+						error("E049", state.tokens.next, "setter", i);
 					}
 
 					saveSetter(tag + i, state.tokens.next);
@@ -2900,7 +2900,7 @@ var JSHINT = (function () {
 				}
 				// It is a Syntax Error if PropName of MethodDefinition is "prototype".
 				if (classdef && i === "prototype") {
-					error("E049", "class method", i);
+					error("E049", state.tokens.next, "class method", i);
 				}
 
 				countMember(i);
@@ -3256,7 +3256,7 @@ var JSHINT = (function () {
 		// It is a Syntax Error if BoundNames of BindingIdentifier contains either
 		// "eval" or "arguments"
 		if (this.name && ["eval", "arguments"].indexOf(this.name) !== -1) {
-			error("E049", "class", this.name);
+			error("E049", state.tokens.next, "class", this.name);
 		}
 		classtail(this);
 		state.directive["use strict"] = strict;
