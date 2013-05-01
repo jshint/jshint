@@ -11,7 +11,6 @@ var TESTS = [
 	"tests/",
 	"tests/stable/unit/",
 	"tests/stable/regression/",
-	"tests/next/unit/",
 ];
 
 var OPTIONS = JSON.parse(cat("./jshint.json"));
