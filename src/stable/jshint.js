@@ -3199,7 +3199,7 @@ var JSHINT = (function () {
 		return this;
 	});
 	letstatement.exps = true;
-	var classstatement = blockstmt("class", function () {
+	blockstmt("class", function () {
 		return classdef.call(this, true);
 	});
 
@@ -3225,7 +3225,6 @@ var JSHINT = (function () {
 	}
 
 	function classtail(c) {
-		var ce;
 		// ClassHeritage(opt)
 		if (state.tokens.next.value === "extends") {
 			advance("extends");
