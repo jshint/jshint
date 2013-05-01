@@ -3092,3 +3092,27 @@ exports.classes = function (test) {
 
 	test.done();
 };
+
+exports["class and method naming"] = function (test) {
+	var code = [
+		"class eval {}",
+		"class arguments {}",
+		"class C {",
+		"  get constructor() {}",
+		"  set constructor(x) {}",
+		"  prototype() {}",
+		"}"
+	];
+	var run = TestRun(test)
+		.addError(1, "Expected an identifier and instead saw 'eval' (a reserved word).")
+		.addError(1, "A class cannot be named 'eval'.")
+		.addError(2, "Expected an identifier and instead saw 'arguments' (a reserved word).")
+		.addError(2, "A class cannot be named 'arguments'.")
+		.addError(4, "A getter cannot be named 'constructor'.")
+		.addError(5, "A setter cannot be named 'constructor'.")
+		.addError(7, "A class method cannot be named 'prototype'.")
+
+	run.test(code, {esnext: true});
+
+	test.done();
+};
