@@ -2827,6 +2827,10 @@ var JSHINT = (function () {
 						error("E035");
 					}
 
+					if (i === "constructor") {
+						error("E049", "getter", i);
+					}
+
 					saveGetter(tag + i);
 					t = state.tokens.next;
 					adjacent(state.tokens.curr, state.tokens.next);
@@ -2848,6 +2852,10 @@ var JSHINT = (function () {
 					i = property_name();
 					if (!i) {
 						error("E035");
+					}
+
+					if (i === "constructor") {
+						error("E049", "setter", i);
 					}
 
 					saveSetter(tag + i, state.tokens.next);
@@ -3236,6 +3244,10 @@ var JSHINT = (function () {
 		} else if (state.tokens.next.identifier && state.tokens.next.value !== "extends") {
 			// BindingIdentifier(opt)
 			this.name = identifier();
+		}
+		// It is a Syntax Error if BoundNames of BindingIdentifier contains either "eval" or "arguments"
+		if (this.name && ["eval", "arguments"].indexOf(this.name) !== -1) {
+			error("E049", "class", this.name);
 		}
 		classtail(this);
 		state.directive["use strict"] = strict;
