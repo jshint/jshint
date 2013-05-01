@@ -2893,6 +2893,9 @@ var JSHINT = (function () {
 						expression(10);
 					}
 				}
+				if (classdef && i === "prototype") {
+						error("E049", "class method", i);
+				}
 
 				countMember(i);
 				if (isclassdef) {
