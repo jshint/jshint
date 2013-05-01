@@ -3026,3 +3026,49 @@ exports["spread rest operator support"] = function (test) {
 	test.done();
 };
 
+exports.classes = function (test) {
+	var code = [
+		"class Foo1 extends interface {}",
+		"class protected {",
+		"  constructor(package) {}",
+		"}",
+		"class Foo3 extends Bar {",
+		"  constructor() {}",
+		"}",
+		"class Foo4 extends Bar {",
+		"  constructor() {",
+		"    super();",
+		"  }",
+		"}",
+		"class Foo5 {",
+		"  constructor() {",
+		"  }",
+		"  static create() {",
+		"  }",
+		"}",
+		"class Foo6 extends Bar {",
+		"  constructor() {",
+		"    super();",
+		"  }",
+		"  static create() {",
+		"  }",
+		"}",
+		"let static = class a {};",
+		"var Foo8 = class {};",
+		"let Foo9 = class extends Bar {};"
+	];
+	var run = TestRun(test)
+		.addError(1, "Expected an identifier and instead saw 'interface' (a reserved word).")
+		.addError(2, "Expected an identifier and instead saw 'protected' (a reserved word).")
+		.addError(3, "Expected an identifier and instead saw 'package' (a reserved word).");
+
+	run.test(code, {esnext: true});
+	run.test(code, {moz: true});
+
+	run.addError(26, "Expected an identifier and instead saw 'static' (a reserved word).");
+
+	run.test(code, {esnext: true, strict: true});
+	run.test(code, {moz: true, strict: true});
+
+	test.done();
+}
