@@ -2829,7 +2829,7 @@ var JSHINT = (function () {
 					// It is a Syntax Error if PropName of MethodDefinition is
 					// "constructor" and SpecialMethod of MethodDefinition is true.
 					if (classdef && i === "constructor") {
-						error("E049", state.tokens.next, "getter", i);
+						error("E049", state.tokens.next, "class getter method", i);
 					}
 
 					saveGetter(tag + i);
@@ -2858,7 +2858,7 @@ var JSHINT = (function () {
 					// It is a Syntax Error if PropName of MethodDefinition is
 					// "constructor" and SpecialMethod of MethodDefinition is true.
 					if (classdef && i === "constructor") {
-						error("E049", state.tokens.next, "setter", i);
+						error("E049", state.tokens.next, "class setter method", i);
 					}
 
 					saveSetter(tag + i, state.tokens.next);

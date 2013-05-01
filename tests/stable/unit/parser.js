@@ -3108,8 +3108,8 @@ exports["class and method naming"] = function (test) {
 		.addError(1, "A class cannot be named 'eval'.")
 		.addError(2, "Expected an identifier and instead saw 'arguments' (a reserved word).")
 		.addError(2, "A class cannot be named 'arguments'.")
-		.addError(4, "A getter cannot be named 'constructor'.")
-		.addError(5, "A setter cannot be named 'constructor'.")
+		.addError(4, "A class getter method cannot be named 'constructor'.")
+		.addError(5, "A class setter method cannot be named 'constructor'.")
 		.addError(7, "A class method cannot be named 'prototype'.")
 
 	run.test(code, {esnext: true});
