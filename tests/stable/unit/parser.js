@@ -3109,10 +3109,8 @@ exports.classes = function (test) {
 	var run = TestRun(test)
 		.addError(3, "Expected an identifier and instead saw 'protected' (a reserved word).")
 		.addError(4, "Expected an identifier and instead saw 'package' (a reserved word).")
-		.addError(6, "Expected an identifier and instead saw 'interface' (a reserved word).")
 		.addError(29, "Expected an identifier and instead saw 'protected' (a reserved word).")
-		.addError(30, "Expected an identifier and instead saw 'package' (a reserved word).")
-		.addError(32, "Expected an identifier and instead saw 'interface' (a reserved word).");
+		.addError(30, "Expected an identifier and instead saw 'package' (a reserved word).");
 
 	run.test(code, {esnext: true});
 	run.test(code, {moz: true});
