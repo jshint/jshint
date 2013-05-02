@@ -1600,6 +1600,9 @@ var JSHINT = (function () {
 	function statements(startLine) {
 		var a = [], p;
 
+		if (!startLine) {
+			funct["(blockscope)"].stack();
+		}
 		while (!state.tokens.next.reach && state.tokens.next.id !== "(end)") {
 			if (state.tokens.next.id === ";") {
 				p = peek();
@@ -1612,6 +1615,9 @@ var JSHINT = (function () {
 			} else {
 				a.push(statement(startLine === state.tokens.next.line));
 			}
+		}
+		if (!startLine) {
+			funct["(blockscope)"].unstack();
 		}
 		return a;
 	}
