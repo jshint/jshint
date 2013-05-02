@@ -3585,8 +3585,15 @@ var JSHINT = (function () {
 				case "var":
 					break;
 				default:
-					if (!funct["(blockscope)"].getlabel(state.tokens.next.value))
-						warning("W088", state.tokens.next, state.tokens.next.value);
+					for (var f = funct; true; f = f["(context)"]) {
+						if (f["(global)"]) {
+							warning("W088", state.tokens.next, state.tokens.next.value);
+							break;
+						}
+						if (f[state.tokens.next.value] === "unused") {
+							break;
+						}
+					}
 				}
 				advance();
 			}
