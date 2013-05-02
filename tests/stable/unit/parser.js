@@ -1287,6 +1287,7 @@ exports["test: let statement out of scope as moz"] = function (test) {
 	];
 
 	TestRun(test)
+		.addError(1, "'x' is defined but never used.")
 		.addError(5, "'z' is defined but never used.")
 		.addError(3, "'y' is defined but never used.")
 		.addError(7, "'z' is not defined.")
@@ -1309,6 +1310,7 @@ exports["test: let statement out of scope as esnext"] = function (test) {
 	];
 
 	TestRun(test)
+		.addError(1, "'x' is defined but never used.")
 		.addError(5, "'z' is defined but never used.")
 		.addError(3, "'y' is defined but never used.")
 		.addError(7, "'z' is not defined.")
@@ -1334,6 +1336,7 @@ exports["test: let statement out of scope as es5"] = function (test) {
 		.addError(1, "'let' is only available in JavaScript 1.7.")
 		.addError(3, "'let' is only available in JavaScript 1.7.")
 		.addError(5, "'let' is only available in JavaScript 1.7.")
+		.addError(1, "'x' is defined but never used.")
 		.addError(5, "'z' is defined but never used.")
 		.addError(3, "'y' is defined but never used.")
 		.addError(7, "'z' is not defined.")
@@ -1359,6 +1362,7 @@ exports["test: let statement out of scope as legacy JS"] = function (test) {
 		.addError(1, "'let' is only available in JavaScript 1.7.")
 		.addError(3, "'let' is only available in JavaScript 1.7.")
 		.addError(5, "'let' is only available in JavaScript 1.7.")
+		.addError(1, "'x' is defined but never used.")
 		.addError(5, "'z' is defined but never used.")
 		.addError(3, "'y' is defined but never used.")
 		.addError(7, "'z' is not defined.")
