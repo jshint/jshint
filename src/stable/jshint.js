@@ -3254,6 +3254,7 @@ var JSHINT = (function () {
 			c.heritage = expression(10);
 		}
 
+		// A ClassBody is always strict code.
 		state.directive["use strict"] = true;
 		advance("{");
 		// ClassBody(opt)
