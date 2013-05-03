@@ -3242,11 +3242,6 @@ var JSHINT = (function () {
 			// BindingIdentifier(opt)
 			this.name = identifier();
 		}
-		// It is a Syntax Error if BoundNames of BindingIdentifier contains either
-		// "eval" or "arguments"
-		if (this.name && ["eval", "arguments"].indexOf(this.name) !== -1) {
-			error("E049", state.tokens.next, "class", this.name);
-		}
 		classtail(this);
 		return this;
 	}
