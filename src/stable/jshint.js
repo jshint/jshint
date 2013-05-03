@@ -1185,14 +1185,12 @@ var JSHINT = (function () {
 	}
 
 	function FutureReservedWord(name, meta) {
-		var x;
+		var x = type(name, (meta && meta.nud) || function () {
+			return this;
+		});
 
 		meta = meta || {};
 		meta.isFutureReservedWord = true;
-
-		x = type(name, meta.nud || function () {
-			return this;
-		});
 
 		x.value = name;
 		x.identifier = true;
