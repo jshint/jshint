@@ -1759,20 +1759,18 @@ var JSHINT = (function () {
 			indent = old_indent;
 		} else if (!ordinary) {
 			if (isfunc) {
+				m = {};
 				if (stmt && !isfatarrow && !state.option.inMoz(true)) {
 					error("W118", state.tokens.curr, "function closure expressions");
 				}
 
 				if (!stmt) {
-					m = {};
 					for (d in state.directive) {
 						if (_.has(state.directive, d)) {
 							m[d] = state.directive[d];
 						}
 					}
 				}
-				m = m || {};
-
 				expression(0);
 
 				if (state.option.strict && funct["(context)"]["(global)"]) {
