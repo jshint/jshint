@@ -3857,7 +3857,7 @@ var JSHINT = (function () {
 	FutureReservedWord("implements", { es5: true, strictOnly: true });
 	FutureReservedWord("import", { es5: true, esnextReserved: true });
 	FutureReservedWord("int");
-	FutureReservedWord("interface");
+	FutureReservedWord("interface", { es5: true, strictOnly: true });
 	FutureReservedWord("long");
 	FutureReservedWord("native");
 	FutureReservedWord("package", { es5: true, strictOnly: true });
