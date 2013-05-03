@@ -1509,7 +1509,7 @@ var JSHINT = (function () {
 		// a FutureReservedWord as a label, we warn but proceed
 		// anyway.
 
-		if (res && t.meta && t.meta.isFutureReservedWord) {
+		if (res && t.meta && t.meta.isFutureReservedWord && peek().id === ":") {
 			warning("W024", t, t.id);
 			res = false;
 		}
