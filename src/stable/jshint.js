@@ -4283,9 +4283,9 @@ var JSHINT = (function () {
 				}
 
 				statements();
-				funct["(blockscope)"].unstack();
 			}
 			advance((state.tokens.next && state.tokens.next.value !== ".")	? "(end)" : undefined);
+			funct["(blockscope)"].unstack();
 
 			var markDefined = function (name, context) {
 				do {
