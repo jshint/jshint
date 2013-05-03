@@ -3107,15 +3107,15 @@ exports.classes = function (test) {
 		"void (Foo1, Foo3, Foo4, Foo5, Foo6, Foo7, Foo8, Foo9, Foo11, Foo12, Foo13);",
 	];
 	var run = TestRun(test)
-		.addError(3, "Expected an identifier and instead saw 'protected' (a reserved word).")
 		.addError(4, "Expected an identifier and instead saw 'package' (a reserved word).")
-		.addError(29, "Expected an identifier and instead saw 'protected' (a reserved word).")
 		.addError(30, "Expected an identifier and instead saw 'package' (a reserved word).");
 
 	run.test(code, {esnext: true});
 	run.test(code, {moz: true});
 
 	run
+		.addError(3, "Expected an identifier and instead saw 'protected' (a reserved word).")
+		.addError(29, "Expected an identifier and instead saw 'protected' (a reserved word).")
 		.addError(1, "'Foo0' is defined but never used.")
 		.addError(3, "'protected' is defined but never used.")
 		.addError(4, "'package' is defined but never used.")
