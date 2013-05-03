@@ -1770,6 +1770,8 @@ var JSHINT = (function () {
 						}
 					}
 				}
+				m = m || {};
+
 				expression(0);
 
 				if (state.option.strict && funct["(context)"]["(global)"]) {
