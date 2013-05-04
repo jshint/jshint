@@ -3046,3 +3046,24 @@ exports["test for GH-1010"] = function (test) {
 	test.done();
 };
 
+exports["test for GH-1018"] = function (test) {
+	var code = [
+		"if (a = 42) {}",
+		"else if (a = 42) {}",
+		"while (a = 42) {}",
+		"for (a = 42; a = 42; a += 42) {}",
+		"do {} while (a = 42);",
+		"switch (a = 42) {}"
+	];
+
+	var run = TestRun(test);
+	run.test(code, {boss: true});
+
+	for (var i = 0; i < code.length; i++) {
+		run.addError(i + 1, "Expected a conditional expression and instead saw an assignment.");
+	}
+
+	run.test(code);
+
+	test.done();
+}
