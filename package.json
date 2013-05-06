@@ -27,7 +27,8 @@
 		"underscore": "1.4.x",
 		"peakle":     "0.0.x",
 		"cli":        "0.4.x",
-		"minimatch":  "0.x.x"
+		"minimatch":  "0.x.x",
+		"console-browserify": "0.1.x"
 	},
 
 	"devDependencies": {
@@ -36,8 +37,7 @@
 		"browserify": "1.16.1",
 		"coveraje":   "0.2.x",
 		"nodeunit":   "0.7.x",
-		"sinon":      "1.6.x",
-		"console-browserify": "0.1.x"
+		"sinon":      "1.6.x"
 	},
 
 	"preferGlobal": true
