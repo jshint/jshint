@@ -4339,7 +4339,7 @@ var JSHINT = (function () {
 
 				var warnable_types = {
 					"vars": ["var"],
-					"last-param": ["var", "last-param"],
+					"last-param": ["var", "param"],
 					"strict": ["var", "param", "last-param"]
 				};
 
@@ -4405,11 +4405,12 @@ var JSHINT = (function () {
 
 				var params = func["(params)"].slice();
 				var param  = params.pop();
-				var type, unused_type;
+				var type, unused_opt;
 
 				while (param) {
 					type = func[param];
-					unused_type = (params.length === func["(params)"].length - 1 ? "last-param" : "param");
+					unused_opt = func["(unusedOption)"] || state.option.unused;
+					unused_opt = unused_opt === true ? "last-param" : unused_opt;
 
 					// 'undefined' is a special case for (function (window, undefined) { ... })();
 					// patterns.
@@ -4418,7 +4419,9 @@ var JSHINT = (function () {
 						return;
 
 					if (type === "unused" || type === "unction") {
-						warnUnused(param, func["(tokens)"][param], unused_type, func["(unusedOption)"]);
+						warnUnused(param, func["(tokens)"][param], "param", func["(unusedOption)"]);
+					} else if (unused_opt === "last-param") {
+						return;
 					}
 
 					param = params.pop();

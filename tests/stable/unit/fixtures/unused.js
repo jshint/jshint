@@ -24,3 +24,9 @@ function bar(g, h) {
 	char = 1;
 	return h;
 }
+
+function baz(a, b, c) {
+	return 1;
+}
+
+baz();
