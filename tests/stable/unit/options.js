@@ -445,8 +445,20 @@ exports.unused = function (test) {
 		[20, "'bar' is defined but never used."]
 	];
 
-	var last_param_errors = [[6, "'f' is defined but never used."]];
-	var all_param_errors = [[15, "'err' is defined but never used."]];
+	var last_param_errors = [
+		[6, "'f' is defined but never used."],
+		[28, "'a' is defined but never used."],
+		[28, "'b' is defined but never used."],
+		[28, "'c' is defined but never used."]
+	];
+
+	var all_param_errors = [
+		[15, "'err' is defined but never used."],
+		[28, "'a' is defined but never used."],
+		[28, "'b' is defined but never used."],
+		[28, "'c' is defined but never used."]
+	];
+
 	var true_run = TestRun(test, {es3: true});
 
 	var_errors.concat(last_param_errors).forEach(function (e) {
@@ -470,7 +482,7 @@ exports.unused = function (test) {
 	vars_run.test(src, { unused: "vars"});
 
 	var unused = JSHINT.data().unused;
-	test.equal(6, unused.length);
+	test.equal(9, unused.length);
 	test.ok(unused.some(function (err) { return err.line === 1 && err.name === "a"; }));
 	test.ok(unused.some(function (err) { return err.line === 6 && err.name === "f"; }));
 	test.ok(unused.some(function (err) { return err.line === 7 && err.name === "c"; }));
@@ -486,21 +498,21 @@ exports['unused overrides'] = function (test) {
 	code = ['function foo(a) {', '/*jshint unused:false */', '}', 'foo();'];
 	TestRun(test).test(code, {es3: true, unused: true});
 
-	code = ['function foo(a, b) {', '/*jshint unused:vars */', 'var i = 3;', '}', 'foo();'];
+	code = ['function foo(a, b, c) {', '/*jshint unused:vars */', 'var i = b;', '}', 'foo();'];
 	TestRun(test)
 		.addError(3, "'i' is defined but never used.")
 		.test(code, {es3: true, unused: true});
 
-	code = ['function foo(a, b) {', '/*jshint unused:true */', 'var i = 3;', '}', 'foo();'];
+	code = ['function foo(a, b, c) {', '/*jshint unused:true */', 'var i = b;', '}', 'foo();'];
 	TestRun(test)
-		.addError(1, "'b' is defined but never used.")
+		.addError(1, "'c' is defined but never used.")
 		.addError(3, "'i' is defined but never used.")
 		.test(code, {es3: true, unused: "strict"});
 
-	code = ['function foo(a, b) {', '/*jshint unused:strict */', 'var i = 3;', '}', 'foo();'];
+	code = ['function foo(a, b, c) {', '/*jshint unused:strict */', 'var i = b;', '}', 'foo();'];
 	TestRun(test)
 		.addError(1, "'a' is defined but never used.")
-		.addError(1, "'b' is defined but never used.")
+		.addError(1, "'c' is defined but never used.")
 		.addError(3, "'i' is defined but never used.")
 		.test(code, {es3: true, unused: true});
 
