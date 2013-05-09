@@ -649,3 +649,20 @@ exports.testRegexArray = function (test) {
 
 	test.done();
 };
+
+// Regression test for GH-1070
+exports.testUndefinedAssignment = function (test) {
+	var src = [
+		"var x = undefined;",
+		"const y = undefined;",
+		"let z = undefined;"
+	];
+
+	TestRun(test)
+		.addError(1, "It's not necessary to initialize 'x' to 'undefined'.")
+		.addError(2, "It's not necessary to initialize 'y' to 'undefined'.")
+		.addError(3, "It's not necessary to initialize 'z' to 'undefined'.")
+		.test(src, {esnext: true});
+
+	test.done();
+};
