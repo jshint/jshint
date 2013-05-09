@@ -1526,7 +1526,7 @@ var JSHINT = (function () {
 					isundef(funct, "W117", tok.token, tok.id);
 				});
 				advance("=");
-				destructuringExpressionMatch(values, expression(0, true));
+				destructuringExpressionMatch(values, expression(5, true));
 				advance(";");
 				return;
 			}
@@ -2153,7 +2153,7 @@ var JSHINT = (function () {
 	prefix("--", "predec");
 	state.syntax["--"].exps = true;
 	prefix("delete", function () {
-		var p = expression(0);
+		var p = expression(5);
 		if (!p || (p.id !== "." && p.id !== "[")) {
 			warning("W051");
 		}
@@ -2386,7 +2386,7 @@ var JSHINT = (function () {
 						exprs.push(bracket.left[t].token);
 					}
 				} else {
-					exprs.push(expression(0));
+					exprs.push(expression(5));
 				}
 				if (state.tokens.next.id !== ",") {
 					break;
@@ -2415,7 +2415,7 @@ var JSHINT = (function () {
 	infix("[", function (left, that) {
 		nobreak(state.tokens.prev, state.tokens.curr);
 		nospace();
-		var e = expression(0), s;
+		var e = expression(5), s;
 		if (e && e.type === "(string)") {
 			if (!state.option.evil && (e.value === "eval" || e.value === "execScript")) {
 				warning("W061", that);
@@ -2446,7 +2446,7 @@ var JSHINT = (function () {
 		res.exps = true;
 		funct["(comparray)"].stack();
 
-		res.right = expression(0);
+		res.right = expression(5);
 		advance("for");
 		if (state.tokens.next.value === "each") {
 			advance("each");
@@ -2456,13 +2456,13 @@ var JSHINT = (function () {
 		}
 		advance("(");
 		funct["(comparray)"].setState("define");
-		res.left = expression(0);
+		res.left = expression(5);
 		advance(")");
 		if (state.tokens.next.value === "if") {
 			advance("if");
 			advance("(");
 			funct["(comparray)"].setState("filter");
-			res.filter = expression(0);
+			res.filter = expression(5);
 			advance(")");
 		}
 		advance("]");
@@ -3034,7 +3034,7 @@ var JSHINT = (function () {
 				if (peek(0).id === "=" && state.tokens.next.identifier) {
 					error("E037", state.tokens.next, state.tokens.next.value);
 				}
-				value = expression(0);
+				value = expression(5);
 				if (lone) {
 					tokens[0].first = value;
 				} else {
@@ -3101,7 +3101,7 @@ var JSHINT = (function () {
 				if (peek(0).id === "=" && state.tokens.next.identifier) {
 					error("E038", state.tokens.next, state.tokens.next.value);
 				}
-				value = expression(0);
+				value = expression(5);
 				if (lone) {
 					tokens[0].first = value;
 				} else {
@@ -3181,7 +3181,7 @@ var JSHINT = (function () {
 				if (peek(0).id === "=" && state.tokens.next.identifier) {
 					error("E037", state.tokens.next, state.tokens.next.value);
 				}
-				value = expression(0);
+				value = expression(5);
 				if (lone) {
 					tokens[0].first = value;
 				} else {
