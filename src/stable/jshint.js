@@ -1300,6 +1300,9 @@ var JSHINT = (function () {
 			that.left = left;
 
 			if (left) {
+				if (state.condition && !state.option.boss) {
+					warning("W084");
+				}
 				if (predefined[left.value] === false &&
 						scope[left.value]["(global)"] === true) {
 					warning("W020", left);
@@ -3255,12 +3258,13 @@ var JSHINT = (function () {
 	blockstmt("if", function () {
 		var t = state.tokens.next;
 		increaseComplexityCount();
+		state.condition = true;
 		advance("(");
 		nonadjacent(this, t);
 		nospace();
-		expression(20);
-		parseCondAssignment();
+		expression(0);
 		advance(")", t);
+		state.condition = false;
 		nospace(state.tokens.prev, state.tokens.curr);
 		block(true, true);
 		if (state.tokens.next.id === "else") {
