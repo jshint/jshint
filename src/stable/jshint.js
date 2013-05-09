@@ -1039,21 +1039,23 @@ var JSHINT = (function () {
 	function comma(opts) {
 		opts = opts || {};
 
-		if (state.tokens.curr.line !== state.tokens.next.line) {
-			if (!state.option.laxcomma) {
-				if (comma.first) {
-					warning("I001");
-					comma.first = false;
+		if (!opts.peek) {
+			if (state.tokens.curr.line !== state.tokens.next.line) {
+				if (!state.option.laxcomma) {
+					if (comma.first) {
+						warning("I001");
+						comma.first = false;
+					}
+					warning("W014", state.tokens.curr, state.tokens.next.value);
 				}
-				warning("W014", state.tokens.curr, state.tokens.next.id);
+			} else if (!state.tokens.curr.comment &&
+					state.tokens.curr.character !== state.tokens.next.from && state.option.white) {
+				state.tokens.curr.from += (state.tokens.curr.character - state.tokens.curr.from);
+				warning("W011", state.tokens.curr, state.tokens.curr.value);
 			}
-		} else if (!state.tokens.curr.comment &&
-				state.tokens.curr.character !== state.tokens.next.from && state.option.white) {
-			state.tokens.curr.from += (state.tokens.curr.character - state.tokens.curr.from);
-			warning("W011", state.tokens.curr, state.tokens.curr.value);
-		}
 
-		advance(",");
+			advance(",");
+		}
 
 		// TODO: This is a temporary solution to fight against false-positives in
 		// arrays and objects with trailing commas (see GH-363). The best solution
@@ -1063,7 +1065,7 @@ var JSHINT = (function () {
 			nonadjacent(state.tokens.curr, state.tokens.next);
 		}
 
-		if (state.tokens.next.identifier && !state.option.inES5()) {
+		if (state.tokens.next.identifier && !(opts.property && state.option.inES5())) {
 			// Keywords that cannot follow a comma operator.
 			switch (state.tokens.next.value) {
 			case "break":
@@ -2040,13 +2042,19 @@ var JSHINT = (function () {
 	bitwiseassignop(">>=", "assignshiftright", 20);
 	bitwiseassignop(">>>=", "assignshiftrightunsigned", 20);
 	infix(",", function (left, that) {
+		var expr;
 		that.exprs = [left];
+		if (!comma({peek: true})) {
+			return that;
+		}
 		while (true) {
-			that.exprs.push(expression(5))
-			if (state.tokens.next.value !== ",") {
+			if (!(expr = expression(5)))  {
 				break;
 			}
-			advance();
+			that.exprs.push(expr);
+			if (state.tokens.next.value !== "," || !comma()) {
+				break;
+			}
 		}
 		return that;
 	}, 5);
@@ -2880,7 +2888,7 @@ var JSHINT = (function () {
 
 				countMember(i);
 				if (state.tokens.next.id === ",") {
-					comma({ allowTrailing: true });
+					comma({ allowTrailing: true, property: true });
 					if (state.tokens.next.id === ",") {
 						warning("W070", state.tokens.curr);
 					} else if (state.tokens.next.id === "}" && !state.option.inES5(true)) {
