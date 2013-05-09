@@ -3023,7 +3023,7 @@ var JSHINT = (function () {
 				advance("=");
 				nonadjacent(state.tokens.curr, state.tokens.next);
 				if (state.tokens.next.id === "undefined") {
-					warning("W080", state.tokens.curr, state.tokens.curr.value);
+					warning("W080", state.tokens.prev, state.tokens.prev.value);
 				}
 				if (peek(0).id === "=" && state.tokens.next.identifier) {
 					error("E037", state.tokens.next, state.tokens.next.value);
@@ -3090,7 +3090,7 @@ var JSHINT = (function () {
 				advance("=");
 				nonadjacent(state.tokens.curr, state.tokens.next);
 				if (state.tokens.next.id === "undefined") {
-					warning("W080", state.tokens.curr, state.tokens.curr.value);
+					warning("W080", state.tokens.prev, state.tokens.prev.value);
 				}
 				if (peek(0).id === "=" && state.tokens.next.identifier) {
 					error("E038", state.tokens.next, state.tokens.next.value);
@@ -3170,7 +3170,7 @@ var JSHINT = (function () {
 				advance("=");
 				nonadjacent(state.tokens.curr, state.tokens.next);
 				if (state.tokens.next.id === "undefined") {
-					warning("W080", state.tokens.curr, state.tokens.curr.value);
+					warning("W080", state.tokens.prev, state.tokens.prev.value);
 				}
 				if (peek(0).id === "=" && state.tokens.next.identifier) {
 					error("E037", state.tokens.next, state.tokens.next.value);
