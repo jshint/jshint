@@ -1565,14 +1565,6 @@ var JSHINT = (function () {
 				warning("W031", t);
 			}
 
-			while (state.tokens.next.id === ",") {
-				if (comma()) {
-					r = expression(0, true);
-				} else {
-					return;
-				}
-			}
-
 			if (state.tokens.next.id !== ";") {
 				if (!state.option.asi) {
 					// If this is the last statement in a block that ends on
@@ -2005,7 +1997,6 @@ var JSHINT = (function () {
 	delim("'").reach = true;
 	delim(";");
 	delim(":").reach = true;
-	delim(",");
 	delim("#");
 
 	reserve("else");
@@ -2046,6 +2037,17 @@ var JSHINT = (function () {
 	bitwiseassignop("<<=", "assignshiftleft", 20);
 	bitwiseassignop(">>=", "assignshiftright", 20);
 	bitwiseassignop(">>>=", "assignshiftrightunsigned", 20);
+	infix(",", function (left, that) {
+		that.exprs = [left];
+		while (true) {
+			that.exprs.push(expression(5))
+			if (state.tokens.next.value !== ",") {
+				break;
+			}
+			advance();
+		}
+		return that;
+	}, 5);
 	infix("?", function (left, that) {
 		that.left = left;
 		that.right = expression(10);
