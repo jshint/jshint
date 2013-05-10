@@ -1301,9 +1301,7 @@ var JSHINT = (function () {
 			that.left = left;
 
 			if (left) {
-				if (state.condition && !state.option.boss) {
-					warning("W084");
-				}
+				that.paren = state.paren;
 				if (predefined[left.value] === false &&
 						scope[left.value]["(global)"] === true) {
 					warning("W020", left);
@@ -2365,6 +2363,8 @@ var JSHINT = (function () {
 	}, 155, true).exps = true;
 
 	prefix("(", function () {
+		var paren = state.paren;
+		state.paren = true;
 
 		nospace();
 		var bracket, brackets = [];
@@ -2410,6 +2410,8 @@ var JSHINT = (function () {
 				warning("W068", this);
 			}
 		}
+
+		state.paren = paren;
 
 		if (state.tokens.next.value === "=>") {
 			return exprs;
@@ -2737,8 +2739,13 @@ var JSHINT = (function () {
 	// Parse assignments that were found instead of conditionals.
 	// For example: if (a = 1) { ... }
 
-	function parseCondAssignment() {
-		switch (state.tokens.next.id) {
+	function checkCondAssignment(expr) {
+		var id = expr.id;
+		if (id === ",") {
+			expr = expr.exprs[expr.exprs.length - 1];
+			id = expr.id;
+		}
+		switch (id) {
 		case "=":
 		case "+=":
 		case "-=":
@@ -2748,12 +2755,9 @@ var JSHINT = (function () {
 		case "|=":
 		case "^=":
 		case "/=":
-			if (!state.option.boss) {
+			if (!expr.paren && !state.option.boss) {
 				warning("W084");
 			}
-
-			advance(state.tokens.next.id);
-			expression(20);
 		}
 	}
 
@@ -3269,7 +3273,7 @@ var JSHINT = (function () {
 		advance("(");
 		nonadjacent(this, t);
 		nospace();
-		expression(0);
+		checkCondAssignment(expression(0));
 		advance(")", t);
 		state.condition = false;
 		nospace(state.tokens.prev, state.tokens.curr);
@@ -3381,8 +3385,7 @@ var JSHINT = (function () {
 		advance("(");
 		nonadjacent(this, t);
 		nospace();
-		expression(20);
-		parseCondAssignment();
+		checkCondAssignment(expression(0));
 		advance(")", t);
 		nospace(state.tokens.prev, state.tokens.curr);
 		block(true, true);
@@ -3417,7 +3420,7 @@ var JSHINT = (function () {
 		advance("(");
 		nonadjacent(this, t);
 		nospace();
-		this.condition = expression(20);
+		checkCondAssignment(expression(0));
 		advance(")", t);
 		nospace(state.tokens.prev, state.tokens.curr);
 		nonadjacent(state.tokens.curr, state.tokens.next);
@@ -3534,8 +3537,7 @@ var JSHINT = (function () {
 			nonadjacent(state.tokens.curr, t);
 			advance("(");
 			nospace();
-			expression(20);
-			parseCondAssignment();
+			checkCondAssignment(expression(0));
 			advance(")", t);
 			nospace(state.tokens.prev, state.tokens.curr);
 			funct["(breakage)"] -= 1;
@@ -3640,8 +3642,7 @@ var JSHINT = (function () {
 			nolinebreak(state.tokens.curr);
 			advance(";");
 			if (state.tokens.next.id !== ";") {
-				expression(20);
-				parseCondAssignment();
+				checkCondAssignment(expression(0));
 			}
 			nolinebreak(state.tokens.curr);
 			advance(";");
