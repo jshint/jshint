@@ -1185,7 +1185,7 @@ var JSHINT = (function () {
 	}
 
 	function FutureReservedWord(name, meta) {
-		var x = type(name, function () {
+		var x = type(name, (meta && meta.nud) || function () {
 			return this;
 		});
 
@@ -1507,7 +1507,7 @@ var JSHINT = (function () {
 		// a FutureReservedWord as a label, we warn but proceed
 		// anyway.
 
-		if (res && t.meta && t.meta.isFutureReservedWord) {
+		if (res && t.meta && t.meta.isFutureReservedWord && peek().id === ":") {
 			warning("W024", t, t.id);
 			res = false;
 		}
@@ -2747,9 +2747,10 @@ var JSHINT = (function () {
 
 
 	(function (x) {
-		x.nud = function () {
+		x.nud = function (isclassdef) {
 			var b, f, i, p, t, g;
 			var props = {}; // All properties, including accessors
+			var tag = "";
 
 			function saveProperty(name, tkn) {
 				if (props[name] && _.has(props, name))
@@ -2802,10 +2803,15 @@ var JSHINT = (function () {
 					indentation();
 				}
 
+				if (isclassdef && state.tokens.next.value === "static") {
+					advance("static");
+					tag = "static ";
+				}
+
 				if (state.tokens.next.value === "get" && peek().id !== ":") {
 					advance("get");
 
-					if (!state.option.inES5(true)) {
+					if (!state.option.inES5(!isclassdef)) {
 						error("E034");
 					}
 
@@ -2814,7 +2820,13 @@ var JSHINT = (function () {
 						error("E035");
 					}
 
-					saveGetter(i);
+					// It is a Syntax Error if PropName of MethodDefinition is
+					// "constructor" and SpecialMethod of MethodDefinition is true.
+					if (isclassdef && i === "constructor") {
+						error("E049", state.tokens.next, "class getter method", i);
+					}
+
+					saveGetter(tag + i);
 					t = state.tokens.next;
 					adjacent(state.tokens.curr, state.tokens.next);
 					f = doFunction();
@@ -2828,7 +2840,7 @@ var JSHINT = (function () {
 				} else if (state.tokens.next.value === "set" && peek().id !== ":") {
 					advance("set");
 
-					if (!state.option.inES5(true)) {
+					if (!state.option.inES5(!isclassdef)) {
 						error("E034");
 					}
 
@@ -2837,7 +2849,13 @@ var JSHINT = (function () {
 						error("E035");
 					}
 
-					saveSetter(i, state.tokens.next);
+					// It is a Syntax Error if PropName of MethodDefinition is
+					// "constructor" and SpecialMethod of MethodDefinition is true.
+					if (isclassdef && i === "constructor") {
+						error("E049", state.tokens.next, "class setter method", i);
+					}
+
+					saveSetter(tag + i, state.tokens.next);
 					t = state.tokens.next;
 					adjacent(state.tokens.curr, state.tokens.next);
 					f = doFunction();
@@ -2856,7 +2874,7 @@ var JSHINT = (function () {
 						g = true;
 					}
 					i = property_name();
-					saveProperty(i, state.tokens.next);
+					saveProperty(tag + i, state.tokens.next);
 
 					if (typeof i !== "string") {
 						break;
@@ -2867,14 +2885,22 @@ var JSHINT = (function () {
 							warning("W104", state.tokens.curr, "concise methods");
 						}
 						doFunction(i, undefined, g);
-					} else {
+					} else if(!isclassdef) {
 						advance(":");
 						nonadjacent(state.tokens.curr, state.tokens.next);
 						expression(10);
 					}
 				}
+				// It is a Syntax Error if PropName of MethodDefinition is "prototype".
+				if (isclassdef && i === "prototype") {
+					error("E049", state.tokens.next, "class method", i);
+				}
 
 				countMember(i);
+				if (isclassdef) {
+					tag = "";
+					continue;
+				}
 				if (state.tokens.next.id === ",") {
 					comma({ allowTrailing: true });
 					if (state.tokens.next.id === ",") {
@@ -3199,6 +3225,43 @@ var JSHINT = (function () {
 		return this;
 	});
 	letstatement.exps = true;
+
+	blockstmt("class", function () {
+		return classdef.call(this, true);
+	});
+
+	function classdef(stmt) {
+		if (!state.option.inESNext()) {
+			warning("W104", state.tokens.curr, "class");
+		}
+		if (stmt) {
+			// BindingIdentifier
+			this.name = identifier();
+			addlabel(this.name, "unused", state.tokens.curr);
+		} else if (state.tokens.next.identifier && state.tokens.next.value !== "extends") {
+			// BindingIdentifier(opt)
+			this.name = identifier();
+		}
+		classtail(this);
+		return this;
+	}
+
+	function classtail(c) {
+		var strictness = state.directive["use strict"];
+
+		// ClassHeritage(opt)
+		if (state.tokens.next.value === "extends") {
+			advance("extends");
+			c.heritage = expression(10);
+		}
+
+		// A ClassBody is always strict code.
+		state.directive["use strict"] = true;
+		advance("{");
+		// ClassBody(opt)
+		c.body = state.syntax["{"].nud(true);
+		state.directive["use strict"] = strictness;
+	}
 
 	blockstmt("function", function () {
 		var generator = false;
@@ -3772,7 +3835,7 @@ var JSHINT = (function () {
 	FutureReservedWord("boolean");
 	FutureReservedWord("byte");
 	FutureReservedWord("char");
-	FutureReservedWord("class", { es5: true });
+	FutureReservedWord("class", { es5: true, nud: classdef });
 	FutureReservedWord("double");
 	FutureReservedWord("enum", { es5: true });
 	FutureReservedWord("export", { es5: true });
@@ -3783,7 +3846,7 @@ var JSHINT = (function () {
 	FutureReservedWord("implements", { es5: true, strictOnly: true });
 	FutureReservedWord("import", { es5: true });
 	FutureReservedWord("int");
-	FutureReservedWord("interface");
+	FutureReservedWord("interface", { es5: true, strictOnly: true });
 	FutureReservedWord("long");
 	FutureReservedWord("native");
 	FutureReservedWord("package", { es5: true, strictOnly: true });

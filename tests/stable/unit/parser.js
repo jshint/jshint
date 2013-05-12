@@ -3046,3 +3046,150 @@ exports["test for GH-1010"] = function (test) {
 	test.done();
 };
 
+exports.classes = function (test) {
+	var cdecl = "// cdecl";
+	var cexpr = "// cexpr";
+	var cdeclAssn = "// cdeclAssn";
+	var cexprAssn = "// cexprAssn";
+	var code = [
+		"var Bar;",
+
+		// class declarations
+		cdecl,
+		"class Foo0 {}",
+		"class Foo1 extends Bar {}",
+		"class protected {",
+		"  constructor(package) {}",
+		"}",
+		"class Foo3 extends interface {",
+		"  constructor() {}",
+		"}",
+		"class Foo4 extends Bar {",
+		"  constructor() {",
+		"    super();",
+		"  }",
+		"}",
+		"class Foo5 {",
+		"  constructor() {",
+		"  }",
+		"  static create() {",
+		"  }",
+		"}",
+		"class Foo6 extends Bar {",
+		"  constructor() {",
+		"    super();",
+		"  }",
+		"  static create() {",
+		"  }",
+		"}",
+
+		// class expressions
+		cexpr,
+		"var Foo7 = class {};",
+		"let Foo8 = class extends Bar {};",
+		"var static = class protected {",
+		"  constructor(package) {}",
+		"};",
+		"var Foo10 = class extends interface {",
+		"  constructor() {}",
+		"};",
+		"var Foo11 = class extends Bar {",
+		"  constructor() {",
+		"    super();",
+		"  }",
+		"};",
+		"var Foo12 = class {",
+		"  constructor() {",
+		"  }",
+		"  static create() {",
+		"  }",
+		"};",
+		"let Foo13 = class extends Bar {",
+		"  constructor() {",
+		"    super();",
+		"  }",
+		"  static create() {",
+		"  }",
+		"};",
+
+		// mark these as used
+		"void (Foo1, Foo3, Foo4, Foo5, Foo6);",
+		"void (Foo8, Foo10, Foo11, Foo12, Foo13);",
+
+		// class declarations: extends AssignmentExpression
+		cdeclAssn,
+		"class Foo14 extends Bar[42] {}",
+		"class Foo15 extends { a: function() { return 42; } } {}",
+		"class Foo16 extends class Foo15 extends Bar {} {}",
+		"class Foo17 extends Foo15 = class Foo16 extends Bar {} {}",
+		"class Foo18 extends function () {} {}",
+		"class Foo19 extends class extends function () {} {} {}",
+		"class Foo20 extends Foo18 = class extends Foo17 = function () {} {} {}",
+
+		// class expressions: extends AssignmentExpression
+		cexprAssn,
+		"let Foo21 = class extends Bar[42] {};",
+		"let Foo22 = class extends { a() { return 42; } } {};",
+		"let Foo23 = class extends class Foo15 extends Bar {} {};",
+		"let Foo24 = class extends Foo15 = class Foo16 extends Bar {} {};",
+		"let Foo25 = class extends function () {} {};",
+		"let Foo26 = class extends class extends function () {} {} {};",
+		"let Foo27 = class extends Foo18 = class extends Foo17 = function () {} {} {};",
+
+		// mark these as used
+		"void (Foo14, Foo15, Foo16, Foo17, Foo18, Foo19, Foo20);",
+		"void (Foo21, Foo22, Foo23, Foo24, Foo25, Foo26, Foo27);"
+	];
+
+	cdecl = code.indexOf(cdecl) + 1;
+	cexpr = code.indexOf(cexpr) + 1;
+	cdeclAssn = code.indexOf(cdeclAssn) + 1;
+	cexprAssn = code.indexOf(cexprAssn) + 1;
+
+	var run = TestRun(test)
+		.addError(cdecl + 4, "Expected an identifier and instead saw 'package' (a reserved word).")
+		.addError(cexpr + 4, "Expected an identifier and instead saw 'package' (a reserved word).");
+
+	run.test(code, {esnext: true});
+	run.test(code, {moz: true});
+
+	run
+		.addError(cdecl + 1, "'Foo0' is defined but never used.")
+		.addError(cdecl + 3, "Expected an identifier and instead saw 'protected' (a reserved word).")
+		.addError(cdecl + 3, "'protected' is defined but never used.")
+		.addError(cdecl + 4, "'package' is defined but never used.")
+	run
+		.addError(cexpr + 1, "'Foo7' is defined but never used.")
+		.addError(cexpr + 3, "Expected an identifier and instead saw 'static' (a reserved word).")
+		.addError(cexpr + 3, "'static' is defined but never used.")
+		.addError(cexpr + 3, "Expected an identifier and instead saw 'protected' (a reserved word).")
+		.addError(cexpr + 4, "'package' is defined but never used.");
+
+	code[0] = "'use strict';" + code[0];
+	run.test(code, {unused: true, globalstrict: true, esnext: true});
+	run.test(code, {unused: true, globalstrict: true, moz: true});
+
+	test.done();
+};
+
+exports["class and method naming"] = function (test) {
+	var code = [
+		"class eval {}",
+		"class arguments {}",
+		"class C {",
+		"  get constructor() {}",
+		"  set constructor(x) {}",
+		"  prototype() {}",
+		"}"
+	];
+	var run = TestRun(test)
+		.addError(1, "Expected an identifier and instead saw 'eval' (a reserved word).")
+		.addError(2, "Expected an identifier and instead saw 'arguments' (a reserved word).")
+		.addError(4, "A class getter method cannot be named 'constructor'.")
+		.addError(5, "A class setter method cannot be named 'constructor'.")
+		.addError(7, "A class method cannot be named 'prototype'.")
+
+	run.test(code, {esnext: true});
+
+	test.done();
+};
