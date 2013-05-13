@@ -3578,15 +3578,24 @@ var JSHINT = (function () {
 				funct["(blockscope)"].stack();
 				state.syntax["let"].fud.call(state.syntax["let"].fud, true);
 			} else {
-				switch (funct[state.tokens.next.value]) {
-				case "unused":
-					funct[state.tokens.next.value] = "var";
-					break;
-				case "var":
-					break;
-				default:
-					if (!funct["(blockscope)"].getlabel(state.tokens.next.value))
+				for (var f = funct; true; f = f["(context)"]) {
+					if (f["(global)"] && f !== funct) {
 						warning("W088", state.tokens.next, state.tokens.next.value);
+						break;
+					}
+					switch (f[state.tokens.next.value]) {
+					case "unused":
+						funct[state.tokens.next.value] = "var";
+						break;
+					case "var":
+						console.log(f[state.tokens.next.value]);
+						break;
+					default:
+						if (!f["(blockscope)"].getlabel(state.tokens.next.value)) {
+							continue;
+						}
+					}
+					break;
 				}
 				advance();
 			}
