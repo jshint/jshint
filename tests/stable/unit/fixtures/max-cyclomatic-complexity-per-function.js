@@ -76,3 +76,7 @@ function functionWithCyclomaticComplexity_8() {
 function functionWithCyclomaticComplexityDueToTernaryStatements_2(a) {
   var b = a ? true : false;
 }
+
+function functionWithCyclomaticComplexityDueToOrOperators_2(a) {
+  var b = a || {};
+}
