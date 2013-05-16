@@ -1302,7 +1302,6 @@ var JSHINT = (function () {
 			that.left = left;
 
 			if (left) {
-				that.paren = state.paren;
 				if (predefined[left.value] === false &&
 						scope[left.value]["(global)"] === true) {
 					warning("W020", left);
@@ -2364,9 +2363,6 @@ var JSHINT = (function () {
 	}, 155, true).exps = true;
 
 	prefix("(", function () {
-		var paren = state.paren;
-		state.paren = true;
-
 		nospace();
 		var bracket, brackets = [];
 		var pn, pn1, i = 0;
@@ -2412,10 +2408,15 @@ var JSHINT = (function () {
 			}
 		}
 
-		state.paren = paren;
-
 		if (state.tokens.next.value === "=>") {
 			return exprs;
+		}
+		if (!exprs.length) {
+			return;
+		}
+		exprs[exprs.length - 1].paren = true;
+		if (exprs.length > 1) {
+			return Object.create(state.syntax[","], { exprs: { value: exprs } });
 		}
 		return exprs[0];
 	});
