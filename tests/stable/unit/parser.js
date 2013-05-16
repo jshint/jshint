@@ -3042,3 +3042,21 @@ exports["test for GH-1010"] = function (test) {
 	test.done();
 };
 
+exports["test warnings for assignments in conditionals"] = function(test) {
+	var code = [
+		"if (a = b) { }",
+		"if ((a = b)) { }",
+		"if (a = b, a) { }",
+		"if (a = b, b = c) { }",
+		"if ((a = b, b = c)) { }",
+		"if (a = b, (b = c)) { }"
+	];
+
+	var run = TestRun(test)
+		.addError(1, "Expected a conditional expression and instead saw an assignment.")
+		.addError(4, "Expected a conditional expression and instead saw an assignment.");
+
+	run.test(code); // es5
+
+	test.done();
+};
