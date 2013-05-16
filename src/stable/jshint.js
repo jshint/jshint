@@ -2047,6 +2047,7 @@ var JSHINT = (function () {
 	bitwiseassignop(">>=", "assignshiftright", 20);
 	bitwiseassignop(">>>=", "assignshiftrightunsigned", 20);
 	infix("?", function (left, that) {
+		increaseComplexityCount();
 		that.left = left;
 		that.right = expression(10);
 		advance(":");
