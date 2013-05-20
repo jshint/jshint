@@ -247,6 +247,7 @@ exports.curly = function (test) {
 		.addError(2, "Expected '{' and instead saw 'return'.")
 		.addError(5, "Expected '{' and instead saw 'doSomething'.")
 		.addError(8, "Expected '{' and instead saw 'doSomething'.")
+		.addError(11, "Expected '{' and instead saw 'doSomething'.")
 		.test(src, { es3: true, curly: true });
 
 	TestRun(test).test(src1, { es3: true, curly: true });
