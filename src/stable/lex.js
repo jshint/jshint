@@ -1486,33 +1486,6 @@ Lexer.prototype = {
 		var checks = asyncTrigger();
 		var token;
 
-		function isReserved(token, isProperty) {
-			if (!token.reserved) {
-				return false;
-			}
-
-			if (token.meta && token.meta.isFutureReservedWord) {
-				// ES3 FutureReservedWord in an ES5 environment.
-				if (state.option.inES5(true) && !token.meta.es5) {
-					return false;
-				}
-
-				// Some ES5 FutureReservedWord identifiers are active only
-				// within a strict mode environment.
-				if (token.meta.strictOnly) {
-					if (!state.option.strict && !state.directive["use strict"]) {
-						return false;
-					}
-				}
-
-				if (isProperty) {
-					return false;
-				}
-			}
-
-			return true;
-		}
-
 		// Produce a token object.
 		var create = function (type, value, isProperty) {
 			/*jshint validthis:true */

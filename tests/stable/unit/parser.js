@@ -3157,7 +3157,7 @@ exports.classes = function (test) {
 		.addError(cdecl + 1, "'Foo0' is defined but never used.")
 		.addError(cdecl + 3, "Expected an identifier and instead saw 'protected' (a reserved word).")
 		.addError(cdecl + 3, "'protected' is defined but never used.")
-		.addError(cdecl + 4, "'package' is defined but never used.")
+		.addError(cdecl + 4, "'package' is defined but never used.");
 	run
 		.addError(cexpr + 1, "'Foo7' is defined but never used.")
 		.addError(cexpr + 3, "Expected an identifier and instead saw 'static' (a reserved word).")
@@ -3187,7 +3187,7 @@ exports["class and method naming"] = function (test) {
 		.addError(2, "Expected an identifier and instead saw 'arguments' (a reserved word).")
 		.addError(4, "A class getter method cannot be named 'constructor'.")
 		.addError(5, "A class setter method cannot be named 'constructor'.")
-		.addError(7, "A class method cannot be named 'prototype'.")
+		.addError(7, "A class method cannot be named 'prototype'.");
 
 	run.test(code, {esnext: true});
 
