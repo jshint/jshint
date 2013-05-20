@@ -63,7 +63,8 @@ var errors = {
 	E045: "Invalid for each loop.",
 	E046: "A yield statement shall be within a generator function (with syntax: `function*`)",
 	E047: "A generator function shall contain a yield statement.",
-	E048: "Let declaration not directly within block."
+	E048: "Let declaration not directly within block.",
+	E049: "A {a} cannot be named '{b}'."
 };
 
 var warnings = {
