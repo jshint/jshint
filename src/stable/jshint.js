@@ -2885,7 +2885,7 @@ var JSHINT = (function () {
 							warning("W104", state.tokens.curr, "concise methods");
 						}
 						doFunction(i, undefined, g);
-					} else if(!isclassdef) {
+					} else if (!isclassdef) {
 						advance(":");
 						nonadjacent(state.tokens.curr, state.tokens.next);
 						expression(10);
@@ -3231,6 +3231,7 @@ var JSHINT = (function () {
 	});
 
 	function classdef(stmt) {
+		/*jshint validthis:true */
 		if (!state.option.inESNext()) {
 			warning("W104", state.tokens.curr, "class");
 		}
