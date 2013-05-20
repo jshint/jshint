@@ -3578,7 +3578,7 @@ var JSHINT = (function () {
 			funct["(loopage)"] += 1;
 			increaseComplexityCount();
 
-			this.first = block(true);
+			this.first = block(true, true);
 			advance("while");
 			var t = state.tokens.next;
 			nonadjacent(state.tokens.curr, t);

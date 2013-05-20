@@ -9,3 +9,7 @@ for (;;) {
 while (true) {
     doSomething();
 }
+
+do {
+    doSomething();
+} while (true);
