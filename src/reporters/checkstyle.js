@@ -47,7 +47,7 @@ module.exports =
 				line: result.error.line,
 				column: result.error.character,
 				message: errorMessage,
-				source: result.error.code
+				source: 'jshint.' + result.error.code
 			});
 		});
 
