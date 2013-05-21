@@ -3234,3 +3234,29 @@ exports["test warnings for assignments in conditionals"] = function (test) {
 
 	test.done();
 };
+
+exports["test for GH-1089"] = function (test) {
+	var code = [
+		"function foo() {",
+		"    'use strict';",
+		"    Object.defineProperty(foo, 'property', {",
+		"        get: function() foo,",
+		"        set: function(value) {},",
+		"        enumerable: true",
+		"    });",
+		"}",
+		"foo;"
+	];
+
+	var run = TestRun(test)
+		.addError(9, "Expected an assignment or function call and instead saw an expression.");
+
+	run.test(code, {moz: true});
+
+	run
+		.addError(4, "'function closure expressions' is only available in Mozilla JavaScript " +
+				"extensions (use moz option).");
+	run.test(code);
+
+	test.done();
+};
