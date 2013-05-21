@@ -3218,4 +3218,4 @@ exports["test for GH-1018"] = function (test) {
 	run.test(code);
 
 	test.done();
-}
+};
