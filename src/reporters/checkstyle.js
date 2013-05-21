@@ -2,7 +2,7 @@
 // http://github.com/relaxnow
 module.exports =
 {
-	reporter: function (results, data)
+	reporter: function (results, data, opts)
 	{
 		"use strict";
 
@@ -15,7 +15,9 @@ module.exports =
 				"<": "&lt;",
 				">": "&gt;"
 			},
-			file, fileName, i, issue, globals, unuseds;
+			file, fileName, i, issue, globals, unuseds, errorMessage;
+
+		opts = opts || {};
 
 		function encode(s) {
 			for (var r in pairs) {
@@ -33,13 +35,19 @@ module.exports =
 				files[result.file] = [];
 			}
 
+			// Create the error message
+			errorMessage = result.error.reason;
+			if (opts.verbose) {
+				errorMessage += ' (' + result.error.code + ')';
+			}
+
 			// Add the error
 			files[result.file].push({
 				severity: 'error',
 				line: result.error.line,
 				column: result.error.character,
-				message: result.error.reason,
-				source: result.error.raw
+				message: errorMessage,
+				source: result.error.code
 			});
 		});
 
