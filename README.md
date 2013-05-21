@@ -81,6 +81,7 @@ Core Team members:
  * [Wolfgang Kluge](http://klugesoftware.de/) ([blog](http://gehirnwindung.de/))
  * [Josh Perez](http://www.goatslacker.com/) ([@goatslacker](http://twitter.com/goatslacker))
  * [Brent Lintner](http://brentlintner.heroku.com/) ([@brentlintner](http://twitter.com/brentlintner))
+ * [Bernard Pratz](http://i.got.nothing.to/blog/) ([@guyzmo](https://twitter.com/guyzmo))
 
 Maintainer: Anton Kovalyov
 
