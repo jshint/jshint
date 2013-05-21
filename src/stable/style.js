@@ -64,20 +64,36 @@ exports.register = function (linter) {
 	});
 
 	// Check that all identifiers are using camelCase notation.
-	// Exceptions: names like MY_VAR and _myVar.
+	// Exceptions: names like MY_VAR, _myVar, and myVar_.
 
 	linter.on("Identifier", function style_scanCamelCase(data) {
+		var camelCaseRE = /^[A-Za-z0-9]+$/;
+		var upperCaseRE = /^[A-Z0-9_]+$/;
+		var isNice = function (identifier) {
+			return camelCaseRE.test(identifier) || upperCaseRE.test(identifier);
+		};
+
 		if (!linter.getOption("camelcase")) {
 			return;
 		}
 
-		if (data.name.replace(/^_+/, "").indexOf("_") > -1 && !data.name.match(/^[A-Z0-9_]*$/)) {
-			linter.warn("W106", {
-				line: data.line,
-				char: data.from,
-				data: [ data.name ]
-			});
+		if (isNice(data.name)) {
+			return;
 		}
+
+		if (/^_+/.test(data.name) && isNice(data.name.replace(/^_+/, ""))) {
+			return;
+		}
+
+		if (/_+$/.test(data.name) && isNice(data.name.replace(/_+$/, ""))) {
+			return;
+		}
+
+		linter.warn("W106", {
+			line: data.line,
+			char: data.from,
+			data: [ data.name ]
+		});
 	});
 
 	// Enforce consistency in style of quoting.
