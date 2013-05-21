@@ -238,7 +238,6 @@ exports.codemirror3 = function (test) {
 		.addError(4093, "Unnecessary semicolon.")
 		.addError(4168, "Wrap the /regexp/ literal in parens to disambiguate the slash operator.")
 		.addError(4277, "'range' is defined but never used.")
-		.addError(4357, "Expected '{' and instead saw 'pos'.")
 		.test(src, opt, { CodeMirror: true });
 
 	test.done();

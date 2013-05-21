@@ -104,7 +104,9 @@ function findConfig(file) {
 	var name = ".jshintrc";
 	var dir = path.dirname(path.resolve(file));
 	var proj = findFile(name, dir);
-	var home = path.normalize(path.join(process.env.HOME || process.env.HOMEPATH, name));
+	var home = path.normalize(path.join(process.env.HOME ||
+	                                    process.env.HOMEPATH ||
+	                                    process.env.USERPROFILE, name));
 
 	if (proj) {
 		return proj;

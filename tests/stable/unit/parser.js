@@ -461,20 +461,16 @@ exports.comma = function (test) {
 	var src = fs.readFileSync(__dirname + "/fixtures/comma.js", "utf8");
 
 	TestRun(test)
-		.addError(6, "Expected a conditional expression and instead saw an assignment.")
-		.addError(6, "Expected \';\' and instead saw \',\'.")
-		.addError(6, "Expected \')\' to match \'(\' from line 6 and instead saw \';\'.")
-		.addError(6, "Missing semicolon.")
-		.addError(6, "Expected an identifier and instead saw \')\'.")
-		.addError(6, "Expected an assignment or function call and instead saw an expression.")
-		.addError(6, "Missing semicolon.")
-		.addError(6, "Expected an assignment or function call and instead saw an expression.")
-		.addError(6, "Missing semicolon.")
+		.addError(2, "Expected an assignment or function call and instead saw an expression.")
 		.addError(15, "Expected an assignment or function call and instead saw an expression.")
 		.addError(15, "Missing semicolon.")
 		.addError(20, "Expected an assignment or function call and instead saw an expression.")
 		.addError(30, "Expected an assignment or function call and instead saw an expression.")
+		.addError(35, "Expected an assignment or function call and instead saw an expression.")
+		.addError(35, "Missing semicolon.")
 		.addError(36, "Unexpected 'if'.")
+		.addError(43, "Expected an assignment or function call and instead saw an expression.")
+		.addError(43, "Missing semicolon.")
 		.addError(44, "Unexpected '}'.")
 		.test(src, {es3: true});
 
@@ -3042,10 +3038,10 @@ exports["test for GH-1010"] = function (test) {
 	];
 
 	var run = TestRun(test);
-	run.test(code, {es3: true});
-	run.test(code, {}); // es5
-	run.test(code, {esnext: true});
-	run.test(code, {moz: true});
+	run.test(code, {expr: true, es3: true});
+	run.test(code, {expr: true}); // es5
+	run.test(code, {expr: true, esnext: true});
+	run.test(code, {expr: true, moz: true});
 
 	test.done();
 };
@@ -3194,6 +3190,47 @@ exports["class and method naming"] = function (test) {
 		.addError(7, "A class method cannot be named 'prototype'.");
 
 	run.test(code, {esnext: true});
+
+	test.done();
+};
+
+exports["test for GH-1018"] = function (test) {
+	var code = [
+		"if (a = 42) {}",
+		"else if (a = 42) {}",
+		"while (a = 42) {}",
+		"for (a = 42; a = 42; a += 42) {}",
+		"do {} while (a = 42);",
+		"switch (a = 42) {}"
+	];
+
+	var run = TestRun(test);
+	run.test(code, {boss: true});
+
+	for (var i = 0; i < code.length; i++) {
+		run.addError(i + 1, "Expected a conditional expression and instead saw an assignment.");
+	}
+
+	run.test(code);
+
+	test.done();
+};
+
+exports["test warnings for assignments in conditionals"] = function (test) {
+	var code = [
+		"if (a = b) { }",
+		"if ((a = b)) { }",
+		"if (a = b, a) { }",
+		"if (a = b, b = c) { }",
+		"if ((a = b, b = c)) { }",
+		"if (a = b, (b = c)) { }"
+	];
+
+	var run = TestRun(test)
+		.addError(1, "Expected a conditional expression and instead saw an assignment.")
+		.addError(4, "Expected a conditional expression and instead saw an assignment.");
+
+	run.test(code); // es5
 
 	test.done();
 };
