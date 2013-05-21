@@ -3468,7 +3468,8 @@ var JSHINT = (function () {
 		advance("(");
 		nonadjacent(this, t);
 		nospace();
-		this.condition = expression(20);
+		expression(20);
+		parseCondAssignment();
 		advance(")", t);
 		nospace(state.tokens.prev, state.tokens.curr);
 		nonadjacent(state.tokens.curr, state.tokens.next);
