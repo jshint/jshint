@@ -378,25 +378,26 @@ var JSHINT = (function () {
 			combine(predefined, vars.yui);
 		}
 
-		// let's assume that chronologically ES3 < ES5 < ES6/ESNext < Moz
+		// Let's assume that chronologically ES3 < ES5 < ES6/ESNext < Moz
+
 		state.option.inMoz = function (strict) {
 			if (strict) {
 				return state.option.moz && !state.option.esnext;
 			}
 			return state.option.moz;
 		};
+
 		state.option.inESNext = function (strict) {
 			if (strict) {
 				return !state.option.moz && state.option.esnext;
 			}
 			return state.option.moz || state.option.esnext;
 		};
-		state.option.inES5 = function (strict) {
-			if (strict) {
-				return !state.option.moz && !state.option.esnext && !state.option.es3;
-			}
+
+		state.option.inES5 = function (/* strict */) {
 			return !state.option.es3;
 		};
+
 		state.option.inES3 = function (strict) {
 			if (strict) {
 				return !state.option.moz && !state.option.esnext && state.option.es3;
