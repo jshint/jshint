@@ -1766,7 +1766,7 @@ var JSHINT = (function () {
 						}
 					}
 				}
-				expression(0);
+				expression(5);
 
 				if (state.option.strict && funct["(context)"]["(global)"]) {
 					if (!m["use strict"] && !state.directive["use strict"]) {
