@@ -247,6 +247,7 @@ exports.curly = function (test) {
 		.addError(2, "Expected '{' and instead saw 'return'.")
 		.addError(5, "Expected '{' and instead saw 'doSomething'.")
 		.addError(8, "Expected '{' and instead saw 'doSomething'.")
+		.addError(11, "Expected '{' and instead saw 'doSomething'.")
 		.test(src, { es3: true, curly: true });
 
 	TestRun(test).test(src1, { es3: true, curly: true });
@@ -1245,7 +1246,11 @@ exports.scope = function (test) {
 };
 
 /*
- * Tests the `esnext` option
+ * Tests `esnext` and `moz` options.
+ *
+ * This test simply makes sure that options are recognizable
+ * and do not reset ES5 mode (see GH-1068)
+ *
  */
 exports.esnext = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/const.js', 'utf8');
@@ -1254,7 +1259,8 @@ exports.esnext = function (test) {
 		'const myConst = true;',
 		'const foo = 9;',
 		'var myConst = function (test) { };',
-		'foo = "hello world";'
+		'foo = "hello world";',
+		'var a = { get x() {} };'
 	];
 
 	TestRun(test)
@@ -1262,9 +1268,18 @@ exports.esnext = function (test) {
 		.test(src, { esnext: true });
 
 	TestRun(test)
+		.addError(21, "const 'immutable4' is initialized to 'undefined'.")
+		.test(src, { moz: true });
+
+	TestRun(test)
 		.addError(3, "const 'myConst' has already been declared.")
 		.addError(4, "Attempting to override 'foo' which is a constant.")
 		.test(code, { esnext: true });
+
+	TestRun(test)
+		.addError(3, "const 'myConst' has already been declared.")
+		.addError(4, "Attempting to override 'foo' which is a constant.")
+		.test(code, { moz: true });
 
 	test.done();
 };
