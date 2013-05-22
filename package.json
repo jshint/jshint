@@ -10,6 +10,15 @@
 		"url":   "http://anton.kovalyov.net/"
 	},
 
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/jshint/jshint.git"
+	},
+
+	"bugs": {
+		"url": "https://github.com/jshint/jshint/issues"
+	},
+
 	"bin": {
 		"jshint": "./bin/jshint"
 	},
