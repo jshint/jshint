@@ -35,8 +35,8 @@
 		"shelljs":    "0.1.x",
 		"browserify": "2.12.x",
 		"coveraje":   "0.2.x",
-		"nodeunit":   "0.7.x",
-		"sinon":      "1.6.x"
+		"nodeunit":   "0.8.x",
+		"sinon":      "1.7.x"
 	},
 
 	"licenses": [
