@@ -3807,7 +3807,10 @@ var JSHINT = (function () {
 				}
 			}
 		} else {
-			nolinebreak(this); // always warn (Line breaking error)
+			if (state.tokens.next.type === "(punctuator)" &&
+				["[", "{", "+", "-"].indexOf(state.tokens.next.value) > -1) {
+				nolinebreak(this); // always warn (Line breaking error)
+			}
 		}
 		reachable("return");
 		return this;

@@ -315,7 +315,6 @@ exports.asi = function (test) {
 
 	TestRun(test, 1)
 		.addError(2, "Missing semicolon.")
-		.addError(4, "Line breaking error 'return'.")
 		.addError(4, "Missing semicolon.")
 		.addError(5, "Missing semicolon.")
 		.addError(9, "Line breaking error 'continue'.")
@@ -325,7 +324,6 @@ exports.asi = function (test) {
 		.addError(11, "Missing semicolon.")
 		.addError(12, "Missing semicolon.")
 		.addError(16, "Missing semicolon.")
-		.addError(17, "Line breaking error 'return'.")
 		.addError(17, "Missing semicolon.")
 		.addError(19, "Line breaking error 'break'.")
 		.addError(19, "Missing semicolon.")
@@ -339,8 +337,6 @@ exports.asi = function (test) {
 
 	TestRun(test, 2)
 		.addError(2, "Missing semicolon.") // throw on "use strict", even option asi is used
-		.addError(4, "Line breaking error 'return'.")
-		.addError(17, "Line breaking error 'return'.")
 		.test(src, { es3: true, asi: true });
 
 	test.done();
