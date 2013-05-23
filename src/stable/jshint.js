@@ -854,6 +854,22 @@ var JSHINT = (function () {
 		}
 	}
 
+	function isInfix(token) {
+		return token.infix || (!token.identifier && !!token.led);
+	}
+
+	function isEndOfExpr() {
+		var curr = state.tokens.curr;
+		var next = state.tokens.next;
+		if (next.id === ";" || next.id === "}") {
+			return true;
+		}
+		if (isInfix(next) === isInfix(curr)) {
+			return curr.line !== next.line;
+		}
+		return false;
+	}
+
 	// This is the heart of JSHINT, the Pratt parser. In addition to parsing, it
 	// is looking for ad hoc lint patterns. We add .fud to Pratt's model, which is
 	// like .nud except that it is only used on the first token of a statement.
@@ -904,10 +920,7 @@ var JSHINT = (function () {
 				error("E030", state.tokens.curr, state.tokens.curr.id);
 			}
 
-			var end_of_expr = state.tokens.next.identifier &&
-									!state.tokens.curr.led &&
-									state.tokens.curr.line !== state.tokens.next.line;
-			while (rbp < state.tokens.next.lbp && !end_of_expr) {
+			while (rbp < state.tokens.next.lbp && !isEndOfExpr()) {
 				isArray = state.tokens.curr.value === "Array";
 				isObject = state.tokens.curr.value === "Object";
 
@@ -1215,6 +1228,7 @@ var JSHINT = (function () {
 	function infix(s, f, p, w) {
 		var x = symbol(s, p);
 		reserveName(x);
+		x.infix = true;
 		x.led = function (left) {
 			if (!w) {
 				nobreaknonadjacent(state.tokens.prev, state.tokens.curr);
