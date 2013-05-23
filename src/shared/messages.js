@@ -64,7 +64,8 @@ var errors = {
 	E046: "A yield statement shall be within a generator function (with syntax: `function*`)",
 	E047: "A generator function shall contain a yield statement.",
 	E048: "Let declaration not directly within block.",
-	E049: "A {a} cannot be named '{b}'."
+	E049: "A {a} cannot be named '{b}'.",
+	E050: "Mozilla requires the yield expression to be parenthesized here."
 };
 
 var warnings = {

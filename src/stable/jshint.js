@@ -1096,7 +1096,6 @@ var JSHINT = (function () {
 			case "in":
 			case "instanceof":
 			case "return":
-			case "yield":
 			case "switch":
 			case "throw":
 			case "try":
@@ -3830,7 +3829,8 @@ var JSHINT = (function () {
 		return this;
 	}).exps = true;
 
-	stmt("yield", function () {
+	prefix("yield", function () {
+		this.lbp = 8;
 		if (state.option.inESNext(true) && funct["(generator)"] !== true) {
 			error("E046", state.tokens.curr, "yield");
 		} else if (!state.option.inESNext()) {
@@ -3843,11 +3843,15 @@ var JSHINT = (function () {
 
 			if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
 				nonadjacent(state.tokens.curr, state.tokens.next);
-				this.first = expression(0);
+				this.first = expression(5);
 
 				if (this.first.type === "(punctuator)" && this.first.value === "=" && !state.option.boss) {
 					warningAt("W093", this.first.line, this.first.character);
 				}
+			}
+
+			if (state.option.inMoz() && !isEndOfExpr() && state.tokens.next.id !== ")") {
+				error("E050", state.tokens.curr);
 			}
 		} else if (!state.option.asi) {
 			nolinebreak(this); // always warn (Line breaking error)
