@@ -1539,7 +1539,7 @@ var JSHINT = (function () {
 					isundef(funct, "W117", tok.token, tok.id);
 				});
 				advance("=");
-				destructuringExpressionMatch(values, expression(5, true));
+				destructuringExpressionMatch(values, expression(10, true));
 				advance(";");
 				return;
 			}
@@ -1779,7 +1779,7 @@ var JSHINT = (function () {
 						}
 					}
 				}
-				expression(5);
+				expression(10);
 
 				if (state.option.strict && funct["(context)"]["(global)"]) {
 					if (!m["use strict"] && !state.directive["use strict"]) {
@@ -2060,7 +2060,7 @@ var JSHINT = (function () {
 			return that;
 		}
 		while (true) {
-			if (!(expr = expression(5)))  {
+			if (!(expr = expression(10)))  {
 				break;
 			}
 			that.exprs.push(expr);
@@ -2069,7 +2069,7 @@ var JSHINT = (function () {
 			}
 		}
 		return that;
-	}, 5);
+	}, 10);
 	infix("?", function (left, that) {
 		that.left = left;
 		that.right = expression(10);
@@ -2172,7 +2172,7 @@ var JSHINT = (function () {
 	prefix("--", "predec");
 	state.syntax["--"].exps = true;
 	prefix("delete", function () {
-		var p = expression(5);
+		var p = expression(10);
 		if (!p || (p.id !== "." && p.id !== "[")) {
 			warning("W051");
 		}
@@ -2404,7 +2404,7 @@ var JSHINT = (function () {
 						exprs.push(bracket.left[t].token);
 					}
 				} else {
-					exprs.push(expression(5));
+					exprs.push(expression(10));
 				}
 				if (state.tokens.next.id !== ",") {
 					break;
@@ -2440,7 +2440,7 @@ var JSHINT = (function () {
 	infix("[", function (left, that) {
 		nobreak(state.tokens.prev, state.tokens.curr);
 		nospace();
-		var e = expression(5), s;
+		var e = expression(10), s;
 		if (e && e.type === "(string)") {
 			if (!state.option.evil && (e.value === "eval" || e.value === "execScript")) {
 				warning("W061", that);
@@ -2471,7 +2471,7 @@ var JSHINT = (function () {
 		res.exps = true;
 		funct["(comparray)"].stack();
 
-		res.right = expression(5);
+		res.right = expression(10);
 		advance("for");
 		if (state.tokens.next.value === "each") {
 			advance("each");
@@ -2481,13 +2481,13 @@ var JSHINT = (function () {
 		}
 		advance("(");
 		funct["(comparray)"].setState("define");
-		res.left = expression(5);
+		res.left = expression(10);
 		advance(")");
 		if (state.tokens.next.value === "if") {
 			advance("if");
 			advance("(");
 			funct["(comparray)"].setState("filter");
-			res.filter = expression(5);
+			res.filter = expression(10);
 			advance(")");
 		}
 		advance("]");
@@ -3087,7 +3087,7 @@ var JSHINT = (function () {
 				if (peek(0).id === "=" && state.tokens.next.identifier) {
 					error("E037", state.tokens.next, state.tokens.next.value);
 				}
-				value = expression(5);
+				value = expression(10);
 				if (lone) {
 					tokens[0].first = value;
 				} else {
@@ -3154,7 +3154,7 @@ var JSHINT = (function () {
 				if (peek(0).id === "=" && state.tokens.next.identifier) {
 					error("E038", state.tokens.next, state.tokens.next.value);
 				}
-				value = expression(5);
+				value = expression(10);
 				if (lone) {
 					tokens[0].first = value;
 				} else {
@@ -3234,7 +3234,7 @@ var JSHINT = (function () {
 				if (peek(0).id === "=" && state.tokens.next.identifier) {
 					error("E037", state.tokens.next, state.tokens.next.value);
 				}
-				value = expression(5);
+				value = expression(10);
 				if (lone) {
 					tokens[0].first = value;
 				} else {
