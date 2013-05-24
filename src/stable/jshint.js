@@ -1334,7 +1334,7 @@ var JSHINT = (function () {
 						warning("E031", that);
 					}
 
-					that.right = expression(19);
+					that.right = expression(10);
 					return that;
 				} else if (left.id === "[") {
 					if (state.tokens.curr.left.first) {
@@ -1348,13 +1348,13 @@ var JSHINT = (function () {
 					} else if (left.left.value === "arguments" && !state.directive["use strict"]) {
 						warning("E031", that);
 					}
-					that.right = expression(19);
+					that.right = expression(10);
 					return that;
 				} else if (left.identifier && !isReserved(left)) {
 					if (funct[left.value] === "exception") {
 						warning("W022", left);
 					}
-					that.right = expression(19);
+					that.right = expression(10);
 					return that;
 				}
 
@@ -1394,7 +1394,7 @@ var JSHINT = (function () {
 			if (left) {
 				if (left.id === "." || left.id === "[" ||
 						(left.identifier && !isReserved(left))) {
-					expression(19);
+					expression(10);
 					return that;
 				}
 				if (left === state.syntax["function"]) {
