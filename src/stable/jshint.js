@@ -2743,7 +2743,7 @@ var JSHINT = (function () {
 	// For example: if (a = 1) { ... }
 
 	function checkCondAssignment(expr) {
-		var id = expr.id;
+		var id = expr && expr.id;
 		if (id === ",") {
 			expr = expr.exprs[expr.exprs.length - 1];
 			id = expr.id;
