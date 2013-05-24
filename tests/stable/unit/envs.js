@@ -62,7 +62,9 @@ exports.node = function (test) {
 		"setTimeout",
 		"clearTimeout",
 		"setInterval",
-		"clearInterval"
+		"clearInterval",
+		"setImmediate",
+		"clearImmediate"
 	];
 
 	globalsImplied(test, globals);
