@@ -165,7 +165,7 @@ function asyncTrigger() {
 		},
 
 		check: function () {
-			for (var check in _checks) {
+			for (var check = 0; check < _checks.length; ++check) {
 				_checks[check]();
 			}
 
