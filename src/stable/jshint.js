@@ -3830,7 +3830,7 @@ var JSHINT = (function () {
 	}).exps = true;
 
 	prefix("yield", function () {
-		this.lbp = 8;
+		this.lbp = 15;
 		if (state.option.inESNext(true) && funct["(generator)"] !== true) {
 			error("E046", state.tokens.curr, "yield");
 		} else if (!state.option.inESNext()) {
@@ -3843,7 +3843,7 @@ var JSHINT = (function () {
 
 			if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
 				nonadjacent(state.tokens.curr, state.tokens.next);
-				this.first = expression(5);
+				this.first = expression(10);
 
 				if (this.first.type === "(punctuator)" && this.first.value === "=" && !state.option.boss) {
 					warningAt("W093", this.first.line, this.first.character);
