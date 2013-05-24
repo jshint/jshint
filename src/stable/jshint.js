@@ -3749,7 +3749,7 @@ var JSHINT = (function () {
 		if (!state.option.asi)
 			nolinebreak(this);
 
-		if (state.tokens.next.id !== ";") {
+		if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
 			if (state.tokens.curr.line === state.tokens.next.line) {
 				if (funct[v] !== "label") {
 					warning("W090", state.tokens.next, v);
@@ -3774,7 +3774,7 @@ var JSHINT = (function () {
 		if (!state.option.asi)
 			nolinebreak(this);
 
-		if (state.tokens.next.id !== ";") {
+		if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
 			if (state.tokens.curr.line === state.tokens.next.line) {
 				if (funct[v] !== "label") {
 					warning("W090", state.tokens.next, v);
