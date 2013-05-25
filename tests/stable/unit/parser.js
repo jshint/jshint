@@ -3260,3 +3260,18 @@ exports["test for GH-1089"] = function (test) {
 
 	test.done();
 };
+
+exports["test for GH-1105"] = function (test) {
+	var code = [
+		"while (true) {",
+		"    if (true) { break }",
+		"}"
+	];
+
+	var run = TestRun(test)
+		.addError(2, "Missing semicolon.");
+
+	run.test(code);
+
+	test.done();
+};
