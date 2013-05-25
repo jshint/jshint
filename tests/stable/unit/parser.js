@@ -3275,3 +3275,18 @@ exports["test for GH-1105"] = function (test) {
 
 	test.done();
 };
+
+exports["test for crash with empty condition"] = function (test) {
+	var code = [
+		"do {} while ();"
+	];
+
+	var run = TestRun(test)
+		.addError(1, "Expected an identifier and instead saw ')'.")
+		.addError(1, "Expected ')' to match '(' from line 1 and instead saw ';'.")
+		.addError(1, "Missing semicolon.");
+
+	run.test(code);
+
+	test.done();
+};
