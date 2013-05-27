@@ -864,7 +864,7 @@ var JSHINT = (function () {
 		if (next.id === ";" || next.id === "}") {
 			return true;
 		}
-		if (isInfix(next) === isInfix(curr)) {
+		if (isInfix(next) === isInfix(curr) || curr.id === "yield") {
 			return curr.line !== next.line;
 		}
 		return false;
