@@ -864,7 +864,7 @@ var JSHINT = (function () {
 		if (next.id === ";" || next.id === "}") {
 			return true;
 		}
-		if (isInfix(next) === isInfix(curr) || curr.id === "yield") {
+		if (isInfix(next) === isInfix(curr) || (curr.id === "yield" && state.option.inMoz(true))) {
 			return curr.line !== next.line;
 		}
 		return false;
@@ -3829,15 +3829,17 @@ var JSHINT = (function () {
 		return this;
 	}).exps = true;
 
-	prefix("yield", function () {
-		this.lbp = 15;
+	(function (x) {
+		x.exps = true;
+		x.lbp = 15;
+	}(prefix("yield", function () {
 		if (state.option.inESNext(true) && funct["(generator)"] !== true) {
 			error("E046", state.tokens.curr, "yield");
 		} else if (!state.option.inESNext()) {
 			warning("W104", state.tokens.curr, "yield");
 		}
 		funct["(generator)"] = "yielded";
-		if (this.line === state.tokens.next.line) {
+		if (this.line === state.tokens.next.line || !state.option.inMoz(true)) {
 			if (state.tokens.next.id === "(regexp)")
 				warning("W092");
 
@@ -3850,14 +3852,14 @@ var JSHINT = (function () {
 				}
 			}
 
-			if (state.option.inMoz() && !isEndOfExpr() && state.tokens.next.id !== ")") {
-				error("E050", state.tokens.curr);
+			if (state.option.inMoz(true) && !isEndOfExpr() && state.tokens.next.id !== ")") {
+				error("E050", this);
 			}
 		} else if (!state.option.asi) {
 			nolinebreak(this); // always warn (Line breaking error)
 		}
 		return this;
-	}).exps = true;
+	})));
 
 
 	stmt("throw", function () {
