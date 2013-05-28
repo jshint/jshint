@@ -1313,9 +1313,7 @@ var JSHINT = (function () {
 	}
 
 	function assignop(s) {
-		symbol(s, 20).exps = true;
-
-		return infix(s, function (left, that) {
+		var x = infix(s, function (left, that) {
 			that.left = left;
 
 			if (left) {
@@ -1368,6 +1366,10 @@ var JSHINT = (function () {
 
 			error("E031", that);
 		}, 20);
+
+		x.exps = true;
+		x.assign = true;
+		return x;
 	}
 
 
