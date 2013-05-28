@@ -3848,7 +3848,8 @@ var JSHINT = (function () {
 			if (state.tokens.next.id === "(regexp)")
 				warning("W092");
 
-			if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
+			if (state.tokens.next.id !== ";" && !state.tokens.next.reach &&
+					state.tokens.next.id !== ",") {
 				nonadjacent(state.tokens.curr, state.tokens.next);
 				this.first = expression(10);
 
