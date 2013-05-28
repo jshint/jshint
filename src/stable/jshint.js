@@ -1050,26 +1050,29 @@ var JSHINT = (function () {
 		}
 	}
 
+	function nobreakcomma(left, right) {
+		if (left.line !== right.line) {
+			if (!state.option.laxcomma) {
+				if (comma.first) {
+					warning("I001");
+					comma.first = false;
+				}
+				warning("W014", left, right.value);
+			}
+		} else if (!left.comment && left.character !== right.from && state.option.white) {
+			left.from += (left.character - left.from);
+			warning("W011", left, left.value);
+		}
+	}
 
 	function comma(opts) {
 		opts = opts || {};
 
 		if (!opts.peek) {
-			if (state.tokens.curr.line !== state.tokens.next.line) {
-				if (!state.option.laxcomma) {
-					if (comma.first) {
-						warning("I001");
-						comma.first = false;
-					}
-					warning("W014", state.tokens.curr, state.tokens.next.value);
-				}
-			} else if (!state.tokens.curr.comment &&
-					state.tokens.curr.character !== state.tokens.next.from && state.option.white) {
-				state.tokens.curr.from += (state.tokens.curr.character - state.tokens.curr.from);
-				warning("W011", state.tokens.curr, state.tokens.curr.value);
-			}
-
+			nobreakcomma(state.tokens.curr, state.tokens.next);
 			advance(",");
+		} else {
+			nobreakcomma(state.tokens.prev, state.tokens.curr);
 		}
 
 		// TODO: This is a temporary solution to fight against false-positives in
