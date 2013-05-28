@@ -3260,3 +3260,76 @@ exports["test for GH-1089"] = function (test) {
 
 	test.done();
 };
+
+exports["test 'yield' in compound expressions."] = function (test) {
+	var code = [
+		"function* F() {",
+		"    // comma            (line  2)",
+		"    a, yield b",
+		"    yield c, d",
+		"    e, yield f, g",
+		"    yield h",
+		"    , i",
+		"    yield yield j",
+		"    yield",          // (line  9)-12 is a single comma expression for `esnext: true`
+		"    yield, yield",
+		"    // assign           (line 11)",
+		"    a, bv = yield b",
+		"    cv = yield c, d",
+		"    e, fv = yield f, g",
+		"    hv = yield h",
+		"    , i",
+		"    yield jv = yield j",
+		"    yield",          // (line 18)-21 is a single comma expression for `esnext: true`
+		"    yield, yield",
+		"    // addition, unary  (line 20)",
+		"    a + yield b",
+		"    yield c + d",
+		"    e + yield f + g",
+		"    yield h",
+		"    + i",
+		"    yield + yield + j",
+		"    yield",          // (line 27)-29 is a single expression for `esnext: true`
+		"    yield",
+		"    + k",
+		"}"
+	];
+
+	var run = TestRun(test)
+		.addError( 3, "Expected an assignment or function call and instead saw an expression.")
+		.addError( 4, "Expected an assignment or function call and instead saw an expression.")
+		.addError( 5, "Expected an assignment or function call and instead saw an expression.")
+		.addError( 7, "Comma warnings can be turned off with 'laxcomma'.")
+		.addError( 6, "Bad line breaking before ','.")
+		.addError( 7, "Expected an assignment or function call and instead saw an expression.")
+		.addError(12, "Expected an assignment or function call and instead saw an expression.")
+		.addError(13, "Expected an assignment or function call and instead saw an expression.")
+		.addError(14, "Expected an assignment or function call and instead saw an expression.")
+		.addError(15, "Bad line breaking before ','.")
+		.addError(16, "Expected an assignment or function call and instead saw an expression.")
+		.addError(17, "Did you mean to return a conditional instead of an assignment?")
+		.addError(21, "Expected an assignment or function call and instead saw an expression.")
+		.addError(23, "Expected an assignment or function call and instead saw an expression.")
+		.addError(25, "Bad line breaking before '+'.");
+
+	run.test(code, {asi: true, white: true, esnext: true});
+
+	run
+		.addError( 1, "'function*' is only available in ES6 (use esnext option).")
+		.addError( 4, "Mozilla requires the yield expression to be parenthesized here.")
+		.addError( 5, "Mozilla requires the yield expression to be parenthesized here.")
+		.addError( 6, "Mozilla requires the yield expression to be parenthesized here.")
+		.addError( 8, "Mozilla requires the yield expression to be parenthesized here.")
+		.addError(10, "Mozilla requires the yield expression to be parenthesized here.")
+		.addError(10, "Expected an assignment or function call and instead saw an expression.")
+		.addError(19, "Mozilla requires the yield expression to be parenthesized here.")
+		.addError(19, "Expected an assignment or function call and instead saw an expression.")
+		.addError(21, "Mozilla requires the yield expression to be parenthesized here.")
+		.addError(23, "Mozilla requires the yield expression to be parenthesized here.")
+		.addError(26, "Mozilla requires the yield expression to be parenthesized here.")
+		.addError(29, "Expected an assignment or function call and instead saw an expression.");
+
+	run.test(code, {asi: true, white: true, moz: true});
+
+	test.done();
+};
