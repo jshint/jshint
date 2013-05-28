@@ -3333,3 +3333,17 @@ exports["test 'yield' in compound expressions."] = function (test) {
 
 	test.done();
 };
+
+exports["test for GH-387"] = function (test) {
+	var code = [
+		"var foo = a",
+		"delete foo.a;"
+	];
+
+	var run = TestRun(test)
+		.addError(1, "Missing semicolon.");
+
+	run.test(code); // es5
+
+	test.done();
+};
