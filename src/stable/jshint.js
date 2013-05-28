@@ -3857,7 +3857,7 @@ var JSHINT = (function () {
 				}
 			}
 
-			if (state.option.inMoz(true) && (prev.lbp >= 25 || !isEndOfExpr()) &&
+			if (state.option.inMoz(true) && (prev.lbp >= 25 || (!prev.assign && !isEndOfExpr())) &&
 					state.tokens.next.id !== ")") {
 				error("E050", this);
 			}
