@@ -3834,7 +3834,7 @@ var JSHINT = (function () {
 		x.lbp = 25;
 	}(prefix("yield", function () {
 		var prev = state.tokens.prev;
-		if (state.option.inESNext(true) && funct["(generator)"] !== true) {
+		if (state.option.inESNext(true) && !funct["(generator)"]) {
 			error("E046", state.tokens.curr, "yield");
 		} else if (!state.option.inESNext()) {
 			warning("W104", state.tokens.curr, "yield");
