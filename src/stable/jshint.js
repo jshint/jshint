@@ -3831,8 +3831,9 @@ var JSHINT = (function () {
 
 	(function (x) {
 		x.exps = true;
-		x.lbp = 15;
+		x.lbp = 25;
 	}(prefix("yield", function () {
+		var prev = state.tokens.prev;
 		if (state.option.inESNext(true) && funct["(generator)"] !== true) {
 			error("E046", state.tokens.curr, "yield");
 		} else if (!state.option.inESNext()) {
@@ -3852,7 +3853,8 @@ var JSHINT = (function () {
 				}
 			}
 
-			if (state.option.inMoz(true) && !isEndOfExpr() && state.tokens.next.id !== ")") {
+			if (state.option.inMoz(true) && (prev.lbp >= 25 || !isEndOfExpr()) &&
+					state.tokens.next.id !== ")") {
 				error("E050", this);
 			}
 		} else if (!state.option.asi) {
