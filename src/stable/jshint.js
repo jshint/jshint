@@ -1312,8 +1312,8 @@ var JSHINT = (function () {
 				node.type === "undefined");
 	}
 
-	function assignop(s) {
-		var x = infix(s, function (left, that) {
+	function assignop(s, f, p) {
+		var x = infix(s, typeof f === "function" ? f : function (left, that) {
 			that.left = left;
 
 			if (left) {
@@ -1365,7 +1365,7 @@ var JSHINT = (function () {
 			}
 
 			error("E031", that);
-		}, 20);
+		}, p);
 
 		x.exps = true;
 		x.assign = true;
