@@ -1389,8 +1389,7 @@ var JSHINT = (function () {
 
 
 	function bitwiseassignop(s) {
-		symbol(s, 20).exps = true;
-		return infix(s, function (left, that) {
+		return assignop(s, function (left, that) {
 			if (state.option.bitwise) {
 				warning("W016", that, that.id);
 			}
