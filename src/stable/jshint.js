@@ -2072,7 +2072,7 @@ var JSHINT = (function () {
 			}
 		}
 		return that;
-	}, 10);
+	}, 10, true);
 	infix("?", function (left, that) {
 		that.left = left;
 		that.right = expression(10);
