@@ -3315,3 +3315,75 @@ exports["test for GH-387"] = function (test) {
 
 	test.done();
 };
+
+exports["test for line breaks with 'yield'"] = function (test) {
+	var code = [
+		"function* F() {",
+		"    a = b + (yield",
+		"    c",
+		"    );",
+		"    d = yield",
+		"    + e;",
+		"    f = (yield",
+		"    , g);",
+		"    h = yield",
+		"    ? i : j;",
+		"    k = l ? yield",
+		"    : m;",
+		"    n = o ? p : yield",
+		"    + r;",
+		"}"
+	];
+
+	var run = TestRun(test)
+		.addError( 3, "Bad line breaking before 'c'.")
+		.addError( 6, "Bad line breaking before '+'.")
+		.addError( 8, "Comma warnings can be turned off with 'laxcomma'.")
+		.addError( 7, "Bad line breaking before ','.")
+		.addError(10, "Bad line breaking before '?'.")
+		.addError(14, "Bad line breaking before '+'.");
+
+	run.test(code, {esnext: true});
+
+	// Mozilla assumes the statement has ended if there is a line break
+	// following a `yield`. This naturally causes havoc with the subsequent
+	// parse.
+	//
+	// Note: there is one exception to the line-breaking rule:
+	// ```js
+	// a ? yield
+	// : b;
+	// ```
+	run = TestRun(test)
+		.addError( 1, "'function*' is only available in ES6 (use esnext option).")
+		.addError( 3, "Expected ')' to match '(' from line 2 and instead saw 'c'.")
+		.addError( 4, "Expected an identifier and instead saw ')'.")
+		.addError( 4, "Expected an assignment or function call and instead saw an expression.")
+		.addError( 6, "Expected an assignment or function call and instead saw an expression.")
+		.addError( 8, "Comma warnings can be turned off with 'laxcomma'.")
+		.addError( 7, "Bad line breaking before ','.")
+		.addError(10, "Expected an identifier and instead saw '?'.")
+		.addError(10, "Expected an assignment or function call and instead saw an expression.")
+		.addError(10, "Label 'i' on j statement.")
+		.addError(10, "Expected an assignment or function call and instead saw an expression.")
+		.addError(14, "Expected an assignment or function call and instead saw an expression.");
+
+	run.test(code, {moz: true, asi: true});
+
+	run
+		.addError( 2, "Line breaking error 'yield'.")
+		.addError( 3, "Missing semicolon.")
+		.addError( 5, "Line breaking error 'yield'.")
+		.addError( 5, "Missing semicolon.")
+		.addError( 7, "Line breaking error 'yield'.")
+		.addError( 9, "Line breaking error 'yield'.")
+		.addError( 9, "Missing semicolon.")
+		.addError(10, "Missing semicolon.")
+		.addError(11, "Line breaking error 'yield'.")
+		.addError(13, "Line breaking error 'yield'.")
+		.addError(13, "Missing semicolon.");
+
+	run.test(code, {moz: true});
+
+	test.done();
+};
