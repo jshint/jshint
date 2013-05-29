@@ -3849,7 +3849,7 @@ var JSHINT = (function () {
 				warning("W092");
 
 			if (state.tokens.next.id !== ";" && !state.tokens.next.reach && state.tokens.next.nud) {
-				nonadjacent(state.tokens.curr, state.tokens.next);
+				nobreaknonadjacent(state.tokens.curr, state.tokens.next);
 				this.first = expression(10);
 
 				if (this.first.type === "(punctuator)" && this.first.value === "=" && !state.option.boss) {
