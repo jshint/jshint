@@ -7,6 +7,7 @@
 var JSHINT	= require('../../../src/stable/jshint.js').JSHINT;
 var fs		= require('fs');
 var TestRun = require("../helpers/testhelper").setup.testRun;
+var path    = require("path");
 
 exports.unsafe = function (test) {
 	var code = [
@@ -3257,6 +3258,132 @@ exports["test for GH-1089"] = function (test) {
 		.addError(4, "'function closure expressions' is only available in Mozilla JavaScript " +
 				"extensions (use moz option).");
 	run.test(code);
+
+	test.done();
+};
+
+exports["test 'yield' in compound expressions."] = function (test) {
+	var code = fs.readFileSync(path.join(__dirname, "./fixtures/yield-expressions.js"), "utf8");
+
+	var run = TestRun(test)
+		.addError(22, "Did you mean to return a conditional instead of an assignment?")
+		.addError(31, "Did you mean to return a conditional instead of an assignment?");
+
+	run.test(code, {maxerr: 1000, expr: true, esnext: true});
+
+	// These are line-column pairs for the Mozilla paren errors.
+	var needparen = [
+		// comma
+		[ 5,  5], [ 6,  8], [ 7,  5], [11,  5], [12,  8], [13,  5],
+		// yield in yield
+		[18, 11], [19, 17], [19, 11], [20, 11], [20,  5], [21, 11], [21,  5], [21, 26], [22, 22],
+		[23, 22], [23, 11], [27, 11], [28, 17], [28, 11], [29, 11], [29,  5], [30, 11], [30,  5],
+		[30, 24], [31, 22], [32, 11], [32, 20],
+		// infix
+		[51, 10], [53, 10], [54, 16], [57, 10], [58,  5], [59, 10], [60,  5], [60, 14],
+		// prefix
+		[64,  6], [65,  7], [66,  6], [67,  7], [70,  6], [71,  7],
+		// ternary
+		[77,  5], [78,  5], [78, 13], [79,  5], [79, 13], [79, 41], [82,  5], [83,  5], [83, 13],
+		[84,  5], [84, 13], [84, 37]
+	];
+
+	needparen.forEach(function (lc) {
+		run.addError(lc[0], "Mozilla requires the yield expression to be parenthesized here.",
+		             {character: lc[1]});
+	})
+
+	run
+		.addError( 1, "'function*' is only available in ES6 (use esnext option).")
+		.addError(74, "'function*' is only available in ES6 (use esnext option).");
+
+	run.test(code, {maxerr: 1000, expr: true, moz: true});
+
+	test.done();
+};
+
+exports["test for GH-387"] = function (test) {
+	var code = [
+		"var foo = a",
+		"delete foo.a;"
+	];
+
+	var run = TestRun(test)
+		.addError(1, "Missing semicolon.");
+
+	run.test(code); // es5
+
+	test.done();
+};
+
+exports["test for line breaks with 'yield'"] = function (test) {
+	var code = [
+		"function* F() {",
+		"    a = b + (yield",
+		"    c",
+		"    );",
+		"    d = yield",
+		"    + e;",
+		"    f = (yield",
+		"    , g);",
+		"    h = yield",
+		"    ? i : j;",
+		"    k = l ? yield",
+		"    : m;",
+		"    n = o ? p : yield",
+		"    + r;",
+		"}"
+	];
+
+	var run = TestRun(test)
+		.addError( 3, "Bad line breaking before 'c'.")
+		.addError( 6, "Bad line breaking before '+'.")
+		.addError( 8, "Comma warnings can be turned off with 'laxcomma'.")
+		.addError( 7, "Bad line breaking before ','.")
+		.addError(10, "Bad line breaking before '?'.")
+		.addError(14, "Bad line breaking before '+'.");
+
+	run.test(code, {esnext: true});
+
+	// Mozilla assumes the statement has ended if there is a line break
+	// following a `yield`. This naturally causes havoc with the subsequent
+	// parse.
+	//
+	// Note: there is one exception to the line-breaking rule:
+	// ```js
+	// a ? yield
+	// : b;
+	// ```
+	run = TestRun(test)
+		.addError( 1, "'function*' is only available in ES6 (use esnext option).")
+		.addError( 3, "Expected ')' to match '(' from line 2 and instead saw 'c'.")
+		.addError( 4, "Expected an identifier and instead saw ')'.")
+		.addError( 4, "Expected an assignment or function call and instead saw an expression.")
+		.addError( 6, "Expected an assignment or function call and instead saw an expression.")
+		.addError( 8, "Comma warnings can be turned off with 'laxcomma'.")
+		.addError( 7, "Bad line breaking before ','.")
+		.addError(10, "Expected an identifier and instead saw '?'.")
+		.addError(10, "Expected an assignment or function call and instead saw an expression.")
+		.addError(10, "Label 'i' on j statement.")
+		.addError(10, "Expected an assignment or function call and instead saw an expression.")
+		.addError(14, "Expected an assignment or function call and instead saw an expression.");
+
+	run.test(code, {moz: true, asi: true});
+
+	run
+		.addError( 2, "Line breaking error 'yield'.")
+		.addError( 3, "Missing semicolon.")
+		.addError( 5, "Line breaking error 'yield'.")
+		.addError( 5, "Missing semicolon.")
+		.addError( 7, "Line breaking error 'yield'.")
+		.addError( 9, "Line breaking error 'yield'.")
+		.addError( 9, "Missing semicolon.")
+		.addError(10, "Missing semicolon.")
+		.addError(11, "Line breaking error 'yield'.")
+		.addError(13, "Line breaking error 'yield'.")
+		.addError(13, "Missing semicolon.");
+
+	run.test(code, {moz: true});
 
 	test.done();
 };
