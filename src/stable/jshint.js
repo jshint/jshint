@@ -1017,7 +1017,7 @@ var JSHINT = (function () {
 		left = left || state.tokens.curr;
 		right = right || state.tokens.next;
 		if (!state.option.laxbreak && left.line !== right.line) {
-			warning("W014", right, right.id);
+			warning("W014", right, right.value);
 		} else if (state.option.white) {
 			left = left || state.tokens.curr;
 			right = right || state.tokens.next;
