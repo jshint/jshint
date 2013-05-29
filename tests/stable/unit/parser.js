@@ -7,6 +7,7 @@
 var JSHINT	= require('../../../src/stable/jshint.js').JSHINT;
 var fs		= require('fs');
 var TestRun = require("../helpers/testhelper").setup.testRun;
+var path    = require("path");
 
 exports.unsafe = function (test) {
 	var code = [
@@ -3262,74 +3263,41 @@ exports["test for GH-1089"] = function (test) {
 };
 
 exports["test 'yield' in compound expressions."] = function (test) {
-	var code = [
-		"function* F() {",
-		"    // comma            (line  2)",
-		"    a, yield b",
-		"    yield c, d",
-		"    e, yield f, g",
-		"    yield h",
-		"    , i",
-		"    yield yield j",
-		"    yield",          // (line  9)-12 is a single comma expression for `esnext: true`
-		"    yield, yield",
-		"    // assign           (line 11)",
-		"    a, bv = yield b",
-		"    cv = yield c, d",
-		"    e, fv = yield f, g",
-		"    hv = yield h",
-		"    , i",
-		"    yield jv = yield j",
-		"    yield",          // (line 18)-21 is a single comma expression for `esnext: true`
-		"    yield, yield",
-		"    // addition, unary  (line 20)",
-		"    a + yield b",
-		"    yield c + d",
-		"    e + yield f + g",
-		"    yield h",
-		"    + i",
-		"    yield + yield + j",
-		"    yield",          // (line 27)-29 is a single expression for `esnext: true`
-		"    yield",
-		"    + k",
-		"}"
-	];
+	var code = fs.readFileSync(path.join(__dirname, "./fixtures/yield-expressions.js"), "utf8");
 
 	var run = TestRun(test)
-		.addError( 3, "Expected an assignment or function call and instead saw an expression.")
-		.addError( 4, "Expected an assignment or function call and instead saw an expression.")
-		.addError( 5, "Expected an assignment or function call and instead saw an expression.")
-		.addError( 7, "Comma warnings can be turned off with 'laxcomma'.")
-		.addError( 6, "Bad line breaking before ','.")
-		.addError( 7, "Expected an assignment or function call and instead saw an expression.")
-		.addError(12, "Expected an assignment or function call and instead saw an expression.")
-		.addError(13, "Expected an assignment or function call and instead saw an expression.")
-		.addError(14, "Expected an assignment or function call and instead saw an expression.")
-		.addError(15, "Bad line breaking before ','.")
-		.addError(16, "Expected an assignment or function call and instead saw an expression.")
-		.addError(17, "Did you mean to return a conditional instead of an assignment?")
-		.addError(21, "Expected an assignment or function call and instead saw an expression.")
-		.addError(23, "Expected an assignment or function call and instead saw an expression.")
-		.addError(25, "Bad line breaking before '+'.");
+		.addError(22, "Did you mean to return a conditional instead of an assignment?")
+		.addError(31, "Did you mean to return a conditional instead of an assignment?");
 
-	run.test(code, {asi: true, white: true, esnext: true});
+	run.test(code, {maxerr: 1000, expr: true, esnext: true});
+
+	// These are line-column pairs for the Mozilla paren errors.
+	var needparen = [
+		// comma
+		[ 5,  5], [ 6,  8], [ 7,  5], [11,  5], [12,  8], [13,  5],
+		// yield in yield
+		[18, 11], [19, 17], [19, 11], [20, 11], [20,  5], [21, 11], [21,  5], [21, 26], [22, 22],
+		[23, 22], [23, 11], [27, 11], [28, 17], [28, 11], [29, 11], [29,  5], [30, 11], [30,  5],
+		[30, 24], [31, 22], [32, 11], [32, 20],
+		// infix
+		[51, 10], [53, 10], [54, 16], [57, 10], [58,  5], [59, 10], [60,  5], [60, 14],
+		// prefix
+		[64,  6], [65,  7], [66,  6], [67,  7], [70,  6], [71,  7],
+		// ternary
+		[77,  5], [78,  5], [78, 13], [79,  5], [79, 13], [79, 41], [82,  5], [83,  5], [83, 13],
+		[84,  5], [84, 13], [84, 37]
+	];
+
+	needparen.forEach(function (lc) {
+		run.addError(lc[0], "Mozilla requires the yield expression to be parenthesized here.",
+		             {character: lc[1]});
+	})
 
 	run
 		.addError( 1, "'function*' is only available in ES6 (use esnext option).")
-		.addError( 4, "Mozilla requires the yield expression to be parenthesized here.")
-		.addError( 5, "Mozilla requires the yield expression to be parenthesized here.")
-		.addError( 6, "Mozilla requires the yield expression to be parenthesized here.")
-		.addError( 8, "Mozilla requires the yield expression to be parenthesized here.")
-		.addError(10, "Mozilla requires the yield expression to be parenthesized here.")
-		.addError(10, "Expected an assignment or function call and instead saw an expression.")
-		.addError(19, "Mozilla requires the yield expression to be parenthesized here.")
-		.addError(19, "Expected an assignment or function call and instead saw an expression.")
-		.addError(21, "Mozilla requires the yield expression to be parenthesized here.")
-		.addError(23, "Mozilla requires the yield expression to be parenthesized here.")
-		.addError(26, "Mozilla requires the yield expression to be parenthesized here.")
-		.addError(29, "Expected an assignment or function call and instead saw an expression.");
+		.addError(74, "'function*' is only available in ES6 (use esnext option).");
 
-	run.test(code, {asi: true, white: true, moz: true});
+	run.test(code, {maxerr: 1000, expr: true, moz: true});
 
 	test.done();
 };
