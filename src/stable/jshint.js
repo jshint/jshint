@@ -3848,8 +3848,7 @@ var JSHINT = (function () {
 			if (state.tokens.next.id === "(regexp)")
 				warning("W092");
 
-			if (state.tokens.next.id !== ";" && !state.tokens.next.reach &&
-					state.tokens.next.nud) {
+			if (state.tokens.next.id !== ";" && !state.tokens.next.reach && state.tokens.next.nud) {
 				nonadjacent(state.tokens.curr, state.tokens.next);
 				this.first = expression(10);
 
@@ -3858,8 +3857,8 @@ var JSHINT = (function () {
 				}
 			}
 
-			if (state.option.inMoz(true) && (prev.lbp > 30 || (!prev.assign && !isEndOfExpr()) || prev.id === "yield") &&
-					state.tokens.next.id !== ")") {
+			if (state.option.inMoz(true) && state.tokens.next.id !== ")" &&
+					(prev.lbp > 30 || (!prev.assign && !isEndOfExpr()) || prev.id === "yield")) {
 				error("E050", this);
 			}
 		} else if (!state.option.asi) {
