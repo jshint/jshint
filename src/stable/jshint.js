@@ -2749,10 +2749,14 @@ var JSHINT = (function () {
 	// For example: if (a = 1) { ... }
 
 	function checkCondAssignment(expr) {
-		var id = expr && expr.id;
-		if (id === ",") {
-			expr = expr.exprs[expr.exprs.length - 1];
+		var id, paren;
+		if (expr) {
 			id = expr.id;
+			paren = expr.paren;
+			if (id === "," && (expr = expr.exprs[expr.exprs.length - 1])) {
+				id = expr.id;
+				paren = paren || expr.paren;
+			}
 		}
 		switch (id) {
 		case "=":
@@ -2764,7 +2768,7 @@ var JSHINT = (function () {
 		case "|=":
 		case "^=":
 		case "/=":
-			if (!expr.paren && !state.option.boss) {
+			if (!paren && !state.option.boss) {
 				warning("W084");
 			}
 		}
