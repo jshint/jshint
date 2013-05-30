@@ -2367,6 +2367,7 @@ var JSHINT = (function () {
 		nospace();
 		var bracket, brackets = [];
 		var pn, pn1, i = 0;
+		var ret;
 
 		do {
 			pn = peek(i);
@@ -2415,11 +2416,16 @@ var JSHINT = (function () {
 		if (!exprs.length) {
 			return;
 		}
-		exprs[exprs.length - 1].paren = true;
 		if (exprs.length > 1) {
-			return Object.create(state.syntax[","], { exprs: { value: exprs } });
+			ret = Object.create(state.syntax[","]);
+			ret.exprs = exprs;
+		} else {
+			ret = exprs[0];
 		}
-		return exprs[0];
+		if (ret) {
+			ret.paren = true;
+		}
+		return ret;
 	});
 
 	application("=>");
