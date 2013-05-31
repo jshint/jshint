@@ -3276,17 +3276,37 @@ exports["test for GH-1105"] = function (test) {
 	test.done();
 };
 
-exports["test for crash with empty condition"] = function (test) {
+exports["test for crash with invalid condition"] = function (test) {
 	var code = [
-		"do {} while ();"
+		"do {} while ();",
+		"do {} while (,);",
+		"do {} while (a,);",
+		"do {} while (,b);",
+		"do {} while (());",
+		"do {} while ((,));",
+		"do {} while ((a,));",
+		"do {} while ((,b));"
 	];
 
+	// As long as jshint doesn't crash, it doesn't matter what these errors
+	// are. Feel free to adjust these if they don't match the output.
 	var run = TestRun(test)
-		.addError(1, "Expected an identifier and instead saw ')'.")
-		.addError(1, "Expected ')' to match '(' from line 1 and instead saw ';'.")
-		.addError(1, "Missing semicolon.");
+		.addError( 1, "Expected an identifier and instead saw ')'.")
+		.addError( 1, "Expected ')' to match '(' from line 1 and instead saw ';'.")
+		.addError( 2, "Expected an identifier and instead saw ','.")
+		.addError( 3, "Unexpected ')'.")
+		.addError( 4, "Expected an identifier and instead saw ','.")
+		.addError( 4, "Expected ')' to match '(' from line 4 and instead saw 'b'.")
+		.addError( 4, "Expected an identifier and instead saw ')'.")
+		.addError( 6, "Expected an identifier and instead saw ','.")
+		.addError( 7, "Unexpected ')'.")
+		.addError( 7, "Expected an identifier and instead saw ')'.")
+		.addError( 7, "Expected ')' to match '(' from line 7 and instead saw ';'.")
+		.addError( 8, "Expected an identifier and instead saw ','.")
+		.addError( 8, "Expected ')' to match '(' from line 8 and instead saw 'b'.")
+		.addError( 8, "Expected an identifier and instead saw ')'.");
 
-	run.test(code);
+	run.test(code, {asi: true, expr: true});
 
 	test.done();
 };
