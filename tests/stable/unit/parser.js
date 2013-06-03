@@ -486,7 +486,7 @@ exports.comma = function (test) {
 
 	// Regression test (GH-1108)
 	TestRun(test)
-		.test("i = 0, g;", {white:true, expr:true});
+		.test("i = 0, g;", {white: true, expr: true});
 
 	test.done();
 };
