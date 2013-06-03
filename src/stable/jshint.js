@@ -2055,7 +2055,7 @@ var JSHINT = (function () {
 			}
 		}
 		return that;
-	}, 5);
+	}, 5, true);
 	infix("?", function (left, that) {
 		that.left = left;
 		that.right = expression(10);

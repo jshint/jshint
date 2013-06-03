@@ -484,6 +484,10 @@ exports.comma = function (test) {
 		.addError(1, "Extra comma. (it breaks older versions of IE)")
 		.test("var f = [1,];", {es3: true});
 
+	// Regression test (GH-1108)
+	TestRun(test)
+		.test("i = 0, g;", {white:true, expr:true});
+
 	test.done();
 };
 
