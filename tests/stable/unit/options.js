@@ -439,11 +439,13 @@ exports.unused = function (test) {
 		[1, "'a' is defined but never used."],
 		[7, "'c' is defined but never used."],
 		[15, "'foo' is defined but never used."],
-		[20, "'bar' is defined but never used."]
+		[20, "'bar' is defined but never used."],
+		[22, "'i' is defined but never used."]
 	];
 
 	var last_param_errors = [
 		[6, "'f' is defined but never used."],
+		[22, "'i' is defined but never used."],
 		[28, "'a' is defined but never used."],
 		[28, "'b' is defined but never used."],
 		[28, "'c' is defined but never used."]
@@ -451,6 +453,7 @@ exports.unused = function (test) {
 
 	var all_param_errors = [
 		[15, "'err' is defined but never used."],
+		[22, "'i' is defined but never used."],
 		[28, "'a' is defined but never used."],
 		[28, "'b' is defined but never used."],
 		[28, "'c' is defined but never used."]
@@ -479,7 +482,7 @@ exports.unused = function (test) {
 	vars_run.test(src, { unused: "vars"});
 
 	var unused = JSHINT.data().unused;
-	test.equal(9, unused.length);
+	test.equal(10, unused.length);
 	test.ok(unused.some(function (err) { return err.line === 1 && err.name === "a"; }));
 	test.ok(unused.some(function (err) { return err.line === 6 && err.name === "f"; }));
 	test.ok(unused.some(function (err) { return err.line === 7 && err.name === "c"; }));
