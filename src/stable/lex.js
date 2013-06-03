@@ -983,7 +983,7 @@ Lexer.prototype = {
 	 *
 	 *   var str = "hello\
 	 *   world";
-   */
+	 */
 	scanStringLiteral: function (checks) {
 		/*jshint loopfunc:true */
 		var quote = this.peek();

@@ -8,7 +8,7 @@ var state = {
 			prev: null,
 			next: null,
 			curr: null
-		},
+		};
 
 		this.option = {};
 		this.ignored = {};
