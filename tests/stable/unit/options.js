@@ -217,6 +217,8 @@ exports.testCamelcase = function (test) {
 		.addError(6, "Identifier 'test_me' is not in camel case.")
 		.addError(6, "Identifier 'test_me' is not in camel case.")
 		.addError(13, "Identifier 'test_1' is not in camel case.")
+		.addError(24, "Identifier '_test_' is not in camel case.")
+		.addError(24, "Identifier 'test_me_' is not in camel case.")
 		.test(source, { es3: true, camelcase: true });
 
 
