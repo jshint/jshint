@@ -64,18 +64,40 @@ exports.register = function (linter) {
 	});
 
 	// Check that all identifiers are using camelCase notation.
-	// Exceptions: names like MY_VAR and _myVar.
+	// Exceptions: names like MY_VAR, _myVar and exact names __proto__ and super_.
 
 	linter.on("Identifier", function style_scanCamelCase(data) {
+		var identifier;
+		var exceptions;
+		var nodeExceptions;
+
 		if (!linter.getOption("camelcase")) {
 			return;
 		}
 
-		if (data.name.replace(/^_+/, "").indexOf("_") > -1 && !data.name.match(/^[A-Z0-9_]*$/)) {
+		identifier = data.name;
+
+		exceptions = [
+			"__proto__"
+		];
+		if (exceptions.indexOf(identifier) > -1) {
+			return;
+		}
+
+		if (linter.getOption("node")) {
+			nodeExceptions = [
+				"super_"  // Node.js util.inherits make super constructor accessible via constructor.super_.
+			];
+			if (nodeExceptions.indexOf(identifier) > -1) {
+				return;
+			}
+		}
+
+		if (identifier.replace(/^_+/, "").indexOf("_") > -1 && !identifier.match(/^[A-Z0-9_]*$/)) {
 			linter.warn("W106", {
 				line: data.line,
 				char: data.from,
-				data: [ data.name ]
+				data: [ identifier ]
 			});
 		}
 	});
