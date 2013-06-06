@@ -428,6 +428,34 @@ exports.rhino = {
 	version      : false
 };
 
+exports.shelljs = {
+	target       : false,
+	echo         : false,
+	exit         : false,
+	cd           : false,
+	pwd          : false,
+	ls           : false,
+	find         : false,
+	cp           : false,
+	rm           : false,
+	mv           : false,
+	mkdir        : false,
+	test         : false,
+	cat          : false,
+	sed          : false,
+	grep         : false,
+	which        : false,
+	dirs         : false,
+	pushd        : false,
+	popd         : false,
+	env          : false,
+	exec         : false,
+	chmod        : false,
+	config       : false,
+	error        : false,
+	tempdir      : false
+};
+
 exports.wsh = {
 	ActiveXObject            : true,
 	Enumerator               : true,
