@@ -567,10 +567,15 @@ exports.exported = function (test) {
 		.addError(13, "'unusedDeclaration' is defined but never used.")
 		.addError(14, "'unusedExpression' is defined but never used.")
 		.addError(17, "'cannotBeExported' is defined but never used.");
+
 	run.test(src, {es3: true, unused: true });
 	run.test(src, {unused: true }); // es5
 	run.test(src, {esnext: true, unused: true });
 	run.test(src, {moz: true, unused: true });
+
+	run = TestRun(test)
+		.addError(1, "'unused' is defined but never used.")
+		.test("var unused = 1; var used = 2;", {exported: ["used"], unused: true});
 
 	test.done();
 };
