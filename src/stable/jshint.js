@@ -4179,7 +4179,7 @@ var JSHINT = (function () {
 
 	// The actual JSHINT function itself.
 	var itself = function (s, o, g) {
-		var a, i, k, x;
+		var i, k, x;
 		var optionKeys;
 		var newOptionObj = {};
 		var newIgnoredObj = {};
@@ -4205,25 +4205,35 @@ var JSHINT = (function () {
 		declared = Object.create(null);
 		exported = Object.create(null);
 
+		function each(obj, cb) {
+			if (!obj)
+				return;
+
+			if (!Array.isArray(obj) && typeof obj === "object")
+				obj = Object.keys(obj);
+
+			obj.forEach(cb);
+		}
+
 		if (o) {
-			a = o.predef;
-			if (a) {
-				if (!Array.isArray(a) && typeof a === "object") {
-					a = Object.keys(a);
+			each(o.predef || null, function (item) {
+				var slice, prop;
+
+				if (item[0] === "-") {
+					slice = item.slice(1);
+					JSHINT.blacklist[slice] = slice;
+				} else {
+					prop = Object.getOwnPropertyDescriptor(o.predef, item);
+					predefined[item] = prop ? prop.value : false;
 				}
+			});
 
-				a.forEach(function (item) {
-					var slice, prop;
+			each(o.exported || null, function (item) {
+				exported[item] = true;
+			});
 
-					if (item[0] === "-") {
-						slice = item.slice(1);
-						JSHINT.blacklist[slice] = slice;
-					} else {
-						prop = Object.getOwnPropertyDescriptor(o.predef, item);
-						predefined[item] = prop ? prop.value : false;
-					}
-				});
-			}
+			delete o.predef;
+			delete o.exported;
 
 			optionKeys = Object.keys(o);
 			for (x = 0; x < optionKeys.length; x++) {
