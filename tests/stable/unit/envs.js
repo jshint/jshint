@@ -405,6 +405,43 @@ exports.rhino = function (test) {
 	test.done();
 };
 
+exports.shelljs = function (test) {
+	var globals = [
+		"target",
+		"echo",
+		"exit",
+		"cd",
+		"pwd",
+		"ls",
+		"find",
+		"cp",
+		"rm",
+		"mv",
+		"mkdir",
+		"test",
+		"cat",
+		"sed",
+		"grep",
+		"which",
+		"dirs",
+		"pushd",
+		"popd",
+		"env",
+		"exec",
+		"chmod",
+		"config",
+		"error",
+		"tempdir"
+	];
+
+	globalsImplied(test, globals);
+	globalsKnown(test, globals, { shelljs: true });
+
+	test.done();
+};
+
+
+
 exports.wsh = function (test) {
 	var globals = [
 		'ActiveXObject',

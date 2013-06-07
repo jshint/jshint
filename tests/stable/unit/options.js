@@ -309,6 +309,43 @@ exports.nonew = function (test) {
 	test.done();
 };
 
+exports.shelljs = function (test) {
+	var src = fs.readFileSync(__dirname + '/fixtures/shelljs.js', 'utf8');
+
+	TestRun(test, 1)
+		.addError(1, "'target' is not defined.")
+		.addError(3, "'echo' is not defined.")
+		.addError(4, "'exit' is not defined.")
+		.addError(5, "'cd' is not defined.")
+		.addError(6, "'pwd' is not defined.")
+		.addError(7, "'ls' is not defined.")
+		.addError(8, "'find' is not defined.")
+		.addError(9, "'cp' is not defined.")
+		.addError(10, "'rm' is not defined.")
+		.addError(11, "'mv' is not defined.")
+		.addError(12, "'mkdir' is not defined.")
+		.addError(13, "'test' is not defined.")
+		.addError(14, "'cat' is not defined.")
+		.addError(15, "'sed' is not defined.")
+		.addError(16, "'grep' is not defined.")
+		.addError(17, "'which' is not defined.")
+		.addError(18, "'dirs' is not defined.")
+		.addError(19, "'pushd' is not defined.")
+		.addError(20, "'popd' is not defined.")
+		.addError(21, "'env' is not defined.")
+		.addError(22, "'exec' is not defined.")
+		.addError(23, "'chmod' is not defined.")
+		.addError(24, "'config' is not defined.")
+		.addError(25, "'error' is not defined.")
+		.addError(26, "'tempdir' is not defined.")
+		.test(src, { undef: true });
+
+	TestRun(test, 2)
+		.test(src, { undef: true, shelljs: true });
+
+	test.done();
+};
+
 // Option `asi` allows you to use automatic-semicolon insertion
 exports.asi = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/asi.js', 'utf8');
