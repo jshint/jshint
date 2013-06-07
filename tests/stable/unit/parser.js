@@ -17,6 +17,9 @@ exports.unsafe = function (test) {
 		.addError(1, "This character may get silently deleted by one or more browsers.")
 		.test(code, {es3: true});
 
+	TestRun(test)
+		.test(code, {es3: true, unsafechars: true});
+
 	test.done();
 };
 
