@@ -126,6 +126,7 @@ var JSHINT = (function () {
 			prototypejs : true, // if Prototype and Scriptaculous globals should be
 			                    // predefined
 			rhino       : true, // if the Rhino environment globals should be predefined
+			shelljs     : true, // if ShellJS globals should be predefined
 			undef       : true, // if variables should be declared before used
 			scripturl   : true, // if script-targeted URLs should be tolerated
 			shadow      : true, // if variable shadowing should be tolerated
@@ -324,6 +325,10 @@ var JSHINT = (function () {
 
 		if (state.option.rhino) {
 			combine(predefined, vars.rhino);
+		}
+
+		if (state.option.shelljs) {
+			combine(predefined, vars.shelljs);
 		}
 
 		if (state.option.phantom) {
