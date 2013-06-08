@@ -81,9 +81,10 @@
 		});
 	}
 
-	if (predef) {
-		opts.predef = {};
+	opts.predef = opts.globals || {};
+	delete(opts.globals);
 
+	if (predef) {
 		predef.split(",").forEach(function (arg) {
 			var global = arg.split("=");
 			opts.predef[global[0]] = global[1] === "true" ? true : false;
