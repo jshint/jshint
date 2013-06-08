@@ -5,13 +5,25 @@
 	"use strict";
 
 	var filenames = [];
+	var flags = {};
 	var optstr; // arg1=val1,arg2=val2,...
 	var predef; // global1=true,global2,global3,...
 	var opts   = {};
 	var retval = 0;
 
 	args.forEach(function (arg) {
-		if (arg.indexOf("=") > -1) {
+		if (arg.indexOf("--") === 0 ) {
+			// Configuration Flags might be boolean or will be split into name and value
+			if( arg.indexOf("=") > -1 ) {
+				var o = arg.split("=");
+				flags[ o[0].slice(2) ] = o[1];
+			} else {
+				flags[ arg.slice(2) ] = true;
+			}
+
+			return;
+		} else if (arg.indexOf("=") > -1) {
+			// usual rhino configuration, like "boss=true,browser=true"
 			if (!optstr) {
 				// First time it's the options.
 				optstr = arg;
@@ -33,6 +45,20 @@
 	if (filenames.length === 0) {
 		print("Usage: jshint.js file.js");
 		quit(1);
+	}
+
+	// If a config flag has been provided, try and load that
+	if( "config" in flags ) {
+		var cfgFileContent;
+		try {
+			cfgFileContent = readFile(flags.config);
+		} catch (e) {
+			print("Could not read config file " + flags.config);
+			quit(1);
+		}
+
+		print("Reading config from " + flags.config);
+		opts = JSON.parse( cfgFileContent );
 	}
 
 	if (optstr) {
