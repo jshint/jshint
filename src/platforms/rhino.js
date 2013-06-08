@@ -12,13 +12,13 @@
 	var retval = 0;
 
 	args.forEach(function (arg) {
-		if (arg.indexOf("--") === 0 ) {
+		if (arg.indexOf("--") === 0) {
 			// Configuration Flags might be boolean or will be split into name and value
-			if( arg.indexOf("=") > -1 ) {
+			if (arg.indexOf("=") > -1) {
 				var o = arg.split("=");
-				flags[ o[0].slice(2) ] = o[1];
+				flags[o[0].slice(2)] = o[1];
 			} else {
-				flags[ arg.slice(2) ] = true;
+				flags[arg.slice(2)] = true;
 			}
 
 			return;
@@ -48,7 +48,7 @@
 	}
 
 	// If a config flag has been provided, try and load that
-	if( "config" in flags ) {
+	if ("config" in flags) {
 		var cfgFileContent;
 		try {
 			cfgFileContent = readFile(flags.config);
@@ -57,7 +57,7 @@
 			quit(1);
 		}
 
-		opts = JSON.parse( cfgFileContent );
+		opts = JSON.parse(cfgFileContent);
 	}
 
 	if (optstr) {
