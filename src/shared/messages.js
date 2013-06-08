@@ -69,7 +69,7 @@ var errors = {
 
 var warnings = {
 	W001: "'hasOwnProperty' is a really bad name.",
-	W002: "Value of '{a}' may be overwritten in IE.",
+	W002: "Value of '{a}' may be overwritten in IE 8 and earlier.",
 	W003: "'{a}' was used before it was defined.",
 	W004: "'{a}' is already defined.",
 	W005: "A dot following a number can be confused with a decimal point.",
