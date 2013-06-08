@@ -57,7 +57,6 @@
 			quit(1);
 		}
 
-		print("Reading config from " + flags.config);
 		opts = JSON.parse( cfgFileContent );
 	}
 
