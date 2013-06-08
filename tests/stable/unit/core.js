@@ -598,7 +598,7 @@ exports.testCatchBlocks = function (test) {
 	src = fs.readFileSync(__dirname + '/fixtures/gh618.js', 'utf8');
 
 	TestRun(test)
-		.addError(5, "Value of 'x' may be overwritten in IE.")
+		.addError(5, "Value of 'x' may be overwritten in IE 8 and earlier.")
 		.test(src, { es3: true, undef: true, devel: true });
 
 	TestRun(test)
