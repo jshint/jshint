@@ -330,6 +330,7 @@ var JSHINT = (function () {
 
 		if (state.option.shelljs) {
 			combine(predefined, vars.shelljs);
+			combine(predefined, vars.node);
 		}
 
 		if (state.option.phantom) {

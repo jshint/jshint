@@ -24,3 +24,8 @@ chmod();
 config.hi = 'hi';
 error();
 tempdir();
+
+// node stuff
+require('hi');
+module.exports = 'hi';
+process.exit();
