@@ -10,6 +10,6 @@ var let = 1;
 	var let = 2;
 }());
 
-var obj = {};
+var obj = { class: 'foo' };
 obj.else = 1;
 obj.throws = 2;
