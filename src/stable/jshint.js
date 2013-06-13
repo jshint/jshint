@@ -1427,7 +1427,6 @@ var JSHINT = (function () {
 		advance();
 
 		var curr = state.tokens.curr;
-		var meta = curr.meta || {};
 		var val  = state.tokens.curr.value;
 
 		if (!isReserved(curr)) {
