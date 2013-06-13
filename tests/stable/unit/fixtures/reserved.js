@@ -13,3 +13,4 @@ var let = 1;
 var obj = { class: 'foo' };
 obj.else = 1;
 obj.throws = 2;
+obj.protected = 4;

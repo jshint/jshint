@@ -552,6 +552,7 @@ exports.testReserved = function (test) {
 		.addError(13, "Reserved words as properties can be used under the 'es5' option.")
 		.addError(14, "Expected an identifier and instead saw 'else' (a reserved word).")
 		.addError(15, "Expected an identifier and instead saw 'throws' (a reserved word).")
+		.addError(16, "Expected an identifier and instead saw 'protected' (a reserved word).")
 		.test(src, {es3: true});
 
 	TestRun(test)
