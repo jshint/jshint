@@ -286,7 +286,7 @@ var JSHINT = (function () {
 				}
 			}
 
-			if (token.isProperty) {
+			if (token.isProperty && state.option.inES5()) {
 				return false;
 			}
 		}
@@ -1435,7 +1435,7 @@ var JSHINT = (function () {
 		}
 
 		if (prop) {
-			if (state.option.inES5() || meta.isFutureReservedWord) {
+			if (state.option.inES5()) {
 				return val;
 			}
 		}

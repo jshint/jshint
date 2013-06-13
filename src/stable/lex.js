@@ -1506,7 +1506,7 @@ Lexer.prototype = {
 					}
 				}
 
-				if (isProperty) {
+				if (isProperty && state.option.inES5()) {
 					return false;
 				}
 			}
