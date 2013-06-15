@@ -1584,3 +1584,17 @@ exports.unignored = function (test) {
 
 	test.done();
 };
+
+/*
+ * Tests extracomma option.
+ */
+exports.extracomma = function (test) {
+	var src = fs.readFileSync(__dirname + "/fixtures/extracomma.js", "utf-8");
+
+	TestRun(test)
+		.addError(1, "Extra comma. (it breaks older versions of IE)")
+		.addError(2, "Extra comma. (it breaks older versions of IE)")
+		.test(src, { extracomma: true });
+
+	test.done();
+};
