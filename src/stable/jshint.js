@@ -2521,7 +2521,8 @@ var JSHINT = (function () {
 			this.first.push(expression(10));
 			if (state.tokens.next.id === ",") {
 				comma({ allowTrailing: true });
-				if (state.tokens.next.id === "]" && (state.option.extracomma || !state.option.inES5(true))) {
+				if (state.tokens.next.id === "]" &&
+					(state.option.extracomma || !state.option.inES5(true))) {
 					warning("W070", state.tokens.curr);
 					break;
 				}
@@ -2930,7 +2931,8 @@ var JSHINT = (function () {
 					comma({ allowTrailing: true, property: true });
 					if (state.tokens.next.id === ",") {
 						warning("W070", state.tokens.curr);
-					} else if (state.tokens.next.id === "}" && (state.option.extracomma || !state.option.inES5())) {
+					} else if (state.tokens.next.id === "}" &&
+						(state.option.extracomma || !state.option.inES5())) {
 						warning("W070", state.tokens.curr);
 					}
 				} else {
