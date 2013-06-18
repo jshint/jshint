@@ -1,7 +1,7 @@
 "use strict";
 
 module.exports = {
-	reporter: function (results, data) {
+	reporter: function (results, data, opts) {
 		var len = results.length,
 			str = '',
 			file, error, globals, unuseds;
@@ -10,7 +10,14 @@ module.exports = {
 			file = result.file;
 			error = result.error;
 			str += file  + ': line ' + error.line + ', col ' +
-				error.character + ', ' + error.reason + '\n';
+				error.character + ', ' + error.reason;
+
+			// Add the error code if the --verbose option is set
+			if (opts.verbose) {
+				str += ' (' + error.code + ')';
+			}
+
+			str += '\n';
 		});
 
 		str += len > 0 ? ("\n" + len + ' error' + ((len === 1) ? '' : 's')) : "";
