@@ -2371,6 +2371,7 @@ var JSHINT = (function () {
 		nospace();
 		var bracket, brackets = [];
 		var pn, pn1, i = 0;
+		var ret;
 
 		do {
 			pn = peek(i);
@@ -2419,11 +2420,16 @@ var JSHINT = (function () {
 		if (!exprs.length) {
 			return;
 		}
-		exprs[exprs.length - 1].paren = true;
 		if (exprs.length > 1) {
-			return Object.create(state.syntax[","], { exprs: { value: exprs } });
+			ret = Object.create(state.syntax[","]);
+			ret.exprs = exprs;
+		} else {
+			ret = exprs[0];
 		}
-		return exprs[0];
+		if (ret) {
+			ret.paren = true;
+		}
+		return ret;
 	});
 
 	application("=>");
@@ -2747,10 +2753,14 @@ var JSHINT = (function () {
 	// For example: if (a = 1) { ... }
 
 	function checkCondAssignment(expr) {
-		var id = expr.id;
-		if (id === ",") {
-			expr = expr.exprs[expr.exprs.length - 1];
+		var id, paren;
+		if (expr) {
 			id = expr.id;
+			paren = expr.paren;
+			if (id === "," && (expr = expr.exprs[expr.exprs.length - 1])) {
+				id = expr.id;
+				paren = paren || expr.paren;
+			}
 		}
 		switch (id) {
 		case "=":
@@ -2762,7 +2772,7 @@ var JSHINT = (function () {
 		case "|=":
 		case "^=":
 		case "/=":
-			if (!expr.paren && !state.option.boss) {
+			if (!paren && !state.option.boss) {
 				warning("W084");
 			}
 		}
@@ -3753,7 +3763,7 @@ var JSHINT = (function () {
 		if (!state.option.asi)
 			nolinebreak(this);
 
-		if (state.tokens.next.id !== ";") {
+		if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
 			if (state.tokens.curr.line === state.tokens.next.line) {
 				if (funct[v] !== "label") {
 					warning("W090", state.tokens.next, v);
@@ -3778,7 +3788,7 @@ var JSHINT = (function () {
 		if (!state.option.asi)
 			nolinebreak(this);
 
-		if (state.tokens.next.id !== ";") {
+		if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
 			if (state.tokens.curr.line === state.tokens.next.line) {
 				if (funct[v] !== "label") {
 					warning("W090", state.tokens.next, v);
