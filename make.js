@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/*global ls, target, find, echo, cat, exit, exec, mkdir, test */
+/*global ls, target, find, echo, cat, chmod, exit, mkdir, test */
 
 "use strict";
 
@@ -124,8 +124,8 @@ target.build = function () {
 		var rhino = cat("./dist/jshint-" + pkg.version + ".js", "./src/platforms/rhino.js");
 		rhino = "#!/usr/bin/env rhino\n\n" + "var window = {};" + rhino;
 		rhino.to("./dist/jshint-rhino-" + pkg.version + ".js");
-		exec("chmod +x dist/jshint-rhino-" + pkg.version + ".js");
+		chmod("+x", "dist/jshint-rhino-" + pkg.version + ".js");
 		cli.ok("Rhino");
-		echo("\n");		
+		echo("\n");
 	});
 };
