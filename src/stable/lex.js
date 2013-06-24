@@ -219,7 +219,7 @@ function Lexer(source) {
 
 	this.emitter = new events.EventEmitter();
 	this.source = source;
-	this.lines = lines;
+	this.setLines(lines);
 	this.prereg = true;
 
 	this.line = 0;
@@ -235,12 +235,12 @@ function Lexer(source) {
 Lexer.prototype = {
 	_lines: [],
 
-	get lines() {
+	getLines: function () {
 		this._lines = state.lines;
 		return this._lines;
 	},
 
-	set lines(val) {
+	setLines: function (val) {
 		this._lines = val;
 		state.lines = this._lines;
 	},
@@ -1395,7 +1395,7 @@ Lexer.prototype = {
 			}
 
 			if (this.peek() === "") { // EOL
-				if (!/^\s*$/.test(this.lines[this.line - 1]) && state.option.trailing) {
+				if (!/^\s*$/.test(this.getLines()[this.line - 1]) && state.option.trailing) {
 					this.trigger("warning", { code: "W102", line: this.line, character: start });
 				}
 			}
@@ -1438,11 +1438,11 @@ Lexer.prototype = {
 	nextLine: function () {
 		var char;
 
-		if (this.line >= this.lines.length) {
+		if (this.line >= this.getLines().length) {
 			return false;
 		}
 
-		this.input = this.lines[this.line];
+		this.input = this.getLines()[this.line];
 		this.line += 1;
 		this.char = 1;
 		this.from = 1;
