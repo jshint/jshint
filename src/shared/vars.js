@@ -137,6 +137,7 @@ exports.browser = {
 	MessageChannel       : false,
 	MessageEvent         : false,
 	MessagePort          : false,
+	MouseEvent           : false,
 	moveBy               : false,
 	moveTo               : false,
 	MutationObserver     : false,
