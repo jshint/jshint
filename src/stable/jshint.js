@@ -859,6 +859,22 @@ var JSHINT = (function () {
 		}
 	}
 
+	function isInfix(token) {
+		return token.infix || (!token.identifier && !!token.led);
+	}
+
+	function isEndOfExpr() {
+		var curr = state.tokens.curr;
+		var next = state.tokens.next;
+		if (next.id === ";" || next.id === "}" || next.id === ":") {
+			return true;
+		}
+		if (isInfix(next) === isInfix(curr) || (curr.id === "yield" && state.option.inMoz(true))) {
+			return curr.line !== next.line;
+		}
+		return false;
+	}
+
 	// This is the heart of JSHINT, the Pratt parser. In addition to parsing, it
 	// is looking for ad hoc lint patterns. We add .fud to Pratt's model, which is
 	// like .nud except that it is only used on the first token of a statement.
@@ -909,10 +925,7 @@ var JSHINT = (function () {
 				error("E030", state.tokens.curr, state.tokens.curr.id);
 			}
 
-			var end_of_expr = state.tokens.next.identifier &&
-									!state.tokens.curr.led &&
-									state.tokens.curr.line !== state.tokens.next.line;
-			while (rbp < state.tokens.next.lbp && !end_of_expr) {
+			while (rbp < state.tokens.next.lbp && !isEndOfExpr()) {
 				isArray = state.tokens.curr.value === "Array";
 				isObject = state.tokens.curr.value === "Object";
 
@@ -1009,7 +1022,7 @@ var JSHINT = (function () {
 		left = left || state.tokens.curr;
 		right = right || state.tokens.next;
 		if (!state.option.laxbreak && left.line !== right.line) {
-			warning("W014", right, right.id);
+			warning("W014", right, right.value);
 		} else if (state.option.white) {
 			left = left || state.tokens.curr;
 			right = right || state.tokens.next;
@@ -1042,26 +1055,29 @@ var JSHINT = (function () {
 		}
 	}
 
+	function nobreakcomma(left, right) {
+		if (left.line !== right.line) {
+			if (!state.option.laxcomma) {
+				if (comma.first) {
+					warning("I001");
+					comma.first = false;
+				}
+				warning("W014", left, right.value);
+			}
+		} else if (!left.comment && left.character !== right.from && state.option.white) {
+			left.from += (left.character - left.from);
+			warning("W011", left, left.value);
+		}
+	}
 
 	function comma(opts) {
 		opts = opts || {};
 
 		if (!opts.peek) {
-			if (state.tokens.curr.line !== state.tokens.next.line) {
-				if (!state.option.laxcomma) {
-					if (comma.first) {
-						warning("I001");
-						comma.first = false;
-					}
-					warning("W014", state.tokens.curr, state.tokens.next.value);
-				}
-			} else if (!state.tokens.curr.comment &&
-					state.tokens.curr.character !== state.tokens.next.from && state.option.white) {
-				state.tokens.curr.from += (state.tokens.curr.character - state.tokens.curr.from);
-				warning("W011", state.tokens.curr, state.tokens.curr.value);
-			}
-
+			nobreakcomma(state.tokens.curr, state.tokens.next);
 			advance(",");
+		} else {
+			nobreakcomma(state.tokens.prev, state.tokens.curr);
 		}
 
 		// TODO: This is a temporary solution to fight against false-positives in
@@ -1088,7 +1104,6 @@ var JSHINT = (function () {
 			case "in":
 			case "instanceof":
 			case "return":
-			case "yield":
 			case "switch":
 			case "throw":
 			case "try":
@@ -1220,6 +1235,7 @@ var JSHINT = (function () {
 	function infix(s, f, p, w) {
 		var x = symbol(s, p);
 		reserveName(x);
+		x.infix = true;
 		x.led = function (left) {
 			if (!w) {
 				nobreaknonadjacent(state.tokens.prev, state.tokens.curr);
@@ -1301,10 +1317,8 @@ var JSHINT = (function () {
 				node.type === "undefined");
 	}
 
-	function assignop(s) {
-		symbol(s, 20).exps = true;
-
-		return infix(s, function (left, that) {
+	function assignop(s, f, p) {
+		var x = infix(s, typeof f === "function" ? f : function (left, that) {
 			that.left = left;
 
 			if (left) {
@@ -1326,7 +1340,7 @@ var JSHINT = (function () {
 						warning("E031", that);
 					}
 
-					that.right = expression(19);
+					that.right = expression(10);
 					return that;
 				} else if (left.id === "[") {
 					if (state.tokens.curr.left.first) {
@@ -1340,13 +1354,13 @@ var JSHINT = (function () {
 					} else if (left.left.value === "arguments" && !state.directive["use strict"]) {
 						warning("E031", that);
 					}
-					that.right = expression(19);
+					that.right = expression(10);
 					return that;
 				} else if (left.identifier && !isReserved(left)) {
 					if (funct[left.value] === "exception") {
 						warning("W022", left);
 					}
-					that.right = expression(19);
+					that.right = expression(10);
 					return that;
 				}
 
@@ -1356,7 +1370,11 @@ var JSHINT = (function () {
 			}
 
 			error("E031", that);
-		}, 20);
+		}, p);
+
+		x.exps = true;
+		x.assign = true;
+		return x;
 	}
 
 
@@ -1376,8 +1394,7 @@ var JSHINT = (function () {
 
 
 	function bitwiseassignop(s) {
-		symbol(s, 20).exps = true;
-		return infix(s, function (left, that) {
+		return assignop(s, function (left, that) {
 			if (state.option.bitwise) {
 				warning("W016", that, that.id);
 			}
@@ -1386,7 +1403,7 @@ var JSHINT = (function () {
 			if (left) {
 				if (left.id === "." || left.id === "[" ||
 						(left.identifier && !isReserved(left))) {
-					expression(19);
+					expression(10);
 					return that;
 				}
 				if (left === state.syntax["function"]) {
@@ -1531,7 +1548,7 @@ var JSHINT = (function () {
 					isundef(funct, "W117", tok.token, tok.id);
 				});
 				advance("=");
-				destructuringExpressionMatch(values, expression(5, true));
+				destructuringExpressionMatch(values, expression(10, true));
 				advance(";");
 				return;
 			}
@@ -1771,7 +1788,7 @@ var JSHINT = (function () {
 						}
 					}
 				}
-				expression(5);
+				expression(10);
 
 				if (state.option.strict && funct["(context)"]["(global)"]) {
 					if (!m["use strict"] && !state.directive["use strict"]) {
@@ -2052,7 +2069,7 @@ var JSHINT = (function () {
 			return that;
 		}
 		while (true) {
-			if (!(expr = expression(5)))  {
+			if (!(expr = expression(10)))  {
 				break;
 			}
 			that.exprs.push(expr);
@@ -2061,7 +2078,8 @@ var JSHINT = (function () {
 			}
 		}
 		return that;
-	}, 5, true);
+	}, 10, true);
+
 	infix("?", function (left, that) {
 		that.left = left;
 		that.right = expression(10);
@@ -2164,7 +2182,7 @@ var JSHINT = (function () {
 	prefix("--", "predec");
 	state.syntax["--"].exps = true;
 	prefix("delete", function () {
-		var p = expression(5);
+		var p = expression(10);
 		if (!p || (p.id !== "." && p.id !== "[")) {
 			warning("W051");
 		}
@@ -2397,7 +2415,7 @@ var JSHINT = (function () {
 						exprs.push(bracket.left[t].token);
 					}
 				} else {
-					exprs.push(expression(5));
+					exprs.push(expression(10));
 				}
 				if (state.tokens.next.id !== ",") {
 					break;
@@ -2438,7 +2456,7 @@ var JSHINT = (function () {
 	infix("[", function (left, that) {
 		nobreak(state.tokens.prev, state.tokens.curr);
 		nospace();
-		var e = expression(5), s;
+		var e = expression(10), s;
 		if (e && e.type === "(string)") {
 			if (!state.option.evil && (e.value === "eval" || e.value === "execScript")) {
 				warning("W061", that);
@@ -2469,7 +2487,7 @@ var JSHINT = (function () {
 		res.exps = true;
 		funct["(comparray)"].stack();
 
-		res.right = expression(5);
+		res.right = expression(10);
 		advance("for");
 		if (state.tokens.next.value === "each") {
 			advance("each");
@@ -2479,13 +2497,13 @@ var JSHINT = (function () {
 		}
 		advance("(");
 		funct["(comparray)"].setState("define");
-		res.left = expression(5);
+		res.left = expression(10);
 		advance(")");
 		if (state.tokens.next.value === "if") {
 			advance("if");
 			advance("(");
 			funct["(comparray)"].setState("filter");
-			res.filter = expression(5);
+			res.filter = expression(10);
 			advance(")");
 		}
 		advance("]");
@@ -3089,7 +3107,7 @@ var JSHINT = (function () {
 				if (peek(0).id === "=" && state.tokens.next.identifier) {
 					error("E037", state.tokens.next, state.tokens.next.value);
 				}
-				value = expression(5);
+				value = expression(10);
 				if (lone) {
 					tokens[0].first = value;
 				} else {
@@ -3156,7 +3174,7 @@ var JSHINT = (function () {
 				if (peek(0).id === "=" && state.tokens.next.identifier) {
 					error("E038", state.tokens.next, state.tokens.next.value);
 				}
-				value = expression(5);
+				value = expression(10);
 				if (lone) {
 					tokens[0].first = value;
 				} else {
@@ -3236,7 +3254,7 @@ var JSHINT = (function () {
 				if (peek(0).id === "=" && state.tokens.next.identifier) {
 					error("E037", state.tokens.next, state.tokens.next.value);
 				}
-				value = expression(5);
+				value = expression(10);
 				if (lone) {
 					tokens[0].first = value;
 				} else {
@@ -3831,30 +3849,39 @@ var JSHINT = (function () {
 		return this;
 	}).exps = true;
 
-	stmt("yield", function () {
-		if (state.option.inESNext(true) && funct["(generator)"] !== true) {
+	(function (x) {
+		x.exps = true;
+		x.lbp = 25;
+	}(prefix("yield", function () {
+		var prev = state.tokens.prev;
+		if (state.option.inESNext(true) && !funct["(generator)"]) {
 			error("E046", state.tokens.curr, "yield");
 		} else if (!state.option.inESNext()) {
 			warning("W104", state.tokens.curr, "yield");
 		}
 		funct["(generator)"] = "yielded";
-		if (this.line === state.tokens.next.line) {
+		if (this.line === state.tokens.next.line || !state.option.inMoz(true)) {
 			if (state.tokens.next.id === "(regexp)")
 				warning("W092");
 
-			if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
-				nonadjacent(state.tokens.curr, state.tokens.next);
-				this.first = expression(0);
+			if (state.tokens.next.id !== ";" && !state.tokens.next.reach && state.tokens.next.nud) {
+				nobreaknonadjacent(state.tokens.curr, state.tokens.next);
+				this.first = expression(10);
 
 				if (this.first.type === "(punctuator)" && this.first.value === "=" && !state.option.boss) {
 					warningAt("W093", this.first.line, this.first.character);
 				}
 			}
+
+			if (state.option.inMoz(true) && state.tokens.next.id !== ")" &&
+					(prev.lbp > 30 || (!prev.assign && !isEndOfExpr()) || prev.id === "yield")) {
+				error("E050", this);
+			}
 		} else if (!state.option.asi) {
 			nolinebreak(this); // always warn (Line breaking error)
 		}
 		return this;
-	}).exps = true;
+	})));
 
 
 	stmt("throw", function () {
