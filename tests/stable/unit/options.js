@@ -338,6 +338,9 @@ exports.shelljs = function (test) {
 		.addError(24, "'config' is not defined.")
 		.addError(25, "'error' is not defined.")
 		.addError(26, "'tempdir' is not defined.")
+		.addError(29, "'require' is not defined.")
+		.addError(30, "'module' is not defined.")
+		.addError(31, "'process' is not defined.")
 		.test(src, { undef: true });
 
 	TestRun(test, 2)
