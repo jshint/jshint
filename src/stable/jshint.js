@@ -2082,6 +2082,7 @@ var JSHINT = (function () {
 	}, 10, true);
 
 	infix("?", function (left, that) {
+		increaseComplexityCount();
 		that.left = left;
 		that.right = expression(10);
 		advance(":");
@@ -2089,7 +2090,13 @@ var JSHINT = (function () {
 		return that;
 	}, 30);
 
-	infix("||", "or", 40);
+	var orPrecendence = 40;
+	infix("||", function (left, that) {
+		increaseComplexityCount();
+		that.left = left;
+		that.right = expression(orPrecendence);
+		return that;
+	}, orPrecendence);
 	infix("&&", "and", 50);
 	bitwise("|", "bitor", 70);
 	bitwise("^", "bitxor", 80);
