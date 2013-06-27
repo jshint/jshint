@@ -271,16 +271,17 @@ var JSHINT = (function () {
 		if (!token.reserved) {
 			return false;
 		}
+		var meta = token.meta;
 
-		if (token.meta && token.meta.isFutureReservedWord) {
+		if (meta && meta.isFutureReservedWord && state.option.inES5()) {
 			// ES3 FutureReservedWord in an ES5 environment.
-			if (state.option.inES5(true) && !token.meta.es5) {
+			if (!meta.es5) {
 				return false;
 			}
 
 			// Some ES5 FutureReservedWord identifiers are active only
 			// within a strict mode environment.
-			if (token.meta.strictOnly) {
+			if (meta.strictOnly) {
 				if (!state.option.strict && !state.directive["use strict"]) {
 					return false;
 				}
@@ -1445,7 +1446,6 @@ var JSHINT = (function () {
 		advance();
 
 		var curr = state.tokens.curr;
-		var meta = curr.meta || {};
 		var val  = state.tokens.curr.value;
 
 		if (!isReserved(curr)) {
@@ -1453,7 +1453,7 @@ var JSHINT = (function () {
 		}
 
 		if (prop) {
-			if (state.option.inES5() || meta.isFutureReservedWord) {
+			if (state.option.inES5()) {
 				return val;
 			}
 		}
