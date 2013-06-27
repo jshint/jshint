@@ -58,6 +58,7 @@ exports.browser = {
 	clearTimeout         : false,
 	close                : false,
 	closed               : false,
+	CustomEvent          : false,
 	DataView             : false,
 	DOMParser            : false,
 	defaultStatus        : false,
