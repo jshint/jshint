@@ -3908,39 +3908,27 @@ var JSHINT = (function () {
 		if (state.tokens.next.identifier) {
 			this.name = identifier();
 			addlabel(this.name, "unused", state.tokens.curr);
-		}
-		else {
+		} else {
 			advance("{");
 			for (;;) {
-				if (state.tokens.next.identifier) {
-					var importName;
-					if (state.tokens.next.type === "default") {
-						importName = "default";
-						advance("default");
-					}
-					else {
-						importName = identifier();
-					}
-					if (state.tokens.next.value === "as") {
-						advance("as");
-						importName = identifier();
-					}
-					addlabel(importName, "unused", state.tokens.next);
+				var importName;
+				if (state.tokens.next.type === "default") {
+					importName = "default";
+					advance("default");
+				} else {
+					importName = identifier();
 				}
-				else if (state.tokens.next.type === "(punctuator)") {
-					if (state.tokens.next.value === ",") {
-						advance(",");
-					}
-					else if (state.tokens.next.value === "}") {
-						advance("}");
-						break;
-					}
-					else {
-						error("E024", state.tokens.next, state.tokens.next.value);
-						break;
-					}
+				if (state.tokens.next.value === "as") {
+					advance("as");
+					importName = identifier();
 				}
-				else {
+				addlabel(importName, "unused", state.tokens.curr);
+				if (state.tokens.next.value === ",") {
+					advance(",");
+				} else if (state.tokens.next.value === "}") {
+					advance("}");
+					break;
+				} else {
 					error("E024", state.tokens.next, state.tokens.next.value);
 					break;
 				}
@@ -3957,59 +3945,44 @@ var JSHINT = (function () {
 			warning("W104", state.tokens.curr, "import");
 		}
 
-		// case 1: defaults
-
 		if (state.tokens.next.type === "default") {
 			advance("default");
-
 			this.exportee = expression(10);
-		}
 
-		// case 2: specifier
-		else if (state.tokens.next.value === "{") {
+			return this;
+		} 
+		if (state.tokens.next.value === "{") {
 			advance("{");
 			for (;;) {
-				if (state.tokens.next.type === "(identifier)") {
-					identifier();
-				}
-				else if (state.tokens.next.type === "(punctuator)") {
-					if (state.tokens.next.value === ",") {
-						advance(",");
-					}
-					else if (state.tokens.next.value === "}") {
-						advance("}");
-						break;
-					}
-					else {
-						error("E024", state.tokens.next, state.tokens.next.value);
-						break;
-					}
-				}
-				else {
+				identifier();
+
+				if (state.tokens.next.value === ",") {
+					advance(",");
+				} else if (state.tokens.next.value === "}") {
+					advance("}");
+					break;
+				} else {
 					error("E024", state.tokens.next, state.tokens.next.value);
 					break;
 				}
 			}
+			return this;
 		}
 
-		// case 3: assignment
-		else {
-			if (state.tokens.next.id === "var") {
-				advance("var");
-				state.syntax["var"].fud.call(state.syntax["var"].fud);
-			}
-			else if (state.tokens.next.id === "let") {
-				advance("let");
-				state.syntax["let"].fud.call(state.syntax["let"].fud);
-			}
-			else if (state.tokens.next.id === "const") {
-				advance("const");
-				state.syntax["const"].fud.call(state.syntax["const"].fud);
-			}
-			else if (state.tokens.next.id === "function") {
-				advance("function");
-				state.syntax["function"].fud();
-			}
+		if (state.tokens.next.id === "var") {
+			advance("var");
+			state.syntax["var"].fud.call(state.syntax["var"].fud);
+		} else if (state.tokens.next.id === "let") {
+			advance("let");
+			state.syntax["let"].fud.call(state.syntax["let"].fud);
+		} else if (state.tokens.next.id === "const") {
+			advance("const");
+			state.syntax["const"].fud.call(state.syntax["const"].fud);
+		} else if (state.tokens.next.id === "function") {
+			advance("function");
+			state.syntax["function"].fud();
+		} else {
+			error("E024", state.tokens.next, state.tokens.next.value);
 		}
 
 		return this;
