@@ -1,9 +1,11 @@
+/* jshint undef:true */
+
 import $ from "jquery";
-import { get, set } from "ember";
+import { get as emGet, set } from "ember";
 import { default as _ } from "underscore";
 
 $.ajax();
-get("foo");
+emGet("foo");
 set("bar");
 _.map();
 
@@ -11,5 +13,5 @@ var foo = "foo";
 var bar = "bar";
 function foobar() {};
 
-export { foo, bar } ;
+export { foo, bar };
 export default foobar;

@@ -674,7 +674,7 @@ exports.testES6Modules = function (test) {
 	var src = fs.readFileSync(__dirname + "/fixtures/es6-import-export.js", "utf8");
 
 	TestRun(test)
-		.test(src, {es5: true});
+		.test(src, {esnext: true});
 
 	test.done();
 }

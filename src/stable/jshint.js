@@ -3900,6 +3900,64 @@ var JSHINT = (function () {
 		return this;
 	}).exps = true;
 
+	stmt("import", function() {
+		if (!state.option.inESNext()) {
+			warning("W104", state.tokens.curr, "import");
+		}
+
+		if (state.tokens.next.identifier) {
+			this.name = identifier();
+			addlabel(this.name, "unused", state.tokens.curr);
+		}
+		else {
+			advance('{');
+			for (;;) {
+				if (state.tokens.next.identifier) {
+					var importName;
+					if (state.tokens.next.type === "default") {
+						importName = "default";
+						advance("default");
+					}
+					else {
+						importName = identifier();
+					}
+					if (state.tokens.next.value === "as") {
+						advance("as");
+						importName = identifier();
+					}
+					addlabel(importName, "unused", state.tokens.next);
+				}
+				else if (state.tokens.next.type === '(punctuator)') {
+					if (state.tokens.next.value === ",") {
+						advance(",");
+					}
+					else if (state.tokens.next.value === "}") {
+						advance("}");
+						break;
+					}
+					else {
+						error("E024", state.tokens.next, state.tokens.next.value);
+						break;
+					}
+				}
+				else {
+					error("E024", state.tokens.next, state.tokens.next.value);
+					break;
+				}
+			}
+		}
+
+		advance("from");
+		advance("(string)");
+		return this;
+	}).exps = true;
+
+	/*infix("as", function(left, that) {
+		var expr;
+		that.exprs = [left];
+		return that;
+	});*/
+
 	// Future Reserved Words
 
 	FutureReservedWord("abstract");
