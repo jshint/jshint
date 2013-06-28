@@ -3923,6 +3923,7 @@ var JSHINT = (function () {
 					importName = identifier();
 				}
 				addlabel(importName, "unused", state.tokens.curr);
+
 				if (state.tokens.next.value === ",") {
 					advance(",");
 				} else if (state.tokens.next.value === "}") {
@@ -3942,7 +3943,7 @@ var JSHINT = (function () {
 
 	stmt("export", function () {
 		if (!state.option.inESNext()) {
-			warning("W104", state.tokens.curr, "import");
+			warning("W104", state.tokens.curr, "export");
 		}
 
 		if (state.tokens.next.type === "default") {

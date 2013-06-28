@@ -676,5 +676,19 @@ exports.testES6Modules = function (test) {
 	TestRun(test)
 		.test(src, {esnext: true});
 
+	TestRun(test)
+		.addError(3, "'import' is only available in JavaScript 1.7.")
+		.addError(4, "'import' is only available in JavaScript 1.7.")
+		.addError(5, "'import' is only available in JavaScript 1.7.")
+		.addError(6, "'import' is only available in JavaScript 1.7.")
+		.addError(17, "'export' is only available in JavaScript 1.7.")
+		.addError(21, "'export' is only available in JavaScript 1.7.")
+		.addError(25, "'export' is only available in JavaScript 1.7.")
+		.addError(26, "'export' is only available in JavaScript 1.7.")
+		.addError(30, "'export' is only available in JavaScript 1.7.")
+		.addError(34, "'export' is only available in JavaScript 1.7.")
+		.addError(38, "'export' is only available in JavaScript 1.7.")
+		.test(src, {});
+
 	test.done();
 };

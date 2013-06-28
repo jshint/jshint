@@ -2,6 +2,7 @@
 
 import $ from "jquery";
 import { get as emGet, set } from "ember";
+import { one } from "foo";
 import { default as _ } from "underscore";
 
 $.ajax();
@@ -21,6 +22,7 @@ export default function() {
 	return "foobar";
 };
 
+export { foo };
 export { foo, bar };
 
 // gettin' fancy
