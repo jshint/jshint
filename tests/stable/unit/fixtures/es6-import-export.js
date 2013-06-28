@@ -1,0 +1,15 @@
+import $ from "jquery";
+import { get, set } from "ember";
+import { default as _ } from "underscore";
+
+$.ajax();
+get("foo");
+set("bar");
+_.map();
+
+var foo = "foo";
+var bar = "bar";
+function foobar() {};
+
+export { foo, bar } ;
+export default foobar;
