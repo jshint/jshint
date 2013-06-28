@@ -690,5 +690,15 @@ exports.testES6Modules = function (test) {
 		.addError(38, "'export' is only available in JavaScript 1.7.")
 		.test(src, {});
 
+	var src2 = [
+		"var a = {",
+		"import: 'foo',",
+		"export: 'bar'",
+		"};"
+	];
+
+	TestRun(test)
+		.test(src2, {});
+
 	test.done();
 };
