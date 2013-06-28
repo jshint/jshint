@@ -3910,7 +3910,7 @@ var JSHINT = (function () {
 			addlabel(this.name, "unused", state.tokens.curr);
 		}
 		else {
-			advance('{');
+			advance("{");
 			for (;;) {
 				if (state.tokens.next.identifier) {
 					var importName;
@@ -3952,11 +3952,68 @@ var JSHINT = (function () {
 		return this;
 	}).exps = true;
 
-	/*infix("as", function(left, that) {
-		var expr;
-		that.exprs = [left];
-		return that;
-	});*/
+	stmt("export", function() {
+		if (!state.option.inESNext()) {
+			warning("W104", state.tokens.curr, "import");
+		}
+
+		// case 1: defaults
+
+		if (state.tokens.next.type === "default") {
+			advance("default");
+
+			this.exportee = expression(10);
+		}
+
+		// case 2: specifier
+		else if (state.tokens.next.value === "{") {
+			advance("{");
+			for (;;) {
+				if (state.tokens.next.type === "(identifier)") {
+					identifier();
+				}
+				else if (state.tokens.next.type === "(punctuator)") {
+					if (state.tokens.next.value === ",") {
+						advance(",");
+					}
+					else if (state.tokens.next.value === "}") {
+						advance("}");
+						break;
+					}
+					else {
+						error("E024", state.tokens.next, state.tokens.next.value);
+						break;
+					}
+				}
+				else {
+					error("E024", state.tokens.next, state.tokens.next.value);
+					break;
+				}
+			}
+		}
+
+		// case 3: assignment
+		else {
+			if (state.tokens.next.id === "var") {
+				advance("var");
+				state.syntax["var"].fud.call(state.syntax["var"].fud);
+			}
+			else if (state.tokens.next.id === "let") {
+				advance("let");
+				state.syntax["let"].fud.call(state.syntax["let"].fud);
+			}
+			else if (state.tokens.next.id === "const") {
+				advance("const");
+				state.syntax["const"].fud.call(state.syntax["const"].fud);
+			}
+			else if (state.tokens.next.id === "function") {
+				advance("function");
+				state.syntax["function"].fud();
+			}
+		}
+
+		return this;
+	}).exps = true;
 
 	// Future Reserved Words
 

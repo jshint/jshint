@@ -11,7 +11,26 @@ _.map();
 
 var foo = "foo";
 var bar = "bar";
-function foobar() {};
+function foobar() {}
+
+export default foobar;
+
+// at some point doing a double export default should error, but for now,
+// makes testing a hell of a lot easier
+export default function() {
+	return "foobar";
+};
 
 export { foo, bar };
-export default foobar;
+
+// gettin' fancy
+
+export function a() {
+	return "a";
+};
+
+export var b = function() {
+	return "b";
+};
+
+export var c = "c";
