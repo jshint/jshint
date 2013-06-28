@@ -677,4 +677,4 @@ exports.testES6Modules = function (test) {
 		.test(src, {esnext: true});
 
 	test.done();
-}
+};

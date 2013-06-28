@@ -3900,7 +3900,7 @@ var JSHINT = (function () {
 		return this;
 	}).exps = true;
 
-	stmt("import", function() {
+	stmt("import", function () {
 		if (!state.option.inESNext()) {
 			warning("W104", state.tokens.curr, "import");
 		}
@@ -3927,7 +3927,7 @@ var JSHINT = (function () {
 					}
 					addlabel(importName, "unused", state.tokens.next);
 				}
-				else if (state.tokens.next.type === '(punctuator)') {
+				else if (state.tokens.next.type === "(punctuator)") {
 					if (state.tokens.next.value === ",") {
 						advance(",");
 					}
@@ -3952,7 +3952,7 @@ var JSHINT = (function () {
 		return this;
 	}).exps = true;
 
-	stmt("export", function() {
+	stmt("export", function () {
 		if (!state.option.inESNext()) {
 			warning("W104", state.tokens.curr, "import");
 		}
