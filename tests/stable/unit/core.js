@@ -669,3 +669,36 @@ exports.testUndefinedAssignment = function (test) {
 
 	test.done();
 };
+
+exports.testES6Modules = function (test) {
+	var src = fs.readFileSync(__dirname + "/fixtures/es6-import-export.js", "utf8");
+
+	TestRun(test)
+		.test(src, {esnext: true});
+
+	TestRun(test)
+		.addError(3, "'import' is only available in JavaScript 1.7.")
+		.addError(4, "'import' is only available in JavaScript 1.7.")
+		.addError(5, "'import' is only available in JavaScript 1.7.")
+		.addError(6, "'import' is only available in JavaScript 1.7.")
+		.addError(17, "'export' is only available in JavaScript 1.7.")
+		.addError(21, "'export' is only available in JavaScript 1.7.")
+		.addError(25, "'export' is only available in JavaScript 1.7.")
+		.addError(26, "'export' is only available in JavaScript 1.7.")
+		.addError(30, "'export' is only available in JavaScript 1.7.")
+		.addError(34, "'export' is only available in JavaScript 1.7.")
+		.addError(38, "'export' is only available in JavaScript 1.7.")
+		.test(src, {});
+
+	var src2 = [
+		"var a = {",
+		"import: 'foo',",
+		"export: 'bar'",
+		"};"
+	];
+
+	TestRun(test)
+		.test(src2, {});
+
+	test.done();
+};
