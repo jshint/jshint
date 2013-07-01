@@ -93,6 +93,7 @@ var JSHINT = (function () {
 			moz         : true, // if mozilla specific syntax should be allowed
 			evil        : true, // if eval should be allowed
 			expr        : true, // if ExpressionStatement should be allowed as Programs
+			extracomma  : true, // if extra commas should always be flagged
 			forin       : true, // if for in statements must filter
 			funcscope   : true, // if only function scope should be used for scope tests
 			gcl         : true, // if JSHint should be compatible with Google Closure Linter
@@ -2539,8 +2540,8 @@ var JSHINT = (function () {
 		}
 		while (state.tokens.next.id !== "(end)") {
 			while (state.tokens.next.id === ",") {
-				if (!state.option.inES5())
-					warning("W070");
+				if (state.option.extracomma || !state.option.inES5())
+					warning("W070", state.tokens.curr);
 				advance(",");
 			}
 			if (state.tokens.next.id === "]") {
@@ -2552,7 +2553,8 @@ var JSHINT = (function () {
 			this.first.push(expression(10));
 			if (state.tokens.next.id === ",") {
 				comma({ allowTrailing: true });
-				if (state.tokens.next.id === "]" && !state.option.inES5(true)) {
+				if (state.tokens.next.id === "]" &&
+					(state.option.extracomma || !state.option.inES5(true))) {
 					warning("W070", state.tokens.curr);
 					break;
 				}
@@ -2965,7 +2967,8 @@ var JSHINT = (function () {
 					comma({ allowTrailing: true, property: true });
 					if (state.tokens.next.id === ",") {
 						warning("W070", state.tokens.curr);
-					} else if (state.tokens.next.id === "}" && !state.option.inES5(true)) {
+					} else if (state.tokens.next.id === "}" &&
+						(state.option.extracomma || !state.option.inES5())) {
 						warning("W070", state.tokens.curr);
 					}
 				} else {
