@@ -79,6 +79,33 @@ exports.group = {
 		test.done();
 	},
 
+	testPrereq: function (test) {
+		sinon.stub(shjs, "cat")
+			.withArgs(sinon.match(/file\.js$/)).returns("a();")
+			.withArgs(sinon.match(/prereq.js$/)).returns("var a = 1;")
+			.withArgs(sinon.match(/config.json$/))
+				.returns("{\"undef\":true,\"prereq\":[\"prereq.js\", \"prereq2.js\"]}");
+
+		sinon.stub(shjs, "test")
+			.withArgs("-e", sinon.match(/file\.js$/)).returns(true)
+			.withArgs("-e", sinon.match(/prereq.js$/)).returns(true)
+			.withArgs("-e", sinon.match(/config.json$/)).returns(true);
+
+		process.exit.restore();
+		sinon.stub(process, "exit")
+			.withArgs(0).returns(true)
+			.withArgs(1).throws("ProcessExit");
+
+		cli.interpret([
+			"node", "jshint", "file.js", "--config", "config.json"
+		]);
+
+		shjs.cat.restore();
+		shjs.test.restore();
+
+		test.done();
+	},
+
 	testReporter: function (test) {
 		test.expect(5);
 

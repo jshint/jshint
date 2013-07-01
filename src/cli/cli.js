@@ -114,6 +114,7 @@ function loadReporter(fp) {
 // Should prevent lots of directory traversal &
 // lookups when liniting an entire project
 var findFileResults = {};
+
 /**
  * Searches for a file with a specified name starting with
  * 'dir' and going all the way up either until it finds the file
@@ -240,19 +241,31 @@ function collect(fp, files, ignores, ext) {
 function lint(code, results, config, data, file) {
 	var globals;
 	var lintData;
+	var buffer = [];
 
 	config = config || {};
 	config = JSON.parse(JSON.stringify(config));
 
-	// Remove potential Unicode BOM.
-	code = code.replace(/^\uFEFF/, "");
+	if (config.prereq) {
+		config.prereq.forEach(function (fp) {
+			fp = path.join(config.dirname, fp);
+			if (shjs.test("-e", fp))
+				buffer.push(shjs.cat(fp));
+		});
+		delete config.prereq;
+	}
 
 	if (config.globals) {
 		globals = config.globals;
 		delete config.globals;
 	}
 
-	if (!JSHINT(code, config, globals)) {
+	delete config.dirname;
+	buffer.push(code);
+	buffer = buffer.join("\n");
+	buffer = buffer.replace(/^\uFEFF/, ""); // Remove potential Unicode BOM.
+
+	if (!JSHINT(buffer, config, globals)) {
 		JSHINT.errors.forEach(function (err) {
 			if (err) {
 				results.push({ file: file || "stdin", error: err });
@@ -286,7 +299,9 @@ var exports = {
 		}
 
 		try {
-			return JSON.parse(removeComments(shjs.cat(fp)));
+			var config = JSON.parse(removeComments(shjs.cat(fp)));
+			config.dirname = path.dirname(fp);
+			return config;
 		} catch (err) {
 			cli.error("Can't parse config file: " + fp);
 			process.exit(1);
