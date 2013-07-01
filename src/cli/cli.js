@@ -255,38 +255,31 @@ function collect(fp, files, ignores, ext) {
 /**
  * Runs JSHint against provided file and saves the result
  *
- * @param {string} file    a path to a file that needs to be linted
+ * @param {string} code    code that needs to be linted
  * @param {object} results a pointer to an object with results
  * @param {object} config  an object with JSHint configuration
  * @param {object} data    a pointer to an object with extra data
+ * @param {string} file    (optional) file name that is being linted
  */
-function lint(file, results, config, data) {
-	var buffer;
+function lint(code, results, config, data, file) {
 	var globals;
 	var lintData;
 
 	config = config || {};
 	config = JSON.parse(JSON.stringify(config));
 
-	try {
-		buffer = shjs.cat(file);
-	} catch (err) {
-		cli.error("Can't open " + file);
-		process.exit(1);
-	}
-
 	// Remove potential Unicode BOM.
-	buffer = buffer.replace(/^\uFEFF/, "");
+	code = code.replace(/^\uFEFF/, "");
 
 	if (config.globals) {
 		globals = config.globals;
 		delete config.globals;
 	}
 
-	if (!JSHINT(buffer, config, globals)) {
+	if (!JSHINT(code, config, globals)) {
 		JSHINT.errors.forEach(function (err) {
 			if (err) {
-				results.push({ file: file, error: err });
+				results.push({ file: file || "stdin", error: err });
 			}
 		});
 	}
@@ -294,7 +287,7 @@ function lint(file, results, config, data) {
 	lintData = JSHINT.data();
 
 	if (lintData) {
-		lintData.file = file;
+		lintData.file = file || "stdin";
 		data.push(lintData);
 	}
 }
@@ -330,26 +323,47 @@ var exports = {
 	 * a reporter and returns the overall result.
 	 *
 	 * @param {object} post-processed options from 'interpret':
-	 *								   args     - CLI arguments
-	 *								   config   - Configuration object
-	 *								   reporter - Reporter function
-	 *								   ignores  - A list of files/dirs to ignore
-	 *								   extensions - A list of non-dot-js extensions to check
+	 *                 args     - CLI arguments
+	 *                 config   - Configuration object
+	 *                 reporter - Reporter function
+	 *                 ignores  - A list of files/dirs to ignore
+	 *                 extensions - A list of non-dot-js extensions to check
+	 * @param {function} cb a callback to call when function is finished
+	 *                   asynchronously.
 	 *
-	 * @returns {bool} 'true' if all files passed and 'false' otherwise.
+	 * @returns {bool} 'true' if all files passed, 'false' otherwise and 'null'
+	 *                 when function will be finished asynchronously.
 	 */
-	run: function (opts) {
+	run: function (opts, cb) {
 		var files = exports.gather(opts);
 		var results = [];
 		var data = [];
 
+		if (files.length === 0) {
+			cli.withStdin(function (code) {
+				lint(code, results, opts.config || {}, data);
+				(opts.reporter || defReporter)(results, data, { verbose: opts.verbose });
+				cb(results.length === 0);
+			});
+
+			return null;
+		}
+
 		files.forEach(function (file) {
 			var config = opts.config || loadConfig(findConfig(file));
-			lint(file, results, config, data);
+			var code;
+
+			try {
+				code = shjs.cat(file);
+			} catch (err) {
+				cli.error("Can't open " + file);
+				process.exit(1);
+			}
+
+			lint(code, results, config, data, file);
 		});
 
 		(opts.reporter || defReporter)(results, data, { verbose: opts.verbose });
-
 		return results.length === 0;
 	},
 
@@ -358,9 +372,9 @@ var exports = {
 	 * Used to determine is stdout has any buffered output before exiting the program
 	 */
 	getBufferSize: function () {
-		return process.stdout.bufferSize; 
+		return process.stdout.bufferSize;
 	},
-	
+
 	/**
 	 * Main entrance function. Parses arguments and calls 'run' when
 	 * its done. This function is called from bin/jshint file.
@@ -414,28 +428,37 @@ var exports = {
 			}
 		}
 
-		var passed = exports.run({
+		// This is a hack. exports.run is both sync and async function
+		// because I needed stdin support (and cli.withStdin is async)
+		// and was too lazy to change tests.
+
+		function done(passed) {
+			if (passed == null)
+				return;
+
+			// Patch as per https://github.com/visionmedia/mocha/issues/333
+			// fixes issues with piped output on Windows.
+			// Root issue is here https://github.com/joyent/node/issues/3584
+			function exit() { process.exit(passed ? 0 : 2); }
+			try {
+				if (exports.getBufferSize()) {
+					process.stdout.once('drain', exit);
+				} else {
+					exit();
+				}
+			} catch (err) {
+				exit();
+			}
+		}
+
+		done(exports.run({
 			args: cli.args,
 			config: config,
 			reporter: reporter,
 			ignores: loadIgnores(),
 			extensions: options["extra-ext"],
 			verbose: options.verbose
-		});
-
-		// Patch as per https://github.com/visionmedia/mocha/issues/333
-		// fixes issues with piped output on Windows.
-		// Root issue is here https://github.com/joyent/node/issues/3584
-		function exit() { process.exit(passed ? 0 : 2); }    
-		try {
-			if (exports.getBufferSize()) {
-				process.stdout.once('drain', exit);
-			} else {
-				exit();
-			}
-		} catch (err) {
-			exit();
-		}
+		}, done));
 	}
 };
 
