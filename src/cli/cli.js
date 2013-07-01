@@ -339,7 +339,7 @@ var exports = {
 		var results = [];
 		var data = [];
 
-		if (files.length === 0) {
+		if (opts.useStdin) {
 			cli.withStdin(function (code) {
 				lint(code, results, opts.config || {}, data);
 				(opts.reporter || defReporter)(results, data, { verbose: opts.verbose });
@@ -457,7 +457,8 @@ var exports = {
 			reporter: reporter,
 			ignores: loadIgnores(),
 			extensions: options["extra-ext"],
-			verbose: options.verbose
+			verbose: options.verbose,
+			useStdin: args[args.length - 1] === "-"
 		}, done));
 	}
 };
