@@ -433,6 +433,8 @@ var exports = {
 		// and was too lazy to change tests.
 
 		function done(passed) {
+			/*jshint eqnull:true */
+
 			if (passed == null)
 				return;
 
