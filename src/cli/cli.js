@@ -69,30 +69,6 @@ function removeComments(str) {
 }
 
 /**
- * Loads and parses a configuration file.
- *
- * @param {string} fp a path to the config file
- * @returns {object} config object
- */
-function loadConfig(fp) {
-	if (!fp) {
-		return {};
-	}
-
-	if (!shjs.test("-e", fp)) {
-		cli.error("Can't find config file: " + fp);
-		process.exit(1);
-	}
-
-	try {
-		return JSON.parse(removeComments(shjs.cat(fp)));
-	} catch (err) {
-		cli.error("Can't parse config file: " + fp);
-		process.exit(1);
-	}
-}
-
-/**
  * Tries to find a configuration file in either project directory
  * or in the home directory. Configuration files are named
  * '.jshintrc'.
@@ -294,6 +270,30 @@ function lint(code, results, config, data, file) {
 
 var exports = {
 	/**
+	 * Loads and parses a configuration file.
+	 *
+	 * @param {string} fp a path to the config file
+	 * @returns {object} config object
+	 */
+	loadConfig: function (fp) {
+		if (!fp) {
+			return {};
+		}
+
+		if (!shjs.test("-e", fp)) {
+			cli.error("Can't find config file: " + fp);
+			process.exit(1);
+		}
+
+		try {
+			return JSON.parse(removeComments(shjs.cat(fp)));
+		} catch (err) {
+			cli.error("Can't parse config file: " + fp);
+			process.exit(1);
+		}
+	},
+
+	/**
 	 * Gathers all files that need to be linted
 	 *
 	 * @param {object} post-processed options from 'interpret':
@@ -350,7 +350,7 @@ var exports = {
 		}
 
 		files.forEach(function (file) {
-			var config = opts.config || loadConfig(findConfig(file));
+			var config = opts.config || exports.loadConfig(findConfig(file));
 			var code;
 
 			try {
@@ -392,7 +392,7 @@ var exports = {
 		// Use config file if specified
 		var config;
 		if (options.config) {
-			config = loadConfig(options.config);
+			config = exports.loadConfig(options.config);
 		}
 
 		switch (true) {
