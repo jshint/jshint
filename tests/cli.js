@@ -506,7 +506,7 @@ exports.group = {
 			.withArgs(sinon.match(/src[\/\\]lib$/)).returns(["file5.js"]);
 
 		sinon.stub(shjs, "cat")
-			.withArgs(sinon.match(/file2?\.js$/)).returns("console.log('Hello');")
+			.withArgs(sinon.match(/file2?\.js$/)).returns("/*jshint devel:true */ console.log('Hello');")
 			.withArgs(sinon.match(/file3\.json$/)).returns("{}")
 			.withArgs(sinon.match(/src[\/\\]file4\.js$/)).returns("print('Hello');")
 			.withArgs(sinon.match(/src[\/\\]lib[\/\\]file5\.js$/)).returns("print('Hello');")
@@ -575,7 +575,8 @@ exports.group = {
 			.withArgs("-e", sinon.match(/.*/)).returns(true);
 
 		sinon.stub(shjs, "cat")
-			.withArgs(sinon.match(/pass\.js$/)).returns("function test() { return 0; }")
+			.withArgs(sinon.match(/pass\.js$/))
+				.returns("function test() { 'use strict'; return 0; } test();")
 			.withArgs(sinon.match(/fail\.js$/)).returns("console.log('Hello')")
 			.withArgs(sinon.match(/\.jshintrc$/)).returns("{}")
 			.withArgs(sinon.match(/\.jshintignore$/)).returns("");
