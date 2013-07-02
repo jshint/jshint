@@ -172,6 +172,9 @@ function loadIgnores(exclude) {
 			return !!line.trim();
 		})
 		.map(function (line) {
+			if (line[0] === "!")
+				return "!" + path.resolve(path.dirname(file), line.substr(1).trim());
+
 			return path.resolve(path.dirname(file), line.trim());
 		});
 }
