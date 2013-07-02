@@ -52,8 +52,8 @@ var errors = {
 	E034: "get/set are ES5 features.",
 	E035: "Missing property name.",
 	E036: "Expected to see a statement and instead saw a block.",
-	E037: "Constant {a} was not declared correctly.",
-	E038: "Variable {a} was not declared correctly.",
+	E037: null, // Vacant
+	E038: null, // Vacant
 	E039: "Function declarations are not invocable. Wrap the whole function invocation in parens.",
 	E040: "Each value should have its own case label.",
 	E041: "Unrecoverable syntax error.",
@@ -190,7 +190,8 @@ var warnings = {
 	W116: "Expected '{a}' and instead saw '{b}'.",
 	W117: "'{a}' is not defined.",
 	W118: "'{a}' is only available in Mozilla JavaScript extensions (use moz option).",
-	W119: "'{a}' is only available in ES6 (use esnext option)."
+	W119: "'{a}' is only available in ES6 (use esnext option).",
+	W120: "You might be leaking a variable ({a}) here."
 };
 
 var info = {
