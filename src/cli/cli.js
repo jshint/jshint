@@ -250,30 +250,36 @@ function lint(code, results, config, data, file) {
 	var globals;
 	var lintData;
 	var buffer = [];
+	var options = JSON.parse(JSON.stringify(require("./defaults.json")));
 
-	config = config || {};
-	config = JSON.parse(JSON.stringify(config));
+	if (config) {
+		for (var key in config) {
+			if (config.hasOwnProperty(key)) {
+				options[key] = config[key];
+			}
+		}
+	}
 
-	if (config.prereq) {
-		config.prereq.forEach(function (fp) {
-			fp = path.join(config.dirname, fp);
+	if (options.prereq) {
+		options.prereq.forEach(function (fp) {
+			fp = path.join(options.dirname, fp);
 			if (shjs.test("-e", fp))
 				buffer.push(shjs.cat(fp));
 		});
-		delete config.prereq;
+		delete options.prereq;
 	}
 
-	if (config.globals) {
-		globals = config.globals;
-		delete config.globals;
+	if (options.globals) {
+		globals = options.globals;
+		delete options.globals;
 	}
 
-	delete config.dirname;
+	delete options.dirname;
 	buffer.push(code);
 	buffer = buffer.join("\n");
 	buffer = buffer.replace(/^\uFEFF/, ""); // Remove potential Unicode BOM.
 
-	if (!JSHINT(buffer, config, globals)) {
+	if (!JSHINT(buffer, options, globals)) {
 		JSHINT.errors.forEach(function (err) {
 			if (err) {
 				results.push({ file: file || "stdin", error: err });
