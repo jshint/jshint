@@ -334,17 +334,18 @@ exports.group = {
 		test.done();
 	},
 
-	testIgnoreFile: function (test) {
+	testIgnores: function (test) {
 		var run = sinon.stub(cli, "run");
 		var dir = __dirname + "/../examples/";
 		sinon.stub(process, "cwd").returns(dir);
 
 		cli.interpret([
-			"node", "jshint", "file.js"
+			"node", "jshint", "file.js", "--exclude=exclude.js"
 		]);
 
-		test.equal(run.args[0][0].ignores[0], path.resolve(dir, "ignored.js"));
-		test.equal(run.args[0][0].ignores[1], path.resolve(dir, "another.js"));
+		test.equal(run.args[0][0].ignores[0], path.resolve(dir, "exclude.js"));
+		test.equal(run.args[0][0].ignores[1], path.resolve(dir, "ignored.js"));
+		test.equal(run.args[0][0].ignores[2], path.resolve(dir, "another.js"));
 
 		run.restore();
 		process.cwd.restore();
@@ -518,7 +519,8 @@ exports.group = {
 
 		files = cli.gather({
 			args: ["file.js", "file2.js", "file3.json", "src"],
-			extensions: "json"
+			extensions: "json",
+			ignores: []
 		});
 
 		args = shjs.cat.args.filter(function (arg) {
@@ -546,7 +548,8 @@ exports.group = {
 
 		files = cli.gather({
 			args: ["examples"],
-			extensions: "json"
+			extensions: "json",
+			ignores: []
 		});
 
 		args = shjs.cat.args.filter(function (arg) {
