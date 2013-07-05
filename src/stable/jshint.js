@@ -3114,7 +3114,7 @@ var JSHINT = (function () {
 					warning("W080", state.tokens.prev, state.tokens.prev.value);
 				}
 				if (peek(0).id === "=" && state.tokens.next.identifier) {
-					error("E037", state.tokens.next, state.tokens.next.value);
+					warning("W120", state.tokens.next, state.tokens.next.value);
 				}
 				value = expression(10);
 				if (lone) {
@@ -3181,7 +3181,7 @@ var JSHINT = (function () {
 					warning("W080", state.tokens.prev, state.tokens.prev.value);
 				}
 				if (peek(0).id === "=" && state.tokens.next.identifier) {
-					error("E038", state.tokens.next, state.tokens.next.value);
+					warning("W120", state.tokens.next, state.tokens.next.value);
 				}
 				value = expression(10);
 				if (lone) {
@@ -3261,7 +3261,7 @@ var JSHINT = (function () {
 					warning("W080", state.tokens.prev, state.tokens.prev.value);
 				}
 				if (peek(0).id === "=" && state.tokens.next.identifier) {
-					error("E037", state.tokens.next, state.tokens.next.value);
+					warning("W120", state.tokens.next, state.tokens.next.value);
 				}
 				value = expression(10);
 				if (lone) {
@@ -3898,6 +3898,95 @@ var JSHINT = (function () {
 		nonadjacent(state.tokens.curr, state.tokens.next);
 		this.first = expression(20);
 		reachable("throw");
+		return this;
+	}).exps = true;
+
+	stmt("import", function () {
+		if (!state.option.inESNext()) {
+			warning("W104", state.tokens.curr, "import");
+		}
+
+		if (state.tokens.next.identifier) {
+			this.name = identifier();
+			addlabel(this.name, "unused", state.tokens.curr);
+		} else {
+			advance("{");
+			for (;;) {
+				var importName;
+				if (state.tokens.next.type === "default") {
+					importName = "default";
+					advance("default");
+				} else {
+					importName = identifier();
+				}
+				if (state.tokens.next.value === "as") {
+					advance("as");
+					importName = identifier();
+				}
+				addlabel(importName, "unused", state.tokens.curr);
+
+				if (state.tokens.next.value === ",") {
+					advance(",");
+				} else if (state.tokens.next.value === "}") {
+					advance("}");
+					break;
+				} else {
+					error("E024", state.tokens.next, state.tokens.next.value);
+					break;
+				}
+			}
+		}
+
+		advance("from");
+		advance("(string)");
+		return this;
+	}).exps = true;
+
+	stmt("export", function () {
+		if (!state.option.inESNext()) {
+			warning("W104", state.tokens.curr, "export");
+		}
+
+		if (state.tokens.next.type === "default") {
+			advance("default");
+			this.exportee = expression(10);
+
+			return this;
+		} 
+		if (state.tokens.next.value === "{") {
+			advance("{");
+			for (;;) {
+				identifier();
+
+				if (state.tokens.next.value === ",") {
+					advance(",");
+				} else if (state.tokens.next.value === "}") {
+					advance("}");
+					break;
+				} else {
+					error("E024", state.tokens.next, state.tokens.next.value);
+					break;
+				}
+			}
+			return this;
+		}
+
+		if (state.tokens.next.id === "var") {
+			advance("var");
+			state.syntax["var"].fud.call(state.syntax["var"].fud);
+		} else if (state.tokens.next.id === "let") {
+			advance("let");
+			state.syntax["let"].fud.call(state.syntax["let"].fud);
+		} else if (state.tokens.next.id === "const") {
+			advance("const");
+			state.syntax["const"].fud.call(state.syntax["const"].fud);
+		} else if (state.tokens.next.id === "function") {
+			advance("function");
+			state.syntax["function"].fud();
+		} else {
+			error("E024", state.tokens.next, state.tokens.next.value);
+		}
+
 		return this;
 	}).exps = true;
 

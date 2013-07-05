@@ -79,6 +79,33 @@ exports.group = {
 		test.done();
 	},
 
+	testPrereq: function (test) {
+		sinon.stub(shjs, "cat")
+			.withArgs(sinon.match(/file\.js$/)).returns("a();")
+			.withArgs(sinon.match(/prereq.js$/)).returns("var a = 1;")
+			.withArgs(sinon.match(/config.json$/))
+				.returns("{\"undef\":true,\"prereq\":[\"prereq.js\", \"prereq2.js\"]}");
+
+		sinon.stub(shjs, "test")
+			.withArgs("-e", sinon.match(/file\.js$/)).returns(true)
+			.withArgs("-e", sinon.match(/prereq.js$/)).returns(true)
+			.withArgs("-e", sinon.match(/config.json$/)).returns(true);
+
+		process.exit.restore();
+		sinon.stub(process, "exit")
+			.withArgs(0).returns(true)
+			.withArgs(1).throws("ProcessExit");
+
+		cli.interpret([
+			"node", "jshint", "file.js", "--config", "config.json"
+		]);
+
+		shjs.cat.restore();
+		shjs.test.restore();
+
+		test.done();
+	},
+
 	testReporter: function (test) {
 		test.expect(5);
 
@@ -307,17 +334,18 @@ exports.group = {
 		test.done();
 	},
 
-	testIgnoreFile: function (test) {
+	testIgnores: function (test) {
 		var run = sinon.stub(cli, "run");
 		var dir = __dirname + "/../examples/";
 		sinon.stub(process, "cwd").returns(dir);
 
 		cli.interpret([
-			"node", "jshint", "file.js"
+			"node", "jshint", "file.js", "--exclude=exclude.js"
 		]);
 
-		test.equal(run.args[0][0].ignores[0], path.resolve(dir, "ignored.js"));
-		test.equal(run.args[0][0].ignores[1], path.resolve(dir, "another.js"));
+		test.equal(run.args[0][0].ignores[0], path.resolve(dir, "exclude.js"));
+		test.equal(run.args[0][0].ignores[1], path.resolve(dir, "ignored.js"));
+		test.equal(run.args[0][0].ignores[2], path.resolve(dir, "another.js"));
 
 		run.restore();
 		process.cwd.restore();
@@ -478,7 +506,7 @@ exports.group = {
 			.withArgs(sinon.match(/src[\/\\]lib$/)).returns(["file5.js"]);
 
 		sinon.stub(shjs, "cat")
-			.withArgs(sinon.match(/file2?\.js$/)).returns("console.log('Hello');")
+			.withArgs(sinon.match(/file2?\.js$/)).returns("/*jshint devel:true */ console.log('Hello');")
 			.withArgs(sinon.match(/file3\.json$/)).returns("{}")
 			.withArgs(sinon.match(/src[\/\\]file4\.js$/)).returns("print('Hello');")
 			.withArgs(sinon.match(/src[\/\\]lib[\/\\]file5\.js$/)).returns("print('Hello');")
@@ -491,7 +519,8 @@ exports.group = {
 
 		files = cli.gather({
 			args: ["file.js", "file2.js", "file3.json", "src"],
-			extensions: "json"
+			extensions: "json",
+			ignores: []
 		});
 
 		args = shjs.cat.args.filter(function (arg) {
@@ -519,7 +548,8 @@ exports.group = {
 
 		files = cli.gather({
 			args: ["examples"],
-			extensions: "json"
+			extensions: "json",
+			ignores: []
 		});
 
 		args = shjs.cat.args.filter(function (arg) {
@@ -545,7 +575,8 @@ exports.group = {
 			.withArgs("-e", sinon.match(/.*/)).returns(true);
 
 		sinon.stub(shjs, "cat")
-			.withArgs(sinon.match(/pass\.js$/)).returns("function test() { return 0; }")
+			.withArgs(sinon.match(/pass\.js$/))
+				.returns("function test() { 'use strict'; return 0; } test();")
 			.withArgs(sinon.match(/fail\.js$/)).returns("console.log('Hello')")
 			.withArgs(sinon.match(/\.jshintrc$/)).returns("{}")
 			.withArgs(sinon.match(/\.jshintignore$/)).returns("");
