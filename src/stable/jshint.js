@@ -2092,7 +2092,6 @@ var JSHINT = (function () {
 
 	var orPrecendence = 40;
 	infix("||", function (left, that) {
-		increaseComplexityCount();
 		that.left = left;
 		that.right = expression(orPrecendence);
 		return that;
@@ -3561,10 +3560,12 @@ var JSHINT = (function () {
 				indentation(-state.option.indent);
 				advance("case");
 				this.cases.push(expression(20));
-				increaseComplexityCount();
 				g = true;
 				advance(":");
 				funct["(verb)"] = "case";
+        if (state.tokens.next.id != "case") { // should not increase complexity for empty block
+          increaseComplexityCount();
+        }
 				break;
 			case "default":
 				switch (funct["(verb)"]) {
