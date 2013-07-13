@@ -1196,6 +1196,18 @@ exports["test: destructuring assign of empty values as JS legacy"] = function (t
 	test.done();
 };
 
+exports["test: array element assignemnt inside array"] = function (test) {
+	var code = [
+		"var a1 = {};",
+		"var a2 = [function f() {a1[0] = 1;}];",
+	];
+
+	TestRun(test)
+		.test(code);
+
+	test.done();
+};
+
 exports["test: let statement as moz"] = function (test) {
 	var code = [
 		"let x = 1;",
