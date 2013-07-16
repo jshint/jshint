@@ -779,6 +779,22 @@ exports.debug = function (test) {
 	test.done();
 };
 
+/** `debugger` statements without semicolons are found on the correct line */
+exports.debug = function (test) {
+  var src = [
+    "function test () {",
+    "debugger",
+    "return true; }"
+  ];
+
+  // Ensure we mark the correct line when finding debugger statements
+  TestRun(test)
+    .addError(2, "Forgotten 'debugger' statement?")
+    .test(src, {es3: true, asi: true});
+
+  test.done();
+};
+
 /** Option `eqeqeq` requires you to use === all the time. */
 exports.eqeqeq = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/eqeqeq.js', 'utf8');
