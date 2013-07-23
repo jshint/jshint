@@ -1589,3 +1589,13 @@ exports.unignored = function (test) {
 
 	test.done();
 };
+
+// Regressions for "var foo = ['{'];" (GH-1132)
+exports['var foo = ["{"];'] = function (test) {
+	var src = fs.readFileSync(__dirname + "/fixtures/gh1132.js", "utf-8");
+
+	TestRun(test)
+		.test(src);
+
+	test.done();
+};
