@@ -4029,9 +4029,10 @@ var JSHINT = (function () {
 		var i = 0;
 		var bracketStack = 0;
 		var ret = {};
-		if (state.tokens.curr.type === '(punctuator)' && _.contains(["[", "{"], state.tokens.curr.value))
+		if (state.tokens.curr.type === "(punctuator)" &&
+			_.contains(["[", "{"], state.tokens.curr.value))
 			bracketStack += 1;
-		if (state.tokens.next.type === '(punctuator)') {
+		if (state.tokens.next.type === "(punctuator)") {
 			if (_.contains(["[", "{"], state.tokens.next.value))
 				bracketStack += 1;
 			if (_.contains(["]", "}"], state.tokens.next.value))
@@ -4042,7 +4043,7 @@ var JSHINT = (function () {
 			pn1 = peek(i + 1);
 			i = i + 1;
 
-			if (pn.type === '(punctuator)') {
+			if (pn.type === "(punctuator)") {
 				if (_.contains(["[", "{"], pn.value)) {
 					bracketStack += 1;
 				} else if (_.contains(["]", "}"], pn.value)) {
@@ -4054,8 +4055,9 @@ var JSHINT = (function () {
 				ret.notJson = true;
 				break;
 			}
-			if (pn.type === '(punctuator)') {
-				if (_.contains(["}", "]"], pn.value) && pn1.type === '(punctuator)' && pn1.value === "=") {
+			if (pn.type === "(punctuator)") {
+				if (_.contains(["}", "]"], pn.value) &&
+					pn1.type === "(punctuator)" && pn1.value === "=") {
 					ret.isDestAssign = true;
 					ret.notJson = true;
 					break;
