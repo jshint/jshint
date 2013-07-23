@@ -3951,7 +3951,7 @@ var JSHINT = (function () {
 			this.exportee = expression(10);
 
 			return this;
-		} 
+		}
 		if (state.tokens.next.value === "{") {
 			advance("{");
 			for (;;) {
@@ -4029,34 +4029,42 @@ var JSHINT = (function () {
 		var i = 0;
 		var bracketStack = 0;
 		var ret = {};
-		if (_.contains(["[", "{"], state.tokens.curr.value))
+		if (state.tokens.curr.type === '(punctuator)' && _.contains(["[", "{"], state.tokens.curr.value))
 			bracketStack += 1;
-		if (_.contains(["[", "{"], state.tokens.next.value))
-			bracketStack += 1;
-		if (_.contains(["]", "}"], state.tokens.next.value))
-			bracketStack -= 1;
+		if (state.tokens.next.type === '(punctuator)') {
+			if (_.contains(["[", "{"], state.tokens.next.value))
+				bracketStack += 1;
+			if (_.contains(["]", "}"], state.tokens.next.value))
+				bracketStack -= 1;
+		}
 		do {
 			pn = peek(i);
 			pn1 = peek(i + 1);
 			i = i + 1;
-			if (_.contains(["[", "{"], pn.value)) {
-				bracketStack += 1;
-			} else if (_.contains(["]", "}"], pn.value)) {
-				bracketStack -= 1;
+
+			if (pn.type === '(punctuator)') {
+				if (_.contains(["[", "{"], pn.value)) {
+					bracketStack += 1;
+				} else if (_.contains(["]", "}"], pn.value)) {
+					bracketStack -= 1;
+				}
 			}
 			if (pn.identifier && pn.value === "for" && bracketStack === 1) {
 				ret.isCompArray = true;
 				ret.notJson = true;
 				break;
 			}
-			if (_.contains(["}", "]"], pn.value) && pn1.value === "=") {
-				ret.isDestAssign = true;
-				ret.notJson = true;
-				break;
-			}
-			if (pn.value === ";") {
-				ret.isBlock = true;
-				ret.notJson = true;
+			if (pn.type === '(punctuator)') {
+				if (_.contains(["}", "]"], pn.value) && pn1.type === '(punctuator)' && pn1.value === "=") {
+					ret.isDestAssign = true;
+					ret.notJson = true;
+					break;
+				}
+				if (pn.value === ";") {
+					ret.isBlock = true;
+					ret.notJson = true;
+					break;
+				}
 			}
 		} while (bracketStack > 0 && pn.id !== "(end)" && i < 15);
 		return ret;
