@@ -423,7 +423,8 @@ var JSHINT = (function () {
 			line: line,
 			character: chr,
 			message: message + " (" + percentage + "% scanned).",
-			raw: message
+			raw: message,
+			code: code
 		};
 	}
 
@@ -4674,6 +4675,7 @@ var JSHINT = (function () {
 				JSHINT.errors.push({
 					scope     : "(main)",
 					raw       : err.raw,
+					code      : err.code,
 					reason    : err.message,
 					line      : err.line || nt.line,
 					character : err.character || nt.from
