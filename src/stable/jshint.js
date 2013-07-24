@@ -3903,7 +3903,7 @@ var JSHINT = (function () {
 
 	stmt("import", function () {
 		if (!state.option.inESNext()) {
-			warning("W104", state.tokens.curr, "import");
+			warning("W119", state.tokens.curr, "import");
 		}
 
 		if (state.tokens.next.identifier) {
@@ -3944,15 +3944,19 @@ var JSHINT = (function () {
 
 	stmt("export", function () {
 		if (!state.option.inESNext()) {
-			warning("W104", state.tokens.curr, "export");
+			warning("W119", state.tokens.curr, "export");
 		}
 
 		if (state.tokens.next.type === "default") {
 			advance("default");
+			if (state.tokens.next.id === "function" || state.tokens.next.id === "class") {
+				this.block = true;
+			}
 			this.exportee = expression(10);
 
 			return this;
-		} 
+		}
+
 		if (state.tokens.next.value === "{") {
 			advance("{");
 			for (;;) {
@@ -3981,8 +3985,13 @@ var JSHINT = (function () {
 			advance("const");
 			state.syntax["const"].fud.call(state.syntax["const"].fud);
 		} else if (state.tokens.next.id === "function") {
+			this.block = true;
 			advance("function");
 			state.syntax["function"].fud();
+		} else if (state.tokens.next.id === "class") {
+			this.block = true;
+			advance("class");
+			state.syntax["class"].fud();
 		} else {
 			error("E024", state.tokens.next, state.tokens.next.value);
 		}
