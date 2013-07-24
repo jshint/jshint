@@ -55,5 +55,10 @@
 		}
 	],
 
-	"preferGlobal": true
+	"preferGlobal": true,
+
+	"files": [
+		"bin",
+		"src"
+	]
 }
