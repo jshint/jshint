@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/*global ls, target, find, echo, cat, chmod, exit, mkdir, test */
+/*jshint shelljs:true*/
 
 "use strict";
 
