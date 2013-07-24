@@ -489,7 +489,7 @@ var exports = {
 			ignores: loadIgnores(options.exclude),
 			extensions: options["extra-ext"],
 			verbose: options.verbose,
-			useStdin: args[args.length - 1] === "-"
+			useStdin: {"-": true, "/dev/stdin": true}[args[args.length - 1]]
 		}, done));
 	}
 };
