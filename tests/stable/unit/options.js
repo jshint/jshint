@@ -1560,6 +1560,25 @@ exports.maxcomplexity = function (test) {
 };
 
 /*
+ * Tests the `maxcomplexity` option
+ */
+exports.maxcomplexity = function (test) {
+	var fixture = '/fixtures/cyclomatic-complexity-per-condition.js';
+	var src = fs.readFileSync(__dirname + fixture, 'utf8');
+
+	TestRun(test)
+		.addError(1, "This function's cyclomatic complexity is too high. (2)")
+		.addError(14, "This function's cyclomatic complexity is too high. (2)")
+		.addError(22, "This function's cyclomatic complexity is too high. (3)")
+		.addError(36, "This function's cyclomatic complexity is too high. (3)")
+		.addError(46, "This function's cyclomatic complexity is too high. (3)")
+		.addError(56, "This function's cyclomatic complexity is too high. (4)")
+		.test(src, { es3: true, maxcomplexity: 1 });
+
+	test.done();
+};
+
+/*
  * Tests ignored warnings.
  */
 exports.ignored = function (test) {
