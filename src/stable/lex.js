@@ -227,7 +227,7 @@ function Lexer(source) {
 	this.from = 1;
 	this.input = "";
 
-	for (var i = 0; i < state.option.indent; i += 1) {
+	for (var i = 0; i < state.option.tab; i += 1) {
 		state.tab += " ";
 	}
 }

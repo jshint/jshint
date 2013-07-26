@@ -159,6 +159,7 @@ var JSHINT = (function () {
 		valOptions = {
 			maxlen       : false,
 			indent       : false,
+			tab          : false,
 			maxerr       : false,
 			predef       : false,
 			quotmark     : false, //'single'|'double'|true
@@ -4399,6 +4400,7 @@ var JSHINT = (function () {
 		state.option = newOptionObj;
 		state.ignored = newIgnoredObj;
 
+		state.option.tab = state.option.tab || 4;
 		state.option.indent = state.option.indent || 4;
 		state.option.maxerr = state.option.maxerr || 50;
 
