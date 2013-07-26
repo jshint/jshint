@@ -104,7 +104,7 @@
 				print("> " + (err.evidence || "").replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"));
 				print("");
 			}
-			retval = 1;
+			retval = 2;
 		}
 	});
 
