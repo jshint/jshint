@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/*jshint shelljs:true*/
+/*jshint shelljs:true, lastsemic:true, -W101*/
 
 "use strict";
 
@@ -153,7 +153,7 @@ target.changelog = function () {
 				authors[cmt[2]] = true;
 		});
 
-		console.log("<!-- auto-generated -->")
+		console.log("<!-- auto-generated -->");
 		console.log("<table class='changelog'>\n" + html + "</table>\n");
 		console.log("<p class='thx'><strong>Thanks</strong> to " + Object.keys(authors).join(", ") + " for sending patches!</p>");
 	});
