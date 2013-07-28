@@ -332,11 +332,12 @@ var exports = {
 	 */
 	gather: function (opts) {
 		var files = [];
+
 		var reg = new RegExp("\\.(js" +
-			(opts.extensions === "" ? "" : "|" +
+			(!opts.extensions ? "" : "|" +
 				opts.extensions.replace(/,/g, "|").replace(/[\. ]/g, "")) + ")$");
 
-		var ignores = opts.ignores.map(function (target) {
+		var ignores = !opts.ignores ? loadIgnores() : opts.ignores.map(function (target) {
 			return path.resolve(target);
 		});
 

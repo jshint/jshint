@@ -457,6 +457,25 @@ exports.group = {
 		test.done();
 	},
 
+	testGatherOptionalParameters: function (test) {
+		sinon.stub(shjs, "test")
+			.withArgs("-e", sinon.match(/.*/)).returns(true);
+
+		sinon.stub(shjs, "cat")
+			.withArgs(sinon.match(/\.jshintignore$/)).returns(path.join("ignore", "**"));
+
+		var files = cli.gather({
+			args: ["file.js"]
+		});
+
+		test.equal(files.length, 1);
+		test.equal(files[0], "file.js");
+
+		shjs.test.restore();
+		shjs.cat.restore();
+		test.done();
+	},
+
 	testGather: function (test) {
 		var dir = __dirname + "/../examples/";
 		var files = [];
