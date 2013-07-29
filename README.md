@@ -77,10 +77,10 @@ Attribution
 
 Core Team members:
 
- * [Anton Kovalyov](http://anton.kovalyov.net/) ([@valueof](http://twitter.com/valueof))
+ * [Anton Kovalyov](http://anton.kovalyov.net/) ([@valueof](https://twitter.com/valueof))
  * [Wolfgang Kluge](http://klugesoftware.de/) ([blog](http://gehirnwindung.de/))
- * [Josh Perez](http://www.goatslacker.com/) ([@goatslacker](http://twitter.com/goatslacker))
- * [Brent Lintner](http://brentlintner.heroku.com/) ([@brentlintner](http://twitter.com/brentlintner))
+ * [Josh Perez](http://www.goatslacker.com/) ([@goatslacker](https://twitter.com/goatslacker))
+ * [Brent Lintner](http://brentlintner.heroku.com/) ([@brentlintner](https://twitter.com/brentlintner))
  * [Bernard Pratz](http://i.got.nothing.to/blog/) ([@guyzmo](https://twitter.com/guyzmo))
 
 Maintainer: Anton Kovalyov
