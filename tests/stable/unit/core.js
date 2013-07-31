@@ -720,3 +720,22 @@ exports.testPotentialVariableLeak = function (test) {
 
 	test.done();
 };
+
+exports.testDefaultArguments = function (test) {
+	var src = fs.readFileSync(__dirname + "/fixtures/default-arguments.js", "utf8");
+	TestRun(test)
+		.addError(11, "Regular parameters cannot come after default parameters.")
+		.test(src, { esnext: true });
+
+	TestRun(test)
+		.addError(11, "Regular parameters cannot come after default parameters.")
+		.test(src, { moz: true });
+
+	TestRun(test)
+		.addError(7, "'default parameters' is only available in ES6 (use esnext option).")
+		.addError(11, "'default parameters' is only available in ES6 (use esnext option).")
+		.addError(11, "Regular parameters cannot come after default parameters.")
+		.test(src, {  });
+
+	test.done();
+};
