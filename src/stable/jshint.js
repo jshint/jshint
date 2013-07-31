@@ -2597,6 +2597,7 @@ var JSHINT = (function () {
 		var ident;
 		var tokens = [];
 		var t;
+		var pastDefault = false;
 
 		if (parsed) {
 			if (parsed instanceof Array) {
@@ -2661,6 +2662,21 @@ var JSHINT = (function () {
 				ident = identifier(true);
 				params.push(ident);
 				addlabel(ident, "unused", state.tokens.curr);
+			}
+
+			// it is a syntax error to have a regular argument after a default argument
+			if (pastDefault) {
+				if (state.tokens.next.id !== "=") {
+					error("E051", state.tokens.current);
+				}
+			}
+			if (state.tokens.next.id === "=") {
+				if (!state.option.inESNext()) {
+					warning("W119", state.tokens.next, "default parameters");
+				}
+				advance("=");
+				pastDefault = true;
+				expression(10);
 			}
 			if (state.tokens.next.id === ",") {
 				comma();
