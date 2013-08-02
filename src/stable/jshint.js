@@ -137,6 +137,8 @@ var JSHINT = (function () {
 			sub         : true, // if all forms of subscript notation are tolerated
 			supernew    : true, // if `new function () { ... };` and `new Object;`
 			                    // should be tolerated
+			unsafechars : true, // if unsafe characters should not be checked
+			                    //
 			trailing    : true, // if trailing whitespace rules apply
 			validthis   : true, // if 'this' inside a non-constructor function is valid.
 			                    // This is a function scoped option only.
