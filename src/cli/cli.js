@@ -75,26 +75,40 @@ function removeComments(str) {
  * or in the home directory. Configuration files are named
  * '.jshintrc'.
  *
- * @param {sting} file path to the file to be linted
+ * @param {string} file path to the file to be linted
  * @returns {string} a path to the config file
  */
 function findConfig(file) {
-	var name = ".jshintrc";
-	var dir = path.dirname(path.resolve(file));
-	var proj = findFile(name, dir);
-	var home = path.normalize(path.join(process.env.HOME ||
-	                                    process.env.HOMEPATH ||
-	                                    process.env.USERPROFILE, name));
+	var dir  = path.dirname(path.resolve(file));
+	var envs = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
+	var home = path.normalize(path.join(envs, ".jshintrc"));
 
-	if (proj) {
+	var proj = findFile(".jshintrc", dir);
+	if (proj)
 		return proj;
-	}
 
-	if (shjs.test("-e", home)) {
+	if (shjs.test("-e", home))
 		return home;
-	}
 
 	return null;
+}
+
+/**
+ * Tries to find JSHint configuration within a package.json file
+ * (if any). It search in the current directory and then goes up
+ * all the way to the root just like findFile.
+ *
+ * @param   {string} file path to the file to be linted
+ * @returns {object} config object
+ */
+function loadNpmConfig(file) {
+	var dir = path.dirname(path.resolve(file));
+	var fp  = findFile("package.json", dir);
+
+	if (!fp)
+		return null;
+
+	return require(fp).jshintConfig || null;
 }
 
 /**
@@ -374,7 +388,7 @@ var exports = {
 		}
 
 		files.forEach(function (file) {
-			var config = opts.config || exports.loadConfig(findConfig(file));
+			var config = opts.config || loadNpmConfig(file) || exports.loadConfig(findConfig(file));
 			var code;
 
 			try {

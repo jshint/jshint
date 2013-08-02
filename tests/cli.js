@@ -459,7 +459,8 @@ exports.group = {
 
 	testGatherOptionalParameters: function (test) {
 		sinon.stub(shjs, "test")
-			.withArgs("-e", sinon.match(/.*/)).returns(true);
+			.withArgs("-e", sinon.match(/\.jshintignore$/)).returns(true)
+			.withArgs("-e", sinon.match(/file.js$/)).returns(true);
 
 		sinon.stub(shjs, "cat")
 			.withArgs(sinon.match(/\.jshintignore$/)).returns(path.join("ignore", "**"));
@@ -481,16 +482,24 @@ exports.group = {
 		var files = [];
 		sinon.stub(process, "cwd").returns(dir);
 
-		sinon.stub(shjs, "test")
-			.withArgs("-e", sinon.match(/.*/)).returns(true);
+		var demoFiles = [
+			[ /file2?\.js$/, "console.log('Hello');" ],
+			[ /ignore[\/\\]file\d\.js$/, "console.log('Hello, ignore me');" ],
+			[ /ignore[\/\\]dir[\/\\]file\d\.js$/, "print('Ignore me');" ],
+			[ /node_script$/, "console.log('Hello, ignore me');" ],
+			[ /\.jshintrc$/, "{}" ],
+			[ /\.jshintignore$/, path.join("ignore", "**") ],
+		];
 
-		sinon.stub(shjs, "cat")
-			.withArgs(sinon.match(/file2?\.js$/)).returns("console.log('Hello');")
-			.withArgs(sinon.match(/ignore[\/\\]file\d\.js$/)).returns("console.log('Hello, ignore me');")
-			.withArgs(sinon.match(/ignore[\/\\]dir[\/\\]file\d\.js$/)).returns("print('Ignore me');")
-			.withArgs(sinon.match(/node_script$/)).returns("console.log('Hello, ignore me');")
-			.withArgs(sinon.match(/\.jshintrc$/)).returns("{}")
-			.withArgs(sinon.match(/\.jshintignore$/)).returns(path.join("ignore", "**"));
+		var testStub = sinon.stub(shjs, "test");
+		demoFiles.forEach(function (file) {
+			testStub = testStub.withArgs("-e", sinon.match(file[0])).returns(true);
+		});
+
+		var catStub = sinon.stub(shjs, "cat");
+		demoFiles.forEach(function (file) {
+			catStub = catStub.withArgs(sinon.match(file[0])).returns(file[1]);
+		});
 
 		files = cli.gather({
 			args: ["file.js", "file2.js", "node_script",
@@ -515,8 +524,23 @@ exports.group = {
 		shjs.test.restore();
 		shjs.cat.restore();
 
-		sinon.stub(shjs, "test")
-			.withArgs("-e", sinon.match(/.*/)).returns(true)
+		demoFiles = [
+			[ /file2?\.js$/, "console.log('Hello');" ],
+			[ /file3\.json$/, "{}" ],
+			[ /src[\/\\]file4\.js$/, "print('Hello');" ],
+			[ /src[\/\\]lib[\/\\]file5\.js$/, "print('Hello'); "],
+			[ /\.jshintrc$/, "{}" ],
+			[ /\.jshintignore$/, "" ]
+		];
+
+		testStub = sinon.stub(shjs, "test");
+		demoFiles.forEach(function (file) {
+			testStub = testStub.withArgs("-e", sinon.match(file[0])).returns(true);
+		});
+
+		testStub = testStub
+			.withArgs("-e", sinon.match(/src$/)).returns(true)
+			.withArgs("-e", sinon.match(/src[\/\\]lib$/)).returns(true)
 			.withArgs("-d", sinon.match(/src$/)).returns(true)
 			.withArgs("-d", sinon.match(/src[\/\\]lib$/)).returns(true);
 
@@ -524,13 +548,10 @@ exports.group = {
 			.withArgs(sinon.match(/src$/)).returns(["lib", "file4.js"])
 			.withArgs(sinon.match(/src[\/\\]lib$/)).returns(["file5.js"]);
 
-		sinon.stub(shjs, "cat")
-			.withArgs(sinon.match(/file2?\.js$/)).returns("console.log('Hello');")
-			.withArgs(sinon.match(/file3\.json$/)).returns("{}")
-			.withArgs(sinon.match(/src[\/\\]file4\.js$/)).returns("print('Hello');")
-			.withArgs(sinon.match(/src[\/\\]lib[\/\\]file5\.js$/)).returns("print('Hello');")
-			.withArgs(sinon.match(/\.jshintrc$/)).returns("{}")
-			.withArgs(sinon.match(/\.jshintignore$/)).returns("");
+		catStub = sinon.stub(shjs, "cat");
+		demoFiles.forEach(function (file) {
+			catStub = catStub.withArgs(sinon.match(file[0])).returns(file[1]);
+		});
 
 		cli.interpret([
 			"node", "jshint", "file.js", "file2.js", "file3.json", "--extra-ext=json", "src"
@@ -591,7 +612,7 @@ exports.group = {
 		sinon.stub(process, "cwd").returns(dir);
 
 		sinon.stub(shjs, "test")
-			.withArgs("-e", sinon.match(/.*/)).returns(true);
+			.withArgs("-e", sinon.match(/(pass\.js|fail\.js|\.jshintrc|\.jshintignore)$/)).returns(true);
 
 		sinon.stub(shjs, "cat")
 			.withArgs(sinon.match(/pass\.js$/)).returns("function test() { return 0; }")
