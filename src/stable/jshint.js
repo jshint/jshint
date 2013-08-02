@@ -582,8 +582,8 @@ var JSHINT = (function () {
 		if (nt.type === "globals") {
 			body.forEach(function (g) {
 				g = g.split(":");
-				var key = g[0];
-				var val = g[1];
+				var key = (g[0] || "").trim();
+				var val = (g[1] || "").trim();
 
 				if (key.charAt(0) === "-") {
 					key = key.slice(1);
