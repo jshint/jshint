@@ -24,9 +24,9 @@
 	},
 
 	"scripts": {
-		"build": "node ./make.js build",
+		"build": "node make.js build",
 		"test": "nodeunit tests tests/stable/regression tests/stable/unit",
-		"lint": "node ./make.js lint"
+		"pretest": "jshint --config=jshint.json src"
 	},
 
 	"main": "./src/stable/jshint.js",
