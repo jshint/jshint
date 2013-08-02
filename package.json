@@ -25,7 +25,7 @@
 
 	"scripts": {
 		"build": "node ./make.js build",
-		"test": "node ./make.js test",
+		"test": "nodeunit tests tests/stable/regression tests/stable/unit",
 		"lint": "node ./make.js lint"
 	},
 

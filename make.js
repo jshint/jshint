@@ -17,7 +17,6 @@ var OPTIONS = JSON.parse(cat("./jshint.json"));
 
 target.all = function () {
 	target.lint();
-	target.test();
 };
 
 target.lint = function () {
@@ -78,22 +77,6 @@ target.lint = function () {
 	}
 
 	exit(1);
-};
-
-target.test = function () {
-	var nodeunit = require("nodeunit").reporters.minimal;
-	var files = [];
-
-	TESTS.forEach(function (dir) {
-		ls(dir + "*.js").forEach(function (file) {
-			files.push(file);
-		});
-	});
-
-	echo("Running tests...", "\n");
-	nodeunit.run(files, null, function (err) {
-		exit(err ? 1 : 0);
-	});
 };
 
 target.build = function () {
