@@ -9,6 +9,7 @@
 	var optstr; // arg1=val1,arg2=val2,...
 	var predef; // global1=true,global2,global3,...
 	var opts   = {};
+	var globals = {};
 	var retval = 0;
 
 	args.forEach(function (arg) {
@@ -80,13 +81,13 @@
 		});
 	}
 
-	opts.predef = opts.globals || {};
+	globals = opts.globals || {};
 	delete(opts.globals);
 
 	if (predef) {
 		predef.split(",").forEach(function (arg) {
 			var global = arg.split("=");
-			opts.predef[global[0]] = global[1] === "true" ? true : false;
+			globals[global[0]] = global[1] === "true" ? true : false;
 		});
 	}
 
@@ -98,13 +99,13 @@
 			quit(1);
 		}
 
-		if (!JSHINT(input, opts)) {
+		if (!JSHINT(input, opts, globals)) {
 			for (var i = 0, err; err = JSHINT.errors[i]; i += 1) {
 				print(err.reason + " (" + name + ":" + err.line + ":" + err.character + ")");
 				print("> " + (err.evidence || "").replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"));
 				print("");
 			}
-			retval = 1;
+			retval = 2;
 		}
 	});
 
