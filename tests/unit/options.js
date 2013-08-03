@@ -6,7 +6,7 @@
 
 "use strict";
 
-var JSHINT = require('../../../src/stable/jshint.js').JSHINT;
+var JSHINT = require('../../src/jshint.js').JSHINT;
 var fs = require('fs');
 var TestRun = require('../helpers/testhelper').setup.testRun;
 var fixture = require('../helpers/fixture').fixture;

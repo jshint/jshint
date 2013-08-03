@@ -1,9 +1,9 @@
 "use strict";
 
-var path = require("path");
-var shjs = require("shelljs");
+var path  = require("path");
+var shjs  = require("shelljs");
 var sinon = require("sinon");
-var cli = require("../src/cli/cli.js");
+var cli   = require("../src/cli.js");
 
 exports.group = {
 	setUp: function (cb) {

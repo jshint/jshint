@@ -28,7 +28,7 @@
 
 /*jshint node: true, eqnull: true*/
 
-var JSHINT = require('../../../src/stable/jshint.js').JSHINT;
+var JSHINT = require('../../src/jshint.js').JSHINT;
 
 if (exports.setup === undefined || exports.setup === null) {
 	exports.setup = {};
