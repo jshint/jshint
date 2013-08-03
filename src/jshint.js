@@ -2506,7 +2506,15 @@ var JSHINT = (function () {
 		}
 		advance("(");
 		funct["(comparray)"].setState("define");
-		res.left = expression(10);
+		res.left = expression(130);
+		if (_.contains(["in", "of"], state.tokens.next.value)) {
+			advance();
+		} else {
+			error("E045", state.tokens.curr);
+		}
+		funct["(comparray)"].setState("generate");
+		expression(10);
+
 		advance(")");
 		if (state.tokens.next.value === "if") {
 			advance("if");
@@ -4161,7 +4169,7 @@ var JSHINT = (function () {
 					_current = _carrays[_carrays.length - 1];
 				},
 				setState: function (s) {
-					if (_.contains(["use", "define", "filter"], s))
+					if (_.contains(["use", "define", "generate", "filter"], s))
 						_current.mode = s;
 				},
 				check: function (v) {
@@ -4183,6 +4191,10 @@ var JSHINT = (function () {
 														undef: false,
 														unused: true});
 						}
+						return true;
+					// When we are in the "generate" state of the list comp,
+					} else if (_current && _current.mode === "generate") {
+						isundef(funct, "W117", state.tokens.curr, v);
 						return true;
 					// When we are in "filter" state,
 					} else if (_current && _current.mode === "filter") {

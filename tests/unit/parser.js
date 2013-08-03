@@ -2380,6 +2380,38 @@ exports["test: array comprehension"] = function (test) {
 
 	test.done();
 };
+
+exports["test: array comprehension with for..of"] = function (test) {
+	// example adapted from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
+	var code = [
+		"function range(begin, end) {",
+		"	for (let i = begin; i < end; ++i) {",
+		"		yield i;",
+		"	}",
+		"}",
+		"var ten_squares = [i * i for (i of range(0, 10))];",
+		"var evens = [i for (i of range(0, 21)) if (i % 2 === 0)];",
+		"print('squares:', ten_squares);",
+		"print('evens:', evens);"
+	];
+	TestRun(test)
+		.test(code, {moz: true, unused: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+
+exports["test: array comprehension with unused variables"] = function (test) {
+	var code = [
+		"var ret = [i for (i of unknown)];",
+		"print('ret:', ret);",
+	];
+	TestRun(test)
+		.addError(1, "'unknown' is not defined.")
+		.test(code, {moz: true, unused: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+
 exports["test: array comprehension as esnext"] = function (test) {
 	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
 	var code = [
@@ -2406,6 +2438,19 @@ exports["test: array comprehension as esnext"] = function (test) {
 
 	test.done();
 };
+
+exports["test: reversed array comprehension as esnext"] = function (test) {
+	var code = [
+		"var numbers = [i for (i of [1, 2, 3])];",
+		"print('numbers:', numbers);"
+	];
+	TestRun(test)
+		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions (use moz option).")
+		.test(code, {esnext: true, unused: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+
 exports["test: array comprehension as es5"] = function (test) {
 	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
 	var code = [
@@ -2534,6 +2579,17 @@ exports['test array comprehension with dest array at global scope as JS legacy']
 exports["test: array comprehension imbrication with dest array"] = function (test) {
 	var code = [
 		"[ [i, j] for ([i, j] in [[a, b] for each ([a, b] in [[2,2], [3,4]])]) ];"
+	];
+
+	TestRun(test)
+		.test(code, {moz: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+
+exports["test: array comprehension imbrication with dest array using for..of"] = function (test) {
+	var code = [
+		"[ [i, j] for ([i, j] of [[a, b] for ([a, b] of [[2,2], [3,4]])]) ];"
 	];
 
 	TestRun(test)
