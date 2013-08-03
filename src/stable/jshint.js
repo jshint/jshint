@@ -4074,7 +4074,7 @@ var JSHINT = (function () {
 				ret.notJson = true;
 				break;
 			}
-			if (_.contains(["}", "]"], pn.value) && pn1.value === "=") {
+			if (_.contains(["}", "]"], pn.value) && pn1.value === "=" && bracketStack === 0) {
 				ret.isDestAssign = true;
 				ret.notJson = true;
 				break;
