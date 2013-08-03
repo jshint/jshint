@@ -34,8 +34,8 @@
 
 var _        = require("underscore");
 var events   = require("events");
-var vars     = require("../shared/vars.js");
-var messages = require("../shared/messages.js");
+var vars     = require("./vars.js");
+var messages = require("./messages.js");
 var Lexer    = require("./lex.js").Lexer;
 var reg      = require("./reg.js");
 var state    = require("./state.js").state;

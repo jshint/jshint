@@ -25,11 +25,11 @@
 
 	"scripts": {
 		"build": "node make.js build",
-		"test": "nodeunit tests tests/stable/regression tests/stable/unit",
+		"test": "nodeunit tests tests/regression tests/unit",
 		"pretest": "jshint src"
 	},
 
-	"main": "./src/stable/jshint.js",
+	"main": "./src/jshint.js",
 
 	"dependencies": {
 		"shelljs":    "0.1.x",
