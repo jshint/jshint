@@ -3644,7 +3644,7 @@ var JSHINT = (function () {
 
 	stmt("debugger", function () {
 		if (!state.option.debug) {
-			warning("W087");
+			warning("W087", this);
 		}
 		return this;
 	}).exps = true;
