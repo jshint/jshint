@@ -442,6 +442,29 @@ exports.shelljs = function (test) {
 	test.done();
 };
 
+exports.typed = function (test) {
+	var globals = [
+		"ArrayBuffer",
+		"ArrayBufferView",
+		"DataView",
+		"Float32Array",
+		"Float64Array",
+		"Int16Array",
+		"Int32Array",
+		"Int8Array",
+		"Uint16Array",
+		"Uint32Array",
+		"Uint8Array",
+		"Uint8ClampedArray"
+	];
+
+	globalsImplied(test, globals);
+	globalsKnown(test, globals, { browser: true });
+	globalsKnown(test, globals, { node: true });
+	globalsKnown(test, globals, { typed: true });
+
+	test.done();
+};
 
 
 exports.wsh = function (test) {
