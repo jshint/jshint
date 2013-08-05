@@ -405,7 +405,9 @@ exports.node = {
 exports.phantom = {
 	phantom      : true,
 	require      : true,
-	WebPage      : true
+	WebPage      : true,
+	console      : true, // in examples, but undocumented
+	exports      : true  // v1.7+
 };
 
 exports.rhino = {
