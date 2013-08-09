@@ -10,3 +10,11 @@ if (true) {
 function hello   () {
 	return console.log(  "Hello World"  );
 }
+
+switch (x) {
+    case 1:
+    case 2:
+        break;
+    default:
+        break;
+}
