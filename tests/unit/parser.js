@@ -341,7 +341,7 @@ exports.regexp = function (test) {
 	run.test(code, {esnext: true});
 	run.test(code, {moz: true});
 
-	
+
 	TestRun(test).test("var y = Math.sqrt(16) / 180;", {es3: true});
 	TestRun(test).test("var y = Math.sqrt(16) / 180;", {}); // es5
 	TestRun(test).test("var y = Math.sqrt(16) / 180;", {esnext: true});
@@ -597,7 +597,7 @@ exports.testIdentifiers = function (test) {
 	run.test(src, {unused: true }); // es5
 	run.test(src, {esnext: true, unused: true });
 	run.test(src, {moz: true, unused: true });
-	
+
 
 	test.done();
 };
@@ -1026,7 +1026,7 @@ exports["test: destructuring globals as esnext"] = function (test) {
 		"[ a, [ [ [ b ], c ], d ] ] = [ 1, [ [ [ 2 ], 3], 4 ] ];",
 		"[ a, { foo : b } ] = [ 2, { foo : 1 } ];",
 	];
-	
+
 	TestRun(test)
 		.addError(4,  "'z' is not defined.")
 		.test(code, {esnext: true, unused: true, undef: true});
@@ -1044,7 +1044,7 @@ exports["test: destructuring globals as es5"] = function (test) {
 		"[ a, [ [ [ b ], c ], d ] ] = [ 1, [ [ [ 2 ], 3], 4 ] ];",
 		"[ a, { foo : b } ] = [ 2, { foo : 1 } ];",
 	];
-	
+
 	TestRun(test)
 		.addError(4,  "'z' is not defined.")
 		.addError(2, "'destructuring assignment' is only available in JavaScript 1.7.")
@@ -1055,7 +1055,7 @@ exports["test: destructuring globals as es5"] = function (test) {
 		.addError(7, "'destructuring assignment' is only available in JavaScript 1.7.")
 		.addError(8, "'destructuring assignment' is only available in JavaScript 1.7.")
 		.test(code, {unused: true, undef: true}); // es5
-	
+
 	test.done();
 };
 exports["test: destructuring globals as legacy JS"] = function (test) {
@@ -1069,7 +1069,7 @@ exports["test: destructuring globals as legacy JS"] = function (test) {
 		"[ a, [ [ [ b ], c ], d ] ] = [ 1, [ [ [ 2 ], 3], 4 ] ];",
 		"[ a, { foo : b } ] = [ 2, { foo : 1 } ];",
 	];
-	
+
 	TestRun(test)
 		.addError(4,  "'z' is not defined.")
 		.addError(2, "'destructuring assignment' is only available in JavaScript 1.7.")
@@ -1080,7 +1080,7 @@ exports["test: destructuring globals as legacy JS"] = function (test) {
 		.addError(7, "'destructuring assignment' is only available in JavaScript 1.7.")
 		.addError(8, "'destructuring assignment' is only available in JavaScript 1.7.")
 		.test(code, {es3: true, unused: true, undef: true});
-	
+
 	test.done();
 };
 exports["test: destructuring globals with syntax error"] = function (test) {
@@ -1091,7 +1091,7 @@ exports["test: destructuring globals with syntax error"] = function (test) {
 		"[ a, b; c ] = [ 1, 2, 3 ];",
 		"[ a, b, c ] = [ 1, 2; 3 ];"
 	];
-	
+
 	TestRun(test)
 		.addError(4, "Expected ']' to match '[' from line 4 and instead saw ';'.")
 		.addError(4, "Expected an assignment or function call and instead saw an expression.")
@@ -1116,7 +1116,7 @@ exports["test: destructuring globals with syntax error"] = function (test) {
 		.addError(5, "Expected an assignment or function call and instead saw an expression.")
 		.addError(2,  "'z' is not defined.")
 		.test(code, {esnext: true, unused: true, undef: true});
-	
+
 	test.done();
 };
 
@@ -2311,7 +2311,7 @@ exports["test: mozilla generator as esnext"] = function (test) {
 		"	print(g.next());"
 	];
 	TestRun(test)
-		.addError(4, 
+		.addError(4,
 		 "A yield statement shall be within a generator function (with syntax: `function*`)")
 		.test(code, {esnext: true, unused: true, undef: true, predef: ["print", "Iterator"]});
 
@@ -2911,7 +2911,7 @@ exports["automatic comma insertion GH-950"] = function (test) {
 		.addError(8, "Line breaking error 'return'.")
 		.addError(9, "Label 'a' on 1 statement.")
 		.addError(9, "Expected an assignment or function call and instead saw an expression.");
-	
+
 	run.test(code, {es3: true, asi: true});
 	run.test(code, {asi: true}); // es5
 	run.test(code, {esnext: true, asi: true});
@@ -3307,7 +3307,7 @@ exports["test for GH-1103"] = function (test) {
 	test.done();
 
 	delete Array.prototype.ohnoes;
-};	
+};
 
 exports["test for GH-1105"] = function (test) {
 	var code = [
@@ -3479,5 +3479,15 @@ exports["test for line breaks with 'yield'"] = function (test) {
 		.addError(13, "Missing semicolon.");
 
 	run.test(code, {moz: true});
+	test.done();
+};
+
+exports["regression for GH-1227"] = function (test) {
+	var src = fs.readFileSync(__dirname + "/fixtures/gh1227.js", "utf8");
+
+	TestRun(test)
+		.addError(14, "Unreachable 'return' after 'return'.")
+		.test(src);
+
 	test.done();
 };
