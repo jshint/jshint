@@ -2365,6 +2365,25 @@ exports["test: mozilla generator as legacy JS"] = function (test) {
 exports["test: array comprehension"] = function (test) {
 	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
 	var code = [
+		"function *range(begin, end) {",
+		"	for (let i = begin; i < end; ++i) {",
+		"		yield i;",
+		"	}",
+		"}",
+		"var ten_squares = [for (i of range(0, 10)) i * i];",
+		"var evens = [for (i of range(0, 21)) if (i % 2 === 0) i];",
+		"print('squares:', ten_squares);",
+		"print('evens:', evens);"
+	];
+	TestRun(test)
+		.test(code, {esnext: true, unused: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+
+exports["test: moz-style array comprehension"] = function (test) {
+	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
+	var code = [
 		"function range(begin, end) {",
 		"	for (let i = begin; i < end; ++i) {",
 		"		yield i;",
@@ -2380,7 +2399,70 @@ exports["test: array comprehension"] = function (test) {
 
 	test.done();
 };
-exports["test: array comprehension as esnext"] = function (test) {
+
+exports["test: array comprehension with for..of"] = function (test) {
+	// example adapted from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
+	var code = [
+		"function *range(begin, end) {",
+		"	for (let i = begin; i < end; ++i) {",
+		"		yield i;",
+		"	}",
+		"}",
+		"var ten_squares = [for (i of range(0, 10)) i * i];",
+		"var evens = [for (i of range(0, 21)) if (i % 2 === 0) i];",
+		"print('squares:', ten_squares);",
+		"print('evens:', evens);"
+	];
+	TestRun(test)
+		.test(code, {esnext: true, unused: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+
+exports["test: moz-style array comprehension with for..of"] = function (test) {
+	// example adapted from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
+	var code = [
+		"function range(begin, end) {",
+		"	for (let i = begin; i < end; ++i) {",
+		"		yield i;",
+		"	}",
+		"}",
+		"var ten_squares = [i * i for (i of range(0, 10))];",
+		"var evens = [i for (i of range(0, 21)) if (i % 2 === 0)];",
+		"print('squares:', ten_squares);",
+		"print('evens:', evens);"
+	];
+	TestRun(test)
+		.test(code, {moz: true, unused: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+
+exports["test: array comprehension with unused variables"] = function (test) {
+	var code = [
+		"var ret = [for (i of unknown) i];",
+		"print('ret:', ret);",
+	];
+	TestRun(test)
+		.addError(1, "'unknown' is not defined.")
+		.test(code, {esnext: true, unused: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+
+exports["test: moz-style array comprehension with unused variables"] = function (test) {
+	var code = [
+		"var ret = [i for (i of unknown)];",
+		"print('ret:', ret);",
+	];
+	TestRun(test)
+		.addError(1, "'unknown' is not defined.")
+		.test(code, {moz: true, unused: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+
+exports["test: moz-style array comprehension as esnext"] = function (test) {
 	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
 	var code = [
 		"function range(begin, end) {",
@@ -2396,17 +2478,41 @@ exports["test: array comprehension as esnext"] = function (test) {
 	TestRun(test)
 		.addError(3, "A yield statement shall be within a generator function (with syntax: " +
 			"`function*`)")
-		.addError(6, "'array comprehension' is only available in Mozilla JavaScript extensions " +
-			"(use moz option).")
+		.addError(6, "Expected 'for' and instead saw 'i'.")
 		.addError(6, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
-		.addError(7, "'array comprehension' is only available in Mozilla JavaScript extensions " +
-			"(use moz option).")
+		.addError(7, "Expected 'for' and instead saw 'i'.")
 		.addError(7, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
 		.test(code, {esnext: true, unused: true, undef: true, predef: ["print"]});
 
 	test.done();
 };
+
 exports["test: array comprehension as es5"] = function (test) {
+	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
+	var code = [
+		"function *range(begin, end) {",
+		"	for (let i = begin; i < end; ++i) {",
+		"		yield i;",
+		"	}",
+		"}",
+		"var ten_squares = [for (i of range(0, 10)) i * i];",
+		"var evens = [for (i of range(0, 21)) if (i % 2 === 0) i];",
+		"print('squares:', ten_squares);",
+		"print('evens:', evens);"
+	];
+	TestRun(test)
+		.addError(1, "'function*' is only available in ES6 (use esnext option).")
+		.addError(2, "'let' is only available in JavaScript 1.7.")
+		.addError(3, "'yield' is only available in JavaScript 1.7.")
+		.addError(6, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.addError(7, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.test(code, {unused: true, undef: true, predef: ["print"]}); // es5
+
+	test.done();
+};
+exports["test: moz-style array comprehension as es5"] = function (test) {
 	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
 	var code = [
 		"function range(begin, end) {",
@@ -2422,11 +2528,13 @@ exports["test: array comprehension as es5"] = function (test) {
 	TestRun(test)
 		.addError(2, "'let' is only available in JavaScript 1.7.")
 		.addError(3, "'yield' is only available in JavaScript 1.7.")
-		.addError(6, "'array comprehension' is only available in Mozilla JavaScript extensions " +
-			"(use moz option).")
+		.addError(6, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.addError(6, "Expected 'for' and instead saw 'i'.")
 		.addError(6, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
-		.addError(7, "'array comprehension' is only available in Mozilla JavaScript extensions " +
-			"(use moz option).")
+		.addError(7, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.addError(7, "Expected 'for' and instead saw 'i'.")
 		.addError(7, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
 		.test(code, {unused: true, undef: true, predef: ["print"]}); // es5
 
@@ -2440,6 +2548,30 @@ exports["test: array comprehension as legacy JS"] = function (test) {
 		"		yield i;",
 		"	}",
 		"}",
+		"var ten_squares = [for (i of range(0, 10)) i * i];",
+		"var evens = [for (i of range(0, 21)) if (i % 2 === 0) i];",
+		"print('squares:', ten_squares);",
+		"print('evens:', evens);"
+	];
+	TestRun(test)
+		.addError(2, "'let' is only available in JavaScript 1.7.")
+		.addError(3, "'yield' is only available in JavaScript 1.7.")
+		.addError(6, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.addError(7, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.test(code, {es3: true, unused: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+exports["test: moz-style array comprehension as legacy JS"] = function (test) {
+	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
+	var code = [
+		"function range(begin, end) {",
+		"	for (let i = begin; i < end; ++i) {",
+		"		yield i;",
+		"	}",
+		"}",
 		"var ten_squares = [i * i for each (i in range(0, 10))];",
 		"var evens = [i for each (i in range(0, 21)) if (i % 2 === 0)];",
 		"print('squares:', ten_squares);",
@@ -2448,18 +2580,30 @@ exports["test: array comprehension as legacy JS"] = function (test) {
 	TestRun(test)
 		.addError(2, "'let' is only available in JavaScript 1.7.")
 		.addError(3, "'yield' is only available in JavaScript 1.7.")
-		.addError(6, "'array comprehension' is only available in Mozilla JavaScript extensions " +
-			"(use moz option).")
+		.addError(6, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.addError(6, "Expected 'for' and instead saw 'i'.")
 		.addError(6, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
-		.addError(7, "'array comprehension' is only available in Mozilla JavaScript extensions (use " +
-			"moz option).")
+		.addError(7, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.addError(7, "Expected 'for' and instead saw 'i'.")
 		.addError(7, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
 		.test(code, {es3: true, unused: true, undef: true, predef: ["print"]});
 
 	test.done();
 };
+exports['test: array comprehension with dest array at global scope'] = function (test) {
+	var code = [
+		"[for ([i, j] of [[0,0], [1,1], [2,2]]) [i, j] ];",
+		"var destarray_comparray_1 = [for ([i, j] of [[0,0], [1,1], [2,2]]) [i, [j, j] ]];",
+		"var destarray_comparray_2 = [for ([i, j] of [[0,0], [1,1], [2,2]]) [i, {i: [i, j]} ]];",
+	];
+	TestRun(test)
+		.test(code, {esnext: true, undef: true, predef: ["print"]});
 
-exports['test array comprehension with dest array at global scope'] = function (test) {
+	test.done();
+};
+exports['test: moz-style array comprehension with dest array at global scope'] = function (test) {
 	var code = [
 		"[ [i, j] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
 		"var destarray_comparray_1 = [ [i, [j, j] ] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
@@ -2470,61 +2614,98 @@ exports['test array comprehension with dest array at global scope'] = function (
 
 	test.done();
 };
-exports['test array comprehension with dest array at global scope as esnext'] = function (test) {
+exports['test: moz-style array comprehension with dest array at global scope as esnext'] = function (test) {
 	var code = [
 		"[ [i, j] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
 		"var destarray_comparray_1 = [ [i, [j, j] ] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
 		"var destarray_comparray_2 = [ [i, {i: [i, j]} ] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
 	];
 	TestRun(test)
-		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions " +
-			"(use moz option).")
+		.addError(1, "Expected 'for' and instead saw '['.")
 		.addError(1, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
-		.addError(2, "'array comprehension' is only available in Mozilla JavaScript extensions " +
-			"(use moz option).")
+		.addError(2, "Expected 'for' and instead saw '['.")
 		.addError(2, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
-		.addError(3, "'array comprehension' is only available in Mozilla JavaScript extensions " +
-			"(use moz option).")
+		.addError(3, "Expected 'for' and instead saw '['.")
 		.addError(3, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
 		.test(code, {esnext: true, undef: true, predef: ["print"]});
 
 	test.done();
 };
-exports['test array comprehension with dest array at global scope as es5'] = function (test) {
+exports['test: array comprehension with dest array at global scope as es5'] = function (test) {
+	var code = [
+		"[for ([i, j] of [[0,0], [1,1], [2,2]]) [i, j] ];",
+		"var destarray_comparray_1 = [for ([i, j] of [[0,0], [1,1], [2,2]]) [i, [j, j] ] ];",
+		"var destarray_comparray_2 = [for ([i, j] of [[0,0], [1,1], [2,2]]) [i, {i: [i, j]} ] ];",
+	];
+	TestRun(test)
+		.addError(1, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.addError(2, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.addError(3, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.test(code, {undef: true, predef: ["print"]}); // es5
+
+	test.done();
+};
+exports['test: moz-style array comprehension with dest array at global scope as es5'] = function (test) {
 	var code = [
 		"[ [i, j] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
 		"var destarray_comparray_1 = [ [i, [j, j] ] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
 		"var destarray_comparray_2 = [ [i, {i: [i, j]} ] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
 	];
 	TestRun(test)
-		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions " +
-			"(use moz option).")
+		.addError(1, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.addError(1, "Expected 'for' and instead saw '['.")
 		.addError(1, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
-		.addError(2, "'array comprehension' is only available in Mozilla JavaScript extensions " +
-			"(use moz option).")
+		.addError(2, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.addError(2, "Expected 'for' and instead saw '['.")
 		.addError(2, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
-		.addError(3, "'array comprehension' is only available in Mozilla JavaScript extensions " +
-			"(use moz option).")
+		.addError(3, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.addError(3, "Expected 'for' and instead saw '['.")
 		.addError(3, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
 		.test(code, {undef: true, predef: ["print"]}); // es5
 
 	test.done();
 };
-exports['test array comprehension with dest array at global scope as JS legacy'] = function (test) {
+exports['test: array comprehension with dest array at global scope as JS legacy'] = function (test) {
+	var code = [
+		"[for ([i, j] of [[0,0], [1,1], [2,2]]) [i, j] ];",
+		"var destarray_comparray_1 = [for ([i, j] of [[0,0], [1,1], [2,2]]) [i, [j, j] ] ];",
+		"var destarray_comparray_2 = [for ([i, j] of [[0,0], [1,1], [2,2]]) [i, {i: [i, j]} ] ];",
+	];
+	TestRun(test)
+		.addError(1, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.addError(2, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.addError(3, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.test(code, {es3: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+exports['test: moz-style array comprehension with dest array at global scope as JS legacy'] = function (test) {
 	var code = [
 		"[ [i, j] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
 		"var destarray_comparray_1 = [ [i, [j, j] ] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
 		"var destarray_comparray_2 = [ [i, {i: [i, j]} ] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
 	];
 	TestRun(test)
-		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions " +
-			"(use moz option).")
+		.addError(1, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.addError(1, "Expected 'for' and instead saw '['.")
 		.addError(1, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
-		.addError(2, "'array comprehension' is only available in Mozilla JavaScript extensions " +
-			"(use moz option).")
+		.addError(2, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.addError(2, "Expected 'for' and instead saw '['.")
 		.addError(2, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
-		.addError(3, "'array comprehension' is only available in Mozilla JavaScript extensions " +
-			"(use moz option).")
+		.addError(3, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.addError(3, "Expected 'for' and instead saw '['.")
 		.addError(3, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
 		.test(code, {es3: true, undef: true, predef: ["print"]});
 
@@ -2532,6 +2713,17 @@ exports['test array comprehension with dest array at global scope as JS legacy']
 };
 
 exports["test: array comprehension imbrication with dest array"] = function (test) {
+	var code = [
+		"[for ([i, j] of [for ([a, b] of [[2,2], [3,4]]) [a, b] ]) [i, j] ];"
+	];
+
+	TestRun(test)
+		.test(code, {esnext: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+
+exports["test: moz-style array comprehension imbrication with dest array"] = function (test) {
 	var code = [
 		"[ [i, j] for ([i, j] in [[a, b] for each ([a, b] in [[2,2], [3,4]])]) ];"
 	];
@@ -2541,45 +2733,87 @@ exports["test: array comprehension imbrication with dest array"] = function (tes
 
 	test.done();
 };
-exports["test: array comprehension imbrication with dest array as esnext"] = function (test) {
+
+exports["test: moz-style array comprehension imbrication with dest array using for..of"] = function (test) {
+	var code = [
+		"[ [i, j] for ([i, j] of [[a, b] for ([a, b] of [[2,2], [3,4]])]) ];"
+	];
+
+	TestRun(test)
+		.test(code, {moz: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+
+exports["test: moz-style array comprehension imbrication with dest array as esnext"] = function (test) {
 	var code = [
 		"[ [i, j] for each ([i, j] in [[a, b] for each ([a, b] in [[2,2], [3,4]])]) ];"
 	];
 	TestRun(test)
-		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions " +
-			"(use moz option).")
-		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions " +
-			"(use moz option).")
+		.addError(1, "Expected 'for' and instead saw '['.")
 		.addError(1, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
 		.test(code, {esnext: true, undef: true, predef: ["print"]});
 
 	test.done();
 };
+
 exports["test: array comprehension imbrication with dest array as es5"] = function (test) {
 	var code = [
-		"[ [i, j] for each ([i, j] in [[a, b] for each ([a, b] in [[2,2], [3,4]])]) ];"
-
+		"[for ([i, j] of [for ([a, b] of [[2,2], [3,4]]) [a, b] ]) [i, j] ];"
 	];
 	TestRun(test)
-		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions " +
-			"(use moz option).")
-		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions " +
-			"(use moz option).")
-		.addError(1, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
+		.addError(1, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.addError(1, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
 		.test(code, {undef: true, predef: ["print"]}); // es5
 
 	test.done();
 };
+
+exports["test: moz-style array comprehension imbrication with dest array as es5"] = function (test) {
+	var code = [
+		"[for ([i, j] of [for ([a, b] of [[2,2], [3,4]]) [a, b] ]) [i, j] ];"
+	];
+	TestRun(test)
+		.addError(1, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.addError(1, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.test(code, {undef: true, predef: ["print"]}); // es5
+
+	test.done();
+};
+
 exports["test: array comprehension imbrication with dest array as legacy JS"] = function (test) {
 	var code = [
 		"[ [i, j] for each ([i, j] in [[a, b] for each ([a, b] in [[2,2], [3,4]])]) ];"
 
 	];
 	TestRun(test)
-		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions " +
-			"(use moz option).")
-		.addError(1, "'array comprehension' is only available in Mozilla JavaScript extensions " +
-			"(use moz option).")
+		.addError(1, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.addError(1, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.addError(1, "Expected 'for' and instead saw '['.")
+		.addError(1, "Expected 'for' and instead saw '['.")
+		.addError(1, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
+		.test(code, {es3: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+exports["test: moz-style array comprehension imbrication with dest array as legacy JS"] = function (test) {
+	var code = [
+		"[ [i, j] for each ([i, j] in [[a, b] for each ([a, b] in [[2,2], [3,4]])]) ];"
+
+	];
+	TestRun(test)
+		.addError(1, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.addError(1, "'array comprehension' is only available in ES6 " +
+			"(use esnext option).")
+		.addError(1, "Expected 'for' and instead saw '['.")
+		.addError(1, "Expected 'for' and instead saw '['.")
 		.addError(1, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
 		.test(code, {es3: true, undef: true, predef: ["print"]});
 
