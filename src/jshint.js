@@ -127,6 +127,7 @@ var JSHINT = (function () {
 			                    // predefined
 			rhino       : true, // if the Rhino environment globals should be predefined
 			shelljs     : true, // if ShellJS globals should be predefined
+			typed       : true, // if typed array globals should be predefined
 			undef       : true, // if variables should be declared before used
 			scripturl   : true, // if script-targeted URLs should be tolerated
 			shadow      : true, // if variable shadowing should be tolerated
@@ -332,6 +333,9 @@ var JSHINT = (function () {
 			combine(predefined, vars.shelljs);
 			combine(predefined, vars.node);
 		}
+		if (state.option.typed) {
+			combine(predefined, vars.typed);
+		}
 
 		if (state.option.phantom) {
 			combine(predefined, vars.phantom);
@@ -343,6 +347,7 @@ var JSHINT = (function () {
 
 		if (state.option.node) {
 			combine(predefined, vars.node);
+			combine(predefined, vars.typed);
 		}
 
 		if (state.option.devel) {
@@ -355,6 +360,7 @@ var JSHINT = (function () {
 
 		if (state.option.browser) {
 			combine(predefined, vars.browser);
+			combine(predefined, vars.typed);
 		}
 
 		if (state.option.nonstandard) {

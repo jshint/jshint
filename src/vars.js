@@ -45,8 +45,6 @@ exports.ecmaIdentifiers = {
 // Global variables commonly provided by a web browser environment.
 
 exports.browser = {
-	ArrayBuffer          : false,
-	ArrayBufferView      : false,
 	Audio                : false,
 	Blob                 : false,
 	addEventListener     : false,
@@ -59,7 +57,6 @@ exports.browser = {
 	close                : false,
 	closed               : false,
 	CustomEvent          : false,
-	DataView             : false,
 	DOMParser            : false,
 	defaultStatus        : false,
 	document             : false,
@@ -67,8 +64,6 @@ exports.browser = {
 	ElementTimeControl   : false,
 	event                : false,
 	FileReader           : false,
-	Float32Array         : false,
-	Float64Array         : false,
 	FormData             : false,
 	focus                : false,
 	frames               : false,
@@ -128,9 +123,6 @@ exports.browser = {
 	HTMLUListElement     : false,
 	HTMLVideoElement     : false,
 	history              : false,
-	Int16Array           : false,
-	Int32Array           : false,
-	Int8Array            : false,
 	Image                : false,
 	length               : false,
 	localStorage         : false,
@@ -328,10 +320,6 @@ exports.browser = {
 	SVGZoomAndPan        : false,
 	TimeEvent            : false,
 	top                  : false,
-	Uint16Array          : false,
-	Uint32Array          : false,
-	Uint8Array           : false,
-	Uint8ClampedArray    : false,
 	WebSocket            : false,
 	window               : false,
 	Worker               : false,
@@ -386,7 +374,6 @@ exports.node = {
 	__filename    : false,
 	__dirname     : false,
 	Buffer        : false,
-	DataView      : false,
 	console       : false,
 	exports       : true,  // In Node it is ok to exports = module.exports = foo();
 	GLOBAL        : false,
@@ -460,6 +447,21 @@ exports.shelljs = {
 	tempdir      : false
 };
 
+exports.typed = {
+	ArrayBuffer         : false,
+	ArrayBufferView     : false,
+	DataView            : false,
+	Float32Array        : false,
+	Float64Array        : false,
+	Int16Array          : false,
+	Int32Array          : false,
+	Int8Array           : false,
+	Uint16Array         : false,
+	Uint32Array         : false,
+	Uint8Array          : false,
+	Uint8ClampedArray   : false
+};
+
 exports.wsh = {
 	ActiveXObject            : true,
 	Enumerator               : true,
@@ -480,7 +482,7 @@ exports.dojo = {
 	dojo     : false,
 	dijit    : false,
 	dojox    : false,
-	define	 : false,
+	define   : false,
 	"require": false
 };
 
