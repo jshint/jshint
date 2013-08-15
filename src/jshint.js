@@ -2495,7 +2495,17 @@ var JSHINT = (function () {
 		res.exps = true;
 		funct["(comparray)"].stack();
 
-		res.right = expression(10);
+		// Handle reversed for expressions, used in spidermonkey
+		var reversed = false;
+		if (state.tokens.next.value !== "for") {
+			reversed = true;
+			if (!state.option.inMoz(true)) {
+				warning("W116", state.tokens.next, "for", state.tokens.next.value);
+			}
+			funct["(comparray)"].setState("use");
+			res.right = expression(10);
+		}
+
 		advance("for");
 		if (state.tokens.next.value === "each") {
 			advance("each");
@@ -2505,7 +2515,15 @@ var JSHINT = (function () {
 		}
 		advance("(");
 		funct["(comparray)"].setState("define");
-		res.left = expression(10);
+		res.left = expression(130);
+		if (_.contains(["in", "of"], state.tokens.next.value)) {
+			advance();
+		} else {
+			error("E045", state.tokens.curr);
+		}
+		funct["(comparray)"].setState("generate");
+		expression(10);
+
 		advance(")");
 		if (state.tokens.next.value === "if") {
 			advance("if");
@@ -2514,6 +2532,12 @@ var JSHINT = (function () {
 			res.filter = expression(10);
 			advance(")");
 		}
+
+		if (!reversed) {
+			funct["(comparray)"].setState("use");
+			res.right = expression(10);
+		}
+
 		advance("]");
 		funct["(comparray)"].unstack();
 		return res;
@@ -2522,8 +2546,8 @@ var JSHINT = (function () {
 	prefix("[", function () {
 		var blocktype = lookupBlockType(true);
 		if (blocktype.isCompArray) {
-			if (!state.option.inMoz(true)) {
-				warning("W118", state.tokens.curr, "array comprehension");
+			if (!state.option.inESNext()) {
+				warning("W119", state.tokens.curr, "array comprehension");
 			}
 			return comprehensiveArrayExpression();
 		} else if (blocktype.isDestAssign && !state.option.inESNext()) {
@@ -4051,17 +4075,13 @@ var JSHINT = (function () {
 
 	var lookupBlockType = function () {
 		var pn, pn1;
-		var i = 0;
+		var i = -1;
 		var bracketStack = 0;
 		var ret = {};
 		if (_.contains(["[", "{"], state.tokens.curr.value))
 			bracketStack += 1;
-		if (_.contains(["[", "{"], state.tokens.next.value))
-			bracketStack += 1;
-		if (_.contains(["]", "}"], state.tokens.next.value))
-			bracketStack -= 1;
 		do {
-			pn = peek(i);
+			pn = (i === -1) ? state.tokens.next : peek(i);
 			pn1 = peek(i + 1);
 			i = i + 1;
 			if (_.contains(["[", "{"], pn.value)) {
@@ -4156,32 +4176,45 @@ var JSHINT = (function () {
 						if (v.undef)
 							isundef(v.funct, "W117", v.token, v.value);
 					});
-					_carrays.splice(_carrays[_carrays.length - 1], 1);
+					_carrays.splice(-1, 1);
 					_current = _carrays[_carrays.length - 1];
 				},
 				setState: function (s) {
-					if (_.contains(["use", "define", "filter"], s))
+					if (_.contains(["use", "define", "generate", "filter"], s))
 						_current.mode = s;
 				},
 				check: function (v) {
+					if (!_current) {
+						return;
+					}
 					// When we are in "use" state of the list comp, we enqueue that var
 					if (_current && _current.mode === "use") {
-						_current.variables.push({funct: funct,
-													token: state.tokens.curr,
-													value: v,
-													undef: true,
-													unused: false});
+						if (use(v)) {
+							_current.variables.push({
+								funct: funct,
+								token: state.tokens.curr,
+								value: v,
+								undef: true,
+								unused: false
+							});
+						}
 						return true;
 					// When we are in "define" state of the list comp,
 					} else if (_current && _current.mode === "define") {
 						// check if the variable has been used previously
 						if (!declare(v)) {
-							_current.variables.push({funct: funct,
-														token: state.tokens.curr,
-														value: v,
-														undef: false,
-														unused: true});
+							_current.variables.push({
+								funct: funct,
+								token: state.tokens.curr,
+								value: v,
+								undef: false,
+								unused: true
+							});
 						}
+						return true;
+					// When we are in the "generate" state of the list comp,
+					} else if (_current && _current.mode === "generate") {
+						isundef(funct, "W117", state.tokens.curr, v);
 						return true;
 					// When we are in "filter" state,
 					} else if (_current && _current.mode === "filter") {
