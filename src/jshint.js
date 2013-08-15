@@ -4569,7 +4569,7 @@ var JSHINT = (function () {
 				directives();
 
 				if (state.directive["use strict"]) {
-					if (!state.option.globalstrict && !state.option.node) {
+					if (!state.option.globalstrict && !(state.option.node || state.option.phantom)) {
 						warning("W097", state.tokens.prev);
 					}
 				}
