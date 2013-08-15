@@ -685,10 +685,26 @@ exports.phantom = function (test) {
 		'phantom',
 		'require',
 		'WebPage',
+		'console',
+		'exports'
 	];
 
 	globalsImplied(test, globals);
 	globalsKnown(test, globals, { phantom: true });
+
+	// Phantom environment assumes `globalstrict`
+	var globalStrict = [
+		'"use strict";',
+		"function test() { return; }",
+	].join('\n');
+
+	TestRun(test)
+		.addError(1, 'Use the function form of "use strict".')
+		.test(globalStrict, { es3: true, strict: true });
+
+	TestRun(test)
+		.test(globalStrict, { es3: true, phantom: true, strict: true });
+
 
 	test.done();
 };
