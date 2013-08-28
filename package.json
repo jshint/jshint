@@ -24,7 +24,7 @@
 	},
 
 	"scripts": {
-		"build": "node make.js build",
+		"build": "node bin/build",
 		"test": "nodeunit tests tests/regression tests/unit",
 		"pretest": "jshint src"
 	},
