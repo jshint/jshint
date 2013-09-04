@@ -1646,7 +1646,7 @@ Lexer.prototype = {
 					line: this.line,
 					character: this.char
 				}, checks, function () {
-					return state.directive["use strict"] && token.base === 8; 
+					return state.directive["use strict"] && token.base === 8;
 				});
 
 				this.trigger("Number", {
@@ -1668,6 +1668,7 @@ Lexer.prototype = {
 
 				if (token.isSpecial) {
 					return {
+						id: '(comment)',
 						value: token.value,
 						body: token.body,
 						type: token.commentType,
