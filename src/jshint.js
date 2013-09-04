@@ -1501,7 +1501,11 @@ var JSHINT = (function () {
 			return;
 		}
 		for (;;) {
-			t = peek(i);
+			do {
+				t = peek(i);
+				i += 1;
+			} while (t.id != "(end)" && t.id === "(comment)");
+
 			if (t.reach) {
 				return;
 			}
@@ -1518,7 +1522,6 @@ var JSHINT = (function () {
 				warning("W027", t, t.value, s);
 				break;
 			}
-			i += 1;
 		}
 	}
 
