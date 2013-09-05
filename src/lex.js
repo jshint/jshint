@@ -1447,6 +1447,21 @@ Lexer.prototype = {
 		this.char = 1;
 		this.from = 1;
 
+		// If we are ignoring linter errors, replace the input with empty string
+		// if it doesn't already at least start or end a multi-line comment
+		if (state.ignoreLinterErrors === true) {
+			var startsWith = function (prefix) {
+				return this.indexOf(prefix) === 0;
+			};
+			var endsWith = function (suffix) {
+				return this.indexOf(suffix, this.length - suffix.length) !== -1;
+			};
+			var inputTrimmed = this.input.trim();
+			if (! (startsWith.call(inputTrimmed, "/*") || endsWith.call(inputTrimmed, "*/"))) {
+				this.input = "";
+			}
+		}
+
 		char = this.scanMixedSpacesAndTabs();
 		if (char >= 0) {
 			this.trigger("warning", { code: "W099", line: this.line, character: char + 1 });
