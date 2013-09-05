@@ -212,6 +212,16 @@ exports.shebang = function (test) {
 	test.done();
 };
 
+exports.shebangImpliesNode = function (test) {
+	var code = [
+		"#!usr/bin/env node",
+		"require('module');",
+	];
+
+	TestRun(test).test(code);
+	test.done();
+};
+
 exports.numbers = function (test) {
 	/*jshint maxlen: 300*/
 
