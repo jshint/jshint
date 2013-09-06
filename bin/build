@@ -18,6 +18,8 @@ bundle.bundle({}, function (err, src) {
 
 	[ "// " + version,
 		"var JSHINT;",
+		"var window;",
+		"if (typeof window === 'undefined') window = {};",
 		"(function () {",
 		"var require;",
 		src,
