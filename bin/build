@@ -8,8 +8,8 @@ var bundle     = browserify("./src/jshint.js");
 var version    = require("../package.json").version;
 require("shelljs/make");
 
-if (!test("-e", "../dist"))
-	mkdir("../dist");
+if (!test("-e", "./dist"))
+	mkdir("./dist");
 
 bundle.require("./src/jshint.js", { expose: "jshint" });
 bundle.bundle({}, function (err, src) {
