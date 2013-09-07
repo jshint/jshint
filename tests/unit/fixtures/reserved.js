@@ -1,13 +1,13 @@
 volatile: for (var i = 0; i < 10; i++) {
-	break volatile;
+    break volatile;
 }
 
 var let = 1;
 
 (function () {
-	"use strict";
+    "use strict";
 
-	var let = 2;
+    var let = 2;
 }());
 
 var obj = { class: 'foo' };

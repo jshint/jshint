@@ -1,5 +1,5 @@
 var x = {
-	default: 10,
+    default: 10,
   in: 1
 };
 
