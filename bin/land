@@ -24,7 +24,7 @@ function succ(res) {
 		data = data.split("\n");
 		data = data[1].replace(/^From\:\s/, "");
 		data = data.replace(/"/g, "");
-		
+
 		shjs.exec("git commit -s --author=\"" + data + "\" --message=\"" + msg + "\"");
 	})
 }
@@ -32,6 +32,3 @@ function succ(res) {
 function err(res) {
 	console.log("error:", res.message);
 }
-
-
-
