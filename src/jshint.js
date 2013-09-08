@@ -180,6 +180,8 @@ var JSHINT = (function () {
 			ignore       : false  // start/end ignoring lines of code, bypassing the linter
 			                      //   start    - start ignoring lines, including the current line
 			                      //   end      - stop ignoring lines, starting on the next line
+			                      //   line     - ignore warnings / errors for just a single line
+			                      //              (this option does not bypass the lexer)
 		},
 
 		// These are JSHint boolean options which are shared with JSLint
