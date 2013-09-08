@@ -177,7 +177,7 @@ var JSHINT = (function () {
 			                      //   false    - don't emit any warnings
 			                      //   true     - warn if any variable is used before its definition
 			                      //   "nofunc" - warn for any variable but function declarations
-			ignore       : false  // start/end ignoring lines of code, bypassing the linter
+			ignore       : false  // start/end ignoring lines of code, bypassing the lexer
 			                      //   start    - start ignoring lines, including the current line
 			                      //   end      - stop ignoring lines, starting on the next line
 			                      //   line     - ignore warnings / errors for just a single line
