@@ -1626,3 +1626,14 @@ exports.unignored = function (test) {
 
 	test.done();
 };
+
+exports.vartop = function (test) {
+	var src = fs.readFileSync(__dirname + "/fixtures/vartop.js", "utf8"); 
+
+	TestRun(test)
+		.addError(9, "Variable declaration not at top of declaring scope.")
+		.addError(21, "Variable declaration not at top of declaring scope.")
+		.test(src, { vartop: true });
+
+	test.done();
+};

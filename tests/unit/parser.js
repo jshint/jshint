@@ -3725,13 +3725,3 @@ exports["regression for GH-1227"] = function (test) {
 
 	test.done();
 };
-
-exports.varTop = function (test) {
-	var src = fs.readFileSync(__dirname + "/fixtures/varTop.js", "utf8"); 
-
-	TestRun(test)
-		.addError(6, "Variable declaration not at top of function scope.")
-		.test(src);
-
-	test.done();
-};

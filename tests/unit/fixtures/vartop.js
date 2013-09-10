@@ -1,4 +1,7 @@
-//fail
+//pass - global scope
+var c;
+
+//fail - func scope
 (function () {
 	var a = true;
 	if (a)
@@ -6,10 +9,13 @@
 	var b = false;
 }());
 
-//pass
+//pass - func scope
 (function () {
 	var a = true;
 	var b = false;
 	if (a)
 		return;
 }());
+
+//fail - global scope
+var d;
