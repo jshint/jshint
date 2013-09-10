@@ -141,6 +141,8 @@ var JSHINT = (function () {
 			trailing    : true, // if trailing whitespace rules apply
 			validthis   : true, // if 'this' inside a non-constructor function is valid.
 			                    // This is a function scoped option only.
+			vartop      : true, // if all var declarations should be placed on 
+			                    // the top of their declaring scope
 			withstmt    : true, // if with statements should be allowed
 			white       : true, // if strict whitespace rules apply
 			worker      : true, // if Web Worker script symbols should be allowed
