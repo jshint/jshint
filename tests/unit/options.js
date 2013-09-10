@@ -1627,6 +1627,9 @@ exports.unignored = function (test) {
 	test.done();
 };
 
+/*
+ * Tests the `vartop` option
+ */
 exports.vartop = function (test) {
 	var src = fs.readFileSync(__dirname + "/fixtures/vartop.js", "utf8"); 
 
