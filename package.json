@@ -32,20 +32,20 @@
 	"main": "./src/jshint.js",
 
 	"dependencies": {
-		"shelljs":    "0.1.x",
-		"underscore": "1.4.x",
-		"cli":        "0.4.x",
-		"minimatch":  "0.x.x",
+		"shelljs": "~0.2.5",
+		"underscore": "~1.5.2",
+		"cli": "0.4.x",
+		"minimatch": "0.x.x",
 		"console-browserify": "0.1.x"
 	},
 
 	"devDependencies": {
-		"jshint":     "2.1.x",
-		"shelljs":    "0.1.x",
-		"browserify": "2.12.x",
-		"coveraje":   "0.2.x",
-		"nodeunit":   "0.8.x",
-		"sinon":      "1.7.x"
+		"jshint": "2.1.x",
+		"shelljs": "~0.2.5",
+		"browserify": "~2.29.1",
+		"coveraje": "0.2.x",
+		"nodeunit": "0.8.x",
+		"sinon": "1.7.x"
 	},
 
 	"jshintConfig": {
