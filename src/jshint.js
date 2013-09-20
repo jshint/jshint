@@ -2760,7 +2760,6 @@ var JSHINT = (function () {
 		}
 
 		funct["(params)"] = functionparams(fatarrowparams);
-
 		funct["(metrics)"].verifyMaxParametersPerFunction(funct["(params)"]);
 
 		block(false, true, true, fatarrowparams ? true:false);
@@ -2788,6 +2787,7 @@ var JSHINT = (function () {
 			statementCount: 0,
 			nestedBlockDepth: -1,
 			ComplexityCount: 1,
+
 			verifyMaxStatementsPerFunction: function () {
 				if (state.option.maxstatements &&
 					this.statementCount > state.option.maxstatements) {
@@ -4780,6 +4780,7 @@ var JSHINT = (function () {
 			functions: [],
 			options: state.option
 		};
+
 		var implieds = [];
 		var members = [];
 		var fu, f, i, j, n, globals;
@@ -4834,6 +4835,13 @@ var JSHINT = (function () {
 			fu.character = f["(character)"];
 			fu.last = f["(last)"];
 			fu.lastcharacter = f["(lastcharacter)"];
+
+			fu.metrics = {
+				complexity: f["(metrics)"].ComplexityCount,
+				parameters: (f["(params)"] || []).length,
+				statements: f["(metrics)"].statementCount
+			};
+
 			data.functions.push(fu);
 		}
 

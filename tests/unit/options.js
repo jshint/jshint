@@ -1568,9 +1568,30 @@ exports.maxcomplexity = function (test) {
 	TestRun(test)
 		.test(src, { es3: true, maxcomplexity: 8 });
 
-
 	TestRun(test)
 		.test(src, { es3: true });
+
+	test.done();
+};
+
+// Metrics output per function.
+exports.fnmetrics = function (test) {
+	JSHINT([
+		"function foo(a, b) { if (a) return b; }",
+		"function bar() { var a = 0; a += 1; return a; }"
+	]);
+
+	test.deepEqual(JSHINT.data().functions[0].metrics, {
+		complexity: 2,
+		parameters: 2,
+		statements: 1
+	});
+
+	test.deepEqual(JSHINT.data().functions[1].metrics, {
+		complexity: 1,
+		parameters: 0,
+		statements: 3
+	});
 
 	test.done();
 };
