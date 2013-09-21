@@ -1626,3 +1626,16 @@ exports.unignored = function (test) {
 
 	test.done();
 };
+
+/*
+ * Tests the `nativeobject` option -- Warn if native object prototype is assigned to.
+ */
+exports.nativeobject = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/nativeobject.js", "utf-8");
+
+  TestRun(test)
+    .addError(3, "Extending prototype of native object: 'Array'.")
+    .test(src, { es3: true, nativeobject: true });
+
+  test.done();
+};
