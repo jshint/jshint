@@ -1076,6 +1076,17 @@ exports.globalstrict = function (test) {
 	test.done();
 };
 
+/** Option `assumestrict` assumes a global "use strict"; is in effect */
+exports.assumestrict = function (test) {
+	var code = 'function callCallee() { return arguments.callee; }';
+
+	TestRun(test)
+		.addError(1, 'Strict violation.')
+		.test(code, { esnext: true, assumestrict: true });
+
+	test.done();
+};
+
 /** Option `laxbreak` allows you to insert newlines before some operators. */
 exports.laxbreak = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/laxbreak.js', 'utf8');

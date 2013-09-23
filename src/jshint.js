@@ -97,6 +97,7 @@ var JSHINT = (function () {
 			funcscope   : true, // if only function scope should be used for scope tests
 			gcl         : true, // if JSHint should be compatible with Google Closure Linter
 			globalstrict: true, // if global "use strict"; should be allowed (also enables 'strict')
+			assumestrict: true, // assume strict mode has been externally enabled, ignoring "use strict";
 			immed       : true, // if immediate invocations must be wrapped in parens
 			iterator    : true, // if the `__iterator__` property should be allowed
 			jquery      : true, // if jQuery globals should be predefined
@@ -386,6 +387,10 @@ var JSHINT = (function () {
 
 		if (state.option.globalstrict && state.option.strict !== false) {
 			state.option.strict = true;
+		}
+
+		if (state.option.assumestrict) {
+			state.directive["use strict"] = true;
 		}
 
 		if (state.option.yui) {
@@ -1684,7 +1689,8 @@ var JSHINT = (function () {
 				indentation();
 				advance();
 				if (state.directive[state.tokens.curr.value]) {
-					warning("W034", state.tokens.curr, state.tokens.curr.value);
+					if (!(state.option.assumestrict && (state.tokens.curr.value === "use strict")))
+						warning("W034", state.tokens.curr, state.tokens.curr.value);
 				}
 
 				if (state.tokens.curr.value === "use strict") {
@@ -4579,7 +4585,8 @@ var JSHINT = (function () {
 				directives();
 
 				if (state.directive["use strict"]) {
-					if (!state.option.globalstrict && !(state.option.node || state.option.phantom)) {
+					if (!(state.option.globalstrict || state.option.assumestrict) &&
+						!(state.option.node || state.option.phantom)) {
 						warning("W097", state.tokens.prev);
 					}
 				}
