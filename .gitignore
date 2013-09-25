@@ -1,4 +1,3 @@
-dist/*
 node_modules/*
 
 # TextMate 2 properties file.
