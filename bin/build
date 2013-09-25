@@ -13,8 +13,8 @@ if (!test("-e", "../dist"))
 
 bundle.require("./src/jshint.js", { expose: "jshint" });
 bundle.bundle({}, function (err, src) {
-	var web   = "./dist/jshint-" + version + ".js";
-	var rhino = "./dist/jshint-rhino-" + version + ".js";
+	var web   = "./dist/jshint.js";
+	var rhino = "./dist/jshint-rhino.js";
 
 	[ "// " + version,
 		"var JSHINT;",
