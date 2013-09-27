@@ -205,12 +205,18 @@ exports.register = function (linter) {
 			}
 		}
 		else {
-			//issue warning due to bad var declaration
 			if (data.name === "var") {
-				linter.warn("W121", {
-					line: data.line,
-					char: data.char
-				});
+				//issue warning due to bad var declaration
+				if (lastToken.line !== lastValidVarDecLn + commentLns) {
+					linter.warn("W121", {
+						line: data.line,
+						char: data.char
+					});
+				}
+				else {
+					lastValidVarDecLn = data.line;
+					commentLns = 0;
+				}
 			}
 		}
 		lastLnPunc = (data.type === "(punctuator)" && lastValidVarDecLn ===

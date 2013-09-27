@@ -1637,7 +1637,7 @@ exports.vartop = function (test) {
 		.addError(9, "Variable declaration not at top of declaring scope.")
 		.addError(21, "Variable declaration not at top of declaring scope.")
 		.addError(28, "Variable declaration not at top of declaring scope.")
-		.addError(53, "Variable declaration not at top of declaring scope.")
+		.addError(54, "Variable declaration not at top of declaring scope.")
 		.test(src, { vartop: true });
 
 	test.done();

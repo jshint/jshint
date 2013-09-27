@@ -42,6 +42,7 @@ function func_name1 () {
 //all pass except the last declaration/initialization - 
 //more mixed declaration and initialization
 function func_name2 () {
+
 	var a = true,
 		b = "hello";
 	var c = true;
