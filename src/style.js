@@ -168,4 +168,53 @@ exports.register = function (linter) {
 			});
 		}
 	});
+
+	//number of commented lines since last valid var declaration
+	var commentLns = 0;
+	var lastValidVarDecLn = 0;
+	var lastLnPunc = "";
+	var lastToken;
+	
+	// Warn about variables not being declared at top of declaring scope
+	linter.on("Keyword Punctuator Comment", function style_scanVarTop(data) {
+		if (!linter.getOption("vartop"))
+			return;
+		//Maintain line # of last valid (top of declaring scope) var declaration.
+		if (data.name === "function") {
+			lastValidVarDecLn = data.line;
+			commentLns = 0;
+		}
+		else if (data.type === "(comment)")
+			commentLns++;
+		else if (data.line === lastValidVarDecLn + commentLns + 1) {
+			if (data.name === "var")
+				lastValidVarDecLn++;
+			if (data.name === "," && lastLnPunc === ",")
+				lastValidVarDecLn++;
+			if (data.name === ";" && lastLnPunc === ",")
+				lastValidVarDecLn++;
+
+			lastValidVarDecLn += commentLns;
+			commentLns = 0;
+		}
+		else if (typeof lastToken !== "undefined" && lastToken.name === ";" && 
+			lastValidVarDecLn === lastToken.line) {
+			if (data.name === "var") {
+				lastValidVarDecLn = data.line;
+				commentLns = 0;
+			}
+		}
+		else {
+			//issue warning due to bad var declaration
+			if (data.name === "var") {
+				linter.warn("W121", {
+					line: data.line,
+					char: data.char
+				});
+			}
+		}
+		lastLnPunc = (data.type === "(punctuator)" && lastValidVarDecLn ===
+			data.line) ? data.name : lastLnPunc;
+		lastToken = data;
+	});
 };

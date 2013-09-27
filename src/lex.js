@@ -1541,10 +1541,6 @@ Lexer.prototype = {
 			}
 
 			if (type === "(identifier)") {
-				if (value === "return" || value === "case" || value === "typeof") {
-					this.prereg = true;
-				}
-
 				if (_.has(state.syntax, value)) {
 					obj = Object.create(state.syntax[value] || state.syntax["(error)"]);
 
@@ -1555,11 +1551,27 @@ Lexer.prototype = {
 				}
 			}
 
+			if (type === "(keyword)") {
+				if (value === "return" || value === "case" || value === "typeof") {
+					this.prereg = true;
+				}
+
+				if (_.has(state.syntax, value)) {
+					obj = Object.create(state.syntax[value] || state.syntax["(error)"]);
+				}
+			}
+
+			if (type === "(comment)") {
+				Object.create(state.syntax["(comment)"]);
+			}
 			if (!obj) {
 				obj = Object.create(state.syntax[type]);
 			}
-
-			obj.identifier = (type === "(identifier)");
+			//TODO: This is bad. It seems the old label "(identifier)" 
+			//actually included both identifiers AND keywords. 
+			//type === "(keyword)" is here only to maintain
+			//backward compatability. This is misleading.
+			obj.identifier = (type === "(identifier)" || type === "(keyword)");
 			obj.type = obj.type || type;
 			obj.value = value;
 			obj.line = this.line;
@@ -1605,24 +1617,35 @@ Lexer.prototype = {
 					char: this.char,
 					from: this.from,
 					value: token.value,
+					type: "(string)",
 					quote: token.quote
 				}, checks, function () { return true; });
 
 				return create("(string)", token.value);
+			case Token.Keyword:
+				this.trigger("Keyword", {
+					line: this.line,
+					char: this.char,
+					from: this.from,
+					name: token.value,
+					type: "(keyword)"
+				});
+
+				return create("(keyword)", token.value);
 			case Token.Identifier:
 				this.trigger("Identifier", {
 					line: this.line,
 					char: this.char,
-					from: this.form,
+					from: this.from,
 					name: token.value,
+					type: "(identifier)",
 					isProperty: state.tokens.curr.id === "."
 				});
 
 				/* falls through */
-			case Token.Keyword:
 			case Token.NullLiteral:
 			case Token.BooleanLiteral:
-				return create("(identifier)", token.value, state.tokens.curr.id === ".");
+				return create("(identifier)", token.value);
 
 			case Token.NumericLiteral:
 				if (token.isMalformed) {
@@ -1679,12 +1702,27 @@ Lexer.prototype = {
 					};
 				}
 
+				this.trigger("Comment", {
+					line: this.line,
+					char: this.char,
+					from: this.from,
+					name: token.value,
+					type: "(comment)"
+				});
 				break;
 
 			case "":
 				break;
 
 			default:
+				this.trigger("Punctuator", {
+					line: this.line,
+					char: this.char,
+					from: this.from,
+					name: token.value,
+					type: "(punctuator)"
+				});
+
 				return create("(punctuator)", token.value);
 			}
 		}
