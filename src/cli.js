@@ -379,7 +379,7 @@ var exports = {
 
 		if (opts.useStdin) {
 			cli.withStdin(function (code) {
-				lint(code, results, opts.config || {}, data);
+				lint(code, results, opts.config || exports.loadConfig(findConfig(".jshintrc")), data);
 				(opts.reporter || defReporter)(results, data, { verbose: opts.verbose });
 				cb(results.length === 0);
 			});
