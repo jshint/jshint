@@ -31,16 +31,16 @@ function gh56() {
 }
 
 function gh676() {
-	var c = b;
-	b = a,
-	if (b) {
-		a = c;
-	}
-	return a;
+    var c = b;
+    b = a,
+    if (b) {
+        a = c;
+    }
+    return a;
 }
 
 function gh771() {
-	gh676(),
+    gh676(),
 }
 
 // GH-793.

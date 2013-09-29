@@ -12,26 +12,26 @@ function repeatedloops() {
             x = i;
         }
     }
-    
+
     while (true) {
         var aa = true;
     }
     while (false) {
         aa = false;
     }
-    
+
     if (true) {
         var bb = true;
     }
     if (false) {
         bb = false;
     }
-    
+
     function xx2() {
         var cc = 3;
         bb = true;
     }
-    
+
     function xx3() {
         bb = true;
         cc = 4;

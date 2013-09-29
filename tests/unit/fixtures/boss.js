@@ -12,7 +12,7 @@ do {
 } while (b = arr.next());
 
 if (e /= 1)
-	doSomething();
+    doSomething();
 
 while (obj /= arr.next())
     doSomething();
@@ -25,9 +25,9 @@ do {
 } while (b /= arr.next());
 
 function foo(a) {
-	return a = 1;
+    return a = 1;
 }
 
 function bar(a) {
-	return b.a = 1;
+    return b.a = 1;
 }

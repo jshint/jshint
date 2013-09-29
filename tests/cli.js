@@ -646,7 +646,7 @@ exports.group = {
 		var dir = __dirname + "/../examples/";
 		sinon.stub(cli, "run").returns(false);
 		sinon.stub(cli, "getBufferSize").returns(1);
-		sinon.stub(process, "cwd").returns(dir);		
+		sinon.stub(process, "cwd").returns(dir);
 		sinon.stub(process.stdout, "on", function (name, func) {
 			func();
 		});
@@ -666,12 +666,12 @@ exports.group = {
 
 		test.done();
 	},
-	
+
 	testDrainNotCalledWhenThereIsNoBufferedOutput: function (test) {
 		var dir = __dirname + "/../examples/";
 		sinon.stub(cli, "run").returns(false);
 		sinon.stub(cli, "getBufferSize").returns(0);
-		sinon.stub(process, "cwd").returns(dir);		
+		sinon.stub(process, "cwd").returns(dir);
 		sinon.stub(process.stdout, "on", function (name, func) {
 			func();
 		});

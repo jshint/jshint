@@ -2,15 +2,15 @@ var name;
 
 switch (name) {
 case "Kamol":
-	doSomething();
+    doSomething();
 default:
-	doSomethingElse();
+    doSomethingElse();
 }
 
 switch (name) {
 default:
-	doSomethingElse();
-	break;
+    doSomethingElse();
+    break;
 case "Kamol":
-	doSomething();
+    doSomething();
 }

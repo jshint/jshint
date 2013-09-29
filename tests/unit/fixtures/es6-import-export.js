@@ -19,7 +19,7 @@ export default foobar;
 // at some point doing a double export default should error, but for now,
 // makes testing a hell of a lot easier
 export default function() {
-	return "foobar";
+    return "foobar";
 }
 
 export { foo };
@@ -28,11 +28,11 @@ export { foo, bar };
 // gettin' fancy
 
 export function a() {
-	return "a";
+    return "a";
 }
 
 export var b = function() {
-	return "b";
+    return "b";
 };
 
 export var c = "c";

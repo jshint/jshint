@@ -14,7 +14,7 @@ function s2() {
     "fdfdsf";
     /* */
     "ddasfgggg";
-    
+
     /*
     */
     /**///xsxsx
@@ -37,7 +37,7 @@ function s4() {
     // comments and other directives are allowed
     "xyz";
     "use strict";
-        
+
     if (true) {
         s3(1);
     }
@@ -48,7 +48,7 @@ function s5() {
     // comments and other directives are allowed
     "xyz";
     // here is no "use strict"...
-        
+
     try {
         "use strict";
         s4(1);
