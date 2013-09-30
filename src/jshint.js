@@ -551,10 +551,18 @@ var JSHINT = (function () {
 					}
 				}
 			} else {
-				if (!state.option.shadow && type !== "exception" ||
-							(funct["(blockscope)"].getlabel(t))) {
+				if ((!state.option.shadow ||
+					state.option.shadow === "inner" ||
+					state.option.shadow === "outer") &&
+						type !== "exception" || (funct["(blockscope)"].getlabel(t))) {
 					warning("W004", state.tokens.next, t);
 				}
+			}
+		}
+
+		if (funct["(context)"] && _.has(funct["(context)"], t) && type !== "function") {
+			if (state.option.shadow === "outer") {
+				warning("W123", state.tokens.next, t);
 			}
 		}
 
