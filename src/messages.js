@@ -192,7 +192,8 @@ var warnings = {
 	W117: "'{a}' is not defined.",
 	W118: "'{a}' is only available in Mozilla JavaScript extensions (use moz option).",
 	W119: "'{a}' is only available in ES6 (use esnext option).",
-	W120: "You might be leaking a variable ({a}) here."
+	W120: "You might be leaking a variable ({a}) here.",
+	W122: "Invalid typeof value '{a}'"
 };
 
 var info = {
