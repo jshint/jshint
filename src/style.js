@@ -172,7 +172,12 @@ exports.register = function (linter) {
 	//number of commented lines since last valid var declaration
 	var commentLns = 0;
 	var lastValidVarDecLn = 0;
-	var lastLnPunc = "";
+	//store last valid var dec at each depth
+	//var lastValidVarDec = {};
+	var lastLnPunc = {
+		name : "",
+		type : "",
+	};
 	var lastToken;
 	
 	// Warn about variables not being declared at top of declaring scope
@@ -189,9 +194,9 @@ exports.register = function (linter) {
 		else if (data.line === lastValidVarDecLn + commentLns + 1) {
 			if (data.name === "var")
 				lastValidVarDecLn++;
-			if (data.name === "," && lastLnPunc === ",")
+			if (data.name === "," && lastLnPunc.name === ",")
 				lastValidVarDecLn++;
-			if (data.name === ";" && lastLnPunc === ",")
+			if (data.name === ";" && lastLnPunc.name === ",")
 				lastValidVarDecLn++;
 
 			lastValidVarDecLn += commentLns;
@@ -208,10 +213,17 @@ exports.register = function (linter) {
 			if (data.name === "var") {
 				//issue warning due to bad var declaration
 				if (lastToken.line !== lastValidVarDecLn + commentLns) {
-					linter.warn("W121", {
-						line: data.line,
-						char: data.char
-					});
+					//check to see if current var is after a multi-line
+					//var initialization. If the negation is true, var
+					//declaration must not be at the top of dec scope
+					if (!(lastToken.name === ";" && 
+						lastToken.char - lastToken.name.length ===
+						data.char - data.name.length + 1)) {
+						linter.warn("W121", {
+							line: data.line,
+							char: data.char
+						});
+					}
 				}
 				else {
 					lastValidVarDecLn = data.line;
@@ -220,7 +232,7 @@ exports.register = function (linter) {
 			}
 		}
 		lastLnPunc = (data.type === "(punctuator)" && lastValidVarDecLn ===
-			data.line) ? data.name : lastLnPunc;
+			data.line) ? data : lastLnPunc;
 		lastToken = data;
 	});
 };
