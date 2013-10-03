@@ -1,4 +1,10 @@
-//pass - global scope
+//pass - global scope, var assigned unnamed func
+var a;
+var b = function () {
+	var b = 3;
+	var c = 3;
+	return b === c;
+};
 var c;
 
 //fail - func scope

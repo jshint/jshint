@@ -1634,10 +1634,10 @@ exports.vartop = function (test) {
 	var src = fs.readFileSync(__dirname + "/fixtures/vartop.js", "utf8"); 
 
 	TestRun(test)
-		.addError(9, "Variable declaration not at top of declaring scope.")
-		.addError(21, "Variable declaration not at top of declaring scope.")
-		.addError(28, "Variable declaration not at top of declaring scope.")
-		.addError(54, "Variable declaration not at top of declaring scope.")
+		.addError(15, "Variable declaration not at top of declaring scope.")
+		.addError(27, "Variable declaration not at top of declaring scope.")
+		.addError(34, "Variable declaration not at top of declaring scope.")
+		.addError(60, "Variable declaration not at top of declaring scope.")
 		.test(src, { vartop: true });
 
 	test.done();
