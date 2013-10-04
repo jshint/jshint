@@ -71,7 +71,6 @@ exports.latedef = function (test) {
 	// When latedef is true, JSHint must not tolerate the use before definition
 	TestRun(test)
 		.addError(10, "'vr' was used before it was defined.")
-		.addError(18, "Inner functions should be listed at the top of the outer function.")
 		.test(src, { es3: true, latedef: "nofunc" });
 
 	// When latedef_func is true, JSHint must not tolerate the use before definition for functions
