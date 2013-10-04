@@ -59,3 +59,15 @@ function func_name2 () {
 	console.assert(1 === 1, "why yes, 1 does equal 1");
 	var f = "this should fail!";
 }
+
+//pass - unnamed multi-line function (with closing brace on the same line
+//as the last line of logic) assigned to a var followed by another
+//var declaration.
+function func_name3 () {
+
+	var a = function () {
+		var b = 3;
+		var c = 3;
+		return b === c; };
+	var c;
+}
