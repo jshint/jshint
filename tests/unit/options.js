@@ -1195,6 +1195,11 @@ exports.indentation = function (test) {
 		.addError(10, "Unexpected space after 'hello'.")
 		.addError(11, "Unexpected space after '('.")
 		.addError(11, "Unexpected space after 'Hello World'.")
+		.addError(15, "Expected 'case' to have an indentation at 1 instead at 5.")
+		.addError(16, "Expected 'case' to have an indentation at 1 instead at 5.")
+		.addError(17, "Expected 'break' to have an indentation at 5 instead at 9.")
+		.addError(18, "Expected 'default' to have an indentation at 1 instead at 5.")
+		.addError(19, "Expected 'break' to have an indentation at 5 instead at 9.")
 		.test(src, { es3: true, indent: 4, white: true });
 
 	TestRun(test)
@@ -1203,7 +1208,21 @@ exports.indentation = function (test) {
 		.addError(6, "Mixed spaces and tabs.")
 		.addError(6, "Expected 'var' to have an indentation at 5 instead at 7.")
 		.addError(7, "Expected '}' to have an indentation at 3 instead at 5.")
+		.addError(15, "Expected 'case' to have an indentation at 1 instead at 5.")
+		.addError(16, "Expected 'case' to have an indentation at 1 instead at 5.")
+		.addError(17, "Expected 'break' to have an indentation at 3 instead at 9.")
+		.addError(18, "Expected 'default' to have an indentation at 1 instead at 5.")
+		.addError(19, "Expected 'break' to have an indentation at 3 instead at 9.")
 		.test(src, { es3: true, indent: 2 });
+
+	// case indent
+	TestRun(test)
+		.addError(5, "Mixed spaces and tabs.")
+		.addError(6, "Mixed spaces and tabs.")
+		.addError(10, "Unexpected space after 'hello'.")
+		.addError(11, "Unexpected space after '('.")
+		.addError(11, "Unexpected space after 'Hello World'.")
+		.test(src, { es3: true, indent: 4, white: true, caseindent: true });
 
 	test.done();
 };

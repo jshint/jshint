@@ -80,6 +80,7 @@ var JSHINT = (function () {
 			boss        : true, // if advanced usage of assignments should be allowed
 			browser     : true, // if the standard browser globals should be predefined
 			camelcase   : true, // if identifiers should be required in camel case
+			caseindent  : true, // if keywords case and default should be indented
 			couch       : true, // if CouchDB globals should be predefined
 			curly       : true, // if curly braces around all blocks should be required
 			debug       : true, // if debugger statements should be allowed
@@ -3586,6 +3587,7 @@ var JSHINT = (function () {
 		advance("{");
 		nonadjacent(state.tokens.curr, state.tokens.next);
 		indent += state.option.indent;
+		if (state.option.caseindent) indent += state.option.indent;
 		this.cases = [];
 
 		for (;;) {
@@ -3640,6 +3642,7 @@ var JSHINT = (function () {
 				break;
 			case "}":
 				indent -= state.option.indent;
+				if (state.option.caseindent) indent -= state.option.indent;
 				indentation();
 				advance("}", t);
 				funct["(breakage)"] -= 1;
