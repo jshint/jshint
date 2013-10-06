@@ -1205,6 +1205,26 @@ exports.indentation = function (test) {
 		.addError(7, "Expected '}' to have an indentation at 3 instead at 5.")
 		.test(src, { es3: true, indent: 2 });
 
+	// case indent
+	TestRun(test)
+		.addError(5, "Mixed spaces and tabs.")
+		.addError(6, "Mixed spaces and tabs.")
+		.addError(10, "Unexpected space after 'hello'.")
+		.addError(11, "Unexpected space after '('.")
+		.addError(11, "Unexpected space after 'Hello World'.")
+		.test(src, { es3: true, indent: 4, white: true });
+
+	test.done();
+};
+
+exports.switchindent = function (test) {
+	var src = fs.readFileSync(__dirname + "/fixtures/switchindent.js", "utf8");
+
+	TestRun(test)
+		.addError(14, "Expected 'x' to have an indentation at 9 instead at 5.")
+		.addError(24, "Expected 'case' to have an indentation at 1 instead at 5.")
+		.test(src, { indent: 4, white: true });
+
 	test.done();
 };
 

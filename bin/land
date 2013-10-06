@@ -32,6 +32,3 @@ function succ(res) {
 function err(res) {
 	console.log("error:", res.message);
 }
-
-
-
