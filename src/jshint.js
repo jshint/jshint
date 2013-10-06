@@ -3572,8 +3572,10 @@ var JSHINT = (function () {
 	});
 
 	blockstmt("switch", function () {
-		var t = state.tokens.next,
-			g = false;
+		var t = state.tokens.next;
+		var g = false;
+		var noindent = false;
+
 		funct["(breakage)"] += 1;
 		advance("(");
 		nonadjacent(this, t);
@@ -3585,7 +3587,13 @@ var JSHINT = (function () {
 		t = state.tokens.next;
 		advance("{");
 		nonadjacent(state.tokens.curr, state.tokens.next);
-		indent += state.option.indent;
+
+		if (state.tokens.next.from === indent)
+			noindent = true;
+
+		if (!noindent)
+			indent += state.option.indent;
+
 		this.cases = [];
 
 		for (;;) {
@@ -3608,7 +3616,7 @@ var JSHINT = (function () {
 						warning("W086", state.tokens.curr, "case");
 					}
 				}
-				indentation(-state.option.indent);
+				indentation();
 				advance("case");
 				this.cases.push(expression(20));
 				increaseComplexityCount();
@@ -3633,13 +3641,14 @@ var JSHINT = (function () {
 						}
 					}
 				}
-				indentation(-state.option.indent);
+				indentation();
 				advance("default");
 				g = true;
 				advance(":");
 				break;
 			case "}":
-				indent -= state.option.indent;
+				if (!noindent)
+					indent -= state.option.indent;
 				indentation();
 				advance("}", t);
 				funct["(breakage)"] -= 1;
@@ -3649,6 +3658,7 @@ var JSHINT = (function () {
 				error("E023", state.tokens.next, "}");
 				return;
 			default:
+				indent += state.option.indent;
 				if (g) {
 					switch (state.tokens.curr.id) {
 					case ",":
@@ -3672,6 +3682,7 @@ var JSHINT = (function () {
 						return;
 					}
 				}
+				indent -= state.option.indent;
 			}
 		}
 	}).labelled = true;
