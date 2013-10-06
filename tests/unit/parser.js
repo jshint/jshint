@@ -592,13 +592,39 @@ exports.testIdentifiers = function (test) {
 		.addError(4, "'π' is defined but never used.")
 		.addError(5, "'привет' is defined but never used.")
 		.addError(6, "'\\u1d44' is defined but never used.")
-		.addError(7, "'encoded\\u1d44' is defined but never used.");
+		.addError(7, "'encoded\\u1d44' is defined but never used.")
+		.addError(8, "'\\uFF38' is defined but never used.")
+		.addError(9, "'\\uFF58' is defined but never used.")
+		.addError(10, "'\\u1FBC' is defined but never used.")
+		.addError(11, "'\\uFF70' is defined but never used.")
+		.addError(12, "'\\u4DB3' is defined but never used.")
+		.addError(13, "'\\u97CA' is defined but never used.")
+		.addError(14, "'\\uD7A1' is defined but never used.")
+		.addError(15, "'\\uFFDA' is defined but never used.")
+		.addError(16, "'\\uA6ED' is defined but never used.")
+		.addError(17, "'\\u0024' is defined but never used.")
+		.addError(18, "'\\u005F' is defined but never used.")
+		.addError(19, "'\\u0024\\uFF38' is defined but never used.")
+		.addError(20, "'\\u0024\\uFF58' is defined but never used.")
+		.addError(21, "'\\u0024\\u1FBC' is defined but never used.")
+		.addError(22, "'\\u0024\\uFF70' is defined but never used.")
+		.addError(23, "'\\u0024\\u4DB3' is defined but never used.")
+		.addError(24, "'\\u0024\\u97CA' is defined but never used.")
+		.addError(25, "'\\u0024\\uD7A1' is defined but never used.")
+		.addError(26, "'\\u0024\\uFFDA' is defined but never used.")
+		.addError(27, "'\\u0024\\uA6ED' is defined but never used.")
+		.addError(28, "'\\u0024\\uFE24' is defined but never used.")
+		.addError(29, "'\\u0024\\uABE9' is defined but never used.")
+		.addError(30, "'\\u0024\\uFF17' is defined but never used.")
+		.addError(31, "'\\u0024\\uFE4E' is defined but never used.")
+		.addError(32, "'\\u0024\\u200C' is defined but never used.")
+		.addError(33, "'\\u0024\\u200D' is defined but never used.")
+		.addError(34, "'\\u0024\\u0024' is defined but never used.")
+		.addError(35, "'\\u0024\\u005F' is defined but never used.");
 	run.test(src, {es3: true, unused: true });
 	run.test(src, {unused: true }); // es5
 	run.test(src, {esnext: true, unused: true });
 	run.test(src, {moz: true, unused: true });
-
-
 	test.done();
 };
 
