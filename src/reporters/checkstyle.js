@@ -15,7 +15,7 @@ module.exports =
 				"<": "&lt;",
 				">": "&gt;"
 			},
-			file, fileName, i, issue, globals, unuseds, errorMessage;
+			fileName, i, issue, errorMessage;
 
 		opts = opts || {};
 
