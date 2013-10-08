@@ -320,6 +320,7 @@ exports.browser = {
 	SVGZoomAndPan        : false,
 	TimeEvent            : false,
 	top                  : false,
+	URL                  : false,
 	WebSocket            : false,
 	window               : false,
 	Worker               : false,
