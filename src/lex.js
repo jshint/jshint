@@ -92,6 +92,9 @@ function Lexer(source) {
 	// Shebangs are used by Node scripts.
 
 	if (lines[0] && lines[0].substr(0, 2) === "#!") {
+		if (lines[0].indexOf("node") !== -1) {
+			state.option.node = true;
+		}
 		lines[0] = "";
 	}
 
