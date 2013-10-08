@@ -1,8 +1,8 @@
 {
 	"name":     "jshint",
-	"version":  "2.1.11",
+	"version":  "2.1.11-demeterr",
 	"homepage": "http://jshint.com/",
-	"description": "Static analysis tool for JavaScript",
+	"description": "Static analysis tool for JavaScript (demeterr build)",
 
 	"author": {
 		"name":  "Anton Kovalyov",
@@ -12,7 +12,7 @@
 
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/jshint/jshint.git"
+		"url": "https://github.com/Demeterr/jshint.git"
 	},
 
 	"bugs": {
