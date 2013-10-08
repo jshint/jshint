@@ -1,5 +1,7 @@
 "use strict";
 
+var _        = require("underscore");
+
 exports.register = function (linter) {
 	// Check for properties named __proto__. This special property was
 	// deprecated and then re-introduced for ES6.
@@ -167,5 +169,90 @@ exports.register = function (linter) {
 				char: data.char
 			});
 		}
+	});
+
+	//number of commented lines since last valid var declaration
+	var commentLns = 0;
+	var lastValidVarDecLn = 0;
+	var validVarDecLns = [];
+	//store last valid var dec at each depth
+	var lastLnPunc = {
+		name : "",
+		type : "",
+	};
+	var lastToken;
+	//for paren/brace/curly brace matching
+	var puncStack = [];
+
+	// Warn about variables not being declared at top of declaring scope
+	linter.on("Keyword Punctuator Comment", function style_scanVarTop(data) {
+		if (!linter.getOption("vartop"))
+			return;
+
+		//update opening/closing punctuator stack. Useful for determining the end
+		//of a multi-line variable initialization.
+		var openPuncs  = [ "(", "{", "[" ];
+		var closePuncs = [ ")", "}", "]" ];
+		if (data.type === "(punctuator)" && _.contains(openPuncs.concat(closePuncs), data.name)) {
+			//assumption: there are no open/close punctuator mismatches
+			//core jshint should already have detected these as errors
+			if (_.contains(openPuncs, data.name))
+				puncStack.push(data);
+			else {
+				var tok = puncStack.pop();
+				if (_.contains(validVarDecLns, tok.line))
+					lastValidVarDecLn = data.line;
+			}
+		}
+
+		//Maintain line # of last valid (top of declaring scope) var declaration.
+		if (data.name === "function") {
+			lastValidVarDecLn = data.line;
+			commentLns = 0;
+		}
+		else if (data.type === "(comment)")
+			commentLns++;
+		else if (data.line === lastValidVarDecLn + commentLns + 1) {
+			if (data.name === "var")
+				lastValidVarDecLn++;
+			if (data.name === "," && lastLnPunc.name === ",")
+				lastValidVarDecLn++;
+			if (data.name === ";" && lastLnPunc.name === ",")
+				lastValidVarDecLn++;
+
+			lastValidVarDecLn += commentLns;
+			commentLns = 0;
+		}
+		else if (typeof lastToken !== "undefined" && lastToken.name === ";" && 
+			lastValidVarDecLn === lastToken.line) {
+			if (data.name === "var") {
+				lastValidVarDecLn = data.line;
+				commentLns = 0;
+			}
+		}
+		else {
+			if (data.name === "var") {
+				//check to see if current var is after a multi-line
+				//var initialization. If the negation is true, var
+				//declaration must not be at the top of dec scope
+				if (lastToken.line !== lastValidVarDecLn + commentLns) {
+					linter.warn("W121", {
+						line: data.line,
+						char: data.char
+					});
+				}
+				else {
+					lastValidVarDecLn = data.line;
+					commentLns = 0;
+				}
+			}
+		}
+
+		if (!_.contains(validVarDecLns, lastValidVarDecLn))
+			validVarDecLns.push(lastValidVarDecLn);
+
+		lastLnPunc = (data.type === "(punctuator)" && lastValidVarDecLn ===
+			data.line) ? data : lastLnPunc;
+		lastToken = data;
 	});
 };

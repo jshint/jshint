@@ -141,6 +141,8 @@ var JSHINT = (function () {
 			trailing    : true, // if trailing whitespace rules apply
 			validthis   : true, // if 'this' inside a non-constructor function is valid.
 			                    // This is a function scoped option only.
+			vartop      : true, // if all var declarations should be placed at
+			                    // the top of their declaring scope
 			withstmt    : true, // if with statements should be allowed
 			white       : true, // if strict whitespace rules apply
 			worker      : true, // if Web Worker script symbols should be allowed
@@ -4560,6 +4562,18 @@ var JSHINT = (function () {
 
 		lex.on("Number", function (ev) {
 			emitter.emit("Number", ev);
+		});
+
+		lex.on("Keyword", function (ev) {
+			emitter.emit("Keyword", ev);
+		});
+
+		lex.on("Punctuator", function (ev) {
+			emitter.emit("Punctuator", ev);
+		});
+
+		lex.on("Comment", function (ev) {
+			emitter.emit("Comment", ev);
 		});
 
 		lex.start();
