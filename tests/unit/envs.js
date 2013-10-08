@@ -360,6 +360,7 @@ exports.browser = function (test) {
 		"Uint32Array",
 		"Uint8Array",
 		"Uint8ClampedArray",
+		"URL",
 		"WebSocket",
 		"window",
 		"Worker",
