@@ -505,6 +505,8 @@ exports.missingRadix = function (test) {
 		})
 		.test(code, {es3: true});
 
+	TestRun(test).test(code);
+
 	test.done();
 };
 
