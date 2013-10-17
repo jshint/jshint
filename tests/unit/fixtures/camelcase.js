@@ -15,3 +15,7 @@ var TEST_1, test1, test_1;
 function _FooBar(_testMe) {
     this.__testMe = _testMe;
 }
+
+function _FooBar_(testMe_) {
+	this.__testMe__ = testMe_;
+}
