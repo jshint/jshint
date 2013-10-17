@@ -14,6 +14,17 @@ in JavaScript code and to enforce your team’s coding conventions. It is
 very flexible so you can easily adjust it to your particular coding guidelines
 and the environment you expect your code to execute in.
 
+#### JSHint 2.x versus JSHint 3
+
+There's an effort going on to release the next major version of JSHint. All
+development in the `master` branch is for the version 3.0. Current stable
+version is in the `2.x` branch. Keep that in mind when submitting pull requests.
+
+Also, before reporting a bug or thinking about hacking on JSHint, read this:
+[JSHint 3 plans](http://www.jshint.com/blog/jshint-3-plans/). TL;DR: we're
+moving away from style checks within JSHint so no new features around
+style checks will be accepted. Bug fixes are fine for the `2.x` branch.
+
 #### Reporting a bug
 
 To report a bug simply create a
