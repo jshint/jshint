@@ -1580,7 +1580,15 @@ var JSHINT = (function () {
 		// Is it a lonely block?
 
 		if (t.id === "{") {
-			block(true, true);
+			// Is it a switch case block?
+			//
+			//	switch (foo) {
+			//		case bar: { <= here.
+			//			...
+			//		}
+			//	}
+			var iscase = (funct["(verb)"] === "case" && state.tokens.curr.value === ":");
+			block(true, true, false, false, iscase);
 			return;
 		}
 
@@ -1709,11 +1717,13 @@ var JSHINT = (function () {
 	 * Parses a single block. A block is a sequence of statements wrapped in
 	 * braces.
 	 *
-	 * ordinary - true for everything but function bodies and try blocks.
+	 * ordinary     - true for everything but function bodies and try blocks.
 	 * stmt		- true if block can be a single statement (e.g. in if/for/while).
 	 * isfunc	- true if block is a function body
+	 * isfatarrow   -
+	 * iscase	- true if block is a switch case block
 	 */
-	function block(ordinary, stmt, isfunc, isfatarrow) {
+	function block(ordinary, stmt, isfunc, isfatarrow, iscase) {
 		var a,
 			b = inblock,
 			old_indent = indent,
@@ -1826,7 +1836,11 @@ var JSHINT = (function () {
 
 			delete funct["(nolet)"];
 		}
-		funct["(verb)"] = null;
+		// Don't clear and let it propagate out if it is "break", "return", or "throw" in switch case
+		if (!(iscase && ["break", "return", "throw"].indexOf(funct["(verb)"]) != -1)) {
+			funct["(verb)"] = null;
+		}
+
 		if (!ordinary || !state.option.funcscope) scope = s;
 		inblock = b;
 		if (ordinary && state.option.noempty && (!a || a.length === 0)) {
