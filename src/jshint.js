@@ -161,7 +161,8 @@ var JSHINT = (function () {
 			maxlen       : false,
 			indent       : false,
 			maxerr       : false,
-			predef       : false,
+			predef       : false, //predef is deprecated and being replaced by globals
+			globals      : false,
 			quotmark     : false, //'single'|'double'|true
 			scope        : false,
 			maxstatements: false, // {int} max statements per function
