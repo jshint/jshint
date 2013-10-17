@@ -635,6 +635,7 @@ exports.testIdentifiers = function (test) {
 	run.test(src, {unused: true }); // es5
 	run.test(src, {esnext: true, unused: true });
 	run.test(src, {moz: true, unused: true });
+
 	test.done();
 };
 
@@ -3759,5 +3760,28 @@ exports["regression for GH-1227"] = function (test) {
 		.addError(14, "Unreachable 'return' after 'return'.")
 		.test(src);
 
+	test.done();
+};
+
+exports["test for 'break' in switch case + curly braces"] = function (test) {
+	var code = [
+		"switch (foo) {",
+		"  case 1: { break; }",
+		"  case 2: { return; }",
+		"  case 3: { throw 'Error'; }",
+		"  case 11: {",
+		"    while (true) {",
+		"      break;",
+		"    }",
+		"  }",
+		"  default: break;",
+		"}"
+	];
+
+	// No error for case 1, 2, 3.
+	var run = TestRun(test)
+		.addError(9, "Expected a 'break' statement before 'default'.");
+
+	run.test(code);
 	test.done();
 };
