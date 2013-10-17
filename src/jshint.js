@@ -2262,6 +2262,7 @@ var JSHINT = (function () {
 					break;
 				case "Date":
 				case "RegExp":
+				case "this":
 					break;
 				default:
 					if (c.id !== "function") {
