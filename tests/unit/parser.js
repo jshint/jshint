@@ -3780,8 +3780,57 @@ exports["test for 'break' in switch case + curly braces"] = function (test) {
 
 	// No error for case 1, 2, 3.
 	var run = TestRun(test)
-		.addError(9, "Expected a 'break' statement before 'default'.");
+		.addError(9, "Expected a 'break' statement before 'default'.")
+		.test(code);
 
-	run.test(code);
+	test.done();
+};
+
+exports["/*jshint ignore */ should be a good option and only accept start, end or line as values"] = function (test) {
+	var code = [
+		"/*jshint ignore:start*/",
+		"/*jshint ignore:end*/",
+		"/*jshint ignore:line*/",
+		"/*jshint ignore:badvalue*/"
+	];
+
+	TestRun(test)
+		.addError(4, "Bad option value.")
+		.test(code);
+
+	test.done();
+};
+
+exports["/*jshint ignore */ should allow the linter to skip blocked-out lines to continue finding errors in the rest of the code"] = function (test) {
+	var code = fs.readFileSync(__dirname + "/fixtures/gh826.js", "utf8");
+
+	TestRun(test)
+		.addError(33, "Mixed spaces and tabs.")
+		.test(code);
+
+	test.done();
+};
+
+exports["/*jshint ignore */ should be detected even with leading and/or trailing whitespace"] = function (test) {
+	var code = [
+		"	/*jshint ignore:start */",                                   // leading whitespace
+		"	 if (true) { alert('mixed tabs and spaces ignored'); }",     // should be ignored
+		"	/*jshint ignore:end */	",                                   // leading and trailing whitespace
+		"	 if (true) { alert('mixed tabs and spaces not ignored'); }", // should not be ignored
+		"	/*jshint ignore:start */   ",                                // leading and trailing whitespace
+		"	 if (true) { alert('mixed tabs and spaces ignored'); }",     // should be ignored
+		"	/*jshint ignore:end */	 "                                   // leading and trailing whitespace
+	];
+
+	TestRun(test)
+		.addError(4, "Mixed spaces and tabs.")
+		.test(code);
+
+	test.done();
+};
+
+exports["should be able to ignore a single line with a trailing comment: // jshint:ignore"] = function (test) {
+	var code = fs.readFileSync(__dirname + "/fixtures/gh870.js", "utf8");
+	TestRun(test).test(code);
 	test.done();
 };
