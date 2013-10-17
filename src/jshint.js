@@ -108,6 +108,7 @@ var JSHINT = (function () {
 			                    // loops
 			mootools    : true, // if MooTools globals should be predefined
 			multistr    : true, // allow multiline strings
+      nativeobject: true, // if modifying native object prototypes should be allowed
 			newcap      : true, // if constructor names must be capitalized
 			noarg       : true, // if arguments.caller and arguments.callee should be
 			                    // disallowed
@@ -1326,11 +1327,50 @@ var JSHINT = (function () {
 				node.type === "undefined");
 	}
 
+  function findNativePrototype(left) {
+    var prototype = false;
+    var natives = ["Array", "ArrayBuffer", "Boolean", "Collator", "DataView", "Date",
+        "DateTimeFormat", "Error", "EvalError", "Float32Array", "Float64Array",
+        "Function", "Infinity", "Intl", "Int16Array", "Int32Array", "Int8Array",
+        "Iterator", "Number", "NumberFormat", "Object", "RangeError",
+        "ReferenceError", "RegExp", "StopIteration", "String", "SyntaxError",
+        "TypeError", "Uint16Array", "Uint32Array", "Uint8Array", "Uint8ClampedArray",
+        "URIError"];
+    function walkPrototype(obj) {
+      if (typeof obj === "object") {
+        if (obj.right === "prototype") {
+          return obj;
+        } else if (typeof obj.left === "object") {
+          return walkPrototype(obj.left);
+        }
+      }
+    }
+    function walkNative(obj) {
+      while (!obj.identifier && typeof obj.left === "object") {
+        obj = obj.left;
+      }
+      if (obj.identifier && natives.indexOf(obj.value) >= 0) {
+        return obj.value;
+      }
+    }
+    prototype = walkPrototype(left);
+    if (prototype) {
+      return walkNative(prototype);
+    }
+  }
+
 	function assignop(s, f, p) {
 		var x = infix(s, typeof f === "function" ? f : function (left, that) {
 			that.left = left;
 
 			if (left) {
+        if (state.option.nativeobject) {
+          var nativeObject = findNativePrototype(left);
+          if (nativeObject) {
+            warning("W121", left, nativeObject);
+          }
+        }
+
 				if (predefined[left.value] === false &&
 						scope[left.value]["(global)"] === true) {
 					warning("W020", left);
