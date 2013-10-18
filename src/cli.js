@@ -303,6 +303,23 @@ function lint(code, results, config, data, file) {
 	}
 }
 
+/**
+ * Copy over any property from one object to another as long as it is not defined
+ * on the target. Target is modified in the process, and also returned
+ *
+ * @param  {object} target - The object to extend
+ * @param  {object} source - The object to copy from
+ * @return {object} - target is returned
+ */
+function extend(target, source) {
+	for (var prop in source) {
+		if (source.hasOwnProperty(prop) && !target.hasOwnProperty(prop)) {
+			target[prop] = source[prop];
+		}
+	}
+	return target;
+}
+
 var exports = {
 	/**
 	 * Loads and parses a configuration file.
@@ -323,6 +340,12 @@ var exports = {
 		try {
 			var config = JSON.parse(removeComments(shjs.cat(fp)));
 			config.dirname = path.dirname(fp);
+
+			if (config['extends']) {
+				extend(config, exports.loadConfig(path.resolve(config.dirname, config['extends'])));
+				delete config['extends'];
+			}
+
 			return config;
 		} catch (err) {
 			cli.error("Can't parse config file: " + fp);
@@ -405,7 +428,7 @@ var exports = {
 		return results.length === 0;
 	},
 
-	/** 
+	/**
 	 * Helper exposed for testing.
 	 * Used to determine is stdout has any buffered output before exiting the program
 	 */
