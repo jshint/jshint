@@ -1561,11 +1561,9 @@ var JSHINT = (function () {
 			}
 			if (t.id !== "(endline)") {
 				if (t.id === "function") {
-					if (!state.option.latedef) {
-						break;
+					if (state.option.latedef === true) {
+						warning("W026", t);
 					}
-
-					warning("W026", t);
 					break;
 				}
 
