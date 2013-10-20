@@ -85,6 +85,22 @@ exports.latedef = function (test) {
 	test.done();
 };
 
+exports.notypeof = function (test) {
+	var src = fs.readFileSync(__dirname + '/fixtures/typeofcomp.js', 'utf8');
+
+	TestRun(test)
+		.addError(1, "Invalid typeof value 'funtion'")
+		.addError(2, "Invalid typeof value 'double'")
+		.addError(3, "Invalid typeof value 'bool'")
+		.addError(4, "Invalid typeof value 'obj'")
+		.test(src);
+
+	TestRun(test)
+		.test(src, { notypeof: true });
+
+	test.done();
+}
+
 exports['combination of latedef and undef'] = function (test) {
 	var src = fixture('latedefundef.js');
 

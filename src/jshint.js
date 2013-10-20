@@ -86,6 +86,7 @@ var JSHINT = (function () {
 			dojo        : true, // if Dojo Toolkit globals should be predefined
 			eqeqeq      : true, // if === should be required
 			eqnull      : true, // if == null comparisons should be tolerated
+			notypeof    : true, // if should report typos in typeof comparisons
 			es3         : true, // if ES3 syntax should be allowed
 			es5         : true, // if ES5 syntax should be allowed (is now set per default)
 			esnext      : true, // if es.next specific syntax should be allowed
@@ -1352,6 +1353,28 @@ var JSHINT = (function () {
 				node.type === "undefined");
 	}
 
+	// Checks whether the 'typeof' operator is used with the correct
+	// value. For docs on 'typeof' see:
+	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof
+
+	function isTypoTypeof(left, right) {
+		if (state.option.notypeof)
+			return false;
+
+		if (!left || !right)
+			return false;
+
+		var values = [
+			"undefined", "object", "boolean", "number",
+			"string", "function", "xml", "object"
+		];
+
+		if (right.type === "(identifier)" && right.value === "typeof" && left.type === "(string)")
+			return !_.contains(values, left.value);
+
+		return false;
+	}
+
 	function assignop(s, f, p) {
 		var x = infix(s, typeof f === "function" ? f : function (left, that) {
 			that.left = left;
@@ -2160,10 +2183,20 @@ var JSHINT = (function () {
 			warning("W041", this, "===", left.value);
 		else if (isPoorRelation(right))
 			warning("W041", this, "===", right.value);
-
+		else if (isTypoTypeof(right, left))
+			warning("W122", this, right.value);
+		else if (isTypoTypeof(left, right))
+			warning("W122", this, left.value);
 		return this;
 	});
-	relation("===");
+	relation("===", function (left, right) {
+		if (isTypoTypeof(right, left)) {
+			warning("W122", this, right.value);
+		} else if (isTypoTypeof(left, right)) {
+			warning("W122", this, left.value);
+		}
+		return this;
+	});
 	relation("!=", function (left, right) {
 		var eqnull = state.option.eqnull &&
 				(left.value === "null" || right.value === "null");
@@ -2174,10 +2207,21 @@ var JSHINT = (function () {
 			warning("W041", this, "!==", left.value);
 		} else if (isPoorRelation(right)) {
 			warning("W041", this, "!==", right.value);
+		} else if (isTypoTypeof(right, left)) {
+			warning("W122", this, right.value);
+		} else if (isTypoTypeof(left, right)) {
+			warning("W122", this, left.value);
 		}
 		return this;
 	});
-	relation("!==");
+	relation("!==", function (left, right) {
+		if (isTypoTypeof(right, left)) {
+			warning("W122", this, right.value);
+		} else if (isTypoTypeof(left, right)) {
+			warning("W122", this, left.value);
+		}
+		return this;
+	});
 	relation("<");
 	relation(">");
 	relation("<=");
