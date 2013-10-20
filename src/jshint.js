@@ -2407,7 +2407,7 @@ var JSHINT = (function () {
 		nospace(state.tokens.prev, state.tokens.curr);
 
 		if (typeof left === "object") {
-			if (left.value === "parseInt" && n === 1) {
+			if (state.option.inES3() && left.value === "parseInt" && n === 1) {
 				warning("W065", state.tokens.curr);
 			}
 			if (!state.option.evil) {
