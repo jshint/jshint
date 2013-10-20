@@ -15,7 +15,7 @@ module.exports =
 				"<": "&lt;",
 				">": "&gt;"
 			},
-			file, fileName, i, issue, globals, unuseds, errorMessage;
+			fileName, i, issue, errorMessage;
 
 		opts = opts || {};
 
@@ -51,40 +51,6 @@ module.exports =
 			});
 		});
 
-		data.forEach(function (result) {
-			file = data.file;
-			globals = result.implieds;
-			unuseds = result.unused;
-
-			// Register the file
-			result.file = result.file.replace(/^\.\//, '');
-			if (!files[result.file]) {
-				files[result.file] = [];
-			}
-
-			if (globals) {
-				globals.forEach(function (global) {
-					files[result.file].push({
-						severity: 'warning',
-						line: global.line,
-						column: 0,
-						message: "Implied global '" + global.name + "'",
-						source: 'jshint.implied-globals'
-					});
-				});
-			}
-			if (unuseds) {
-				unuseds.forEach(function (unused) {
-					files[result.file].push({
-						severity: 'warning',
-						line: unused.line,
-						column: 0,
-						message: "Unused variable: '" + unused.name + "'",
-						source: 'jshint.implied-unuseds'
-					});
-				});
-			}
-		});
 
 		out.push("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
 		out.push("<checkstyle version=\"4.3\">");
