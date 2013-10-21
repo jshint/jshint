@@ -1661,3 +1661,20 @@ exports.unignored = function (test) {
 
 	test.done();
 };
+
+/*
+* Tests the `freeze` option -- Warn if native object prototype is assigned to.
+*/
+exports.freeze = function (test) {
+	var src = fs.readFileSync(__dirname + "/fixtures/nativeobject.js", "utf-8");
+
+	TestRun(test)
+		.addError(3, "Extending prototype of native object: 'Array'.")
+		.addError(13, "Extending prototype of native object: 'Boolean'.")
+		.test(src, { freeze: true });
+
+	TestRun(test)
+		.test(src);
+
+	test.done();
+};
