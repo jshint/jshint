@@ -165,7 +165,7 @@ var JSHINT = (function () {
 			maxerr       : false,
 			predef       : false, //predef is deprecated and being replaced by globals
 			globals      : false,
-			quotmark     : false, //'single'|'double'|true
+			quotmark     : false, //'single'|'double'|'smartsingle'|'smartdouble'|true
 			scope        : false,
 			maxstatements: false, // {int} max statements per function
 			maxdepth     : false, // {int} max nested block depth per function
@@ -717,6 +717,8 @@ var JSHINT = (function () {
 						break;
 					case "double":
 					case "single":
+					case "smartsingle":
+					case "smartdouble":
 						state.option.quotmark = val;
 						break;
 					default:
