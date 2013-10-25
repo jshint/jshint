@@ -34,3 +34,19 @@
     var test1 = 'hello';
     var test2 = "hello";
 })();
+
+(function () {
+    /*jshint quotmark:smartsingle */
+
+    var test1 = 'hello';
+    var test2 = "don't";
+    var test3 = "wrong";
+})();
+
+(function () {
+    /*jshint quotmark:smartdouble */
+
+    var test1 = "hello";
+    var test2 = 'command "echo foo"';
+    var test3 = 'wrong';
+})();

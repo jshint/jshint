@@ -1310,6 +1310,8 @@ exports.quotesInline = function (test) {
 		.addError(14, "Strings must use singlequote.")
 		.addError(21, "Mixed double and single quotes.")
 		.addError(32, "Bad option value.")
+		.addError(43, "Strings must use singlequote.")
+		.addError(51, "Strings must use doublequote.")
 		.test(fs.readFileSync(__dirname + "/fixtures/quotes3.js", "utf8"));
 
 	test.done();
