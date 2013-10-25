@@ -102,6 +102,20 @@ exports.register = function (linter) {
 			code = "W108";
 		}
 
+		// If quotmark is set to 'smartsingle' warn about double-quotes,
+		// except if quoted string has single quote.
+
+		if (quotmark === "smartsingle" && data.quote !== "'" && !data.value.match(/'/)) {
+			code = "W109";
+		}
+
+		// If quotmark is set to 'smartdouble' warn about single-quotes,
+		// except if quoted string has double quote.
+
+		if (quotmark === "smartdouble" && data.quote !== "\"" && !data.value.match(/"/)) {
+			code = "W108";
+		}
+
 		// If quotmark is set to true, remember the first quotation style
 		// and then warn about all others.
 
