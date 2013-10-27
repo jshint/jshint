@@ -732,3 +732,48 @@ exports.phantom = function (test) {
 
 	test.done();
 };
+
+exports.jasmine = function (test) {
+    var globals = [
+        'afterEach',
+        'beforeEach',
+        'describe',
+        'expect',
+        'it',
+        'jasmine',
+        'runs',
+        'spyOn',
+        'waitsFor',
+        'xdescribe',
+        'xit'
+    ];
+
+    globalsImplied(test, globals);
+    globalsKnown(test, globals, { jasmine: true });
+
+    test.done();
+};
+
+exports.mocha = function (test) {
+    var globals = [
+        'after',
+        'afterEach',
+        'before',
+        'beforeEach',
+        'describe',
+        'it',
+        'mocha',
+        'suite',
+        'test',
+        'setup',
+        'teardown',
+        'suiteSetup',
+        'suiteTeardown'
+    ];
+
+    globalsImplied(test, globals);
+    globalsKnown(test, globals, { mocha: true });
+
+    test.done();
+};
+
