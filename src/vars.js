@@ -587,3 +587,32 @@ exports.yui = {
 	YUI_config: false
 };
 
+exports.jasmine = {
+	afterEach: false,
+	beforeEach: false,
+	describe: false,
+	expect: false,
+	it: false,
+	jasmine: false,
+	runs: false,
+	spyOn: false,
+	waitsFor: false,
+	xdescribe: false,
+	xit: false
+};
+
+exports.mocha = {
+	after: false,
+	afterEach: false,
+	before: false,
+	beforeEach: false,
+	describe: false,
+	it: false,
+	mocha: false,
+	suite: false,
+	test: false,
+	setup: false,
+	teardown: false,
+	suiteSetup: false,
+	suiteTeardown: false
+};

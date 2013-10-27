@@ -74,6 +74,8 @@
     "worker"        : false,    // Web Workers
     "wsh"           : false,    // Windows Scripting Host
     "yui"           : false,    // Yahoo User Interface
+    "jasmine"       : false,    // Jasmine testing framework
+    "mocha"         : false,    // Mocha testing framework
 
     // Legacy
     "nomen"         : false,    // true: Prohibit dangling `_` in variables
