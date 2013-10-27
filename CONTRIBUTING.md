@@ -12,7 +12,7 @@ However, before sending a patch, please make sure that the following applies:
 * Your patch doesn't have useless merge commits.
 * Your coding style is similar to ours (see below).
 * Your patch is 100% tested. We don't accept any test regressions.
-* All tests and lint checks pass (`node make.js test` and `node make.js lint`).
+* All tests and lint checks pass (`npm test` and `jshint src`).
 * You understand that we're super grateful for your patch.
 
 Coding Style
