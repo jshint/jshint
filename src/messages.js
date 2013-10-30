@@ -125,7 +125,7 @@ var warnings = {
 	W054: "The Function constructor is a form of eval.",
 	W055: "A constructor name should start with an uppercase letter.",
 	W056: "Bad constructor.",
-	W057: "Weird construction. Is 'new' unnecessary?",
+	W057: "Weird construction. Is 'new' necessary?",
 	W058: "Missing '()' invoking a constructor.",
 	W059: "Avoid arguments.{a}.",
 	W060: "document.write can be a form of eval.",
