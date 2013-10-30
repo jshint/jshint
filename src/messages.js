@@ -40,7 +40,7 @@ var errors = {
 	E024: "Unexpected '{a}'.",
 	E025: "Missing ':' on a case clause.",
 	E026: "Missing '}' to match '{' from line {a}.",
-	E027: "Missing ']' to match '[' form line {a}.",
+	E027: "Missing ']' to match '[' from line {a}.",
 	E028: "Illegal comma.",
 	E029: "Unclosed string.",
 
