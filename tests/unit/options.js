@@ -740,7 +740,7 @@ exports.supernew = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/supernew.js', 'utf8');
 
 	TestRun(test)
-		.addError(1, "Weird construction. Is 'new' unnecessary?")
+		.addError(1, "Weird construction. Is 'new' necessary?")
 		.addError(9, "Missing '()' invoking a constructor.", { character: 1 })
 		.addError(11, "Missing '()' invoking a constructor.", {
 			character: 13
