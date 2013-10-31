@@ -88,21 +88,18 @@ function Lexer(source) {
 			.split("\n");
 	}
 
-	// If the first line is a shebang (#!), make it a blank and move on.
-	// Shebangs are used by Node scripts.
+	this.emitter = new events.EventEmitter();
+	this.source = source;
+	this.prereg = true;
+
+	// If the first line is a hash-bang (#!), make it a blank and move on.
 
 	if (lines[0] && lines[0].substr(0, 2) === "#!") {
-		if (lines[0].indexOf("node") !== -1) {
-			state.option.node = true;
-		}
+		this.trigger("Hashbang", { line: 1, ch: 0, value: lines[0] });
 		lines[0] = "";
 	}
 
-	this.emitter = new events.EventEmitter();
-	this.source = source;
 	this.setLines(lines);
-	this.prereg = true;
-
 	this.line = 0;
 	this.char = 1;
 	this.from = 1;

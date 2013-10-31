@@ -4196,6 +4196,11 @@ var JSHINT = function (s, o, g) {
 		quit("E041", ev.line, ev.from);
 	});
 
+	lex.on("Hashbang", function (ev) {
+		if (~ev.value.indexOf("node"))
+			state.option.node = true;
+	});
+
 	lex.on("Identifier", function (ev) {
 		emitter.emit("Identifier", ev);
 	});
