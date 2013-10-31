@@ -37,7 +37,8 @@
 		"underscore": "1.4.x",
 		"cli":        "0.4.x",
 		"minimatch":  "0.x.x",
-		"console-browserify": "0.1.x"
+		"console-browserify": "0.1.x",
+		"htmlparser2": "3.3.x"
 	},
 
 	"devDependencies": {
