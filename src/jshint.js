@@ -45,8 +45,8 @@ var style    = require("./style.js");
 var options  = require("./options.js");
 var console  = require("console-browserify"); // Needed for browserify to work with IE and Rhino.
 
-var extraModules = [];
-var emitter = new events.EventEmitter();
+var addons   = [];
+var emitter  = new events.EventEmitter();
 
 var anonname;    // The guessed name for anonymous functions.
 var api;         // Extension API
@@ -4227,7 +4227,7 @@ var JSHINT = function (s, o, g) {
 	};
 
 	emitter.removeAllListeners();
-	(extraModules || []).forEach(function (func) {
+	(addons || []).forEach(function (func) {
 		func(api);
 	});
 
@@ -4478,7 +4478,7 @@ var JSHINT = function (s, o, g) {
 
 // Modules.
 JSHINT.addModule = function (func) {
-	extraModules.push(func);
+	addons.push(func);
 };
 
 JSHINT.addModule(style.register);
