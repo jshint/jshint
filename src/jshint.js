@@ -311,18 +311,10 @@ var JSHINT = (function () {
 		});
 	}
 
-	function combine(t, o) {
-		var n;
-		for (n in o) {
-			if (_.has(o, n) && !_.has(JSHINT.blacklist, n)) {
-				t[n] = o[n];
-			}
-		}
-	}
-
-	function updatePredefined() {
-		Object.keys(JSHINT.blacklist).forEach(function (key) {
-			delete predefined[key];
+	function combine(dest, src) {
+		Object.keys(src).forEach(function (name) {
+			if (JSHINT.blacklist.hasOwnProperty(name)) return;
+			dest[name] = src[name];
 		});
 	}
 
@@ -547,8 +539,7 @@ var JSHINT = (function () {
 					}
 				}
 			} else {
-				if (!state.option.shadow && type !== "exception" ||
-							(funct["(blockscope)"].getlabel(t))) {
+				if (!state.option.shadow && type !== "exception" || (funct["(blockscope)"].getlabel(t))) {
 					warning("W004", state.tokens.next, t);
 				}
 			}
@@ -604,7 +595,7 @@ var JSHINT = (function () {
 					val = false;
 
 					JSHINT.blacklist[key] = key;
-					updatePredefined();
+					delete predefined[key];
 				} else {
 					predef[key] = (val === "true");
 				}
@@ -697,15 +688,14 @@ var JSHINT = (function () {
 
 				if (key === "validthis") {
 					// `validthis` is valid only within a function scope.
-					if (funct["(global)"]) {
-						error("E009");
-					} else {
-						if (val === "true" || val === "false") {
-							state.option.validthis = (val === "true");
-						} else {
-							error("E002", nt);
-						}
-					}
+
+					if (funct["(global)"])
+						return void error("E009");
+
+					if (val !== "true" && val !== "false")
+						return void error("E002", nt);
+
+					state.option.validthis = (val === "true");
 					return;
 				}
 
