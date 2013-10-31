@@ -741,3 +741,11 @@ exports.testDefaultArguments = function (test) {
 
 	test.done();
 };
+
+// Issue #1324: Make sure that we're not mutating passed options object.
+exports.testClonePassedObjects = function (test) {
+	var options = { predef: ["sup"] };
+	JSHINT("", options);
+	test.ok(options.predef.length == 1);
+	test.done();
+};
