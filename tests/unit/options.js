@@ -316,9 +316,7 @@ exports.nonew = function (test) {
 	TestRun(test).test(code1, { es3: true });
 
 	TestRun(test)
-		.addError(1, "Do not use 'new' for side effects.", {
-			character: 1
-		})
+		.addError(1, "Do not use 'new' for side effects.", { ch: 1 })
 		.test(code, { es3: true, nonew: true });
 
 	test.done();
@@ -381,9 +379,9 @@ exports.asi = function (test) {
 		.addError(19, "Missing semicolon.")
 		.addError(21, "Missing semicolon.")
 		.addError(25, "Missing semicolon.")
-		.addError(26, "Missing semicolon.", { character: 10 })
-		.addError(27, "Missing semicolon.", { character: 12 })
-		.addError(28, "Missing semicolon.", { character: 12 })
+		.addError(26, "Missing semicolon.", { ch: 10 })
+		.addError(27, "Missing semicolon.", { ch: 12 })
+		.addError(28, "Missing semicolon.", { ch: 12 })
 		.test(src, { es3: true });
 
 	TestRun(test, 2)
@@ -737,10 +735,8 @@ exports.supernew = function (test) {
 
 	TestRun(test)
 		.addError(1, "Weird construction. Is 'new' necessary?")
-		.addError(9, "Missing '()' invoking a constructor.", { character: 1 })
-		.addError(11, "Missing '()' invoking a constructor.", {
-			character: 13
-		})
+		.addError(9, "Missing '()' invoking a constructor.", { ch: 1 })
+		.addError(11, "Missing '()' invoking a constructor.", { ch: 13 })
 		.test(src, {es3: true});
 
 	TestRun(test).test(src, { es3: true, supernew: true });
@@ -941,6 +937,7 @@ exports.passfail = function (test) {
 
 	TestRun(test)
 		.addError(1, "Missing semicolon.")
+		.addError(1, "Stopping. (33% scanned).")
 		.test(code, { es3: true, passfail: true });
 
 	test.done();
@@ -1013,9 +1010,7 @@ exports.newcap = function (test) {
 /** Option `sub` allows all forms of subscription. */
 exports.sub = function (test) {
 	TestRun(test)
-		.addError(1, "['prop'] is better written in dot notation.", {
-			character: 17
-		})
+		.addError(1, "['prop'] is better written in dot notation.", { ch: 17 })
 		.test("window.obj = obj['prop'];", {es3: true});
 
 	TestRun(test).test("window.obj = obj['prop'];", { es3: true, sub: true });

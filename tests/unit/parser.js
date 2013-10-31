@@ -31,11 +31,13 @@ exports.other = function (test) {
 		.addError(1, "Unexpected '\\'.")
 		.addError(2, "Unexpected early end of program.")
 		.addError(2, "Expected an identifier and instead saw '(end)'.")
+		.addError(2, "Unrecoverable syntax error. (100% scanned).")
 		.test(code, {es3: true});
 
 	// GH-818
 	TestRun(test)
 		.addError(1, "Expected an identifier and instead saw ')'.")
+		.addError(1, "Unrecoverable syntax error. (100% scanned).")
 		.test("if (product < ) {}", {es3: true});
 
 	test.done();
@@ -135,13 +137,13 @@ exports.relations = function (test) {
 	var run = TestRun(test)
 		.addError(1, "Use the isNaN function to compare with NaN.")
 		.addError(2, "Use the isNaN function to compare with NaN.")
-		.addError(3, "Confusing use of '!'.", {character : 9})
-		.addError(4, "Confusing use of '!'.", {character : 13})
-		.addError(5, "Confusing use of '!'.", {character : 10})
-		.addError(6, "Confusing use of '!'.", {character : 10})
-		.addError(7, "Confusing use of '!'.", {character : 16})
-		.addError(8, "Confusing use of '!'.", {character : 10})
-		.addError(9, "Confusing use of '!'.", {character : 10});
+		.addError(3, "Confusing use of '!'.", {ch : 9})
+		.addError(4, "Confusing use of '!'.", {ch : 13})
+		.addError(5, "Confusing use of '!'.", {ch : 10})
+		.addError(6, "Confusing use of '!'.", {ch : 10})
+		.addError(7, "Confusing use of '!'.", {ch : 16})
+		.addError(8, "Confusing use of '!'.", {ch : 10})
+		.addError(9, "Confusing use of '!'.", {ch : 10});
 	run.test(code, {es3: true});
 	run.test(code, {}); // es5
 	run.test(code, {esnext: true});
@@ -343,7 +345,8 @@ exports.regexp = function (test) {
 		.addError(17, "Invalid regular expression.")
 		.addError(20, "Invalid regular expression.")
 		.addError(21, "Invalid regular expression.")
-		.addError(24, "Unclosed regular expression.");
+		.addError(24, "Unclosed regular expression.")
+		.addError(24, "Unrecoverable syntax error. (88% scanned).");
 	run.test(code, {es3: true});
 	run.test(code, {}); // es5
 	run.test(code, {esnext: true});
@@ -400,7 +403,7 @@ exports.strings = function (test) {
 	];
 
 	var run = TestRun(test)
-		.addError(1, "Control character in string: <non-printable>.", {character: 10})
+		.addError(1, "Control character in string: <non-printable>.", {ch: 10})
 		.addError(1, "This character may get silently deleted by one or more browsers.")
 		.addError(2, "Bad or unnecessary escaping.")
 		.addError(5, "Unclosed string.")
@@ -662,7 +665,8 @@ exports.testHtml = function (test) {
 		.addError(1, "Expected an assignment or function call and instead saw an expression.")
 		.addError(1, "Missing semicolon.")
 		.addError(1, "Expected an identifier and instead saw '<'.")
-		.test(html, {});
+		.addError(1, "Unrecoverable syntax error. (100% scanned).")
+		.test(html);
 	test.done();
 };
 
@@ -3628,7 +3632,7 @@ exports["test 'yield' in compound expressions."] = function (test) {
 
 	needparen.forEach(function (lc) {
 		run.addError(lc[0], "Mozilla requires the yield expression to be parenthesized here.",
-		             {character: lc[1]});
+		             {ch: lc[1]});
 	});
 
 	run

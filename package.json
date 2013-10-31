@@ -60,6 +60,7 @@
 		"undef":     true,
 		"unused":    true,
 		"onecase":   true,
+		"lastsemic": true,
 		"newcap":    false,
 		"maxlen":    100,
 		"indent":    2

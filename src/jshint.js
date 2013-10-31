@@ -79,7 +79,7 @@ function checkOption(name, t) {
 
 	if (options.multi[name] === undefined && options.simple[name] === undefined) {
 		if (t.type !== "jslint") {
-			error("E001", t, name);
+			warn("E001", { token: t, args: [name] });
 			return false;
 		}
 	}
@@ -125,13 +125,6 @@ function isReserved(token) {
 	return true;
 }
 
-function supplant(str, data) {
-	return str.replace(/\{([^{}]*)\}/g, function (a, b) {
-		var r = data[b];
-		return typeof r === "string" || typeof r === "number" ? r : a;
-	});
-}
-
 function combine(dest, src) {
 	Object.keys(src).forEach(function (name) {
 		if (JSHINT.blacklist.hasOwnProperty(name)) return;
@@ -141,7 +134,7 @@ function combine(dest, src) {
 
 function assume() {
 	if (state.option.es5) {
-		warning("I003");
+		warn("I003");
 	}
 	if (state.option.couch) {
 		combine(predefined, vars.couch);
@@ -243,111 +236,65 @@ function assume() {
 
 // Produce an error warning.
 function quit(code, line, chr) {
-	var percentage = Math.floor((line / state.lines.length) * 100);
-	var message = messages.errors[code].desc;
+	var pct = Math.floor((line / state.lines.length) * 100);
+	var msg = messages.get(code);
 
 	throw {
 		name: "JSHintError",
 		line: line,
-		character: chr,
-		message: message + " (" + percentage + "% scanned).",
-		raw: message,
-		code: code
-	};
-}
-
-function isundef(scope, code, token, a) {
-	return JSHINT.undefs.push([scope, code, token, a]);
-}
-
-function warning(code, t, a, b, c, d) {
-	var ch, l, w, msg;
-
-	if (/^W\d{3}$/.test(code)) {
-		if (state.ignored[code])
-			return;
-
-		msg = messages.warnings[code];
-	} else if (/E\d{3}/.test(code)) {
-		msg = messages.errors[code];
-	} else if (/I\d{3}/.test(code)) {
-		msg = messages.info[code];
-	}
-
-	t = t || state.tokens.next;
-	if (t.id === "(end)") {  // `~
-		t = state.tokens.curr;
-	}
-
-	l = t.line || 0;
-	ch = t.from || 0;
-
-	w = {
-		id: "(error)",
-		raw: msg.desc,
+		ch: chr,
+		message: msg.desc + " (" + pct + "% scanned).",
 		code: msg.code,
-		evidence: state.lines[l - 1] || "",
-		line: l,
-		character: ch,
-		scope: JSHINT.scope,
-		a: a,
-		b: b,
-		c: c,
-		d: d
+		type: msg.type
 	};
+}
 
-	w.reason = supplant(msg.desc, w);
-	JSHINT.errors.push(w);
+function isundef(scope, code, opts) {
+	return JSHINT.undefs.push([scope, code, opts]);
+}
 
-	if (state.option.passfail) {
-		quit("E042", l, ch);
+function warn(code, opts) {
+	opts = opts || {};
+	var msg = messages.get(code, opts.args || []);
+	var line, ch, token;
+
+	if (state.ignored[code])
+		return;
+
+	if (opts.coord) {
+		line = opts.coord.line || 0;
+		ch = opts.coord.ch || 0;
+	} else {
+		token = opts.token || state.tokens.next;
+		if (token.id === "(end)") token = state.tokens.curr;
+
+		line = token.line || 0;
+		ch = token.from || 0;
 	}
+
+	JSHINT.errors.push({
+		code:    msg.code,
+		type:    msg.type,
+		line:    line,
+		ch:      ch,
+		message: msg.desc,
+		source:  state.lines[line - 1] || "",
+		scope:   JSHINT.scope
+	});
+
+	if (state.option.passfail)
+		quit("E042", line, ch);
 
 	warnings += 1;
-	if (warnings >= state.option.maxerr) {
-		quit("E043", l, ch);
-	}
-
-	return w;
-}
-
-function warningAt(m, l, ch, a, b, c, d) {
-	return warning(m, {
-		line: l,
-		from: ch
-	}, a, b, c, d);
-}
-
-function error(m, t, a, b, c, d) {
-	warning(m, t, a, b, c, d);
-}
-
-function errorAt(m, l, ch, a, b, c, d) {
-	return error(m, {
-		line: l,
-		from: ch
-	}, a, b, c, d);
-}
-
-// Tracking of "internal" scripts, like eval containing a static string
-function addInternalSrc(elem, src) {
-	var i;
-	i = {
-		id: "(internal)",
-		elem: elem,
-		value: src
-	};
-	JSHINT.internals.push(i);
-	return i;
+	if (warnings >= state.option.maxerr)
+		quit("E043", line, ch);
 }
 
 function addlabel(t, type, tkn, islet) {
 	// Define t in the current function in the current scope.
 	if (type === "exception") {
-		if (_.has(funct["(context)"], t)) {
-			if (funct[t] !== true && !state.option.node) {
-				warning("W002", state.tokens.next, t);
-			}
+		if (_.has(funct["(context)"], t) && funct[t] !== true && !state.option.node) {
+			warn("W002", { token: state.tokens.next, args: [t] });
 		}
 	}
 
@@ -356,19 +303,19 @@ function addlabel(t, type, tkn, islet) {
 			if (state.option.latedef) {
 				if ((state.option.latedef === true && _.contains([funct[t], type], "unction")) ||
 						!_.contains([funct[t], type], "unction")) {
-					warning("W003", state.tokens.next, t);
+					warn("W003", { token: state.tokens.next, args: [t] });
 				}
 			}
 		} else {
 			if (!state.option.shadow && type !== "exception" || (funct["(blockscope)"].getlabel(t))) {
-				warning("W004", state.tokens.next, t);
+				warn("W004", { token: state.tokens.next, args: [t] });
 			}
 		}
 	}
 
 	// a double definition of a let variable in same block throws a TypeError
 	if (funct["(blockscope)"] && funct["(blockscope)"].current.has(t)) {
-		error("E044", state.tokens.next, t);
+		warn("E044", { token: state.tokens.next, args: [t] });
 	}
 
 	// if the identifier is from a let, adds it only to the current blockscope
@@ -388,7 +335,7 @@ function addlabel(t, type, tkn, islet) {
 				if (state.option.latedef) {
 					if ((state.option.latedef === true && _.contains([funct[t], type], "unction")) ||
 							!_.contains([funct[t], type], "unction")) {
-						warning("W003", state.tokens.next, t);
+						warn("W003", { token: state.tokens.next, args: [t] });
 					}
 				}
 
@@ -488,7 +435,7 @@ function doOption() {
 					val = +val;
 
 					if (typeof val !== "number" || !isFinite(val) || val <= 0 || Math.floor(val) !== val) {
-						error("E032", nt, g[1].trim());
+						warn("E032", { token: nt, args: [g[1].trim()] });
 						return;
 					}
 
@@ -506,10 +453,10 @@ function doOption() {
 				// `validthis` is valid only within a function scope.
 
 				if (funct["(global)"])
-					return void error("E009");
+					return void warn("E009");
 
 				if (val !== "true" && val !== "false")
-					return void error("E002", nt);
+					return void warn("E002", { token: nt });
 
 				state.option.validthis = (val === "true");
 				return;
@@ -526,7 +473,7 @@ function doOption() {
 					state.option.quotmark = val;
 					break;
 				default:
-					error("E002", nt);
+					warn("E002", { token: nt });
 				}
 				return;
 			}
@@ -544,7 +491,7 @@ function doOption() {
 					state.option.unused = val;
 					break;
 				default:
-					error("E002", nt);
+					warn("E002", { token: nt });
 				}
 				return;
 			}
@@ -561,7 +508,7 @@ function doOption() {
 					state.option.latedef = "nofunc";
 					break;
 				default:
-					error("E002", nt);
+					warn("E002", { token: nt });
 				}
 				return;
 			}
@@ -582,7 +529,7 @@ function doOption() {
 					});
 					break;
 				default:
-					error("E002", nt);
+					warn("E002", { token: nt });
 				}
 				return;
 			}
@@ -613,7 +560,7 @@ function doOption() {
 				return;
 			}
 
-			error("E002", nt);
+			warn("E002", { token: nt });
 		});
 
 		assume();
@@ -645,17 +592,17 @@ function advance(id, t) {
 	switch (state.tokens.curr.id) {
 	case "(number)":
 		if (state.tokens.next.id === ".") {
-			warning("W005", state.tokens.curr);
+			warn("W005", { token: state.tokens.curr });
 		}
 		break;
 	case "-":
 		if (state.tokens.next.id === "-" || state.tokens.next.id === "--") {
-			warning("W006");
+			warn("W006");
 		}
 		break;
 	case "+":
 		if (state.tokens.next.id === "+" || state.tokens.next.id === "++") {
-			warning("W007");
+			warn("W007");
 		}
 		break;
 	}
@@ -667,12 +614,15 @@ function advance(id, t) {
 	if (id && state.tokens.next.id !== id) {
 		if (t) {
 			if (state.tokens.next.id === "(end)") {
-				error("E019", t, t.id);
+				warn("E019", { token: t, args: [t.id] });
 			} else {
-				error("E020", state.tokens.next, id, t.id, t.line, state.tokens.next.value);
+				warn("E020", {
+					token: state.tokens.next,
+					args: [id, t.id, t.line, state.tokens.next.value]
+				});
 			}
 		} else if (state.tokens.next.type !== "(identifier)" || state.tokens.next.value !== id) {
-			warning("W116", state.tokens.next, id, state.tokens.next.value);
+			warn("W116", { token: state.tokens.next, args: [id, state.tokens.next.value] });
 		}
 	}
 
@@ -738,9 +688,9 @@ function expression(rbp, initial) {
 
 	// if current expression is a let expression
 	if (!initial && state.tokens.next.value === "let" && peek(0).value === "(") {
-		if (!state.option.inMoz(true)) {
-			warning("W118", state.tokens.next, "let expressions");
-		}
+		if (!state.option.inMoz(true))
+			warn("W118", { token: state.tokens.next, args: ["let expressions"] });
+
 		isLetExpr = true;
 		// create a new block scope we use only for the current expression
 		funct["(blockscope)"].stack();
@@ -751,7 +701,7 @@ function expression(rbp, initial) {
 	}
 
 	if (state.tokens.next.id === "(end)")
-		error("E006", state.tokens.curr);
+		warn("E006", { token: state.tokens.curr });
 
 	advance();
 
@@ -766,7 +716,7 @@ function expression(rbp, initial) {
 		if (state.tokens.curr.nud) {
 			left = state.tokens.curr.nud();
 		} else {
-			error("E030", state.tokens.curr, state.tokens.curr.id);
+			warn("E030", { token: state.tokens.curr, args: [state.tokens.curr.id] });
 		}
 
 		while (rbp < state.tokens.next.lbp && !isEndOfExpr()) {
@@ -794,17 +744,17 @@ function expression(rbp, initial) {
 			advance();
 
 			if (isArray && state.tokens.curr.id === "(" && state.tokens.next.id === ")") {
-				warning("W009", state.tokens.curr);
+				warn("W009", { token: state.tokens.curr });
 			}
 
 			if (isObject && state.tokens.curr.id === "(" && state.tokens.next.id === ")") {
-				warning("W010", state.tokens.curr);
+				warn("W010", { token: state.tokens.curr });
 			}
 
 			if (left && state.tokens.curr.led) {
 				left = state.tokens.curr.led(left);
 			} else {
-				error("E033", state.tokens.curr, state.tokens.curr.id);
+				warn("E033", { token: state.tokens.curr, args: [state.tokens.curr.id] });
 			}
 		}
 	}
@@ -841,7 +791,7 @@ function comma(opts) {
 		case "let":
 		case "while":
 		case "with":
-			error("E024", state.tokens.next, state.tokens.next.value);
+			warn("E024", { token: state.tokens.next, args: [state.tokens.next.value] });
 			return false;
 		}
 	}
@@ -857,7 +807,7 @@ function comma(opts) {
 
 			/* falls through */
 		case ")":
-			error("E024", state.tokens.next, state.tokens.next.value);
+			warn("E024", { token: state.tokens.next, args: [state.tokens.next.value] });
 			return false;
 		}
 	}
@@ -912,10 +862,10 @@ function prefix(s, f) {
 		this.arity = "unary";
 		if (this.id === "++" || this.id === "--") {
 			if (state.option.plusplus) {
-				warning("W016", this, this.id);
+				warn("W016", { token: this, args: [this.id] });
 			} else if ((!this.right.identifier || isReserved(this.right)) &&
 					this.right.id !== "." && this.right.id !== "[") {
-				warning("W017", this);
+				warn("W017", { token: this });
 			}
 		}
 		return this;
@@ -968,7 +918,7 @@ function infix(s, f, p) {
 	x.infix = true;
 	x.led = function (left) {
 		if (s === "in" && left.id === "!") {
-			warning("W018", left, "!");
+			warn("W018", { token: left, args: ["!"] });
 		}
 		if (typeof f === "function") {
 			return f(left, this);
@@ -987,7 +937,7 @@ function application(s) {
 
 	x.led = function (left) {
 		if (!state.option.inESNext()) {
-			warning("W104", state.tokens.curr, "arrow function syntax (=>)");
+			warn("W104", { token: state.tokens.curr, args: ["arrow function syntax (=>)"] });
 		}
 
 		this.left = left;
@@ -1004,7 +954,7 @@ function relation(s, f) {
 		var right = expression(100);
 
 		if (isIdentifier(left, "NaN") || isIdentifier(right, "NaN")) {
-			warning("W019", this);
+			warn("W019", { token: this });
 		} else if (f) {
 			f.apply(this, [left, right]);
 		}
@@ -1014,11 +964,11 @@ function relation(s, f) {
 		}
 
 		if (left.id === "!") {
-			warning("W018", left, "!");
+			warn("W018", { token: left, args: ["!"] });
 		}
 
 		if (right.id === "!") {
-			warning("W018", right, "!");
+			warn("W018", { token: right, args: ["!"] });
 		}
 
 		this.left = left;
@@ -1096,25 +1046,25 @@ function assignop(s, f, p) {
 			if (state.option.freeze) {
 				var nativeObject = findNativePrototype(left);
 				if (nativeObject)
-					warning("W121", left, nativeObject);
+					warn("W121", { token: left, args: [nativeObject] });
 			}
 
 			if (predefined[left.value] === false &&
 					scope[left.value]["(global)"] === true) {
-				warning("W020", left);
+				warn("W020", { token: left });
 			} else if (left["function"]) {
-				warning("W021", left, left.value);
+				warn("W021", { token: left, args: [left.value] });
 			}
 
 			if (funct[left.value] === "const") {
-				error("E013", left, left.value);
+				warn("E013", { token: left, args: [left.value] });
 			}
 
 			if (left.id === ".") {
 				if (!left.left) {
-					warning("E031", that);
+					warn("E031", { token: that });
 				} else if (left.left.value === "arguments" && !state.directive["use strict"]) {
-					warning("E031", that);
+					warn("E031", { token: that });
 				}
 
 				that.right = expression(10);
@@ -1123,30 +1073,30 @@ function assignop(s, f, p) {
 				if (state.tokens.curr.left.first) {
 					state.tokens.curr.left.first.forEach(function (t) {
 						if (funct[t.value] === "const") {
-							error("E013", t, t.value);
+							warn("E013", { token: t, args: [t.value] });
 						}
 					});
 				} else if (!left.left) {
-					warning("E031", that);
+					warn("E031", { token: that });
 				} else if (left.left.value === "arguments" && !state.directive["use strict"]) {
-					warning("E031", that);
+					warn("E031", { token: that });
 				}
 				that.right = expression(10);
 				return that;
 			} else if (left.identifier && !isReserved(left)) {
 				if (funct[left.value] === "exception") {
-					warning("W022", left);
+					warn("W022", { token: left });
 				}
 				that.right = expression(10);
 				return that;
 			}
 
 			if (left === state.syntax["function"]) {
-				warning("W023", state.tokens.curr);
+				warn("W023", { token: state.tokens.curr });
 			}
 		}
 
-		error("E031", that);
+		warn("E031", { token: that });
 	}, p);
 
 	x.exps = true;
@@ -1160,7 +1110,7 @@ function bitwise(s, f, p) {
 	reserveName(x);
 	x.led = (typeof f === "function") ? f : function (left) {
 		if (state.option.bitwise) {
-			warning("W016", this, this.id);
+			warn("W016", { token: this, args: [this.id] });
 		}
 		this.left = left;
 		this.right = expression(p);
@@ -1173,7 +1123,7 @@ function bitwise(s, f, p) {
 function bitwiseassignop(s) {
 	return assignop(s, function (left, that) {
 		if (state.option.bitwise) {
-			warning("W016", that, that.id);
+			warn("W016", { token: that, args: [that.id] });
 		}
 		if (left) {
 			if (left.id === "." || left.id === "[" ||
@@ -1182,11 +1132,11 @@ function bitwiseassignop(s) {
 				return that;
 			}
 			if (left === state.syntax["function"]) {
-				warning("W023", state.tokens.curr);
+				warn("W023", { token: state.tokens.curr });
 			}
 			return that;
 		}
-		error("E031", that);
+		warn("E031", { token: that });
 	}, 20);
 }
 
@@ -1196,9 +1146,9 @@ function suffix(s) {
 
 	x.led = function (left) {
 		if (state.option.plusplus) {
-			warning("W016", this, this.id);
+			warn("W016", { token: this, args: [this.id] });
 		} else if ((!left.identifier || isReserved(left)) && left.id !== "." && left.id !== "[") {
-			warning("W017", this);
+			warn("W017", { token: this });
 		}
 
 		this.left = left;
@@ -1239,10 +1189,10 @@ function optionalidentifier(fnparam, prop) {
 	// and ES5 but do it only once.
 	if (prop && !api.getCache("displayed:I002")) {
 		api.setCache("displayed:I002", true);
-		warning("I002");
+		warn("I002");
 	}
 
-	warning("W024", state.tokens.curr, state.tokens.curr.id);
+	warn("W024", { token: state.tokens.curr, args: [state.tokens.curr.id] });
 	return val;
 }
 
@@ -1255,9 +1205,9 @@ function identifier(fnparam, prop) {
 		return i;
 	}
 	if (state.tokens.curr.id === "function" && state.tokens.next.id === "(") {
-		warning("W025");
+		warn("W025");
 	} else {
-		error("E030", state.tokens.next, state.tokens.next.value);
+		warn("E030", { token: state.tokens.next, args: [state.tokens.next.value] });
 	}
 }
 
@@ -1279,12 +1229,12 @@ function reachable(s) {
 		if (t.id !== "(endline)") {
 			if (t.id === "function") {
 				if (state.option.latedef === true) {
-					warning("W026", t);
+					warn("W026", { token: t });
 				}
 				break;
 			}
 
-			warning("W027", t, t.value, s);
+			warn("W027", { token: t, args: [t.value, s] });
 			break;
 		}
 	}
@@ -1308,7 +1258,7 @@ function statement() {
 	// anyway.
 
 	if (res && t.meta && t.meta.isFutureReservedWord && peek().id === ":") {
-		warning("W024", t, t.id);
+		warn("W024", { token: t, args: [t.id] });
 		res = false;
 	}
 
@@ -1316,11 +1266,11 @@ function statement() {
 	if (_.has(["[", "{"], t.value)) {
 		if (lookupBlockType().isDestAssign) {
 			if (!state.option.inESNext()) {
-				warning("W104", state.tokens.curr, "destructuring expression");
+				warn("W104", { token: state.tokens.curr, args: ["destructuring expression"] });
 			}
 			values = destructuringExpression();
 			values.forEach(function (tok) {
-				isundef(funct, "W117", tok.token, tok.id);
+				isundef(funct, "W117", { token: tok.token, args: [tok.id] });
 			});
 			advance("=");
 			destructuringExpressionMatch(values, expression(10, true));
@@ -1335,7 +1285,7 @@ function statement() {
 		addlabel(t.value, "label");
 
 		if (!state.tokens.next.labelled && state.tokens.next.value !== "{") {
-			warning("W028", state.tokens.next, t.value, state.tokens.next.value);
+			warn("W028", { token: state.tokens.next, args: [t.value, state.tokens.next.value] });
 		}
 
 		state.tokens.next.label = t.value;
@@ -1364,9 +1314,9 @@ function statement() {
 
 	if (!t.block) {
 		if (!state.option.expr && (!r || !r.exps)) {
-			warning("W030", state.tokens.curr);
+			warn("W030", { token: state.tokens.curr });
 		} else if (state.option.nonew && r && r.left && r.id === "(" && r.left.id === "new") {
-			warning("W031", t);
+			warn("W031", { token: t });
 		}
 
 		if (state.tokens.next.id !== ";") {
@@ -1376,7 +1326,10 @@ function statement() {
 				// Otherwise, complain about missing semicolon.
 				if (!state.option.lastsemic || state.tokens.next.id !== "}" ||
 					state.tokens.next.line !== state.tokens.curr.line) {
-					warningAt("W033", state.tokens.curr.line, state.tokens.curr.character);
+					warn("W033", { coord: {
+						line: state.tokens.curr.line,
+						ch: state.tokens.curr.character
+					}});
 				}
 			}
 		} else {
@@ -1400,7 +1353,7 @@ function statements(startLine) {
 			p = peek();
 
 			if (!p || (p.id !== "(" && p.id !== "[")) {
-				warning("W032");
+				warn("W032");
 			}
 
 			advance(";");
@@ -1436,20 +1389,20 @@ function directives() {
 						pn.id !== "}") {
 						break;
 					}
-					warning("W033", state.tokens.next);
+					warn("W033", { token: state.tokens.next });
 				} else {
 					p = pn;
 				}
 			} else if (p.id === "}") {
 				// Directive with no other statements, warn about missing semicolon
-				warning("W033", p);
+				warn("W033", { token: p });
 			} else if (p.id !== ";") {
 				break;
 			}
 
 			advance();
 			if (state.directive[state.tokens.curr.value]) {
-				warning("W034", state.tokens.curr, state.tokens.curr.value);
+				warn("W034", { token: state.tokens.curr, args: [state.tokens.curr.value] });
 			}
 
 			if (state.tokens.curr.value === "use strict") {
@@ -1526,7 +1479,7 @@ function block(ordinary, stmt, isfunc, isfatarrow, iscase) {
 
 				if (state.option.strict && funct["(context)"]["(global)"]) {
 					if (!m["use strict"] && !state.directive["use strict"]) {
-						warning("E007");
+						warn("E007");
 					}
 				}
 			}
@@ -1550,7 +1503,7 @@ function block(ordinary, stmt, isfunc, isfatarrow, iscase) {
 		if (isfunc) {
 			m = {};
 			if (stmt && !isfatarrow && !state.option.inMoz(true)) {
-				error("W118", state.tokens.curr, "function closure expressions");
+				warn("W118", { token: state.tokens.curr, args: ["function closure expressions"] });
 			}
 
 			if (!stmt) {
@@ -1564,11 +1517,11 @@ function block(ordinary, stmt, isfunc, isfatarrow, iscase) {
 
 			if (state.option.strict && funct["(context)"]["(global)"]) {
 				if (!m["use strict"] && !state.directive["use strict"]) {
-					warning("E007");
+					warn("E007");
 				}
 			}
 		} else {
-			error("E021", state.tokens.next, "{", state.tokens.next.value);
+			warn("E021", { token: state.tokens.next, args: ["{", state.tokens.next.value] });
 		}
 	} else {
 
@@ -1576,7 +1529,7 @@ function block(ordinary, stmt, isfunc, isfatarrow, iscase) {
 		funct["(nolet)"] = true;
 
 		if (!stmt || state.option.curly) {
-			warning("W116", state.tokens.next, "{", state.tokens.next.value);
+			warn("W116", { token: state.tokens.next, args: ["{", state.tokens.next.value] });
 		}
 
 		noreach = true;
@@ -1596,7 +1549,7 @@ function block(ordinary, stmt, isfunc, isfatarrow, iscase) {
 	if (!ordinary || !state.option.funcscope) scope = s;
 	inblock = b;
 	if (ordinary && state.option.noempty && (!a || a.length === 0)) {
-		warning("W035");
+		warn("W035");
 	}
 	metrics.nestedBlockDepth -= 1;
 	return a;
@@ -1605,7 +1558,7 @@ function block(ordinary, stmt, isfunc, isfatarrow, iscase) {
 
 function countMember(m) {
 	if (membersOnly && typeof membersOnly[m] !== "boolean") {
-		warning("W036", state.tokens.curr, m);
+		warn("W036", { token: state.tokens.curr, args: [m] });
 	}
 	if (typeof member[m] === "number") {
 		member[m] += 1;
@@ -1682,7 +1635,7 @@ state.syntax["(identifier)"] = {
 				this["function"] = true;
 				break;
 			case "label":
-				warning("W037", state.tokens.curr, v);
+				warn("W037", { token: state.tokens.curr, args: [v] });
 				break;
 			}
 		} else if (funct["(global)"]) {
@@ -1706,7 +1659,7 @@ state.syntax["(identifier)"] = {
 					// before declaring it undefined.
 
 					if (!funct["(comparray)"].check(v)) {
-						isundef(funct, "W117", state.tokens.curr, v);
+						isundef(funct, "W117", { token: state.tokens.curr, args: [v] });
 					}
 				}
 			}
@@ -1721,10 +1674,10 @@ state.syntax["(identifier)"] = {
 			case "function":
 			case "var":
 			case "unused":
-				warning("W038", state.tokens.curr, v);
+				warn("W038", { token: state.tokens.curr, args: [v] });
 				break;
 			case "label":
-				warning("W037", state.tokens.curr, v);
+				warn("W037", { token: state.tokens.curr, args: [v] });
 				break;
 			case "outer":
 			case "global":
@@ -1735,7 +1688,7 @@ state.syntax["(identifier)"] = {
 				if (s === true) {
 					funct[v] = true;
 				} else if (s === null) {
-					warning("W039", state.tokens.curr, v);
+					warn("W039", { token: state.tokens.curr, args: [v] });
 					note_implied(state.tokens.curr);
 				} else if (typeof s !== "object") {
 					// Operators typeof and delete do not raise runtime errors even
@@ -1748,7 +1701,7 @@ state.syntax["(identifier)"] = {
 						(state.tokens.next &&
 							(state.tokens.next.value === "." || state.tokens.next.value === "["))) {
 
-						isundef(funct, "W117", state.tokens.curr, v);
+						isundef(funct, "W117", { token: state.tokens.curr, args: [v] });
 					}
 					funct[v] = true;
 					note_implied(state.tokens.curr);
@@ -1769,7 +1722,7 @@ state.syntax["(identifier)"] = {
 						funct[v] = s["(global)"] ? "global" : "outer";
 						break;
 					case "label":
-						warning("W037", state.tokens.curr, v);
+						warn("W037", { token: state.tokens.curr, args: [v] });
 					}
 				}
 			}
@@ -1777,7 +1730,7 @@ state.syntax["(identifier)"] = {
 		return this;
 	},
 	led: function () {
-		error("E033", state.tokens.next, state.tokens.next.value);
+		warn("E033", { token: state.tokens.next, args: [state.tokens.next.value] });
 	}
 };
 
@@ -1807,7 +1760,7 @@ reserve("default").reach = true;
 reserve("finally");
 reservevar("arguments", function (x) {
 	if (state.directive["use strict"] && funct["(global)"]) {
-		warning("E008", x);
+		warn("E008", { token: x });
 	}
 });
 reservevar("eval");
@@ -1817,7 +1770,7 @@ reservevar("null");
 reservevar("this", function (x) {
 	if (state.directive["use strict"] && !state.option.validthis && ((funct["(statement)"] &&
 			funct["(name)"].charAt(0) > "Z") || funct["(global)"])) {
-		warning("W040", x);
+		warn("W040", { token: x });
 	}
 });
 reservevar("true");
@@ -1827,9 +1780,7 @@ assignop("=", "assign", 20);
 assignop("+=", "assignadd", 20);
 assignop("-=", "assignsub", 20);
 assignop("*=", "assignmult", 20);
-assignop("/=", "assigndiv", 20).nud = function () {
-	error("E014");
-};
+assignop("/=", "assigndiv", 20).nud = function () { warn("E014") };
 assignop("%=", "assignmod", 20);
 
 bitwiseassignop("&=", "assignbitand", 20);
@@ -1880,22 +1831,22 @@ relation("==", function (left, right) {
 	var eqnull = state.option.eqnull && (left.value === "null" || right.value === "null");
 
 	if (!eqnull && state.option.eqeqeq)
-		warning("W116", this, "===", "==");
+		warn("W116", { token: this, args: ["===", "=="] });
 	else if (isPoorRelation(left))
-		warning("W041", this, "===", left.value);
+		warn("W041", { token: this, args: ["===", left.value] });
 	else if (isPoorRelation(right))
-		warning("W041", this, "===", right.value);
+		warn("W041", { token: this, args: ["===", right.value] });
 	else if (isTypoTypeof(right, left))
-		warning("W122", this, right.value);
+		warn("W122", { token: this, args: [right.value] });
 	else if (isTypoTypeof(left, right))
-		warning("W122", this, left.value);
+		warn("W122", { token: this, args: [left.value] });
 	return this;
 });
 relation("===", function (left, right) {
 	if (isTypoTypeof(right, left)) {
-		warning("W122", this, right.value);
+		warn("W122", { token: this, args: [right.value] });
 	} else if (isTypoTypeof(left, right)) {
-		warning("W122", this, left.value);
+		warn("W122", { token: this, args: [left.value] });
 	}
 	return this;
 });
@@ -1904,23 +1855,23 @@ relation("!=", function (left, right) {
 			(left.value === "null" || right.value === "null");
 
 	if (!eqnull && state.option.eqeqeq) {
-		warning("W116", this, "!==", "!=");
+		warn("W116", { token: this, args: ["!==", "!="] });
 	} else if (isPoorRelation(left)) {
-		warning("W041", this, "!==", left.value);
+		warn("W041", { token: this, args: ["!==", left.value] });
 	} else if (isPoorRelation(right)) {
-		warning("W041", this, "!==", right.value);
+		warn("W041", { token: this, args: ["!==", right.value] });
 	} else if (isTypoTypeof(right, left)) {
-		warning("W122", this, right.value);
+		warn("W122", { token: this, args: [right.value] });
 	} else if (isTypoTypeof(left, right)) {
-		warning("W122", this, left.value);
+		warn("W122", { token: this, args: [left.value] });
 	}
 	return this;
 });
 relation("!==", function (left, right) {
 	if (isTypoTypeof(right, left)) {
-		warning("W122", this, right.value);
+		warn("W122", { token: this, args: [right.value] });
 	} else if (isTypoTypeof(left, right)) {
-		warning("W122", this, left.value);
+		warn("W122", { token: this, args: [left.value] });
 	}
 	return this;
 });
@@ -1939,7 +1890,7 @@ infix("+", function (left, that) {
 		left.value += right.value;
 		left.character = right.character;
 		if (!state.option.scripturl && reg.javascriptURL.test(left.value)) {
-			warning("W050", left);
+			warn("W050", { token: left });
 		}
 		return left;
 	}
@@ -1949,13 +1900,13 @@ infix("+", function (left, that) {
 }, 130);
 prefix("+", "num");
 prefix("+++", function () {
-	warning("W007");
+	warn("W007");
 	this.right = expression(150);
 	this.arity = "unary";
 	return this;
 });
 infix("+++", function (left) {
-	warning("W007");
+	warn("W007");
 	this.left = left;
 	this.right = expression(130);
 	return this;
@@ -1963,13 +1914,13 @@ infix("+++", function (left) {
 infix("-", "sub", 130);
 prefix("-", "neg");
 prefix("---", function () {
-	warning("W006");
+	warn("W006");
 	this.right = expression(150);
 	this.arity = "unary";
 	return this;
 });
 infix("---", function (left) {
-	warning("W006");
+	warn("W006");
 	this.left = left;
 	this.right = expression(130);
 	return this;
@@ -1988,7 +1939,7 @@ state.syntax["--"].exps = true;
 prefix("delete", function () {
 	var p = expression(10);
 	if (!p || (p.id !== "." && p.id !== "[")) {
-		warning("W051");
+		warn("W051");
 	}
 	this.first = p;
 	return this;
@@ -1996,19 +1947,19 @@ prefix("delete", function () {
 
 prefix("~", function () {
 	if (state.option.bitwise) {
-		warning("W052", this, "~");
+		warn("W052", { token: this, args: ["~"] });
 	}
 	expression(150);
 	return this;
 });
 
 prefix("...", function () {
-	if (!state.option.inESNext()) {
-		warning("W104", this, "spread/rest operator");
-	}
-	if (!state.tokens.next.identifier) {
-		error("E030", state.tokens.next, state.tokens.next.value);
-	}
+	if (!state.option.inESNext())
+		warn("W104", { token: this, args: ["spread/rest operator"] });
+
+	if (!state.tokens.next.identifier)
+		warn("E030", { token: state.tokens.next, args: [state.tokens.next.value] });
+
 	expression(150);
 	return this;
 });
@@ -2024,7 +1975,7 @@ prefix("!", function () {
 		quit("E041", this.line || 0); // '!' followed by nothing? Give up.
 
 	if (_.contains(bang, this.right.id))
-		warning("W018", this, "!");
+		warn("W018", { token: this, args: ["!"] });
 
 	return this;
 });
@@ -2041,11 +1992,11 @@ prefix("new", function () {
 			case "Boolean":
 			case "Math":
 			case "JSON":
-				warning("W053", state.tokens.prev, c.value);
+				warn("W053", { token: state.tokens.prev, args: [c.value] });
 				break;
 			case "Function":
 				if (!state.option.evil) {
-					warning("W054");
+					warn("W054");
 				}
 				break;
 			case "Date":
@@ -2056,22 +2007,22 @@ prefix("new", function () {
 				if (c.id !== "function") {
 					i = c.value.substr(0, 1);
 					if (state.option.newcap && (i < "A" || i > "Z") && !_.has(globalscope, c.value)) {
-						warning("W055", state.tokens.curr);
+						warn("W055", { token: state.tokens.curr });
 					}
 				}
 			}
 		} else {
 			if (c.id !== "." && c.id !== "[" && c.id !== "(") {
-				warning("W056", state.tokens.curr);
+				warn("W056", { token: state.tokens.curr });
 			}
 		}
 	} else {
 		if (!state.option.supernew)
-			warning("W057", this);
+			warn("W057", { token: this });
 	}
 
 	if (state.tokens.next.id !== "(" && !state.option.supernew) {
-		warning("W058", state.tokens.curr, state.tokens.curr.value);
+		warn("W058", { token: state.tokens.curr, args: [state.tokens.curr.value] });
 	}
 	this.first = c;
 	return this;
@@ -2091,21 +2042,21 @@ infix(".", function (left, that) {
 	that.right = m;
 
 	if (m && m === "hasOwnProperty" && state.tokens.next.value === "=") {
-		warning("W001");
+		warn("W001");
 	}
 
 	if (left && left.value === "arguments" && (m === "callee" || m === "caller")) {
 		if (state.option.noarg)
-			warning("W059", left, m);
+			warn("W059", { token: left, args: [m] });
 		else if (state.directive["use strict"])
-			error("E008");
+			warn("E008");
 	} else if (!state.option.evil && left && left.value === "document" &&
 			(m === "write" || m === "writeln")) {
-		warning("W060", left);
+		warn("W060", { token: left });
 	}
 
 	if (!state.option.evil && (m === "eval" || m === "execScript")) {
-		warning("W061");
+		warn("W061");
 	}
 
 	return that;
@@ -2113,7 +2064,7 @@ infix(".", function (left, that) {
 
 infix("(", function (left, that) {
 	if (state.option.immed && left && !left.immed && left.id === "function") {
-		warning("W062");
+		warn("W062");
 	}
 
 	var n = 0;
@@ -2124,9 +2075,9 @@ infix("(", function (left, that) {
 			if (left.value.match(/^[A-Z]([A-Z0-9_$]*[a-z][A-Za-z0-9_$]*)?$/)) {
 				if ("Number String Boolean Date Object".indexOf(left.value) === -1) {
 					if (left.value === "Math") {
-						warning("W063", left);
+						warn("W063", { token: left });
 					} else if (state.option.newcap) {
-						warning("W064", left);
+						warn("W064", { token: left });
 					}
 				}
 			}
@@ -2146,38 +2097,40 @@ infix("(", function (left, that) {
 
 	advance(")");
 
+	// Tracking of "internal" scripts, like eval containing a static string
+	function addInternal(elem, src) {
+		JSHINT.internals.push({ id: "(internal)", elem: elem, value: src });
+	}
+
+
 	if (typeof left === "object") {
 		if (state.option.inES3() && left.value === "parseInt" && n === 1) {
-			warning("W065", state.tokens.curr);
+			warn("W065", { token: state.tokens.curr });
 		}
 		if (!state.option.evil) {
-			if (left.value === "eval" || left.value === "Function" ||
-					left.value === "execScript") {
-				warning("W061", left);
+			if (left.value === "eval" || left.value === "Function" || left.value === "execScript") {
+				warn("W061", { token: left });
 
-				if (p[0] && [0].id === "(string)") {
-					addInternalSrc(left, p[0].value);
-				}
+				if (p[0] && [0].id === "(string)")
+					addInternal(left, p[0].value);
+
 			} else if (p[0] && p[0].id === "(string)" &&
-				   (left.value === "setTimeout" ||
-					left.value === "setInterval")) {
-				warning("W066", left);
-				addInternalSrc(left, p[0].value);
+				(left.value === "setTimeout" || left.value === "setInterval")) {
+				warn("W066", { token: left });
+				addInternal(left, p[0].value);
 
 			// window.setTimeout/setInterval
-			} else if (p[0] && p[0].id === "(string)" &&
-				   left.value === "." &&
-				   left.left.value === "window" &&
-				   (left.right === "setTimeout" ||
-					left.right === "setInterval")) {
-				warning("W066", left);
-				addInternalSrc(left, p[0].value);
+			} else if (p[0] && p[0].id === "(string)" && left.value === "." &&
+				left.left.value === "window" &&
+				(left.right === "setTimeout" || left.right === "setInterval")) {
+				warn("W066", { token: left });
+				addInternal(left, p[0].value);
 			}
 		}
 		if (!left.identifier && left.id !== "." && left.id !== "[" &&
 				left.id !== "(" && left.id !== "&&" && left.id !== "||" &&
 				left.id !== "?") {
-			warning("W067", left);
+			warn("W067", { token: left });
 		}
 	}
 
@@ -2226,7 +2179,7 @@ prefix("(", function () {
 	if (state.option.immed && exprs[0] && exprs[0].id === "function") {
 		if (state.tokens.next.id !== "(" &&
 		  (state.tokens.next.id !== "." || (peek().value !== "call" && peek().value !== "apply"))) {
-			warning("W068", this);
+			warn("W068", { token: this });
 		}
 	}
 
@@ -2254,21 +2207,21 @@ infix("[", function (left, that) {
 	var e = expression(10), s;
 	if (e && e.type === "(string)") {
 		if (!state.option.evil && (e.value === "eval" || e.value === "execScript")) {
-			warning("W061", that);
+			warn("W061", { token: that });
 		}
 
 		countMember(e.value);
 		if (!state.option.sub && reg.identifier.test(e.value)) {
 			s = state.syntax[e.value];
 			if (!s || !isReserved(s)) {
-				warning("W069", state.tokens.prev, e.value);
+				warn("W069", { token: state.tokens.prev, args: [e.value] });
 			}
 		}
 	}
 	advance("]", that);
 
 	if (e && e.value === "hasOwnProperty" && state.tokens.next.value === "=") {
-		warning("W001");
+		warn("W001");
 	}
 
 	that.left = left;
@@ -2286,7 +2239,7 @@ function comprehensiveArrayExpression() {
 	if (state.tokens.next.value !== "for") {
 		reversed = true;
 		if (!state.option.inMoz(true)) {
-			warning("W116", state.tokens.next, "for", state.tokens.next.value);
+			warn("W116", { token: state.tokens.next, args: ["for", state.tokens.next.value] });
 		}
 		funct["(comparray)"].setState("use");
 		res.right = expression(10);
@@ -2296,7 +2249,7 @@ function comprehensiveArrayExpression() {
 	if (state.tokens.next.value === "each") {
 		advance("each");
 		if (!state.option.inMoz(true)) {
-			warning("W118", state.tokens.curr, "for each");
+			warn("W118", { token: state.tokens.curr, args: ["for each"] });
 		}
 	}
 	advance("(");
@@ -2305,7 +2258,7 @@ function comprehensiveArrayExpression() {
 	if (_.contains(["in", "of"], state.tokens.next.value)) {
 		advance();
 	} else {
-		error("E045", state.tokens.curr);
+		warn("E045", { token: state.tokens.curr });
 	}
 	funct["(comparray)"].setState("generate");
 	expression(10);
@@ -2333,11 +2286,11 @@ prefix("[", function () {
 	var blocktype = lookupBlockType(true);
 	if (blocktype.isCompArray) {
 		if (!state.option.inESNext()) {
-			warning("W119", state.tokens.curr, "array comprehension");
+			warn("W119", { token: state.tokens.curr, args: ["array comprehension"] });
 		}
 		return comprehensiveArrayExpression();
 	} else if (blocktype.isDestAssign && !state.option.inESNext()) {
-		warning("W104", state.tokens.curr, "destructuring assignment");
+		warn("W104", { token: state.tokens.curr, args: ["destructuring assignment"] });
 	}
 	var b = state.tokens.curr.line !== state.tokens.next.line;
 	this.first = [];
@@ -2350,7 +2303,7 @@ prefix("[", function () {
 	while (state.tokens.next.id !== "(end)") {
 		while (state.tokens.next.id === ",") {
 			if (!state.option.inES5())
-				warning("W070");
+				warn("W070");
 			advance(",");
 		}
 		if (state.tokens.next.id === "]") {
@@ -2360,7 +2313,7 @@ prefix("[", function () {
 		if (state.tokens.next.id === ",") {
 			comma({ allowTrailing: true });
 			if (state.tokens.next.id === "]" && !state.option.inES5(true)) {
-				warning("W070", state.tokens.curr);
+				warn("W070", { token: state.tokens.curr });
 				break;
 			}
 		} else {
@@ -2389,7 +2342,7 @@ function property_name() {
 	}
 
 	if (id === "hasOwnProperty") {
-		warning("W001");
+		warn("W001");
 	}
 
 	return id;
@@ -2418,7 +2371,7 @@ function functionparams(parsed) {
 					}
 				} else if (curr.value === "...") {
 					if (!state.option.inESNext()) {
-						warning("W104", curr, "spread/rest operator");
+						warn("W104", { token: curr, args: ["spread/rest operator"] });
 					}
 					continue;
 				} else {
@@ -2455,7 +2408,7 @@ function functionparams(parsed) {
 			}
 		} else if (state.tokens.next.value === "...") {
 			if (!state.option.inESNext()) {
-				warning("W104", state.tokens.next, "spread/rest operator");
+				warn("W104", { token: state.tokens.next, args: ["spread/rest operator"] });
 			}
 			advance("...");
 			ident = identifier(true);
@@ -2470,12 +2423,12 @@ function functionparams(parsed) {
 		// it is a syntax error to have a regular argument after a default argument
 		if (pastDefault) {
 			if (state.tokens.next.id !== "=") {
-				error("E051", state.tokens.current);
+				warn("E051", { token: state.tokens.current });
 			}
 		}
 		if (state.tokens.next.id === "=") {
 			if (!state.option.inESNext()) {
-				warning("W119", state.tokens.next, "default parameters");
+				warn("W119", { token: state.tokens.next, args: ["default parameters"] });
 			}
 			advance("=");
 			pastDefault = true;
@@ -2535,7 +2488,7 @@ function doFunction(name, statement, generator, fatarrowparams) {
 	block(false, true, true, fatarrowparams ? true:false);
 
 	if (generator && funct["(generator)"] !== "yielded") {
-		error("E047", state.tokens.curr);
+		warn("E047", { token: state.tokens.curr });
 	}
 
 	funct["(metrics)"].verifyMaxStatementsPerFunction();
@@ -2561,7 +2514,7 @@ function createMetrics(functionStartToken) {
 		verifyMaxStatementsPerFunction: function () {
 			if (state.option.maxstatements &&
 				this.statementCount > state.option.maxstatements) {
-				warning("W071", functionStartToken, this.statementCount);
+				warn("W071", { token: functionStartToken, args: [this.statementCount] });
 			}
 		},
 
@@ -2569,7 +2522,7 @@ function createMetrics(functionStartToken) {
 			params = params || [];
 
 			if (state.option.maxparams && params.length > state.option.maxparams) {
-				warning("W072", functionStartToken, params.length);
+				warn("W072", { token: functionStartToken, args: [params.length] });
 			}
 		},
 
@@ -2577,7 +2530,7 @@ function createMetrics(functionStartToken) {
 			if (state.option.maxdepth &&
 				this.nestedBlockDepth > 0 &&
 				this.nestedBlockDepth === state.option.maxdepth + 1) {
-				warning("W073", null, this.nestedBlockDepth);
+				warn("W073", { token: null, args: [this.nestedBlockDepth] });
 			}
 		},
 
@@ -2585,7 +2538,7 @@ function createMetrics(functionStartToken) {
 			var max = state.option.maxcomplexity;
 			var cc = this.ComplexityCount;
 			if (max && cc > max) {
-				warning("W074", functionStartToken, cc);
+				warn("W074", { token: functionStartToken, args: [cc] });
 			}
 		}
 	};
@@ -2619,7 +2572,7 @@ function checkCondAssignment(expr) {
 	case "^=":
 	case "/=":
 		if (!paren && !state.option.boss) {
-			warning("W084");
+			warn("W084");
 		}
 	}
 }
@@ -2633,7 +2586,7 @@ function checkCondAssignment(expr) {
 
 		function saveProperty(name, tkn) {
 			if (props[name] && _.has(props, name))
-				warning("W075", state.tokens.next, i);
+				warn("W075", { token: state.tokens.next, args: [i] });
 			else
 				props[name] = {};
 
@@ -2644,7 +2597,7 @@ function checkCondAssignment(expr) {
 		function saveSetter(name, tkn) {
 			if (props[name] && _.has(props, name)) {
 				if (props[name].basic || props[name].setter)
-					warning("W075", state.tokens.next, i);
+					warn("W075", { token: state.tokens.next, args: [i] });
 			} else {
 				props[name] = {};
 			}
@@ -2656,7 +2609,7 @@ function checkCondAssignment(expr) {
 		function saveGetter(name) {
 			if (props[name] && _.has(props, name)) {
 				if (props[name].basic || props[name].getter)
-					warning("W075", state.tokens.next, i);
+					warn("W075", { token: state.tokens.next, args: [i] });
 			} else {
 				props[name] = {};
 			}
@@ -2687,44 +2640,42 @@ function checkCondAssignment(expr) {
 				advance("get");
 
 				if (!state.option.inES5(!isclassdef)) {
-					error("E034");
+					warn("E034");
 				}
 
 				i = property_name();
 				if (!i) {
-					error("E035");
+					warn("E035");
 				}
 
 				// It is a Syntax Error if PropName of MethodDefinition is
 				// "constructor" and SpecialMethod of MethodDefinition is true.
 				if (isclassdef && i === "constructor") {
-					error("E049", state.tokens.next, "class getter method", i);
+					warn("E049", { token: state.tokens.next, args: ["class getter method", i] });
 				}
 
 				saveGetter(tag + i);
 				t = state.tokens.next;
 				f = doFunction();
 				p = f["(params)"];
-
-				if (p) {
-					warning("W076", t, p[0], i);
-				}
+				if (p)
+					warn("W076", { token: t, args: [p[0], i] });
 			} else if (state.tokens.next.value === "set" && peek().id !== ":") {
 				advance("set");
 
 				if (!state.option.inES5(!isclassdef)) {
-					error("E034");
+					warn("E034");
 				}
 
 				i = property_name();
 				if (!i) {
-					error("E035");
+					warn("E035");
 				}
 
 				// It is a Syntax Error if PropName of MethodDefinition is
 				// "constructor" and SpecialMethod of MethodDefinition is true.
 				if (isclassdef && i === "constructor") {
-					error("E049", state.tokens.next, "class setter method", i);
+					warn("E049", { token: state.tokens.next, args: ["class setter method", i ] });
 				}
 
 				saveSetter(tag + i, state.tokens.next);
@@ -2733,13 +2684,13 @@ function checkCondAssignment(expr) {
 				p = f["(params)"];
 
 				if (!p || p.length !== 1) {
-					warning("W077", t, i);
+					warn("W077", { token: t, args: [i] });
 				}
 			} else {
 				g = false;
 				if (state.tokens.next.value === "*" && state.tokens.next.type === "(punctuator)") {
 					if (!state.option.inESNext()) {
-						warning("W104", state.tokens.next, "generator functions");
+						warn("W104", { token: state.tokens.next, args: ["generator functions"] });
 					}
 					advance("*");
 					g = true;
@@ -2753,7 +2704,7 @@ function checkCondAssignment(expr) {
 
 				if (state.tokens.next.value === "(") {
 					if (!state.option.inESNext()) {
-						warning("W104", state.tokens.curr, "concise methods");
+						warn("W104", { token: state.tokens.curr, args: ["concise methods"] });
 					}
 					doFunction(i, undefined, g);
 				} else if (!isclassdef) {
@@ -2763,7 +2714,7 @@ function checkCondAssignment(expr) {
 			}
 			// It is a Syntax Error if PropName of MethodDefinition is "prototype".
 			if (isclassdef && i === "prototype") {
-				error("E049", state.tokens.next, "class method", i);
+				warn("E049", { token: state.tokens.next, args: ["class method", i] });
 			}
 
 			countMember(i);
@@ -2774,9 +2725,9 @@ function checkCondAssignment(expr) {
 			if (state.tokens.next.id === ",") {
 				comma({ allowTrailing: true, property: true });
 				if (state.tokens.next.id === ",") {
-					warning("W070", state.tokens.curr);
+					warn("W070", { token: state.tokens.curr });
 				} else if (state.tokens.next.id === "}" && !state.option.inES5(true)) {
-					warning("W070", state.tokens.curr);
+					warn("W070", { token: state.tokens.curr });
 				}
 			} else {
 				break;
@@ -2791,14 +2742,14 @@ function checkCondAssignment(expr) {
 		if (state.option.inES5()) {
 			for (var name in props) {
 				if (_.has(props, name) && props[name].setter && !props[name].getter) {
-					warning("W078", props[name].setterToken);
+					warn("W078", { token: props[name].setterToken });
 				}
 			}
 		}
 		return this;
 	};
 	x.fud = function () {
-		error("E036", state.tokens.curr);
+		warn("E036", { token: state.tokens.curr });
 	};
 }(delim("{")));
 
@@ -2806,7 +2757,7 @@ function destructuringExpression() {
 	var id, ids;
 	var identifiers = [];
 	if (!state.option.inESNext()) {
-		warning("W104", state.tokens.curr, "destructuring expression");
+		warn("W104", { token: state.tokens.curr, args: ["destructuring expression"] });
 	}
 	var nextInnerDE = function () {
 		var ident;
@@ -2863,7 +2814,7 @@ function destructuringExpressionMatch(tokens, value) {
 			if (token && value) {
 				token.first = value;
 			} else if (token && token.first && !value) {
-				warning("W080", token.first, token.first.value);
+				warn("W080", { token: token.first, args: [token.first.value] });
 			} /* else {
 				XXX value is discarded: wouldn't it need a warning ?
 			} */
@@ -2877,7 +2828,7 @@ var conststatement = stmt("const", function (prefix) {
 	var lone;
 
 	if (!state.option.inESNext()) {
-		warning("W104", state.tokens.curr, "const");
+		warn("W104", { token: state.tokens.curr, args: ["const"] });
 	}
 
 	this.first = [];
@@ -2893,10 +2844,10 @@ var conststatement = stmt("const", function (prefix) {
 		for (var t in tokens) {
 			t = tokens[t];
 			if (funct[t.id] === "const") {
-				warning("E011", null, t.id);
+				warn("E011", { token: null, args: [t.id] });
 			}
 			if (funct["(global)"] && predefined[t.id] === false) {
-				warning("W079", t.token, t.id);
+				warn("W079", { token: t.token, args: [t.id] });
 			}
 			if (t.id) {
 				addlabel(t.id, "const");
@@ -2910,16 +2861,16 @@ var conststatement = stmt("const", function (prefix) {
 		this.first = this.first.concat(names);
 
 		if (state.tokens.next.id !== "=") {
-			warning("E012", state.tokens.curr, state.tokens.curr.value);
+			warn("E012", { token: state.tokens.curr, args: [state.tokens.curr.value] });
 		}
 
 		if (state.tokens.next.id === "=") {
 			advance("=");
 			if (state.tokens.next.id === "undefined") {
-				warning("W080", state.tokens.prev, state.tokens.prev.value);
+				warn("W080", { token: state.tokens.prev, args: [state.tokens.prev.value] });
 			}
 			if (peek(0).id === "=" && state.tokens.next.identifier) {
-				warning("W120", state.tokens.next, state.tokens.next.value);
+				warn("W120", { token: state.tokens.next, args: [state.tokens.next.value] });
 			}
 			value = expression(10);
 			if (lone) {
@@ -2943,7 +2894,7 @@ var varstatement = stmt("var", function (prefix) {
 	var tokens, lone, value;
 
 	if (funct["(onevar)"] && state.option.onevar) {
-		warning("W081");
+		warn("W081");
 	} else if (!funct["(global)"]) {
 		funct["(onevar)"] = true;
 	}
@@ -2961,10 +2912,10 @@ var varstatement = stmt("var", function (prefix) {
 		for (var t in tokens) {
 			t = tokens[t];
 			if (state.option.inESNext() && funct[t.id] === "const") {
-				warning("E011", null, t.id);
+				warn("E011", { token: null, args: [t.id] });
 			}
 			if (funct["(global)"] && predefined[t.id] === false) {
-				warning("W079", t.token, t.id);
+				warn("W079", { token: t.token, args: [t.id] });
 			}
 			if (t.id) {
 				addlabel(t.id, "unused", t.token);
@@ -2980,10 +2931,10 @@ var varstatement = stmt("var", function (prefix) {
 		if (state.tokens.next.id === "=") {
 			advance("=");
 			if (state.tokens.next.id === "undefined") {
-				warning("W080", state.tokens.prev, state.tokens.prev.value);
+				warn("W080", { token: state.tokens.prev, args: [state.tokens.prev.value] });
 			}
 			if (peek(0).id === "=" && state.tokens.next.identifier) {
-				warning("W120", state.tokens.next, state.tokens.next.value);
+				warn("W120", { token: state.tokens.next, args: [state.tokens.next.value] });
 			}
 			value = expression(10);
 			if (lone) {
@@ -3005,22 +2956,22 @@ var letstatement = stmt("let", function (prefix) {
 	var tokens, lone, value, letblock;
 
 	if (!state.option.inESNext()) {
-		warning("W104", state.tokens.curr, "let");
+		warn("W104", { token: state.tokens.curr, args: ["let"] });
 	}
 
 	if (state.tokens.next.value === "(") {
 		if (!state.option.inMoz(true)) {
-			warning("W118", state.tokens.next, "let block");
+			warn("W118", { token: state.tokens.next, args: ["let block"] });
 		}
 		advance("(");
 		funct["(blockscope)"].stack();
 		letblock = true;
 	} else if (funct["(nolet)"]) {
-		error("E048", state.tokens.curr);
+		warn("E048", { token: state.tokens.curr });
 	}
 
 	if (funct["(onevar)"] && state.option.onevar) {
-		warning("W081");
+		warn("W081");
 	} else if (!funct["(global)"]) {
 		funct["(onevar)"] = true;
 	}
@@ -3038,10 +2989,10 @@ var letstatement = stmt("let", function (prefix) {
 		for (var t in tokens) {
 			t = tokens[t];
 			if (state.option.inESNext() && funct[t.id] === "const") {
-				warning("E011", null, t.id);
+				warn("E011", { token: null, args: [t.id] });
 			}
 			if (funct["(global)"] && predefined[t.id] === false) {
-				warning("W079", t.token, t.id);
+				warn("W079", { token: t.token, args: [t.id] });
 			}
 			if (t.id && !funct["(nolet)"]) {
 				addlabel(t.id, "unused", t.token, true);
@@ -3057,10 +3008,10 @@ var letstatement = stmt("let", function (prefix) {
 		if (state.tokens.next.id === "=") {
 			advance("=");
 			if (state.tokens.next.id === "undefined") {
-				warning("W080", state.tokens.prev, state.tokens.prev.value);
+				warn("W080", { token: state.tokens.prev, args: [state.tokens.prev.value] });
 			}
 			if (peek(0).id === "=" && state.tokens.next.identifier) {
-				warning("W120", state.tokens.next, state.tokens.next.value);
+				warn("W120", { token: state.tokens.next, args: [state.tokens.next.value] });
 			}
 			value = expression(10);
 			if (lone) {
@@ -3093,7 +3044,7 @@ blockstmt("class", function () {
 function classdef(stmt) {
 	/*jshint validthis:true */
 	if (!state.option.inESNext()) {
-		warning("W104", state.tokens.curr, "class");
+		warn("W104", { token: state.tokens.curr, args: ["class"] });
 	}
 	if (stmt) {
 		// BindingIdentifier
@@ -3131,23 +3082,23 @@ blockstmt("function", function () {
 		if (state.option.inESNext(true)) {
 			generator = true;
 		} else {
-			warning("W119", state.tokens.curr, "function*");
+			warn("W119", { token: state.tokens.curr, args: ["function*"] });
 		}
 	}
 	if (inblock) {
-		warning("W082", state.tokens.curr);
+		warn("W082", { token: state.tokens.curr });
 
 	}
 	var i = identifier();
 	if (funct[i] === "const") {
-		warning("E011", null, i);
+		warn("E011", { token: null, args: [i] });
 	}
 
 	addlabel(i, "unction", state.tokens.curr);
 
 	doFunction(i, { statement: true }, generator);
 	if (state.tokens.next.id === "(" && state.tokens.next.line === state.tokens.curr.line) {
-		error("E039");
+		warn("E039");
 	}
 	return this;
 });
@@ -3156,7 +3107,7 @@ prefix("function", function () {
 	var generator = false;
 	if (state.tokens.next.value === "*") {
 		if (!state.option.inESNext()) {
-			warning("W119", state.tokens.curr, "function*");
+			warn("W119", { token: state.tokens.curr, args: ["function*"] });
 		}
 		advance("*");
 		generator = true;
@@ -3164,7 +3115,7 @@ prefix("function", function () {
 	var i = optionalidentifier();
 	doFunction(i, undefined, generator);
 	if (!state.option.loopfunc && funct["(loopage)"]) {
-		warning("W083");
+		warn("W083");
 	}
 	return this;
 });
@@ -3204,7 +3155,7 @@ blockstmt("try", function () {
 		e = state.tokens.next.value;
 		if (state.tokens.next.type !== "(identifier)") {
 			e = null;
-			warning("E030", state.tokens.next, e);
+			warn("E030", { token: state.tokens.next, args: [e] });
 		}
 
 		advance();
@@ -3231,7 +3182,7 @@ blockstmt("try", function () {
 
 		if (state.tokens.next.value === "if") {
 			if (!state.option.inMoz(true)) {
-				warning("W118", state.tokens.curr, "catch filter");
+				warn("W118", { token: state.tokens.curr, args: ["catch filter"] });
 			}
 			advance("if");
 			expression(0);
@@ -3256,7 +3207,7 @@ blockstmt("try", function () {
 	while (state.tokens.next.id === "catch") {
 		increaseComplexityCount();
 		if (b && (!state.option.inMoz(true))) {
-			warning("W118", state.tokens.next, "multiple catch blocks");
+			warn("W118", { token: state.tokens.next, args: ["multiple catch blocks"] });
 		}
 		doCatch();
 		b = true;
@@ -3269,7 +3220,7 @@ blockstmt("try", function () {
 	}
 
 	if (!b) {
-		error("E021", state.tokens.next, "catch", state.tokens.next.value);
+		warn("E021", { token: state.tokens.next, args: ["catch", state.tokens.next.value] });
 	}
 
 	return this;
@@ -3292,9 +3243,9 @@ blockstmt("while", function () {
 blockstmt("with", function () {
 	var t = state.tokens.next;
 	if (state.directive["use strict"]) {
-		error("E010", state.tokens.curr);
+		warn("E010", { token: state.tokens.curr });
 	} else if (!state.option.withstmt) {
-		warning("W085", state.tokens.curr);
+		warn("W085", { token: state.tokens.curr });
 	}
 
 	advance("(");
@@ -3342,7 +3293,7 @@ blockstmt("switch", function () {
 				// adding a comment /* falls through */ on a line just before
 				// the next `case`.
 				if (!reg.fallsThrough.test(state.lines[state.tokens.next.line - 2])) {
-					warning("W086", state.tokens.curr, "case");
+					warn("W086", { token: state.tokens.curr, args: ["case"] });
 				}
 			}
 			advance("case");
@@ -3365,7 +3316,7 @@ blockstmt("switch", function () {
 				// there is a special /* falls through */ comment.
 				if (this.cases.length) {
 					if (!reg.fallsThrough.test(state.lines[state.tokens.next.line - 2])) {
-						warning("W086", state.tokens.curr, "default");
+						warn("W086", { token: state.tokens.curr, args: ["default"] });
 					}
 				}
 			}
@@ -3381,30 +3332,30 @@ blockstmt("switch", function () {
 			funct["(verb)"] = undefined;
 			return;
 		case "(end)":
-			error("E023", state.tokens.next, "}");
+			warn("E023", { token: state.tokens.next, args: ["}"] });
 			return;
 		default:
 			indent += state.option.indent;
 			if (g) {
 				switch (state.tokens.curr.id) {
 				case ",":
-					error("E040");
+					warn("E040");
 					return;
 				case ":":
 					g = false;
 					statements();
 					break;
 				default:
-					error("E025", state.tokens.curr);
+					warn("E025", { token: state.tokens.curr });
 					return;
 				}
 			} else {
 				if (state.tokens.curr.id === ":") {
 					advance(":");
-					error("E024", state.tokens.curr, ":");
+					warn("E024", { token: state.tokens.curr, args: [":"] });
 					statements();
 				} else {
-					error("E021", state.tokens.next, "case", state.tokens.next.value);
+					warn("E021", { token: state.tokens.next, args: ["case", state.tokens.next.value] });
 					return;
 				}
 			}
@@ -3415,7 +3366,7 @@ blockstmt("switch", function () {
 
 stmt("debugger", function () {
 	if (!state.option.debug) {
-		warning("W087", this);
+		warn("W087", { token: this });
 	}
 	return this;
 }).exps = true;
@@ -3449,7 +3400,7 @@ blockstmt("for", function () {
 		foreachtok = t;
 		advance("each");
 		if (!state.option.inMoz(true)) {
-			warning("W118", state.tokens.curr, "for each");
+			warn("W118", { token: state.tokens.curr, args: ["for each"] });
 		}
 	}
 
@@ -3471,7 +3422,7 @@ blockstmt("for", function () {
 	// if we're in a for (… in|of …) statement
 	if (_.contains(inof, nextop.value)) {
 		if (!state.option.inESNext() && nextop.value === "of") {
-			error("W104", nextop, "for of");
+			warn("W104", { token: nextop, args: ["for of"] });
 		}
 		if (state.tokens.next.id === "var") {
 			advance("var");
@@ -3491,7 +3442,7 @@ blockstmt("for", function () {
 				break;
 			default:
 				if (!funct["(blockscope)"].getlabel(state.tokens.next.value))
-					warning("W088", state.tokens.next, state.tokens.next.value);
+					warn("W088", { token: state.tokens.next, args: [state.tokens.next.value] });
 			}
 			advance();
 		}
@@ -3501,13 +3452,13 @@ blockstmt("for", function () {
 		s = block(true, true);
 		if (state.option.forin && s && (s.length > 1 || typeof s[0] !== "object" ||
 				s[0].value !== "if")) {
-			warning("W089", this);
+			warn("W089", { token: this });
 		}
 		funct["(breakage)"] -= 1;
 		funct["(loopage)"] -= 1;
 	} else {
 		if (foreachtok) {
-			error("E045", foreachtok);
+			warn("E045", { token: foreachtok });
 		}
 		if (state.tokens.next.id !== ";") {
 			if (state.tokens.next.id === "var") {
@@ -3535,7 +3486,7 @@ blockstmt("for", function () {
 		}
 		advance(";");
 		if (state.tokens.next.id === ";") {
-			error("E021", state.tokens.next, ")", ";");
+			warn("E021", { token: state.tokens.next, args: [")", ";"] });
 		}
 		if (state.tokens.next.id !== ")") {
 			for (;;) {
@@ -3564,14 +3515,14 @@ stmt("break", function () {
 	var v = state.tokens.next.value;
 
 	if (funct["(breakage)"] === 0)
-		warning("W052", state.tokens.next, this.value);
+		warn("W052", { token: state.tokens.next, args: [this.value] });
 
 	if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
 		if (state.tokens.curr.line === state.tokens.next.line) {
 			if (funct[v] !== "label") {
-				warning("W090", state.tokens.next, v);
+				warn("W090", { token: state.tokens.next, args: [v] });
 			} else if (scope[v] !== funct) {
-				warning("W091", state.tokens.next, v);
+				warn("W091", { token: state.tokens.next, args: [v] });
 			}
 			this.first = state.tokens.next;
 			advance();
@@ -3586,20 +3537,20 @@ stmt("continue", function () {
 	var v = state.tokens.next.value;
 
 	if (funct["(breakage)"] === 0)
-		warning("W052", state.tokens.next, this.value);
+		warn("W052", { token: state.tokens.next, args: [this.value] });
 
 	if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
 		if (state.tokens.curr.line === state.tokens.next.line) {
 			if (funct[v] !== "label") {
-				warning("W090", state.tokens.next, v);
+				warn("W090", { token: state.tokens.next, args: [v] });
 			} else if (scope[v] !== funct) {
-				warning("W091", state.tokens.next, v);
+				warn("W091", { token: state.tokens.next, args: [v] });
 			}
 			this.first = state.tokens.next;
 			advance();
 		}
 	} else if (!funct["(loopage)"]) {
-		warning("W052", state.tokens.next, this.value);
+		warn("W052", { token: state.tokens.next, args: [this.value] });
 	}
 	reachable("continue");
 	return this;
@@ -3609,14 +3560,14 @@ stmt("continue", function () {
 stmt("return", function () {
 	if (this.line === state.tokens.next.line) {
 		if (state.tokens.next.id === "(regexp)")
-			warning("W092");
+			warn("W092");
 
 		if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
 			this.first = expression(0);
 
 			if (this.first &&
 					this.first.type === "(punctuator)" && this.first.value === "=" && !state.option.boss) {
-				warningAt("W093", this.first.line, this.first.character);
+				warn("W093", { coord: { line: this.first.line, ch: this.first.character }});
 			}
 		}
 	} else {
@@ -3634,26 +3585,26 @@ stmt("return", function () {
 }(prefix("yield", function () {
 	var prev = state.tokens.prev;
 	if (state.option.inESNext(true) && !funct["(generator)"]) {
-		error("E046", state.tokens.curr, "yield");
+		warn("E046", { token: state.tokens.curr, args: ["yield"] });
 	} else if (!state.option.inESNext()) {
-		warning("W104", state.tokens.curr, "yield");
+		warn("W104", { token: state.tokens.curr, args: ["yield"] });
 	}
 	funct["(generator)"] = "yielded";
 	if (this.line === state.tokens.next.line || !state.option.inMoz(true)) {
 		if (state.tokens.next.id === "(regexp)")
-			warning("W092");
+			warn("W092");
 
 		if (state.tokens.next.id !== ";" && !state.tokens.next.reach && state.tokens.next.nud) {
 			this.first = expression(10);
 
 			if (this.first.type === "(punctuator)" && this.first.value === "=" && !state.option.boss) {
-				warningAt("W093", this.first.line, this.first.character);
+				warn("W093", { coord: { line: this.first.line, ch: this.first.character } });
 			}
 		}
 
 		if (state.option.inMoz(true) && state.tokens.next.id !== ")" &&
 				(prev.lbp > 30 || (!prev.assign && !isEndOfExpr()) || prev.id === "yield")) {
-			error("E050", this);
+			warn("E050", { token: this });
 		}
 	}
 	return this;
@@ -3668,7 +3619,7 @@ stmt("throw", function () {
 
 stmt("import", function () {
 	if (!state.option.inESNext()) {
-		warning("W119", state.tokens.curr, "import");
+		warn("W119", { token: state.tokens.curr, args: ["import"] });
 	}
 
 	if (state.tokens.next.identifier) {
@@ -3696,7 +3647,7 @@ stmt("import", function () {
 				advance("}");
 				break;
 			} else {
-				error("E024", state.tokens.next, state.tokens.next.value);
+				warn("E024", { token: state.tokens.next, args: [state.tokens.next.value] });
 				break;
 			}
 		}
@@ -3709,7 +3660,7 @@ stmt("import", function () {
 
 stmt("export", function () {
 	if (!state.option.inESNext()) {
-		warning("W119", state.tokens.curr, "export");
+		warn("W119", { token: state.tokens.curr, args: ["export"] });
 	}
 
 	if (state.tokens.next.type === "default") {
@@ -3733,7 +3684,7 @@ stmt("export", function () {
 				advance("}");
 				break;
 			} else {
-				error("E024", state.tokens.next, state.tokens.next.value);
+				warn("E024", { token: state.tokens.next, args: [state.tokens.next.value] });
 				break;
 			}
 		}
@@ -3758,7 +3709,7 @@ stmt("export", function () {
 		advance("class");
 		state.syntax["class"].fud();
 	} else {
-		error("E024", state.tokens.next, state.tokens.next.value);
+		warn("E024", { token: state.tokens.next, args: [state.tokens.next.value] });
 	}
 
 	return this;
@@ -3842,7 +3793,7 @@ function destructuringAssignOrJsonValue() {
 	var block = lookupBlockType();
 	if (block.notJson) {
 		if (!state.option.inESNext() && block.isDestAssign) {
-			warning("W104", state.tokens.curr, "destructuring assignment");
+			warn("W104", { token: state.tokens.curr, args: ["destructuring assignment"] });
 		}
 		statements();
 	// otherwise parse json value
@@ -3897,9 +3848,9 @@ var arrayComprehension = function () {
 			unstack: function () {
 				_current.variables.filter(function (v) {
 					if (v.unused)
-						warning("W098", v.token, v.value);
+						warn("W098", { token: v.token, args: [v.value] });
 					if (v.undef)
-						isundef(v.funct, "W117", v.token, v.value);
+						isundef(v.funct, "W117", { token: v.token, args: [v.value] });
 				});
 				_carrays.splice(-1, 1);
 				_current = _carrays[_carrays.length - 1];
@@ -3939,14 +3890,14 @@ var arrayComprehension = function () {
 					return true;
 				// When we are in the "generate" state of the list comp,
 				} else if (_current && _current.mode === "generate") {
-					isundef(funct, "W117", state.tokens.curr, v);
+					isundef(funct, "W117", { token: state.tokens.curr, args: [v] });
 					return true;
 				// When we are in "filter" state,
 				} else if (_current && _current.mode === "filter") {
 					// we check whether current variable has been declared
 					if (use(v)) {
 						// if not we warn about it
-						isundef(funct, "W117", state.tokens.curr, v);
+						isundef(funct, "W117", { token: state.tokens.curr, args: [v] });
 					}
 					return true;
 				}
@@ -3966,21 +3917,21 @@ function jsonValue() {
 		if (state.tokens.next.id !== "}") {
 			for (;;) {
 				if (state.tokens.next.id === "(end)") {
-					error("E026", state.tokens.next, t.line);
+					warn("E026", { token: state.tokens.next, args: [t.line] });
 				} else if (state.tokens.next.id === "}") {
-					warning("W094", state.tokens.curr);
+					warn("W094", { token: state.tokens.curr });
 					break;
 				} else if (state.tokens.next.id === ",") {
-					error("E028", state.tokens.next);
+					warn("E028", { token: state.tokens.next });
 				} else if (state.tokens.next.id !== "(string)") {
-					warning("W095", state.tokens.next, state.tokens.next.value);
+					warn("W095", { token: state.tokens.next, args: [state.tokens.next.value] });
 				}
 				if (o[state.tokens.next.value] === true) {
-					warning("W075", state.tokens.next, state.tokens.next.value);
+					warn("W075", { token: state.tokens.next, args: [state.tokens.next.value] });
 				} else if ((state.tokens.next.value === "__proto__" &&
 					!state.option.proto) || (state.tokens.next.value === "__iterator__" &&
 					!state.option.iterator)) {
-					warning("W096", state.tokens.next, state.tokens.next.value);
+					warn("W096", { token: state.tokens.next, args: [state.tokens.next.value] });
 				} else {
 					o[state.tokens.next.value] = true;
 				}
@@ -4002,12 +3953,12 @@ function jsonValue() {
 		if (state.tokens.next.id !== "]") {
 			for (;;) {
 				if (state.tokens.next.id === "(end)") {
-					error("E027", state.tokens.next, t.line);
+					warn("E027", { token: state.tokens.next, args: [t.line] });
 				} else if (state.tokens.next.id === "]") {
-					warning("W094", state.tokens.curr);
+					warn("W094", { token: state.tokens.curr });
 					break;
 				} else if (state.tokens.next.id === ",") {
-					error("E028", state.tokens.next);
+					warn("E028", { token: state.tokens.next });
 				}
 				jsonValue();
 				if (state.tokens.next.id !== ",") {
@@ -4038,7 +3989,7 @@ function jsonValue() {
 		advance("(number)");
 		break;
 	default:
-		error("E003", state.tokens.next);
+		warn("E003", { token: state.tokens.next });
 	}
 }
 
@@ -4051,9 +4002,7 @@ var blockScope = function () {
 			if (_current[t]["(type)"] === "unused") {
 				if (state.option.unused) {
 					var tkn = _current[t]["(token)"];
-					var line = tkn.line;
-					var chr  = tkn.character;
-					warningAt("W098", line, chr, t);
+					warn("W098", { coord: { line: tkn.line, ch: tkn.character }, args: [t] });
 				}
 			}
 		}
@@ -4194,7 +4143,7 @@ var JSHINT = function (s, o, g) {
 	unuseds = [];
 
 	if (!_.isString(s) && !Array.isArray(s)) {
-		errorAt("E004", 0);
+		warn("E004", { coord: { line: 0, ch: 0 } });
 		return false;
 	}
 
@@ -4216,7 +4165,7 @@ var JSHINT = function (s, o, g) {
 		},
 
 		warn: function (code, data) {
-			warningAt.apply(null, [ code, data.line, data.char ].concat(data.data));
+			warn.call(null, code, { coord: { line: data.line, ch: data.char }, args: data.data });
 		},
 
 		on: function (names, listener) {
@@ -4236,11 +4185,11 @@ var JSHINT = function (s, o, g) {
 	lex = new Lexer(s);
 
 	lex.on("warning", function (ev) {
-		warningAt.apply(null, [ ev.code, ev.line, ev.character].concat(ev.data));
+		warn.call(null, ev.code, { coord: { line: ev.line, ch: ev.character }, args: ev.data });
 	});
 
 	lex.on("error", function (ev) {
-		errorAt.apply(null, [ ev.code, ev.line, ev.character ].concat(ev.data));
+		warn.call(null, ev.code, { coord: { line: ev.line, ch: ev.character }, args: ev.data });
 	});
 
 	lex.on("fatal", function (ev) {
@@ -4288,7 +4237,7 @@ var JSHINT = function (s, o, g) {
 
 			if (state.directive["use strict"]) {
 				if (!state.option.globalstrict && !(state.option.node || state.option.phantom)) {
-					warning("W097", state.tokens.prev);
+					warn("W097", { token: state.tokens.prev });
 				}
 			}
 
@@ -4356,7 +4305,7 @@ var JSHINT = function (s, o, g) {
 
 			if (unused_opt) {
 				if (warnable_types[unused_opt] && warnable_types[unused_opt].indexOf(type) !== -1) {
-					warningAt("W098", line, chr, name);
+					warn("W098", { coord: { line: line, ch: chr }, args: [name] });
 				}
 			}
 
@@ -4390,15 +4339,17 @@ var JSHINT = function (s, o, g) {
 		};
 
 		// Check queued 'x is not defined' instances to see if they're still undefined.
-		for (i = 0; i < JSHINT.undefs.length; i += 1) {
-			k = JSHINT.undefs[i].slice(0);
+		JSHINT.undefs.forEach(function (params) {
+			var scope = params[0];
+			var code  = params[1];
+			var opts  = params[2];
 
-			if (markDefined(k[2].value, k[0])) {
-				clearImplied(k[2].value, k[2].line);
-			} else if (state.option.undef) {
-				warning.apply(warning, k.slice(1));
-			}
-		}
+			if (markDefined(opts.token.value, scope))
+				return void clearImplied(opts.token.value, opts.token.line);
+
+			if (state.option.undef)
+				warn.call(null, code, opts);
+		});
 
 		functions.forEach(function (func) {
 			if (func["(unusedOption)"] === false) {
@@ -4450,11 +4401,11 @@ var JSHINT = function (s, o, g) {
 			var nt = state.tokens.next || {};
 			JSHINT.errors.push({
 				scope     : "(main)",
-				raw       : err.raw,
+				message   : err.message,
 				code      : err.code,
-				reason    : err.message,
 				line      : err.line || nt.line,
-				character : err.character || nt.from
+				character : err.character || nt.from,
+				type      : "error"
 			}, null);
 		} else {
 			throw err;

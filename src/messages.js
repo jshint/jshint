@@ -2,7 +2,32 @@
 
 var _ = require("underscore");
 
-var errors = {
+function make(type, messages) {
+	return _.reduce(_.pairs(messages), function (dest, data) {
+		var code = data[0];
+		var desc = data[1];
+
+		dest[code] = { type: type, code: code, desc: desc };
+		return dest;
+	}, {});
+}
+
+function get(code, args) {
+	var msg = _.clone(
+		/^W\d{3}$/.test(code) ? warnings[code] :
+		/^E\d{3}$/.test(code) ? errors[code]   :
+		/^I\d{3}$/.test(code) ? info[code]     :
+		null
+	);
+
+	if (!msg)
+		return null;
+
+	_.each(args || [], function (val) { msg.desc = msg.desc.replace(/\{([^{}]*)\}/, val) });
+	return msg;
+}
+
+var errors = make("error", {
 	// JSHint options
 	E001: "Bad option: '{a}'.",
 	E002: "Bad option value.",
@@ -66,9 +91,9 @@ var errors = {
 	E049: "A {a} cannot be named '{b}'.",
 	E050: "Mozilla requires the yield expression to be parenthesized here.",
 	E051: "Regular parameters cannot come after default parameters."
-};
+});
 
-var warnings = {
+var warnings = make("warning", {
 	W001: "'hasOwnProperty' is a really bad name.",
 	W002: "Value of '{a}' may be overwritten in IE 8 and earlier.",
 	W003: "'{a}' was used before it was defined.",
@@ -194,26 +219,12 @@ var warnings = {
 	W120: "You might be leaking a variable ({a}) here.",
 	W121: "Extending prototype of native object: '{a}'.",
 	W122: "Invalid typeof value '{a}'"
-};
+});
 
-var info = {
+var info = make("info", {
 	I001: "Comma warnings can be turned off with 'laxcomma'.",
 	I002: "Reserved words as properties can be used under the 'es5' option.",
 	I003: "ES5 option is now set per default"
-};
-
-exports.errors = {};
-exports.warnings = {};
-exports.info = {};
-
-_.each(errors, function (desc, code) {
-	exports.errors[code] = { code: code, desc: desc };
 });
 
-_.each(warnings, function (desc, code) {
-	exports.warnings[code] = { code: code, desc: desc };
-});
-
-_.each(info, function (desc, code) {
-	exports.info[code] = { code: code, desc: desc };
-});
+exports.get = get;

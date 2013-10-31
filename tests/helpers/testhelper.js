@@ -28,6 +28,7 @@
 
 /*jshint node: true, eqnull: true*/
 
+var _ = require("underscore");
 var JSHINT = require('../../src/jshint.js').JSHINT;
 
 if (exports.setup === undefined || exports.setup === null) {
@@ -50,44 +51,34 @@ exports.setup.testRun = function (test, name) {
 
 		test: function (source, options, globals) {
 			var ret = !!JSHINT(source, options, globals);
-			var errors = JSHINT.errors.filter(function (er) {
-				return er && er.id === "(error)";
-			});
+			var errors = _.compact(JSHINT.errors);
 
-			if (errors.length === 0 && definedErrors.length === 0) {
+			if (errors.length === 0 && definedErrors.length === 0)
 				return;
-			}
 
-			// filter all thrown errors
-			var undefinedErrors = errors.filter(function (er) {
-				return !definedErrors.some(function (def) {
-					var result = def.line === er.line &&
-						def.message === er.reason;
+			var undefinedErrors = errors.reduce(function (acc, curr) {
+				var isdef = definedErrors.some(function (err) {
+					if (err.line !== curr.line || err.message !== curr.message)
+						return false;
 
-					if (!result) {
-						return result;
+					if (err.extras) {
+						return _.every(err.extras, function (val, key) {
+							return curr[key] === val;
+						});
 					}
 
-					if (def.extras) {
-						for (var extra in def.extras) {
-							if (def.extras.hasOwnProperty(extra) &&
-									er.hasOwnProperty(extra)) {
-								result = (def.extras[extra] === er[extra]);
-								if (!result) {
-									return result;
-								}
-							}
-						}
-					}
-					return result;
+					return true;
 				});
-			});
+
+				if (!isdef) acc.push(curr);
+				return acc;
+			}, []);
 
 			// filter all defined errors
 			var unthrownErrors = definedErrors.filter(function (def) {
 				return !errors.some(function (er) {
 					return def.line === er.line &&
-						def.message === er.reason;
+						def.message === er.message;
 				});
 			});
 
@@ -95,7 +86,7 @@ exports.setup.testRun = function (test, name) {
 			var wrongLineNumbers = undefinedErrors.map(function (er) {
 				var lines = unthrownErrors.filter(function (def) {
 					return def.line !== er.line &&
-						def.message === er.reason;
+						def.message === er.message;
 				}).map(function (def) {
 					return def.line;
 				});
@@ -103,7 +94,7 @@ exports.setup.testRun = function (test, name) {
 				if (lines.length) {
 					return {
 						line: er.line,
-						message: er.reason,
+						message: er.message,
 						definedIn: lines
 					};
 				}
@@ -115,7 +106,7 @@ exports.setup.testRun = function (test, name) {
 			// remove undefined errors, if there is a definition with wrong line number
 			undefinedErrors = undefinedErrors.filter(function (er) {
 				return !wrongLineNumbers.some(function (def) {
-					return def.message === er.reason;
+					return def.message === er.message;
 				});
 			});
 			unthrownErrors = unthrownErrors.filter(function (er) {
@@ -130,11 +121,11 @@ exports.setup.testRun = function (test, name) {
 				(name == null ? "" : "\n  TestRun: [bold]{" + name + "}") +
 				unthrownErrors.map(function (el, idx) {
 					return (idx === 0 ? "\n	[yellow]{Errors defined, but not thrown by JSHINT}\n" : "") +
-						" [bold]{Line " + el.line + ", Char " + el.character + "} " + el.message;
+						" [bold]{Line " + el.line + ", Char " + el.ch + "} " + el.message;
 				}).join("\n") +
 				undefinedErrors.map(function (el, idx) {
 					return (idx === 0 ? "\n	[yellow]{Errors thrown by JSHINT, but not defined in test run}\n" : "") +
-						"	[bold]{Line " + el.line + ", Char " + el.character + "} " + el.reason;
+						"	[bold]{Line " + el.line + ", Char " + el.ch + "} " + el.message;
 				}).join("\n") +
 				wrongLineNumbers.map(function (el, idx) {
 					return (idx === 0 ? "\n	[yellow]{Errors with wrong line number}\n" : "") +

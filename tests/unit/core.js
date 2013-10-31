@@ -274,6 +274,7 @@ exports.returnStatement = function (test) {
 	TestRun(test)
 		.addError(3, "Did you mean to return a conditional instead of an assignment?")
 		.addError(38, "Missing semicolon.")
+		.addError(38, "Too many errors. (92% scanned).")
 		.test(src, { es3: true, maxerr: 2 });
 
 	test.done();
@@ -310,8 +311,8 @@ exports.argsInCatchReused = function (test) {
 
 exports.testRawOnError = function (test) {
 	JSHINT(';', { maxerr: 1 });
-	test.equal(JSHINT.errors[0].raw, 'Unnecessary semicolon.');
-	test.equal(JSHINT.errors[1].raw, 'Too many errors.');
+	test.equal(JSHINT.errors[0].message, 'Unnecessary semicolon.');
+	test.equal(JSHINT.errors[1].message, 'Too many errors. (100% scanned).');
 	test.equal(JSHINT.errors[2], null);
 
 	test.done();
@@ -362,7 +363,7 @@ exports.insideEval = function (test) {
 	// Regression test for bug GH-714.
 	JSHINT(src, { evil: false, maxerr: 1 });
 	var err = JSHINT.data().errors[1];
-	test.equal(err.raw, "Too many errors.");
+	test.equal(err.message, "Too many errors. (5% scanned).");
 	test.equal(err.scope, "(main)");
 
 	test.done();
@@ -380,6 +381,7 @@ exports.noExcOnTooManyUndefined = function (test) {
 
 	TestRun(test)
 		.addError(1, "'a' is not defined.")
+		.addError(1, "Too many errors. (100% scanned).")
 		.test(code, { es3: true, undef: true, maxerr: 1 });
 
 	test.done();
@@ -453,7 +455,7 @@ exports.testConstructor = function (test) {
 
 	TestRun(test)
 		.addError(1, "Do not use Number as a constructor.", {
-			character: 1
+			ch: 1
 		})
 		.test(code, {es3: true});
 
@@ -465,7 +467,7 @@ exports.missingRadix = function (test) {
 
 	TestRun(test)
 		.addError(1, "Missing radix parameter.", {
-			character: 12
+			ch: 12
 		})
 		.test(code, {es3: true});
 
