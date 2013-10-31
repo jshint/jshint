@@ -29,9 +29,9 @@
 		}
 	});
 
-	// this should trigger an error
-	 if (true) {
-		throw "why did you not lint the above line";
+	if (true) {
+		// this should trigger an error
+		throw "why did you not lint the above line"
 	}
 
 	void Qux;

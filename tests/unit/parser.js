@@ -165,7 +165,6 @@ exports.options = function (test) {
 		"/*jslint maxerr: 20 */",
 		"/*member c:true */",
 		"/*jshint d:no */",
-		"/*jshint white:no */",
 		"/*global xxx*/",
 		"xxx = 2;",
 	];
@@ -180,8 +179,7 @@ exports.options = function (test) {
 		.addError(9, "Expected a small integer or 'false' and instead saw '300.4'.")
 		.addError(10, "Expected a small integer or 'false' and instead saw '0'.")
 		.addError(13, "Bad option: 'd'.")
-		.addError(14, "Bad option value.")
-		.addError(16, "Read only.");
+		.addError(15, "Read only.");
 	run.test(code, {es3: true});
 	run.test(code, {}); // es5
 	run.test(code, {esnext: true});
@@ -497,7 +495,7 @@ exports.comma = function (test) {
 
 	// Regression test (GH-1108)
 	TestRun(test)
-		.test("i = 0, g;", {white: true, expr: true});
+		.test("i = 0, g;", {expr: true});
 
 	test.done();
 };
@@ -508,26 +506,20 @@ exports.withStatement = function (test) {
 
 	run = TestRun(test)
 		.addError(5, "Don't use 'with'.")
-		.addError(5, "Missing space after 'with'.")
-		.addError(5, "Unexpected space after '('.")
 		.addError(13, "'with' is not allowed in strict mode.")
-		.addError(13, "Missing space after ')'.")
-		.addError(13, "Unexpected space after '2'.");
-	run.test(src, {white: true, es3: true});
-	run.test(src, {white: true}); // es5
-	run.test(src, {white: true, esnext: true});
-	run.test(src, {white: true, moz: true});
+
+	run.test(src, {es3: true});
+	run.test(src, {}); // es5
+	run.test(src, {esnext: true});
+	run.test(src, {moz: true});
 
 	run = TestRun(test)
-		.addError(5, "Missing space after 'with'.")
-		.addError(5, "Unexpected space after '('.")
 		.addError(13, "'with' is not allowed in strict mode.")
-		.addError(13, "Missing space after ')'.")
-		.addError(13, "Unexpected space after '2'.");
-	run.test(src, {white: true, withstmt: true, es3: true});
-	run.test(src, {white: true, withstmt: true}); // es5
-	run.test(src, {white: true, withstmt: true, esnext: true});
-	run.test(src, {white: true, withstmt: true, moz: true});
+
+	run.test(src, {withstmt: true, es3: true});
+	run.test(src, {withstmt: true}); // es5
+	run.test(src, {withstmt: true, esnext: true});
+	run.test(src, {withstmt: true, moz: true});
 
 	test.done();
 };
@@ -1170,7 +1162,7 @@ exports["test: destructuring assign of empty values as moz"] = function (test) {
 		.addError(2, "'d' is defined but never used.")
 		.addError(3, "'e' is defined but never used.")
 		.addError(3, "'f' is defined but never used.")
-		.test(code, {moz: true, unused: true, undef: true, laxcomma: true});
+		.test(code, {moz: true, unused: true, undef: true});
 
 	test.done();
 };
@@ -3145,20 +3137,6 @@ exports["regression test for crash from GH-964"] = function (test) {
 	test.done();
 };
 
-exports["regression test for GH-890"] = function (test) {
-	var code = [
-		"var a = 1; ",
-		"  ",
-		"var b;"
-	];
-
-	TestRun(test)
-		.addError(1, "Trailing whitespace.")
-		.test(code, { trailing: true });
-
-	test.done();
-};
-
 exports["automatic comma insertion GH-950"] = function (test) {
 	var code = [
 		"var a = b",
@@ -3177,9 +3155,6 @@ exports["automatic comma insertion GH-950"] = function (test) {
 	];
 
 	var run = TestRun(test)
-		.addError(2, "Bad line breaking before 'instanceof'.")
-		.addError(6, "Bad line breaking before '&&'.")
-		.addError(8, "Line breaking error 'return'.")
 		.addError(9, "Label 'a' on 1 statement.")
 		.addError(9, "Expected an assignment or function call and instead saw an expression.");
 
@@ -3189,11 +3164,8 @@ exports["automatic comma insertion GH-950"] = function (test) {
 	run.test(code, {moz: true, asi: true});
 
 	run = TestRun(test)
-		.addError(2, "Bad line breaking before 'instanceof'.")
 		.addError(3, "Missing semicolon.")
 		.addError(4, "Missing semicolon.")
-		.addError(6, "Bad line breaking before '&&'.")
-		.addError(8, "Line breaking error 'return'.")
 		.addError(8, "Missing semicolon.")
 		.addError(9, "Label 'a' on 1 statement.")
 		.addError(9, "Expected an assignment or function call and instead saw an expression.")
@@ -3701,15 +3673,7 @@ exports["test for line breaks with 'yield'"] = function (test) {
 		"}"
 	];
 
-	var run = TestRun(test)
-		.addError(3, "Bad line breaking before 'c'.")
-		.addError(6, "Bad line breaking before '+'.")
-		.addError(8, "Comma warnings can be turned off with 'laxcomma'.")
-		.addError(7, "Bad line breaking before ','.")
-		.addError(10, "Bad line breaking before '?'.")
-		.addError(14, "Bad line breaking before '+'.");
-
-	run.test(code, {esnext: true});
+	TestRun(test).test(code, {esnext: true});
 
 	// Mozilla assumes the statement has ended if there is a line break
 	// following a `yield`. This naturally causes havoc with the subsequent
@@ -3720,14 +3684,12 @@ exports["test for line breaks with 'yield'"] = function (test) {
 	// a ? yield
 	// : b;
 	// ```
-	run = TestRun(test)
+	var run = TestRun(test)
 		.addError(1, "'function*' is only available in ES6 (use esnext option).")
 		.addError(3, "Expected ')' to match '(' from line 2 and instead saw 'c'.")
 		.addError(4, "Expected an identifier and instead saw ')'.")
 		.addError(4, "Expected an assignment or function call and instead saw an expression.")
 		.addError(6, "Expected an assignment or function call and instead saw an expression.")
-		.addError(8, "Comma warnings can be turned off with 'laxcomma'.")
-		.addError(7, "Bad line breaking before ','.")
 		.addError(10, "Expected an identifier and instead saw '?'.")
 		.addError(10, "Expected an assignment or function call and instead saw an expression.")
 		.addError(10, "Label 'i' on j statement.")
@@ -3737,16 +3699,10 @@ exports["test for line breaks with 'yield'"] = function (test) {
 	run.test(code, {moz: true, asi: true});
 
 	run
-		.addError(2, "Line breaking error 'yield'.")
 		.addError(3, "Missing semicolon.")
-		.addError(5, "Line breaking error 'yield'.")
 		.addError(5, "Missing semicolon.")
-		.addError(7, "Line breaking error 'yield'.")
-		.addError(9, "Line breaking error 'yield'.")
 		.addError(9, "Missing semicolon.")
 		.addError(10, "Missing semicolon.")
-		.addError(11, "Line breaking error 'yield'.")
-		.addError(13, "Line breaking error 'yield'.")
 		.addError(13, "Missing semicolon.");
 
 	run.test(code, {moz: true});
@@ -3805,7 +3761,7 @@ exports["/*jshint ignore */ should allow the linter to skip blocked-out lines to
 	var code = fs.readFileSync(__dirname + "/fixtures/gh826.js", "utf8");
 
 	TestRun(test)
-		.addError(33, "Mixed spaces and tabs.")
+		.addError(34, "Missing semicolon.")
 		.test(code);
 
 	test.done();
@@ -3813,17 +3769,17 @@ exports["/*jshint ignore */ should allow the linter to skip blocked-out lines to
 
 exports["/*jshint ignore */ should be detected even with leading and/or trailing whitespace"] = function (test) {
 	var code = [
-		"	/*jshint ignore:start */",                                   // leading whitespace
-		"	 if (true) { alert('mixed tabs and spaces ignored'); }",     // should be ignored
-		"	/*jshint ignore:end */	",                                   // leading and trailing whitespace
-		"	 if (true) { alert('mixed tabs and spaces not ignored'); }", // should not be ignored
-		"	/*jshint ignore:start */   ",                                // leading and trailing whitespace
-		"	 if (true) { alert('mixed tabs and spaces ignored'); }",     // should be ignored
-		"	/*jshint ignore:end */	 "                                   // leading and trailing whitespace
+		"/*jshint ignore:start */",                                  // leading whitespace
+		"if (true) { alert('mixed tabs and spaces ignored') }",     // should be ignored
+		"/*jshint ignore:end */	",                                   // leading and trailing whitespace
+		"if (true) { alert('mixed tabs and spaces not ignored') }", // should not be ignored
+		"/*jshint ignore:start */   ",                               // leading and trailing whitespace
+		"if (true) { alert('mixed tabs and spaces ignored') }",     // should be ignored
+		"/*jshint ignore:end */	 "                                   // leading and trailing whitespace
 	];
 
 	TestRun(test)
-		.addError(4, "Mixed spaces and tabs.")
+		.addError(4, "Missing semicolon.")
 		.test(code);
 
 	test.done();

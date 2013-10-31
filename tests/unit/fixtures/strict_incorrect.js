@@ -1,4 +1,4 @@
-/*jshint white: true*/
+
 (function (t) {
     var w = t;
     "use strict";

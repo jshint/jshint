@@ -1218,26 +1218,6 @@ Lexer.prototype = {
 	},
 
 	/*
-	 * Scan for any occurence of mixed tabs and spaces. If smarttabs option
-	 * is on, ignore tabs followed by spaces.
-	 *
-	 * Tabs followed by one space followed by a block comment are allowed.
-	 */
-	scanMixedSpacesAndTabs: function () {
-		var at, match;
-
-		if (state.option.smarttabs) {
-			// Negative look-behind for "//"
-			match = this.input.match(/(\/\/|^\s?\*)? \t/);
-			at = match && !match[1] ? 0 : -1;
-		} else {
-			at = this.input.search(/ \t|\t [^\*]/);
-		}
-
-		return at;
-	},
-
-	/*
 	 * Scan for characters that get silently deleted by one or more browsers.
 	 */
 	scanUnsafeChars: function () {
@@ -1327,11 +1307,6 @@ Lexer.prototype = {
 			if (! (startsWith.call(inputTrimmed, "/*") || endsWith.call(inputTrimmed, "*/"))) {
 				this.input = "";
 			}
-		}
-
-		char = this.scanMixedSpacesAndTabs();
-		if (char >= 0) {
-			this.trigger("warning", { code: "W099", line: this.line, character: char + 1 });
 		}
 
 		this.input = this.input.replace(/\t/g, state.tab);

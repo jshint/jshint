@@ -372,17 +372,13 @@ exports.asi = function (test) {
 		.addError(2, "Missing semicolon.")
 		.addError(4, "Missing semicolon.")
 		.addError(5, "Missing semicolon.")
-		.addError(9, "Line breaking error 'continue'.")
 		.addError(9, "Missing semicolon.")
 		.addError(10, "Missing semicolon.")
-		.addError(11, "Line breaking error 'break'.")
 		.addError(11, "Missing semicolon.")
 		.addError(12, "Missing semicolon.")
 		.addError(16, "Missing semicolon.")
 		.addError(17, "Missing semicolon.")
-		.addError(19, "Line breaking error 'break'.")
 		.addError(19, "Missing semicolon.")
-		.addError(21, "Line breaking error 'break'.")
 		.addError(21, "Missing semicolon.")
 		.addError(25, "Missing semicolon.")
 		.addError(26, "Missing semicolon.", { character: 10 })
@@ -1091,78 +1087,6 @@ exports.globalstrict = function (test) {
 	test.done();
 };
 
-/** Option `laxbreak` allows you to insert newlines before some operators. */
-exports.laxbreak = function (test) {
-	var src = fs.readFileSync(__dirname + '/fixtures/laxbreak.js', 'utf8');
-
-	TestRun(test)
-		.addError(2, "Bad line breaking before ','.")
-		.addError(3, "Comma warnings can be turned off with 'laxcomma'.")
-		.addError(12, "Bad line breaking before ','.")
-		.test(src, { es3: true });
-
-	var ops = [ '||', '&&', '*', '/', '%', '+', '-', '>=',
-				'==', '===', '!=', '!==', '>', '<', '<=', 'instanceof' ];
-
-	for (var i = 0, op, code; op = ops[i]; i += 1) {
-		code = ['var a = b ', op + ' c;'];
-		TestRun(test)
-			.addError(2, "Bad line breaking before '" + op + "'.")
-			.test(code, { es3: true });
-
-		TestRun(test).test(code, { es3: true, laxbreak: true });
-	}
-
-	code = [ 'var a = b ', '? c : d;' ];
-	TestRun(test)
-		.addError(2, "Bad line breaking before '?'.")
-		.test(code, { es3: true });
-
-	TestRun(test).test(code, { es3: true, laxbreak: true });
-
-	test.done();
-};
-
-exports.white = function (test) {
-	var src = fs.readFileSync(__dirname + '/fixtures/white.js', 'utf8');
-
-	TestRun(test).test(src, {es3: true});
-	TestRun(test)
-		.addError(1, "Unexpected space after 'hello'.", { character: 15 })
-		.addError(2, "Unexpected space after 'true'.", { character: 16 })
-		.addError(5, "Missing space after 'function'.")
-		.addError(6, "Missing space after 'if'.")
-		.addError(6, "Missing space after ')'.")
-		.addError(14, "Unexpected space after 'true'.", { character: 16 })
-		.addError(15, "Missing space after ':'.")
-		.addError(18, "Unexpected space after '('.", { character: 9 })
-		.addError(18, "Unexpected space after 'ex'.", { character: 12 })
-		.addError(55, "Missing space after ','.") // 2 times?
-		.addError(56, "Missing space after '1'.")
-		.addError(58, "Unexpected space before 'b'.")
-		.addError(58, "Unexpected space after 'a'.")
-		.addError(60, "Unexpected space before 'c'.")
-		.addError(62, "Expected 'var' to have an indentation at 1 instead at 2.")
-		.addError(64, "Unexpected space after 'nodblwarnings'.", { character: 23 })
-		.addError(64, "Unexpected space after '('.", { character: 25 })
-		.test(src, { es3: true, white: true });
-
-	test.done();
-};
-
-exports.trailing = function (test) {
-	var src = fs.readFileSync(__dirname + '/fixtures/white.js', 'utf8');
-
-	TestRun(test).test(src, {es3: true});
-
-	TestRun(test)
-		.addError(8, "Trailing whitespace.", { character: 16 })
-		.addError(9, "Trailing whitespace.", { character: 6 })
-		.test(src, { es3: true, trailing: true });
-
-	test.done();
-};
-
 exports.validthis = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/strict_this.js', 'utf8');
 
@@ -1186,59 +1110,6 @@ exports.validthis = function (test) {
 	TestRun(test)
 		.addError(2, "Bad option value.")
 		.test(code, {es3: true});
-
-	test.done();
-};
-
-exports.indentation = function (test) {
-	var src = fs.readFileSync(__dirname + '/fixtures/indent.js', 'utf8');
-
-	TestRun(test)
-		.addError(5, "Mixed spaces and tabs.")
-		.addError(6, "Mixed spaces and tabs.")
-		.test(src, {es3: true});
-
-	// indent:false shouldn't trigger indent (GH-1035)
-	TestRun(test)
-		.addError(5, "Mixed spaces and tabs.")
-		.addError(6, "Mixed spaces and tabs.")
-		.test(src, {es3: true, indent: false});
-
-	TestRun(test)
-		.addError(5, "Mixed spaces and tabs.")
-		.addError(6, "Mixed spaces and tabs.")
-		.addError(10, "Unexpected space after 'hello'.")
-		.addError(11, "Unexpected space after '('.")
-		.addError(11, "Unexpected space after 'Hello World'.")
-		.test(src, { es3: true, indent: 4, white: true });
-
-	TestRun(test)
-		.addError(5, "Mixed spaces and tabs.")
-		.addError(5, "Expected 'var' to have an indentation at 5 instead at 7.")
-		.addError(6, "Mixed spaces and tabs.")
-		.addError(6, "Expected 'var' to have an indentation at 5 instead at 7.")
-		.addError(7, "Expected '}' to have an indentation at 3 instead at 5.")
-		.test(src, { es3: true, indent: 2 });
-
-	// case indent
-	TestRun(test)
-		.addError(5, "Mixed spaces and tabs.")
-		.addError(6, "Mixed spaces and tabs.")
-		.addError(10, "Unexpected space after 'hello'.")
-		.addError(11, "Unexpected space after '('.")
-		.addError(11, "Unexpected space after 'Hello World'.")
-		.test(src, { es3: true, indent: 4, white: true });
-
-	test.done();
-};
-
-exports.switchindent = function (test) {
-	var src = fs.readFileSync(__dirname + "/fixtures/switchindent.js", "utf8");
-
-	TestRun(test)
-		.addError(14, "Expected 'x' to have an indentation at 9 instead at 5.")
-		.addError(24, "Expected 'case' to have an indentation at 1 instead at 5.")
-		.test(src, { indent: 4, white: true });
 
 	test.done();
 };
@@ -1387,58 +1258,6 @@ exports.maxlen = function (test) {
 	test.done();
 };
 
-exports.smarttabs = function (test) {
-	var src = fs.readFileSync(__dirname + '/fixtures/smarttabs.js', 'utf8');
-
-	TestRun(test)
-		.addError(4, "Mixed spaces and tabs.")
-		.addError(5, "Mixed spaces and tabs.")
-		.addError(13, "Mixed spaces and tabs.")
-		.test(src, {es3: true});
-
-	TestRun(test)
-		.addError(5, "Mixed spaces and tabs.")
-		.test(src, {es3: true, smarttabs: true });
-
-	test.done();
-};
-
-/*
- * Tests the `laxcomma` option
- */
-exports.laxcomma = function (test) {
-	var src = fs.readFileSync(__dirname + '/fixtures/laxcomma.js', 'utf8');
-
-	// All errors.
-	TestRun(test)
-		.addError(1, "Bad line breaking before ','.")
-		.addError(2, "Comma warnings can be turned off with 'laxcomma'.")
-		.addError(2, "Bad line breaking before ','.")
-		.addError(6, "Bad line breaking before ','.")
-		.addError(10, "Bad line breaking before '&&'.")
-		.addError(15, "Bad line breaking before '?'.")
-		.test(src, {es3: true});
-
-	// Allows bad line breaking, but not on commas.
-	TestRun(test)
-		.addError(1, "Bad line breaking before ','.")
-		.addError(2, "Comma warnings can be turned off with 'laxcomma'.")
-		.addError(2, "Bad line breaking before ','.")
-		.addError(6, "Bad line breaking before ','.")
-		.test(src, {es3: true, laxbreak: true });
-
-	// Allows comma-first style but warns on bad line breaking
-	TestRun(test)
-		.addError(10, "Bad line breaking before '&&'.")
-		.addError(15, "Bad line breaking before '?'.")
-		.test(src, {es3: true, laxcomma: true });
-
-	// No errors if both laxbreak and laxcomma are turned on
-	TestRun(test).test(src, {es3: true, laxbreak: true, laxcomma: true });
-
-	test.done();
-};
-
 /*
  * Tests the `browser` option
  */
@@ -1471,10 +1290,6 @@ exports.unnecessarysemicolon = function (test) {
 	TestRun(test)
 		.addError(2, "Unnecessary semicolon.")
 		.test(code, {es3: true});
-
-	TestRun(test)
-		.addError(2, "Unnecessary semicolon.")
-		.test(code, {es3: true, white: true });
 
 	test.done();
 };

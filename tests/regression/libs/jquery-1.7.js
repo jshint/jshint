@@ -1,4 +1,4 @@
-/*jshint white: false, undef: true, regexp: false, plusplus: false,
+/*jshint undef: true, regexp: false, plusplus: false,
   eqeqeq: false, eqnull: true, evil: true, newcap: false, browser: true,
   forin: false, maxlen: 9001, immed: false */
 

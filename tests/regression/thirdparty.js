@@ -43,9 +43,7 @@ exports.jQuery_1_7 = function (test) {
 		.addError(4465, "'curLoop' is defined but never used.")
 		.addError(4560, "Expected an assignment or function call and instead saw an expression.")
 		.addError(4694, "'cache' is defined but never used.")
-		.addError(4702, "Mixed spaces and tabs.")
 		.addError(4712, "Expected a 'break' statement before 'case'.")
-		.addError(4715, "Mixed spaces and tabs.")
 		.addError(4843, "Expected an assignment or function call and instead saw an expression.")
 		.addError(5635, "'elem' is defined but never used.")
 		.addError(5675, "'i' is defined but never used.")
@@ -53,7 +51,6 @@ exports.jQuery_1_7 = function (test) {
 		.addError(7141, "'i' is defined but never used.")
 		.addError(6061, "'cur' is defined but never used.")
 		.addError(8595, "Did you mean to return a conditional instead of an assignment?")
-		.addError(9209, "Mixed spaces and tabs.")
 		.test(src, { undef: true, unused: true }, globals);
 
 	test.done();
@@ -135,7 +132,6 @@ exports.prototype_1_7 = function (test) {
 			loopfunc : true,
 			evil     : true,
 			eqnull   : true,
-			laxbreak : true,
 			boss     : true,
 			expr     : true,
 			maxerr   : 9001
@@ -155,11 +151,9 @@ exports.lodash_0_6_1 = function (test) {
 		boss     : true,
 		regexdash: true,
 		proto    : true,
-		laxbreak : true,
 		newcap   : false,
 		node     : true,
-		evil     : true,
-		laxcomma : true
+		evil     : true
 	};
 
 	TestRun(test)
@@ -197,7 +191,7 @@ exports.json2 = function (test) {
 	TestRun(test)
 		.addError(177, "'key' is defined but never used.")
 		.addError(191, "'key' is defined but never used.")
-		.test(src, { undef: true, unused: true, laxbreak: true }, { JSON: true });
+		.test(src, { undef: true, unused: true }, { JSON: true });
 
 	test.done();
 };
@@ -210,7 +204,6 @@ exports.codemirror3 = function (test) {
 		unused:   true,
 		eqnull:   true,
 		boss:     true,
-		laxbreak: true,
 		shadow:   true,
 		loopfunc: true,
 		browser:  true,
