@@ -4507,6 +4507,7 @@ var JSHINT = (function () {
 		var newOptionObj = {};
 		var newIgnoredObj = {};
 
+		o = _.clone(o);
 		state.reset();
 
 		if (o && o.scope) {
