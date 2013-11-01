@@ -199,7 +199,7 @@ var warnings = make("warning", {
 	W099: null,
 	W100: "This character may get silently deleted by one or more browsers.",
 	W101: "Line is too long.",
-	W102: "Trailing whitespace.",
+	W102: null,
 	W103: "The '{a}' property is deprecated.",
 	W104: "'{a}' is only available in JavaScript 1.7.",
 	W105: "Unexpected {a} in '{b}'.",

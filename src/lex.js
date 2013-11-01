@@ -1237,12 +1237,6 @@ Lexer.prototype = {
 				this.from += 1;
 				this.skip();
 			}
-
-			if (this.peek() === "") { // EOL
-				if (!/^\s*$/.test(this.getLines()[this.line - 1]) && state.option.trailing) {
-					this.trigger("warning", { code: "W102", line: this.line, character: start });
-				}
-			}
 		}
 
 		// Methods that work with multi-line structures and move the
