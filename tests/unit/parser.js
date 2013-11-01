@@ -452,13 +452,11 @@ exports.jsonMode = function (test) {
 
 	var run = TestRun(test)
 		.addError(2, "Expected a string and instead saw a.")
-		.addError(3, "Strings must use doublequote.")
 		.addError(3, "Avoid \\v.")
 		.addError(3, "Avoid \\x-.")
 		.addError(3, "Avoid \\'.")
 		.addError(4, "Avoid \\v.")
 		.addError(4, "Avoid \\x-.")
-		.addError(4, "Strings must use doublequote.")
 		.addError(5, "Avoid EOL escaping.")
 		.addError(7, "Avoid 0x-.");
 	run.test(code, {multistr: true, es3: true});

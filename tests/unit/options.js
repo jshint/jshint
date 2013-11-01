@@ -1136,51 +1136,6 @@ exports.strings = function (test) {
 	test.done();
 };
 
-/*
- * Test the `quotmark` option
- *	 quotmark	 quotation mark or true (=ensure consistency)
- */
-exports.quotes = function (test) {
-	var src = fs.readFileSync(__dirname + '/fixtures/quotes.js', 'utf8');
-	var src2 = fs.readFileSync(__dirname + '/fixtures/quotes2.js', 'utf8');
-
-	TestRun(test)
-		.test(src, { es3: true });
-
-	TestRun(test)
-		.addError(3, "Mixed double and single quotes.")
-		.test(src, { es3: true, quotmark: true });
-
-	TestRun(test)
-		.addError(3, "Strings must use singlequote.")
-		.test(src, { es3: true, quotmark: 'single' });
-
-	TestRun(test)
-		.addError(2, "Strings must use doublequote.")
-		.test(src, { es3: true, quotmark: 'double' });
-
-	// test multiple runs (must have the same result)
-	var run = TestRun(test);
-	run.addError(3, "Mixed double and single quotes.")
-		.test(src, { es3: true, quotmark: true });
-	run.addError(3, "Mixed double and single quotes.")
-		.test(src2, { es3: true, quotmark: true });
-
-	test.done();
-};
-
-// Test the `quotmark` option when defined as a JSHint comment.
-exports.quotesInline = function (test) {
-	TestRun(test)
-		.addError(6, "Strings must use doublequote.")
-		.addError(14, "Strings must use singlequote.")
-		.addError(21, "Mixed double and single quotes.")
-		.addError(32, "Bad option value.")
-		.test(fs.readFileSync(__dirname + "/fixtures/quotes3.js", "utf8"));
-
-	test.done();
-};
-
 exports.scope = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/scope.js', 'utf8');
 

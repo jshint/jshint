@@ -857,13 +857,6 @@ Lexer.prototype = {
 			return null;
 		}
 
-		// In JSON strings must always use double quotes.
-		this.triggerAsync("warning", {
-			code: "W108",
-			line: this.line,
-			character: this.char // +1?
-		}, checks, function () { return state.jsonMode && quote !== "\""; });
-
 		var value = "";
 		var startLine = this.line;
 		var startChar = this.char;

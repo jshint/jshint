@@ -462,22 +462,6 @@ function doOption() {
 				return;
 			}
 
-			if (key === "quotmark") {
-				switch (val) {
-				case "true":
-				case "false":
-					state.option.quotmark = (val === "true");
-					break;
-				case "double":
-				case "single":
-					state.option.quotmark = val;
-					break;
-				default:
-					warn("E002", { token: nt });
-				}
-				return;
-			}
-
 			if (key === "unused") {
 				switch (val) {
 				case "true":

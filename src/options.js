@@ -85,7 +85,6 @@ exports.multi = {
 	maxerr       : false,
 	predef       : false, // predef is deprecated and being replaced by globals
 	globals      : false,
-	quotmark     : false, // 'single'|'double'|true
 	scope        : false,
 	maxstatements: false, // {int} max statements per function
 	maxdepth     : false, // {int} max nested block depth per function
