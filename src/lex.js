@@ -91,7 +91,7 @@ function Lexer(source) {
 	// If the first line is a shebang (#!), make it a blank and move on.
 	// Shebangs are used by Node scripts.
 
-	if (lines[0] && lines[0].substr(0, 2) === "#!") {
+	if (lines[0] && lines[0].substring(0, 2) === "#!") {
 		if (lines[0].indexOf("node") !== -1) {
 			state.option.node = true;
 		}
@@ -351,7 +351,7 @@ Lexer.prototype = {
 	scanComments: function () {
 		var ch1 = this.peek();
 		var ch2 = this.peek(1);
-		var rest = this.input.substr(2);
+		var rest = this.input.substring(2);
 		var startLine = this.line;
 		var startChar = this.char;
 
@@ -381,16 +381,16 @@ Lexer.prototype = {
 					return;
 				}
 
-				if (body.substr(0, str.length) === str) {
+				if (body.substring(0, str.length) === str) {
 					isSpecial = true;
 					label = label + str;
-					body = body.substr(str.length);
+					body = body.substring(str.length);
 				}
 
-				if (!isSpecial && body.charAt(0) === " " && body.substr(1, str.length) === str) {
+				if (!isSpecial && body.charAt(0) === " " && body.substring(1, str.length + 1) === str) {
 					isSpecial = true;
 					label = label + " " + str;
-					body = body.substr(str.length + 1);
+					body = body.substring(str.length + 1);
 				}
 
 				if (!isSpecial) {
@@ -987,7 +987,7 @@ Lexer.prototype = {
 					function () { return n >= 0 && n <= 7 && state.directive["use strict"]; });
 					break;
 				case "u":
-					char = String.fromCharCode(parseInt(this.input.substr(1, 4), 16));
+					char = String.fromCharCode(parseInt(this.input.substring(1, 5), 16));
 					jump = 5;
 					break;
 				case "v":
@@ -1001,7 +1001,7 @@ Lexer.prototype = {
 					char = "\v";
 					break;
 				case "x":
-					var	x = parseInt(this.input.substr(1, 2), 16);
+					var	x = parseInt(this.input.substring(1, 3), 16);
 
 					this.triggerAsync("warning", {
 						code: "W114",
@@ -1158,7 +1158,7 @@ Lexer.prototype = {
 			}
 
 			if (char === "/") {
-				body = body.substr(0, body.length - 1);
+				body = body.substring(0, body.length - 1);
 				terminated = true;
 				index += 1;
 				break;
