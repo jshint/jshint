@@ -355,6 +355,8 @@ exports.nonstandard = {
 	unescape: false
 };
 
+exports.legacy = exports.nonstandard;
+
 // Globals provided by popular JavaScript environments.
 
 exports.couch = {
