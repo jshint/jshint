@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 var s = "foo";
 
 // ES5 annex B
