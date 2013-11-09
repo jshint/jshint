@@ -3732,7 +3732,7 @@ FutureReservedWord("transient");
 FutureReservedWord("volatile");
 
 // this function is used to determine wether a squarebracket or a curlybracket
-// expression is a comprehension array, destructuring assignment or a json value.
+// expression is a comprehension array or a destructuring assignment.
 
 var lookupBlockType = function () {
 	var pn, pn1;
@@ -3752,40 +3752,18 @@ var lookupBlockType = function () {
 		}
 		if (pn.identifier && pn.value === "for" && bracketStack === 1) {
 			ret.isCompArray = true;
-			ret.notJson = true;
 			break;
 		}
 		if (_.contains(["}", "]"], pn.value) && pn1.value === "=" && bracketStack === 0) {
 			ret.isDestAssign = true;
-			ret.notJson = true;
 			break;
 		}
 		if (pn.value === ";") {
 			ret.isBlock = true;
-			ret.notJson = true;
 		}
 	} while (bracketStack > 0 && pn.id !== "(end)" && i < 15);
 	return ret;
 };
-
-// Check whether this function has been reached for a destructuring assign with undeclared values
-function destructuringAssignOrJsonValue() {
-	// lookup for the assignment (esnext only)
-	// if it has semicolons, it is a block, so go parse it as a block
-	// or it's not a block, but there are assignments, check for undeclared variables
-
-	var block = lookupBlockType();
-	if (block.notJson) {
-		if (!state.option.inESNext() && block.isDestAssign) {
-			warn("W104", { token: state.tokens.curr, args: ["destructuring assignment"] });
-		}
-		statements();
-	// otherwise parse json value
-	} else {
-		state.jsonMode = true;
-		jsonValue();
-	}
-}
 
 // array comprehension parsing function
 // parses and defines the three states of the list comprehension in order
@@ -3889,93 +3867,6 @@ var arrayComprehension = function () {
 			}
 			};
 };
-
-
-// Parse JSON
-
-function jsonValue() {
-
-	function jsonObject() {
-		var o = {}, t = state.tokens.next;
-		advance("{");
-		if (state.tokens.next.id !== "}") {
-			for (;;) {
-				if (state.tokens.next.id === "(end)") {
-					warn("E026", { token: state.tokens.next, args: [t.line] });
-				} else if (state.tokens.next.id === "}") {
-					warn("W094", { token: state.tokens.curr });
-					break;
-				} else if (state.tokens.next.id === ",") {
-					warn("E028", { token: state.tokens.next });
-				} else if (state.tokens.next.id !== "(string)") {
-					warn("W095", { token: state.tokens.next, args: [state.tokens.next.value] });
-				}
-				if (o[state.tokens.next.value] === true) {
-					warn("W075", { token: state.tokens.next, args: [state.tokens.next.value] });
-				} else if ((state.tokens.next.value === "__proto__" &&
-					!state.option.proto) || (state.tokens.next.value === "__iterator__" &&
-					!state.option.iterator)) {
-					warn("W096", { token: state.tokens.next, args: [state.tokens.next.value] });
-				} else {
-					o[state.tokens.next.value] = true;
-				}
-				advance();
-				advance(":");
-				jsonValue();
-				if (state.tokens.next.id !== ",") {
-					break;
-				}
-				advance(",");
-			}
-		}
-		advance("}");
-	}
-
-	function jsonArray() {
-		var t = state.tokens.next;
-		advance("[");
-		if (state.tokens.next.id !== "]") {
-			for (;;) {
-				if (state.tokens.next.id === "(end)") {
-					warn("E027", { token: state.tokens.next, args: [t.line] });
-				} else if (state.tokens.next.id === "]") {
-					warn("W094", { token: state.tokens.curr });
-					break;
-				} else if (state.tokens.next.id === ",") {
-					warn("E028", { token: state.tokens.next });
-				}
-				jsonValue();
-				if (state.tokens.next.id !== ",") {
-					break;
-				}
-				advance(",");
-			}
-		}
-		advance("]");
-	}
-
-	switch (state.tokens.next.id) {
-	case "{":
-		jsonObject();
-		break;
-	case "[":
-		jsonArray();
-		break;
-	case "true":
-	case "false":
-	case "null":
-	case "(number)":
-	case "(string)":
-		advance();
-		break;
-	case "-":
-		advance("-");
-		advance("(number)");
-		break;
-	default:
-		warn("E003", { token: state.tokens.next });
-	}
-}
 
 var blockScope = function () {
 	var _current = {};
@@ -4132,10 +4023,6 @@ var JSHINT = function (s, o, g) {
 	}
 
 	api = {
-		get isJSON() {
-			return state.jsonMode;
-		},
-
 		getOption: function (name) {
 			return state.option[name] || null;
 		},
@@ -4216,22 +4103,21 @@ var JSHINT = function (s, o, g) {
 
 	try {
 		advance();
-		switch (state.tokens.next.id) {
-		case "{":
-		case "[":
-			destructuringAssignOrJsonValue();
-			break;
-		default:
-			directives();
+		directives();
 
+		if (state.tokens.next.id === "{" || state.tokens.next.id === "[") {
+			if (!state.option.inESNext() && lookupBlockType().isDestAssign) {
+				warn("W104", { token: state.tokens.curr, args: ["destructuring assignment"] });
+			}
+		} else {
 			if (state.directive["use strict"]) {
 				if (!state.option.globalstrict && !(state.option.node || state.option.phantom)) {
 					warn("W097", { token: state.tokens.prev });
 				}
 			}
-
-			statements();
 		}
+
+		statements();
 		advance((state.tokens.next && state.tokens.next.value !== ".")	? "(end)" : undefined);
 		funct["(blockscope)"].unstack();
 
@@ -4436,10 +4322,6 @@ JSHINT.data = function () {
 
 	if (JSHINT.errors.length) {
 		data.errors = JSHINT.errors;
-	}
-
-	if (state.jsonMode) {
-		data.json = true;
 	}
 
 	for (n in implied) {

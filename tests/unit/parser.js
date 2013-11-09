@@ -437,36 +437,6 @@ exports.ownProperty = function (test) {
 	test.done();
 };
 
-exports.jsonMode = function (test) {
-	var code = [
-		'{',
-		'	a: 2,',
-		'	\'b\': "hallo\\"\\v\\x12\\\'world",',
-		'	"c\\"\\v\\x12": \'4\',',
-		'	"d": "4\\',
-		'	",',
-		'	"e": 0x332,',
-		'	"x": 0',
-		'}',
-	];
-
-	var run = TestRun(test)
-		.addError(2, "Expected a string and instead saw a.")
-		.addError(3, "Avoid \\v.")
-		.addError(3, "Avoid \\x-.")
-		.addError(3, "Avoid \\'.")
-		.addError(4, "Avoid \\v.")
-		.addError(4, "Avoid \\x-.")
-		.addError(5, "Avoid EOL escaping.")
-		.addError(7, "Avoid 0x-.");
-	run.test(code, {multistr: true, es3: true});
-	run.test(code, {multistr: true}); // es5
-	run.test(code, {multistr: true, esnext: true});
-	run.test(code, {multistr: true, moz: true});
-
-	test.done();
-};
-
 exports.comma = function (test) {
 	var src = fs.readFileSync(__dirname + "/fixtures/comma.js", "utf8");
 

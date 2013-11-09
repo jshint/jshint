@@ -884,19 +884,12 @@ Lexer.prototype = {
 					allowNewLine = false;
 
 					// Otherwise show a warning if multistr option was not set.
-					// For JSON, show warning no matter what.
 
 					this.triggerAsync("warning", {
 						code: "W043",
 						line: this.line,
 						character: this.char
 					}, checks, function () { return !state.option.multistr; });
-
-					this.triggerAsync("warning", {
-						code: "W042",
-						line: this.line,
-						character: this.char
-					}, checks, function () { return state.jsonMode && state.option.multistr; });
 				}
 
 				// If we get an EOF inside of an unclosed string, show an
@@ -940,14 +933,6 @@ Lexer.prototype = {
 				char = this.peek();
 
 				switch (char) {
-				case "'":
-					this.triggerAsync("warning", {
-						code: "W114",
-						line: this.line,
-						character: this.char,
-						data: [ "\\'" ]
-					}, checks, function () {return state.jsonMode; });
-					break;
 				case "b":
 					char = "\b";
 					break;
@@ -981,31 +966,16 @@ Lexer.prototype = {
 					jump = 5;
 					break;
 				case "v":
-					this.triggerAsync("warning", {
-						code: "W114",
-						line: this.line,
-						character: this.char,
-						data: [ "\\v" ]
-					}, checks, function () { return state.jsonMode; });
-
 					char = "\v";
 					break;
 				case "x":
-					var	x = parseInt(this.input.substr(1, 2), 16);
-
-					this.triggerAsync("warning", {
-						code: "W114",
-						line: this.line,
-						character: this.char,
-						data: [ "\\x-" ]
-					}, checks, function () { return state.jsonMode; });
-
-					char = String.fromCharCode(x);
+					char = String.fromCharCode(parseInt(this.input.substr(1, 2), 16));
 					jump = 3;
 					break;
 				case "\\":
 				case "\"":
 				case "/":
+				case "'":
 					break;
 				case "":
 					allowNewLine = true;
@@ -1474,13 +1444,6 @@ Lexer.prototype = {
 						data: [ token.value ]
 					});
 				}
-
-				this.triggerAsync("warning", {
-					code: "W114",
-					line: this.line,
-					character: this.char,
-					data: [ "0x-" ]
-				}, checks, function () { return token.base === 16 && state.jsonMode; });
 
 				this.triggerAsync("warning", {
 					code: "W115",

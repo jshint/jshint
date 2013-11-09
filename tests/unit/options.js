@@ -189,7 +189,6 @@ exports["implied and unused should respect hoisting"] = function (test) {
  */
 exports.testProtoAndIterator = function (test) {
 	var source = fs.readFileSync(__dirname + '/fixtures/protoiterator.js', 'utf8');
-	var json = '{"__proto__": true, "__iterator__": false, "_identifier": null, "property": 123}';
 
 	// JSHint should not allow the `__proto__` and
 	// `__iterator__` properties by default
@@ -202,15 +201,10 @@ exports.testProtoAndIterator = function (test) {
 		.addError(37, "The '__proto__' property is deprecated.")
 		.test(source, {es3: true});
 
-	TestRun(test)
-		.addError(1, "The '__proto__' key may produce unexpected results.")
-		.addError(1, "The '__iterator__' key may produce unexpected results.")
-		.test(json, {es3: true});
-
 	// Should not report any errors when proto and iterator
 	// options are on
-	TestRun("source").test(source, { es3: true, proto: true, iterator: true });
-	TestRun("json").test(json, { es3: true, proto: true, iterator: true });
+	TestRun(test)
+		.test(source, { es3: true, proto: true, iterator: true });
 
 	test.done();
 };
