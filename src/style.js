@@ -80,49 +80,6 @@ exports.register = function (linter) {
 		}
 	});
 
-	// Enforce consistency in style of quoting.
-
-	linter.on("String", function style_scanQuotes(data) {
-		var quotmark = linter.getOption("quotmark");
-		var code;
-
-		if (!quotmark) {
-			return;
-		}
-
-		// If quotmark is set to 'single' warn about all double-quotes.
-
-		if (quotmark === "single" && data.quote !== "'") {
-			code = "W109";
-		}
-
-		// If quotmark is set to 'double' warn about all single-quotes.
-
-		if (quotmark === "double" && data.quote !== "\"") {
-			code = "W108";
-		}
-
-		// If quotmark is set to true, remember the first quotation style
-		// and then warn about all others.
-
-		if (quotmark === true) {
-			if (!linter.getCache("quotmark")) {
-				linter.setCache("quotmark", data.quote);
-			}
-
-			if (linter.getCache("quotmark") !== data.quote) {
-				code = "W110";
-			}
-		}
-
-		if (code) {
-			linter.warn(code, {
-				line: data.line,
-				char: data.char,
-			});
-		}
-	});
-
 	linter.on("Number", function style_scanNumbers(data) {
 		if (data.value.charAt(0) === ".") {
 			// Warn about a leading decimal point.
