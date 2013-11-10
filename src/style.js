@@ -63,23 +63,6 @@ exports.register = function (linter) {
 		}
 	});
 
-	// Check that all identifiers are using camelCase notation.
-	// Exceptions: names like MY_VAR and _myVar.
-
-	linter.on("Identifier", function style_scanCamelCase(data) {
-		if (!linter.getOption("camelcase")) {
-			return;
-		}
-
-		if (data.name.replace(/^_+|_+$/g, "").indexOf("_") > -1 && !data.name.match(/^[A-Z0-9_]*$/)) {
-			linter.warn("W106", {
-				line: data.line,
-				char: data.from,
-				data: [ data.name ]
-			});
-		}
-	});
-
 	linter.on("Number", function style_scanNumbers(data) {
 		if (data.value.charAt(0) === ".") {
 			// Warn about a leading decimal point.

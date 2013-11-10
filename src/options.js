@@ -6,7 +6,6 @@ exports.simple = {
 	bitwise     : true, // if bitwise operators should not be allowed
 	boss        : true, // if advanced usage of assignments should be allowed
 	browser     : true, // if the standard browser globals should be predefined
-	camelcase   : true, // if identifiers should be required in camel case
 	couch       : true, // if CouchDB globals should be predefined
 	curly       : true, // if curly braces around all blocks should be required
 	debug       : true, // if debugger statements should be allowed

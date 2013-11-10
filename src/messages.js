@@ -203,7 +203,7 @@ var warnings = make("warning", {
 	W103: "The '{a}' property is deprecated.",
 	W104: "'{a}' is only available in JavaScript 1.7.",
 	W105: "Unexpected {a} in '{b}'.",
-	W106: "Identifier '{a}' is not in camel case.",
+	W106: null,
 	W107: "Script URL.",
 	W108: null,
 	W109: null,
