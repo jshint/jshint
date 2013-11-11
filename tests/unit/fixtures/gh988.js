@@ -41,14 +41,6 @@ function maxComplexity() {
     };
 }
 
-function maxLen() {
-    /*jshint maxlen: 40 */
-    return function () {
-        /*jshint maxlen: false */
-        return "a long string that would otherwise make the line too long";
-    };
-}
-
 function indent() {
     /*jshint indent: 4 */
     return function () {

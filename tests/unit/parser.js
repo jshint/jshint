@@ -161,7 +161,6 @@ exports.options = function (test) {
 		"/*jslint indent: 0 */",
 		"/*jslint indent: -2 */",
 		"/*jslint indent: 100.4 */",
-		"/*jslint maxlen: 200.4 */",
 		"/*jslint maxerr: 300.4 */",
 		"/*jslint maxerr: 0 */",
 		"/*jslint maxerr: 20 */",
@@ -177,11 +176,10 @@ exports.options = function (test) {
 		.addError(5, "Expected a small integer or 'false' and instead saw '0'.")
 		.addError(6, "Expected a small integer or 'false' and instead saw '-2'.")
 		.addError(7, "Expected a small integer or 'false' and instead saw '100.4'.")
-		.addError(8, "Expected a small integer or 'false' and instead saw '200.4'.")
-		.addError(9, "Expected a small integer or 'false' and instead saw '300.4'.")
-		.addError(10, "Expected a small integer or 'false' and instead saw '0'.")
-		.addError(13, "Bad option: 'd'.")
-		.addError(15, "Read only.");
+		.addError(8, "Expected a small integer or 'false' and instead saw '300.4'.")
+		.addError(9, "Expected a small integer or 'false' and instead saw '0'.")
+		.addError(12, "Bad option: 'd'.")
+		.addError(14, "Read only.");
 	run.test(code, {es3: true});
 	run.test(code, {}); // es5
 	run.test(code, {esnext: true});

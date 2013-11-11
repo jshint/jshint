@@ -1092,16 +1092,6 @@ exports.strings = function (test) {
 		.addError(10, "Unclosed string.")
 		.addError(15, "Unclosed string.")
 		.addError(23, "Octal literals are not allowed in strict mode.")
-		.test(src, { es3: true, multistr: true });
-
-	TestRun(test)
-		.addError(3, "Bad escaping of EOL. Use option multistr if needed.")
-		.addError(4, "Bad escaping of EOL. Use option multistr if needed.")
-		.addError(9, "Unclosed string.")
-		.addError(10, "Unclosed string.")
-		.addError(14, "Bad escaping of EOL. Use option multistr if needed.")
-		.addError(15, "Unclosed string.")
-		.addError(23, "Octal literals are not allowed in strict mode.")
 		.test(src, { es3: true });
 
 	test.done();
@@ -1162,19 +1152,6 @@ exports.esnext = function (test) {
 		.addError(3, "const 'myConst' has already been declared.")
 		.addError(4, "Attempting to override 'foo' which is a constant.")
 		.test(code, { moz: true });
-
-	test.done();
-};
-
-/*
- * Tests the `maxlen` option
- */
-exports.maxlen = function (test) {
-	var src = fs.readFileSync(__dirname + '/fixtures/maxlen.js', 'utf8');
-
-	TestRun(test)
-		.addError(3, "Line is too long.")
-		.test(src, { es3: true, maxlen: 23 });
 
 	test.done();
 };

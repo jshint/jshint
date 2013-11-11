@@ -31,7 +31,6 @@ exports.simple = {
 	loopfunc    : true, // if functions should be allowed to be defined within
 	                    // loops
 	mootools    : true, // if MooTools globals should be predefined
-	multistr    : true, // allow multiline strings
 	freeze      : true, // if modifying native object prototypes should be disallowed
 	newcap      : true, // if constructor names must be capitalized
 	noarg       : true, // if arguments.caller and arguments.callee should be
@@ -79,7 +78,6 @@ exports.simple = {
 // These are the JSHint options that can take any value
 // (we use this object to detect invalid options)
 exports.multi = {
-	maxlen       : false,
 	indent       : false,
 	maxerr       : false,
 	predef       : false, // predef is deprecated and being replaced by globals

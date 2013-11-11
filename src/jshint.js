@@ -45,6 +45,7 @@ var style    = require("./style.js");
 var options  = require("./options.js");
 var console  = require("console-browserify"); // Needed for browserify to work with IE and Rhino.
 
+var syntax   = {};
 var addons   = [];
 var emitter  = new events.EventEmitter();
 
@@ -236,7 +237,7 @@ function assume() {
 
 // Produce an error warning.
 function quit(code, line, chr) {
-	var pct = Math.floor((line / state.lines.length) * 100);
+	var pct = Math.floor((line / lex.source.length) * 100);
 	var msg = messages.get(code);
 
 	throw {
@@ -278,7 +279,7 @@ function warn(code, opts) {
 		line:    line,
 		ch:      ch,
 		message: msg.desc,
-		source:  state.lines[line - 1] || "",
+		source:  lex.source[line - 1] || "",
 		scope:   JSHINT.scope
 	});
 
@@ -414,7 +415,6 @@ function doOption() {
 		"maxdepth",
 		"maxcomplexity",
 		"maxerr",
-		"maxlen",
 		"indent"
 	];
 
@@ -551,6 +551,66 @@ function doOption() {
 	}
 }
 
+function convertToken(token) {
+	var obj;
+
+	function reserved(obj, isprop) {
+		var meta = obj.meta;
+
+		if (!obj.reserved)
+			return false;
+
+		if (!meta || !meta.isFutureReservedWord || !state.option.inES5())
+			return true;
+
+		// ES3 FutureReservedWord in an ES5 environment.
+		if (!meta.es5)
+			return false;
+
+		// Some ES5 FutureReservedWord identifiers are active only
+		// within a strict mode environment.
+		if (meta.strictOnly && !state.option.strict && !state.directive["use strict"])
+			return false;
+
+		if (isprop)
+			return false;
+
+		return true;
+	}
+
+	if (token.id)
+		return token;
+
+	if (token.type === "(punctuator)")
+		obj = Object.create(syntax[token.value] || syntax["(error)"]);
+
+	if (token.type === "(identifier)") {
+		if (_.has(syntax, token.value)) {
+			obj = Object.create(syntax[token.value] || syntax["(error)"]);
+
+			// If this can't be a reserved keyword, reset the object.
+			if (!reserved(obj, state.tokens.curr.id === "." && token.type === "(identifier)"))
+				obj = null;
+		}
+	}
+
+	if (!obj)
+		obj = Object.create(syntax[token.type]);
+
+	obj.identifier = (token.type === "(identifier)");
+	obj.check = token.check;
+	obj.type  = obj.type || token.type;
+	obj.value = token.value;
+	obj.line  = token.pos.line;
+	obj.from  = token.pos.from;
+	obj.character = token.pos.ch;
+
+	if (state.tokens.curr.id === "." && obj.identifier)
+		obj.isProperty = true;
+
+	return obj;
+}
+
 // We need a peek function. If it has an argument, it peeks that much farther
 // ahead. It is used to distinguish
 //	   for ( var i in ...
@@ -563,7 +623,7 @@ function peek(p) {
 	while (j <= i) {
 		t = lookahead[j];
 		if (!t) {
-			t = lookahead[j] = lex.token();
+			t = lookahead[j] = convertToken(lex.token());
 		}
 		j += 1;
 	}
@@ -613,7 +673,7 @@ function advance(id, t) {
 	state.tokens.prev = state.tokens.curr;
 	state.tokens.curr = state.tokens.next;
 	for (;;) {
-		state.tokens.next = lookahead.shift() || lex.token();
+		state.tokens.next = lookahead.shift() || convertToken(lex.token());
 
 		if (!state.tokens.next) { // No more tokens left, give up
 			quit("E041", state.tokens.curr.line);
@@ -680,7 +740,7 @@ function expression(rbp, initial) {
 		funct["(blockscope)"].stack();
 		advance("let");
 		advance("(");
-		state.syntax["let"].fud.call(state.syntax["let"].fud, false);
+		syntax["let"].fud.call(syntax["let"].fud, false);
 		advance(")");
 	}
 
@@ -802,9 +862,9 @@ function comma(opts) {
 // tokens.
 
 function symbol(s, p) {
-	var x = state.syntax[s];
+	var x = syntax[s];
 	if (!x || typeof x !== "object") {
-		state.syntax[s] = x = {
+		syntax[s] = x = {
 			id: s,
 			lbp: p,
 			value: s
@@ -1075,7 +1135,7 @@ function assignop(s, f, p) {
 				return that;
 			}
 
-			if (left === state.syntax["function"]) {
+			if (left === syntax["function"]) {
 				warn("W023", { token: state.tokens.curr });
 			}
 		}
@@ -1115,7 +1175,7 @@ function bitwiseassignop(s) {
 				expression(10);
 				return that;
 			}
-			if (left === state.syntax["function"]) {
+			if (left === syntax["function"]) {
 				warn("W023", { token: state.tokens.curr });
 			}
 			return that;
@@ -1146,34 +1206,19 @@ function suffix(s) {
 // prop means that this identifier is that of an object property
 
 function optionalidentifier(fnparam, prop) {
-	if (!state.tokens.next.identifier) {
+	if (!state.tokens.next.identifier)
 		return;
-	}
 
 	advance();
 
 	var curr = state.tokens.curr;
 	var val  = state.tokens.curr.value;
 
-	if (!isReserved(curr)) {
+	switch (true) {
+	case !isReserved(curr):
+	case prop && state.option.inES5():
+	case fnparam && val === "undefined":
 		return val;
-	}
-
-	if (prop) {
-		if (state.option.inES5()) {
-			return val;
-		}
-	}
-
-	if (fnparam && val === "undefined") {
-		return val;
-	}
-
-	// Display an info message about reserved words as properties
-	// and ES5 but do it only once.
-	if (prop && !api.getCache("displayed:I002")) {
-		api.setCache("displayed:I002", true);
-		warn("I002");
 	}
 
 	warn("W024", { token: state.tokens.curr, args: [state.tokens.curr.id] });
@@ -1577,7 +1622,7 @@ type("(string)", function () {
 	return this;
 });
 
-state.syntax["(identifier)"] = {
+syntax["(identifier)"] = {
 	type: "(identifier)",
 	lbp: 0,
 	identifier: true,
@@ -1915,11 +1960,11 @@ infix("%", "mod", 140);
 
 suffix("++", "postinc");
 prefix("++", "preinc");
-state.syntax["++"].exps = true;
+syntax["++"].exps = true;
 
 suffix("--", "postdec");
 prefix("--", "predec");
-state.syntax["--"].exps = true;
+syntax["--"].exps = true;
 prefix("delete", function () {
 	var p = expression(10);
 	if (!p || (p.id !== "." && p.id !== "[")) {
@@ -2011,7 +2056,7 @@ prefix("new", function () {
 	this.first = c;
 	return this;
 });
-state.syntax["new"].exps = true;
+syntax["new"].exps = true;
 
 prefix("void").exps = true;
 
@@ -2174,7 +2219,7 @@ prefix("(", function () {
 		return;
 	}
 	if (exprs.length > 1) {
-		ret = Object.create(state.syntax[","]);
+		ret = Object.create(syntax[","]);
 		ret.exprs = exprs;
 	} else {
 		ret = exprs[0];
@@ -2196,7 +2241,7 @@ infix("[", function (left, that) {
 
 		countMember(e.value);
 		if (!state.option.sub && reg.identifier.test(e.value)) {
-			s = state.syntax[e.value];
+			s = syntax[e.value];
 			if (!s || !isReserved(s)) {
 				warn("W069", { token: state.tokens.prev, args: [e.value] });
 			}
@@ -3055,7 +3100,7 @@ function classtail(c) {
 	state.directive["use strict"] = true;
 	advance("{");
 	// ClassBody(opt)
-	c.body = state.syntax["{"].nud(true);
+	c.body = syntax["{"].nud(true);
 	state.directive["use strict"] = strictness;
 }
 
@@ -3276,7 +3321,7 @@ blockstmt("switch", function () {
 				// You can tell JSHint that you don't use break intentionally by
 				// adding a comment /* falls through */ on a line just before
 				// the next `case`.
-				if (!reg.fallsThrough.test(state.lines[state.tokens.next.line - 2])) {
+				if (!reg.fallsThrough.test(lex.source[state.tokens.next.line - 2])) {
 					warn("W086", { token: state.tokens.curr, args: ["case"] });
 				}
 			}
@@ -3299,7 +3344,7 @@ blockstmt("switch", function () {
 				// Do not display a warning if 'default' is the first statement or if
 				// there is a special /* falls through */ comment.
 				if (this.cases.length) {
-					if (!reg.fallsThrough.test(state.lines[state.tokens.next.line - 2])) {
+					if (!reg.fallsThrough.test(lex.source[state.tokens.next.line - 2])) {
 						warn("W086", { token: state.tokens.curr, args: ["default"] });
 					}
 				}
@@ -3410,13 +3455,13 @@ blockstmt("for", function () {
 		}
 		if (state.tokens.next.id === "var") {
 			advance("var");
-			state.syntax["var"].fud.call(state.syntax["var"].fud, true);
+			syntax["var"].fud.call(syntax["var"].fud, true);
 		} else if (state.tokens.next.id === "let") {
 			advance("let");
 			// create a new block scope
 			letscope = true;
 			funct["(blockscope)"].stack();
-			state.syntax["let"].fud.call(state.syntax["let"].fud, true);
+			syntax["let"].fud.call(syntax["let"].fud, true);
 		} else {
 			switch (funct[state.tokens.next.value]) {
 			case "unused":
@@ -3447,13 +3492,13 @@ blockstmt("for", function () {
 		if (state.tokens.next.id !== ";") {
 			if (state.tokens.next.id === "var") {
 				advance("var");
-				state.syntax["var"].fud.call(state.syntax["var"].fud);
+				syntax["var"].fud.call(syntax["var"].fud);
 			} else if (state.tokens.next.id === "let") {
 				advance("let");
 				// create a new block scope
 				letscope = true;
 				funct["(blockscope)"].stack();
-				state.syntax["let"].fud.call(state.syntax["let"].fud);
+				syntax["let"].fud.call(syntax["let"].fud);
 			} else {
 				for (;;) {
 					expression(0, "for");
@@ -3677,21 +3722,21 @@ stmt("export", function () {
 
 	if (state.tokens.next.id === "var") {
 		advance("var");
-		state.syntax["var"].fud.call(state.syntax["var"].fud);
+		syntax["var"].fud.call(syntax["var"].fud);
 	} else if (state.tokens.next.id === "let") {
 		advance("let");
-		state.syntax["let"].fud.call(state.syntax["let"].fud);
+		syntax["let"].fud.call(syntax["let"].fud);
 	} else if (state.tokens.next.id === "const") {
 		advance("const");
-		state.syntax["const"].fud.call(state.syntax["const"].fud);
+		syntax["const"].fud.call(syntax["const"].fud);
 	} else if (state.tokens.next.id === "function") {
 		this.block = true;
 		advance("function");
-		state.syntax["function"].fud();
+		syntax["function"].fud();
 	} else if (state.tokens.next.id === "class") {
 		this.block = true;
 		advance("class");
-		state.syntax["class"].fud();
+		syntax["class"].fud();
 	} else {
 		warn("E024", { token: state.tokens.next, args: [state.tokens.next.value] });
 	}
@@ -4027,14 +4072,6 @@ var JSHINT = function (s, o, g) {
 			return state.option[name] || null;
 		},
 
-		getCache: function (name) {
-			return state.cache[name];
-		},
-
-		setCache: function (name, value) {
-			state.cache[name] = value;
-		},
-
 		warn: function (code, data) {
 			warn.call(null, code, { coord: { line: data.line, ch: data.char }, args: data.data });
 		},
@@ -4051,9 +4088,9 @@ var JSHINT = function (s, o, g) {
 		func(api);
 	});
 
-	state.tokens.prev = state.tokens.curr = state.tokens.next = state.syntax["(begin)"];
+	state.tokens.prev = state.tokens.curr = state.tokens.next = syntax["(begin)"];
 
-	lex = new Lexer(s);
+	lex = new Lexer(s, { indent: state.option.indent });
 
 	lex.on("warning", function (ev) {
 		warn.call(null, ev.code, { coord: { line: ev.line, ch: ev.character }, args: ev.data });

@@ -1,8 +1,6 @@
 "use strict";
 
 var state = {
-	syntax: {},
-
 	reset: function () {
 		this.tokens = {
 			prev: null,
@@ -13,9 +11,6 @@ var state = {
 		this.option = {};
 		this.ignored = {};
 		this.directive = {};
-		this.lines = [];
-		this.tab = "";
-		this.cache = {}; // Node.JS doesn't have Map. Sniff.
 		this.ignoreLinterErrors = false;    // Blank out non-multi-line-commented
 											// lines when ignoring linter errors
 	}

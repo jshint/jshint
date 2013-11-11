@@ -78,7 +78,7 @@ function asyncTrigger() {
  * Mozilla's JavaScript Parser API. Eventually, we will move away from
  * JSLint format.
  */
-function Lexer(source) {
+function Lexer(source, options) {
 	var lines = source;
 
 	if (typeof lines === "string") {
@@ -89,7 +89,6 @@ function Lexer(source) {
 	}
 
 	this.emitter = new events.EventEmitter();
-	this.source = source;
 	this.prereg = true;
 
 	// If the first line is a hash-bang (#!), make it a blank and move on.
@@ -99,28 +98,21 @@ function Lexer(source) {
 		lines[0] = "";
 	}
 
-	this.setLines(lines);
+	this.source = lines;
 	this.line = 0;
 	this.char = 1;
 	this.from = 1;
+	this.tab  = "";
 	this.input = "";
 
-	for (var i = 0; i < state.option.indent; i += 1) {
-		state.tab += " ";
+	for (var i = 0; i < options.indent; i += 1) {
+		this.tab += " ";
 	}
 }
 
 Lexer.prototype = {
-	_lines: [],
-
-	getLines: function () {
-		this._lines = state.lines;
-		return this._lines;
-	},
-
-	setLines: function (val) {
-		this._lines = val;
-		state.lines = this._lines;
+	pos: function () {
+		return { line: this.line, ch: this.char, from: this.from };
 	},
 
 	/*
@@ -874,23 +866,10 @@ Lexer.prototype = {
 				// Another approach is to implicitly close a string on EOL
 				// but it generates too many false positives.
 
-				if (!allowNewLine) {
-					this.trigger("warning", {
-						code: "W112",
-						line: this.line,
-						character: this.char
-					});
-				} else {
+				if (!allowNewLine)
+					this.trigger("warning", { code: "W112", line: this.line, character: this.char });
+				else
 					allowNewLine = false;
-
-					// Otherwise show a warning if multistr option was not set.
-
-					this.triggerAsync("warning", {
-						code: "W043",
-						line: this.line,
-						character: this.char
-					}, checks, function () { return !state.option.multistr; });
-				}
 
 				// If we get an EOF inside of an unclosed string, show an
 				// error and implicitly close it at the EOF point.
@@ -1239,11 +1218,10 @@ Lexer.prototype = {
 	nextLine: function () {
 		var char;
 
-		if (this.line >= this.getLines().length) {
+		if (this.line >= this.source.length)
 			return false;
-		}
 
-		this.input = this.getLines()[this.line];
+		this.input = this.source[this.line];
 		this.line += 1;
 		this.char = 1;
 		this.from = 1;
@@ -1263,18 +1241,11 @@ Lexer.prototype = {
 			}
 		}
 
-		this.input = this.input.replace(/\t/g, state.tab);
+		this.input = this.input.replace(/\t/g, this.tab);
 		char = this.scanUnsafeChars();
 
 		if (char >= 0) {
 			this.trigger("warning", { code: "W100", line: this.line, character: char });
-		}
-
-		// If there is a limit on line length, warn when lines get too
-		// long.
-
-		if (state.option.maxlen && state.option.maxlen < this.input.length) {
-			this.trigger("warning", { code: "W101", line: this.line, character: this.input.length });
 		}
 
 		return true;
@@ -1297,98 +1268,14 @@ Lexer.prototype = {
 		var checks = asyncTrigger();
 		var token;
 
-
-		function isReserved(token, isProperty) {
-			if (!token.reserved) {
-				return false;
-			}
-			var meta = token.meta;
-
-			if (meta && meta.isFutureReservedWord && state.option.inES5()) {
-				// ES3 FutureReservedWord in an ES5 environment.
-				if (!meta.es5) {
-					return false;
-				}
-
-				// Some ES5 FutureReservedWord identifiers are active only
-				// within a strict mode environment.
-				if (meta.strictOnly) {
-					if (!state.option.strict && !state.directive["use strict"]) {
-						return false;
-					}
-				}
-
-				if (isProperty) {
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		// Produce a token object.
-		var create = function (type, value, isProperty) {
-			/*jshint validthis:true */
-			var obj;
-
-			if (type !== "(endline)" && type !== "(end)") {
-				this.prereg = false;
-			}
-
-			if (type === "(punctuator)") {
-				switch (value) {
-				case ".":
-				case ")":
-				case "~":
-				case "#":
-				case "]":
-					this.prereg = false;
-					break;
-				default:
-					this.prereg = true;
-				}
-
-				obj = Object.create(state.syntax[value] || state.syntax["(error)"]);
-			}
-
-			if (type === "(identifier)") {
-				if (value === "return" || value === "case" || value === "typeof") {
-					this.prereg = true;
-				}
-
-				if (_.has(state.syntax, value)) {
-					obj = Object.create(state.syntax[value] || state.syntax["(error)"]);
-
-					// If this can't be a reserved keyword, reset the object.
-					if (!isReserved(obj, isProperty && type === "(identifier)")) {
-						obj = null;
-					}
-				}
-			}
-
-			if (!obj) {
-				obj = Object.create(state.syntax[type]);
-			}
-
-			obj.identifier = (type === "(identifier)");
-			obj.type = obj.type || type;
-			obj.value = value;
-			obj.line = this.line;
-			obj.character = this.char;
-			obj.from = this.from;
-
-			if (isProperty && obj.identifier) {
-				obj.isProperty = isProperty;
-			}
-
-			obj.check = checks.check;
-
-			return obj;
-		}.bind(this);
-
 		for (;;) {
 			if (!this.input.length) {
-				return create(this.nextLine() ? "(endline)" : "(end)", "");
+				return {
+					type: this.nextLine() ? "(endline)" : "(end)",
+					value: "",
+					check: checks.check,
+					pos: this.pos()
+				};
 			}
 
 			token = this.next(checks);
@@ -1411,6 +1298,8 @@ Lexer.prototype = {
 
 			switch (token.type) {
 			case Token.StringLiteral:
+				this.prereg = false;
+
 				this.triggerAsync("String", {
 					line: this.line,
 					char: this.char,
@@ -1419,8 +1308,10 @@ Lexer.prototype = {
 					quote: token.quote
 				}, checks, function () { return true; });
 
-				return create("(string)", token.value);
+				return { type: "(string)", value: token.value, check: checks.check, pos: this.pos() };
 			case Token.Identifier:
+				this.prereg = false;
+
 				this.trigger("Identifier", {
 					line: this.line,
 					char: this.char,
@@ -1431,11 +1322,17 @@ Lexer.prototype = {
 
 				/* falls through */
 			case Token.Keyword:
+				if (_.contains(["return", "case", "typeof"], token.value))
+					this.prereg = true;
+
+				/* falls through */
 			case Token.NullLiteral:
 			case Token.BooleanLiteral:
-				return create("(identifier)", token.value, state.tokens.curr.id === ".");
+				return { type: "(identifier)", value: token.value, check: checks.check, pos: this.pos() };
 
 			case Token.NumericLiteral:
+				this.prereg = false;
+
 				if (token.isMalformed) {
 					this.trigger("warning", {
 						code: "W045",
@@ -1462,14 +1359,13 @@ Lexer.prototype = {
 					isMalformed: token.malformed
 				});
 
-				return create("(number)", token.value);
+				return { type: "(number)", value: token.value, check: checks.check, pos: this.pos() };
 
 			case Token.RegExp:
-				return create("(regexp)", token.value);
+				this.prereg = false;
+				return { type: "(regexp)", value: token.value, check: checks.check, pos: this.pos() };
 
 			case Token.Comment:
-				state.tokens.curr.comment = true;
-
 				if (token.isSpecial) {
 					return {
 						id: '(comment)',
@@ -1485,11 +1381,20 @@ Lexer.prototype = {
 
 				break;
 
-			case "":
-				break;
-
 			default:
-				return create("(punctuator)", token.value);
+				switch (token.value) {
+				case ".":
+				case ")":
+				case "~":
+				case "#":
+				case "]":
+					this.prereg = false;
+					break;
+				default:
+					this.prereg = true;
+				}
+
+				return { type: "(punctuator)", value: token.value, check: checks.check, pos: this.pos() };
 			}
 		}
 	}

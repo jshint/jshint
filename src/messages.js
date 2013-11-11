@@ -135,7 +135,7 @@ var warnings = make("warning", {
 	W040: "Possible strict violation.",
 	W041: "Use '{a}' to compare with '{b}'.",
 	W042: "Avoid EOL escaping.",
-	W043: "Bad escaping of EOL. Use option multistr if needed.",
+	W043: null,
 	W044: "Bad or unnecessary escaping.",
 	W045: "Bad number '{a}'.",
 	W046: "Don't use extra leading zeros '{a}'.",
@@ -198,7 +198,7 @@ var warnings = make("warning", {
 	W098: "'{a}' is defined but never used.",
 	W099: null,
 	W100: "This character may get silently deleted by one or more browsers.",
-	W101: "Line is too long.",
+	W101: null,
 	W102: null,
 	W103: "The '{a}' property is deprecated.",
 	W104: "'{a}' is only available in JavaScript 1.7.",
@@ -223,7 +223,7 @@ var warnings = make("warning", {
 
 var info = make("info", {
 	I001: "Comma warnings can be turned off with 'laxcomma'.",
-	I002: "Reserved words as properties can be used under the 'es5' option.",
+	I002: null,
 	I003: "ES5 option is now set per default"
 });
 

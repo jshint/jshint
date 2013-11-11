@@ -18,7 +18,7 @@ module.exports = {
 			prevfile = file;
 
 			str += file  + ': line ' + error.line + ', col ' +
-				error.character + ', ' + error.reason;
+				error.ch + ', ' + error.message;
 
 			if (opts.verbose) {
 				str += ' (' + error.code + ')';
