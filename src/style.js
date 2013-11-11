@@ -35,34 +35,6 @@ exports.register = function (linter) {
 		}
 	});
 
-	// Check for dangling underscores.
-
-	linter.on("Identifier", function style_scanDangling(data) {
-		if (!linter.getOption("nomen")) {
-			return;
-		}
-
-		// Underscore.js
-		if (data.name === "_") {
-			return;
-		}
-
-		// In Node, __dirname and __filename should be ignored.
-		if (linter.getOption("node")) {
-			if (/^(__dirname|__filename)$/.test(data.name) && !data.isProperty) {
-				return;
-			}
-		}
-
-		if (/^(_+.*|.*_+)$/.test(data.name)) {
-			linter.warn("W105", {
-				line: data.line,
-				char: data.from,
-				data: [ "dangling '_'", data.name ]
-			});
-		}
-	});
-
 	linter.on("Number", function style_scanNumbers(data) {
 		if (data.value.charAt(0) === ".") {
 			// Warn about a leading decimal point.
