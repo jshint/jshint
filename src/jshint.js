@@ -657,10 +657,6 @@ function advance(id, t) {
 			return;
 		}
 
-		if (state.tokens.next.check) {
-			state.tokens.next.check(state);
-		}
-
 		if (state.tokens.next.isSpecial) {
 			doOption();
 		} else {
@@ -4315,6 +4311,9 @@ JSHINT.addModule(function (linter) {
 	});
 
 	linter.on("Number", function (num) {
+		if (num.isMalformed)
+			linter.warn("W045", { line: num.line, char: num.char, data: [ num.value ] });
+
 		if (num.base !== 8 || !linter.isStrictMode())
 			return;
 

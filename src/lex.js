@@ -1297,22 +1297,13 @@ Lexer.prototype = {
 			case Token.NumericLiteral:
 				this.prereg = false;
 
-				if (token.isMalformed) {
-					this.trigger("warning", {
-						code: "W045",
-						line: this.line,
-						character: this.char,
-						data: [ token.value ]
-					});
-				}
-
 				this.trigger("Number", {
 					line: this.line,
 					char: this.char,
 					from: this.from,
 					value: token.value,
 					base: token.base,
-					isMalformed: token.malformed
+					isMalformed: token.isMalformed
 				});
 
 				return { type: "(number)", value: token.value, pos: this.pos() };
