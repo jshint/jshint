@@ -30,27 +30,6 @@ var Token = {
 	RegExp: 9
 };
 
-// Object that handles postponed lexing verifications that checks the parsed
-// environment state.
-
-function asyncTrigger() {
-	var _checks = [];
-
-	return {
-		push: function (fn) {
-			_checks.push(fn);
-		},
-
-		check: function () {
-			for (var check = 0; check < _checks.length; ++check) {
-				_checks[check]();
-			}
-
-			_checks.splice(0, _checks.length);
-		}
-	};
-}
-
 /*
  * Lexer for JSHint.
  *
@@ -153,21 +132,6 @@ Lexer.prototype = {
 	 */
 	trigger: function () {
 		this.emitter.emit.apply(this.emitter, Array.prototype.slice.call(arguments));
-	},
-
-	/*
-	 * Postpone a token event. the checking condition is set as
-	 * last parameter, and the trigger function is called in a
-	 * stored callback. To be later called using the check() function
-	 * by the parser. This avoids parser's peek() to give the lexer
-	 * a false context.
-	 */
-	triggerAsync: function (type, args, checks, fn) {
-		checks.push(function () {
-			if (fn()) {
-				this.trigger(type, args);
-			}
-		}.bind(this));
 	},
 
 	/*
@@ -1268,7 +1232,6 @@ Lexer.prototype = {
 	 */
 	token: function () {
 		/*jshint loopfunc:true */
-		var checks = asyncTrigger();
 		var token;
 
 		for (;;) {
@@ -1276,7 +1239,6 @@ Lexer.prototype = {
 				return {
 					type: this.nextLine() ? "(endline)" : "(end)",
 					value: "",
-					check: checks.check,
 					pos: this.pos()
 				};
 			}
@@ -1302,16 +1264,16 @@ Lexer.prototype = {
 			switch (token.type) {
 			case Token.StringLiteral:
 				this.prereg = false;
-				this.triggerAsync("String", {
+				this.trigger("String", {
 					line: this.line,
 					char: this.char,
 					from: this.from,
 					value: token.value,
 					quote: token.quote,
 					hasOctal: token.hasOctal
-				}, checks, function () { return true; });
+				});
 
-				return { type: "(string)", value: token.value, check: checks.check, pos: this.pos() };
+				return { type: "(string)", value: token.value, pos: this.pos() };
 			case Token.Identifier:
 				this.prereg = false;
 
@@ -1330,7 +1292,7 @@ Lexer.prototype = {
 				/* falls through */
 			case Token.NullLiteral:
 			case Token.BooleanLiteral:
-				return { type: "(identifier)", value: token.value, check: checks.check, pos: this.pos() };
+				return { type: "(identifier)", value: token.value, pos: this.pos() };
 
 			case Token.NumericLiteral:
 				this.prereg = false;
@@ -1353,11 +1315,11 @@ Lexer.prototype = {
 					isMalformed: token.malformed
 				});
 
-				return { type: "(number)", value: token.value, check: checks.check, pos: this.pos() };
+				return { type: "(number)", value: token.value, pos: this.pos() };
 
 			case Token.RegExp:
 				this.prereg = false;
-				return { type: "(regexp)", value: token.value, check: checks.check, pos: this.pos() };
+				return { type: "(regexp)", value: token.value, pos: this.pos() };
 
 			case Token.Comment:
 				if (token.isSpecial) {
@@ -1388,7 +1350,7 @@ Lexer.prototype = {
 					this.prereg = true;
 				}
 
-				return { type: "(punctuator)", value: token.value, check: checks.check, pos: this.pos() };
+				return { type: "(punctuator)", value: token.value, pos: this.pos() };
 			}
 		}
 	}
