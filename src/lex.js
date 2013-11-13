@@ -7,7 +7,6 @@
 var _      = require("underscore");
 var events = require("events");
 var reg    = require("./reg.js");
-var state  = require("./state.js").state;
 
 var unicodeData = require("../data/ascii-identifier-data.js");
 var asciiIdentifierStartTable = unicodeData.asciiIdentifierStartTable;
@@ -98,6 +97,7 @@ function Lexer(source, options) {
 		lines[0] = "";
 	}
 
+	this.ignoring = false;
 	this.source = lines;
 	this.line = 0;
 	this.char = 1;
@@ -840,7 +840,7 @@ Lexer.prototype = {
 	 *   var str = "hello\
 	 *   world";
 	 */
-	scanStringLiteral: function (checks) {
+	scanStringLiteral: function () {
 		/*jshint loopfunc:true */
 		var quote = this.peek();
 
@@ -853,6 +853,7 @@ Lexer.prototype = {
 		var startLine = this.line;
 		var startChar = this.char;
 		var allowNewLine = false;
+		var hasOctal = false;
 
 		this.skip();
 
@@ -885,6 +886,7 @@ Lexer.prototype = {
 						type: Token.StringLiteral,
 						value: value,
 						isUnclosed: true,
+						hasOctal: hasOctal,
 						quote: quote
 					};
 				}
@@ -931,14 +933,13 @@ Lexer.prototype = {
 					char = "\0";
 
 					// Octal literals fail in strict mode.
-					// Check if the number is between 00 and 07.
+					// Check if the number is between 00 and 07 and set
+					// a flag on a String token to alert the parser.
+
 					var n = parseInt(this.peek(1), 10);
-					this.triggerAsync("warning", {
-						code: "W115",
-						line: this.line,
-						character: this.char
-					}, checks,
-					function () { return n >= 0 && n <= 7 && state.directive["use strict"]; });
+					if (n >= 0 && n <= 7)
+						hasOctal = true;
+
 					break;
 				case "u":
 					char = String.fromCharCode(parseInt(this.input.substr(1, 4), 16));
@@ -981,10 +982,12 @@ Lexer.prototype = {
 		}
 
 		this.skip();
+
 		return {
 			type: Token.StringLiteral,
 			value: value,
 			isUnclosed: false,
+			hasOctal: hasOctal,
 			quote: quote
 		};
 	},
@@ -1167,7 +1170,7 @@ Lexer.prototype = {
 	 * Produce the next raw token or return 'null' if no tokens can be matched.
 	 * This method skips over all space characters.
 	 */
-	next: function (checks) {
+	next: function () {
 		this.from = this.char;
 
 		// Move to the next non-space character.
@@ -1185,7 +1188,7 @@ Lexer.prototype = {
 		// character pointer.
 
 		var match = this.scanComments() ||
-			this.scanStringLiteral(checks);
+			this.scanStringLiteral();
 
 		if (match) {
 			return match;
@@ -1228,7 +1231,7 @@ Lexer.prototype = {
 
 		// If we are ignoring linter errors, replace the input with empty string
 		// if it doesn't already at least start or end a multi-line comment
-		if (state.ignoreLinterErrors === true) {
+		if (this.ignoring === true) {
 			var startsWith = function (prefix) {
 				return this.indexOf(prefix) === 0;
 			};
@@ -1278,7 +1281,7 @@ Lexer.prototype = {
 				};
 			}
 
-			token = this.next(checks);
+			token = this.next();
 
 			if (!token) {
 				if (this.input.length) {
@@ -1299,13 +1302,13 @@ Lexer.prototype = {
 			switch (token.type) {
 			case Token.StringLiteral:
 				this.prereg = false;
-
 				this.triggerAsync("String", {
 					line: this.line,
 					char: this.char,
 					from: this.from,
 					value: token.value,
-					quote: token.quote
+					quote: token.quote,
+					hasOctal: token.hasOctal
 				}, checks, function () { return true; });
 
 				return { type: "(string)", value: token.value, check: checks.check, pos: this.pos() };
@@ -1316,8 +1319,7 @@ Lexer.prototype = {
 					line: this.line,
 					char: this.char,
 					from: this.form,
-					name: token.value,
-					isProperty: state.tokens.curr.id === "."
+					name: token.value
 				});
 
 				/* falls through */
@@ -1341,14 +1343,6 @@ Lexer.prototype = {
 						data: [ token.value ]
 					});
 				}
-
-				this.triggerAsync("warning", {
-					code: "W115",
-					line: this.line,
-					character: this.char
-				}, checks, function () {
-					return state.directive["use strict"] && token.base === 8;
-				});
 
 				this.trigger("Number", {
 					line: this.line,

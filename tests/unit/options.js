@@ -1060,6 +1060,7 @@ exports.strings = function (test) {
 		.addError(10, "Unclosed string.")
 		.addError(15, "Unclosed string.")
 		.addError(23, "Octal literals are not allowed in strict mode.")
+
 		.test(src, { es3: true });
 
 	test.done();

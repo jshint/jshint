@@ -128,7 +128,7 @@ var warnings = make("warning", {
 	W033: "Missing semicolon.",
 	W034: "Unnecessary directive \"{a}\".",
 	W035: "Empty block.",
-	W036: "Unexpected /*member '{a}'.",
+	W036: null,
 	W037: "'{a}' is a statement label.",
 	W038: "'{a}' used out of scope.",
 	W039: "'{a}' is not allowed.",

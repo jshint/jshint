@@ -61,8 +61,6 @@ var inblock;
 var indent;
 var lookahead;
 var lex;
-var member;
-var membersOnly;
 var noreach;
 var predefined;  // Global variables defined by option
 var scope;       // The current scope
@@ -385,30 +383,6 @@ function doOption() {
 		});
 	}
 
-	if (nt.type === "members") {
-		membersOnly = membersOnly || {};
-
-		body.forEach(function (m) {
-			var ch1 = m.charAt(0);
-			var ch2 = m.charAt(m.length - 1);
-
-			if (ch1 === ch2 && (ch1 === "\"" || ch1 === "'")) {
-				m = m
-					.substr(1, m.length - 2)
-					.replace("\\b", "\b")
-					.replace("\\t", "\t")
-					.replace("\\n", "\n")
-					.replace("\\v", "\v")
-					.replace("\\f", "\f")
-					.replace("\\r", "\r")
-					.replace("\\\\", "\\")
-					.replace("\\\"", "\"");
-			}
-
-			membersOnly[m] = false;
-		});
-	}
-
 	var numvals = [
 		"maxstatements",
 		"maxparams",
@@ -500,10 +474,10 @@ function doOption() {
 			if (key === "ignore") {
 				switch (val) {
 				case "start":
-					state.ignoreLinterErrors = true;
+					lex.ignoring = true;
 					break;
 				case "end":
-					state.ignoreLinterErrors = false;
+					lex.ignoring = false;
 					break;
 				case "line":
 					// Any errors or warnings that happened on the current line, make them go away.
@@ -684,7 +658,7 @@ function advance(id, t) {
 		}
 
 		if (state.tokens.next.check) {
-			state.tokens.next.check();
+			state.tokens.next.check(state);
 		}
 
 		if (state.tokens.next.isSpecial) {
@@ -1584,19 +1558,6 @@ function block(ordinary, stmt, isfunc, isfatarrow, iscase) {
 	return a;
 }
 
-
-function countMember(m) {
-	if (membersOnly && typeof membersOnly[m] !== "boolean") {
-		warn("W036", { token: state.tokens.curr, args: [m] });
-	}
-	if (typeof member[m] === "number") {
-		member[m] += 1;
-	} else {
-		member[m] = 1;
-	}
-}
-
-
 function note_implied(tkn) {
 	var name = tkn.value, line = tkn.line, a = implied[name];
 	if (typeof a === "function") {
@@ -2063,10 +2024,6 @@ prefix("void").exps = true;
 infix(".", function (left, that) {
 	var m = identifier(false, true);
 
-	if (typeof m === "string") {
-		countMember(m);
-	}
-
 	that.left = left;
 	that.right = m;
 
@@ -2239,7 +2196,6 @@ infix("[", function (left, that) {
 			warn("W061", { token: that });
 		}
 
-		countMember(e.value);
 		if (!state.option.sub && reg.identifier.test(e.value)) {
 			s = syntax[e.value];
 			if (!s || !isReserved(s)) {
@@ -2746,7 +2702,6 @@ function checkCondAssignment(expr) {
 				warn("E049", { token: state.tokens.next, args: ["class method", i] });
 			}
 
-			countMember(i);
 			if (isclassdef) {
 				tag = "";
 				continue;
@@ -4054,8 +4009,6 @@ var JSHINT = function (s, o, g) {
 	functions = [funct];
 	urls = [];
 	stack = null;
-	member = {};
-	membersOnly = null;
 	implied = {};
 	inblock = false;
 	lookahead = [];
@@ -4068,6 +4021,10 @@ var JSHINT = function (s, o, g) {
 	}
 
 	api = {
+		isStrictMode: function () {
+			return state.directive["use strict"];
+		},
+
 		getOption: function (name) {
 			return state.option[name] || null;
 		},
@@ -4346,6 +4303,29 @@ JSHINT.addModule = function (func) {
 
 JSHINT.addModule(style.register);
 
+JSHINT.addModule(function (linter) {
+	linter.on("String", function (str) {
+		if (!str.hasOctal || !linter.isStrictMode())
+			return;
+
+		linter.warn("W115", {
+			line: str.line,
+			char: str.char
+		});
+	});
+
+	linter.on("Number", function (num) {
+		if (num.base !== 8 || !linter.isStrictMode())
+			return;
+
+		linter.warn("W115", {
+			line: num.line,
+			char: num.char,
+			data: [ num.value ]
+		});
+	});
+});
+
 // Data summary.
 JSHINT.data = function () {
 	var data = {
@@ -4354,7 +4334,6 @@ JSHINT.data = function () {
 	};
 
 	var implieds = [];
-	var members = [];
 	var fu, f, i, j, n, globals;
 
 	if (JSHINT.errors.length) {
@@ -4417,14 +4396,6 @@ JSHINT.data = function () {
 
 	if (unuseds.length > 0) {
 		data.unused = unuseds;
-	}
-
-	members = [];
-	for (n in member) {
-		if (typeof member[n] === "number") {
-			data.member = member;
-			break;
-		}
 	}
 
 	return data;

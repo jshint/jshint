@@ -154,8 +154,6 @@ exports.relations = function (test) {
 
 exports.options = function (test) {
 	var code = [
-		"/*member a*/",
-		"/*members b*/",
 		"var x; x.a.b.c();",
 		"/*jshint ++ */",
 		"/*jslint indent: 0 */",
@@ -164,22 +162,20 @@ exports.options = function (test) {
 		"/*jslint maxerr: 300.4 */",
 		"/*jslint maxerr: 0 */",
 		"/*jslint maxerr: 20 */",
-		"/*member c:true */",
 		"/*jshint d:no */",
 		"/*global xxx*/",
 		"xxx = 2;",
 	];
 
 	var run = TestRun(test)
-		.addError(3, "Unexpected /*member 'c'.")
-		.addError(4, "Bad option: '++'.")
-		.addError(5, "Expected a small integer or 'false' and instead saw '0'.")
-		.addError(6, "Expected a small integer or 'false' and instead saw '-2'.")
-		.addError(7, "Expected a small integer or 'false' and instead saw '100.4'.")
-		.addError(8, "Expected a small integer or 'false' and instead saw '300.4'.")
-		.addError(9, "Expected a small integer or 'false' and instead saw '0'.")
-		.addError(12, "Bad option: 'd'.")
-		.addError(14, "Read only.");
+		.addError(2, "Bad option: '++'.")
+		.addError(3, "Expected a small integer or 'false' and instead saw '0'.")
+		.addError(4, "Expected a small integer or 'false' and instead saw '-2'.")
+		.addError(5, "Expected a small integer or 'false' and instead saw '100.4'.")
+		.addError(6, "Expected a small integer or 'false' and instead saw '300.4'.")
+		.addError(7, "Expected a small integer or 'false' and instead saw '0'.")
+		.addError(9, "Bad option: 'd'.")
+		.addError(11, "Read only.");
 	run.test(code, {es3: true});
 	run.test(code, {}); // es5
 	run.test(code, {esnext: true});
@@ -406,6 +402,7 @@ exports.strings = function (test) {
 		.addError(2, "Bad or unnecessary escaping.")
 		.addError(5, "Unclosed string.")
 		.addError(5, "Missing semicolon.");
+
 	run.test(code, {es3: true});
 	run.test(code, {}); // es5
 	run.test(code, {esnext: true});
