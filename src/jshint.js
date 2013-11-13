@@ -4301,6 +4301,10 @@ JSHINT.addModule(style.register);
 
 JSHINT.addModule(function (linter) {
 	linter.on("String", function (str) {
+		str.missedBackslashes.forEach(function (pos) {
+			linter.warn("W112", { line: pos.line, char: pos.char });
+		});
+
 		if (!str.hasOctal || !linter.isStrictMode())
 			return;
 

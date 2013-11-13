@@ -818,6 +818,7 @@ Lexer.prototype = {
 		var startChar = this.char;
 		var allowNewLine = false;
 		var hasOctal = false;
+		var missedBackslashes = []; // A list of all potentially missed backslashes.
 
 		this.skip();
 
@@ -832,7 +833,7 @@ Lexer.prototype = {
 				// but it generates too many false positives.
 
 				if (!allowNewLine)
-					this.trigger("warning", { code: "W112", line: this.line, character: this.char });
+					missedBackslashes.push({ line: this.line, character: this.char });
 				else
 					allowNewLine = false;
 
@@ -850,6 +851,7 @@ Lexer.prototype = {
 						type: Token.StringLiteral,
 						value: value,
 						isUnclosed: true,
+						missedBackslashes: missedBackslashes,
 						hasOctal: hasOctal,
 						quote: quote
 					};
@@ -951,6 +953,7 @@ Lexer.prototype = {
 			type: Token.StringLiteral,
 			value: value,
 			isUnclosed: false,
+			missedBackslashes: missedBackslashes,
 			hasOctal: hasOctal,
 			quote: quote
 		};
@@ -1270,7 +1273,8 @@ Lexer.prototype = {
 					from: this.from,
 					value: token.value,
 					quote: token.quote,
-					hasOctal: token.hasOctal
+					hasOctal: token.hasOctal,
+					missedBackslashes: token.missedBackslashes
 				});
 
 				return { type: "(string)", value: token.value, pos: this.pos() };
