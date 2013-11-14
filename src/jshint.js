@@ -512,9 +512,6 @@ function doOption() {
 					state.option[key] = (val === "true");
 				}
 
-				if (key === "newcap") {
-					state.option["(explicitNewcap)"] = true;
-				}
 				return;
 			}
 
@@ -1405,8 +1402,6 @@ function directives() {
 			}
 
 			if (state.tokens.curr.value === "use strict") {
-				if (!state.option["(explicitNewcap)"])
-					state.option.newcap = true;
 				state.option.undef = true;
 			}
 
@@ -1992,9 +1987,6 @@ prefix("new", function () {
 			default:
 				if (c.id !== "function") {
 					i = c.value.substr(0, 1);
-					if (state.option.newcap && (i < "A" || i > "Z") && !_.has(globalscope, c.value)) {
-						warn("W055", { token: state.tokens.curr });
-					}
 				}
 			}
 		} else {
@@ -2058,8 +2050,6 @@ infix("(", function (left, that) {
 				if ("Number String Boolean Date Object".indexOf(left.value) === -1) {
 					if (left.value === "Math") {
 						warn("W063", { token: left });
-					} else if (state.option.newcap) {
-						warn("W064", { token: left });
 					}
 				}
 			}
@@ -3981,9 +3971,6 @@ var JSHINT = function (s, o, g) {
 				newIgnoredObj[optionKeys[x].slice(1)] = true;
 			} else {
 				newOptionObj[optionKeys[x]] = o[optionKeys[x]];
-
-				if (optionKeys[x] === "newcap" && o[optionKeys[x]] === false)
-					newOptionObj["(explicitNewcap)"] = true;
 			}
 		}
 	}

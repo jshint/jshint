@@ -147,7 +147,7 @@ var warnings = make("warning", {
 	W052: "Unexpected '{a}'.",
 	W053: "Do not use {a} as a constructor.",
 	W054: "The Function constructor is a form of eval.",
-	W055: "A constructor name should start with an uppercase letter.",
+	W055: null,
 	W056: "Bad constructor.",
 	W057: "Weird construction. Is 'new' necessary?",
 	W058: "Missing '()' invoking a constructor.",
@@ -158,7 +158,7 @@ var warnings = make("warning", {
 		"to assist the reader in understanding that the expression " +
 		"is the result of a function, and not the function itself.",
 	W063: "Math is not a function.",
-	W064: "Missing 'new' prefix when invoking a constructor.",
+	W064: null,
 	W065: "Missing radix parameter.",
 	W066: "Implied eval. Consider passing a function instead of a string.",
 	W067: "Bad invocation.",

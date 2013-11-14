@@ -919,33 +919,6 @@ exports.plusplus = function (test) {
 	test.done();
 };
 
-/**
- * Option `newcap` requires constructors to be capitalized.
- *
- * Constructors are functions that are designed to be used with the `new` statement.
- * `new` creates a new object and binds it to the implied this parameter.
- * A constructor executed without new will have its this assigned to a global object,
- * leading to errors.
- *
- * Unfortunately, JavaScript gives us absolutely no way of telling if a function is a
- * constructor. There is a convention to capitalize all constructor names to prevent
- * those mistakes. This option enforces that convention.
- */
-exports.newcap = function (test) {
-	var src = fs.readFileSync(__dirname + '/fixtures/newcap.js', 'utf8');
-
-	TestRun(test).test(src, {es3: true}); // By default, everything is fine
-
-	// When newcap is true, enforce the conventions
-	TestRun(test)
-		.addError(1, 'A constructor name should start with an uppercase letter.')
-		.addError(5, "Missing 'new' prefix when invoking a constructor.")
-		.addError(10, "A constructor name should start with an uppercase letter.")
-		.test(src, { es3: true, newcap: true });
-
-	test.done();
-};
-
 /** Option `sub` allows all forms of subscription. */
 exports.sub = function (test) {
 	TestRun(test)
@@ -963,7 +936,6 @@ exports.strict = function (test) {
 	var code1 = '(function (test) { "use strict"; return; }());';
 	var src = fs.readFileSync(__dirname + '/fixtures/strict_violations.js', 'utf8');
 	var src2 = fs.readFileSync(__dirname + '/fixtures/strict_incorrect.js', 'utf8');
-	var src3 = fs.readFileSync(__dirname + '/fixtures/strict_newcap.js', 'utf8');
 
 	TestRun(test).test(code, {es3: true});
 	TestRun(test).test(code1, {es3: true});
@@ -987,10 +959,6 @@ exports.strict = function (test) {
 		.addError(28, 'Expected an assignment or function call and instead saw an expression.')
 		.addError(53, 'Expected an assignment or function call and instead saw an expression.')
 		.test(src2, { es3: true, strict: false });
-
-	TestRun(test)
-		.addError(6, "Missing 'new' prefix when invoking a constructor.")
-		.test(src3, {es3 : true});
 
 	TestRun(test).test("var obj = Object({ foo: 'bar' });", { es3: true, strict: true });
 
