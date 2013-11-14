@@ -50,8 +50,9 @@ exports.setup.testRun = function (test, name) {
 		},
 
 		test: function (source, options, globals) {
-			var ret = !!JSHINT(source, options, globals);
-			var errors = _.compact(JSHINT.errors);
+			var ret  = !!JSHINT(source, options, globals);
+			var data = JSHINT.data();
+			var errors = _.compact(data.errors);
 
 			if (errors.length === 0 && definedErrors.length === 0)
 				return;

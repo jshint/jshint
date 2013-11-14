@@ -288,7 +288,7 @@ function lint(code, results, config, data, file) {
 	buffer = buffer.replace(/^\uFEFF/, ""); // Remove potential Unicode BOM.
 
 	if (!JSHINT(buffer, config, globals)) {
-		JSHINT.errors.forEach(function (err) {
+		JSHINT.data().errors.forEach(function (err) {
 			if (err) {
 				results.push({ file: file || "stdin", error: err });
 			}

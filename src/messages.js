@@ -224,7 +224,7 @@ var warnings = make("warning", {
 var info = make("info", {
 	I001: "Comma warnings can be turned off with 'laxcomma'.",
 	I002: null,
-	I003: "ES5 option is now set per default"
+	I003: null
 });
 
 exports.get = get;

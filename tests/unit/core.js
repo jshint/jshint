@@ -311,9 +311,9 @@ exports.argsInCatchReused = function (test) {
 
 exports.testRawOnError = function (test) {
 	JSHINT(';', { maxerr: 1 });
-	test.equal(JSHINT.errors[0].message, 'Unnecessary semicolon.');
-	test.equal(JSHINT.errors[1].message, 'Too many errors. (100% scanned).');
-	test.equal(JSHINT.errors[2], null);
+	test.equal(JSHINT.data().errors[0].message, 'Unnecessary semicolon.');
+	test.equal(JSHINT.data().errors[1].message, 'Too many errors. (100% scanned).');
+	test.equal(JSHINT.data().errors[2], null);
 
 	test.done();
 };

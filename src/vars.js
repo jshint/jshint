@@ -4,12 +4,12 @@
 
 // Identifiers provided by the ECMAScript standard.
 
-exports.reservedVars = {
+exports.reserved = {
 	arguments : false,
 	NaN       : false
 };
 
-exports.ecmaIdentifiers = {
+exports.ecma = {
 	Array              : false,
 	Boolean            : false,
 	Date               : false,

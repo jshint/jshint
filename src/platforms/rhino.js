@@ -100,7 +100,7 @@
 		}
 
 		if (!JSHINT(input, opts, globals)) {
-			for (var i = 0, err; err = JSHINT.errors[i]; i += 1) {
+			for (var i = 0, err; err = JSHINT.data().errors[i]; i += 1) {
 				print(err.reason + " (" + name + ":" + err.line + ":" + err.character + ")");
 				print("> " + (err.evidence || "").replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"));
 				print("");
