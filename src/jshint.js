@@ -40,7 +40,6 @@ var vars     = require("./vars.js");
 var messages = require("./messages.js");
 var Lexer    = require("./lex.js").Lexer;
 var reg      = require("./reg.js");
-var state    = require("./state.js").state;
 var style    = require("./style.js");
 var options  = require("./options.js");
 var console  = require("console-browserify"); // Needed for browserify to work with IE and Rhino.
@@ -48,6 +47,7 @@ var console  = require("console-browserify"); // Needed for browserify to work w
 var syntax   = {};
 var addons   = [];
 var emitter  = new events.EventEmitter();
+var state    = {};
 
 var anonname;    // The guessed name for anonymous functions.
 var api;         // Extension API
@@ -3918,7 +3918,13 @@ var JSHINT = function (s, o, g) {
 	var newIgnoredObj = {};
 
 	o = _.clone(o);
-	state.reset();
+
+	state = {
+		tokens: { prev: null, next: null, curr: null },
+		option: {},
+		ignored: {},
+		directive: {}
+	};
 
 	if (o && o.scope) {
 		JSHINT.scope = o.scope;
