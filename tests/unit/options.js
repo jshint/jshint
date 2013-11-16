@@ -805,47 +805,6 @@ exports.evil = function (test) {
 	test.done();
 };
 
-/**
- * Option `immed` forces you to wrap immediate invocations in parens.
- *
- * Functions in JavaScript can be immediately invoce but that can confuse
- * readers of your code. To make it less confusing, wrap the invocations in
- * parens.
- *
- * E.g. (note the parens):
- *	 var a = (function (test) {
- *	   return 'a';
- *	 }());
- *	 console.log(a); // --> 'a'
- */
-exports.immed = function (test) {
-	var src = fs.readFileSync(__dirname + '/fixtures/immed.js', 'utf8');
-
-	TestRun(test).test(src, {es3: true});
-
-	TestRun(test)
-		.addError(3, "Wrap an immediate function invocation in parens " +
-					 "to assist the reader in understanding that the expression " +
-					 "is the result of a function, and not the function itself.")
-		.addError(13, "Wrapping non-IIFE function literals in parens is unnecessary.")
-		.test(src, { es3: true, immed: true });
-
-	// Regression for GH-900
-	TestRun(test)
-		.addError(1, "Expected an assignment or function call and instead saw an expression.")
-		.addError(1, "Missing semicolon.")
-		.addError(1, "Expected an identifier and instead saw ')'.")
-		.addError(1, "Expected an assignment or function call and instead saw an expression.")
-		.addError(1, "Unmatched '{'.")
-		.addError(1, "Unmatched '('.")
-		.addError(1, "Wrapping non-IIFE function literals in parens is unnecessary.")
-		.addError(1, "Expected an assignment or function call and instead saw an expression.")
-		.addError(1, "Missing semicolon.")
-		.test("(function () { if (true) { }());", { es3: true, immed: true });
-
-	test.done();
-};
-
 /** Option `passfail` tells JSHint to stop at the first error. */
 exports.passfail = function (test) {
 	var code = [

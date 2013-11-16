@@ -1,6 +1,6 @@
 /*jshint undef: true, regexp: false, plusplus: false,
   eqeqeq: false, eqnull: true, evil: true, newcap: false, browser: true,
-  forin: false, immed: false */
+  forin: false */
 
 /*!
  * jQuery JavaScript Library v1.7

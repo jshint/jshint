@@ -1940,10 +1940,6 @@ infix(".", function (left, that) {
 }, 160, true);
 
 infix("(", function (left, that) {
-	if (state.option.immed && left && !left.immed && left.id === "function") {
-		warn("W062");
-	}
-
 	var n = 0;
 	var p = [];
 
@@ -2024,10 +2020,6 @@ prefix("(", function () {
 		i += 1;
 	} while (pn.value !== ")" && pn1.value !== "=>" && pn1.value !== ";" && pn1.type !== "(end)");
 
-	if (state.tokens.next.id === "function") {
-		state.tokens.next.immed = true;
-	}
-
 	var exprs = [];
 
 	if (state.tokens.next.id !== ")") {
@@ -2050,12 +2042,6 @@ prefix("(", function () {
 	}
 
 	advance(")", this);
-	if (state.option.immed && exprs[0] && exprs[0].id === "function") {
-		if (state.tokens.next.id !== "(" &&
-		  (state.tokens.next.id !== "." || (peek().value !== "call" && peek().value !== "apply"))) {
-			warn("W068", { token: this });
-		}
-	}
 
 	if (state.tokens.next.value === "=>") {
 		return exprs;

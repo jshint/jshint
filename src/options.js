@@ -23,7 +23,6 @@ exports.simple = {
 	forin       : true, // if for in statements must filter
 	funcscope   : true, // if only function scope should be used for scope tests
 	globalstrict: true, // if global "use strict"; should be allowed (also enables 'strict')
-	immed       : true, // if immediate invocations must be wrapped in parens
 	iterator    : true, // if the `__iterator__` property should be allowed
 	jquery      : true, // if jQuery globals should be predefined
 	lastsemic   : true, // if semicolons may be ommitted for the trailing
