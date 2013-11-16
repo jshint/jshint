@@ -1449,9 +1449,6 @@ function block(ordinary, stmt, isfunc, isfatarrow, iscase) {
 
 	if (!ordinary || !state.option.funcscope) scope = s;
 	inblock = b;
-	if (ordinary && state.option.noempty && (!a || a.length === 0)) {
-		warn("W035");
-	}
 	metrics.nestedBlockDepth -= 1;
 	return a;
 }

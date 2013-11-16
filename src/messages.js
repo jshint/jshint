@@ -127,7 +127,7 @@ var warnings = make("warning", {
 	W032: "Unnecessary semicolon.",
 	W033: "Missing semicolon.",
 	W034: "Unnecessary directive \"{a}\".",
-	W035: "Empty block.",
+	W035: null,
 	W036: null,
 	W037: "'{a}' is a statement label.",
 	W038: "'{a}' used out of scope.",

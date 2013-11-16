@@ -3,7 +3,6 @@
 exports.register = function (linter) {
 	// Check for properties named __proto__. This special property was
 	// deprecated and then re-introduced for ES6.
-
 	linter.on("Identifier", function style_scanProto(data) {
 		if (linter.getOption("proto")) {
 			return;
@@ -20,7 +19,6 @@ exports.register = function (linter) {
 
 	// Check for properties named __iterator__. This is a special property
 	// available only in browsers with JavaScript 1.7 implementation.
-
 	linter.on("Identifier", function style_scanIterator(data) {
 		if (linter.getOption("iterator")) {
 			return;
@@ -65,7 +63,6 @@ exports.register = function (linter) {
 	});
 
 	// Warn about script URLs.
-
 	linter.on("String", function style_scanJavaScriptURLs(data) {
 		var re = /^(?:javascript|jscript|ecmascript|vbscript|mocha|livescript)\s*:/i;
 
