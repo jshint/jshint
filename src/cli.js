@@ -4,7 +4,7 @@ var cli         = require("cli");
 var path        = require("path");
 var shjs        = require("shelljs");
 var minimatch   = require("minimatch");
-var JSHINT      = require("./jshint.js").JSHINT;
+var jshint      = require("./jshint.js");
 var defReporter = require("./reporters/default").reporter;
 
 var OPTIONS = {
@@ -287,15 +287,16 @@ function lint(code, results, config, data, file) {
 	buffer = buffer.join("\n");
 	buffer = buffer.replace(/^\uFEFF/, ""); // Remove potential Unicode BOM.
 
-	if (!JSHINT(buffer, config, globals)) {
-		JSHINT.data().errors.forEach(function (err) {
+	var report = jshint.run(buffer, config, globals);
+	if (!report.success) {
+		report.data.errors.forEach(function (err) {
 			if (err) {
 				results.push({ file: file || "stdin", error: err });
 			}
 		});
 	}
 
-	lintData = JSHINT.data();
+	lintData = report.data;
 
 	if (lintData) {
 		lintData.file = file || "stdin";

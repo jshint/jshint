@@ -1,25 +1,25 @@
 "use strict";
 
-var JSHINT	= require('../../src/jshint.js').JSHINT;
+var jshint	= require('../../src/jshint.js');
 var fs      = require('fs');
 var TestRun = require("../helpers/testhelper").setup.testRun;
 
 /**
- * JSHint allows you to specify custom globals as a parameter to the JSHINT
+ * JSHint allows you to specify custom globals as a parameter to the jshint.run
  * function so it is not necessary to spam code with jshint-related comments
  */
 exports.testCustomGlobals = function (test) {
 	var code   = '(function (test) { return [ fooGlobal, barGlobal ]; }());';
 	var custom = { fooGlobal: false, barGlobal: false };
+	var report = jshint.run(code, {}, custom);
 
-	test.ok(JSHINT(code, {}, custom));
+	test.ok(report.success);
 
-	var report = JSHINT.data();
-	test.strictEqual(report.implieds, undefined);
-	test.equal(report.globals.length, 2);
+	test.strictEqual(report.data.implieds, undefined);
+	test.equal(report.data.globals.length, 2);
 
 	var dict = {};
-	for (var i = 0, g; g = report.globals[i]; i += 1)
+	for (var i = 0, g; g = report.data.globals[i]; i += 1)
 		dict[g] = true;
 
 	for (i = 0, g = null; g = custom[i]; i += 1)
@@ -310,10 +310,10 @@ exports.argsInCatchReused = function (test) {
 };
 
 exports.testRawOnError = function (test) {
-	JSHINT(';', { maxerr: 1 });
-	test.equal(JSHINT.data().errors[0].message, 'Unnecessary semicolon.');
-	test.equal(JSHINT.data().errors[1].message, 'Too many errors. (100% scanned).');
-	test.equal(JSHINT.data().errors[2], null);
+	var report = jshint.run(";", { maxerr: 1 });
+	test.equal(report.data.errors[0].message, 'Unnecessary semicolon.');
+	test.equal(report.data.errors[1].message, 'Too many errors. (100% scanned).');
+	test.equal(report.data.errors[2], null);
 
 	test.done();
 };
@@ -361,8 +361,8 @@ exports.insideEval = function (test) {
 		.test(src, { es3: true, evil: false });
 
 	// Regression test for bug GH-714.
-	JSHINT(src, { evil: false, maxerr: 1 });
-	var err = JSHINT.data().errors[1];
+	var rep = jshint.run(src, { evil: false, maxerr: 1 });
+	var err = rep.data.errors[1];
 	test.equal(err.message, "Too many errors. (5% scanned).");
 	test.equal(err.scope, "(main)");
 
@@ -374,7 +374,7 @@ exports.noExcOnTooManyUndefined = function (test) {
 	var code = 'a(); b();';
 
 	try {
-		JSHINT(code, {undef: true, maxerr: 1});
+		jshint.run(code, {undef: true, maxerr: 1});
 	} catch (e) {
 		test.ok(false, 'Exception was thrown');
 	}
@@ -429,23 +429,9 @@ exports.multilineArray = function (test) {
 };
 
 exports.testInvalidSource = function (test) {
-	TestRun(test)
-		.addError(0, "Input is neither a string nor an array of strings.")
-		.test(undefined);
-
-	TestRun(test)
-		.addError(0, "Input is neither a string nor an array of strings.")
-		.test(null);
-
-	TestRun(test)
-		.addError(0, "Input is neither a string nor an array of strings.")
-		.test({}, {es3: true});
-
-	TestRun(test)
-		.test("", {es3: true});
-
-	TestRun(test)
-		.test([], {es3: true});
+	test.ok(jshint.run(undefined) === null);
+	test.ok(jshint.run("") === null);
+	test.ok(jshint.run([]) === null);
 
 	test.done();
 };
@@ -709,7 +695,7 @@ exports.testDefaultArguments = function (test) {
 // Issue #1324: Make sure that we're not mutating passed options object.
 exports.testClonePassedObjects = function (test) {
 	var options = { predef: ["sup"] };
-	JSHINT("", options);
+	jshint.run("", options);
 	test.ok(options.predef.length == 1);
 	test.done();
 };

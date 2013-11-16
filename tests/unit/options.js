@@ -6,8 +6,8 @@
 
 "use strict";
 
-var JSHINT = require('../../src/jshint.js').JSHINT;
 var fs = require('fs');
+var jshint  = require('../../src/jshint.js');
 var TestRun = require('../helpers/testhelper').setup.testRun;
 var fixture = require('../helpers/fixture').fixture;
 
@@ -170,9 +170,7 @@ exports["implied and unused should respect hoisting"] = function (test) {
 		.addError(14, "'fun4' is not defined.")
 		.test(src, { undef: true }); // es5
 
-	JSHINT.flag = true;
-	JSHINT(src, { undef: true });
-	var report = JSHINT.data();
+	var report = jshint.run(src, { undef: true }).data;
 
 	test.equal(report.implieds.length, 1);
 	test.equal(report.implieds[0].name, 'fun4');
@@ -441,11 +439,14 @@ exports.undef = function (test) {
 
 	// Regression test for GH-668.
 	src = fs.readFileSync(__dirname + "/fixtures/gh668.js", "utf8");
-	test.ok(JSHINT(src, { undef: true }));
-	test.ok(!JSHINT.data().implieds);
 
-	test.ok(JSHINT(src));
-	test.ok(!JSHINT.data().implieds);
+	var rep = jshint.run(src, { undef: true });
+	test.ok(rep.success);
+	test.ok(!rep.data.implieds);
+
+	rep = jshint.run(src);
+	test.ok(rep.success);
+	test.ok(!rep.data.implieds);
 
 	test.done();
 };
@@ -486,7 +487,7 @@ exports.unused = function (test) {
 	});
 
 	true_run.test(src, { unused: true });
-	test.ok(!JSHINT(src, { es3: true, unused: true }));
+	test.ok(!jshint.run(src, { es3: true, unused: true }).success);
 
 	// Test checking all function params via unused="strict"
 	var all_run = TestRun(test);
@@ -501,7 +502,7 @@ exports.unused = function (test) {
 	var_errors.forEach(function (e) { vars_run.addError.apply(vars_run, e); });
 	vars_run.test(src, { unused: "vars"});
 
-	var unused = JSHINT.data().unused;
+	var unused = jshint.run(src, { unused: "vars" }).data.unused;
 	test.equal(10, unused.length);
 	test.ok(unused.some(function (err) { return err.line === 1 && err.name === "a"; }));
 	test.ok(unused.some(function (err) { return err.line === 6 && err.name === "f"; }));
@@ -1261,18 +1262,18 @@ exports.maxcomplexity = function (test) {
 
 // Metrics output per function.
 exports.fnmetrics = function (test) {
-	JSHINT([
+	var rep = jshint.run([
 		"function foo(a, b) { if (a) return b; }",
 		"function bar() { var a = 0; a += 1; return a; }"
 	]);
 
-	test.deepEqual(JSHINT.data().functions[0].metrics, {
+	test.deepEqual(rep.data.functions[0].metrics, {
 		complexity: 2,
 		parameters: 2,
 		statements: 1
 	});
 
-	test.deepEqual(JSHINT.data().functions[1].metrics, {
+	test.deepEqual(rep.data.functions[1].metrics, {
 		complexity: 1,
 		parameters: 0,
 		statements: 3

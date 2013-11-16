@@ -5,7 +5,7 @@ for (var key in objects) {
 }
 
 // Empty for in block like the one found in jQuery
-// JSHINT would crash upon finding this and wouldn't continue
+// JSHint would crash upon finding this and wouldn't continue
 // GH-336
 for ( key in objects ) { }
 

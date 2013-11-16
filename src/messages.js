@@ -33,9 +33,9 @@ var errors = make("error", {
 	E002: "Bad option value.",
 
 	// JSHint input
-	E003: "Expected a JSON value.",
-	E004: "Input is neither a string nor an array of strings.",
-	E005: "Input is empty.",
+	E003: null,
+	E004: null,
+	E005: null,
 	E006: "Unexpected early end of program.",
 
 	// Strict mode

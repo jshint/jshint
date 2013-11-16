@@ -1,5 +1,5 @@
 /*jshint boss: true, rhino: true, unused: true, undef: true, white: true, quotmark: double */
-/*global JSHINT */
+/*global jshint */
 
 (function (args) {
 	"use strict";
@@ -99,8 +99,9 @@
 			quit(1);
 		}
 
-		if (!JSHINT(input, opts, globals)) {
-			for (var i = 0, err; err = JSHINT.data().errors[i]; i += 1) {
+		var report = jshint.run(input, opts, globals);
+		if (!report.success) {
+			for (var i = 0, err; err = report.data.errors[i]; i += 1) {
 				print(err.reason + " (" + name + ":" + err.line + ":" + err.character + ")");
 				print("> " + (err.evidence || "").replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"));
 				print("");

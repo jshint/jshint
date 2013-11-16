@@ -4,7 +4,7 @@
 
 "use strict";
 
-var JSHINT  = require('../../src/jshint.js').JSHINT;
+var jshint  = require('../../src/jshint.js');
 var fs      = require('fs');
 var TestRun = require("../helpers/testhelper").setup.testRun;
 
@@ -13,8 +13,7 @@ function wrap(globals) {
 }
 
 function globalsKnown(test, globals, options) {
-	JSHINT(wrap(globals), options || {});
-	var report = JSHINT.data();
+	var report = jshint.run(wrap(globals), options || {}).data;
 
 	test.ok(report.implied === undefined);
 	test.equal(report.globals.length, globals.length);
@@ -27,8 +26,7 @@ function globalsKnown(test, globals, options) {
 }
 
 function globalsImplied(test, globals, options) {
-	JSHINT(wrap(globals), options || {});
-	var report = JSHINT.data();
+	var report = jshint.run(wrap(globals), options || {}).data;
 
 	test.ok(report.implieds !== null);
 	test.ok(report.globals === undefined);

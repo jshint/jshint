@@ -29,7 +29,7 @@
 /*jshint node: true, eqnull: true*/
 
 var _ = require("underscore");
-var JSHINT = require('../../src/jshint.js').JSHINT;
+var jshint = require('../../src/jshint.js');
 
 if (exports.setup === undefined || exports.setup === null) {
 	exports.setup = {};
@@ -50,8 +50,7 @@ exports.setup.testRun = function (test, name) {
 		},
 
 		test: function (source, options, globals) {
-			var ret  = !!JSHINT(source, options, globals);
-			var data = JSHINT.data();
+			var data = jshint.run(source, options, globals).data;
 			var errors = _.compact(data.errors);
 
 			if (errors.length === 0 && definedErrors.length === 0)
@@ -121,11 +120,11 @@ exports.setup.testRun = function (test, name) {
 
 				(name == null ? "" : "\n  TestRun: [bold]{" + name + "}") +
 				unthrownErrors.map(function (el, idx) {
-					return (idx === 0 ? "\n	[yellow]{Errors defined, but not thrown by JSHINT}\n" : "") +
+					return (idx === 0 ? "\n	[yellow]{Errors defined, but not thrown by JSHint}\n" : "") +
 						" [bold]{Line " + el.line + ", Char " + el.ch + "} " + el.message;
 				}).join("\n") +
 				undefinedErrors.map(function (el, idx) {
-					return (idx === 0 ? "\n	[yellow]{Errors thrown by JSHINT, but not defined in test run}\n" : "") +
+					return (idx === 0 ? "\n	[yellow]{Errors thrown by JSHint, but not defined in test run}\n" : "") +
 						"	[bold]{Line " + el.line + ", Char " + el.ch + "} " + el.message;
 				}).join("\n") +
 				wrongLineNumbers.map(function (el, idx) {

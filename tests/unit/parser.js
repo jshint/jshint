@@ -4,7 +4,7 @@
 
 "use strict";
 
-var JSHINT	= require('../../src/jshint.js').JSHINT;
+var jshint	= require('../../src/jshint.js');
 var fs		= require('fs');
 var TestRun = require("../helpers/testhelper").setup.testRun;
 var path    = require("path");
@@ -512,8 +512,8 @@ exports.functionCharacterLocation = function (test) {
 			__dirname + "/fixtures/nestedFunctions-locations.js", "utf8"
 		)
 	);
-	JSHINT(src);
-	var report = JSHINT.data().functions;
+
+	var report = jshint.run(src).data.functions;
 
 	test.equal(locations.length, report.length);
 	for (i = 0; i < locations.length; i += 1) {
@@ -3491,32 +3491,6 @@ exports["test for GH-1089"] = function (test) {
 	run.test(code);
 
 	test.done();
-};
-
-exports["test for GH-1103"] = function (test) {
-	var code = [ "var ohnoes = 42;" ];
-
-	var run = TestRun(test);
-
-	var patch = true;
-
-	JSHINT.addModule(function (linter) {
-		if (!patch) {
-			return;
-		}
-		patch = false;
-
-		var ohnoes = "oh noes";
-		Array.prototype.ohnoes = function () {
-			linter.warn("E024", { line: 1, char: 1, data: [ ohnoes += "!" ] });
-		};
-	});
-
-	run.test(code);
-
-	test.done();
-
-	delete Array.prototype.ohnoes;
 };
 
 exports["test for GH-1105"] = function (test) {
