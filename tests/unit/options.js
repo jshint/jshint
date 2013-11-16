@@ -864,17 +864,6 @@ exports.plusplus = function (test) {
 	test.done();
 };
 
-/** Option `sub` allows all forms of subscription. */
-exports.sub = function (test) {
-	TestRun(test)
-		.addError(1, "['prop'] is better written in dot notation.", { ch: 17 })
-		.test("window.obj = obj['prop'];", {es3: true});
-
-	TestRun(test).test("window.obj = obj['prop'];", { es3: true, sub: true });
-
-	test.done();
-};
-
 /** Option `strict` requires you to use "use strict"; */
 exports.strict = function (test) {
 	var code  = "(function (test) { return; }());";

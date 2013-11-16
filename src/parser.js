@@ -2072,9 +2072,6 @@ infix("[", function (left, that) {
 
 		if (!state.option.sub && reg.identifier.test(e.value)) {
 			s = syntax[e.value];
-			if (!s || !isReserved(s)) {
-				warn("W069", { token: state.tokens.prev, args: [e.value] });
-			}
 		}
 	}
 	advance("]", that);

@@ -423,7 +423,6 @@ exports.ownProperty = function (test) {
 		.addError(1, "'hasOwnProperty' is a really bad name.")
 		.addError(2, "'hasOwnProperty' is a really bad name.")
 		.addError(3, "'hasOwnProperty' is a really bad name.")
-		.addError(3, "['hasOwnProperty'] is better written in dot notation.");
 	run.test(code, {es3: true});
 	run.test(code, {}); // es5
 	run.test(code, {esnext: true});

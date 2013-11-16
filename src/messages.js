@@ -161,7 +161,7 @@ var warnings = make("warning", {
 	W066: "Implied eval. Consider passing a function instead of a string.",
 	W067: "Bad invocation.",
 	W068: null,
-	W069: "['{a}'] is better written in dot notation.",
+	W069: null,
 	W070: "Extra comma. (it breaks older versions of IE)",
 	W071: "This function has too many statements. ({a})",
 	W072: "This function has too many parameters. ({a})",
