@@ -16,7 +16,6 @@ function get(code, args) {
 	var msg = _.clone(
 		/^W\d{3}$/.test(code) ? warnings[code] :
 		/^E\d{3}$/.test(code) ? errors[code]   :
-		/^I\d{3}$/.test(code) ? info[code]     :
 		null
 	);
 
@@ -217,12 +216,6 @@ var warnings = make("warning", {
 	W120: "You might be leaking a variable ({a}) here.",
 	W121: "Extending prototype of native object: '{a}'.",
 	W122: "Invalid typeof value '{a}'"
-});
-
-var info = make("info", {
-	I001: "Comma warnings can be turned off with 'laxcomma'.",
-	I002: null,
-	I003: null
 });
 
 exports.get = get;
