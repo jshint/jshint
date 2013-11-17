@@ -3395,9 +3395,6 @@ stmt("continue", function () {
 
 stmt("return", function () {
 	if (this.line === state.tokens.next.line) {
-		if (state.tokens.next.id === "(regexp)")
-			warn("W092");
-
 		if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
 			this.first = expression(0);
 
@@ -3427,9 +3424,6 @@ stmt("return", function () {
 	}
 	funct["(generator)"] = "yielded";
 	if (this.line === state.tokens.next.line || !api.getEnvironment("moz", true)) {
-		if (state.tokens.next.id === "(regexp)")
-			warn("W092");
-
 		if (state.tokens.next.id !== ";" && !state.tokens.next.reach && state.tokens.next.nud) {
 			this.first = expression(10);
 
