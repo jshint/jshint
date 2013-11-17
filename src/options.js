@@ -39,8 +39,6 @@ exports.simple = {
 	nonew       : true, // if using `new` for side-effects should be disallowed
 	nonstandard : true, // if non-standard (but widely adopted) globals should
 	                    // be predefined
-	onevar      : true, // if only one var statement per function should be
-	                    // allowed
 	passfail    : true, // if the scan should stop on first error
 	phantom     : true, // if PhantomJS symbols should be allowed
 	plusplus    : true, // if increment/decrement should not be allowed

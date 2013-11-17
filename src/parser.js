@@ -2743,12 +2743,6 @@ var varstatement = stmt("var", function (prefix) {
 	// declaring a variable in a block can have unexpected consequences.
 	var tokens, lone, value;
 
-	if (funct["(onevar)"] && state.option.onevar) {
-		warn("W081");
-	} else if (!funct["(global)"]) {
-		funct["(onevar)"] = true;
-	}
-
 	this.first = [];
 	for (;;) {
 		var names = [];
@@ -2818,12 +2812,6 @@ var letstatement = stmt("let", function (prefix) {
 		letblock = true;
 	} else if (funct["(nolet)"]) {
 		warn("E048", { token: state.tokens.curr });
-	}
-
-	if (funct["(onevar)"] && state.option.onevar) {
-		warn("W081");
-	} else if (!funct["(global)"]) {
-		funct["(onevar)"] = true;
 	}
 
 	this.first = [];

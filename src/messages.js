@@ -173,7 +173,7 @@ var warnings = make("warning", {
 	W078: "Setter is defined without getter.",
 	W079: "Redefinition of '{a}'.",
 	W080: "It's not necessary to initialize '{a}' to 'undefined'.",
-	W081: "Too many var statements.",
+	W081: null,
 	W082: "Function declarations should not be placed in blocks. " +
 		"Use a function expression or move the statement to the top of " +
 		"the outer function.",

@@ -827,21 +827,6 @@ exports.passfail = function (test) {
 	test.done();
 };
 
-/**
- * Option `onevar` allows you to use only one var statement
- * per function. Don't ask me why.
- */
-exports.onevar = function (test) {
-	var src = fs.readFileSync(__dirname + '/fixtures/onevar.js', 'utf8');
-
-	TestRun(test).test(src, {es3: true});
-	TestRun(test)
-		.addError(10, "Too many var statements.")
-		.test(src, { es3: true, onevar: true });
-
-	test.done();
-};
-
 /** Option `plusplus` prohibits the use of increments/decrements. */
 exports.plusplus = function (test) {
 	var ops = [ '++', '--' ];
