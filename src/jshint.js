@@ -4013,7 +4013,8 @@ var JSHINT = (function () {
 				this.first = expression(0);
 
 				if (this.first &&
-						this.first.type === "(punctuator)" && this.first.value === "=" && !state.option.boss) {
+						this.first.type === "(punctuator)" && this.first.value === "=" &&
+						!this.first.paren && !state.option.boss) {
 					warningAt("W093", this.first.line, this.first.character);
 				}
 			}
@@ -4046,7 +4047,8 @@ var JSHINT = (function () {
 				nobreaknonadjacent(state.tokens.curr, state.tokens.next);
 				this.first = expression(10);
 
-				if (this.first.type === "(punctuator)" && this.first.value === "=" && !state.option.boss) {
+				if (this.first.type === "(punctuator)" && this.first.value === "=" &&
+						!this.first.paren && !state.option.boss) {
 					warningAt("W093", this.first.line, this.first.character);
 				}
 			}
