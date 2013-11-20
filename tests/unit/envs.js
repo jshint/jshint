@@ -544,6 +544,19 @@ exports.es5 = function (test) {
 		.addError(69, "Missing property name.")
 		.test(src, {  }); // es5
 
+	// JSHint should not throw "Missing property name" error on nameless getters/setters
+	// using Method Definition Shorthand if esnext flag is enabled.
+	TestRun(test)
+		.addError(36, "Setter is defined without getter.")
+		.addError(43, "Duplicate key 'x'.")
+		.addError(48, "Duplicate key 'x'.")
+		.addError(54, "Duplicate key 'x'.")
+		.addError(58, "Unexpected parameter 'a' in get x function.")
+		.addError(59, "Unexpected parameter 'a' in get y function.")
+		.addError(62, "Expected a single parameter in set x function.")
+		.addError(64, "Expected a single parameter in set z function.")
+		.test(src, { esnext: true });
+
 	// Make sure that JSHint parses getters/setters as function expressions
 	// (https://github.com/jshint/jshint/issues/96)
 	src = fs.readFileSync(__dirname + "/fixtures/es5.funcexpr.js", "utf8");
