@@ -749,3 +749,8 @@ exports.testClonePassedObjects = function (test) {
 	test.ok(options.predef.length == 1);
 	test.done();
 };
+
+exports.testMagicProtoVariable = function (test) {
+	JSHINT("__proto__ = 1;");
+	test.done();
+};
