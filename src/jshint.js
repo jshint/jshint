@@ -1939,7 +1939,7 @@ var JSHINT = (function () {
 
 	function note_implied(tkn) {
 		var name = tkn.value, line = tkn.line, a = implied[name];
-		if (typeof a === "function") {
+		if (typeof a === "function" || typeof a === 'object') {
 			a = false;
 		}
 
