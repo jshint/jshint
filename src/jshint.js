@@ -1937,17 +1937,13 @@ var JSHINT = (function () {
 
 
 	function note_implied(tkn) {
-		var name = tkn.value, line = tkn.line, a = implied[name];
-		if (typeof a === "function") {
-			a = false;
-		}
+		var name = tkn.value;
+		var desc = Object.getOwnPropertyDescriptor(implied, name);
 
-		if (!a) {
-			a = [line];
-			implied[name] = a;
-		} else if (a[a.length - 1] !== line) {
-			a.push(line);
-		}
+		if (!desc)
+			implied[name] = [tkn.line];
+		else
+			desc.value.push(tkn.line);
 	}
 
 
