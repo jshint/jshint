@@ -3394,9 +3394,10 @@ stmt("return", function () {
 		if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
 			this.first = expression(0);
 
-			if (this.first &&
-					this.first.type === "(punctuator)" && this.first.value === "=" && !state.option.boss) {
-				warn("W093", { coord: { line: this.first.line, ch: this.first.character }});
+			if (this.first && this.first.type === "(punctuator)" && this.first.value === "=") {
+				if (!this.first.paren && !state.option.boss) {
+					warn("W093", { coord: { line: this.first.line, ch: this.first.character }});
+				}
 			}
 		}
 	} else {
@@ -3404,6 +3405,7 @@ stmt("return", function () {
 			["[", "{", "+", "-"].indexOf(state.tokens.next.value) > -1) {
 		}
 	}
+
 	reachable("return");
 	return this;
 }).exps = true;
@@ -3423,8 +3425,10 @@ stmt("return", function () {
 		if (state.tokens.next.id !== ";" && !state.tokens.next.reach && state.tokens.next.nud) {
 			this.first = expression(10);
 
-			if (this.first.type === "(punctuator)" && this.first.value === "=" && !state.option.boss) {
-				warn("W093", { coord: { line: this.first.line, ch: this.first.character } });
+			if (this.first.type === "(punctuator)" && this.first.value === "=") {
+				if (!this.first.paren && !state.option.boss) {
+					warn("W093", { coord: { line: this.first.line, ch: this.first.character } });
+				}
 			}
 		}
 
