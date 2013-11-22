@@ -28,13 +28,17 @@ exports.group = {
 		sinon.stub(shjs, "cat")
 			.withArgs(sinon.match(/file\.js$/)).returns("var a = function () {}; a();")
 			.withArgs(sinon.match(/file1\.json$/)).returns("wat")
-			.withArgs(sinon.match(/file2\.json$/)).returns("{\"node\":true}");
+			.withArgs(sinon.match(/file2\.json$/)).returns("{\"node\":true}")
+			.withArgs(sinon.match(/file4\.json$/)).returns("{\"extends\":\"file3.json\"}")
+			.withArgs(sinon.match(/file5\.json$/)).returns("{\"extends\":\"file2.json\"}");
 
 		sinon.stub(shjs, "test")
 			.withArgs("-e", sinon.match(/file\.js$/)).returns(true)
 			.withArgs("-e", sinon.match(/file1\.json$/)).returns(true)
 			.withArgs("-e", sinon.match(/file2\.json$/)).returns(true)
-			.withArgs("-e", sinon.match(/file3\.json$/)).returns(false);
+			.withArgs("-e", sinon.match(/file3\.json$/)).returns(false)
+			.withArgs("-e", sinon.match(/file4\.json$/)).returns(true)
+			.withArgs("-e", sinon.match(/file5\.json$/)).returns(true);
 
 		process.exit.restore();
 		sinon.stub(process, "exit").throws("ProcessExit");
@@ -63,10 +67,17 @@ exports.group = {
 			test.equal(err, "ProcessExit");
 		}
 
-		// Valid config
 		process.exit.restore();
 		sinon.stub(process, "exit");
 
+		// Merges existing valid files
+		cli.interpret([
+			"node", "jshint", "file.js", "--config", "file5.json"
+		]);
+		test.equal(cli.run.lastCall.args[0].config.node, true);
+		test.equal(cli.run.lastCall.args[0].config['extends'], void 0);
+
+		// Valid config
 		cli.interpret([
 			"node", "jshint", "file.js", "--config", "file2.json"
 		]);
@@ -646,7 +657,7 @@ exports.group = {
 		var dir = __dirname + "/../examples/";
 		sinon.stub(cli, "run").returns(false);
 		sinon.stub(cli, "getBufferSize").returns(1);
-		sinon.stub(process, "cwd").returns(dir);		
+		sinon.stub(process, "cwd").returns(dir);
 		sinon.stub(process.stdout, "on", function (name, func) {
 			func();
 		});
@@ -666,12 +677,12 @@ exports.group = {
 
 		test.done();
 	},
-	
+
 	testDrainNotCalledWhenThereIsNoBufferedOutput: function (test) {
 		var dir = __dirname + "/../examples/";
 		sinon.stub(cli, "run").returns(false);
 		sinon.stub(cli, "getBufferSize").returns(0);
-		sinon.stub(process, "cwd").returns(dir);		
+		sinon.stub(process, "cwd").returns(dir);
 		sinon.stub(process.stdout, "on", function (name, func) {
 			func();
 		});
