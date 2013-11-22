@@ -4,6 +4,7 @@ var cli         = require("cli");
 var path        = require("path");
 var shjs        = require("shelljs");
 var minimatch   = require("minimatch");
+var _           = require("underscore");
 var JSHINT      = require("./jshint.js").JSHINT;
 var defReporter = require("./reporters/default").reporter;
 
@@ -323,6 +324,12 @@ var exports = {
 		try {
 			var config = JSON.parse(removeComments(shjs.cat(fp)));
 			config.dirname = path.dirname(fp);
+
+			if (config['extends']) {
+				_.extend(config, exports.loadConfig(path.resolve(config.dirname, config['extends'])));
+				delete config['extends'];
+			}
+
 			return config;
 		} catch (err) {
 			cli.error("Can't parse config file: " + fp);
@@ -405,7 +412,7 @@ var exports = {
 		return results.length === 0;
 	},
 
-	/** 
+	/**
 	 * Helper exposed for testing.
 	 * Used to determine is stdout has any buffered output before exiting the program
 	 */
