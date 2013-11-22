@@ -1314,16 +1314,17 @@ Lexer.prototype = {
 		this.char = 1;
 		this.from = 1;
 
+		var startsWith = function (prefix) {
+			return this.indexOf(prefix) === 0;
+		};
+		var endsWith = function (suffix) {
+			return this.indexOf(suffix, this.length - suffix.length) !== -1;
+		};
+		var inputTrimmed = this.input.trim();
+
 		// If we are ignoring linter errors, replace the input with empty string
 		// if it doesn't already at least start or end a multi-line comment
 		if (state.ignoreLinterErrors === true) {
-			var startsWith = function (prefix) {
-				return this.indexOf(prefix) === 0;
-			};
-			var endsWith = function (suffix) {
-				return this.indexOf(suffix, this.length - suffix.length) !== -1;
-			};
-			var inputTrimmed = this.input.trim();
 			if (! (startsWith.call(inputTrimmed, "/*") || endsWith.call(inputTrimmed, "*/"))) {
 				this.input = "";
 			}
@@ -1345,7 +1346,15 @@ Lexer.prototype = {
 		// long.
 
 		if (state.option.maxlen && state.option.maxlen < this.input.length) {
-			this.trigger("warning", { code: "W101", line: this.line, character: this.input.length });
+			var inComment = state.tokens.curr.comment ||
+				startsWith.call(inputTrimmed, "//") ||
+				startsWith.call(inputTrimmed, "/*");
+
+			var shouldTriggerError = !inComment || !reg.maxlenException.test(inputTrimmed);
+
+			if (shouldTriggerError) {
+				this.trigger("warning", { code: "W101", line: this.line, character: this.input.length });
+			}
 		}
 
 		return true;
