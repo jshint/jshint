@@ -224,6 +224,43 @@ exports.group = {
 		test.done();
 	},
 
+	textExtract: function (test) {
+		var html = "<html><script>var a = 1;</script></html>";
+		var text = "hello world";
+		var js   = "var a = 1;";
+
+		test.equal(cli.extract(html, "never"), html);
+		test.equal(cli.extract(html, "auto"), js);
+		test.equal(cli.extract(html, "always"), js);
+
+		test.equal(cli.extract(js, "never"), js);
+		test.equal(cli.extract(js, "auto"), js);
+		test.equal(cli.extract(js, "always"), js);
+
+		test.equal(cli.extract(text, "never"), text);
+		test.equal(cli.extract(text, "auto"), text);
+		test.equal(cli.extract(text, "always"), text);
+
+		html = [
+			"<html>",
+				"<script type='text/javascript'>",
+					"var a = 1;",
+				"</script>",
+				"<h1>Hello!</h1>",
+				"<script type='text/coffeescript'>",
+					"a = 1",
+				"</script>",
+				"<script>",
+					"var b = 1;",
+				"</script>",
+			"</html>" ].join("\n");
+
+		js = ["\n\n", "var a = 1;", "\n\n\n\n\n", "var b = 1;\n" ].join("\n");
+
+		test.equal(cli.extract(html, "auto"), js);
+		test.done();
+	},
+
 	testExtensions: function (test) {
 		var run = sinon.stub(cli, "run");
 
