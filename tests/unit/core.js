@@ -699,3 +699,9 @@ exports.testClonePassedObjects = function (test) {
 	test.ok(options.predef.length == 1);
 	test.done();
 };
+
+// Issue #1360: JSHint was crashing on __proto__ = foo
+exports.testMagicProtoVariable = function (test) {
+	jshint.run("__proto__ = 1;");
+	test.done();
+};

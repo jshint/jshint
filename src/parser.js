@@ -1454,17 +1454,13 @@ function block(ordinary, stmt, isfunc, isfatarrow, iscase) {
 }
 
 function note_implied(tkn) {
-	var name = tkn.value, line = tkn.line, a = state.implied[name];
-	if (typeof a === "function") {
-		a = false;
-	}
+	var name = tkn.value;
+	var desc = Object.getOwnPropertyDescriptor(state.implied, name);
 
-	if (!a) {
-		a = [line];
-		state.implied[name] = a;
-	} else if (a[a.length - 1] !== line) {
-		a.push(line);
-	}
+	if (!desc)
+		state.implied[name] = [tkn.line];
+	else
+		desc.value.push(tkn.line);
 }
 
 // Build the syntax table by declaring the syntactic elements of the language.
