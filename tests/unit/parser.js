@@ -3285,6 +3285,54 @@ exports["concise methods support"] = function (test) {
 	test.done();
 };
 
+exports["concise methods support for 'get' and 'set' function names"] = function (test) {
+	var code = [
+		"var a = [1, 2, 3, 4, 5];",
+		"var strange = {",
+		"	get (i) {",
+		"		return a[i];",
+		"	},",
+		"	set () {",
+		"		a.forEach(function(v, i, l) { l[i] = v++; });",
+		"	}",
+		"};"
+	];
+
+	TestRun(test).test(code, {esnext: true});
+
+	test.done();
+};
+
+exports["concise methods support for 'get' without 'set'"] = function (test) {
+	var code = [
+		"var a = [1, 2, 3, 4, 5];",
+		"var strange = {",
+		"	get () {",
+		"		return a;",
+		"	}",
+		"};"
+	];
+
+	TestRun(test).test(code, {esnext: true});
+
+	test.done();
+};
+
+exports["concise methods support for 'set' without 'get'"] = function (test) {
+	var code = [
+		"var a = [1, 2, 3, 4, 5];",
+		"var strange = {",
+		"	set (v) {",
+		"		a = v;",
+		"	}",
+		"};"
+	];
+
+	TestRun(test).test(code, {esnext: true});
+
+	test.done();
+};
+
 exports["spread rest operator support"] = function (test) {
 	var code = [
 		// spread operator
