@@ -1382,6 +1382,10 @@ exports.maxlen = function (test) {
 
 	TestRun(test)
 		.addError(3, "Line is too long.")
+		.addError(4, "Line is too long.")
+		.addError(5, "Line is too long.")
+		.addError(6, "Line is too long.")
+		// line 7 and more are exceptions and won't trigger the error
 		.test(src, { es3: true, maxlen: 23 });
 
 	test.done();

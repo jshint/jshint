@@ -27,12 +27,8 @@ exports.jQuery_1_7 = function (test) {
 		.addError(1607, "'table' is defined but never used.")
 		.addError(1710, "'internalKey' is defined but never used.")
 		.addError(1813, "'internalKey' is defined but never used.")
-		.addError(2662, "Did you mean to return a conditional instead of an assignment?")
-		.addError(2751, "Did you mean to return a conditional instead of an assignment?")
-		.addError(2805, "Did you mean to return a conditional instead of an assignment?")
 		.addError(2818, "Expected an assignment or function call and instead saw an expression.")
 		.addError(2822, "Expected an assignment or function call and instead saw an expression.")
-		.addError(2850, "Did you mean to return a conditional instead of an assignment?")
 		.addError(2859, "'rnamespaces' is defined but never used.")
 		.addError(2861, "'rperiod' is defined but never used.")
 		.addError(2862, "'rspaces' is defined but never used.")
@@ -52,7 +48,6 @@ exports.jQuery_1_7 = function (test) {
 		.addError(5691, "'i' is defined but never used.")
 		.addError(7141, "'i' is defined but never used.")
 		.addError(6061, "'cur' is defined but never used.")
-		.addError(8595, "Did you mean to return a conditional instead of an assignment?")
 		.addError(9209, "Mixed spaces and tabs.")
 		.test(src, { undef: true, unused: true }, globals);
 

@@ -24,6 +24,7 @@ bundle.bundle({}, function (err, src) {
 		"var require;",
 		src,
 		"JSHINT = require('jshint').JSHINT;",
+		"if (typeof exports === 'object' && exports) exports.JSHINT = JSHINT;",
 		"}());"
 	].join("\n").to(web);
 

@@ -28,13 +28,17 @@ exports.group = {
 		sinon.stub(shjs, "cat")
 			.withArgs(sinon.match(/file\.js$/)).returns("var a = function () {}; a();")
 			.withArgs(sinon.match(/file1\.json$/)).returns("wat")
-			.withArgs(sinon.match(/file2\.json$/)).returns("{\"node\":true}");
+			.withArgs(sinon.match(/file2\.json$/)).returns("{\"node\":true}")
+			.withArgs(sinon.match(/file4\.json$/)).returns("{\"extends\":\"file3.json\"}")
+			.withArgs(sinon.match(/file5\.json$/)).returns("{\"extends\":\"file2.json\"}");
 
 		sinon.stub(shjs, "test")
 			.withArgs("-e", sinon.match(/file\.js$/)).returns(true)
 			.withArgs("-e", sinon.match(/file1\.json$/)).returns(true)
 			.withArgs("-e", sinon.match(/file2\.json$/)).returns(true)
-			.withArgs("-e", sinon.match(/file3\.json$/)).returns(false);
+			.withArgs("-e", sinon.match(/file3\.json$/)).returns(false)
+			.withArgs("-e", sinon.match(/file4\.json$/)).returns(true)
+			.withArgs("-e", sinon.match(/file5\.json$/)).returns(true);
 
 		process.exit.restore();
 		sinon.stub(process, "exit").throws("ProcessExit");
@@ -63,10 +67,17 @@ exports.group = {
 			test.equal(err, "ProcessExit");
 		}
 
-		// Valid config
 		process.exit.restore();
 		sinon.stub(process, "exit");
 
+		// Merges existing valid files
+		cli.interpret([
+			"node", "jshint", "file.js", "--config", "file5.json"
+		]);
+		test.equal(cli.run.lastCall.args[0].config.node, true);
+		test.equal(cli.run.lastCall.args[0].config['extends'], void 0);
+
+		// Valid config
 		cli.interpret([
 			"node", "jshint", "file.js", "--config", "file2.json"
 		]);
@@ -210,6 +221,43 @@ exports.group = {
 		test.equal(run.args[0][0].reporter, rep.reporter);
 
 		run.restore();
+		test.done();
+	},
+
+	textExtract: function (test) {
+		var html = "<html><script>var a = 1;</script></html>";
+		var text = "hello world";
+		var js   = "var a = 1;";
+
+		test.equal(cli.extract(html, "never"), html);
+		test.equal(cli.extract(html, "auto"), js);
+		test.equal(cli.extract(html, "always"), js);
+
+		test.equal(cli.extract(js, "never"), js);
+		test.equal(cli.extract(js, "auto"), js);
+		test.equal(cli.extract(js, "always"), js);
+
+		test.equal(cli.extract(text, "never"), text);
+		test.equal(cli.extract(text, "auto"), text);
+		test.equal(cli.extract(text, "always"), text);
+
+		html = [
+			"<html>",
+				"<script type='text/javascript'>",
+					"var a = 1;",
+				"</script>",
+				"<h1>Hello!</h1>",
+				"<script type='text/coffeescript'>",
+					"a = 1",
+				"</script>",
+				"<script>",
+					"var b = 1;",
+				"</script>",
+			"</html>" ].join("\n");
+
+		js = ["\n\n", "var a = 1;", "\n\n\n\n\n", "var b = 1;\n" ].join("\n");
+
+		test.equal(cli.extract(html, "auto"), js);
 		test.done();
 	},
 
@@ -646,7 +694,7 @@ exports.group = {
 		var dir = __dirname + "/../examples/";
 		sinon.stub(cli, "run").returns(false);
 		sinon.stub(cli, "getBufferSize").returns(1);
-		sinon.stub(process, "cwd").returns(dir);		
+		sinon.stub(process, "cwd").returns(dir);
 		sinon.stub(process.stdout, "on", function (name, func) {
 			func();
 		});
@@ -666,12 +714,12 @@ exports.group = {
 
 		test.done();
 	},
-	
+
 	testDrainNotCalledWhenThereIsNoBufferedOutput: function (test) {
 		var dir = __dirname + "/../examples/";
 		sinon.stub(cli, "run").returns(false);
 		sinon.stub(cli, "getBufferSize").returns(0);
-		sinon.stub(process, "cwd").returns(dir);		
+		sinon.stub(process, "cwd").returns(dir);
 		sinon.stub(process.stdout, "on", function (name, func) {
 			func();
 		});
