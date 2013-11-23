@@ -2492,22 +2492,30 @@ function checkCondAssignment(expr) {
 					warn("E034");
 
 				i = property_name();
-				if (!i) {
+
+				// ES6 allows for get() {...} and set() {...} method
+				// definition shorthand syntax, so we don't produce an error
+				// if the esnext option is enabled.
+				if (!i && !api.getEnvironment("es6"))
 					warn("E035");
-				}
 
 				// It is a Syntax Error if PropName of MethodDefinition is
 				// "constructor" and SpecialMethod of MethodDefinition is true.
-				if (isclassdef && i === "constructor") {
+				if (isclassdef && i === "constructor")
 					warn("E049", { token: state.tokens.next, args: ["class getter method", i] });
-				}
 
-				saveGetter(tag + i);
+				// We don't want to save this getter unless it's an actual getter
+				// and not an ES6 concise method
+				if (i)
+					saveGetter(tag + i);
+
 				t = state.tokens.next;
 				f = doFunction();
 				p = f["(params)"];
-				if (p)
+				// Don't warn about getter/setter pairs if this is an ES6 concise method
+				if (i && p)
 					warn("W076", { token: t, args: [p[0], i] });
+
 			} else if (state.tokens.next.value === "set" && peek().id !== ":") {
 				advance("set");
 
@@ -2515,24 +2523,30 @@ function checkCondAssignment(expr) {
 					warn("E034");
 
 				i = property_name();
-				if (!i) {
+
+				// ES6 allows for get() {...} and set() {...} method
+				// definition shorthand syntax, so we don't produce an error
+				// if the esnext option is enabled.
+				if (!i && !api.getEnvironment("es6"))
 					warn("E035");
-				}
 
 				// It is a Syntax Error if PropName of MethodDefinition is
 				// "constructor" and SpecialMethod of MethodDefinition is true.
-				if (isclassdef && i === "constructor") {
+				if (isclassdef && i === "constructor")
 					warn("E049", { token: state.tokens.next, args: ["class setter method", i ] });
-				}
 
-				saveSetter(tag + i, state.tokens.next);
+				// We don't want to save this getter unless it's an actual getter
+				// and not an ES6 concise method
+				if (i)
+					saveSetter(tag + i, state.tokens.next);
+
 				t = state.tokens.next;
 				f = doFunction();
 				p = f["(params)"];
 
-				if (!p || p.length !== 1) {
+				// Don't warn about getter/setter pairs if this is an ES6 concise method
+				if (i && (!p || p.length !== 1))
 					warn("W077", { token: t, args: [i] });
-				}
 			} else {
 				g = false;
 				if (state.tokens.next.value === "*" && state.tokens.next.type === "(punctuator)") {
