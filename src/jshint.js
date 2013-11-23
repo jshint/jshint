@@ -3031,7 +3031,11 @@ var JSHINT = (function () {
 					}
 
 					i = property_name();
-					if (!i) {
+
+					// ES6 allows for get() {...} and set() {...} method
+					// definition shorthand syntax, so we don't produce an error
+					// if the esnext option is enabled.
+					if (!i && !state.option.inESNext()) {
 						error("E035");
 					}
 
@@ -3041,13 +3045,19 @@ var JSHINT = (function () {
 						error("E049", state.tokens.next, "class getter method", i);
 					}
 
-					saveGetter(tag + i);
+					// We don't want to save this getter unless it's an actual getter
+					// and not an ES6 concise method
+					if (i) {
+						saveGetter(tag + i);
+					}
+
 					t = state.tokens.next;
 					adjacent(state.tokens.curr, state.tokens.next);
 					f = doFunction();
 					p = f["(params)"];
 
-					if (p) {
+					// Don't warn about getter/setter pairs if this is an ES6 concise method
+					if (i && p) {
 						warning("W076", t, p[0], i);
 					}
 
@@ -3060,7 +3070,11 @@ var JSHINT = (function () {
 					}
 
 					i = property_name();
-					if (!i) {
+
+					// ES6 allows for get() {...} and set() {...} method
+					// definition shorthand syntax, so we don't produce an error
+					// if the esnext option is enabled.
+					if (!i && !state.option.inESNext()) {
 						error("E035");
 					}
 
@@ -3070,13 +3084,19 @@ var JSHINT = (function () {
 						error("E049", state.tokens.next, "class setter method", i);
 					}
 
-					saveSetter(tag + i, state.tokens.next);
+					// We don't want to save this getter unless it's an actual getter
+					// and not an ES6 concise method
+					if (i) {
+						saveSetter(tag + i, state.tokens.next);
+					}
+
 					t = state.tokens.next;
 					adjacent(state.tokens.curr, state.tokens.next);
 					f = doFunction();
 					p = f["(params)"];
 
-					if (!p || p.length !== 1) {
+					// Don't warn about getter/setter pairs if this is an ES6 concise method
+					if (i && (!p || p.length !== 1)) {
 						warning("W077", t, i);
 					}
 				} else {
