@@ -63,7 +63,8 @@
 		"undef":     true,
 		"unused":    true,
 		"onecase":   true,
-		"indent":    2
+		"indent":    2,
+		"legacy":    true
 	},
 
 	"licenses": [

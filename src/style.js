@@ -133,7 +133,7 @@ exports.register = function (linter) {
 			});
 		}
 
-		if (data.value.substr(data.value.length - 1) === ".") {
+		if (data.value.substring(data.value.length - 1) === ".") {
 			// Warn about a trailing decimal point.
 			linter.warn("W047", {
 				line: data.line,
