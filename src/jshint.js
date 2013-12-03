@@ -4630,7 +4630,7 @@ var JSHINT = (function () {
 		}
 
 		api = {
-			get isJSON() {
+			isJSON: function () {
 				return state.jsonMode;
 			},
 
