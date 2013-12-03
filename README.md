@@ -42,8 +42,10 @@ that cover your issue. And remember the wisdom: pull request > bug report > twee
 
 #### License
 
-JSHint is distributed under the MIT License. One file and one file only
-(src/stable/jshint.js) is distributed under the slightly modified MIT License.
+JSHint is distributed under the MIT License. One file and one file in the 2.x branch only
+(src/jshint.js) is distributed under the slightly modified MIT License.
+
+(This means that 3.0 will be able to be distributed from free-software-only repositories)
 
 
 #### Thank you!
