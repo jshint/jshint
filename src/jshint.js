@@ -107,103 +107,103 @@ var JSHINT = (function () {
 			laxcomma    : true, // if line breaks should not be checked around commas
 			legacy	    : true, // if legacy annex B functions should be tolerated
 			loopfunc    : true, // if functions should be allowed to be defined within
-					    // loops
+			                    // loops
 			mootools    : true, // if MooTools globals should be predefined
 			multistr    : true, // allow multiline strings
-			freeze	    : true, // if modifying native object prototypes should be disallowed
-			newcap	    : true, // if constructor names must be capitalized
-			noarg	    : true, // if arguments.caller and arguments.callee should be
-					    // disallowed
-			node	    : true, // if the Node.js environment globals should be
-					    // predefined
-			noempty	    : true, // if empty blocks should be disallowed
-			nonew	    : true, // if using `new` for side-effects should be disallowed
+			freeze      : true, // if modifying native object prototypes should be disallowed
+			newcap      : true, // if constructor names must be capitalized
+			noarg       : true, // if arguments.caller and arguments.callee should be
+			                    // disallowed
+			node        : true, // if the Node.js environment globals should be
+			                    // predefined
+			noempty     : true, // if empty blocks should be disallowed
+			nonew       : true, // if using `new` for side-effects should be disallowed
 			nonstandard : true, // if non-standard (but widely adopted) globals should
-					    // be predefined
-			nomen	    : true, // if names should be checked
-			onevar	    : true, // if only one var statement per function should be
-					    // allowed
+			                    // be predefined
+			nomen       : true, // if names should be checked
+			onevar      : true, // if only one var statement per function should be
+			                    // allowed
 			passfail    : true, // if the scan should stop on first error
-			phantom	    : true, // if PhantomJS symbols should be allowed
+			phantom     : true, // if PhantomJS symbols should be allowed
 			plusplus    : true, // if increment/decrement should not be allowed
-			proto	    : true, // if the `__proto__` property should be allowed
+			proto       : true, // if the `__proto__` property should be allowed
 			prototypejs : true, // if Prototype and Scriptaculous globals should be
-					    // predefined
-			rhino	    : true, // if the Rhino environment globals should be predefined
-			shelljs	    : true, // if ShellJS globals should be predefined
-			typed	    : true, // if typed array globals should be predefined
-			undef	    : true, // if variables should be declared before used
+			                    // predefined
+			rhino       : true, // if the Rhino environment globals should be predefined
+			shelljs     : true, // if ShellJS globals should be predefined
+			typed       : true, // if typed array globals should be predefined
+			undef       : true, // if variables should be declared before used
 			scripturl   : true, // if script-targeted URLs should be tolerated
-			shadow	    : true, // if variable shadowing should be tolerated
+			shadow      : true, // if variable shadowing should be tolerated
 			smarttabs   : true, // if smarttabs should be tolerated
-					    // (http://www.emacswiki.org/emacs/SmartTabs)
-			strict	    : true, // require the "use strict"; pragma
-			sub	    : true, // if all forms of subscript notation are tolerated
+			                    // (http://www.emacswiki.org/emacs/SmartTabs)
+			strict      : true, // require the "use strict"; pragma
+			sub         : true, // if all forms of subscript notation are tolerated
 			supernew    : true, // if `new function () { ... };` and `new Object;`
-					    // should be tolerated
+			                    // should be tolerated
 			trailing    : true, // if trailing whitespace rules apply
 			validthis   : true, // if 'this' inside a non-constructor function is valid.
-					    // This is a function scoped option only.
+			                    // This is a function scoped option only.
 			withstmt    : true, // if with statements should be allowed
-			white	    : true, // if strict whitespace rules apply
-			worker	    : true, // if Web Worker script symbols should be allowed
-			wsh	    : true, // if the Windows Scripting Host environment globals
-					    // should be predefined
-			yui	    : true, // YUI variables should be predefined
+			white       : true, // if strict whitespace rules apply
+			worker      : true, // if Web Worker script symbols should be allowed
+			wsh         : true, // if the Windows Scripting Host environment globals
+			                    // should be predefined
+			yui         : true, // YUI variables should be predefined
 
 			// Obsolete options
-			onecase	    : true, // if one case switch statements should be allowed
-			regexp	    : true, // if the . should not be allowed in regexp literals
+			onecase     : true, // if one case switch statements should be allowed
+			regexp      : true, // if the . should not be allowed in regexp literals
 			regexdash   : true  // if unescaped first/last dash (-) inside brackets
-					    // should be tolerated
+			                    // should be tolerated
 		},
 
 		// These are the JSHint options that can take any value
 		// (we use this object to detect invalid options)
 		valOptions = {
-			maxlen	     : false,
-			indent	     : false,
-			maxerr	     : false,
-			predef	     : false, //predef is deprecated and being replaced by globals
-			globals	     : false,
+			maxlen       : false,
+			indent       : false,
+			maxerr       : false,
+			predef       : false, //predef is deprecated and being replaced by globals
+			globals      : false,
 			quotmark     : false, //'single'|'double'|true
-			scope	     : false,
+			scope        : false,
 			maxstatements: false, // {int} max statements per function
 			maxdepth     : false, // {int} max nested block depth per function
 			maxparams    : false, // {int} max params per function
 			maxcomplexity: false, // {int} max cyclomatic complexity per function
-			unused	     : true,  // warn if variables are unused. Available options:
-					      //   false    - don't check for unused variables
-					      //   true	    - "vars" + check last function param
-					      //   "vars"   - skip checking unused function params
-					      //   "strict" - "vars" + check all function params
-			latedef	     : false, // warn if the variable is used before its definition
-					      //   false    - don't emit any warnings
-					      //   true	    - warn if any variable is used before its definition
-					      //   "nofunc" - warn for any variable but function declarations
-			ignore	     : false  // start/end ignoring lines of code, bypassing the lexer
-					      //   start    - start ignoring lines, including the current line
-					      //   end	    - stop ignoring lines, starting on the next line
-					      //   line	    - ignore warnings / errors for just a single line
-					      //	      (this option does not bypass the lexer)
+			unused       : true,  // warn if variables are unused. Available options:
+			                      //   false    - don't check for unused variables
+			                      //   true     - "vars" + check last function param
+			                      //   "vars"   - skip checking unused function params
+			                      //   "strict" - "vars" + check all function params
+			latedef      : false, // warn if the variable is used before its definition
+			                      //   false    - don't emit any warnings
+			                      //   true     - warn if any variable is used before its definition
+			                      //   "nofunc" - warn for any variable but function declarations
+			ignore       : false  // start/end ignoring lines of code, bypassing the lexer
+			                      //   start    - start ignoring lines, including the current line
+			                      //   end      - stop ignoring lines, starting on the next line
+			                      //   line     - ignore warnings / errors for just a single line
+			                      //              (this option does not bypass the lexer)
 		},
 
 		// These are JSHint boolean options which are shared with JSLint
 		// where the definition in JSHint is opposite JSLint
 		invertedOptions = {
 			bitwise : true,
-			forin	: true,
-			newcap	: true,
-			nomen	: true,
+			forin   : true,
+			newcap  : true,
+			nomen   : true,
 			plusplus: true,
-			regexp	: true,
-			undef	: true,
-			white	: true,
+			regexp  : true,
+			undef   : true,
+			white   : true,
 
 			// Inverted and renamed, use JSHint name here
-			eqeqeq	: true,
-			onevar	: true,
-			strict	: true
+			eqeqeq  : true,
+			onevar  : true,
+			strict  : true
 		},
 
 		// These are JSHint boolean options which are shared with JSLint
@@ -237,7 +237,7 @@ var JSHINT = (function () {
 		noreach,
 		predefined,		// Global variables defined by option
 
-		scope,	// The current scope
+		scope,  // The current scope
 		stack,
 		unuseds,
 		urls,
