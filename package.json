@@ -27,7 +27,7 @@
 		"data": "node scripts/generate-identifier-data",
 		"build": "node bin/build",
 		"test": "nodeunit tests tests/regression tests/unit",
-		"pretest": "jshint src"
+		"pretest": "node bin/jshint src"
 	},
 
 	"main": "./src/jshint.js",
