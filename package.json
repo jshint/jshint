@@ -27,7 +27,7 @@
 		"data": "node scripts/generate-identifier-data",
 		"build": "node bin/build",
 		"test": "nodeunit tests tests/regression tests/unit",
-		"pretest": "node bin/jshint src"
+		"pretest": "jshint src"
 	},
 
 	"main": "./src/jshint.js",
@@ -63,8 +63,7 @@
 		"undef":     true,
 		"unused":    true,
 		"onecase":   true,
-		"indent":    2,
-		"legacy":    true
+		"indent":    2
 	},
 
 	"licenses": [
