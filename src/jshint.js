@@ -2197,9 +2197,10 @@ var JSHINT = (function () {
 	relation("==", function (left, right) {
 		var eqnull = state.option.eqnull && (left.value === "null" || right.value === "null");
 
-		if (!eqnull && state.option.eqeqeq)
+		if (!eqnull && state.option.eqeqeq) {
+			this.from = this.character;
 			warning("W116", this, "===", "==");
-		else if (isPoorRelation(left))
+		} else if (isPoorRelation(left))
 			warning("W041", this, "===", left.value);
 		else if (isPoorRelation(right))
 			warning("W041", this, "===", right.value);
@@ -2222,6 +2223,7 @@ var JSHINT = (function () {
 				(left.value === "null" || right.value === "null");
 
 		if (!eqnull && state.option.eqeqeq) {
+			this.from = this.character;
 			warning("W116", this, "!==", "!=");
 		} else if (isPoorRelation(left)) {
 			warning("W041", this, "!==", left.value);
