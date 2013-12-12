@@ -27,7 +27,7 @@
 		"data": "node scripts/generate-identifier-data",
 		"build": "node bin/build",
 		"test": "nodeunit tests tests/regression tests/unit",
-		"pretest": "jshint src"
+		"pretest": "jshint src && jscs src"
 	},
 
 	"main": "./src/jshint.js",
@@ -49,14 +49,14 @@
 		"nodeunit":      "0.8.x",
 		"sinon":         "1.7.x",
 		"unicode-6.3.0": "0.1.x",
-		"regenerate":    "0.5.x"
+		"regenerate":    "0.5.x",
+		"jscs":          "1.0.x"
 	},
 
 	"jshintConfig": {
 		"boss":      true,
 		"node":      true,
 		"strict":    true,
-		"white":     true,
 		"smarttabs": true,
 		"undef":     true,
 		"unused":    true,

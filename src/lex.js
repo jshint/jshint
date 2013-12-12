@@ -1206,7 +1206,7 @@ Lexer.prototype = {
 				return this.indexOf(suffix, this.length - suffix.length) !== -1;
 			};
 			var inputTrimmed = this.input.trim();
-			if (! (startsWith.call(inputTrimmed, "/*") || endsWith.call(inputTrimmed, "*/"))) {
+			if (!(startsWith.call(inputTrimmed, "/*") || endsWith.call(inputTrimmed, "*/"))) {
 				this.input = "";
 			}
 		}

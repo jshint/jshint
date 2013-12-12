@@ -2335,7 +2335,7 @@ function doFunction(name, statement, generator, fatarrowparams) {
 	funct["(params)"] = functionparams(fatarrowparams);
 	funct["(metrics)"].verifyMaxParametersPerFunction(funct["(params)"]);
 
-	block(false, true, true, fatarrowparams ? true:false);
+	block(false, true, true, fatarrowparams ? true : false);
 
 	if (generator && funct["(generator)"] !== "yielded") {
 		warn("E047", { token: state.tokens.curr });
