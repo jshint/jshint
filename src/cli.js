@@ -229,7 +229,7 @@ function isIgnored(fp, patterns) {
 
 /**
  * Extract JS code from a given source code. The source code my be either HTML
- * code or JS code. In the later case, no extraction will be done unless
+ * code or JS code. In the latter case, no extraction will be done unless
  * 'always' is given.
  *
  * @param {string} code a piece of code
@@ -245,7 +245,7 @@ function extract(code, when) {
 	if (when !== "always" && (when !== "auto" || !/^\s*</.test(code)))
 		return code;
 
-	var inscript = true;
+	var inscript = false;
 	var index = 0;
 	var js = [];
 
