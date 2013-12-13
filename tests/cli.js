@@ -278,6 +278,36 @@ exports.group = {
 		test.done();
 	},
 
+	testMalformedNpmFile: function (test) {
+		sinon.stub(process, "cwd").returns(__dirname);
+		var localNpm = path.normalize(__dirname + "/package.json");
+		var localRc = path.normalize(__dirname + "/.jshintrc");
+		var testStub = sinon.stub(shjs, "test");
+		var catStub = sinon.stub(shjs, "cat");
+
+		// stub rc file
+		testStub.withArgs("-e", localRc).returns(true);
+		catStub.withArgs(localRc).returns('{"evil": true}');
+
+		// stub npm file
+		testStub.withArgs("-e", localNpm).returns(true);
+		catStub.withArgs(localNpm).returns('{'); // malformed package.json
+
+		// stub src file
+		testStub.withArgs("-e", sinon.match(/file\.js$/)).returns(true);
+		catStub.withArgs(sinon.match(/file\.js$/)).returns("eval('a=2');");
+
+		cli.interpret([
+			"node", "jshint", "file.js"
+		]);
+		test.equal(process.exit.args[0][0], 0); // lint with wrong package.json
+
+		shjs.test.restore();
+		shjs.cat.restore();
+		process.cwd.restore();
+		test.done();
+	},
+
 	testRcFile: function (test) {
 		sinon.stub(process, "cwd").returns(__dirname);
 		var localRc = path.normalize(__dirname + "/.jshintrc");
