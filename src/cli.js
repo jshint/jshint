@@ -245,7 +245,7 @@ function extract(code, when) {
 	if (when !== "always" && (when !== "auto" || !/^\s*</.test(code)))
 		return code;
 
-	var inscript = true;
+	var inscript = false;
 	var index = 0;
 	var js = [];
 
