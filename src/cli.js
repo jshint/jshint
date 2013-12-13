@@ -117,7 +117,11 @@ function loadNpmConfig(file) {
 	if (!fp)
 		return null;
 
-	return require(fp).jshintConfig || null;
+	try {
+		return require(fp).jshintConfig;
+	} catch (e) {
+		return null;
+	}
 }
 
 /**
