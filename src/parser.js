@@ -1707,54 +1707,73 @@ infix("&&", "and", 50);
 bitwise("|", "bitor", 70);
 bitwise("^", "bitxor", 80);
 bitwise("&", "bitand", 90);
+
 relation("==", function (left, right) {
 	var eqnull = state.option.eqnull && (left.value === "null" || right.value === "null");
 
-	if (!eqnull && state.option.eqeqeq)
-		warn("W116", { token: this, args: ["===", "=="] });
-	else if (isPoorRelation(left))
-		warn("W041", { token: this, args: ["===", left.value] });
-	else if (isPoorRelation(right))
-		warn("W041", { token: this, args: ["===", right.value] });
-	else if (isTypoTypeof(right, left))
+	switch (true) {
+		case !eqnull && state.option.eqeqeq:
+			this.from = this.character;
+			warn("W116", { token: this, args: ["===", "=="] });
+			break;
+		case isPoorRelation(left):
+			warn("W041", { token: this, args: ["===", left.value] });
+			break;
+		case isPoorRelation(right):
+			warn("W041", { token: this, args: ["===", right.value] });
+			break;
+		case isTypoTypeof(right, left):
+			warn("W122", { token: this, args: [right.value] });
+			break;
+		case isTypoTypeof(left, right):
+			warn("W122", { token: this, args: [left.value] });
+	}
+
+	return this;
+});
+
+relation("===", function (left, right) {
+	if (isTypoTypeof(right, left))
 		warn("W122", { token: this, args: [right.value] });
 	else if (isTypoTypeof(left, right))
 		warn("W122", { token: this, args: [left.value] });
-	return this;
-});
-relation("===", function (left, right) {
-	if (isTypoTypeof(right, left)) {
-		warn("W122", { token: this, args: [right.value] });
-	} else if (isTypoTypeof(left, right)) {
-		warn("W122", { token: this, args: [left.value] });
-	}
-	return this;
-});
-relation("!=", function (left, right) {
-	var eqnull = state.option.eqnull &&
-			(left.value === "null" || right.value === "null");
 
-	if (!eqnull && state.option.eqeqeq) {
-		warn("W116", { token: this, args: ["!==", "!="] });
-	} else if (isPoorRelation(left)) {
-		warn("W041", { token: this, args: ["!==", left.value] });
-	} else if (isPoorRelation(right)) {
-		warn("W041", { token: this, args: ["!==", right.value] });
-	} else if (isTypoTypeof(right, left)) {
-		warn("W122", { token: this, args: [right.value] });
-	} else if (isTypoTypeof(left, right)) {
-		warn("W122", { token: this, args: [left.value] });
-	}
 	return this;
 });
+
+relation("!=", function (left, right) {
+	var eqnull = state.option.eqnull && (left.value === "null" || right.value === "null");
+
+	switch (true) {
+		case !eqnull && state.option.eqeqeq:
+			this.from = this.character;
+			warn("W116", { token: this, args: ["!==", "!="] });
+			break;
+		case isPoorRelation(left):
+			warn("W041", { token: this, args: ["!==", left.value] });
+			break;
+		case isPoorRelation(right):
+			warn("W041", { token: this, args: ["!==", right.value] });
+			break;
+		case isTypoTypeof(right, left):
+			warn("W122", { token: this, args: [right.value] });
+			break;
+		case isTypoTypeof(left, right):
+			warn("W122", { token: this, args: [left.value] });
+	}
+
+	return this;
+});
+
 relation("!==", function (left, right) {
-	if (isTypoTypeof(right, left)) {
+	if (isTypoTypeof(right, left))
 		warn("W122", { token: this, args: [right.value] });
-	} else if (isTypoTypeof(left, right)) {
+	else if (isTypoTypeof(left, right))
 		warn("W122", { token: this, args: [left.value] });
-	}
+
 	return this;
 });
+
 relation("<");
 relation(">");
 relation("<=");

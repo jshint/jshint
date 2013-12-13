@@ -705,3 +705,18 @@ exports.testMagicProtoVariable = function (test) {
 	jshint.run("__proto__ = 1;");
 	test.done();
 };
+
+// Issue #1371: column number at end of non-strict comparison (for usability reasons)
+exports.testColumnNumAfterNonStrictComparison = function (test) {
+	var src =	"if (1 == 1) {\n" +
+				"  var foo = 2;\n" +
+				"  if (1 != 1){\n" +
+				"    var bar = 3;\n" +
+				"  }\n"+
+				"}";
+	TestRun(test)
+		.addError(1, "Expected '===' and instead saw '=='.", {ch: 9})
+		.addError(3, "Expected '!==' and instead saw '!='.", {ch: 11})
+		.test(src, {eqeqeq: true});
+	test.done();
+};
