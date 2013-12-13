@@ -225,7 +225,7 @@ exports.group = {
 	},
 
 	textExtract: function (test) {
-		var html = "<html><script>var a = 1;</script></html>";
+		var html = "<html>text<script>var a = 1;</script></html>";
 		var text = "hello world";
 		var js   = "var a = 1;";
 
@@ -235,11 +235,11 @@ exports.group = {
 
 		test.equal(cli.extract(js, "never"), js);
 		test.equal(cli.extract(js, "auto"), js);
-		test.equal(cli.extract(js, "always"), js);
+		test.equal(cli.extract(js, "always"), '');
 
 		test.equal(cli.extract(text, "never"), text);
 		test.equal(cli.extract(text, "auto"), text);
-		test.equal(cli.extract(text, "always"), text);
+		test.equal(cli.extract(text, "always"), '');
 
 		html = [
 			"<html>",
@@ -255,7 +255,7 @@ exports.group = {
 				"</script>",
 			"</html>" ].join("\n");
 
-		js = ["\n\n", "var a = 1;", "\n\n\n\n\n", "var b = 1;\n" ].join("\n");
+		js = ["\n", "var a = 1;", "\n\n\n\n\n", "var b = 1;\n" ].join("\n");
 
 		test.equal(cli.extract(html, "auto"), js);
 		test.done();
