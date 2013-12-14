@@ -6,7 +6,9 @@
 
 exports.reservedVars = {
 	arguments : false,
-	NaN       : false
+	NaN       : false,
+	Infinity  : false,
+	undefined : false
 };
 
 exports.ecmaIdentifiers = {
