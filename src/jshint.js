@@ -2198,22 +2198,22 @@ var JSHINT = (function () {
 		var eqnull = state.option.eqnull && (left.value === "null" || right.value === "null");
 
 		switch (true) {
-			case !eqnull && state.option.eqeqeq:
-				this.from = this.character;
-				warning("W116", this, "===", "==");
-				break;
-			case isPoorRelation(left):
-				warning("W041", this, "===", left.value);
-				break;
-			case isPoorRelation(right):
-				warning("W041", this, "===", right.value);
-				break;
-			case isTypoTypeof(right, left):
-				warning("W122", this, right.value);
-				break;
-			case isTypoTypeof(left, right):
-				warning("W122", this, left.value);
-				break;
+		case !eqnull && state.option.eqeqeq:
+			this.from = this.character;
+			warning("W116", this, "===", "==");
+			break;
+		case isPoorRelation(left):
+			warning("W041", this, "===", left.value);
+			break;
+		case isPoorRelation(right):
+			warning("W041", this, "===", right.value);
+			break;
+		case isTypoTypeof(right, left):
+			warning("W122", this, right.value);
+			break;
+		case isTypoTypeof(left, right):
+			warning("W122", this, left.value);
+			break;
 		}
 
 		return this;
