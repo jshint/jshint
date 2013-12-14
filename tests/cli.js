@@ -445,6 +445,37 @@ exports.group = {
 		test.done();
 	},
 
+	testExcludePath: function (test) {
+		var run = sinon.stub(cli, "run");
+		var dir = __dirname + "/../examples/";
+		sinon.stub(process, "cwd").returns(dir);
+
+		cli.interpret([
+			"node", "jshint", "file.js", "--exclude-path=../examples/.customignore"
+		]);
+
+		test.equal(run.args[0][0].ignores[0], path.resolve(dir, "exclude.js"));
+
+		run.restore();
+		process.cwd.restore();
+
+		sinon.stub(process, "cwd").returns(__dirname + "/../");
+		sinon.stub(shjs, "cat")
+			.withArgs(sinon.match(/file.js$/)).returns("console.log('Hello');")
+			.withArgs(sinon.match(/\.jshintrc$/)).returns("{}")
+			.withArgs(sinon.match(/\.jshintignore$/)).returns("examples");
+
+		var args = shjs.cat.args.filter(function (arg) {
+			return !/\.jshintrc$/.test(arg[0]) && !/\.jshintignore$/.test(arg[0]);
+		});
+
+		test.equal(args.length, 0);
+
+		process.cwd.restore();
+		shjs.cat.restore();
+		test.done();
+	},
+
 	testCollectFiles: function (test) {
 		var gather = sinon.stub(cli, "gather");
 		var args = [];
