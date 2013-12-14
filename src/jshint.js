@@ -105,6 +105,7 @@ var JSHINT = (function () {
 			                    // statements inside of a one-line blocks.
 			laxbreak    : true, // if line breaks should not be checked
 			laxcomma    : true, // if line breaks should not be checked around commas
+			legacy	    : true, // if legacy annex B functions should be tolerated
 			loopfunc    : true, // if functions should be allowed to be defined within
 			                    // loops
 			mootools    : true, // if MooTools globals should be predefined
@@ -372,6 +373,10 @@ var JSHINT = (function () {
 			combine(predefined, vars.jquery);
 		}
 
+		if (state.option.legacy) {
+			combine(predefined, vars.legacy);
+		}
+
 		if (state.option.mootools) {
 			combine(predefined, vars.mootools);
 		}
@@ -625,7 +630,7 @@ var JSHINT = (function () {
 
 				if (ch1 === ch2 && (ch1 === "\"" || ch1 === "'")) {
 					m = m
-						.substr(1, m.length - 2)
+						.substring(1, m.length - 1)
 						.replace("\\b", "\b")
 						.replace("\\t", "\t")
 						.replace("\\n", "\n")
@@ -2380,7 +2385,7 @@ var JSHINT = (function () {
 					break;
 				default:
 					if (c.id !== "function") {
-						i = c.value.substr(0, 1);
+						i = c.value.substring(0, 1);
 						if (state.option.newcap && (i < "A" || i > "Z") && !_.has(global, c.value)) {
 							warning("W055", state.tokens.curr);
 						}
@@ -2436,6 +2441,11 @@ var JSHINT = (function () {
 			warning("W061");
 		}
 
+		if (state.option.legacy && (m === "substr" || m === "getYear" ||
+                                           m === "setYear" || m === "toGMTString")) {
+			warning("W123", this, m);
+		}
+
 		return that;
 	}, 160, true);
 
@@ -2462,6 +2472,9 @@ var JSHINT = (function () {
 							warning("W064", left);
 						}
 					}
+				} else if (state.option.legacy && 
+					((left.value === "escape") || (left.value === "unescape"))) {
+					warning("W123", this, left.value);
 				}
 			}
 		}

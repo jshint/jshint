@@ -201,7 +201,7 @@ function loadIgnores(exclude, excludePath) {
 		})
 		.map(function (line) {
 			if (line[0] === "!")
-				return "!" + path.resolve(path.dirname(file), line.substr(1).trim());
+				return "!" + path.resolve(path.dirname(file), line.substring(1).trim());
 
 			return path.resolve(path.dirname(file), line.trim());
 		});

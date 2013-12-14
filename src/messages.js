@@ -194,7 +194,8 @@ var warnings = {
 	W119: "'{a}' is only available in ES6 (use esnext option).",
 	W120: "You might be leaking a variable ({a}) here.",
 	W121: "Extending prototype of native object: '{a}'.",
-	W122: "Invalid typeof value '{a}'"
+	W122: "Invalid typeof value '{a}'",
+	W123: "'{a}' is deprecated in ES5 Annex B."
 };
 
 var info = {
