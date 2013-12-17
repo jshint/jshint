@@ -377,20 +377,20 @@ exports.couch = {
 exports.node = {
 	__filename    : false,
 	__dirname     : false,
-	Buffer        : false,
-	console       : false,
+	Buffer        : true,
+	console       : true,
 	exports       : true,  // In Node it is ok to exports = module.exports = foo();
 	GLOBAL        : false,
 	global        : false,
 	module        : false,
-	process       : false,
+	process       : true,
 	require       : false,
-	setTimeout    : false,
-	clearTimeout  : false,
-	setInterval   : false,
-	clearInterval : false,
-	setImmediate  : false, // v0.9.1+
-	clearImmediate: false  // v0.9.1+
+	setTimeout    : true,
+	clearTimeout  : true,
+	setInterval   : true,
+	clearInterval : true,
+	setImmediate  : true, // v0.9.1+
+	clearImmediate: true  // v0.9.1+
 };
 
 exports.phantom = {
