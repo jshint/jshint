@@ -1749,3 +1749,28 @@ exports.nonbsp = function (test) {
 
   test.done();
 };
+
+// Option `safeasi` -- warn in scenarios that would be unsafe when using asi.
+exports.safeasi = function (test) {
+  var src = fs.readFileSync(__dirname + '/fixtures/safeasi.js', 'utf8');
+
+  TestRun(test, 1)
+    // TOOD consider setting an option to suppress these errors so that
+    // the tests don't become tightly interdependent
+    .addError(10, "Bad line breaking before '/'.")
+    .addError(10, "Expected an identifier and instead saw '.'.")
+    .addError(10, "Expected an assignment or function call and instead saw an expression.")
+    .test(src, { asi: true });
+
+  TestRun(test, 2)
+    .addError(3, "Bad line breaking before '['.")
+    .addError(5, "Bad line breaking before '('.")
+    .addError(6, "Bad line breaking before '['.")
+    .addError(8, "Bad line breaking before '('.")
+    .addError(10, "Bad line breaking before '/'.")
+    .addError(10, "Expected an identifier and instead saw '.'.")
+    .addError(10, "Expected an assignment or function call and instead saw an expression.")
+    .test(src, { asi: true, safeasi: true });
+
+  test.done();
+};

@@ -132,6 +132,7 @@ var JSHINT = (function () {
       shelljs     : true, // if ShellJS globals should be predefined
       typed       : true, // if typed array globals should be predefined
       undef       : true, // if variables should be declared before used
+      safeasi     : true, // if only safe asi should be allowed
       scripturl   : true, // if script-targeted URLs should be tolerated
       smarttabs   : true, // if smarttabs should be tolerated
                           // (http://www.emacswiki.org/emacs/SmartTabs)
@@ -964,6 +965,13 @@ var JSHINT = (function () {
 
     if (state.tokens.next.id === "(end)")
       error("E006", state.tokens.curr);
+
+    if (state.option.safeasi &&
+        (state.tokens.curr.id === "[" ||
+          state.tokens.curr.id === "(" ||
+          state.tokens.curr.id === "/") &&
+        state.tokens.prev.line < state.tokens.curr.line)
+      warning("W014", state.tokens.curr, state.tokens.curr.id);
 
     advance();
 
