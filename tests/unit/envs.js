@@ -88,6 +88,7 @@ exports.node = function (test) {
 	// Make sure that we can do fancy Node export
 
 	var overwrites = [
+		"global = {};",
 		"Buffer = {};",
 		"exports = module.exports = {};"
 	];
