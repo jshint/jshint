@@ -30,12 +30,45 @@ exports.shadow = function (test) {
 		.addError(10, "'foo' is already defined.")
 		.test(src, {es3: true});
 
+	TestRun(test)
+		.addError(5, "'a' is already defined.")
+		.addError(10, "'foo' is already defined.")
+		.test(src, {es3: true, shadow: false });
+
+	TestRun(test)
+		.addError(5, "'a' is already defined.")
+		.addError(10, "'foo' is already defined.")
+		.test(src, {es3: true, shadow: "inner" });
+
 	// Allow variable shadowing when shadow is true
 	TestRun(test)
 		.test(src, { es3: true, shadow: true });
 
 	test.done();
 };
+
+/**
+ * Option `scopeshadow` allows you to re-define variables later in inner scopes.
+ *
+ *  E.g.:
+ *    var a = 1;
+ *    function foo() {
+ *        var a = 2;
+ *    }
+ */
+exports.scopeshadow = function (test) {
+	var src = fs.readFileSync(__dirname + "/fixtures/scope-redef.js", "utf8");
+
+	// Do not tolarate inner scope variable shadowing by default
+	TestRun(test)
+		.addError(5, "'a' is already defined in outer scope.")
+		.addError(12, "'b' is already defined in outer scope.")
+		.addError(20, "'bar' is already defined in outer scope.")
+		.addError(26, "'foo' is already defined.")
+		.test(src, { es3: true, shadow: "outer" });
+
+	test.done();
+}
 
 /**
  * Option `latedef` allows you to prohibit the use of variable before their

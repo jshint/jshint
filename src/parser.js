@@ -223,9 +223,16 @@ function addlabel(t, type, tkn, islet) {
 				}
 			}
 		} else {
-			if (!state.option.shadow && type !== "exception" || (funct["(blockscope)"].getlabel(t))) {
+			if ((!state.option.shadow || _.contains([ "inner", "outer" ], state.option.shadow)) &&
+					type !== "exception" || funct["(blockscope)"].getlabel(t)) {
 				warn("W004", { token: state.tokens.next, args: [t] });
 			}
+		}
+	}
+
+	if (funct["(context)"] && _.has(funct["(context)"], t) && type !== "function") {
+		if (state.option.shadow === "outer") {
+			warn("W123", { token: state.tokens.next, args: [t] });
 		}
 	}
 
@@ -341,6 +348,25 @@ function doOption() {
 					return void warn("E002", { token: nt });
 
 				state.option.validthis = (val === "true");
+				return;
+			}
+
+			if (key === "shadow") {
+				switch (val) {
+				case "true":
+					state.option.shadow = true;
+					break;
+				case "outer":
+					state.option.shadow = "outer";
+					break;
+				case "false":
+				case "inner":
+					state.option.shadow = "inner";
+					break;
+				default:
+					warn("E002", { token: nt });
+				}
+
 				return;
 			}
 

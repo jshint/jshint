@@ -50,7 +50,6 @@ exports.simple = {
 	typed       : true, // if typed array globals should be predefined
 	undef       : true, // if variables should be declared before used
 	scripturl   : true, // if script-targeted URLs should be tolerated
-	shadow      : true, // if variable shadowing should be tolerated
 	strict      : true, // require the "use strict"; pragma
 	sub         : true, // if all forms of subscript notation are tolerated
 	supernew    : true, // if `new function () { ... };` and `new Object;`
@@ -91,11 +90,16 @@ exports.multi = {
 	                      //   false    - don't emit any warnings
 	                      //   true     - warn if any variable is used before its definition
 	                      //   "nofunc" - warn for any variable but function declarations
-	ignore       : false  // start/end ignoring lines of code, bypassing the lexer
+	ignore       : false, // start/end ignoring lines of code, bypassing the lexer
 	                      //   start    - start ignoring lines, including the current line
 	                      //   end      - stop ignoring lines, starting on the next line
 	                      //   line     - ignore warnings / errors for just a single line
 	                      //              (this option does not bypass the lexer)
+	shadow       : true,  // if variable shadowing should be tolerated
+	                      // "inner"  - check for variables defined in the same scope only
+	                      // "outer"  - check for variables defined in outer scopes as well
+	                      // false    - same as inner
+	                      // true     - allow variable shadowing
 };
 
 // These are JSHint boolean options which are shared with JSLint
