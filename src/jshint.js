@@ -133,7 +133,6 @@ var JSHINT = (function () {
 			typed       : true, // if typed array globals should be predefined
 			undef       : true, // if variables should be declared before used
 			scripturl   : true, // if script-targeted URLs should be tolerated
-			shadow      : true, // if variable shadowing should be tolerated
 			smarttabs   : true, // if smarttabs should be tolerated
 			                    // (http://www.emacswiki.org/emacs/SmartTabs)
 			strict      : true, // require the "use strict"; pragma
@@ -171,6 +170,11 @@ var JSHINT = (function () {
 			maxdepth     : false, // {int} max nested block depth per function
 			maxparams    : false, // {int} max params per function
 			maxcomplexity: false, // {int} max cyclomatic complexity per function
+			shadow       : false, // if variable shadowing should be tolerated
+			                      //   "inner"  - check for variables defined in the same scope only
+			                      //   "outer"  - check for variables defined in outer scopes as well
+			                      //   false    - same as inner
+			                      //   true     - allow variable shadowing
 			unused       : true,  // warn if variables are unused. Available options:
 			                      //   false    - don't check for unused variables
 			                      //   true     - "vars" + check last function param
@@ -539,9 +543,16 @@ var JSHINT = (function () {
 					}
 				}
 			} else {
-				if (!state.option.shadow && type !== "exception" || (funct["(blockscope)"].getlabel(t))) {
+				if ((!state.option.shadow || _.contains([ "inner", "outer" ], state.option.shadow)) &&
+						type !== "exception" || funct["(blockscope)"].getlabel(t)) {
 					warning("W004", state.tokens.next, t);
 				}
+			}
+		}
+
+		if (funct["(context)"] && _.has(funct["(context)"], t) && type !== "function") {
+			if (state.option.shadow === "outer") {
+				warning("W123", state.tokens.next, t);
 			}
 		}
 
@@ -708,6 +719,24 @@ var JSHINT = (function () {
 					case "double":
 					case "single":
 						state.option.quotmark = val;
+						break;
+					default:
+						error("E002", nt);
+					}
+					return;
+				}
+
+				if (key === "shadow") {
+					switch (val) {
+					case "true":
+						state.option.shadow = true;
+						break;
+					case "outer":
+						state.option.shadow = "outer";
+						break;
+					case "false":
+					case "inner":
+						state.option.shadow = "inner";
 						break;
 					default:
 						error("E002", nt);
