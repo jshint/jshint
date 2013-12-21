@@ -959,22 +959,22 @@ Lexer.prototype = {
 					}, checks, function () {return state.jsonMode; });
 					break;
 				case "b":
-					char = "\b";
+					char = "\\b";
 					break;
 				case "f":
-					char = "\f";
+					char = "\\f";
 					break;
 				case "n":
-					char = "\n";
+					char = "\\n";
 					break;
 				case "r":
-					char = "\r";
+					char = "\\r";
 					break;
 				case "t":
-					char = "\t";
+					char = "\\t";
 					break;
 				case "0":
-					char = "\0";
+					char = "\\0";
 
 					// Octal literals fail in strict mode.
 					// Check if the number is between 00 and 07.
@@ -1014,7 +1014,11 @@ Lexer.prototype = {
 					jump = 3;
 					break;
 				case "\\":
+					char = "\\\\";
+					break;
 				case "\"":
+					char = "\\\"";
+					break;
 				case "/":
 					break;
 				case "":

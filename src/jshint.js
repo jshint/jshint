@@ -637,13 +637,6 @@ var JSHINT = (function () {
 				if (ch1 === ch2 && (ch1 === "\"" || ch1 === "'")) {
 					m = m
 						.substr(1, m.length - 2)
-						.replace("\\b", "\b")
-						.replace("\\t", "\t")
-						.replace("\\n", "\n")
-						.replace("\\v", "\v")
-						.replace("\\f", "\f")
-						.replace("\\r", "\r")
-						.replace("\\\\", "\\")
 						.replace("\\\"", "\"");
 				}
 
