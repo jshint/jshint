@@ -966,6 +966,15 @@ var JSHINT = (function () {
 		if (state.tokens.next.id === "(end)")
 			error("E006", state.tokens.curr);
 
+		// Arrow expression with single argument:
+		// x => x + 1
+		// x => { return x + 1 }
+		if (peek(0).value === "=>") {
+			left = functionparams();
+			advance();
+			return state.tokens.curr.led(left);
+		}
+
 		advance();
 
 		if (initial) {
@@ -2554,9 +2563,9 @@ var JSHINT = (function () {
 
 	prefix("(", function () {
 		nospace();
-		var bracket, brackets = [];
 		var pn, pn1, i = 0;
 		var ret;
+		var exprs;
 
 		do {
 			pn = peek(i);
@@ -2569,25 +2578,20 @@ var JSHINT = (function () {
 			state.tokens.next.immed = true;
 		}
 
-		var exprs = [];
-
-		if (state.tokens.next.id !== ")") {
-			for (;;) {
-				if (pn1.value === "=>" && state.tokens.next.value === "{") {
-					bracket = state.tokens.next;
-					bracket.left = destructuringExpression();
-					brackets.push(bracket);
-					for (var t in bracket.left) {
-						exprs.push(bracket.left[t].token);
-					}
-				} else {
+		// If it's pramas for an arrow: (x, y) => ...
+		if (pn1.value === "=>") {
+			exprs = functionparams(false);
+		} else {
+			exprs = [];
+			if (state.tokens.next.id !== ")") {
+				for (;;) {
 					exprs.push(expression(10));
+					if (state.tokens.next.id !== ",") {
+						break;
+					}
+					comma();
 				}
-				if (state.tokens.next.id !== ",") {
-					break;
-				}
-				comma();
-			}
+		  }
 		}
 
 		advance(")", this);
@@ -2771,52 +2775,24 @@ var JSHINT = (function () {
 		return id;
 	}
 
-
-	function functionparams(parsed) {
-		var curr, next;
+	function functionparams(advanceParens) {
+		var next;
 		var params = [];
 		var ident;
 		var tokens = [];
 		var t;
 		var pastDefault = false;
 
-		if (parsed) {
-			if (parsed instanceof Array) {
-				for (var i in parsed) {
-					curr = parsed[i];
-					if (_.contains(["{", "["], curr.id)) {
-						for (t in curr.left) {
-							t = tokens[t];
-							if (t.id) {
-								params.push(t.id);
-								addlabel(t.id, "unused", t.token);
-							}
-						}
-					} else if (curr.value === "...") {
-						if (!state.option.inESNext()) {
-							warning("W104", curr, "spread/rest operator");
-						}
-						continue;
-					} else {
-						addlabel(curr.value, "unused", curr);
-					}
-				}
-				return params;
-			} else {
-				if (parsed.identifier === true) {
-					addlabel(parsed.value, "unused", parsed);
-					return [parsed];
-				}
-			}
-		}
-
 		next = state.tokens.next;
 
-		advance("(");
+		if (advanceParens)
+			advance("(");
+
 		nospace();
 
 		if (state.tokens.next.id === ")") {
-			advance(")");
+			if (advanceParens)
+				advance(")");
 			return;
 		}
 
@@ -2862,7 +2838,8 @@ var JSHINT = (function () {
 			if (state.tokens.next.id === ",") {
 				comma();
 			} else {
-				advance(")", next);
+				if (advanceParens)
+					advance(")", next);
 				nospace(state.tokens.prev, state.tokens.curr);
 				return params;
 			}
@@ -2908,7 +2885,7 @@ var JSHINT = (function () {
 			addlabel(name, "function");
 		}
 
-		funct["(params)"] = functionparams(fatarrowparams);
+		funct["(params)"] =  fatarrowparams || functionparams(true);
 		funct["(metrics)"].verifyMaxParametersPerFunction(funct["(params)"]);
 
 		block(false, true, true, fatarrowparams ? true:false);
