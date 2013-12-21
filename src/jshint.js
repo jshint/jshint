@@ -1233,19 +1233,23 @@ var JSHINT = (function () {
 	function prefix(s, f) {
 		var x = symbol(s, 150);
 		reserveName(x);
+
 		x.nud = (typeof f === "function") ? f : function () {
 			this.right = expression(150);
 			this.arity = "unary";
+
 			if (this.id === "++" || this.id === "--") {
 				if (state.option.plusplus) {
 					warning("W016", this, this.id);
-				} else if ((!this.right.identifier || isReserved(this.right)) &&
+				} else if (this.right && (!this.right.identifier || isReserved(this.right)) &&
 						this.right.id !== "." && this.right.id !== "[") {
 					warning("W017", this);
 				}
 			}
+
 			return this;
 		};
+
 		return x;
 	}
 
