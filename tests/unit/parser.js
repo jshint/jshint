@@ -864,10 +864,12 @@ exports["test: destructuring const as moz"] = function (test) {
 		"const [ f, [ [ [ g ], h ], i ] ] = [ 1, [ [ [ 2 ], 3], 4 ] ];",
 		"const { foo : bar } = { foo : 1 };",
 		"const [ j, { foo : foobar } ] = [ 2, { foo : 1 } ];",
+		"const [ aa, bb ] = yield func();"
 	];
 
 	TestRun(test)
 		.addError(3, "'z' is not defined.")
+		.addError(9, "'func' is not defined.")
 		.test(code, {moz: true, unused: true, undef: true});
 
 	test.done();
