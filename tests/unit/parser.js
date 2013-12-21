@@ -3778,3 +3778,17 @@ exports["should be able to ignore a single line with a trailing comment: // jshi
 	TestRun(test).test(code);
 	test.done();
 };
+
+exports["regression test for GH-1431"] = function (test) {
+	// The code is invalid but it should not crash JSHint.
+	TestRun(test)
+		.addError(1, "Use '!==' to compare with 'null'.")
+		.addError(1, "Expected ';' and instead saw ')'.")
+		.addError(1, "Expected ')' and instead saw ';'.")
+		.addError(1, "Expected an identifier and instead saw ';'.")
+		.addError(1, "Expected ')' to match '(' from line 1 and instead saw 'i'.")
+		.addError(1, "Expected an identifier and instead saw ')'.")
+		.test("for (i=0; (arr[i])!=null); i++);");
+
+	test.done();
+};

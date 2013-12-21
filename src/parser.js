@@ -810,19 +810,22 @@ function reserveName(x) {
 function prefix(s, f) {
 	var x = symbol(s, 150);
 	reserveName(x);
+
 	x.nud = (typeof f === "function") ? f : function () {
 		this.right = expression(150);
 		this.arity = "unary";
 		if (this.id === "++" || this.id === "--") {
 			if (state.option.plusplus) {
 				warn("W016", { token: this, args: [this.id] });
-			} else if ((!this.right.identifier || isReserved(this.right)) &&
+			} else if (this.right && (!this.right.identifier || isReserved(this.right)) &&
 					this.right.id !== "." && this.right.id !== "[") {
 				warn("W017", { token: this });
 			}
 		}
+
 		return this;
 	};
+
 	return x;
 }
 
