@@ -881,22 +881,22 @@ Lexer.prototype = {
 
 				switch (char) {
 				case "b":
-					char = "\b";
+					char = "\\b";
 					break;
 				case "f":
-					char = "\f";
+					char = "\\f";
 					break;
 				case "n":
-					char = "\n";
+					char = "\\n";
 					break;
 				case "r":
-					char = "\r";
+					char = "\\r";
 					break;
 				case "t":
-					char = "\t";
+					char = "\\t";
 					break;
 				case "0":
-					char = "\0";
+					char = "\\0";
 
 					// Octal literals fail in strict mode.
 					// Check if the number is between 00 and 07 and set
@@ -912,14 +912,18 @@ Lexer.prototype = {
 					jump = 5;
 					break;
 				case "v":
-					char = "\v";
+					char = "\\v";
 					break;
 				case "x":
 					char = String.fromCharCode(parseInt(this.input.substr(1, 2), 16));
 					jump = 3;
 					break;
 				case "\\":
+					char = "\\\\";
+					break;
 				case "\"":
+					char = "\\\"";
+					break;
 				case "/":
 				case "'":
 					break;
