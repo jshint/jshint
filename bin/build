@@ -17,15 +17,14 @@ bundle.bundle({}, function (err, src) {
 	var rhino = "./dist/jshint-rhino.js";
 
 	[ "// " + version,
-		"var JSHINT;",
-		"var window;",
-		"if (typeof window === 'undefined') window = {};",
-		"(function () {",
-		"var require;",
-		src,
-		"JSHINT = require('jshint').JSHINT;",
-		"if (typeof exports === 'object' && exports) exports.JSHINT = JSHINT;",
-		"}());"
+	  "var JSHINT;",
+	  "if (typeof window === 'undefined') window = {};",
+	  "(function () {",
+	    "var require;",
+	    src,
+	    "JSHINT = require('jshint').JSHINT;",
+	    "if (typeof exports === 'object' && exports) exports.JSHINT = JSHINT;",
+	  "}());"
 	].join("\n").to(web);
 
 	("#!/usr/bin/env rhino\nvar window = {};\n" + cat(web, "./src/platforms/rhino.js")).to(rhino);
