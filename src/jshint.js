@@ -4911,7 +4911,7 @@ var JSHINT = (function () {
 			});
 
 			for (var key in declared) {
-				if (_.has(declared, key) && !_.has(global, key)) {
+				if (_.has(declared, key) && !_.has(global, key) && !_.has(exported, key)) {
 					warnUnused(key, declared[key], "var");
 				}
 			}
