@@ -1,5 +1,5 @@
-/*global Cat */
-/*exported isCat, isDog, cannotBeExported */
+/*global Cat, Dog */
+/*exported isCat, isDog, cannotBeExported, Dog */
 
 function isCat(obj) {
 	var unused;
