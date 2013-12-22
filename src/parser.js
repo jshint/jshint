@@ -1506,22 +1506,24 @@ syntax["(identifier)"] = {
 	type: "(identifier)",
 	lbp: 0,
 	identifier: true,
+
 	nud: function () {
-		var v = this.value,
-			s = scope[v],
-			f;
+		var v = this.value;
+		var s = scope[v];
+		var f;
+		var block;
 
 		if (typeof s === "function") {
 			// Protection against accidental inheritance.
 			s = undefined;
-		} else if (typeof s === "boolean") {
+		} else if (!funct["(blockscope)"].current.has(v) && typeof s === "boolean") {
 			f = funct;
 			funct = state.functions[0];
 			addlabel(v, "var");
 			s = funct;
 			funct = f;
 		}
-		var block;
+
 		if (_.has(funct, "(blockscope)")) {
 			block = funct["(blockscope)"].getlabel(v);
 		}
@@ -1638,6 +1640,7 @@ syntax["(identifier)"] = {
 		}
 		return this;
 	},
+
 	led: function () {
 		warn("E033", { token: state.tokens.next, args: [state.tokens.next.value] });
 	}
