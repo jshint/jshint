@@ -4093,7 +4093,7 @@ function parse(input, options, program) {
 	});
 
 	for (var key in declared) {
-		if (_.has(declared, key) && !_.has(globalscope, key)) {
+		if (_.has(declared, key) && !_.has(globalscope, key) && !_.has(exported, key)) {
 			warnUnused(key, declared[key], "var");
 		}
 	}
