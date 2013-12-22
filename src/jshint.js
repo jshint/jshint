@@ -1987,22 +1987,24 @@ var JSHINT = (function () {
 		type: "(identifier)",
 		lbp: 0,
 		identifier: true,
+
 		nud: function () {
-			var v = this.value,
-				s = scope[v],
-				f;
+			var v = this.value;
+			var s = scope[v];
+			var f;
+			var block;
 
 			if (typeof s === "function") {
 				// Protection against accidental inheritance.
 				s = undefined;
-			} else if (typeof s === "boolean") {
+			} else if (!funct["(blockscope)"].current.has(v) && typeof s === "boolean") {
 				f = funct;
 				funct = functions[0];
 				addlabel(v, "var");
 				s = funct;
 				funct = f;
 			}
-			var block;
+
 			if (_.has(funct, "(blockscope)")) {
 				block = funct["(blockscope)"].getlabel(v);
 			}
@@ -2119,6 +2121,7 @@ var JSHINT = (function () {
 			}
 			return this;
 		},
+
 		led: function () {
 			error("E033", state.tokens.next, state.tokens.next.value);
 		}
@@ -3409,6 +3412,7 @@ var JSHINT = (function () {
 		return this;
 	});
 	varstatement.exps = true;
+
 	var letstatement = stmt("let", function (prefix) {
 		var tokens, lone, value, letblock;
 
