@@ -1368,21 +1368,21 @@ function directives() {
  * Parses a single block. A block is a sequence of statements wrapped in
  * braces.
  *
- * ordinary     - true for everything but function bodies and try blocks.
- * stmt		- true if block can be a single statement (e.g. in if/for/while).
- * isfunc	- true if block is a function body
- * isfatarrow   -
- * iscase	- true if block is a switch case block
+ * ordinary   - true for everything but function bodies and try blocks.
+ * stmt       - true if block can be a single statement (e.g. in if/for/while).
+ * isfunc     - true if block is a function body
+ * isfatarrow - true if block is a body of a fat arrow function
+ * iscase     - true if block is a switch case block
  */
 function block(ordinary, stmt, isfunc, isfatarrow, iscase) {
-	var a,
-		b = inblock,
-		old_indent = indent,
-		m,
-		s = scope,
-		t,
-		line,
-		d;
+	var a;
+	var b = inblock;
+	var old_indent = indent;
+	var m;
+	var s = scope;
+	var t;
+	var line;
+	var d;
 
 	inblock = ordinary;
 
@@ -3075,7 +3075,7 @@ blockstmt("try", function () {
 		funct = funct["(context)"];
 	}
 
-	block(false);
+	block(true);
 
 	while (state.tokens.next.id === "catch") {
 		increaseComplexityCount();
@@ -3089,7 +3089,7 @@ blockstmt("try", function () {
 
 	if (state.tokens.next.id === "finally") {
 		advance("finally");
-		block(false);
+		block(true);
 		return;
 	}
 
