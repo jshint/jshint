@@ -30,3 +30,14 @@ function baz(a, b, c) {
 }
 
 baz();
+
+const aa = 1;
+const bb = aa + 1;
+const cc = 2;
+
+function bazbaz() {
+	const dd = 1;
+	baz(bb);
+}
+
+bazbaz();
