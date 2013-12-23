@@ -105,9 +105,9 @@ function normalize(state) {
 		fu.lastcharacter = f["(lastcharacter)"];
 
 		fu.metrics = {
-			complexity: f["(metrics)"].ComplexityCount,
+			complexity: f["(metrics)"].complexity,
 			parameters: (f["(params)"] || []).length,
-			statements: f["(metrics)"].statementCount
+			statements: f["(metrics)"].statements
 		};
 
 		data.functions.push(fu);
