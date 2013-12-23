@@ -521,14 +521,16 @@ exports.undef = function (test) {
 exports.unused = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/unused.js', 'utf8');
 
-	TestRun(test).test(src, { es3: true });
+	TestRun(test).test(src, { esnext: true });
 
 	var var_errors = [
 		[1, "'a' is defined but never used."],
 		[7, "'c' is defined but never used."],
 		[15, "'foo' is defined but never used."],
 		[20, "'bar' is defined but never used."],
-		[22, "'i' is defined but never used."]
+		[22, "'i' is defined but never used."],
+		[36, "'cc' is defined but never used."],
+		[39, "'dd' is defined but never used."]
 	];
 
 	var last_param_errors = [
@@ -547,14 +549,14 @@ exports.unused = function (test) {
 		[28, "'c' is defined but never used."]
 	];
 
-	var true_run = TestRun(test, {es3: true});
+	var true_run = TestRun(test, {esnext: true});
 
 	var_errors.concat(last_param_errors).forEach(function (e) {
 		true_run.addError.apply(true_run, e);
 	});
 
-	true_run.test(src, { unused: true });
-	test.ok(!JSHINT(src, { es3: true, unused: true }));
+	true_run.test(src, { esnext: true, unused: true });
+	test.ok(!JSHINT(src, { esnext: true, unused: true }));
 
 	// Test checking all function params via unused="strict"
 	var all_run = TestRun(test);
@@ -562,15 +564,15 @@ exports.unused = function (test) {
 		all_run.addError.apply(true_run, e);
 	});
 
-	all_run.test(src, { es3: true, unused: "strict"});
+	all_run.test(src, { esnext: true, unused: "strict"});
 
 	// Test checking everything except function params
 	var vars_run = TestRun(test);
 	var_errors.forEach(function (e) { vars_run.addError.apply(vars_run, e); });
-	vars_run.test(src, { unused: "vars"});
+	vars_run.test(src, { esnext: true, unused: "vars"});
 
 	var unused = JSHINT.data().unused;
-	test.equal(10, unused.length);
+	test.equal(12, unused.length);
 	test.ok(unused.some(function (err) { return err.line === 1 && err.name === "a"; }));
 	test.ok(unused.some(function (err) { return err.line === 6 && err.name === "f"; }));
 	test.ok(unused.some(function (err) { return err.line === 7 && err.name === "c"; }));

@@ -524,68 +524,77 @@ var JSHINT = (function () {
 		return i;
 	}
 
-	function addlabel(t, type, tkn, islet) {
-		// Define t in the current function in the current scope.
+	// name: string
+	// opts: { type: string, token: token, islet: bool }
+	function addlabel(name, opts) {
+		opts = opts || {};
+
+		var type  = opts.type;
+		var token = opts.token;
+		var islet = opts.islet;
+
+		// Define label in the current function in the current scope.
 		if (type === "exception") {
-			if (_.has(funct["(context)"], t)) {
-				if (funct[t] !== true && !state.option.node) {
-					warning("W002", state.tokens.next, t);
+			if (_.has(funct["(context)"], name)) {
+				if (funct[name] !== true && !state.option.node) {
+					warning("W002", state.tokens.next, name);
 				}
 			}
 		}
 
-		if (_.has(funct, t) && !funct["(global)"]) {
-			if (funct[t] === true) {
+		if (_.has(funct, name) && !funct["(global)"]) {
+			if (funct[name] === true) {
 				if (state.option.latedef) {
-					if ((state.option.latedef === true && _.contains([funct[t], type], "unction")) ||
-							!_.contains([funct[t], type], "unction")) {
-						warning("W003", state.tokens.next, t);
+					if ((state.option.latedef === true && _.contains([funct[name], type], "unction")) ||
+							!_.contains([funct[name], type], "unction")) {
+						warning("W003", state.tokens.next, name);
 					}
 				}
 			} else {
 				if ((!state.option.shadow || _.contains([ "inner", "outer" ], state.option.shadow)) &&
-						type !== "exception" || funct["(blockscope)"].getlabel(t)) {
-					warning("W004", state.tokens.next, t);
+						type !== "exception" || funct["(blockscope)"].getlabel(name)) {
+					warning("W004", state.tokens.next, name);
 				}
 			}
 		}
 
-		if (funct["(context)"] && _.has(funct["(context)"], t) && type !== "function") {
+		if (funct["(context)"] && _.has(funct["(context)"], name) && type !== "function") {
 			if (state.option.shadow === "outer") {
-				warning("W123", state.tokens.next, t);
+				warning("W123", state.tokens.next, name);
 			}
 		}
 
 		// a double definition of a let variable in same block throws a TypeError
-		if (funct["(blockscope)"] && funct["(blockscope)"].current.has(t)) {
-			error("E044", state.tokens.next, t);
+		if (funct["(blockscope)"] && funct["(blockscope)"].current.has(name)) {
+			error("E044", state.tokens.next, name);
 		}
 
 		// if the identifier is from a let, adds it only to the current blockscope
 		if (islet) {
-			funct["(blockscope)"].current.add(t, type, state.tokens.curr);
+			funct["(blockscope)"].current.add(name, type, state.tokens.curr);
 		} else {
+			funct[name] = type;
 
-			funct[t] = type;
-
-			if (tkn) {
-				funct["(tokens)"][t] = tkn;
+			if (token) {
+				funct["(tokens)"][name] = token;
 			}
 
+			setprop(funct, name, { unused: opts.unused || false });
+
 			if (funct["(global)"]) {
-				global[t] = funct;
-				if (_.has(implied, t)) {
+				global[name] = funct;
+				if (_.has(implied, name)) {
 					if (state.option.latedef) {
-						if ((state.option.latedef === true && _.contains([funct[t], type], "unction")) ||
-								!_.contains([funct[t], type], "unction")) {
-							warning("W003", state.tokens.next, t);
+						if ((state.option.latedef === true && _.contains([funct[name], type], "unction")) ||
+								!_.contains([funct[name], type], "unction")) {
+							warning("W003", state.tokens.next, name);
 						}
 					}
 
-					delete implied[t];
+					delete implied[name];
 				}
 			} else {
-				scope[t] = funct;
+				scope[name] = funct;
 			}
 		}
 	}
@@ -1667,7 +1676,7 @@ var JSHINT = (function () {
 			advance();
 			advance(":");
 			scope = Object.create(s);
-			addlabel(t.value, "label");
+			addlabel(t.value, { type: "label" });
 
 			if (!state.tokens.next.labelled && state.tokens.next.value !== "{") {
 				warning("W028", state.tokens.next, t.value, state.tokens.next.value);
@@ -2001,7 +2010,7 @@ var JSHINT = (function () {
 			} else if (!funct["(blockscope)"].current.has(v) && typeof s === "boolean") {
 				f = funct;
 				funct = functions[0];
-				addlabel(v, "var");
+				addlabel(v, { type: "var" });
 				s = funct;
 				funct = f;
 			}
@@ -2023,6 +2032,9 @@ var JSHINT = (function () {
 					if (block) block[v]["(type)"] = "function";
 					else funct[v] = "function";
 					this["function"] = true;
+					break;
+				case "const":
+					setprop(funct, v, { unused: false });
 					break;
 				case "function":
 					this["function"] = true;
@@ -2110,6 +2122,9 @@ var JSHINT = (function () {
 						case "unused":
 							s[v] = "closure";
 							funct[v] = s["(global)"] ? "global" : "outer";
+							break;
+						case "const":
+							setprop(s, v, { unused: false });
 							break;
 						case "closure":
 							funct[v] = s["(global)"] ? "global" : "outer";
@@ -2767,7 +2782,6 @@ var JSHINT = (function () {
 		return id;
 	}
 
-
 	function functionparams(parsed) {
 		var curr, next;
 		var params = [];
@@ -2785,7 +2799,7 @@ var JSHINT = (function () {
 							t = tokens[t];
 							if (t.id) {
 								params.push(t.id);
-								addlabel(t.id, "unused", t.token);
+								addlabel(t.id, { type: "unused", token: t.token });
 							}
 						}
 					} else if (curr.value === "...") {
@@ -2794,13 +2808,13 @@ var JSHINT = (function () {
 						}
 						continue;
 					} else {
-						addlabel(curr.value, "unused", curr);
+						addlabel(curr.value, { type: "unused", token: curr });
 					}
 				}
 				return params;
 			} else {
 				if (parsed.identifier === true) {
-					addlabel(parsed.value, "unused", parsed);
+					addlabel(parsed.value, { type: "unused", token: parsed });
 					return [parsed];
 				}
 			}
@@ -2823,7 +2837,7 @@ var JSHINT = (function () {
 					t = tokens[t];
 					if (t.id) {
 						params.push(t.id);
-						addlabel(t.id, "unused", t.token);
+						addlabel(t.id, { type: "unused", token: t.token });
 					}
 				}
 			} else if (state.tokens.next.value === "...") {
@@ -2834,11 +2848,11 @@ var JSHINT = (function () {
 				nospace();
 				ident = identifier(true);
 				params.push(ident);
-				addlabel(ident, "unused", state.tokens.curr);
+				addlabel(ident, { type: "unused", token: state.tokens.curr });
 			} else {
 				ident = identifier(true);
 				params.push(ident);
-				addlabel(ident, "unused", state.tokens.curr);
+				addlabel(ident, { type: "unused", token: state.tokens.curr });
 			}
 
 			// it is a syntax error to have a regular argument after a default argument
@@ -2865,6 +2879,61 @@ var JSHINT = (function () {
 		}
 	}
 
+	function setprop(funct, name, values) {
+		if (!funct["(properties)"][name]) {
+			funct["(properties)"][name] = { unused: false };
+		}
+
+		_.extend(funct["(properties)"][name], values);
+	}
+
+	function getprop(funct, name, prop) {
+		if (!funct["(properties)"][name])
+			return null;
+
+		return funct["(properties)"][name][prop] || null;
+	}
+
+	function functor(name, token, scope, overwrites) {
+		var funct = {
+			"(name)"      : name,
+			"(breakage)"  : 0,
+			"(loopage)"   : 0,
+			"(scope)"     : scope,
+			"(tokens)"    : {},
+			"(properties)": {},
+
+			"(catch)"     : false,
+			"(global)"    : false,
+
+			"(line)"      : null,
+			"(character)" : null,
+			"(metrics)"   : null,
+			"(statement)" : null,
+			"(context)"   : null,
+			"(blockscope)": null,
+			"(comparray)" : null,
+			"(generator)" : null,
+			"(params)"    : null
+		};
+
+		if (token) {
+			_.extend(funct, {
+				"(line)"     : token.line,
+				"(character)": token.character,
+				"(metrics)"  : createMetrics(token)
+			});
+		}
+
+		_.extend(funct, overwrites);
+
+		if (funct["(context)"]) {
+			funct["(blockscope)"] = funct["(context)"]["(blockscope)"];
+			funct["(comparray)"]  = funct["(context)"]["(comparray)"];
+		}
+
+		return funct;
+	}
 
 	function doFunction(name, statement, generator, fatarrowparams) {
 		var f;
@@ -2874,26 +2943,13 @@ var JSHINT = (function () {
 
 		state.option = Object.create(state.option);
 		state.ignored = Object.create(state.ignored);
-		scope  = Object.create(scope);
+		scope = Object.create(scope);
 
-		funct = {
-			"(name)"      : name || "\"" + anonname + "\"",
-			"(line)"      : state.tokens.next.line,
-			"(character)" : state.tokens.next.character,
-			"(context)"   : funct,
-			"(breakage)"  : 0,
-			"(loopage)"   : 0,
-			"(metrics)"   : createMetrics(state.tokens.next),
-			"(scope)"     : scope,
-			"(statement)" : statement,
-			"(tokens)"    : {},
-			"(blockscope)": funct["(blockscope)"],
-			"(comparray)" : funct["(comparray)"]
-		};
-
-		if (generator) {
-			funct["(generator)"] = true;
-		}
+		funct = functor(name || "\"" + anonname + "\"", state.tokens.next, scope, {
+			"(statement)": statement,
+			"(context)":   funct,
+			"(generator)": generator ? true : null
+		});
 
 		f = funct;
 		state.tokens.curr.funct = funct;
@@ -2901,7 +2957,7 @@ var JSHINT = (function () {
 		functions.push(funct);
 
 		if (name) {
-			addlabel(name, "function");
+			addlabel(name, { type: "function" });
 		}
 
 		funct["(params)"] = functionparams(fatarrowparams);
@@ -3260,6 +3316,7 @@ var JSHINT = (function () {
 		}
 		return identifiers;
 	}
+
 	function destructuringExpressionMatch(tokens, value) {
 		var first = value.first;
 
@@ -3278,13 +3335,12 @@ var JSHINT = (function () {
 	}
 
 	var conststatement = stmt("const", function (prefix) {
-		var tokens, value;
-		// state variable to know if it is a lone identifier, or a destructuring statement.
-		var lone;
+		var tokens;
+		var value;
+		var lone; // State variable to know if it is a lone identifier, or a destructuring statement.
 
-		if (!state.option.inESNext()) {
+		if (!state.option.inESNext())
 			warning("W104", state.tokens.curr, "const");
-		}
 
 		this.first = [];
 		for (;;) {
@@ -3306,7 +3362,7 @@ var JSHINT = (function () {
 					warning("W079", t.token, t.id);
 				}
 				if (t.id) {
-					addlabel(t.id, "const");
+					addlabel(t.id, { token: t.token, type: "const", unused: true });
 					names.push(t.token);
 				}
 			}
@@ -3345,6 +3401,7 @@ var JSHINT = (function () {
 		}
 		return this;
 	});
+
 	conststatement.exps = true;
 	var varstatement = stmt("var", function (prefix) {
 		// JavaScript does not have block scope. It only has function scope. So,
@@ -3377,7 +3434,7 @@ var JSHINT = (function () {
 					warning("W079", t.token, t.id);
 				}
 				if (t.id) {
-					addlabel(t.id, "unused", t.token);
+					addlabel(t.id, { type: "unused", token: t.token });
 					names.push(t.token);
 				}
 			}
@@ -3458,7 +3515,7 @@ var JSHINT = (function () {
 					warning("W079", t.token, t.id);
 				}
 				if (t.id && !funct["(nolet)"]) {
-					addlabel(t.id, "unused", t.token, true);
+					addlabel(t.id, { type: "unused", token: t.token, islet: true });
 					names.push(t.token);
 				}
 			}
@@ -3514,7 +3571,7 @@ var JSHINT = (function () {
 		if (stmt) {
 			// BindingIdentifier
 			this.name = identifier();
-			addlabel(this.name, "unused", state.tokens.curr);
+			addlabel(this.name, { type: "unused", token: state.tokens.curr });
 		} else if (state.tokens.next.identifier && state.tokens.next.value !== "extends") {
 			// BindingIdentifier(opt)
 			this.name = identifier();
@@ -3559,7 +3616,7 @@ var JSHINT = (function () {
 			warning("E011", null, i);
 		}
 		adjacent(state.tokens.curr, state.tokens.next);
-		addlabel(i, "unction", state.tokens.curr);
+		addlabel(i, { type: "unction", token: state.tokens.curr });
 
 		doFunction(i, { statement: true }, generator);
 		if (state.tokens.next.id === "(" && state.tokens.next.line === state.tokens.curr.line) {
@@ -3635,24 +3692,16 @@ var JSHINT = (function () {
 
 			advance();
 
-			funct = {
-				"(name)"     : "(catch)",
-				"(line)"     : state.tokens.next.line,
-				"(character)": state.tokens.next.character,
+			funct = functor("(catch)", state.tokens.next, scope, {
 				"(context)"  : funct,
 				"(breakage)" : funct["(breakage)"],
 				"(loopage)"  : funct["(loopage)"],
-				"(scope)"    : scope,
 				"(statement)": false,
-				"(metrics)"  : createMetrics(state.tokens.next),
-				"(catch)"    : true,
-				"(tokens)"   : {},
-				"(blockscope)": funct["(blockscope)"],
-				"(comparray)": funct["(comparray)"]
-			};
+				"(catch)"    : true
+			});
 
 			if (e) {
-				addlabel(e, "exception");
+				addlabel(e, { type: "exception" });
 			}
 
 			if (state.tokens.next.value === "if") {
@@ -4136,7 +4185,7 @@ var JSHINT = (function () {
 
 		if (state.tokens.next.identifier) {
 			this.name = identifier();
-			addlabel(this.name, "unused", state.tokens.curr);
+			addlabel(this.name, { type: "unused", token: state.tokens.curr });
 		} else {
 			advance("{");
 			for (;;) {
@@ -4151,7 +4200,7 @@ var JSHINT = (function () {
 					advance("as");
 					importName = identifier();
 				}
-				addlabel(importName, "unused", state.tokens.curr);
+				addlabel(importName, { type: "unused", token: state.tokens.curr });
 
 				if (state.tokens.next.value === ",") {
 					advance(",");
@@ -4551,9 +4600,9 @@ var JSHINT = (function () {
 				has: function (t) {
 					return _.has(_current, t);
 				},
+
 				add: function (t, type, tok) {
-					_current[t] = { "(type)" : type,
-									"(token)": tok };
+					_current[t] = { "(type)" : type, "(token)": tok };
 				}
 			}
 		};
@@ -4643,17 +4692,14 @@ var JSHINT = (function () {
 		indent = 1;
 		global = Object.create(predefined);
 		scope = global;
-		funct = {
-			"(global)":   true,
-			"(name)":	  "(global)",
-			"(scope)":	  scope,
-			"(breakage)": 0,
-			"(loopage)":  0,
-			"(tokens)":   {},
-			"(metrics)":   createMetrics(state.tokens.next),
+
+		funct = functor("(global)", null, scope, {
+			"(global)"    : true,
 			"(blockscope)": blockScope(),
-			"(comparray)": arrayComprehension()
-		};
+			"(comparray)" : arrayComprehension(),
+			"(metrics)"   : createMetrics(state.tokens.next)
+		});
+
 		functions = [funct];
 		urls = [];
 		stack = null;
@@ -4846,7 +4892,7 @@ var JSHINT = (function () {
 				if (key.charAt(0) === "(")
 					return;
 
-				if (type !== "unused" && type !== "unction")
+				if (type !== "unused" && type !== "unction" && type !== "const")
 					return;
 
 				// Params are checked separately from other variables.
@@ -4854,9 +4900,12 @@ var JSHINT = (function () {
 					return;
 
 				// Variable is in global scope and defined as exported.
-				if (func["(global)"] && _.has(exported, key)) {
+				if (func["(global)"] && _.has(exported, key))
 					return;
-				}
+
+				// Is this constant unused?
+				if (type === "const" && !getprop(func, key, "unused"))
+					return;
 
 				warnUnused(key, tkn, "var");
 			};
