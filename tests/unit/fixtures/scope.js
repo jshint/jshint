@@ -41,3 +41,15 @@ function repeatedloops() {
 function repeatedloops() {
     bb = 2;
 }
+
+function trycatch() {
+    try {
+        var xx = 1;
+    } catch (err) {
+    } finally {
+        var yy = 1;
+    }
+
+    xx++;
+    yy++;
+}

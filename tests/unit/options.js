@@ -1360,6 +1360,8 @@ exports.scope = function (test) {
 		.addError(27, "'bb' used out of scope.")
 		.addError(37, "'cc' is not defined.")
 		.addError(42, "'bb' is not defined.")
+		.addError(53, "'xx' used out of scope.")
+		.addError(54, "'yy' used out of scope.")
 		.test(src, {es3: true});
 
 	TestRun(test, 2)
