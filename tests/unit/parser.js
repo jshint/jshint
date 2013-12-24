@@ -2485,6 +2485,18 @@ exports["test: esnext generator without yield"] = function (test) {
 	test.done();
 };
 
+exports["test: esnext generator without yield and check turned off"] = function (test) {
+	var code = [
+		"function* emptyGenerator() {}",
+
+		"emptyGenerator();"
+	];
+	TestRun(test)
+		.test(code, {esnext: true, noyield: true, unused: true, undef: true, predef: ["print"]});
+
+	test.done();
+};
+
 exports["test: mozilla generator"] = function (test) {
 	// example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
 	var code = [

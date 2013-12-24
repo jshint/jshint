@@ -148,6 +148,7 @@ var JSHINT = (function () {
 			wsh         : true, // if the Windows Scripting Host environment globals
 			                    // should be predefined
 			yui         : true, // YUI variables should be predefined
+			noyield     : true, // allow generators without a yield
 
 			// Obsolete options
 			onecase     : true, // if one case switch statements should be allowed
@@ -2969,8 +2970,8 @@ var JSHINT = (function () {
 
 		block(false, true, true, fatarrowparams ? true : false);
 
-		if (generator && funct["(generator)"] !== "yielded") {
-			error("E047", state.tokens.curr);
+		if (!state.option.noyield && generator && funct["(generator)"] !== "yielded") {
+			warning("W124", state.tokens.curr);
 		}
 
 		funct["(metrics)"].verifyMaxStatementsPerFunction();
