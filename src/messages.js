@@ -52,14 +52,14 @@ var errors = {
 	E034: "get/set are ES5 features.",
 	E035: "Missing property name.",
 	E036: "Expected to see a statement and instead saw a block.",
-	E037: null, // Vacant
-	E038: null, // Vacant
+	E037: null,
+	E038: null,
 	E039: "Function declarations are not invocable. Wrap the whole function invocation in parens.",
 	E040: "Each value should have its own case label.",
 	E041: "Unrecoverable syntax error.",
 	E042: "Stopping.",
 	E043: "Too many errors.",
-	E044: "'{a}' is already defined and can't be redefined.",
+	E044: null,
 	E045: "Invalid for each loop.",
 	E046: "A yield statement shall be within a generator function (with syntax: `function*`)",
 	E047: "A generator function shall contain a yield statement.",
