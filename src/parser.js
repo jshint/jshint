@@ -244,16 +244,11 @@ function addlabel(name, opts) {
 		}
 	}
 
-	// a double definition of a let variable in same block throws a TypeError
-	if (funct["(blockscope)"] && funct["(blockscope)"].current.has(name)) {
-		warn("E044", { token: state.tokens.next, args: [name] });
-	}
-
 	// if the identifier is from a let, adds it only to the current blockscope
 	if (islet) {
 		funct["(blockscope)"].current.add(name, type, state.tokens.curr);
 	} else {
-
+		funct["(blockscope)"].shadow(name);
 		funct[name] = type;
 
 		if (opts.token) {
@@ -1538,14 +1533,12 @@ syntax["(identifier)"] = {
 			funct = f;
 		}
 
-		if (_.has(funct, "(blockscope)")) {
-			block = funct["(blockscope)"].getlabel(v);
-		}
+		block = funct["(blockscope)"].getlabel(v);
 
 		// The name is in scope and defined in the current function.
 		if (funct === s || block) {
 			// Change 'unused' to 'var', and reject labels.
-			// the name is in a block scope
+			// the name is in a block scope.
 			switch (block ? block[v]["(type)"] : funct[v]) {
 			case "unused":
 				if (block) block[v]["(type)"] = "var";
@@ -2421,6 +2414,12 @@ function doFunction(name, statement, generator, fatarrowparams) {
 	state.ignored = oldIgnored;
 	funct["(last)"] = state.tokens.curr.line;
 	funct["(lastcharacter)"] = state.tokens.curr.character;
+
+	_.map(Object.keys(funct), function (key) {
+		if (key[0] === "(") return;
+		funct["(blockscope)"].unshadow(key);
+	});
+
 	funct = funct["(context)"];
 
 	return f;
@@ -3781,8 +3780,24 @@ var blockScope = function () {
 
 		getlabel: function (l) {
 			for (var i = _variables.length - 1 ; i >= 0; --i) {
-				if (_.has(_variables[i], l)) {
+				if (_.has(_variables[i], l) && !_variables[i][l]["(shadowed)"]) {
 					return _variables[i];
+				}
+			}
+		},
+
+		shadow: function (name) {
+			for (var i = _variables.length - 1; i >= 0; i--) {
+				if (_.has(_variables[i], name)) {
+					_variables[i][name]["(shadowed)"] = true;
+				}
+			}
+		},
+
+		unshadow: function (name) {
+			for (var i = _variables.length - 1; i >= 0; i--) {
+				if (_.has(_variables[i], name)) {
+					_variables[i][name]["(shadowed)"] = false;
 				}
 			}
 		},
@@ -3792,7 +3807,7 @@ var blockScope = function () {
 				return _.has(_current, t);
 			},
 			add: function (t, type, tok) {
-				_current[t] = { "(type)" : type, "(token)": tok };
+				_current[t] = { "(type)" : type, "(token)": tok, "(shadowed)": false };
 			}
 		}
 	};

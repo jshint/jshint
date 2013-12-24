@@ -2154,6 +2154,36 @@ exports["make sure let variables are not treated as globals"] = function (test) 
 	test.done();
 };
 
+exports["make sure var variables can shadow let variables"] = function (test) {
+	// This is a regression test for GH-1394
+	var code = [
+		"let a = 1;",
+		"let b = 2;",
+		"var c = 3;",
+
+		"function sup(a) {",
+			"var b = 4;",
+			"let c = 5;",
+			"let d = 6;",
+			"if (false) {",
+				"var d = 7;",
+			"}",
+			"return b + c + a + d;",
+		"}",
+
+		"sup();"
+	];
+
+	TestRun(test)
+		.addError(1, "'a' is defined but never used.")
+		.addError(2, "'b' is defined but never used.")
+		.addError(3, "'c' is defined but never used.")
+		.addError(7, "'d' is defined but never used.")
+		.test(code, { esnext: true, unused: true, undef: true, funcscope: true });
+
+	test.done();
+};
+
 exports["test destructuring function as moz"] = function (test) {
 	// Example from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
 	var code = [

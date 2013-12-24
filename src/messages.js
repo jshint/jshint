@@ -82,7 +82,7 @@ var errors = make("error", {
 	E041: "Unrecoverable syntax error.",
 	E042: "Stopping.",
 	E043: "Too many errors.",
-	E044: "'{a}' is already defined and can't be redefined.",
+	E044: null,
 	E045: "Invalid for each loop.",
 	E046: "A yield statement shall be within a generator function (with syntax: `function*`)",
 	E047: "A generator function shall contain a yield statement.",
