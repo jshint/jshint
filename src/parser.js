@@ -3923,6 +3923,8 @@ function parse(input, options, program) {
 			if (!state.option.globalstrict && !(state.option.node || state.option.phantom)) {
 				warn("W097", { token: state.tokens.prev });
 			}
+		} else if (state.option.globalstrict && state.option.strict) {
+			warn("E007");
 		}
 	}
 
