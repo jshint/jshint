@@ -4823,6 +4823,8 @@ var JSHINT = (function () {
 					if (!state.option.globalstrict && !(state.option.node || state.option.phantom)) {
 						warning("W097", state.tokens.prev);
 					}
+				} else if (state.option.globalstrict && state.option.strict) {
+					warning("E007");
 				}
 
 				statements();
