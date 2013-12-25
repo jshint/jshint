@@ -2784,7 +2784,7 @@ var JSHINT = (function () {
 		var pastDefault = false;
 
 		if (parsed) {
-			if (parsed instanceof Array) {
+			if (Array.isArray(parsed)) {
 				for (var i in parsed) {
 					curr = parsed[i];
 					if (_.contains(["{", "["], curr.id)) {
@@ -2801,6 +2801,7 @@ var JSHINT = (function () {
 						}
 						continue;
 					} else {
+						params.push(curr.value);
 						addlabel(curr.value, { type: "unused", token: curr });
 					}
 				}
@@ -2955,6 +2956,15 @@ var JSHINT = (function () {
 
 		funct["(params)"] = functionparams(fatarrowparams);
 		funct["(metrics)"].verifyMaxParametersPerFunction(funct["(params)"]);
+
+		// So we parse fat-arrow functions after we encounter =>. So basically
+		// doFunction is called with the left side of => as its last argument.
+		// This means that the parser, at that point, had already added its
+		// arguments to the undefs array and here we undo that.
+
+		JSHINT.undefs = _.filter(JSHINT.undefs, function (item) {
+			return !_.contains(_.union(fatarrowparams), item[2]);
+		});
 
 		block(false, true, true, fatarrowparams ? true : false);
 
