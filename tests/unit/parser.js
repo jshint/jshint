@@ -3412,7 +3412,7 @@ exports["fat arrows support"] = function (test) {
 		"let odds = evens.map(v => v + 1);",
 		"let fives = []; nats.forEach(v => { if (v % 5 === 0) fives.push(v); });",
 
-		"let block = (x,y,{z: t}) => {",
+		"let block = (x,y, { z: t }) => {",
 		"	print(x,y,z);",
 		"	print(j, t);",
 		"};",
@@ -3424,9 +3424,17 @@ exports["fat arrows support"] = function (test) {
 		"  }",
 		"};",
 	];
-	var run = TestRun(test);
-	run.test(code, {esnext: true});
-	run.test(code, {moz: true});
+
+	var run = TestRun(test)
+		.addError(5, "'evens' is not defined.")
+		.addError(6, "'nats' is not defined.")
+		.addError(8, "'print' is not defined.")
+		.addError(9, "'print' is not defined.")
+		.addError(9, "'j' is not defined.")
+		.addError(8, "'z' is not defined.");
+
+	run.test(code, { undef: true, esnext: true });
+	run.test(code, { undef: true, moz: true });
 
 	run = TestRun(test)
 		.addError(1, "'let' is only available in JavaScript 1.7.")
