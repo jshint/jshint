@@ -2273,7 +2273,7 @@ function functionparams(parsed) {
 	var pastDefault = false;
 
 	if (parsed) {
-		if (parsed instanceof Array) {
+		if (Array.isArray(parsed)) {
 			for (var i in parsed) {
 				curr = parsed[i];
 				if (_.contains(["{", "["], curr.id)) {
@@ -2290,6 +2290,7 @@ function functionparams(parsed) {
 					}
 					continue;
 				} else {
+					params.push(curr.value);
 					addlabel(curr.value, { type: "unused", token: curr });
 				}
 			}
@@ -2389,6 +2390,15 @@ function doFunction(name, statement, generator, fatarrowparams) {
 	if (state.option.maxparams && params.length > state.option.maxparams) {
 		warn("W072", { token: funct["(metrics)"].token, args: [params.length] });
 	}
+
+	// So we parse fat-arrow functions after we encounter =>. So basically
+	// doFunction is called with the left side of => as its last argument.
+	// This means that the parser, at that point, had already added its
+	// arguments to the undefs array and here we undo that.
+
+	state.undefs = _.filter(state.undefs, function (item) {
+		return !_.contains(_.union(fatarrowparams), item[2].token);
+	});
 
 	block(false, true, true, fatarrowparams ? true : false);
 
