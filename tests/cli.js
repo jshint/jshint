@@ -28,9 +28,9 @@ exports.group = {
 		sinon.stub(shjs, "cat")
 			.withArgs(sinon.match(/file\.js$/)).returns("var a = function () {}; a();")
 			.withArgs(sinon.match(/file1\.json$/)).returns("wat")
-			.withArgs(sinon.match(/file2\.json$/)).returns("{\"node\":true}")
+			.withArgs(sinon.match(/file2\.json$/)).returns("{\"node\":true, \"browser\":true}")
 			.withArgs(sinon.match(/file4\.json$/)).returns("{\"extends\":\"file3.json\"}")
-			.withArgs(sinon.match(/file5\.json$/)).returns("{\"extends\":\"file2.json\"}");
+			.withArgs(sinon.match(/file5\.json$/)).returns("{\"node\":false,\"extends\":\"file2.json\"}");
 
 		sinon.stub(shjs, "test")
 			.withArgs("-e", sinon.match(/file\.js$/)).returns(true)
@@ -74,7 +74,8 @@ exports.group = {
 		cli.interpret([
 			"node", "jshint", "file.js", "--config", "file5.json"
 		]);
-		test.equal(cli.run.lastCall.args[0].config.node, true);
+		test.equal(cli.run.lastCall.args[0].config.node, false);
+		test.equal(cli.run.lastCall.args[0].config.browser, true);
 		test.equal(cli.run.lastCall.args[0].config['extends'], void 0);
 
 		// Valid config
