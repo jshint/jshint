@@ -1704,6 +1704,14 @@ var JSHINT = (function () {
 		}
 		r = expression(0, true);
 
+		if (r && (!r.identifier || r.value !== "function") && (r.type !== "(punctuator)")) {
+			if (!state.directive["use strict"] &&
+					state.option.globalstrict &&
+					state.option.strict) {
+				warning("E007");
+			}
+		}
+
 		// Look for the final semicolon.
 
 		if (!t.block) {
