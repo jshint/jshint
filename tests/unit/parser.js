@@ -4100,3 +4100,136 @@ exports["regression test for GH-1431"] = function (test) {
 
 	test.done();
 };
+
+// Issue #1311: Support destructuring function parameters
+exports["test destructuring function parameters as moz"] = function (test) {
+	var src = fs.readFileSync(__dirname + "/fixtures/destparam.js", "utf8");
+	TestRun(test)
+		.test(src, {moz: true, unused: true, undef: true});
+
+	test.done();
+};
+
+exports["test destructuring function parameters as esnext"] = function (test) {
+	var src = fs.readFileSync(__dirname + "/fixtures/destparam.js", "utf8");
+	TestRun(test)
+		.test(src, {esnext: true, unused: true, undef: true});
+
+	test.done();
+};
+
+exports["test destructuring function parameters as es5"] = function (test) {
+	var src = fs.readFileSync(__dirname + "/fixtures/destparam.js", "utf8");
+	TestRun(test)
+		.addError(4, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(4, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(5, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(5, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(6, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(6, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(6, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(7, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(7, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(7, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(7, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(10, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(10, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(11, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(11, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(14, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(14, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(15, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(15, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(16, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(16, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(16, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(17, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(17, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(18, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(18, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(21, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(21, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(21, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(22, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(22, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(22, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(23, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(23, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(23, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(24, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(24, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(24, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(27, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(27, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(27, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(28, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(28, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(28, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(29, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(29, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(29, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(30, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(30, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(30, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.test(src, {unused: true, undef: true});
+
+	test.done();
+};
+
+exports["test destructuring function parameters as legacy JS"] = function (test) {
+	var src = fs.readFileSync(__dirname + "/fixtures/destparam.js", "utf8");
+	TestRun(test)
+		.addError(4, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(4, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(5, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(5, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(6, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(6, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(6, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(7, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(7, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(7, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(7, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(10, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(10, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(11, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(11, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(14, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(14, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(15, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(15, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(16, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(16, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(16, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(17, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(17, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(18, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(18, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(21, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(21, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(21, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(22, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(22, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(22, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(23, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(23, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(23, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(24, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(24, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(24, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(27, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(27, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(27, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(28, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(28, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(28, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(29, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(29, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(29, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.addError(30, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(30, "'destructuring expression' is only available in JavaScript 1.7.")
+		.addError(30, "'arrow function syntax (=>)' is only available in JavaScript 1.7.")
+		.test(src, {es3: true, unused: true, undef: true});
+
+	test.done();
+};
