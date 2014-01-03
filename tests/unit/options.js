@@ -1123,10 +1123,21 @@ exports.globalstrict = function (test) {
 	// Don't enforce "use strict"; if strict has been explicitly set to false
 	TestRun(test).test(code[1], { es3: true, globalstrict: true, strict: false });
 
-	// Check that we can detect missing directives in files without functions
+	// Check that we can detect missing "use strict"; statement for code that is
+	// not inside a function
+	code = [
+		"var a = 1;",
+		"a += 1;",
+		"function func() {}"
+	];
 	TestRun(test)
 		.addError(1, 'Missing "use strict" statement.')
-		.test(["var a = 1;", "a += 1;"], { globalstrict: true, strict: true });
+		.test(code, { globalstrict: true, strict: true });
+
+	// globalscript does not prevent you from using only the function-mode
+	// "use strict";
+	code = '(function (test) { "use strict"; return; }());';
+	TestRun(test).test(code, { globalstrict: true, strict: true });
 
 	test.done();
 };
