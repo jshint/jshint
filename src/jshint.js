@@ -4120,9 +4120,6 @@ var JSHINT = (function () {
 
 	stmt("return", function () {
 		if (this.line === state.tokens.next.line) {
-			if (state.tokens.next.id === "(regexp)")
-				warning("W092");
-
 			if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
 				nonadjacent(state.tokens.curr, state.tokens.next);
 				this.first = expression(0);
@@ -4155,9 +4152,6 @@ var JSHINT = (function () {
 		}
 		funct["(generator)"] = "yielded";
 		if (this.line === state.tokens.next.line || !state.option.inMoz(true)) {
-			if (state.tokens.next.id === "(regexp)")
-				warning("W092");
-
 			if (state.tokens.next.id !== ";" && !state.tokens.next.reach && state.tokens.next.nud) {
 				nobreaknonadjacent(state.tokens.curr, state.tokens.next);
 				this.first = expression(10);

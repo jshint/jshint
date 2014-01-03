@@ -165,7 +165,6 @@ var warnings = {
 		"unwanted properties from the prototype.",
 	W090: "'{a}' is not a statement label.",
 	W091: "'{a}' is out of scope.",
-	W092: "Wrap the /regexp/ literal in parens to disambiguate the slash operator.",
 	W093: "Did you mean to return a conditional instead of an assignment?",
 	W094: "Unexpected comma.",
 	W095: "Expected a string and instead saw {a}.",
