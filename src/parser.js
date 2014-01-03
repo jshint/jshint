@@ -2404,9 +2404,8 @@ function doFunction(name, statement, generator, fatarrowparams) {
 
 	block(false, true, true, fatarrowparams ? true : false);
 
-	if (generator && funct["(generator)"] !== "yielded") {
-		warn("E047", { token: state.tokens.curr });
-	}
+	if (!state.option.noyield && generator && funct["(generator)"] !== "yielded")
+		warn("W124", { token: state.tokens.curr });
 
 	var metrics = funct["(metrics)"];
 	if (state.option.maxstatements && metrics.statements > state.option.maxstatements) {

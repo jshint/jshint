@@ -85,7 +85,7 @@ var errors = make("error", {
 	E044: null,
 	E045: "Invalid for each loop.",
 	E046: "A yield statement shall be within a generator function (with syntax: `function*`)",
-	E047: "A generator function shall contain a yield statement.",
+	E047: null,
 	E048: "Let declaration not directly within block.",
 	E049: "A {a} cannot be named '{b}'.",
 	E050: "Mozilla requires the yield expression to be parenthesized here.",
@@ -216,7 +216,8 @@ var warnings = make("warning", {
 	W120: "You might be leaking a variable ({a}) here.",
 	W121: "Extending prototype of native object: '{a}'.",
 	W122: "Invalid typeof value '{a}'",
-	W123: "'{a}' is already defined in outer scope."
+	W123: "'{a}' is already defined in outer scope.",
+	W124: "A generator function shall contain a yield statement."
 });
 
 exports.get = get;

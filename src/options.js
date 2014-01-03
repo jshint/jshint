@@ -14,6 +14,7 @@ exports.simple = {
 	eqeqeq      : true, // if === should be required
 	eqnull      : true, // if == null comparisons should be tolerated
 	notypeof    : true, // if should report typos in typeof comparisons
+	noyield     : true, // if generators without a yield should be tolerated
 	es3         : true, // if ES3 syntax should be allowed
 	es5         : true, // if ES5 syntax should be allowed (is now set per default)
 	esnext      : true, // if es.next specific syntax should be allowed

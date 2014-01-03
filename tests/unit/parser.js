@@ -2436,9 +2436,13 @@ exports["test: esnext generator without yield"] = function (test) {
 		"for (let i = 0; i < 10; i++)",
 		"	print(g.next());"
 	];
+
 	TestRun(test)
 		.addError(7, "A generator function shall contain a yield statement.")
 		.test(code, {esnext: true, unused: true, undef: true, predef: ["print"]});
+
+	TestRun(test)
+		.test(code, {esnext: true, noyield: true, unused: true, undef: true, predef: ["print"]});
 
 	test.done();
 };
