@@ -1250,6 +1250,12 @@ function statement() {
 	// Parse the statement.
 	r = expression(0, true);
 
+	if (r && (!r.identifier || r.value !== "function") && (r.type !== "(punctuator)")) {
+		if (!state.directive["use strict"] && state.option.globalstrict && state.option.strict) {
+			warn("E007");
+		}
+	}
+
 	// Look for the final semicolon.
 
 	if (!t.block) {
@@ -3934,8 +3940,6 @@ function parse(input, options, program) {
 			if (!state.option.globalstrict && !(state.option.node || state.option.phantom)) {
 				warn("W097", { token: state.tokens.prev });
 			}
-		} else if (state.option.globalstrict && state.option.strict) {
-			warn("E007");
 		}
 	}
 
