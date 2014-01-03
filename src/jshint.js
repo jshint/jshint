@@ -3363,16 +3363,18 @@ var JSHINT = (function () {
 				lone = true;
 			}
 			for (var t in tokens) {
-				t = tokens[t];
-				if (funct[t.id] === "const") {
-					warning("E011", null, t.id);
-				}
-				if (funct["(global)"] && predefined[t.id] === false) {
-					warning("W079", t.token, t.id);
-				}
-				if (t.id) {
-					addlabel(t.id, { token: t.token, type: "const", unused: true });
-					names.push(t.token);
+				if (tokens.hasOwnProperty(t)) {
+					t = tokens[t];
+					if (funct[t.id] === "const") {
+						warning("E011", null, t.id);
+					}
+					if (funct["(global)"] && predefined[t.id] === false) {
+						warning("W079", t.token, t.id);
+					}
+					if (t.id) {
+						addlabel(t.id, { token: t.token, type: "const", unused: true });
+						names.push(t.token);
+					}
 				}
 			}
 			if (prefix) {
@@ -3435,16 +3437,18 @@ var JSHINT = (function () {
 				lone = true;
 			}
 			for (var t in tokens) {
-				t = tokens[t];
-				if (state.option.inESNext() && funct[t.id] === "const") {
-					warning("E011", null, t.id);
-				}
-				if (funct["(global)"] && predefined[t.id] === false) {
-					warning("W079", t.token, t.id);
-				}
-				if (t.id) {
-					addlabel(t.id, { type: "unused", token: t.token });
-					names.push(t.token);
+				if (tokens.hasOwnProperty(t)) {
+					t = tokens[t];
+					if (state.option.inESNext() && funct[t.id] === "const") {
+						warning("E011", null, t.id);
+					}
+					if (funct["(global)"] && predefined[t.id] === false) {
+						warning("W079", t.token, t.id);
+					}
+					if (t.id) {
+						addlabel(t.id, { type: "unused", token: t.token });
+						names.push(t.token);
+					}
 				}
 			}
 			if (prefix) {
@@ -3516,16 +3520,18 @@ var JSHINT = (function () {
 				lone = true;
 			}
 			for (var t in tokens) {
-				t = tokens[t];
-				if (state.option.inESNext() && funct[t.id] === "const") {
-					warning("E011", null, t.id);
-				}
-				if (funct["(global)"] && predefined[t.id] === false) {
-					warning("W079", t.token, t.id);
-				}
-				if (t.id && !funct["(nolet)"]) {
-					addlabel(t.id, { type: "unused", token: t.token, islet: true });
-					names.push(t.token);
+				if (tokens.hasOwnProperty(t)) {
+					t = tokens[t];
+					if (state.option.inESNext() && funct[t.id] === "const") {
+						warning("E011", null, t.id);
+					}
+					if (funct["(global)"] && predefined[t.id] === false) {
+						warning("W079", t.token, t.id);
+					}
+					if (t.id && !funct["(nolet)"]) {
+						addlabel(t.id, { type: "unused", token: t.token, islet: true });
+						names.push(t.token);
+					}
 				}
 			}
 			if (prefix) {
