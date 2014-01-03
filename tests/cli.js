@@ -30,7 +30,8 @@ exports.group = {
 			.withArgs(sinon.match(/file1\.json$/)).returns("wat")
 			.withArgs(sinon.match(/file2\.json$/)).returns("{\"node\":true}")
 			.withArgs(sinon.match(/file4\.json$/)).returns("{\"extends\":\"file3.json\"}")
-			.withArgs(sinon.match(/file5\.json$/)).returns("{\"extends\":\"file2.json\"}");
+			.withArgs(sinon.match(/file5\.json$/)).returns("{\"extends\":\"file2.json\"}")
+			.withArgs(sinon.match(/file6\.json$/)).returns("{\"extends\":\"file2.json\",\"node\":false}");
 
 		sinon.stub(shjs, "test")
 			.withArgs("-e", sinon.match(/file\.js$/)).returns(true)
@@ -38,7 +39,8 @@ exports.group = {
 			.withArgs("-e", sinon.match(/file2\.json$/)).returns(true)
 			.withArgs("-e", sinon.match(/file3\.json$/)).returns(false)
 			.withArgs("-e", sinon.match(/file4\.json$/)).returns(true)
-			.withArgs("-e", sinon.match(/file5\.json$/)).returns(true);
+			.withArgs("-e", sinon.match(/file5\.json$/)).returns(true)
+			.withArgs("-e", sinon.match(/file6\.json$/)).returns(true);
 
 		process.exit.restore();
 		sinon.stub(process, "exit").throws("ProcessExit");
@@ -67,6 +69,18 @@ exports.group = {
 			test.equal(err, "ProcessExit");
 		}
 
+		// Invalid merged filed
+		try {
+			cli.interpret([
+				"node", "jshint", "file.js", "--config", "file4.json"
+			]);
+		} catch (err) {
+			var msg = out.args[2][0];
+			test.equal(msg.slice(0, 23), "Can't find config file:");
+			test.equal(msg.slice(msg.length - 10), "file3.json");
+			test.equal(err, "ProcessExit");
+		}
+
 		process.exit.restore();
 		sinon.stub(process, "exit");
 
@@ -76,6 +90,12 @@ exports.group = {
 		]);
 		test.equal(cli.run.lastCall.args[0].config.node, true);
 		test.equal(cli.run.lastCall.args[0].config['extends'], void 0);
+
+		// Overwrites options after extending
+		cli.interpret([
+			"node", "jshint", "file.js", "--config", "file6.json"
+		]);
+		test.equal(cli.run.lastCall.args[0].config.node, false);
 
 		// Valid config
 		cli.interpret([

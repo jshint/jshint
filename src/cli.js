@@ -398,7 +398,7 @@ var exports = {
 			config.dirname = path.dirname(fp);
 
 			if (config['extends']) {
-				_.extend(config, exports.loadConfig(path.resolve(config.dirname, config['extends'])));
+				_.defaults(config, exports.loadConfig(path.resolve(config.dirname, config['extends'])));
 				delete config['extends'];
 			}
 
