@@ -1329,7 +1329,9 @@ Lexer.prototype = {
 		// If we are ignoring linter errors, replace the input with empty string
 		// if it doesn't already at least start or end a multi-line comment
 		if (state.ignoreLinterErrors === true) {
-			if (! (startsWith.call(inputTrimmed, "/*") || endsWith.call(inputTrimmed, "*/"))) {
+			if (! (startsWith.call(inputTrimmed, "/*") ||
+							startsWith.call(inputTrimmed, "//") ||
+							endsWith.call(inputTrimmed, "*/"))) {
 				this.input = "";
 			}
 		}
