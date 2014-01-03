@@ -2069,6 +2069,7 @@ infix("(", function (left, that) {
 }, 155, true).exps = true;
 
 prefix("(", function () {
+	/*jshint loopfunc:true */
 	var bracket, brackets = [];
 	var pn, pn1, i = 0;
 	var ret;
@@ -2088,9 +2089,7 @@ prefix("(", function () {
 				bracket = state.tokens.next;
 				bracket.left = destructuringExpression();
 				brackets.push(bracket);
-				for (var t in bracket.left) {
-					exprs.push(bracket.left[t].token);
-				}
+				bracket.left.forEach(function (t) { exprs.push(t.token) });
 			} else {
 				exprs.push(expression(10));
 			}
@@ -2265,35 +2264,33 @@ function property_name() {
 }
 
 function functionparams(parsed) {
-	var curr, next;
+	/*jshint loopfunc:true */
+	var next;
 	var params = [];
 	var ident;
 	var tokens = [];
-	var t;
 	var pastDefault = false;
 
 	if (parsed) {
 		if (Array.isArray(parsed)) {
-			for (var i in parsed) {
-				curr = parsed[i];
+			parsed.forEach(function (curr) {
 				if (_.contains(["{", "["], curr.id)) {
-					for (t in curr.left) {
-						t = tokens[t];
+					curr.left.forEach(function (t) {
 						if (t.id) {
 							params.push(t.id);
 							addlabel(t.id, { type: "unused", token: t.token });
 						}
-					}
+					});
 				} else if (curr.value === "...") {
 					if (!api.getEnvironment("es6")) {
 						warn("W104", { token: curr, args: ["spread/rest operator"] });
 					}
-					continue;
+					return;
 				} else {
 					params.push(curr.value);
 					addlabel(curr.value, { type: "unused", token: curr });
 				}
-			}
+			});
 			return params;
 		} else {
 			if (parsed.identifier === true) {
@@ -2315,13 +2312,12 @@ function functionparams(parsed) {
 	for (;;) {
 		if (_.contains(["{", "["], state.tokens.next.id)) {
 			tokens = destructuringExpression();
-			for (t in tokens) {
-				t = tokens[t];
+			tokens.forEach(function (t) {
 				if (t.id) {
 					params.push(t.id);
 					addlabel(t.id, { type: "unused", token: t.token });
 				}
-			}
+			});
 		} else if (state.tokens.next.value === "...") {
 			if (!api.getEnvironment("es6")) {
 				warn("W104", { token: state.tokens.next, args: ["spread/rest operator"] });
@@ -2425,7 +2421,7 @@ function doFunction(name, statement, generator, fatarrowparams) {
 	funct["(last)"] = state.tokens.curr.line;
 	funct["(lastcharacter)"] = state.tokens.curr.character;
 
-	_.map(Object.keys(funct), function (key) {
+	Object.keys(funct).forEach(function (key) {
 		if (key[0] === "(") return;
 		funct["(blockscope)"].unshadow(key);
 	});
@@ -2655,19 +2651,18 @@ function checkCondAssignment(expr) {
 }(delim("{")));
 
 function destructuringExpression() {
-	var id, ids;
+	var id;
 	var identifiers = [];
-	if (!api.getEnvironment("es6")) {
+
+	if (!api.getEnvironment("es6"))
 		warn("W104", { token: state.tokens.curr, args: ["destructuring expression"] });
-	}
+
 	var nextInnerDE = function () {
 		var ident;
 		if (_.contains(["[", "{"], state.tokens.next.value)) {
-			ids = destructuringExpression();
-			for (var id in ids) {
-				id = ids[id];
+			destructuringExpression().forEach(function (id) {
 				identifiers.push({ id: id.id, token: id.token });
-			}
+			});
 		} else if (state.tokens.next.value === ",") {
 			identifiers.push({ id: null, token: state.tokens.curr });
 		} else {
@@ -2725,6 +2720,7 @@ function destructuringExpressionMatch(tokens, value) {
 }
 
 var conststatement = stmt("const", function (prefix) {
+	/*jshint loopfunc:true */
 	var tokens;
 	var value;
 	var lone; // State variable to know if it is a lone identifier, or a destructuring statement.
@@ -2743,8 +2739,8 @@ var conststatement = stmt("const", function (prefix) {
 			tokens = [ { id: identifier(), token: state.tokens.curr } ];
 			lone = true;
 		}
-		for (var t in tokens) {
-			t = tokens[t];
+
+		tokens.forEach(function (t) {
 			if (funct[t.id] === "const") {
 				warn("E011", { token: null, args: [t.id] });
 			}
@@ -2755,7 +2751,8 @@ var conststatement = stmt("const", function (prefix) {
 				addlabel(t.id, { type: "const", token: t.token, unused: true });
 				names.push(t.token);
 			}
-		}
+		});
+
 		if (prefix) {
 			break;
 		}
@@ -2790,9 +2787,9 @@ var conststatement = stmt("const", function (prefix) {
 	return this;
 });
 conststatement.exps = true;
+
 var varstatement = stmt("var", function (prefix) {
-	// JavaScript does not have block scope. It only has function scope. So,
-	// declaring a variable in a block can have unexpected consequences.
+	/*jshint loopfunc:true */
 	var tokens, lone, value;
 
 	this.first = [];
@@ -2805,8 +2802,8 @@ var varstatement = stmt("var", function (prefix) {
 			tokens = [ { id: identifier(), token: state.tokens.curr } ];
 			lone = true;
 		}
-		for (var t in tokens) {
-			t = tokens[t];
+
+		tokens.forEach(function (t) {
 			if (api.getEnvironment("es6") && funct[t.id] === "const") {
 				warn("E011", { token: null, args: [t.id] });
 			}
@@ -2817,7 +2814,8 @@ var varstatement = stmt("var", function (prefix) {
 				addlabel(t.id, { type: "unused", token: t.token });
 				names.push(t.token);
 			}
-		}
+		});
+
 		if (prefix) {
 			break;
 		}
@@ -2848,7 +2846,9 @@ var varstatement = stmt("var", function (prefix) {
 	return this;
 });
 varstatement.exps = true;
+
 var letstatement = stmt("let", function (prefix) {
+	/*jshint loopfunc:true */
 	var tokens, lone, value, letblock;
 
 	if (!api.getEnvironment("es6")) {
@@ -2876,8 +2876,8 @@ var letstatement = stmt("let", function (prefix) {
 			tokens = [ { id: identifier(), token: state.tokens.curr.value } ];
 			lone = true;
 		}
-		for (var t in tokens) {
-			t = tokens[t];
+
+		tokens.forEach(function (t) {
 			if (api.getEnvironment("es6") && funct[t.id] === "const") {
 				warn("E011", { token: null, args: [t.id] });
 			}
@@ -2888,7 +2888,8 @@ var letstatement = stmt("let", function (prefix) {
 				addlabel(t.id, { type: "unused", token: t.token, islet: true });
 				names.push(t.token);
 			}
-		}
+		});
+
 		if (prefix) {
 			break;
 		}

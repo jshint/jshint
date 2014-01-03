@@ -720,3 +720,10 @@ exports.testColumnNumAfterNonStrictComparison = function (test) {
 		.test(src, {eqeqeq: true});
 	test.done();
 };
+
+exports.testArrayPrototypeExtensions = function (test) {
+	Array.prototype.undefinedPrototypeProperty = undefined;
+	jshint.run("var x = 123;\nlet y = 456;\nconst z = 123;");
+	delete Array.prototype.undefinedPrototypeProperty;
+	test.done();
+};
