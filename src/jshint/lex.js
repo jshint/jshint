@@ -9,11 +9,11 @@ var events = require("events");
 var reg    = require("./reg.js");
 var state  = require("./state.js").state;
 
-var unicodeData = require("../data/ascii-identifier-data.js");
+var unicodeData = require("../../data/ascii-identifier-data.js");
 var asciiIdentifierStartTable = unicodeData.asciiIdentifierStartTable;
 var asciiIdentifierPartTable = unicodeData.asciiIdentifierPartTable;
-var nonAsciiIdentifierStartTable = require("../data/non-ascii-identifier-start.js");
-var nonAsciiIdentifierPartTable = require("../data/non-ascii-identifier-part-only.js");
+var nonAsciiIdentifierStartTable = require("../../data/non-ascii-identifier-start.js");
+var nonAsciiIdentifierPartTable = require("../../data/non-ascii-identifier-part-only.js");
 
 // Some of these token types are from JavaScript Parser API
 // while others are specific to JSHint parser.

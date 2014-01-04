@@ -3,7 +3,7 @@
 var path  = require("path");
 var shjs  = require("shelljs");
 var sinon = require("sinon");
-var cli   = require("../src/cli.js");
+var cli   = require("../src/cli/cli.js");
 
 exports.group = {
 	setUp: function (cb) {
