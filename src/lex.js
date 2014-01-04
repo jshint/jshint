@@ -1242,6 +1242,23 @@ Lexer.prototype = {
 	},
 
 	/*
+	 * Scan for any occurance of a non-breaking space.
+	 */
+	scanNonBreakingSpace: function () {
+		var nbsp = -1;
+
+		if (state.option.nonbsp) {
+			nbsp = this.input.search(reg.nonBreakingSpace);
+		}
+
+		if (state.option.nonbsp === true || state.option.nonbsp === false) {
+			console.log(state.option.nonbsp, nbsp);
+		}
+
+		return nbsp;
+	},
+
+	/*
 	 * Scan for characters that get silently deleted by one or more browsers.
 	 */
 	scanUnsafeChars: function () {
@@ -1332,6 +1349,11 @@ Lexer.prototype = {
 			if (! (startsWith.call(inputTrimmed, "/*") || endsWith.call(inputTrimmed, "*/"))) {
 				this.input = "";
 			}
+		}
+
+		char = this.scanNonBreakingSpace();
+		if (char >= 0) {
+			this.trigger("warning", { code: "W125", line: this.line, character: char + 1 });
 		}
 
 		char = this.scanMixedSpacesAndTabs();

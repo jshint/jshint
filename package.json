@@ -1,8 +1,8 @@
 {
 	"name":     "jshint",
-	"version":  "2.4.1",
+	"version":  "2.4.1-prayerslayer",
 	"homepage": "http://jshint.com/",
-	"description": "Static analysis tool for JavaScript",
+	"description": "Static analysis tool for JavaScript (prayerslayer build)",
 
 	"author": {
 		"name":  "Anton Kovalyov",
@@ -12,7 +12,7 @@
 
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/jshint/jshint.git"
+		"url": "https://github.com/prayerslayer/jshint.git"
 	},
 
 	"bugs": {

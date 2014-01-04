@@ -117,6 +117,24 @@ exports.latedef = function (test) {
 	test.done();
 };
 
+/** Option `nonbsp` warns you about non-breaking spaces.*/
+
+exports.nonbsp = function (test) {
+	// load fixture
+	var src = fs.readFileSync(__dirname + '/fixtures/gh1456.js', 'utf8');
+
+	// if `nonbsp` is set to false we're fine with the code 
+	TestRun( test )
+		.test( src, { nonbsp: false, sub: true } );
+
+	// if `nonbsp` is set to true we add an error message
+	TestRun( test )
+		.addError( 1, "Illegal non-breaking space." )
+		.test( src, { nonbsp: true, sub: true } );
+
+	test.done();
+};
+
 exports.notypeof = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/typeofcomp.js', 'utf8');
 

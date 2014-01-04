@@ -116,6 +116,7 @@ var JSHINT = (function () {
 			node        : true, // if the Node.js environment globals should be
 			                    // predefined
 			noempty     : true, // if empty blocks should be disallowed
+			nonbsp		: false,// if non-breaking spaces should be disallowed
 			nonew       : true, // if using `new` for side-effects should be disallowed
 			nonstandard : true, // if non-standard (but widely adopted) globals should
 			                    // be predefined
