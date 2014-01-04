@@ -6,8 +6,8 @@ var path        = require("path");
 var shjs        = require("shelljs");
 var minimatch   = require("minimatch");
 var htmlparser  = require("htmlparser2");
-var JSHINT      = require("./jshint.js").JSHINT;
-var defReporter = require("./reporters/default").reporter;
+var JSHINT      = require("../jshint/jshint.js").JSHINT;
+var defReporter = require("../reporters/default").reporter;
 
 var OPTIONS = {
 	"config": ["c", "Custom configuration file", "string", false ],
@@ -502,7 +502,7 @@ var exports = {
 		cli.options = {};
 
 		cli.enable("version", "glob", "help");
-		cli.setApp(path.resolve(__dirname + "/../package.json"));
+		cli.setApp(path.resolve(__dirname + "/../../package.json"));
 
 		var options = cli.parse(OPTIONS);
 		// Use config file if specified
@@ -515,18 +515,18 @@ var exports = {
 		// JSLint reporter
 		case options.reporter === "jslint":
 		case options["jslint-reporter"]:
-			options.reporter = "./reporters/jslint_xml.js";
+			options.reporter = "../reporters/jslint_xml.js";
 			break;
 
 		// CheckStyle (XML) reporter
 		case options.reporter === "checkstyle":
 		case options["checkstyle-reporter"]:
-			options.reporter = "./reporters/checkstyle.js";
+			options.reporter = "../reporters/checkstyle.js";
 			break;
 
 		// Reporter that displays additional JSHint data
 		case options["show-non-errors"]:
-			options.reporter = "./reporters/non_error.js";
+			options.reporter = "../reporters/non_error.js";
 			break;
 
 		// Custom reporter

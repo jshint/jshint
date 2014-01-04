@@ -6,7 +6,7 @@
 	var coveraje = require("coveraje").coveraje,
 		fs = require("fs"),
 		path = require("path");
-	var filePath = path.resolve(path.join(__dirname, "../../jshint.js"));
+	var filePath = path.resolve(path.join(__dirname, "../../jshint/jshint.js"));
 
 	function runTests(file, helper) {
 		return function (context) {
