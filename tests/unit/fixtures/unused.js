@@ -41,3 +41,12 @@ function bazbaz() {
 }
 
 bazbaz();
+
+function useSomeConstDefinedLater() {
+	return A_CONST + " à vous";
+}
+
+useSomeConstDefinedLater();
+
+const A_CONST = "Bonjour";
+
