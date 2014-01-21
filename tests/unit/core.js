@@ -61,7 +61,7 @@ exports.testNewArray = function (test) {
 	TestRun(test).test(code2);
 
 	TestRun(test)
-		.addError(1, "The array literal notation [] is preferrable.")
+		.addError(1, "The array literal notation [] is preferable.")
 		.test('new Array();');
 
 	test.done();
@@ -104,11 +104,11 @@ exports.testNewObject = function (test) {
 	TestRun(test).test(code1);
 
 	TestRun(test)
-		.addError(1, "The object literal notation {} is preferrable.")
+		.addError(1, "The object literal notation {} is preferable.")
 		.test('Object();');
 
 	TestRun(test)
-		.addError(1, "The object literal notation {} is preferrable.")
+		.addError(1, "The object literal notation {} is preferable.")
 		.test('new Object();');
 
 	test.done();
