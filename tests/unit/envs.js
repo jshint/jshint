@@ -323,6 +323,7 @@ exports.browser = function (test) {
 		"length",
 		"localStorage",
 		"location",
+    "matchMedia",
 		"MessageChannel",
 		"MessageEvent",
 		"MessagePort",
