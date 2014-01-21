@@ -130,6 +130,7 @@ exports.browser = {
 	length               : false,
 	localStorage         : false,
 	location             : false,
+  matchMedia           : false,
 	MessageChannel       : false,
 	MessageEvent         : false,
 	MessagePort          : false,
