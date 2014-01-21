@@ -7,6 +7,11 @@ var someCode; // http://jshint.com/docs/
   // http://jshint.com/docs/
   /* http://jshint.com/docs/
    */
+a = 23;
   /*
    * http://jshint.com/docs/
    */
+a = 23;
+/*
+   http://jshint.com/docs/
+ */

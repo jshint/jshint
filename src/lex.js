@@ -107,6 +107,7 @@ function Lexer(source) {
 	this.char = 1;
 	this.from = 1;
 	this.input = "";
+	this.inComment = false;
 
 	for (var i = 0; i < state.option.indent; i += 1) {
 		state.tab += " ";
@@ -447,6 +448,7 @@ Lexer.prototype = {
 
 		/* Multi-line comment */
 		if (ch2 === "*") {
+			this.inComment = true;
 			this.skip(2);
 
 			while (this.peek() !== "*" || this.peek(1) !== "/") {
@@ -462,6 +464,7 @@ Lexer.prototype = {
 							character: startChar
 						});
 
+						this.inComment = false;
 						return commentToken("/*", body, {
 							isMultiline: true,
 							isMalformed: true
@@ -474,6 +477,7 @@ Lexer.prototype = {
 			}
 
 			this.skip(2);
+			this.inComment = false;
 			return commentToken("/*", body, { isMultiline: true });
 		}
 	},
@@ -1350,7 +1354,7 @@ Lexer.prototype = {
 		// long.
 
 		if (state.option.maxlen && state.option.maxlen < this.input.length) {
-			var inComment = state.tokens.curr.comment ||
+			var inComment = this.inComment ||
 				startsWith.call(inputTrimmed, "//") ||
 				startsWith.call(inputTrimmed, "/*");
 
