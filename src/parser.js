@@ -961,7 +961,7 @@ function isTypoTypeof(left, right) {
 
 	var values = [
 		"undefined", "object", "boolean", "number",
-		"string", "function", "xml", "object"
+		"string", "function", "xml", "object", "unknown"
 	];
 
 	if (right.type === "(identifier)" && right.value === "typeof" && left.type === "(string)")
