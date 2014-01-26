@@ -203,7 +203,7 @@ function loadIgnores(exclude, excludePath) {
 			if (line[0] === "!")
 				return "!" + path.resolve(path.dirname(file), line.substr(1).trim());
 
-			return path.resolve(path.dirname(file), line.trim());
+			return path.join(path.dirname(file), line.trim());
 		});
 }
 
