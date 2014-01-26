@@ -1735,3 +1735,16 @@ exports.freeze = function (test) {
 
   test.done();
 };
+
+exports.nonbsp = function (test) {
+  var src = fs.readFileSync(__dirname + '/fixtures/nbsp.js', 'utf8');
+
+  TestRun(test)
+    .test(src, { sub: true });
+
+  TestRun(test)
+    .addError(1, "This line contains non-breaking spaces: http://jshint.com/doc/options/#nonbsp")
+    .test(src, { nonbsp: true, sub: true });
+
+  test.done();
+};
