@@ -4099,6 +4099,21 @@ exports["should be able to ignore a single line with a trailing comment: // jshi
 	test.done();
 };
 
+exports["jshint ignore:start/end should be detected using single line comments"] = function (test) {
+	var code = [
+		"// jshint ignore:start",
+		"var a;",
+		"// jshint ignore:end",
+		"var b;",
+	];
+
+	var run = TestRun(test).addError(4, "'b' is defined but never used.");
+
+	run.test(code, {unused: true});
+
+	test.done();
+};
+
 exports["regression test for GH-1431"] = function (test) {
 	// The code is invalid but it should not crash JSHint.
 	TestRun(test)
