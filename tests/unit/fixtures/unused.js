@@ -18,15 +18,15 @@ function foo(err, cb) {
 }
 
 function bar(g, h) {
-	//jshint unused:true, es3:false
-	var i = 1;
-	var char;
-	char = 1;
-	return h;
+  //jshint unused:true, es3:false
+  var i = 1;
+  var char;
+  char = 1;
+  return h;
 }
 
 function baz(a, b, c) {
-	return 1;
+  return 1;
 }
 
 baz();
@@ -36,8 +36,8 @@ const bb = aa + 1;
 const cc = 2;
 
 function bazbaz() {
-	const dd = 1;
-	baz(bb);
+  const dd = 1;
+  baz(bb);
 }
 
 bazbaz();

@@ -1,34 +1,34 @@
 "use strict";
 
 module.exports = {
-	reporter: function (results, data, opts) {
-		var len = results.length;
-		var str = '';
-		var prevfile;
+  reporter: function (results, data, opts) {
+    var len = results.length;
+    var str = '';
+    var prevfile;
 
-		opts = opts || {};
+    opts = opts || {};
 
-		results.forEach(function (result) {
-			var file = result.file;
-			var error = result.error;
+    results.forEach(function (result) {
+      var file = result.file;
+      var error = result.error;
 
-			if (prevfile && prevfile !== file) {
-				str += "\n";
-			}
-			prevfile = file;
+      if (prevfile && prevfile !== file) {
+        str += "\n";
+      }
+      prevfile = file;
 
-			str += file  + ': line ' + error.line + ', col ' +
-				error.character + ', ' + error.reason;
+      str += file  + ': line ' + error.line + ', col ' +
+        error.character + ', ' + error.reason;
 
-			if (opts.verbose) {
-				str += ' (' + error.code + ')';
-			}
+      if (opts.verbose) {
+        str += ' (' + error.code + ')';
+      }
 
-			str += '\n';
-		});
+      str += '\n';
+    });
 
-		if (str) {
-			process.stdout.write(str + "\n" + len + ' error' + ((len === 1) ? '' : 's') + "\n");
-		}
-	}
+    if (str) {
+      process.stdout.write(str + "\n" + len + ' error' + ((len === 1) ? '' : 's') + "\n");
+    }
+  }
 };
