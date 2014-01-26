@@ -2585,7 +2585,6 @@ var JSHINT = (function () {
 
       i += 1;
       pn1 = peek(i);
-      i += 1;
     } while (!(parens === 0 && pn.value === ")") &&
              pn1.value !== "=>" && pn1.value !== ";" && pn1.type !== "(end)");
 
