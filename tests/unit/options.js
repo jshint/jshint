@@ -227,7 +227,7 @@ exports.testProtoAndIterator = function (test) {
     .addError(7, "The '__proto__' property is deprecated.")
     .addError(8, "The '__proto__' property is deprecated.")
     .addError(10, "The '__proto__' property is deprecated.")
-    .addError(27, "'__iterator__' is only available in JavaScript 1.7.")
+    .addError(27, "'__iterator__' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(33, "The '__proto__' property is deprecated.")
     .addError(37, "The '__proto__' property is deprecated.")
     .test(source, {es3: true});

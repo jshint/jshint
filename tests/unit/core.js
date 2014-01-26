@@ -641,11 +641,11 @@ exports.testES6Modules = function (test) {
     .addError(34, "'export' is only available in ES6 (use esnext option).")
     .addError(38, "'export' is only available in ES6 (use esnext option).")
     .addError(40, "'export' is only available in ES6 (use esnext option).")
-    .addError(40, "'class' is only available in JavaScript 1.7.")
+    .addError(40, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(41, "'export' is only available in ES6 (use esnext option).")
-    .addError(41, "'class' is only available in JavaScript 1.7.")
+    .addError(41, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(42, "'export' is only available in ES6 (use esnext option).")
-    .addError(42, "'class' is only available in JavaScript 1.7.")
+    .addError(42, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .test(src, {});
 
   var src2 = [

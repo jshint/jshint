@@ -198,7 +198,7 @@ var warnings = make("warning", {
   W101: null,
   W102: null,
   W103: "The '{a}' property is deprecated.",
-  W104: "'{a}' is only available in JavaScript 1.7.",
+  W104: "'{a}' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).",
   W105: "Unexpected {a} in '{b}'.",
   W106: null,
   W107: "Script URL.",
