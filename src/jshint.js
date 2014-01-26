@@ -2571,13 +2571,22 @@ var JSHINT = (function () {
     var bracket, brackets = [];
     var pn, pn1, i = 0;
     var ret;
+    var parens = 1;
 
     do {
       pn = peek(i);
+
+      if (pn.value === "(") {
+        parens += 1;
+      } else if (pn.value === ")") {
+        parens -= 1;
+      }
+
       i += 1;
       pn1 = peek(i);
       i += 1;
-    } while (pn.value !== ")" && pn1.value !== "=>" && pn1.value !== ";" && pn1.type !== "(end)");
+    } while (!(parens === 0 && pn.value === ")") &&
+             pn1.value !== "=>" && pn1.value !== ";" && pn1.type !== "(end)");
 
     if (state.tokens.next.id === "function") {
       state.tokens.next.immed = true;
@@ -2587,7 +2596,7 @@ var JSHINT = (function () {
 
     if (state.tokens.next.id !== ")") {
       for (;;) {
-        if (pn1.value === "=>" && state.tokens.next.value === "{") {
+        if (pn1.value === "=>" && _.contains(["{", "["], state.tokens.next.value)) {
           bracket = state.tokens.next;
           bracket.left = destructuringExpression();
           brackets.push(bracket);
@@ -2800,7 +2809,7 @@ var JSHINT = (function () {
           if (_.contains(["{", "["], curr.id)) {
             for (t in curr.left) {
               t = tokens[t];
-              if (t.id) {
+              if (t && t.id) {
                 params.push(t.id);
                 addlabel(t.id, { type: "unused", token: t.token });
               }
@@ -2810,7 +2819,7 @@ var JSHINT = (function () {
               warning("W104", curr, "spread/rest operator");
             }
             continue;
-          } else {
+          } else if (curr.value !== ",") {
             params.push(curr.value);
             addlabel(curr.value, { type: "unused", token: curr });
           }
@@ -3298,6 +3307,10 @@ var JSHINT = (function () {
         }
       } else if (state.tokens.next.value === ",") {
         identifiers.push({ id: null, token: state.tokens.curr });
+      } else if (state.tokens.next.value === "(") {
+        advance("(");
+        nextInnerDE();
+        advance(")");
       } else {
         ident = identifier();
         if (ident)
