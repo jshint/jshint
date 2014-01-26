@@ -217,7 +217,8 @@ var warnings = make("warning", {
   W121: "Extending prototype of native object: '{a}'.",
   W122: "Invalid typeof value '{a}'",
   W123: "'{a}' is already defined in outer scope.",
-  W124: "A generator function shall contain a yield statement."
+  W124: "A generator function shall contain a yield statement.",
+  W125: "This line contains non-breaking spaces: http://jshint.com/docs/options/#nonbsp"
 });
 
 exports.get = get;

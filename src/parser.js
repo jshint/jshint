@@ -67,7 +67,7 @@ var api = {
   },
 
   warn: function (code, data) {
-    warn.call(null, code, { coord: { line: data.line, ch: data.char }, args: data.data });
+    warn(code, { coord: { line: data.line, ch: data.char }, args: data.data });
   },
 
   on: function (names, listener) {
@@ -3883,11 +3883,11 @@ function parse(input, options, program) {
   lex = new Lexer(input, { indent: state.option.indent });
 
   lex.on("warning", function (ev) {
-    warn.call(null, ev.code, { coord: { line: ev.line, ch: ev.character }, args: ev.data });
+    warn(ev.code, { coord: { line: ev.line, ch: ev.character }, args: ev.data });
   });
 
   lex.on("error", function (ev) {
-    warn.call(null, ev.code, { coord: { line: ev.line, ch: ev.character }, args: ev.data });
+    warn(ev.code, { coord: { line: ev.line, ch: ev.character }, args: ev.data });
   });
 
   lex.on("fatal", function (ev) {
@@ -3897,6 +3897,11 @@ function parse(input, options, program) {
   lex.on("Hashbang", function (ev) {
     if (~ev.value.indexOf("node"))
       state.option.node = true;
+  });
+
+  lex.on("NBSP", function (ev) {
+    if (!state.option.nonbsp) return;
+    warn("W125", { coord: { line: ev.line, ch: ev.character } });
   });
 
   [ "Identifier", "String", "Number" ].forEach(function (name) {
@@ -4051,7 +4056,7 @@ function parse(input, options, program) {
       return void clearImplied(opts.token.value, opts.token.line);
 
     if (state.option.undef)
-      warn.call(null, code, opts);
+      warn(code, opts);
   });
 
   state.functions.forEach(function (func) {

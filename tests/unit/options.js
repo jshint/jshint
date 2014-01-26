@@ -1287,8 +1287,8 @@ exports.unignored = function (test) {
 };
 
 /*
-* Tests the `freeze` option -- Warn if native object prototype is assigned to.
-*/
+ * Tests the `freeze` option -- Warn if native object prototype is assigned to.
+ */
 exports.freeze = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/nativeobject.js", "utf-8");
 
@@ -1299,6 +1299,19 @@ exports.freeze = function (test) {
 
   TestRun(test)
     .test(src);
+
+  test.done();
+};
+
+exports.nonbsp = function (test) {
+  var src = fs.readFileSync(__dirname + '/fixtures/nbsp.js', 'utf8');
+
+  TestRun(test)
+    .test(src, { sub: true });
+
+  TestRun(test)
+    .addError(1, "This line contains non-breaking spaces: http://jshint.com/docs/options/#nonbsp")
+    .test(src, { nonbsp: true, sub: true });
 
   test.done();
 };
