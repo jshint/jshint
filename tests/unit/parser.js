@@ -4000,3 +4000,18 @@ exports["regression test for GH-1431"] = function (test) {
 
 	test.done();
 };
+
+exports["jshint ignore:start/end should be detected using single line comments"] = function (test) {
+  var code = [
+    "// jshint ignore:start",
+    "var a;",
+    "// jshint ignore:end",
+    "var b;"
+  ];
+
+  TestRun(test)
+    .addError(4, "'b' is defined but never used.")
+    .test(code, { unused: true });
+
+  test.done();
+};

@@ -1202,15 +1202,21 @@ Lexer.prototype = {
 
 		// If we are ignoring linter errors, replace the input with empty string
 		// if it doesn't already at least start or end a multi-line comment
+		var inputTrimmed = this.input.trim();
+		var startsWith = function () {
+			return _.some(arguments, function (prefix) {
+				return inputTrimmed.indexOf(prefix) === 0;
+			});
+		};
+
+		var endsWith = function () {
+			return _.some(arguments, function (suffix) {
+				return inputTrimmed.indexOf(suffix, inputTrimmed.length - suffix.length) !== -1;
+			});
+		};
+
 		if (this.ignoring === true) {
-			var startsWith = function (prefix) {
-				return this.indexOf(prefix) === 0;
-			};
-			var endsWith = function (suffix) {
-				return this.indexOf(suffix, this.length - suffix.length) !== -1;
-			};
-			var inputTrimmed = this.input.trim();
-			if (!(startsWith.call(inputTrimmed, "/*") || endsWith.call(inputTrimmed, "*/"))) {
+      if (!startsWith("/*", "//") && !endsWith("*/")) {
 				this.input = "";
 			}
 		}
