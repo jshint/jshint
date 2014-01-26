@@ -1246,6 +1246,16 @@ Lexer.prototype = {
   },
 
   /*
+   * Scan for any occurence of non-breaking spaces. Non-breaking spaces
+   * can be mistakenly typed on OS X with option-space. Non UTF-8 web
+   * pages with non-breaking pages produce syntax errors.
+   */
+  scanNonBreakingSpaces: function () {
+    return state.option.nonbsp ?
+      this.input.search(/(\u00A0)/) : -1;
+  },
+
+  /*
    * Scan for characters that get silently deleted by one or more browsers.
    */
   scanUnsafeChars: function () {
@@ -1342,6 +1352,11 @@ Lexer.prototype = {
       if (!startsWith("/*", "//") && !endsWith("*/")) {
         this.input = "";
       }
+    }
+
+    char = this.scanNonBreakingSpaces();
+    if (char >= 0) {
+      this.trigger("warning", { code: "W125", line: this.line, character: char + 1 });
     }
 
     char = this.scanMixedSpacesAndTabs();
