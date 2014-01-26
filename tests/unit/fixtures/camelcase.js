@@ -17,5 +17,5 @@ function _FooBar(_testMe) {
 }
 
 function _FooBar_(testMe_) {
-	this.__testMe__ = testMe_;
+  this.__testMe__ = testMe_;
 }

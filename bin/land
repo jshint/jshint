@@ -12,23 +12,23 @@ opts.agent = new https.Agent(opts);
 https.get(opts, succ).on("error", err);
 
 function succ(res) {
-	if (res.statusCode !== 200)
-		return void console.log("error:", res.statusCode);
+  if (res.statusCode !== 200)
+    return void console.log("error:", res.statusCode);
 
-	var data = "";
-	res.on("data", function (chunk) {
-		data += chunk.toString();
-	});
+  var data = "";
+  res.on("data", function (chunk) {
+    data += chunk.toString();
+  });
 
-	res.on("end", function () {
-		data = data.split("\n");
-		data = data[1].replace(/^From\:\s/, "");
-		data = data.replace(/"/g, "");
-		
-		shjs.exec("git commit -s --author=\"" + data + "\" --message=\"" + msg + "\"");
-	})
+  res.on("end", function () {
+    data = data.split("\n");
+    data = data[1].replace(/^From\:\s/, "");
+    data = data.replace(/"/g, "");
+
+    shjs.exec("git commit -s --author=\"" + data + "\" --message=\"" + msg + "\"");
+  })
 }
 
 function err(res) {
-	console.log("error:", res.message);
+  console.log("error:", res.message);
 }

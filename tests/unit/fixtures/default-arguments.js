@@ -8,9 +8,9 @@ Doit.prototype = {
     return num === num2;
   },
 
-	testBadDefault: function(num, num2=1, num3) {
-		return num === num2;
-	},
+  testBadDefault: function(num, num2=1, num3) {
+    return num === num2;
+  },
 
   get someProperty() {
     return this._someProperty;
