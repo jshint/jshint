@@ -674,6 +674,8 @@ exports.testUndefinedAssignment = function (test) {
 
 exports.testES6Modules = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/es6-import-export.js", "utf8");
+  var classError = "'class' is available in ES6 (use esnext option) " +
+                   "or Mozilla JS extensions (use moz).";
 
   TestRun(test)
     .test(src, {esnext: true});
@@ -691,11 +693,17 @@ exports.testES6Modules = function (test) {
     .addError(34, "'export' is only available in ES6 (use esnext option).")
     .addError(38, "'export' is only available in ES6 (use esnext option).")
     .addError(40, "'export' is only available in ES6 (use esnext option).")
-    .addError(40, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(40, classError)
     .addError(41, "'export' is only available in ES6 (use esnext option).")
-    .addError(41, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(41, classError)
     .addError(42, "'export' is only available in ES6 (use esnext option).")
-    .addError(42, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(42, classError)
+    .addError(46, "'export' is only available in ES6 (use esnext option).")
+    .addError(47, "'export' is only available in ES6 (use esnext option).")
+    .addError(50, "'export' is only available in ES6 (use esnext option).")
+    .addError(50, classError)
+    .addError(51, "'export' is only available in ES6 (use esnext option).")
+    .addError(51, classError)
     .test(src, {});
 
   var src2 = [
