@@ -5,12 +5,14 @@
   "use strict";
 
   var filenames = [];
-  var flags = {};
+  var flags     = {};
+  var opts      = {};
+  var globals   = {};
+  var retval    = 0;
+  var readf     = (typeof readFully === "function" ? readFully : readFile);
+
   var optstr; // arg1=val1,arg2=val2,...
   var predef; // global1=true,global2,global3,...
-  var opts   = {};
-  var globals = {};
-  var retval = 0;
 
   args.forEach(function (arg) {
     if (arg.indexOf("--") === 0) {
@@ -52,7 +54,7 @@
   if ("config" in flags) {
     var cfgFileContent;
     try {
-      cfgFileContent = readFile(flags.config);
+      cfgFileContent = readf(flags.config);
     } catch (e) {
       print("Could not read config file " + flags.config);
       quit(1);
@@ -92,7 +94,7 @@
   }
 
   filenames.forEach(function (name) {
-    var input = readFile(name);
+    var input = readf(name);
 
     if (!input) {
       print("jshint: Couldn't open file " + name);
