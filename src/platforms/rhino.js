@@ -1,5 +1,5 @@
 /*jshint boss: true, rhino: true, unused: true, undef: true, white: true, quotmark: double */
-/*global jshint */
+/*global jshint, readFully */
 
 (function (args) {
   "use strict";
