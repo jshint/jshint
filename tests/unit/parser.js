@@ -4243,3 +4243,16 @@ exports["test destructuring function parameters as legacy JS"] = function (test)
 
   test.done();
 };
+
+exports["test for parentheses in odd-numbered token"] = function (test) {
+  var code = [
+    "let f, b;",
+    "let a = x => ({ f: f(x) });",
+    "b = x => x;"
+  ];
+
+  TestRun(test)
+    .test(code, {esnext: true});
+
+  test.done();
+};
