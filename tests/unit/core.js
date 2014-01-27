@@ -310,7 +310,9 @@ exports.returnStatement = function (test) {
   TestRun(test)
     .addError(3, "Did you mean to return a conditional instead of an assignment?")
     .addError(38, "Line breaking error 'return'.")
-    .test(src, { es3: true, maxerr: 2 });
+    .addError(38, "Missing semicolon.")
+    .addError(39, "Unnecessary semicolon.")
+    .test(src, { es3: true });
 
   test.done();
 };
@@ -416,7 +418,8 @@ exports.noExcOnTooManyUndefined = function (test) {
 
   TestRun(test)
     .addError(1, "'a' is not defined.")
-    .test(code, { es3: true, undef: true, maxerr: 1 });
+    .addError(1, "'b' is not defined.")
+    .test(code, { es3: true, undef: true });
 
   test.done();
 };
