@@ -2806,15 +2806,7 @@ var JSHINT = (function () {
       if (Array.isArray(parsed)) {
         for (var i in parsed) {
           curr = parsed[i];
-          if (_.contains(["{", "["], curr.id)) {
-            for (t in curr.left) {
-              t = tokens[t];
-              if (t && t.id) {
-                params.push(t.id);
-                addlabel(t.id, { type: "unused", token: t.token });
-              }
-            }
-          } else if (curr.value === "...") {
+          if (curr.value === "...") {
             if (!state.option.inESNext()) {
               warning("W104", curr, "spread/rest operator");
             }
