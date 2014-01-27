@@ -2079,19 +2079,27 @@ prefix("(", function () {
   var bracket, brackets = [];
   var pn, pn1, i = 0;
   var ret;
+  var parens = 1;
 
   do {
     pn = peek(i);
+
+    if (pn.value === "(") {
+      parens += 1;
+    } else if (pn.value === ")") {
+      parens -= 1;
+    }
+
     i += 1;
     pn1 = peek(i);
-    i += 1;
-  } while (pn.value !== ")" && pn1.value !== "=>" && pn1.value !== ";" && pn1.type !== "(end)");
+  } while (!(parens === 0 && pn.value === ")") &&
+           pn1.value !== "=>" && pn1.value !== ";" && pn1.type !== "(end)");
 
   var exprs = [];
 
   if (state.tokens.next.id !== ")") {
     for (;;) {
-      if (pn1.value === "=>" && state.tokens.next.value === "{") {
+      if (pn1.value === "=>" && _.contains(["{", "["], state.tokens.next.value)) {
         bracket = state.tokens.next;
         bracket.left = destructuringExpression();
         brackets.push(bracket);
@@ -2280,19 +2288,11 @@ function functionparams(parsed) {
   if (parsed) {
     if (Array.isArray(parsed)) {
       parsed.forEach(function (curr) {
-        if (_.contains(["{", "["], curr.id)) {
-          curr.left.forEach(function (t) {
-            if (t.id) {
-              params.push(t.id);
-              addlabel(t.id, { type: "unused", token: t.token });
-            }
-          });
-        } else if (curr.value === "...") {
-          if (!api.getEnvironment("es6")) {
+        if (curr.value === "...") {
+          if (!api.getEnvironment("es6"))
             warn("W104", { token: curr, args: ["spread/rest operator"] });
-          }
           return;
-        } else {
+        } else if (curr.value !== ",") {
           params.push(curr.value);
           addlabel(curr.value, { type: "unused", token: curr });
         }
@@ -2662,20 +2662,26 @@ function destructuringExpression() {
   if (!api.getEnvironment("es6"))
     warn("W104", { token: state.tokens.curr, args: ["destructuring expression"] });
 
-  var nextInnerDE = function () {
+  function nextInnerDE() {
     var ident;
+
     if (_.contains(["[", "{"], state.tokens.next.value)) {
       destructuringExpression().forEach(function (id) {
         identifiers.push({ id: id.id, token: id.token });
       });
     } else if (state.tokens.next.value === ",") {
       identifiers.push({ id: null, token: state.tokens.curr });
+    } else if (state.tokens.next.value === "(") {
+      advance("(");
+      nextInnerDE();
+      advance(")");
     } else {
       ident = identifier();
       if (ident)
         identifiers.push({ id: ident, token: state.tokens.curr });
     }
-  };
+  }
+
   if (state.tokens.next.value === "[") {
     advance("[");
     nextInnerDE();

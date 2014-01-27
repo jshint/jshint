@@ -3965,13 +3965,13 @@ exports["/*jshint ignore */ should allow the linter to skip blocked-out lines to
 
 exports["/*jshint ignore */ should be detected even with leading and/or trailing whitespace"] = function (test) {
   var code = [
-    "/*jshint ignore:start */",                                  // leading whitespace
+    "/*jshint ignore:start */",                                 // leading whitespace
     "if (true) { alert('mixed tabs and spaces ignored') }",     // should be ignored
-    "/*jshint ignore:end */  ",                                   // leading and trailing whitespace
+    "/*jshint ignore:end */  ",                                 // leading and trailing whitespace
     "if (true) { alert('mixed tabs and spaces not ignored') }", // should not be ignored
-    "/*jshint ignore:start */   ",                               // leading and trailing whitespace
+    "/*jshint ignore:start */   ",                              // leading and trailing whitespace
     "if (true) { alert('mixed tabs and spaces ignored') }",     // should be ignored
-    "/*jshint ignore:end */   "                                   // leading and trailing whitespace
+    "/*jshint ignore:end */   "                                 // leading and trailing whitespace
   ];
 
   TestRun(test)
@@ -4012,6 +4012,128 @@ exports["jshint ignore:start/end should be detected using single line comments"]
   TestRun(test)
     .addError(4, "'b' is defined but never used.")
     .test(code, { unused: true });
+
+  test.done();
+};
+
+exports["test destructuring function parameters as es5"] = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/destparam.js", "utf8");
+  TestRun(test)
+    .addError(4, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(4, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(5, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(5, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(6, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(6, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(6, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(7, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(7, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(7, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(7, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(10, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(10, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(11, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(11, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(14, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(14, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(15, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(15, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(16, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(16, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(16, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(17, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(17, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(18, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(18, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(21, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(21, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(21, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(22, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(22, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(22, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(23, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(23, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(23, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(24, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(24, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(24, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(27, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(27, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(27, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(28, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(28, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(28, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(29, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(29, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(29, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(30, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(30, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(30, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(31, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(31, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(31, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .test(src, {unused: true, undef: true, maxerr: 100});
+
+  test.done();
+};
+
+exports["test destructuring function parameters as legacy JS"] = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/destparam.js", "utf8");
+  TestRun(test)
+    .addError(4, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(4, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(5, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(5, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(6, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(6, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(6, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(7, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(7, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(7, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(7, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(10, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(10, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(11, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(11, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(14, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(14, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(15, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(15, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(16, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(16, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(16, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(17, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(17, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(18, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(18, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(21, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(21, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(21, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(22, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(22, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(22, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(23, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(23, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(23, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(24, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(24, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(24, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(27, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(27, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(27, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(28, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(28, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(28, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(29, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(29, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(29, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(30, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(30, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(30, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(31, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(31, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(31, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .test(src, {es3: true, unused: true, undef: true, maxerr: 100});
 
   test.done();
 };
