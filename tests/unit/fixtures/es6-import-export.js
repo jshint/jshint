@@ -40,3 +40,12 @@ export var c = "c";
 export class Foo {}
 export class List extends Array {}
 export default class Bar {}
+
+// Alternate default = syntax
+
+export default = { foo: 'foo', bar: 'bar' };
+export default = function() {
+	return "barbaz";
+}
+export default = class Bar {}
+export default = class Bar extends Array {}

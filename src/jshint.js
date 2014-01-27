@@ -4248,8 +4248,14 @@ var JSHINT = (function () {
       warning("W119", state.tokens.curr, "export");
     }
 
+    // Handle special default export situation
     if (state.tokens.next.type === "default") {
       advance("default");
+      // Allow alternate assignment expression syntax; export default = 42;
+      if (state.tokens.next.value === "=") {
+        advance("=");
+      }
+      // Allow export default function() { ... } and class
       if (state.tokens.next.id === "function" || state.tokens.next.id === "class") {
         this.block = true;
       }
