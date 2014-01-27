@@ -980,6 +980,7 @@ exports.passfail = function (test) {
 
   TestRun(test)
     .addError(1, "Missing semicolon.")
+    .addError(1, "Stopping. (33% scanned).")
     .test(code, { es3: true, passfail: true });
 
   test.done();

@@ -31,11 +31,13 @@ exports.other = function (test) {
     .addError(1, "Unexpected '\\'.")
     .addError(2, "Unexpected early end of program.")
     .addError(2, "Expected an identifier and instead saw '(end)'.")
+    .addError(2, "Unrecoverable syntax error. (100% scanned).")
     .test(code, {es3: true});
 
   // GH-818
   TestRun(test)
     .addError(1, "Expected an identifier and instead saw ')'.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
     .test("if (product < ) {}", {es3: true});
 
   test.done();
@@ -345,7 +347,9 @@ exports.regexp = function (test) {
     .addError(17, "Invalid regular expression.")
     .addError(20, "Invalid regular expression.")
     .addError(21, "Invalid regular expression.")
-    .addError(24, "Unclosed regular expression.");
+    .addError(24, "Unclosed regular expression.")
+    .addError(24, "Unrecoverable syntax error. (88% scanned).");
+
   run.test(code, {es3: true});
   run.test(code, {}); // es5
   run.test(code, {esnext: true});
@@ -670,6 +674,7 @@ exports.testHtml = function (test) {
     .addError(1, "Expected an assignment or function call and instead saw an expression.")
     .addError(1, "Missing semicolon.")
     .addError(1, "Expected an identifier and instead saw '<'.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
     .test(html, {});
   test.done();
 };
@@ -4181,7 +4186,10 @@ exports["test destructuring function parameters as es5"] = function (test) {
     .addError(30, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(30, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(30, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
-    .test(src, {unused: true, undef: true});
+    .addError(31, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(31, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(31, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+  .test(src, {unused: true, undef: true, maxerr: 100});
 
   test.done();
 };
@@ -4239,7 +4247,10 @@ exports["test destructuring function parameters as legacy JS"] = function (test)
     .addError(30, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(30, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(30, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
-    .test(src, {es3: true, unused: true, undef: true});
+    .addError(31, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(31, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(31, "'arrow function syntax (=>)' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .test(src, {es3: true, unused: true, undef: true, maxerr: 100});
 
   test.done();
 };
