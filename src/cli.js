@@ -186,7 +186,7 @@ function findFile(name, dir) {
  * @return {array} a list of files to ignore.
  */
 function loadIgnores(exclude, excludePath) {
-  var file = findFile(excludePath || ".jshintignore");
+  var file = findFile(excludePath || ".jshintignore") || findFile(".gitignore");
 
   if (!file && !exclude) {
     return [];
