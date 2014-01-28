@@ -201,7 +201,7 @@ var warnings = {
 
 var info = {
   I001: "Comma warnings can be turned off with 'laxcomma'.",
-  I002: "Reserved words as properties can be used under the 'es5' option.",
+  I002: null,
   I003: "ES5 option is now set per default"
 };
 
