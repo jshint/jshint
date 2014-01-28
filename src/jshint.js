@@ -1576,13 +1576,6 @@ var JSHINT = (function () {
       return val;
     }
 
-    // Display an info message about reserved words as properties
-    // and ES5 but do it only once.
-    if (prop && !api.getCache("displayed:I002")) {
-      api.setCache("displayed:I002", true);
-      warning("I002");
-    }
-
     warning("W024", state.tokens.curr, state.tokens.curr.id);
     return val;
   }
