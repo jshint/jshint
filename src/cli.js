@@ -457,6 +457,13 @@ var exports = {
 
     if (opts.useStdin) {
       cli.withStdin(function (code) {
+        var config = opts.config
+        if (opts.args.fileName && !config) {
+          config = loadNpmConfig(opts.args.fileName) || exports.loadConfig(findConfig(file))
+        }
+
+        config = config || {}
+
         lint(extract(code, opts.extract), results, opts.config || {}, data);
         (opts.reporter || defReporter)(results, data, { verbose: opts.verbose });
         cb(results.length === 0);
