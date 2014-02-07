@@ -462,7 +462,7 @@ var exports = {
       cli.withStdin(function (code) {
         var config = opts.config;
         if (opts.filename && !config) {
-          var filename = path.join(process.cwd(), opts.filename);
+          var filename = path.resolve(opts.filename);
           config = loadNpmConfig(filename) ||
             exports.loadConfig(findConfig(filename));
         }
