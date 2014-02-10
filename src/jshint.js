@@ -4253,7 +4253,7 @@ var JSHINT = (function () {
     if (state.tokens.next.value === "{") {
       advance("{");
       for (;;) {
-        identifier();
+        exported[identifier()] = true;
 
         if (state.tokens.next.value === ",") {
           advance(",");
@@ -4270,20 +4270,25 @@ var JSHINT = (function () {
 
     if (state.tokens.next.id === "var") {
       advance("var");
+      exported[state.tokens.next.value] = true;
       state.syntax["var"].fud.call(state.syntax["var"].fud);
     } else if (state.tokens.next.id === "let") {
       advance("let");
+      exported[state.tokens.next.value] = true;
       state.syntax["let"].fud.call(state.syntax["let"].fud);
     } else if (state.tokens.next.id === "const") {
       advance("const");
+      exported[state.tokens.next.value] = true;
       state.syntax["const"].fud.call(state.syntax["const"].fud);
     } else if (state.tokens.next.id === "function") {
       this.block = true;
       advance("function");
+      exported[state.tokens.next.value] = true;
       state.syntax["function"].fud();
     } else if (state.tokens.next.id === "class") {
       this.block = true;
       advance("class");
+      exported[state.tokens.next.value] = true;
       state.syntax["class"].fud();
     } else {
       error("E024", state.tokens.next, state.tokens.next.value);
