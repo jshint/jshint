@@ -253,6 +253,7 @@ function extract(code, when) {
   var inscript = false;
   var index = 0;
   var js = [];
+  var startOffset;
 
   // Test if current tag is a valid <script> tag.
   function onopen(name, attrs) {
@@ -267,6 +268,7 @@ function extract(code, when) {
     // location information.
     inscript = true;
     js.push.apply(js, code.slice(index, parser.endIndex).match(/\n\r|\n|\r/g));
+    startOffset = null;
   }
 
   function onclose(name) {
@@ -275,17 +277,42 @@ function extract(code, when) {
 
     inscript = false;
     index = parser.startIndex;
+    startOffset = null;
   }
 
   function ontext(data) {
-    if (inscript)
-      js.push(data); // Collect JavaScript code.
+    if (!inscript)
+      return;
+
+    if (!startOffset) {
+      var lines = data.split(/\n\r|\n|\r/);
+      // console.log('' + lines.length, 'lines in\n' + data);
+      lines.some(function (line) {
+        if (!line) return;
+        // console.log('first non empty line', line);
+        startOffset = /^(\s*)/.exec(line)[1];
+        // console.log('start offset "' + startOffset + '"');
+        return true;
+      });
+    }
+
+    if (startOffset) {
+      var lines = data.split(/\n\r|\n|\r/);
+      lines = lines.map(function (line) {
+        return line.replace(startOffset, '');
+      });
+      data = lines.join('\n');
+    }
+
+    js.push(data); // Collect JavaScript code.
   }
 
   var parser = new htmlparser.Parser({ onopentag: onopen, onclosetag: onclose, ontext: ontext });
   parser.parseComplete(code);
 
-  return js.join("");
+  var code = js.join("");
+  // console.log('remaining js code\n' + code);
+  return code;
 }
 
 /**
