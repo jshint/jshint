@@ -294,6 +294,7 @@ function extract(code, when) {
       });
     }
 
+    // check for startOffset again to remove leading white space from first line
     if (startOffset) {
       lines = lines.map(function (line) {
         return line.replace(startOffset, '');
