@@ -284,20 +284,17 @@ function extract(code, when) {
     if (!inscript)
       return;
 
+    var lines = data.split(/\n\r|\n|\r/);
+
     if (!startOffset) {
-      var lines = data.split(/\n\r|\n|\r/);
-      // console.log('' + lines.length, 'lines in\n' + data);
       lines.some(function (line) {
         if (!line) return;
-        // console.log('first non empty line', line);
         startOffset = /^(\s*)/.exec(line)[1];
-        // console.log('start offset "' + startOffset + '"');
         return true;
       });
     }
 
     if (startOffset) {
-      var lines = data.split(/\n\r|\n|\r/);
       lines = lines.map(function (line) {
         return line.replace(startOffset, '');
       });
@@ -310,9 +307,7 @@ function extract(code, when) {
   var parser = new htmlparser.Parser({ onopentag: onopen, onclosetag: onclose, ontext: ontext });
   parser.parseComplete(code);
 
-  var code = js.join("");
-  // console.log('remaining js code\n' + code);
-  return code;
+  return js.join("");
 }
 
 /**
