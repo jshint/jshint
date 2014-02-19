@@ -2159,16 +2159,17 @@ var JSHINT = (function () {
   delim(":").reach = true;
   delim("#");
 
+  type("arguments", function (x) {
+    if (state.directive["use strict"] && funct["(global)"]) {
+      warning("E008", x);
+    }
+  }).identifier = true;
+
   reserve("else");
   reserve("case").reach = true;
   reserve("catch");
   reserve("default").reach = true;
   reserve("finally");
-  reservevar("arguments", function (x) {
-    if (state.directive["use strict"] && funct["(global)"]) {
-      warning("E008", x);
-    }
-  });
   reservevar("eval");
   reservevar("false");
   reservevar("Infinity");
