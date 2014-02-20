@@ -6,6 +6,7 @@ var path        = require("path");
 var shjs        = require("shelljs");
 var minimatch   = require("minimatch");
 var htmlparser  = require("htmlparser2");
+var exit        = require("exit");
 var JSHINT      = require("./jshint.js").JSHINT;
 var defReporter = require("./reporters/default").reporter;
 
@@ -375,6 +376,7 @@ function lint(code, results, config, data, file) {
 
 var exports = {
   extract: extract,
+  exit: exit,
 
   /**
    * Loads and parses a configuration file.
@@ -389,7 +391,7 @@ var exports = {
 
     if (!shjs.test("-e", fp)) {
       cli.error("Can't find config file: " + fp);
-      process.exit(1);
+      exports.exit(1);
     }
 
     try {
@@ -404,7 +406,7 @@ var exports = {
       return config;
     } catch (err) {
       cli.error("Can't parse config file: " + fp);
-      process.exit(1);
+      exports.exit(1);
     }
   },
 
@@ -473,7 +475,7 @@ var exports = {
         code = shjs.cat(file);
       } catch (err) {
         cli.error("Can't open " + file);
-        process.exit(1);
+        exports.exit(1);
       }
 
       lint(extract(code, opts.extract), results, config, data, file);
@@ -540,7 +542,7 @@ var exports = {
 
       if (reporter === null) {
         cli.error("Can't load reporter file: " + options.reporter);
-        process.exit(1);
+        exports.exit(1);
       }
     }
 
@@ -554,19 +556,7 @@ var exports = {
       if (passed == null)
         return;
 
-      // Patch as per https://github.com/visionmedia/mocha/issues/333
-      // fixes issues with piped output on Windows.
-      // Root issue is here https://github.com/joyent/node/issues/3584
-      function exit() { process.exit(passed ? 0 : 2); }
-      try {
-        if (exports.getBufferSize()) {
-          process.stdout.once('drain', exit);
-        } else {
-          exit();
-        }
-      } catch (err) {
-        exit();
-      }
+      exports.exit(passed ? 0 : 2);
     }
 
     done(exports.run({
