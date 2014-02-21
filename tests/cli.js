@@ -7,16 +7,12 @@ var cli   = require("../src/cli.js");
 
 exports.group = {
   setUp: function (cb) {
-    if (!process.stdout.flush) {
-      process.stdout.flush = function () { return true; };
-    }
-
-    sinon.stub(process, "exit");
+    sinon.stub(cli, "exit");
     cb();
   },
 
   tearDown: function (cb) {
-    process.exit.restore();
+    cli.exit.restore();
     cb();
   },
 
@@ -42,8 +38,8 @@ exports.group = {
       .withArgs("-e", sinon.match(/file5\.json$/)).returns(true)
       .withArgs("-e", sinon.match(/file6\.json$/)).returns(true);
 
-    process.exit.restore();
-    sinon.stub(process, "exit").throws("ProcessExit");
+    cli.exit.restore();
+    sinon.stub(cli, "exit").throws("ProcessExit");
 
     // File doesn't exist.
     try {
@@ -81,8 +77,8 @@ exports.group = {
       test.equal(err, "ProcessExit");
     }
 
-    process.exit.restore();
-    sinon.stub(process, "exit");
+    cli.exit.restore();
+    sinon.stub(cli, "exit");
 
     // Merges existing valid files
     cli.interpret([
@@ -122,8 +118,8 @@ exports.group = {
       .withArgs("-e", sinon.match(/prereq.js$/)).returns(true)
       .withArgs("-e", sinon.match(/config.json$/)).returns(true);
 
-    process.exit.restore();
-    sinon.stub(process, "exit")
+    cli.exit.restore();
+    sinon.stub(cli, "exit")
       .withArgs(0).returns(true)
       .withArgs(1).throws("ProcessExit");
 
@@ -147,8 +143,8 @@ exports.group = {
     var dir = __dirname + "/../examples/";
     sinon.stub(process, "cwd").returns(dir);
 
-    process.exit.restore();
-    sinon.stub(process, "exit").throws("ProcessExit");
+    cli.exit.restore();
+    sinon.stub(cli, "exit").throws("ProcessExit");
 
     // Test failed attempt.
     try {
@@ -336,7 +332,7 @@ exports.group = {
     cli.interpret([
       "node", "jshint", "file.js"
     ]);
-    test.equal(process.exit.args[0][0], 0); // lint with wrong package.json
+    test.equal(cli.exit.args[0][0], 0); // lint with wrong package.json
 
     shjs.test.restore();
     shjs.cat.restore();
@@ -361,7 +357,7 @@ exports.group = {
     cli.interpret([
       "node", "jshint", "file.js"
     ]);
-    test.equal(process.exit.args[0][0], 0); // eval allowed = rc file found
+    test.equal(cli.exit.args[0][0], 0); // eval allowed = rc file found
 
     shjs.test.restore();
     shjs.cat.restore();
@@ -385,7 +381,7 @@ exports.group = {
     cli.interpret([
       "node", "jshint", "/file.js"
     ]);
-    test.equal(process.exit.args[0][0], 0); // eval allowed = rc file found
+    test.equal(cli.exit.args[0][0], 0); // eval allowed = rc file found
 
     shjs.test.restore();
     shjs.cat.restore();
@@ -413,7 +409,7 @@ exports.group = {
     cli.interpret([
       "node", "jshint", "file.js"
     ]);
-    test.equal(process.exit.args[0][0], 0); // eval allowed = rc file found
+    test.equal(cli.exit.args[0][0], 0); // eval allowed = rc file found
 
     shjs.test.restore();
     shjs.cat.restore();
@@ -440,7 +436,7 @@ exports.group = {
     cli.interpret([
       "node", "jshint", srcFile
     ]);
-    test.equal(process.exit.args[0][0], 0); // eval allowed = rc file found
+    test.equal(cli.exit.args[0][0], 0); // eval allowed = rc file found
 
     shjs.test.restore();
     shjs.cat.restore();
@@ -765,8 +761,8 @@ exports.group = {
       .withArgs(sinon.match(/\.jshintrc$/)).returns("{}")
       .withArgs(sinon.match(/\.jshintignore$/)).returns("");
 
-    process.exit.restore();
-    sinon.stub(process, "exit");
+    cli.exit.restore();
+    sinon.stub(cli, "exit");
 
     cli.interpret([
       "node", "jshint", "pass.js", "--reporter=reporter.js"
@@ -776,62 +772,13 @@ exports.group = {
       "node", "jshint", "fail.js", "--reporter=reporter.js"
     ]);
 
-    test.strictEqual(process.exit.args[0][0], 0);
-    test.equal(process.exit.args[1][0], 2);
+    test.strictEqual(cli.exit.args[0][0], 0);
+    test.equal(cli.exit.args[1][0], 2);
 
     rep.reporter.restore();
     process.cwd.restore();
     shjs.test.restore();
     shjs.cat.restore();
-
-    test.done();
-  },
-
-  testDrainCalledWhenThereIsBufferedOutput: function (test) {
-    var dir = __dirname + "/../examples/";
-    sinon.stub(cli, "run").returns(false);
-    sinon.stub(cli, "getBufferSize").returns(1);
-    sinon.stub(process, "cwd").returns(dir);
-    sinon.stub(process.stdout, "on", function (name, func) {
-      func();
-    });
-
-    process.exit.restore();
-    sinon.stub(process, "exit");
-
-    cli.interpret(["node", "jshint", "reporter.js"]);
-    test.equal(process.stdout.on.callCount, 1);
-    test.equal(process.stdout.on.args[0][0], "drain");
-    test.strictEqual(process.exit.args[0][0], 2);
-
-    process.cwd.restore();
-    process.stdout.on.restore();
-    cli.run.restore();
-    cli.getBufferSize.restore();
-
-    test.done();
-  },
-
-  testDrainNotCalledWhenThereIsNoBufferedOutput: function (test) {
-    var dir = __dirname + "/../examples/";
-    sinon.stub(cli, "run").returns(false);
-    sinon.stub(cli, "getBufferSize").returns(0);
-    sinon.stub(process, "cwd").returns(dir);
-    sinon.stub(process.stdout, "on", function (name, func) {
-      func();
-    });
-
-    process.exit.restore();
-    sinon.stub(process, "exit");
-
-    cli.interpret(["node", "jshint", "reporter.js"]);
-    test.equal(process.stdout.on.callCount, 0);
-    test.strictEqual(process.exit.args[0][0], 2);
-
-    process.cwd.restore();
-    process.stdout.on.restore();
-    cli.run.restore();
-    cli.getBufferSize.restore();
 
     test.done();
   }
