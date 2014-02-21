@@ -1,4 +1,4 @@
-// 2.4.3
+// 2.4.4
 var JSHINT;
 if (typeof window === 'undefined') window = {};
 (function () {
@@ -52732,9 +52732,7 @@ function assert(expression) {
 
 }).call(this);
 
-},{}],"jshint":[function(require,module,exports){
-module.exports=require('nr+AlQ');
-},{}],"nr+AlQ":[function(require,module,exports){
+},{}],"lGT9nC":[function(require,module,exports){
 /*!
  * JSHint, by JSHint Community.
  *
@@ -54314,13 +54312,6 @@ var JSHINT = (function () {
       return val;
     }
 
-    // Display an info message about reserved words as properties
-    // and ES5 but do it only once.
-    if (prop && !api.getCache("displayed:I002")) {
-      api.setCache("displayed:I002", true);
-      warning("I002");
-    }
-
     warning("W024", state.tokens.curr, state.tokens.curr.id);
     return val;
   }
@@ -55322,7 +55313,6 @@ var JSHINT = (function () {
 
       i += 1;
       pn1 = peek(i);
-      i += 1;
     } while (!(parens === 0 && pn.value === ")") &&
              pn1.value !== "=>" && pn1.value !== ";" && pn1.type !== "(end)");
 
@@ -55544,15 +55534,7 @@ var JSHINT = (function () {
       if (Array.isArray(parsed)) {
         for (var i in parsed) {
           curr = parsed[i];
-          if (_.contains(["{", "["], curr.id)) {
-            for (t in curr.left) {
-              t = tokens[t];
-              if (t && t.id) {
-                params.push(t.id);
-                addlabel(t.id, { type: "unused", token: t.token });
-              }
-            }
-          } else if (curr.value === "...") {
+          if (curr.value === "...") {
             if (!state.option.inESNext()) {
               warning("W104", curr, "spread/rest operator");
             }
@@ -56953,12 +56935,20 @@ var JSHINT = (function () {
       warning("W119", state.tokens.curr, "import");
     }
 
+    if (state.tokens.next.type === "(string)") {
+      advance("(string)");
+      return this;
+    }
     if (state.tokens.next.identifier) {
       this.name = identifier();
       addlabel(this.name, { type: "unused", token: state.tokens.curr });
     } else {
       advance("{");
       for (;;) {
+        if (state.tokens.next.value === "}") {
+          advance("}");
+          break;
+        }
         var importName;
         if (state.tokens.next.type === "default") {
           importName = "default";
@@ -57007,7 +56997,7 @@ var JSHINT = (function () {
     if (state.tokens.next.value === "{") {
       advance("{");
       for (;;) {
-        identifier();
+        exported[identifier()] = true;
 
         if (state.tokens.next.value === ",") {
           advance(",");
@@ -57024,20 +57014,25 @@ var JSHINT = (function () {
 
     if (state.tokens.next.id === "var") {
       advance("var");
+      exported[state.tokens.next.value] = true;
       state.syntax["var"].fud.call(state.syntax["var"].fud);
     } else if (state.tokens.next.id === "let") {
       advance("let");
+      exported[state.tokens.next.value] = true;
       state.syntax["let"].fud.call(state.syntax["let"].fud);
     } else if (state.tokens.next.id === "const") {
       advance("const");
+      exported[state.tokens.next.value] = true;
       state.syntax["const"].fud.call(state.syntax["const"].fud);
     } else if (state.tokens.next.id === "function") {
       this.block = true;
       advance("function");
+      exported[state.tokens.next.value] = true;
       state.syntax["function"].fud();
     } else if (state.tokens.next.id === "class") {
       this.block = true;
       advance("class");
+      exported[state.tokens.next.value] = true;
       state.syntax["class"].fud();
     } else {
       error("E024", state.tokens.next, state.tokens.next.value);
@@ -57886,7 +57881,9 @@ if (typeof exports === "object" && exports) {
   exports.JSHINT = JSHINT;
 }
 
-},{"./lex.js":14,"./messages.js":15,"./reg.js":16,"./state.js":17,"./style.js":18,"./vars.js":19,"console-browserify":10,"events":5,"underscore":11}],14:[function(require,module,exports){
+},{"./lex.js":14,"./messages.js":15,"./reg.js":16,"./state.js":17,"./style.js":18,"./vars.js":19,"console-browserify":10,"events":5,"underscore":11}],"jshint":[function(require,module,exports){
+module.exports=require('lGT9nC');
+},{}],14:[function(require,module,exports){
 /*
  * Lexical analysis and token construction.
  */
@@ -59706,7 +59703,7 @@ var warnings = {
 
 var info = {
   I001: "Comma warnings can be turned off with 'laxcomma'.",
-  I002: "Reserved words as properties can be used under the 'es5' option.",
+  I002: null,
   I003: "ES5 option is now set per default"
 };
 
@@ -60380,10 +60377,12 @@ exports.rhino = {
   deserialize  : false,
   gc           : false,
   help         : false,
+  importClass  : false,
   importPackage: false,
   "java"       : false,
   load         : false,
   loadClass    : false,
+  Packages     : false,
   print        : false,
   quit         : false,
   readFile     : false,
@@ -60565,7 +60564,7 @@ exports.yui = {
 };
 
 
-},{}]},{},["nr+AlQ"])
+},{}]},{},["lGT9nC"])
 JSHINT = require('jshint').JSHINT;
 if (typeof exports === 'object' && exports) exports.JSHINT = JSHINT;
 }());
