@@ -28,7 +28,7 @@ module.exports = {
     });
 
     if (str) {
-      process.stdout.write(str + "\n" + len + ' error' + ((len === 1) ? '' : 's') + "\n");
+      console.log(str + "\n" + len + ' error' + ((len === 1) ? '' : 's'));
     }
   }
 };

@@ -76,6 +76,6 @@ module.exports =
 
     out.push("</checkstyle>");
 
-    process.stdout.write(out.join("\n") + "\n");
+    console.log(out.join("\n"));
   }
 };
