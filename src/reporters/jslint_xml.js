@@ -52,6 +52,6 @@ module.exports =
 
     out.push("</jslint>");
 
-    process.stdout.write(out.join("\n") + "\n");
+    console.log(out.join("\n") + "\n");
   }
 };
