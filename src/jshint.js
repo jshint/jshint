@@ -4199,12 +4199,20 @@ var JSHINT = (function () {
       warning("W119", state.tokens.curr, "import");
     }
 
+    if (state.tokens.next.type === "(string)") {
+      advance("(string)");
+      return this;
+    }
     if (state.tokens.next.identifier) {
       this.name = identifier();
       addlabel(this.name, { type: "unused", token: state.tokens.curr });
     } else {
       advance("{");
       for (;;) {
+        if (state.tokens.next.value === "}") {
+          advance("}");
+          break;
+        }
         var importName;
         if (state.tokens.next.type === "default") {
           importName = "default";
