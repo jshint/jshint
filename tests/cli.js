@@ -281,6 +281,22 @@ exports.group = {
     test.done();
   },
 
+  textExtractWithIndent: function (test) {
+    var html = [
+      "<html>",
+        "<script type='text/javascript'>",
+        "  var a = 1;",
+        "    var b = 1;",
+        "</script>",
+      "</html>" ].join("\n");
+
+    // leading whitespace is removed by amount from first js line
+    var js = ["\n", "var a = 1;", "  var b = 1;\n"].join("\n");
+
+    test.equal(cli.extract(html, "auto"), js);
+    test.done();
+  },
+
   testExtensions: function (test) {
     var run = sinon.stub(cli, "run");
 
