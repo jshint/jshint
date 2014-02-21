@@ -244,7 +244,7 @@ exports.group = {
     test.done();
   },
 
-  textExtract: function (test) {
+  testExtract: function (test) {
     var html = "<html>text<script>var a = 1;</script></html>";
     var text = "hello world";
     var js   = "var a = 1;";
@@ -276,6 +276,22 @@ exports.group = {
       "</html>" ].join("\n");
 
     js = ["\n", "var a = 1;", "\n\n\n\n\n", "var b = 1;\n" ].join("\n");
+
+    test.equal(cli.extract(html, "auto"), js);
+    test.done();
+  },
+
+  testExtractWithIndent: function (test) {
+    var html = [
+      "<html>",
+        "<script type='text/javascript'>",
+        "  var a = 1;",
+        "    var b = 1;",
+        "</script>",
+      "</html>" ].join("\n");
+
+    // leading whitespace is removed by amount from first js line
+    var js = ["\n", "var a = 1;", "  var b = 1;\n"].join("\n");
 
     test.equal(cli.extract(html, "auto"), js);
     test.done();
