@@ -661,6 +661,53 @@ exports.testES6Modules = function (test) {
   test.done();
 };
 
+exports.testES6ModulesNamedExportsAffectUnused = function (test) {
+  // Named Exports should count as used
+  var src1 = [
+    "var a = {",
+    "  foo: 'foo',",
+    "  bar: 'bar'",
+    "};",
+    "var x = 23;",
+    "var z = 42;",
+    "export { a, x };",
+    "export var b = { baz: 'baz' };",
+    "export function boo() { return z; }",
+    "export class MyClass { }"
+  ];
+
+  TestRun(test)
+    .test(src1, {
+      esnext: true,
+      unused: true
+    });
+
+  test.done();
+};
+
+exports.testES6ModulesDefaultExportsAffectUnused = function (test) {
+  // Default Exports should count as used
+  var src1 = [
+    "var a = {",
+    "  foo: 'foo',",
+    "  bar: 'bar'",
+    "};",
+    "var x = 23;",
+    "var z = 42;",
+    "export default { a: a, x: x };",
+    "export default function boo() { return x + z; }",
+    "export default class MyClass { }"
+  ];
+
+  TestRun(test)
+    .test(src1, {
+      esnext: true,
+      unused: true
+    });
+
+  test.done();
+};
+
 exports.testPotentialVariableLeak = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/leak.js", "utf8");
 

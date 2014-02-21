@@ -3565,7 +3565,7 @@ stmt("export", function () {
   if (state.tokens.next.value === "{") {
     advance("{");
     for (;;) {
-      identifier();
+      exported[identifier()] = true;
 
       if (state.tokens.next.value === ",") {
         advance(",");
@@ -3582,20 +3582,25 @@ stmt("export", function () {
 
   if (state.tokens.next.id === "var") {
     advance("var");
+    exported[state.tokens.next.value] = true;
     syntax["var"].fud.call(syntax["var"].fud);
   } else if (state.tokens.next.id === "let") {
     advance("let");
+    exported[state.tokens.next.value] = true;
     syntax["let"].fud.call(syntax["let"].fud);
   } else if (state.tokens.next.id === "const") {
     advance("const");
+    exported[state.tokens.next.value] = true;
     syntax["const"].fud.call(syntax["const"].fud);
   } else if (state.tokens.next.id === "function") {
     this.block = true;
     advance("function");
+    exported[state.tokens.next.value] = true;
     syntax["function"].fud();
   } else if (state.tokens.next.id === "class") {
     this.block = true;
     advance("class");
+    exported[state.tokens.next.value] = true;
     syntax["class"].fud();
   } else {
     warn("E024", { token: state.tokens.next, args: [state.tokens.next.value] });
