@@ -2544,6 +2544,26 @@ exports["test: mozilla generator as esnext"] = function (test) {
   test.done();
 };
 
+exports["test: yield statement within try-catch"] = function (test) {
+  // see issue: https://github.com/jshint/jshint/issues/1505
+  var code = [
+    "function* fib() {",
+    "  try {",
+    "    yield 1;",
+    "  } catch (err) {",
+    "    yield err;",
+    "  }",
+    "}",
+    "var g = fib();",
+    "for (let i = 0; i < 10; i++)",
+    "  print(g.next());"
+  ];
+  TestRun(test)
+    .test(code, {esnext: true, unused: true, undef: true, predef: ["print", "Iterator"]});
+
+  test.done();
+};
+
 exports["test: mozilla generator as es5"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [

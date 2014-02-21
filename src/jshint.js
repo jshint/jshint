@@ -4160,7 +4160,10 @@ var JSHINT = (function () {
   }(prefix("yield", function () {
     var prev = state.tokens.prev;
     if (state.option.inESNext(true) && !funct["(generator)"]) {
-      error("E046", state.tokens.curr, "yield");
+      // If it's a yield within a catch clause inside a generator then that's ok
+      if (!("(catch)" === funct["(name)"] && funct["(context)"]["(generator)"])) {
+        error("E046", state.tokens.curr, "yield");
+      }
     } else if (!state.option.inESNext()) {
       warning("W104", state.tokens.curr, "yield");
     }
