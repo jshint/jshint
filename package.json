@@ -38,7 +38,8 @@
     "cli":         "0.4.x",
     "minimatch":   "0.x.x",
     "htmlparser2": "3.3.x",
-    "console-browserify": "0.1.x"
+    "console-browserify": "0.1.x",
+    "exit": "0.1.x"
   },
 
   "devDependencies": {
