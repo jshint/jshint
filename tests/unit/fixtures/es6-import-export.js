@@ -4,6 +4,8 @@ import $ from "jquery";
 import { get as emGet, set } from "ember";
 import { one } from "foo";
 import { default as _ } from "underscore";
+import {} from "ember";
+import "ember";
 
 $.ajax();
 emGet("foo");
