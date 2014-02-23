@@ -1944,7 +1944,7 @@ var JSHINT = (function () {
       delete funct["(nolet)"];
     }
 
-    // Don't clear and let it propagate out if it is "break", "return", "throw" or similar in switch case
+    // Don't clear and let it propagate out if it is "break", "return" or similar in switch case
     switch (funct["(verb)"]) {
     case "break":
     case "continue":
