@@ -3,10 +3,10 @@ function hello () {
 }
 
 var bye = function() {
-    if(hey){
-        // Next two lines have a trailing whitespace
+    if(hey){ // Next two lines have trailing whitespace
+        
         return; 
-    } 
+    }
 };
 
 try {

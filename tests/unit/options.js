@@ -1208,8 +1208,8 @@ exports.trailing = function (test) {
   TestRun(test).test(src, {es3: true});
 
   TestRun(test)
+    .addError(7, "Trailing whitespace.", { character: 1 })
     .addError(8, "Trailing whitespace.", { character: 16 })
-    .addError(9, "Trailing whitespace.", { character: 6 })
     .test(src, { es3: true, trailing: true });
 
   test.done();

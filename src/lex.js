@@ -1279,10 +1279,8 @@ Lexer.prototype = {
         this.skip();
       }
 
-      if (this.peek() === "") { // EOL
-        if (!/^\s*$/.test(this.getLines()[this.line - 1]) && state.option.trailing) {
-          this.trigger("warning", { code: "W102", line: this.line, character: start });
-        }
+      if (state.option.trailing && this.peek() === "") { // EOL
+        this.trigger("warning", { code: "W102", line: this.line, character: start });
       }
     }
 
