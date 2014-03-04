@@ -255,6 +255,7 @@ function extract(code, when) {
   var index = 0;
   var js = [];
   var startOffset;
+  var offsets = [];
 
   // Test if current tag is a valid <script> tag.
   function onopen(name, attrs) {
@@ -288,7 +289,7 @@ function extract(code, when) {
     var lines = data.split(/\n\r|\n|\r/);
 
     if (!startOffset) {
-      lines.some(function (line) {
+      lines.some(function (line, k) {
         if (!line) return;
         startOffset = /^(\s*)/.exec(line)[1];
         return true;
@@ -297,7 +298,7 @@ function extract(code, when) {
 
     // check for startOffset again to remove leading white space from first line
     if (startOffset) {
-      lines = lines.map(function (line) {
+      lines = lines.map(function (line, k) {
         return line.replace(startOffset, '');
       });
       data = lines.join('\n');
@@ -310,6 +311,93 @@ function extract(code, when) {
   parser.parseComplete(code);
 
   return js.join("");
+}
+
+/**
+ * Crude version of source maps: extract how much JavaSscript in HTML
+ * was shifted based on first JS line. For example if first js line
+ * is offset by 4 spaces, each line in this js fragment will have offset 4
+ * to restore the original column.
+ *
+ * @param {string} code a piece of code
+ * @param {string} when 'always' will extract the JS code, no matter what.
+ * 'never' won't do anything. 'auto' will check if the code looks like HTML
+ * before extracting it.
+ *
+ * @return {Array} extracted offsets
+ */
+function extractOffsets(code, when) {
+  // A JS file won't start with a less-than character, whereas a HTML file
+  // should always start with that.
+  if (when !== "always" && (when !== "auto" || !/^\s*</.test(code)))
+    return;
+
+  var inscript = false;
+  var index = 0;
+  var lineCounter = 0;
+  var startOffset;
+  var offsets = [];
+
+  // Test if current tag is a valid <script> tag.
+  function onopen(name, attrs) {
+    if (name !== "script")
+      return;
+
+    if (attrs.type && !/text\/javascript/.test(attrs.type.toLowerCase()))
+      return;
+
+    // Mark that we're inside a <script> a tag and push all new lines
+    // in between the last </script> tag and this <script> tag to preserve
+    // location information.
+    inscript = true;
+    var n = code.slice(index, parser.endIndex).match(/\n\r|\n|\r/g).length;
+    // lineCounter += n;
+    console.log('line counter', n);
+    startOffset = null;
+  }
+
+  function onclose(name) {
+    if (name !== "script" || !inscript)
+      return;
+
+    inscript = false;
+    index = parser.startIndex;
+    startOffset = null;
+  }
+
+  function ontext(data) {
+    if (!inscript)
+      return;
+
+    var lines = data.split(/\n\r|\n|\r/);
+
+    if (!startOffset) {
+      lines.some(function (line) {
+        if (!line) return;
+        startOffset = /^(\s*)/.exec(line)[1];
+        return true;
+      });
+    }
+
+    // check for startOffset again to remove leading white space from first line
+    if (startOffset) {
+      lines.forEach(function (line) {
+        offsets[lineCounter] = startOffset.length;
+        lineCounter += 1;
+      });
+    } else {
+      lines.forEach(function (line) {
+        lineCounter += 1;
+      });
+    }
+  }
+
+  var parser = new htmlparser.Parser({ onopentag: onopen, onclosetag: onclose, ontext: ontext });
+  parser.parseComplete(code);
+
+  console.log('offsets');
+  console.log(offsets);
+  return offsets;
 }
 
 /**
@@ -502,6 +590,19 @@ var exports = {
       }
 
       lint(extract(code, opts.extract), results, config, data, file);
+
+      if (results.length) {
+        var offsets = extractOffsets(code, opts.extract);
+        if (offsets && offsets.length) {
+          results.forEach(function (errorInfo) {
+            var line = errorInfo.error.line;
+            if (line >= 0 && line < offsets.length) {
+              var offset = +offsets[line];
+              errorInfo.error.character += offset;
+            }
+          });
+        }
+      }
     });
 
     (opts.reporter || defReporter)(results, data, { verbose: opts.verbose });
