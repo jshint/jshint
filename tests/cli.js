@@ -832,5 +832,62 @@ exports.group = {
     test.equal(lintError.character, 5, "first misaligned character at column 5");
 
     test.done();
+  },
+
+  testExtractWithIndentReportLocationMultipleFragments: function (test) {
+    var rep = require("../examples/reporter.js");
+    var errors = [];
+    sinon.stub(rep, "reporter", function (res) {
+      errors = errors.concat(res);
+    });
+
+    var dir = __dirname + "/../examples/";
+    sinon.stub(process, "cwd").returns(dir);
+
+    var html = [
+      "<html>",
+      "<script type='text/javascript'>",
+      "  /* jshint indent: 2*/",
+      "  var a = 1;",
+      "    var b = 1;", // misindented on purpose
+      "</script>",
+      "<p>nothing</p>",
+      "<script type='text/javascript'>",
+      "  /* jshint indent: 2*/",
+      "      var a = 1;", // misindented on purpose
+      "</script>",
+      "</html>"
+    ].join("\n");
+
+    sinon.stub(shjs, "cat")
+      .withArgs(sinon.match(/indent\.html$/)).returns(html)
+      .withArgs(sinon.match(/.\jshintignore$/)).returns("");
+
+    sinon.stub(shjs, "test")
+      .withArgs("-e", sinon.match(/indent\.html$/)).returns(true)
+      .withArgs("-e", sinon.match(/\.jshintignore$/)).returns(false);
+
+    cli.exit.restore();
+    sinon.stub(cli, "exit");
+
+    cli.interpret([
+      "node", "jshint", "indent.html", "--extract", "always", "--reporter=reporter.js"
+    ]);
+    test.equal(cli.exit.args[0][0], 1);
+
+    rep.reporter.restore();
+    process.cwd.restore();
+    shjs.cat.restore();
+    shjs.test.restore();
+
+    test.equal(errors.length, 2, "found two errors");
+
+    test.equal(errors[0].error.line, 5, "first error line");
+    test.equal(errors[0].error.character, 5, "first error column");
+
+    test.equal(errors[1].error.line, 10, "second error line");
+    test.equal(errors[1].error.character, 7, "second error column");
+
+    test.done();
   }
 };
