@@ -255,7 +255,6 @@ function extract(code, when) {
   var index = 0;
   var js = [];
   var startOffset;
-  var offsets = [];
 
   // Test if current tag is a valid <script> tag.
   function onopen(name, attrs) {
@@ -289,7 +288,7 @@ function extract(code, when) {
     var lines = data.split(/\n\r|\n|\r/);
 
     if (!startOffset) {
-      lines.some(function (line, k) {
+      lines.some(function (line) {
         if (!line) return;
         startOffset = /^(\s*)/.exec(line)[1];
         return true;
@@ -298,10 +297,10 @@ function extract(code, when) {
 
     // check for startOffset again to remove leading white space from first line
     if (startOffset) {
-      lines = lines.map(function (line, k) {
-        return line.replace(startOffset, '');
+      lines = lines.map(function (line) {
+        return line.replace(startOffset, "");
       });
-      data = lines.join('\n');
+      data = lines.join("\n");
     }
 
     js.push(data); // Collect JavaScript code.
@@ -350,9 +349,9 @@ function extractOffsets(code, when) {
     // in between the last </script> tag and this <script> tag to preserve
     // location information.
     inscript = true;
-    var n = code.slice(index, parser.endIndex).match(/\n\r|\n|\r/g).length;
-    // lineCounter += n;
-    console.log('line counter', n);
+    var fragment = code.slice(index, parser.endIndex);
+    var n = fragment.match(/\n\r|\n|\r/g).length;
+    lineCounter += n;
     startOffset = null;
   }
 
@@ -380,23 +379,18 @@ function extractOffsets(code, when) {
     }
 
     // check for startOffset again to remove leading white space from first line
-    if (startOffset) {
-      lines.forEach(function (line) {
+    lines.forEach(function () {
+      lineCounter += 1;
+      if (startOffset) {
         offsets[lineCounter] = startOffset.length;
-        lineCounter += 1;
-      });
-    } else {
-      lines.forEach(function (line) {
-        lineCounter += 1;
-      });
-    }
+      } else {
+        offsets[lineCounter] = 0;
+      }
+    });
   }
 
   var parser = new htmlparser.Parser({ onopentag: onopen, onclosetag: onclose, ontext: ontext });
   parser.parseComplete(code);
-
-  console.log('offsets');
-  console.log(offsets);
   return offsets;
 }
 
