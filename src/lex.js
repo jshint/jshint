@@ -1367,7 +1367,7 @@ Lexer.prototype = {
     this.input = this.input.replace(/\t/g, state.tab);
     char = this.scanUnsafeChars();
 
-    if (char >= 0) {
+    if (state.option.unsafechars && char >= 0) {
       this.trigger("warning", { code: "W100", line: this.line, character: char });
     }
 

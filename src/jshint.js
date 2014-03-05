@@ -154,8 +154,9 @@ var JSHINT = (function () {
       // Obsolete options
       onecase     : true, // if one case switch statements should be allowed
       regexp      : true, // if the . should not be allowed in regexp literals
-      regexdash   : true  // if unescaped first/last dash (-) inside brackets
+      regexdash   : true, // if unescaped first/last dash (-) inside brackets
                           // should be tolerated
+      unsafechars : true  // if unsafe (not UTF-8) characters should be allowed
     },
 
     // These are the JSHint options that can take any value
