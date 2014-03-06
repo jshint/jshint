@@ -710,6 +710,15 @@ exports.testES6ModulesDefaultExportsAffectUnused = function (test) {
   test.done();
 };
 
+exports.testES6TemplateLiterals = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/es6-template-literal.js", "utf8");
+  TestRun(test)
+    .addError(6, "Unclosed template literal.")
+    .addError(6, "Missing semicolon.")
+    .test(src, { esnext: true });
+  test.done();
+};
+
 exports.testPotentialVariableLeak = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/leak.js", "utf8");
 
