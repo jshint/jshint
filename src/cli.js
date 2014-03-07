@@ -1,14 +1,15 @@
 "use strict";
 
-var _           = require("underscore");
-var cli         = require("cli");
-var path        = require("path");
-var shjs        = require("shelljs");
-var minimatch   = require("minimatch");
-var htmlparser  = require("htmlparser2");
-var jshint      = require("./jshint.js");
-var exit        = require("exit");
-var defReporter = require("./reporters/default").reporter;
+var _                 = require("underscore");
+var cli               = require("cli");
+var path              = require("path");
+var shjs              = require("shelljs");
+var minimatch         = require("minimatch");
+var htmlparser        = require("htmlparser2");
+var jshint            = require("./jshint.js");
+var exit              = require("exit");
+var stripJsonComments = require("strip-json-comments");
+var defReporter       = require("./reporters/default").reporter;
 
 var OPTIONS = {
   "config": ["c", "Custom configuration file", "string", false ],
@@ -56,29 +57,6 @@ function deprecated(text, alt) {
   }
 
   return text + " (DEPRECATED, use " + alt + " instead)";
-}
-
-/**
- * Removes JavaScript comments from a string by replacing
- * everything between block comments and everything after
- * single-line comments in a non-greedy way.
- *
- * English version of the regex:
- *   match '/*'
- *   then match zero or more instances of any character (incl. \n)
- *   except for instances of '* /' (without a space, obv.)
- *   then match '* /' (again, without a space)
- *
- * @param {string} str a string with potential JavaScript comments.
- * @returns {string} a string without JavaScript comments.
- */
-function removeComments(str) {
-  str = str || "";
-
-  str = str.replace(/\/\*(?:(?!\*\/)[\s\S])*\*\//g, "");
-  str = str.replace(/\/\/[^\n\r]*/g, ""); // Everything after '//'
-
-  return str;
 }
 
 /**
@@ -419,7 +397,7 @@ var exports = {
     }
 
     try {
-      var config = JSON.parse(removeComments(shjs.cat(fp)));
+      var config = JSON.parse(stripJsonComments(shjs.cat(fp)));
       config.dirname = path.dirname(fp);
 
       if (config['extends']) {
