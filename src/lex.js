@@ -28,7 +28,8 @@ var Token = {
   Keyword: 6,
   NullLiteral: 7,
   BooleanLiteral: 8,
-  RegExp: 9
+  RegExp: 9,
+  TemplateLiteral: 10
 };
 
 // Object that handles postponed lexing verifications that checks the parsed
@@ -845,6 +846,62 @@ Lexer.prototype = {
   },
 
   /*
+   * Extract a template literal out of the next sequence of characters
+   * and/or lines or return 'null' if its not possible. Since template
+   * literals can span across multiple lines, this method has to move
+   * the char pointer.
+   */
+  scanTemplateLiteral: function () {
+    // String must start with a backtick.
+    if (!state.option.esnext || this.peek() !== "`") {
+      return null;
+    }
+
+    var startLine = this.line;
+    var startChar = this.char;
+    var jump = 1;
+    var value = "";
+
+    // For now, do not perform any linting of the content of the template
+    // string. Just skip until the next backtick is found.
+    this.skip();
+
+    while (this.peek() !== "`") {
+      while (this.peek() === "") {
+        // End of line --- For template literals in ES6, no backslash is
+        // required to precede newlines.
+        if (!this.nextLine()) {
+          this.trigger("error", {
+            code: "E052",
+            line: startLine,
+            character: startChar
+          });
+
+          return {
+            type: Token.TemplateLiteral,
+            value: value,
+            isUnclosed: true
+          };
+        }
+        value += "\n";
+      }
+
+      // TODO: do more interesting linting here, similar to string literal
+      // linting.
+      var char = this.peek();
+      this.skip(jump);
+      value += char;
+    }
+
+    this.skip();
+    return {
+      type: Token.TemplateLiteral,
+      value: value,
+      isUnclosed: false
+    };
+  },
+
+  /*
    * Extract a string out of the next sequence of characters and/or
    * lines or return 'null' if its not possible. Since strings can
    * span across multiple lines this method has to move the char
@@ -1290,7 +1347,8 @@ Lexer.prototype = {
     // character pointer.
 
     var match = this.scanComments() ||
-      this.scanStringLiteral(checks);
+      this.scanStringLiteral(checks) ||
+      this.scanTemplateLiteral();
 
     if (match) {
       return match;
@@ -1529,6 +1587,16 @@ Lexer.prototype = {
         }, checks, function () { return true; });
 
         return create("(string)", token.value);
+
+      case Token.TemplateLiteral:
+        this.trigger("Template", {
+          line: this.line,
+          char: this.char,
+          from: this.from,
+          value: token.value
+        });
+        return create("(template)", token.value);
+
       case Token.Identifier:
         this.trigger("Identifier", {
           line: this.line,
