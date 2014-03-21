@@ -1944,8 +1944,19 @@ var JSHINT = (function () {
 
       delete funct["(nolet)"];
     }
-    // Don't clear and let it propagate out if it is "break", "return", or "throw" in switch case
-    if (!(iscase && ["break", "return", "throw"].indexOf(funct["(verb)"]) != -1)) {
+
+    // Don't clear and let it propagate out if it is "break", "return" or similar in switch case
+    switch (funct["(verb)"]) {
+    case "break":
+    case "continue":
+    case "return":
+    case "throw":
+      if (iscase) {
+        break;
+      }
+
+      /* falls through */
+    default:
       funct["(verb)"] = null;
     }
 
