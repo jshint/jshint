@@ -1517,6 +1517,10 @@ type("(string)", function () {
   return this;
 });
 
+type("(template)", function() {
+  return this;
+});
+
 syntax["(identifier)"] = {
   type: "(identifier)",
   lbp: 0,
@@ -3903,7 +3907,7 @@ function parse(input, options, program) {
   warnings = 0;
 
   // Configure and start lexer
-  lex = new Lexer(input, { indent: state.option.indent });
+  lex = new Lexer(input, { indent: state.option.indent, esnext: state.option.esnext });
 
   lex.on("warning", function (ev) {
     warn(ev.code, { coord: { line: ev.line, ch: ev.character }, args: ev.data });
