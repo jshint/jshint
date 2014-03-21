@@ -1991,6 +1991,10 @@ var JSHINT = (function () {
     return this;
   });
 
+  type("(template)", function () {
+    return this;
+  });
+
   state.syntax["(identifier)"] = {
     type: "(identifier)",
     lbp: 0,
