@@ -3938,6 +3938,32 @@ exports["test for 'break' in switch case + curly braces"] = function (test) {
   test.done();
 };
 
+exports["test for 'break' in switch case in loop + curly braces"] = function (test) {
+  var code = [
+    "while (true) {",
+    "  switch (foo) {",
+    "    case 1: { break; }",
+    "    case 2: { return; }",
+    "    case 3: { throw 'Error'; }",
+    "    case 4: { continue; }",
+    "    case 11: {",
+    "      while (true) {",
+    "        break;",
+    "      }",
+    "    }",
+    "    default: break;",
+    "  }",
+    "}"
+  ];
+
+  // No error for case 1, 2, 3, 4.
+  var run = TestRun(test)
+    .addError(11, "Expected a 'break' statement before 'default'.")
+    .test(code);
+
+  test.done();
+};
+
 exports["/*jshint ignore */ should be a good option and only accept start, end or line as values"] = function (test) {
   var code = [
     "/*jshint ignore:start*/",
