@@ -17,7 +17,7 @@ var OPTIONS = {
   "exclude": ["exclude",
     "Exclude files matching the given filename pattern (same as .jshintignore)", "string", null],
   "exclude-path": ["exclude-path", "Pass in a custom jshintignore file path", "string", null],
-  "filename": ["filename", 
+  "filename": ["filename",
     "Pass in a filename when using STDIN to emulate config lookup for that file name",
     "string", null],
   "verbose": ["verbose", "Show message codes"],
@@ -465,6 +465,13 @@ var exports = {
   exit: exit,
 
   /**
+   * Returns a configuration file or nothing, if it can't be found.
+   */
+  getConfig: function (fp) {
+    return loadNpmConfig(fp) || exports.loadConfig(findConfig(fp));
+  },
+
+  /**
    * Loads and parses a configuration file.
    *
    * @param {string} fp a path to the config file
@@ -563,7 +570,7 @@ var exports = {
     }
 
     files.forEach(function (file) {
-      var config = opts.config || loadNpmConfig(file) || exports.loadConfig(findConfig(file));
+      var config = opts.config || exports.getConfig(file);
       var code;
 
       try {
