@@ -77,7 +77,7 @@ var warnings = {
   W004: "'{a}' is already defined.",
   W005: "A dot following a number can be confused with a decimal point.",
   W006: "Confusing minuses.",
-  W007: "Confusing pluses.",
+  W007: "Confusing plusses.",
   W008: "A leading decimal point can be confused with a dot: '{a}'.",
   W009: "The array literal notation [] is preferable.",
   W010: "The object literal notation {} is preferable.",
