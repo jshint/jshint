@@ -141,6 +141,7 @@ exports.browser = {
   name                 : false,
   Node                 : false,
   NodeFilter           : false,
+  NodeList             : false,
   navigator            : false,
   onbeforeunload       : true,
   onblur               : true,
