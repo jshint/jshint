@@ -3207,7 +3207,7 @@ blockstmt("switch", function () {
         }
       }
       advance("case");
-      this.cases.push(expression(20));
+      this.cases.push(expression(0));
       increaseComplexityCount();
       g = true;
       advance(":");
