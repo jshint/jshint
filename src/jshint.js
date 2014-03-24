@@ -73,7 +73,7 @@ var JSHINT = (function () {
       "%"  : true
     },
 
-    // These are the JSHint boolean options.
+    // These are the JSHint default boolean options.
     boolOptions = {
       asi         : true, // if automatic semicolon insertion should be tolerated
       bitwise     : true, // if bitwise operators should not be allowed
