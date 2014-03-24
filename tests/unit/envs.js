@@ -333,6 +333,7 @@ exports.browser = function (test) {
     "MutationObserver",
     "name",
     "Node",
+    "NodeList",
     "NodeFilter",
     "navigator",
     "onbeforeunload",
