@@ -1462,7 +1462,7 @@ var JSHINT = (function () {
         } else if (left.id === "[") {
           if (state.tokens.curr.left.first) {
             state.tokens.curr.left.first.forEach(function (t) {
-              if (funct[t.value] === "const") {
+              if (t && funct[t.value] === "const") {
                 error("E013", t, t.value);
               }
             });

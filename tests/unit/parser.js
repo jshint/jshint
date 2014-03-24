@@ -4313,3 +4313,14 @@ exports["test for parentheses in odd-numbered token"] = function (test) {
 
   test.done();
 };
+
+exports["regression crash from GH-1573"] = function (test) {
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw 'var'.")
+    .addError(1, "Expected ']' to match '[' from line 1 and instead saw 'foo'.")
+    .addError(1, "Expected an identifier and instead saw ']'.")
+    .addError(1, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, "Missing semicolon.")
+    .test("[var foo = 1;]");
+  test.done();
+};
