@@ -55,9 +55,9 @@ exports.confusingOps = function (test) {
 
   var run = TestRun(test)
     .addError(1, "Confusing minuses.")
-    .addError(2, "Confusing pluses.")
+    .addError(2, "Confusing plusses.")
     .addError(3, "Confusing minuses.")
-    .addError(4, "Confusing pluses.");
+    .addError(4, "Confusing plusses.");
   run.test(code, {es3: true});
   run.test(code, {}); // es5
   run.test(code, {esnext: true});
