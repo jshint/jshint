@@ -965,6 +965,13 @@ var JSHINT = (function () {
     if (state.tokens.next.id === "(end)")
       error("E006", state.tokens.curr);
 
+    if (state.option.asi &&
+        (state.tokens.curr.id === "[" ||
+          state.tokens.curr.id === "(" ||
+          state.tokens.curr.id === "/") &&
+        state.tokens.prev.line < state.tokens.curr.line)
+      warning("W014", state.tokens.curr, state.tokens.curr.id);
+
     advance();
 
     if (initial) {
