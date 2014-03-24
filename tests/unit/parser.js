@@ -4101,6 +4101,17 @@ exports["test for 'break' in switch case in loop + curly braces"] = function (te
   test.done();
 };
 
+exports["allow expression with a comma in switch case condition"] = function (test) {
+  var code = [
+    "switch (false) {",
+    "  case x = 1, y = x: { break; }",
+    "}"
+  ]
+
+  var run = TestRun(test).test(code);
+  test.done();
+};
+
 exports["/*jshint ignore */ should be a good option and only accept start, end or line as values"] = function (test) {
   var code = [
     "/*jshint ignore:start*/",
