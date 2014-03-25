@@ -26,7 +26,6 @@ exports.ecmaIdentifiers = {
   isNaN              : false,
   JSON               : false,
   Math               : false,
-  Map                : false,
   Number             : false,
   Object             : false,
   parseInt           : false,
@@ -34,12 +33,19 @@ exports.ecmaIdentifiers = {
   RangeError         : false,
   ReferenceError     : false,
   RegExp             : false,
-  Set                : false,
   String             : false,
   SyntaxError        : false,
   TypeError          : false,
   URIError           : false,
-  WeakMap            : false
+};
+
+exports.newEcmaIdentifiers = {
+  Set     : false,
+  Map     : false,
+  WeakMap : false,
+  WeakSet : false,
+  Proxy   : false,
+  Promise : false
 };
 
 // Global variables commonly provided by a web browser environment.

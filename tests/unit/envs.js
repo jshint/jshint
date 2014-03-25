@@ -677,7 +677,6 @@ exports.standard = function (test) {
     'isFinite',
     'isNaN',
     'JSON',
-    'Map',
     'Math',
     'Number',
     'Object',
@@ -686,15 +685,28 @@ exports.standard = function (test) {
     'RangeError',
     'ReferenceError',
     'RegExp',
-    'Set',
     'String',
     'SyntaxError',
     'TypeError',
     'URIError',
-    "WeakMap",
   ];
 
   globalsKnown(test, globals); // You don't need any option to recognize standard globals
+
+  test.done();
+};
+
+exports.esnext = function (test) {
+  var globals = [
+    'Set',
+    'Map',
+    'WeakMap',
+    'WeakSet',
+    'Proxy',
+    'Promise'
+  ];
+
+  globalsKnown(test, globals, { esnext: true });
 
   test.done();
 };

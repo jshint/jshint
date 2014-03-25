@@ -328,6 +328,11 @@ var JSHINT = (function () {
     if (state.option.es5) {
       warning("I003");
     }
+
+    if (state.option.esnext) {
+      combine(predefined, vars.newEcmaIdentifiers);
+    }
+
     if (state.option.couch) {
       combine(predefined, vars.couch);
     }
