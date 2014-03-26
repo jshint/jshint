@@ -4385,7 +4385,6 @@ var JSHINT = (function () {
   // Parse JSON
 
   function jsonValue() {
-
     function jsonObject() {
       var o = {}, t = state.tokens.next;
       advance("{");
@@ -4461,9 +4460,6 @@ var JSHINT = (function () {
       break;
     case "-":
       advance("-");
-      if (state.tokens.curr.character !== state.tokens.next.from) {
-        warning("W011", state.tokens.curr);
-      }
       advance("(number)");
       break;
     default:
