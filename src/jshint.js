@@ -120,7 +120,6 @@ var JSHINT = (function () {
       nonew       : true, // if using `new` for side-effects should be disallowed
       nonstandard : true, // if non-standard (but widely adopted) globals should
                           // be predefined
-      passfail    : true, // if the scan should stop on first error
       phantom     : true, // if PhantomJS symbols should be allowed
       plusplus    : true, // if increment/decrement should not be allowed
       proto       : true, // if the `__proto__` property should be allowed
@@ -215,8 +214,9 @@ var JSHINT = (function () {
     },
 
     removedOptions = {
-      nomen:  true,
+      nomen: true,
       onevar: true,
+      passfail: true
     },
 
     declared, // Globals that were declared using /*global ... */ syntax.
@@ -495,9 +495,6 @@ var JSHINT = (function () {
     JSHINT.errors.push(w);
 
     removeIgnoredMessages();
-
-    if (state.option.passfail && JSHINT.errors.length)
-      quit("E042", l, ch);
 
     if (JSHINT.errors.length >= state.option.maxerr)
       quit("E043", l, ch);

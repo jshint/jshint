@@ -962,28 +962,6 @@ exports.immed = function (test) {
   test.done();
 };
 
-/** Option `passfail` tells JSHint to stop at the first error. */
-exports.passfail = function (test) {
-  var code = [
-    'one()',
-    'two()',
-    'three()',
-  ];
-
-  TestRun(test)
-    .addError(1, "Missing semicolon.")
-    .addError(2, "Missing semicolon.")
-    .addError(3, "Missing semicolon.")
-    .test(code, { es3: true });
-
-  TestRun(test)
-    .addError(1, "Missing semicolon.")
-    .addError(1, "Stopping. (33% scanned).")
-    .test(code, { es3: true, passfail: true });
-
-  test.done();
-};
-
 /** Option `plusplus` prohibits the use of increments/decrements. */
 exports.plusplus = function (test) {
   var ops = [ '++', '--' ];
