@@ -18,8 +18,10 @@ var state = {
     this.lines = [];
     this.tab = "";
     this.cache = {}; // Node.JS doesn't have Map. Sniff.
-    this.ignoreLinterErrors = false;    // Blank out non-multi-line-commented
-                      // lines when ignoring linter errors
+    this.ignoredLines = {};
+
+    // Blank out non-multi-line-commented lines when ignoring linter errors
+    this.ignoreLinterErrors = false;
   }
 };
 

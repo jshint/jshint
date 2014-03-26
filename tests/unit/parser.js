@@ -4157,7 +4157,7 @@ exports["/*jshint ignore */ should be detected even with leading and/or trailing
 
 exports["should be able to ignore a single line with a trailing comment: // jshint:ignore"] = function (test) {
   var code = fs.readFileSync(__dirname + "/fixtures/gh870.js", "utf8");
-  TestRun(test).test(code);
+  TestRun(test).test(code, { unused: true });
   test.done();
 };
 
