@@ -3873,6 +3873,7 @@ var JSHINT = (function () {
       if (!state.option.inESNext() && nextop.value === "of") {
         error("W104", nextop, "for of");
       }
+
       if (state.tokens.next.id === "var") {
         advance("var");
         state.syntax["var"].fud.call(state.syntax["var"].fud, true);
@@ -3882,6 +3883,9 @@ var JSHINT = (function () {
         letscope = true;
         funct["(blockscope)"].stack();
         state.syntax["let"].fud.call(state.syntax["let"].fud, true);
+      } else if (!state.tokens.next.identifier) {
+        error("E030", state.tokens.next, state.tokens.next.type);
+        advance();
       } else {
         switch (funct[state.tokens.next.value]) {
         case "unused":

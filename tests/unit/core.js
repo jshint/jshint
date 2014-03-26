@@ -608,6 +608,16 @@ exports.testForIn = function (test) {
     .addError(2, "Creating global 'for' variable. Should be 'for (var i ...'.")
     .test(src, {es3: true});
 
+  src = [
+    "(function (o) {",
+    "for ('i' in o) { i(); }",
+    "}());"
+  ];
+
+  TestRun(test)
+    .addError(2, "Expected an identifier and instead saw '(string)'.")
+    .test(src);
+
   test.done();
 };
 
