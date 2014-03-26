@@ -962,38 +962,6 @@ exports.immed = function (test) {
   test.done();
 };
 
-/** Option `nomen` disallows variable names with dangling '_'. */
-exports.nomen = function (test) {
-  var names = [ '_hey', 'hey_' ];
-
-  for (var i = 0, name; name = names[i]; i += 1) {
-    TestRun(test).test('var ' + name + ';', {es3: true});
-  }
-
-  for (i = 0, name = null; name = names[i]; i += 1) {
-    TestRun(test)
-      .addError(1, "Unexpected dangling '_' in '" + name + "'.")
-      .test('var ' + name + ';', { es3: true, nomen: true });
-  }
-
-  // Normal names should pass all the time
-  TestRun(test).test('var hey;');
-  TestRun(test).test('var hey;', { es3: true, nomen: true });
-
-  // Node globals
-  TestRun(test)
-    .addError(1, "Unexpected dangling '_' in '_x'.")
-    .test('var x = top._x + __dirname + __filename;', { es3: true, node: true, nomen: true });
-
-  // Underscore.js global should be fine
-  TestRun(test).test("_.defer();", { es3: true, nomen: true });
-  TestRun(test)
-    .addError(1, "Unexpected dangling '_' in '__'.")
-    .test("var __;", { es3: true, nomen: true });
-
-  test.done();
-};
-
 /** Option `passfail` tells JSHint to stop at the first error. */
 exports.passfail = function (test) {
   var code = [

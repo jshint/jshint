@@ -119,7 +119,6 @@ var JSHINT = (function () {
       nonew       : true, // if using `new` for side-effects should be disallowed
       nonstandard : true, // if non-standard (but widely adopted) globals should
                           // be predefined
-      nomen       : true, // if names should be checked
       onevar      : true, // if only one var statement per function should be
                           // allowed
       passfail    : true, // if the scan should stop on first error
@@ -163,9 +162,9 @@ var JSHINT = (function () {
       maxlen       : false,
       indent       : false,
       maxerr       : false,
-      predef       : false, //predef is deprecated and being replaced by globals
+      predef       : false, // predef is deprecated and being replaced by globals
       globals      : false,
-      quotmark     : false, //'single'|'double'|true
+      quotmark     : false, // 'single'|'double'|true
       scope        : false,
       maxstatements: false, // {int} max statements per function
       maxdepth     : false, // {int} max nested block depth per function
@@ -198,7 +197,6 @@ var JSHINT = (function () {
       bitwise : true,
       forin   : true,
       newcap  : true,
-      nomen   : true,
       plusplus: true,
       regexp  : true,
       undef   : true,
@@ -217,6 +215,10 @@ var JSHINT = (function () {
       vars   : "onevar",
       windows: "wsh",
       sloppy : "strict"
+    },
+
+    removedOptions = {
+      nomen: true
     },
 
     declared, // Globals that were declared using /*global ... */ syntax.
@@ -257,7 +259,7 @@ var JSHINT = (function () {
     }
 
     if (valOptions[name] === undefined && boolOptions[name] === undefined) {
-      if (t.type !== "jslint") {
+      if (t.type !== "jslint" && !removedOptions[name]) {
         error("E001", t, name);
         return false;
       }

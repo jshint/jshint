@@ -70,25 +70,6 @@ exports.node = function (test) {
   globalsImplied(test, globals);
   globalsKnown(test, globals, { node: true });
 
-  // Make sure that the `node` option doesn't conflict with `nomen`
-  var asGlobals = [
-    'console.log(__dirname);',
-    "console.log(__filename);",
-  ];
-
-  var asProps = [
-    'console.log(a.__dirname);',
-    'console.log(a.__filename);',
-    "console.log(__hello);",
-  ];
-
-  TestRun(test).test(asGlobals, { es3: true, node: true, nomen: true });
-  TestRun(test)
-    .addError(1, "Unexpected dangling '_' in '__dirname'.")
-    .addError(2, "Unexpected dangling '_' in '__filename'.")
-    .addError(3, "Unexpected dangling '_' in '__hello'.")
-    .test(asProps, { es3: true, node: true, nomen: true });
-
   // Node environment assumes `globalstrict`
   var globalStrict = [
     '"use strict";',
