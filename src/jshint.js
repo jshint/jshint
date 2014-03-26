@@ -1037,7 +1037,7 @@ var JSHINT = (function () {
   }
 
 
-// Functions for conformance of style.
+  // Functions for conformance of style.
 
   function nobreaknonadjacent(left, right) {
     left = left || state.tokens.curr;
@@ -2442,7 +2442,7 @@ var JSHINT = (function () {
     if (left) {
       if (left.type === "(identifier)") {
         if (left.value.match(/^[A-Z]([A-Z0-9_$]*[a-z][A-Za-z0-9_$]*)?$/)) {
-          if ("Number String Boolean Date Object".indexOf(left.value) === -1) {
+          if ("Number String Boolean Date Object Error".indexOf(left.value) === -1) {
             if (left.value === "Math") {
               warning("W063", left);
             } else if (state.option.newcap) {
