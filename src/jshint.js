@@ -119,8 +119,6 @@ var JSHINT = (function () {
       nonew       : true, // if using `new` for side-effects should be disallowed
       nonstandard : true, // if non-standard (but widely adopted) globals should
                           // be predefined
-      onevar      : true, // if only one var statement per function should be
-                          // allowed
       passfail    : true, // if the scan should stop on first error
       phantom     : true, // if PhantomJS symbols should be allowed
       plusplus    : true, // if increment/decrement should not be allowed
@@ -204,7 +202,6 @@ var JSHINT = (function () {
 
       // Inverted and renamed, use JSHint name here
       eqeqeq  : true,
-      onevar  : true,
       strict  : true
     },
 
@@ -212,13 +209,13 @@ var JSHINT = (function () {
     // where the name has been changed but the effect is unchanged
     renamedOptions = {
       eqeq   : "eqeqeq",
-      vars   : "onevar",
       windows: "wsh",
       sloppy : "strict"
     },
 
     removedOptions = {
-      nomen: true
+      nomen:  true,
+      onevar: true,
     },
 
     declared, // Globals that were declared using /*global ... */ syntax.
@@ -3457,12 +3454,6 @@ var JSHINT = (function () {
     // declaring a variable in a block can have unexpected consequences.
     var tokens, lone, value;
 
-    if (funct["(onevar)"] && state.option.onevar) {
-      warning("W081");
-    } else if (!funct["(global)"]) {
-      funct["(onevar)"] = true;
-    }
-
     this.first = [];
     for (;;) {
       var names = [];
@@ -3538,12 +3529,6 @@ var JSHINT = (function () {
       letblock = true;
     } else if (funct["(nolet)"]) {
       error("E048", state.tokens.curr);
-    }
-
-    if (funct["(onevar)"] && state.option.onevar) {
-      warning("W081");
-    } else if (!funct["(global)"]) {
-      funct["(onevar)"] = true;
     }
 
     this.first = [];
