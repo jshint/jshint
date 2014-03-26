@@ -207,42 +207,6 @@ exports.testVoid = function (test) {
   test.done();
 };
 
-exports.testMissingSpaces = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/missingspaces.js', 'utf8');
-  TestRun(test)
-    .addError(1, "Missing space after 'function'.", { character: 17 })
-    .addError(2, "Missing space after 'b'.", { character: 6 })
-    .addError(2, "Missing space after '='.", { character: 7 })
-    .addError(2, "Missing space after ')'.", { character: 18 })
-    .addError(3, "Missing space after 'd'.", { character: 6 })
-    .addError(4, "Missing space after ')'.", { character: 13 })
-    .addError(5, "Missing space after '1'.", { character: 13 })
-    .addError(7, "Missing space after '2'.", { character: 10 })
-    .addError(7, "Missing space after '+'.", { character: 11 })
-    .addError(8, "Missing space after '/'.", { character: 14 })
-    .addError(8, "Missing space after '+'.", { character: 15 })
-    .addError(8, "Missing space after 'uid'.", { character: 20 })
-    .addError(8, "Missing space after '+'.", { character: 21 })
-    .addError(8, "Missing space after '/likes?access_token='.", { character: 43 })
-    .addError(8, "Missing space after '+'.", { character: 44 })
-    .test(src, { es3: true, white: true });
-
-  test.done();
-};
-
-exports.testGoogleClosureLinterCompatibility = function (test) {
-  var code = "var a = function() { return; };";
-
-  TestRun(test)
-    .addError(1, "Missing space after 'function'.")
-    .test(code, { es3: true, white: true });
-
-  TestRun(test)
-    .test(code, { es3: true, white: true, gcl: true });
-
-  test.done();
-};
-
 exports.functionScopedOptions = function (test) {
   var src = fs.readFileSync(__dirname + '/fixtures/functionScopedOptions.js', 'utf8');
   TestRun(test)

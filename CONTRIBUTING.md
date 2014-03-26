@@ -98,5 +98,3 @@ token.isPunctuator(";") && report.addWarning("W001");
 if (token.isPunctuator(";"))
   report.addWarning("W001");
 ```
-
-Today we use JSHint's `white:true` to enforce some of these rules. Eventually we'll switch to JSHint Next style enforcing component. But it's not ready yet.

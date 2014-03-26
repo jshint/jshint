@@ -75,9 +75,6 @@
     "wsh"           : false,    // Windows Scripting Host
     "yui"           : false,    // Yahoo User Interface
 
-    // Legacy
-    "white"         : false,    // true: Check against strict whitespace and indentation rules
-
     // Custom Globals
     "globals"       : {}        // additional predefined global variables
 }

@@ -58,7 +58,6 @@
     "boss":      true,
     "node":      true,
     "strict":    true,
-    "white":     true,
     "smarttabs": true,
     "maxlen":    100,
     "newcap":    false,
