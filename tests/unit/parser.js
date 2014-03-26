@@ -4335,3 +4335,8 @@ exports["regression crash from GH-1573"] = function (test) {
     .test("[var foo = 1;]");
   test.done();
 };
+
+exports["make sure we don't throw errors on removed options"] = function (test) {
+  TestRun(test).test("a();", { nomen: true });
+  test.done();
+};
