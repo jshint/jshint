@@ -96,7 +96,6 @@ var JSHINT = (function () {
       expr        : true, // if ExpressionStatement should be allowed as Programs
       forin       : true, // if for in statements must filter
       funcscope   : true, // if only function scope should be used for scope tests
-      gcl         : true, // if JSHint should be compatible with Google Closure Linter
       globalstrict: true, // if global "use strict"; should be allowed (also enables 'strict')
       immed       : true, // if immediate invocations must be wrapped in parens
       iterator    : true, // if the `__iterator__` property should be allowed
@@ -140,7 +139,6 @@ var JSHINT = (function () {
       validthis   : true, // if 'this' inside a non-constructor function is valid.
                           // This is a function scoped option only.
       withstmt    : true, // if with statements should be allowed
-      white       : true, // if strict whitespace rules apply
       worker      : true, // if Web Worker script symbols should be allowed
       wsh         : true, // if the Windows Scripting Host environment globals
                           // should be predefined
@@ -198,7 +196,6 @@ var JSHINT = (function () {
       plusplus: true,
       regexp  : true,
       undef   : true,
-      white   : true,
 
       // Inverted and renamed, use JSHint name here
       eqeqeq  : true,
@@ -216,7 +213,9 @@ var JSHINT = (function () {
     removedOptions = {
       nomen: true,
       onevar: true,
-      passfail: true
+      passfail: true,
+      white: true,
+      gcl: true
     },
 
     declared, // Globals that were declared using /*global ... */ syntax.
@@ -1040,68 +1039,16 @@ var JSHINT = (function () {
 
 // Functions for conformance of style.
 
-  function adjacent(left, right) {
-    left = left || state.tokens.curr;
-    right = right || state.tokens.next;
-    if (state.option.white) {
-      if (left.character !== right.from && left.line === right.line) {
-        left.from += (left.character - left.from);
-        warning("W011", left, left.value);
-      }
-    }
-  }
-
-  function nobreak(left, right) {
-    left = left || state.tokens.curr;
-    right = right || state.tokens.next;
-    if (state.option.white && (left.character !== right.from || left.line !== right.line)) {
-      warning("W012", right, right.value);
-    }
-  }
-
-  function nospace(left, right) {
-    left = left || state.tokens.curr;
-    right = right || state.tokens.next;
-    if (state.option.white && !left.comment) {
-      if (left.line === right.line) {
-        adjacent(left, right);
-      }
-    }
-  }
-
-  function nonadjacent(left, right) {
-    if (state.option.white) {
-      left = left || state.tokens.curr;
-      right = right || state.tokens.next;
-
-      if (left.value === ";" && right.value === ";") {
-        return;
-      }
-
-      if (left.line === right.line && left.character === right.from) {
-        left.from += (left.character - left.from);
-        warning("W013", left, left.value);
-      }
-    }
-  }
-
   function nobreaknonadjacent(left, right) {
     left = left || state.tokens.curr;
     right = right || state.tokens.next;
     if (!state.option.laxbreak && left.line !== right.line) {
       warning("W014", right, right.value);
-    } else if (state.option.white) {
-      left = left || state.tokens.curr;
-      right = right || state.tokens.next;
-      if (left.character === right.from) {
-        left.from += (left.character - left.from);
-        warning("W013", left, left.value);
-      }
     }
   }
 
   function indentation(bias) {
-    if (!state.option.white && !state.option["(explicitIndent)"]) {
+    if (!state.option["(explicitIndent)"]) {
       return;
     }
 
@@ -1131,9 +1078,6 @@ var JSHINT = (function () {
         }
         warning("W014", left, right.value);
       }
-    } else if (!left.comment && left.character !== right.from && state.option.white) {
-      left.from += (left.character - left.from);
-      warning("W011", left, left.value);
     }
   }
 
@@ -1145,14 +1089,6 @@ var JSHINT = (function () {
       advance(",");
     } else {
       nobreakcomma(state.tokens.prev, state.tokens.curr);
-    }
-
-    // TODO: This is a temporary solution to fight against false-positives in
-    // arrays and objects with trailing commas (see GH-363). The best solution
-    // would be to extract all whitespace rules out of parser.
-
-    if (state.tokens.next.value !== "]" && state.tokens.next.value !== "}") {
-      nonadjacent(state.tokens.curr, state.tokens.next);
     }
 
     if (state.tokens.next.identifier && !(opts.property && state.option.inES5())) {
@@ -1310,7 +1246,6 @@ var JSHINT = (function () {
     x.led = function (left) {
       if (!w) {
         nobreaknonadjacent(state.tokens.prev, state.tokens.curr);
-        nonadjacent(state.tokens.curr, state.tokens.next);
       }
       if (s === "in" && left.id === "!") {
         warning("W018", left, "!");
@@ -1336,7 +1271,6 @@ var JSHINT = (function () {
       }
 
       nobreaknonadjacent(state.tokens.prev, state.tokens.curr);
-      nonadjacent(state.tokens.curr, state.tokens.next);
 
       this.left = left;
       this.right = doFunction(undefined, undefined, false, left);
@@ -1350,7 +1284,6 @@ var JSHINT = (function () {
 
     x.led = function (left) {
       nobreaknonadjacent(state.tokens.prev, state.tokens.curr);
-      nonadjacent(state.tokens.curr, state.tokens.next);
       var right = expression(100);
 
       if (isIdentifier(left, "NaN") || isIdentifier(right, "NaN")) {
@@ -1525,8 +1458,7 @@ var JSHINT = (function () {
       if (state.option.bitwise) {
         warning("W016", that, that.id);
       }
-      nonadjacent(state.tokens.prev, state.tokens.curr);
-      nonadjacent(state.tokens.curr, state.tokens.next);
+
       if (left) {
         if (left.id === "." || left.id === "[" ||
             (left.identifier && !isReserved(left))) {
@@ -1737,9 +1669,7 @@ var JSHINT = (function () {
           }
         }
       } else {
-        adjacent(state.tokens.curr, state.tokens.next);
         advance(";");
-        nonadjacent(state.tokens.curr, state.tokens.next);
       }
     }
 
@@ -1856,7 +1786,6 @@ var JSHINT = (function () {
     if (!ordinary || !state.option.funcscope)
       scope = Object.create(scope);
 
-    nonadjacent(state.tokens.curr, state.tokens.next);
     t = state.tokens.next;
 
     var metrics = funct["(metrics)"];
@@ -2461,7 +2390,6 @@ var JSHINT = (function () {
       if (!state.option.supernew)
         warning("W057", this);
     }
-    adjacent(state.tokens.curr, state.tokens.next);
     if (state.tokens.next.id !== "(" && !state.option.supernew) {
       warning("W058", state.tokens.curr, state.tokens.curr.value);
     }
@@ -2473,8 +2401,6 @@ var JSHINT = (function () {
   prefix("void").exps = true;
 
   infix(".", function (left, that) {
-    adjacent(state.tokens.prev, state.tokens.curr);
-    nobreak();
     var m = identifier(false, true);
 
     if (typeof m === "string") {
@@ -2506,11 +2432,6 @@ var JSHINT = (function () {
   }, 160, true);
 
   infix("(", function (left, that) {
-    if (state.tokens.prev.id !== "}" && state.tokens.prev.id !== ")") {
-      nobreak(state.tokens.prev, state.tokens.curr);
-    }
-
-    nospace();
     if (state.option.immed && left && !left.immed && left.id === "function") {
       warning("W062");
     }
@@ -2544,7 +2465,6 @@ var JSHINT = (function () {
     }
 
     advance(")");
-    nospace(state.tokens.prev, state.tokens.curr);
 
     if (typeof left === "object") {
       if (state.option.inES3() && left.value === "parseInt" && n === 1) {
@@ -2586,7 +2506,6 @@ var JSHINT = (function () {
   }, 155, true).exps = true;
 
   prefix("(", function () {
-    nospace();
     var bracket, brackets = [];
     var pn, pn1, i = 0;
     var ret;
@@ -2632,7 +2551,6 @@ var JSHINT = (function () {
     }
 
     advance(")", this);
-    nospace(state.tokens.prev, state.tokens.curr);
     if (state.option.immed && exprs[0] && exprs[0].id === "function") {
       if (state.tokens.next.id !== "(" &&
         (state.tokens.next.id !== "." || (peek().value !== "call" && peek().value !== "apply"))) {
@@ -2661,8 +2579,6 @@ var JSHINT = (function () {
   application("=>");
 
   infix("[", function (left, that) {
-    nobreak(state.tokens.prev, state.tokens.curr);
-    nospace();
     var e = expression(10), s;
     if (e && e.type === "(string)") {
       if (!state.option.evil && (e.value === "eval" || e.value === "execScript")) {
@@ -2683,7 +2599,6 @@ var JSHINT = (function () {
       warning("W001");
     }
 
-    nospace(state.tokens.prev, state.tokens.curr);
     that.left = left;
     that.right = e;
     return that;
@@ -2846,7 +2761,6 @@ var JSHINT = (function () {
     next = state.tokens.next;
 
     advance("(");
-    nospace();
 
     if (state.tokens.next.id === ")") {
       advance(")");
@@ -2868,7 +2782,6 @@ var JSHINT = (function () {
           warning("W104", state.tokens.next, "spread/rest operator");
         }
         advance("...");
-        nospace();
         ident = identifier(true);
         params.push(ident);
         addlabel(ident, { type: "unused", token: state.tokens.curr });
@@ -2896,7 +2809,6 @@ var JSHINT = (function () {
         comma();
       } else {
         advance(")", next);
-        nospace(state.tokens.prev, state.tokens.curr);
         return params;
       }
     }
@@ -3185,7 +3097,6 @@ var JSHINT = (function () {
           }
 
           t = state.tokens.next;
-          adjacent(state.tokens.curr, state.tokens.next);
           f = doFunction();
           p = f["(params)"];
 
@@ -3193,8 +3104,6 @@ var JSHINT = (function () {
           if (i && p) {
             warning("W076", t, p[0], i);
           }
-
-          adjacent(state.tokens.curr, state.tokens.next);
         } else if (state.tokens.next.value === "set" && peek().id !== ":") {
           advance("set");
 
@@ -3224,7 +3133,6 @@ var JSHINT = (function () {
           }
 
           t = state.tokens.next;
-          adjacent(state.tokens.curr, state.tokens.next);
           f = doFunction();
           p = f["(params)"];
 
@@ -3255,7 +3163,6 @@ var JSHINT = (function () {
             doFunction(i, undefined, g);
           } else if (!isclassdef) {
             advance(":");
-            nonadjacent(state.tokens.curr, state.tokens.next);
             expression(10);
           }
         }
@@ -3387,7 +3294,6 @@ var JSHINT = (function () {
     this.first = [];
     for (;;) {
       var names = [];
-      nonadjacent(state.tokens.curr, state.tokens.next);
       if (_.contains(["{", "["], state.tokens.next.value)) {
         tokens = destructuringExpression();
         lone = false;
@@ -3421,9 +3327,7 @@ var JSHINT = (function () {
       }
 
       if (state.tokens.next.id === "=") {
-        nonadjacent(state.tokens.curr, state.tokens.next);
         advance("=");
-        nonadjacent(state.tokens.curr, state.tokens.next);
         if (state.tokens.next.id === "undefined") {
           warning("W080", state.tokens.prev, state.tokens.prev.value);
         }
@@ -3455,7 +3359,6 @@ var JSHINT = (function () {
     this.first = [];
     for (;;) {
       var names = [];
-      nonadjacent(state.tokens.curr, state.tokens.next);
       if (_.contains(["{", "["], state.tokens.next.value)) {
         tokens = destructuringExpression();
         lone = false;
@@ -3485,9 +3388,7 @@ var JSHINT = (function () {
       this.first = this.first.concat(names);
 
       if (state.tokens.next.id === "=") {
-        nonadjacent(state.tokens.curr, state.tokens.next);
         advance("=");
-        nonadjacent(state.tokens.curr, state.tokens.next);
         if (state.tokens.next.id === "undefined") {
           warning("W080", state.tokens.prev, state.tokens.prev.value);
         }
@@ -3532,7 +3433,6 @@ var JSHINT = (function () {
     this.first = [];
     for (;;) {
       var names = [];
-      nonadjacent(state.tokens.curr, state.tokens.next);
       if (_.contains(["{", "["], state.tokens.next.value)) {
         tokens = destructuringExpression();
         lone = false;
@@ -3562,9 +3462,7 @@ var JSHINT = (function () {
       this.first = this.first.concat(names);
 
       if (state.tokens.next.id === "=") {
-        nonadjacent(state.tokens.curr, state.tokens.next);
         advance("=");
-        nonadjacent(state.tokens.curr, state.tokens.next);
         if (state.tokens.next.id === "undefined") {
           warning("W080", state.tokens.prev, state.tokens.prev.value);
         }
@@ -3651,7 +3549,6 @@ var JSHINT = (function () {
     if (funct[i] === "const") {
       warning("E011", null, i);
     }
-    adjacent(state.tokens.curr, state.tokens.next);
     addlabel(i, { type: "unction", token: state.tokens.curr });
 
     doFunction(i, { statement: true }, generator);
@@ -3671,11 +3568,6 @@ var JSHINT = (function () {
       generator = true;
     }
     var i = optionalidentifier();
-    if (i || state.option.gcl) {
-      adjacent(state.tokens.curr, state.tokens.next);
-    } else {
-      nonadjacent(state.tokens.curr, state.tokens.next);
-    }
     doFunction(i, undefined, generator);
     if (!state.option.loopfunc && funct["(loopage)"]) {
       warning("W083");
@@ -3688,15 +3580,11 @@ var JSHINT = (function () {
     increaseComplexityCount();
     state.condition = true;
     advance("(");
-    nonadjacent(this, t);
-    nospace();
     checkCondAssignment(expression(0));
     advance(")", t);
     state.condition = false;
-    nospace(state.tokens.prev, state.tokens.curr);
     block(true, true);
     if (state.tokens.next.id === "else") {
-      nonadjacent(state.tokens.curr, state.tokens.next);
       advance("else");
       if (state.tokens.next.id === "if" || state.tokens.next.id === "switch") {
         statement(true);
@@ -3715,7 +3603,6 @@ var JSHINT = (function () {
       var e;
 
       advance("catch");
-      nonadjacent(state.tokens.curr, state.tokens.next);
       advance("(");
 
       scope = Object.create(oldScope);
@@ -3792,11 +3679,8 @@ var JSHINT = (function () {
     funct["(loopage)"] += 1;
     increaseComplexityCount();
     advance("(");
-    nonadjacent(this, t);
-    nospace();
     checkCondAssignment(expression(0));
     advance(")", t);
-    nospace(state.tokens.prev, state.tokens.curr);
     block(true, true);
     funct["(breakage)"] -= 1;
     funct["(loopage)"] -= 1;
@@ -3812,11 +3696,8 @@ var JSHINT = (function () {
     }
 
     advance("(");
-    nonadjacent(this, t);
-    nospace();
     expression(0);
     advance(")", t);
-    nospace(state.tokens.prev, state.tokens.curr);
     block(true, true);
 
     return this;
@@ -3829,15 +3710,10 @@ var JSHINT = (function () {
 
     funct["(breakage)"] += 1;
     advance("(");
-    nonadjacent(this, t);
-    nospace();
     checkCondAssignment(expression(0));
     advance(")", t);
-    nospace(state.tokens.prev, state.tokens.curr);
-    nonadjacent(state.tokens.curr, state.tokens.next);
     t = state.tokens.next;
     advance("{");
-    nonadjacent(state.tokens.curr, state.tokens.next);
 
     if (state.tokens.next.from === indent)
       noindent = true;
@@ -3954,12 +3830,9 @@ var JSHINT = (function () {
       this.first = block(true, true);
       advance("while");
       var t = state.tokens.next;
-      nonadjacent(state.tokens.curr, t);
       advance("(");
-      nospace();
       checkCondAssignment(expression(0));
       advance(")", t);
-      nospace(state.tokens.prev, state.tokens.curr);
       funct["(breakage)"] -= 1;
       funct["(loopage)"] -= 1;
       return this;
@@ -3985,8 +3858,6 @@ var JSHINT = (function () {
     funct["(loopage)"] += 1;
     increaseComplexityCount();
     advance("(");
-    nonadjacent(this, t);
-    nospace();
 
     // what kind of for(…) statement it is? for(…of…)? for(…in…)? for(…;…;…)?
     var nextop; // contains the token of the "in" or "of" operator
@@ -4079,7 +3950,6 @@ var JSHINT = (function () {
         }
       }
       advance(")", t);
-      nospace(state.tokens.prev, state.tokens.curr);
       block(true, true);
       funct["(breakage)"] -= 1;
       funct["(loopage)"] -= 1;
@@ -4148,7 +4018,6 @@ var JSHINT = (function () {
   stmt("return", function () {
     if (this.line === state.tokens.next.line) {
       if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
-        nonadjacent(state.tokens.curr, state.tokens.next);
         this.first = expression(0);
 
         if (this.first &&
@@ -4205,7 +4074,6 @@ var JSHINT = (function () {
 
   stmt("throw", function () {
     nolinebreak(this);
-    nonadjacent(state.tokens.curr, state.tokens.next);
     this.first = expression(20);
     reachable("throw");
     return this;
@@ -4597,7 +4465,6 @@ var JSHINT = (function () {
       if (state.tokens.curr.character !== state.tokens.next.from) {
         warning("W011", state.tokens.curr);
       }
-      adjacent(state.tokens.curr, state.tokens.next);
       advance("(number)");
       break;
     default:

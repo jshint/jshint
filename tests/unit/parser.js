@@ -167,7 +167,6 @@ exports.options = function (test) {
     "/*jslint maxerr: 20 */",
     "/*member c:true */",
     "/*jshint d:no */",
-    "/*jshint white:no */",
     "/*global xxx*/",
     "xxx = 2;",
   ];
@@ -182,8 +181,7 @@ exports.options = function (test) {
     .addError(9, "Expected a small integer or 'false' and instead saw '300.4'.")
     .addError(10, "Expected a small integer or 'false' and instead saw '0'.")
     .addError(13, "Bad option: 'd'.")
-    .addError(14, "Bad option value.")
-    .addError(16, "Read only.");
+    .addError(15, "Read only.");
   run.test(code, {es3: true});
   run.test(code, {}); // es5
   run.test(code, {esnext: true});
@@ -499,10 +497,6 @@ exports.comma = function (test) {
     .addError(1, "Extra comma. (it breaks older versions of IE)")
     .test("var f = [1,];", {es3: true});
 
-  // Regression test (GH-1108)
-  TestRun(test)
-    .test("i = 0, g;", {white: true, expr: true});
-
   test.done();
 };
 
@@ -512,26 +506,18 @@ exports.withStatement = function (test) {
 
   run = TestRun(test)
     .addError(5, "Don't use 'with'.")
-    .addError(5, "Missing space after 'with'.")
-    .addError(5, "Unexpected space after '('.")
-    .addError(13, "'with' is not allowed in strict mode.")
-    .addError(13, "Missing space after ')'.")
-    .addError(13, "Unexpected space after '2'.");
-  run.test(src, {white: true, es3: true});
-  run.test(src, {white: true}); // es5
-  run.test(src, {white: true, esnext: true});
-  run.test(src, {white: true, moz: true});
+    .addError(13, "'with' is not allowed in strict mode.");
+  run.test(src, {es3: true});
+  run.test(src); // es5
+  run.test(src, {esnext: true});
+  run.test(src, {moz: true});
 
   run = TestRun(test)
-    .addError(5, "Missing space after 'with'.")
-    .addError(5, "Unexpected space after '('.")
-    .addError(13, "'with' is not allowed in strict mode.")
-    .addError(13, "Missing space after ')'.")
-    .addError(13, "Unexpected space after '2'.");
-  run.test(src, {white: true, withstmt: true, es3: true});
-  run.test(src, {white: true, withstmt: true}); // es5
-  run.test(src, {white: true, withstmt: true, esnext: true});
-  run.test(src, {white: true, withstmt: true, moz: true});
+    .addError(13, "'with' is not allowed in strict mode.");
+  run.test(src, {withstmt: true, es3: true});
+  run.test(src, {withstmt: true}); // es5
+  run.test(src, {withstmt: true, esnext: true});
+  run.test(src, {withstmt: true, moz: true});
 
   test.done();
 };
@@ -4337,6 +4323,6 @@ exports["regression crash from GH-1573"] = function (test) {
 };
 
 exports["make sure we don't throw errors on removed options"] = function (test) {
-  TestRun(test).test("a();", { nomen: true, onevar: true, passfail: true });
+  TestRun(test).test("a();", { nomen: true, onevar: true, passfail: true, white: true });
   test.done();
 };

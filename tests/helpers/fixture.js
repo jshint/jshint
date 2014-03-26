@@ -1,4 +1,4 @@
-/*jshint node:true, white:true, undef:true, maxlen:100 */
+/*jshint node:true, undef:true, maxlen:100 */
 
 var fs = require('fs');
 

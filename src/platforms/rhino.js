@@ -1,4 +1,4 @@
-/*jshint boss: true, rhino: true, unused: true, undef: true, white: true, quotmark: double */
+/*jshint boss: true, rhino: true, unused: true, undef: true, quotmark: double */
 /*global JSHINT, readFully */
 
 (function (args) {

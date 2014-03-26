@@ -1136,41 +1136,13 @@ exports.laxbreak = function (test) {
   test.done();
 };
 
-exports.white = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/white.js', 'utf8');
-
-  TestRun(test).test(src, {es3: true});
-  TestRun(test)
-    .addError(1, "Unexpected space after 'hello'.", { character: 15 })
-    .addError(2, "Unexpected space after 'true'.", { character: 16 })
-    .addError(5, "Missing space after 'function'.")
-    .addError(6, "Missing space after 'if'.")
-    .addError(6, "Missing space after ')'.")
-    .addError(14, "Unexpected space after 'true'.", { character: 16 })
-    .addError(15, "Missing space after ':'.")
-    .addError(18, "Unexpected space after '('.", { character: 9 })
-    .addError(18, "Unexpected space after 'ex'.", { character: 12 })
-    .addError(55, "Missing space after ','.") // 2 times?
-    .addError(56, "Missing space after '1'.")
-    .addError(58, "Unexpected space before 'b'.")
-    .addError(58, "Unexpected space after 'a'.")
-    .addError(60, "Unexpected space before 'c'.")
-    .addError(62, "Expected 'var' to have an indentation at 1 instead at 2.")
-    .addError(64, "Unexpected space after 'nodblwarnings'.", { character: 23 })
-    .addError(64, "Unexpected space after '('.", { character: 25 })
-    .test(src, { es3: true, white: true });
-
-  test.done();
-};
-
 exports.trailing = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/white.js', 'utf8');
+  var src = "hello(); ";
 
   TestRun(test).test(src, {es3: true});
 
   TestRun(test)
-    .addError(8, "Trailing whitespace.", { character: 16 })
-    .addError(9, "Trailing whitespace.", { character: 6 })
+    .addError(1, "Trailing whitespace.", { character: 9 })
     .test(src, { es3: true, trailing: true });
 
   test.done();
@@ -1219,39 +1191,11 @@ exports.indentation = function (test) {
 
   TestRun(test)
     .addError(5, "Mixed spaces and tabs.")
-    .addError(6, "Mixed spaces and tabs.")
-    .addError(10, "Unexpected space after 'hello'.")
-    .addError(11, "Unexpected space after '('.")
-    .addError(11, "Unexpected space after 'Hello World'.")
-    .test(src, { es3: true, indent: 4, white: true });
-
-  TestRun(test)
-    .addError(5, "Mixed spaces and tabs.")
     .addError(5, "Expected 'var' to have an indentation at 5 instead at 7.")
     .addError(6, "Mixed spaces and tabs.")
     .addError(6, "Expected 'var' to have an indentation at 5 instead at 7.")
     .addError(7, "Expected '}' to have an indentation at 3 instead at 5.")
     .test(src, { es3: true, indent: 2 });
-
-  // case indent
-  TestRun(test)
-    .addError(5, "Mixed spaces and tabs.")
-    .addError(6, "Mixed spaces and tabs.")
-    .addError(10, "Unexpected space after 'hello'.")
-    .addError(11, "Unexpected space after '('.")
-    .addError(11, "Unexpected space after 'Hello World'.")
-    .test(src, { es3: true, indent: 4, white: true });
-
-  test.done();
-};
-
-exports.switchindent = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/switchindent.js", "utf8");
-
-  TestRun(test)
-    .addError(14, "Expected 'x' to have an indentation at 9 instead at 5.")
-    .addError(24, "Expected 'case' to have an indentation at 1 instead at 5.")
-    .test(src, { indent: 4, white: true });
 
   test.done();
 };
@@ -1490,10 +1434,6 @@ exports.unnecessarysemicolon = function (test) {
   TestRun(test)
     .addError(2, "Unnecessary semicolon.")
     .test(code, {es3: true});
-
-  TestRun(test)
-    .addError(2, "Unnecessary semicolon.")
-    .test(code, {es3: true, white: true });
 
   test.done();
 };
