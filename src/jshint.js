@@ -245,7 +245,6 @@ var JSHINT = (function () {
     stack,
     unuseds,
     urls,
-    warnings,
 
     extraModules = [],
     emitter = new events.EventEmitter();
@@ -449,6 +448,13 @@ var JSHINT = (function () {
     return JSHINT.undefs.push([scope, code, token, a]);
   }
 
+  function removeIgnoredMessages() {
+    var ignored = state.ignoredLines;
+
+    if (_.isEmpty(ignored)) return;
+    JSHINT.errors = _.reject(JSHINT.errors, function (err) { return ignored[err.line] });
+  }
+
   function warning(code, t, a, b, c, d) {
     var ch, l, w, msg;
 
@@ -488,14 +494,13 @@ var JSHINT = (function () {
     w.reason = supplant(msg.desc, w);
     JSHINT.errors.push(w);
 
-    if (state.option.passfail) {
-      quit("E042", l, ch);
-    }
+    removeIgnoredMessages();
 
-    warnings += 1;
-    if (warnings >= state.option.maxerr) {
+    if (state.option.passfail && JSHINT.errors.length)
+      quit("E042", l, ch);
+
+    if (JSHINT.errors.length >= state.option.maxerr)
       quit("E043", l, ch);
-    }
 
     return w;
   }
@@ -792,11 +797,8 @@ var JSHINT = (function () {
             state.ignoreLinterErrors = false;
             break;
           case "line":
-            // Any errors or warnings that happened on the current line, make them go away.
-            JSHINT.errors = _.reject(JSHINT.errors, function (error) {
-              // nt.line returns to the current line
-              return error.line === nt.line;
-            });
+            state.ignoredLines[nt.line] = true;
+            removeIgnoredMessages();
             break;
           default:
             error("E002", nt);
@@ -4783,7 +4785,6 @@ var JSHINT = (function () {
     implied = {};
     inblock = false;
     lookahead = [];
-    warnings = 0;
     unuseds = [];
 
     if (!isString(s) && !Array.isArray(s)) {

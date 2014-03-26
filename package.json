@@ -65,6 +65,7 @@
     "undef":     true,
     "unused":    true,
     "onecase":   true,
+    "lastsemic": true,
     "indent":    2
   },
 
