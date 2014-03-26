@@ -81,7 +81,7 @@ var warnings = {
   W008: "A leading decimal point can be confused with a dot: '{a}'.",
   W009: "The array literal notation [] is preferable.",
   W010: "The object literal notation {} is preferable.",
-  W011: "Unexpected space after '{a}'.",
+  W011: null,
   W012: null,
   W013: null,
   W014: "Bad line breaking before '{a}'.",
