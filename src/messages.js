@@ -172,7 +172,7 @@ var warnings = {
   W096: "The '{a}' key may produce unexpected results.",
   W097: "Use the function form of \"use strict\".",
   W098: "'{a}' is defined but never used.",
-  W099: "Mixed spaces and tabs.",
+  W099: null,
   W100: "This character may get silently deleted by one or more browsers.",
   W101: "Line is too long.",
   W102: "Trailing whitespace.",

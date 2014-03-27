@@ -1325,22 +1325,6 @@ exports.maxlen = function (test) {
   test.done();
 };
 
-exports.smarttabs = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/smarttabs.js', 'utf8');
-
-  TestRun(test)
-    .addError(4, "Mixed spaces and tabs.")
-    .addError(5, "Mixed spaces and tabs.")
-    .addError(13, "Mixed spaces and tabs.")
-    .test(src, {es3: true});
-
-  TestRun(test)
-    .addError(5, "Mixed spaces and tabs.")
-    .test(src, {es3: true, smarttabs: true });
-
-  test.done();
-};
-
 /*
  * Tests the `laxcomma` option
  */
