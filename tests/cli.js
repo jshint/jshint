@@ -798,7 +798,7 @@ exports.group = {
       "<script type='text/javascript'>",
       "  /* jshint indent: 2*/",
       "  var a = 1;",
-      "    var b = 1;", // misindented on purpose
+      "    var b = 1",
       "</script>",
       "</html>"
     ].join("\n");
@@ -827,9 +827,9 @@ exports.group = {
     test.equal(errors.length, 1, "found single error");
     var lintError = errors[0].error;
     test.ok(lintError, "have error object");
-    test.equal(lintError.code, "W015", "found indentation error");
+    test.equal(lintError.code, "W033", "found missing semicolon warning");
     test.equal(lintError.line, 5, "misaligned line");
-    test.equal(lintError.character, 5, "first misaligned character at column 5");
+    test.equal(lintError.character, 14, "first misaligned character at column 5");
 
     test.done();
   },
@@ -849,12 +849,12 @@ exports.group = {
       "<script type='text/javascript'>",
       "  /* jshint indent: 2*/",
       "  var a = 1;",
-      "    var b = 1;", // misindented on purpose
+      "    var b = 1", // misindented on purpose
       "</script>",
       "<p>nothing</p>",
       "<script type='text/javascript'>",
       "  /* jshint indent: 2*/",
-      "      var a = 1;", // misindented on purpose
+      "      var a = 1", // misindented on purpose
       "</script>",
       "</html>"
     ].join("\n");
@@ -883,10 +883,10 @@ exports.group = {
     test.equal(errors.length, 2, "found two errors");
 
     test.equal(errors[0].error.line, 5, "first error line");
-    test.equal(errors[0].error.character, 5, "first error column");
+    test.equal(errors[0].error.character, 14, "first error column");
 
     test.equal(errors[1].error.line, 10, "second error line");
-    test.equal(errors[1].error.character, 7, "second error column");
+    test.equal(errors[1].error.character, 16, "second error column");
 
     test.done();
   }
