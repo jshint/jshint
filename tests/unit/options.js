@@ -1175,31 +1175,6 @@ exports.validthis = function (test) {
   test.done();
 };
 
-exports.indentation = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/indent.js', 'utf8');
-
-  TestRun(test)
-    .addError(5, "Mixed spaces and tabs.")
-    .addError(6, "Mixed spaces and tabs.")
-    .test(src, {es3: true});
-
-  // indent:false shouldn't trigger indent (GH-1035)
-  TestRun(test)
-    .addError(5, "Mixed spaces and tabs.")
-    .addError(6, "Mixed spaces and tabs.")
-    .test(src, {es3: true, indent: false});
-
-  TestRun(test)
-    .addError(5, "Mixed spaces and tabs.")
-    .addError(5, "Expected 'var' to have an indentation at 5 instead at 7.")
-    .addError(6, "Mixed spaces and tabs.")
-    .addError(6, "Expected 'var' to have an indentation at 5 instead at 7.")
-    .addError(7, "Expected '}' to have an indentation at 3 instead at 5.")
-    .test(src, { es3: true, indent: 2 });
-
-  test.done();
-};
-
 /*
  * Test string relevant options
  *   multistr   allows multiline strings

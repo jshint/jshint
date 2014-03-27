@@ -677,7 +677,6 @@ var JSHINT = (function () {
         }
 
         if (numvals.indexOf(key) >= 0) {
-
           // GH988 - numeric options can be disabled by setting them to `false`
           if (val !== "false") {
             val = +val;
@@ -687,16 +686,9 @@ var JSHINT = (function () {
               return;
             }
 
-            if (key === "indent") {
-              state.option["(explicitIndent)"] = true;
-            }
             state.option[key] = val;
           } else {
-            if (key === "indent") {
-              state.option["(explicitIndent)"] = false;
-            } else {
-              state.option[key] = false;
-            }
+            state.option[key] = key === "indent" ? 4 : false;
           }
 
           return;
@@ -1044,21 +1036,6 @@ var JSHINT = (function () {
     right = right || state.tokens.next;
     if (!state.option.laxbreak && left.line !== right.line) {
       warning("W014", right, right.value);
-    }
-  }
-
-  function indentation(bias) {
-    if (!state.option["(explicitIndent)"]) {
-      return;
-    }
-
-    if (state.tokens.next.id === "(end)") {
-      return;
-    }
-
-    var i = indent + (bias || 0);
-    if (state.tokens.next.from !== i) {
-      warning("W015", state.tokens.next, state.tokens.next.value, i, state.tokens.next.from);
     }
   }
 
@@ -1568,7 +1545,7 @@ var JSHINT = (function () {
   }
 
 
-  function statement(noindent) {
+  function statement() {
     var values;
     var i = indent, r, s = scope, t = state.tokens.next;
 
@@ -1636,9 +1613,6 @@ var JSHINT = (function () {
 
     // Parse the statement.
 
-    if (!noindent) {
-      indentation();
-    }
     r = expression(0, true);
 
     if (r && (!r.identifier || r.value !== "function") && (r.type !== "(punctuator)")) {
@@ -1736,7 +1710,6 @@ var JSHINT = (function () {
           break;
         }
 
-        indentation();
         advance();
         if (state.directive[state.tokens.curr.value]) {
           warning("W034", state.tokens.curr, state.tokens.curr.value);
@@ -1830,12 +1803,8 @@ var JSHINT = (function () {
         }
 
         indent -= state.option.indent;
-        if (line !== state.tokens.next.line) {
-          indentation();
-        }
-      } else if (line !== state.tokens.next.line) {
-        indentation();
       }
+
       advance("}", t);
 
       funct["(blockscope)"].unstack();
@@ -1877,7 +1846,7 @@ var JSHINT = (function () {
       noreach = true;
       indent += state.option.indent;
       // test indentation only if statement is in new line
-      a = [statement(state.tokens.next.line === state.tokens.curr.line)];
+      a = [statement()];
       indent -= state.option.indent;
       noreach = false;
 
@@ -2681,12 +2650,11 @@ var JSHINT = (function () {
           warning("W070");
         advance(",");
       }
+
       if (state.tokens.next.id === "]") {
         break;
       }
-      if (b && state.tokens.curr.line !== state.tokens.next.line) {
-        indentation();
-      }
+
       this.first.push(expression(10));
       if (state.tokens.next.id === ",") {
         comma({ allowTrailing: true });
@@ -2700,7 +2668,6 @@ var JSHINT = (function () {
     }
     if (b) {
       indent -= state.option.indent;
-      indentation();
     }
     advance("]", this);
     return this;
@@ -3059,10 +3026,6 @@ var JSHINT = (function () {
           break;
         }
 
-        if (b) {
-          indentation();
-        }
-
         if (isclassdef && state.tokens.next.value === "static") {
           advance("static");
           tag = "static ";
@@ -3189,7 +3152,6 @@ var JSHINT = (function () {
       }
       if (b) {
         indent -= state.option.indent;
-        indentation();
       }
       advance("}", this);
 
@@ -3743,7 +3705,7 @@ var JSHINT = (function () {
             warning("W086", state.tokens.curr, "case");
           }
         }
-        indentation();
+
         advance("case");
         this.cases.push(expression(0));
         increaseComplexityCount();
@@ -3768,7 +3730,7 @@ var JSHINT = (function () {
             }
           }
         }
-        indentation();
+
         advance("default");
         g = true;
         advance(":");
@@ -3776,7 +3738,7 @@ var JSHINT = (function () {
       case "}":
         if (!noindent)
           indent -= state.option.indent;
-        indentation();
+
         advance("}", t);
         funct["(breakage)"] -= 1;
         funct["(verb)"] = undefined;
@@ -4605,9 +4567,6 @@ var JSHINT = (function () {
 
           if (optionKeys[x] === "newcap" && o[optionKeys[x]] === false)
             newOptionObj["(explicitNewcap)"] = true;
-
-          if (optionKeys[x] === "indent")
-            newOptionObj["(explicitIndent)"] = o[optionKeys[x]] === false ? false : true;
         }
       }
     }

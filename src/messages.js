@@ -85,7 +85,7 @@ var warnings = {
   W012: null,
   W013: null,
   W014: "Bad line breaking before '{a}'.",
-  W015: "Expected '{a}' to have an indentation at {b} instead at {c}.",
+  W015: null,
   W016: "Unexpected use of '{a}'.",
   W017: "Bad operand.",
   W018: "Confusing use of '{a}'.",
