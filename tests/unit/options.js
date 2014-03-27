@@ -1136,18 +1136,6 @@ exports.laxbreak = function (test) {
   test.done();
 };
 
-exports.trailing = function (test) {
-  var src = "hello(); ";
-
-  TestRun(test).test(src, {es3: true});
-
-  TestRun(test)
-    .addError(1, "Trailing whitespace.", { character: 9 })
-    .test(src, { es3: true, trailing: true });
-
-  test.done();
-};
-
 exports.validthis = function (test) {
   var src = fs.readFileSync(__dirname + '/fixtures/strict_this.js', 'utf8');
 

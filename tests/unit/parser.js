@@ -3364,20 +3364,6 @@ exports["regression test for crash from GH-964"] = function (test) {
   test.done();
 };
 
-exports["regression test for GH-890"] = function (test) {
-  var code = [
-    "var a = 1; ",
-    "  ",
-    "var b;"
-  ];
-
-  TestRun(test)
-    .addError(1, "Trailing whitespace.")
-    .test(code, { trailing: true });
-
-  test.done();
-};
-
 exports["automatic comma insertion GH-950"] = function (test) {
   var code = [
     "var a = b",
