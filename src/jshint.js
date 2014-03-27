@@ -132,7 +132,6 @@ var JSHINT = (function () {
       sub         : true, // if all forms of subscript notation are tolerated
       supernew    : true, // if `new function () { ... };` and `new Object;`
                           // should be tolerated
-      trailing    : true, // if trailing whitespace rules apply
       validthis   : true, // if 'this' inside a non-constructor function is valid.
                           // This is a function scoped option only.
       withstmt    : true, // if with statements should be allowed
@@ -213,7 +212,8 @@ var JSHINT = (function () {
       passfail: true,
       white: true,
       gcl: true,
-      smarttabs: true
+      smarttabs: true,
+      trailing: true
     },
 
     declared, // Globals that were declared using /*global ... */ syntax.
