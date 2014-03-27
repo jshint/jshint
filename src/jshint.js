@@ -129,8 +129,6 @@ var JSHINT = (function () {
       typed       : true, // if typed array globals should be predefined
       undef       : true, // if variables should be declared before used
       scripturl   : true, // if script-targeted URLs should be tolerated
-      smarttabs   : true, // if smarttabs should be tolerated
-                          // (http://www.emacswiki.org/emacs/SmartTabs)
       strict      : true, // require the "use strict"; pragma
       sub         : true, // if all forms of subscript notation are tolerated
       supernew    : true, // if `new function () { ... };` and `new Object;`
@@ -215,7 +213,8 @@ var JSHINT = (function () {
       onevar: true,
       passfail: true,
       white: true,
-      gcl: true
+      gcl: true,
+      smarttabs: true
     },
 
     declared, // Globals that were declared using /*global ... */ syntax.

@@ -39,16 +39,13 @@ exports.jQuery_1_7 = function (test) {
     .addError(4465, "'curLoop' is defined but never used.")
     .addError(4560, "Expected an assignment or function call and instead saw an expression.")
     .addError(4694, "'cache' is defined but never used.")
-    .addError(4702, "Mixed spaces and tabs.")
     .addError(4712, "Expected a 'break' statement before 'case'.")
-    .addError(4715, "Mixed spaces and tabs.")
     .addError(4843, "Expected an assignment or function call and instead saw an expression.")
     .addError(5635, "'elem' is defined but never used.")
     .addError(5675, "'i' is defined but never used.")
     .addError(5691, "'i' is defined but never used.")
     .addError(7141, "'i' is defined but never used.")
     .addError(6061, "'cur' is defined but never used.")
-    .addError(9209, "Mixed spaces and tabs.")
     .test(src, { undef: true, unused: true }, globals);
 
   test.done();

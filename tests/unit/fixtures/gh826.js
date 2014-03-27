@@ -30,7 +30,7 @@
 	});
 
 	// this should trigger an error
-	 if (true) {
+	if (a == 0) {
 		throw "why did you not lint the above line";
 	}
 

@@ -1283,26 +1283,6 @@ Lexer.prototype = {
   },
 
   /*
-   * Scan for any occurence of mixed tabs and spaces. If smarttabs option
-   * is on, ignore tabs followed by spaces.
-   *
-   * Tabs followed by one space followed by a block comment are allowed.
-   */
-  scanMixedSpacesAndTabs: function () {
-    var at, match;
-
-    if (state.option.smarttabs) {
-      // Negative look-behind for "//"
-      match = this.input.match(/(\/\/|^\s?\*)? \t/);
-      at = match && !match[1] ? 0 : -1;
-    } else {
-      at = this.input.search(/ \t|\t [^\*]/);
-    }
-
-    return at;
-  },
-
-  /*
    * Scan for any occurence of non-breaking spaces. Non-breaking spaces
    * can be mistakenly typed on OS X with option-space. Non UTF-8 web
    * pages with non-breaking pages produce syntax errors.
@@ -1375,8 +1355,7 @@ Lexer.prototype = {
 
   /*
    * Switch to the next line and reset all char pointers. Once
-   * switched, this method also checks for mixed spaces and tabs
-   * and other minor warnings.
+   * switched, this method also checks for other minor warnings.
    */
   nextLine: function () {
     var char;
@@ -1415,11 +1394,6 @@ Lexer.prototype = {
     char = this.scanNonBreakingSpaces();
     if (char >= 0) {
       this.trigger("warning", { code: "W125", line: this.line, character: char + 1 });
-    }
-
-    char = this.scanMixedSpacesAndTabs();
-    if (char >= 0) {
-      this.trigger("warning", { code: "W099", line: this.line, character: char + 1 });
     }
 
     this.input = this.input.replace(/\t/g, state.tab);
