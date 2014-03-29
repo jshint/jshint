@@ -140,6 +140,7 @@ var JSHINT = (function () {
       wsh         : true, // if the Windows Scripting Host environment globals
                           // should be predefined
       yui         : true, // YUI variables should be predefined
+      mocha       : true, // Mocha functions should be predefined
       noyield     : true, // allow generators without a yield
 
       // Obsolete options
@@ -397,6 +398,10 @@ var JSHINT = (function () {
 
     if (state.option.yui) {
       combine(predefined, vars.yui);
+    }
+
+    if (state.option.mocha) {
+      combine(predefined, vars.mocha);
     }
 
     // Let's assume that chronologically ES3 < ES5 < ES6/ESNext < Moz
