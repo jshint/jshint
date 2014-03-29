@@ -3491,7 +3491,10 @@ stmt("return", function () {
 }(prefix("yield", function () {
   var prev = state.tokens.prev;
   if (api.getEnvironment("es6", true) && !funct["(generator)"]) {
-    warn("E046", { token: state.tokens.curr, args: ["yield"] });
+    // If it's a yield within a catch clause inside a generator then that's ok
+    if (!("(catch)" === funct["(name)"] && funct["(context)"]["(generator)"])) {
+      warn("E046", { token: state.tokens.curr, args: ["yield"] });
+    }
   } else if (!api.getEnvironment("es6")) {
     warn("W104", { token: state.tokens.curr, args: ["yield"] });
   }
