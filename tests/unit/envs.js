@@ -746,3 +746,23 @@ exports.phantom = function (test) {
 
   test.done();
 };
+
+exports.mocha = function (test) {
+  var globals = [
+    'describe',
+    'it',
+    'before',
+    'after',
+    'beforeEach',
+    'afterEach',
+    'suite',
+    'test',
+    'setup',
+    'teardown'
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { mocha: true });
+
+  test.done();
+};
