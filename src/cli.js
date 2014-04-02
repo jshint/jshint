@@ -439,7 +439,18 @@ function lint(code, results, config, data, file) {
     delete config.globals;
   }
 
+  if (config.overrides) {
+    if (file) {
+      _.each(config.overrides, function (options, pattern) {
+        if ((new RegExp(pattern)).test(file)) _.extend(config, options);
+      });
+    }
+
+    delete config.overrides;
+  }
+
   delete config.dirname;
+
   buffer.push(code);
   buffer = buffer.join("\n");
   buffer = buffer.replace(/^\uFEFF/, ""); // Remove potential Unicode BOM.

@@ -133,6 +133,57 @@ exports.group = {
     test.done();
   },
 
+  testOverrides: function (test) {
+    var dir = __dirname + "/../examples/";
+    var rep = require("../examples/reporter.js");
+    var config = {
+      "asi": true,
+      "overrides": {
+        "bar.js$": {
+          "asi": false
+        }
+      }
+    };
+
+    sinon.stub(process, "cwd").returns(dir);
+    sinon.stub(rep, "reporter");
+    sinon.stub(shjs, "cat")
+      .withArgs(sinon.match(/foo\.js$/)).returns("a()")
+      .withArgs(sinon.match(/bar\.js$/)).returns("a()")
+      .withArgs(sinon.match(/config\.json$/))
+        .returns(JSON.stringify(config));
+
+    sinon.stub(shjs, "test")
+      .withArgs("-e", sinon.match(/foo\.js$/)).returns(true)
+      .withArgs("-e", sinon.match(/bar\.js$/)).returns(true)
+      .withArgs("-e", sinon.match(/config\.json$/)).returns(true);
+
+    cli.exit.restore();
+    sinon.stub(cli, "exit")
+      .withArgs(0).returns(true)
+      .withArgs(1).throws("ProcessExit");
+
+    // Test successful file
+    cli.interpret([
+      "node", "jshint", "foo.js", "--config", "config.json", "--reporter", "reporter.js"
+    ]);
+    test.ok(rep.reporter.args[0][0].length === 0);
+
+    // Test overriden, failed file
+    cli.interpret([
+      "node", "jshint", "bar.js", "--config", "config.json", "--reporter", "reporter.js"
+    ]);
+    test.ok(rep.reporter.args[1][0].length > 0, "Error was expected but not thrown");
+    test.equal(rep.reporter.args[1][0][0].error.code, "W033");
+
+    process.cwd.restore();
+    rep.reporter.restore();
+    shjs.cat.restore();
+    shjs.test.restore();
+
+    test.done();
+  },
+
   testReporter: function (test) {
     test.expect(5);
 
