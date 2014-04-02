@@ -967,13 +967,11 @@ var JSHINT = (function () {
     var isDangerous =
       state.option.asi &&
       state.tokens.prev.line < state.tokens.curr.line &&
-      _.contains(["[", "(", "/"], state.tokens.curr.id) &&
-      (state.tokens.prev.type === "(punctuator)" &&
-        _.contains(["]", ")", "}"], state.tokens.prev.id));
+      _.contains(["]", ")"], state.tokens.prev.id) &&
+      _.contains(["[", "("], state.tokens.curr.id);
 
-    if (isDangerous) {
-      warning("W126", state.tokens.curr, state.tokens.curr.id);
-    }
+    if (isDangerous)
+      warning("W014", state.tokens.curr, state.tokens.curr.id);
 
     advance();
 
