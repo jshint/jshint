@@ -447,10 +447,9 @@ exports.safeasi = function (test) {
     .test(src, {});
 
   TestRun(test, 2)
-    .addError(3, "An automatic semicolon might be inserted before '['.")
-    .addError(5, "An automatic semicolon might be inserted before '('.")
-    .addError(8, "An automatic semicolon might be inserted before '('.")
-    .addError(10, "An automatic semicolon might be inserted before '/'.")
+    .addError(5, "Bad line breaking before '('.")
+    .addError(8, "Bad line breaking before '('.")
+    .addError(10, "Bad line breaking before '/'.")
     .addError(10, "Bad line breaking before '/'.")
     .addError(10, "Expected an identifier and instead saw '.'.")
     .addError(10, "Expected an assignment or function call and instead saw an expression.")
