@@ -443,13 +443,14 @@ exports.safeasi = function (test) {
     .addError(10, "Missing semicolon.")
     .addError(10, "Missing semicolon.")
     .addError(11, "Missing semicolon.")
+    .addError(21, "Missing semicolon.")
     .test(src, {});
 
   TestRun(test, 2)
-    .addError(3, "Bad line breaking before '['.")
-    .addError(5, "Bad line breaking before '('.")
-    .addError(6, "Bad line breaking before '['.")
-    .addError(8, "Bad line breaking before '('.")
+    .addError(3, "An automatic semicolon might be inserted before '['.")
+    .addError(5, "An automatic semicolon might be inserted before '('.")
+    .addError(8, "An automatic semicolon might be inserted before '('.")
+    .addError(10, "An automatic semicolon might be inserted before '/'.")
     .addError(10, "Bad line breaking before '/'.")
     .addError(10, "Expected an identifier and instead saw '.'.")
     .addError(10, "Expected an assignment or function call and instead saw an expression.")
@@ -477,11 +478,6 @@ exports.lastsemic = function (test) {
     .test(src, { es3: true, lastsemic: true });
   // this line is valid now: [1, 2, 3].forEach(function(i) { print(i) });
   // line 5 isn't, because the block doesn't close on the same line
-
-  // it shouldn't interfere with asi option
-  TestRun(test)
-    .addError(4, "Bad line breaking before '['.")
-    .test(src, { es3: true, lastsemic: true, asi: true });
 
   test.done();
 };

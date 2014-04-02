@@ -9,3 +9,13 @@ var fn = function() {}
 
     /a/.exec('a').forEach(fn)
 })()
+
+fn(
+  (fn1),
+  (fn2),
+  [
+    (fn3)
+  ],
+  fn1 &&
+  (fn2)
+)
