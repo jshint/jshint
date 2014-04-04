@@ -98,6 +98,7 @@ var JSHINT = (function () {
       globalstrict: true, // if global "use strict"; should be allowed (also enables 'strict')
       immed       : true, // if immediate invocations must be wrapped in parens
       iterator    : true, // if the `__iterator__` property should be allowed
+      jasmine     : true, // Jasmine functions should be predefined
       jquery      : true, // if jQuery globals should be predefined
       lastsemic   : true, // if semicolons may be ommitted for the trailing
                           // statements inside of a one-line blocks.
@@ -373,6 +374,10 @@ var JSHINT = (function () {
 
     if (state.option.nonstandard) {
       combine(predefined, vars.nonstandard);
+    }
+
+    if (state.option.jasmine) {
+      combine(predefined, vars.jasmine);
     }
 
     if (state.option.jquery) {
