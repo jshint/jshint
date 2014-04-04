@@ -766,3 +766,26 @@ exports.mocha = function (test) {
 
   test.done();
 };
+
+exports.jasmine = function (test) {
+  var globals = [
+    'jasmine',
+    'describe',
+    'it',
+    'xit',
+    'beforeEach',
+    'afterEach',
+    'setFixtures',
+    'loadFixtures',
+    'spyOn',
+    'expect',
+    'runs',
+    'waitsFor',
+    'waits'
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { jasmine: true });
+
+  test.done();
+};
