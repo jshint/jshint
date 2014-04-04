@@ -618,3 +618,20 @@ exports.mocha = {
   setup       : false,
   teardown    : false
 };
+
+exports.jasmine = {
+  jasmine     : false,
+  describe    : false,
+  it          : false,
+  xit         : false,
+  beforeEach  : false,
+  afterEach   : false,
+  setFixtures : false,
+  loadFixtures: false,
+  spyOn       : false,
+  expect      : false,
+  // Jasmine 1.3
+  runs        : false,
+  waitsFor    : false,
+  waits       : false,
+};
