@@ -633,5 +633,5 @@ exports.jasmine = {
   // Jasmine 1.3
   runs        : false,
   waitsFor    : false,
-  waits       : false,
+  waits       : false
 };
