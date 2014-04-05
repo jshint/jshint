@@ -1554,6 +1554,21 @@ var JSHINT = (function () {
     }
   }
 
+  function parseFinalSemicolon() {
+    if (state.tokens.next.id !== ";") {
+      if (!state.option.asi) {
+        // If this is the last statement in a block that ends on
+        // the same line *and* option lastsemic is on, ignore the warning.
+        // Otherwise, complain about missing semicolon.
+        if (!state.option.lastsemic || state.tokens.next.id !== "}" ||
+          state.tokens.next.line !== state.tokens.curr.line) {
+          warningAt("W033", state.tokens.curr.line, state.tokens.curr.character);
+        }
+      }
+    } else {
+      advance(";");
+    }
+  }
 
   function statement() {
     var values;
@@ -1588,7 +1603,7 @@ var JSHINT = (function () {
         addlabel(name, { type: "unused", token: state.tokens.curr });
         advance("from");
         advance("(string)");
-        advance(";");
+        parseFinalSemicolon();
         return;
       }
     }
@@ -1658,21 +1673,9 @@ var JSHINT = (function () {
       } else if (state.option.nonew && r && r.left && r.id === "(" && r.left.id === "new") {
         warning("W031", t);
       }
-
-      if (state.tokens.next.id !== ";") {
-        if (!state.option.asi) {
-          // If this is the last statement in a block that ends on
-          // the same line *and* option lastsemic is on, ignore the warning.
-          // Otherwise, complain about missing semicolon.
-          if (!state.option.lastsemic || state.tokens.next.id !== "}" ||
-            state.tokens.next.line !== state.tokens.curr.line) {
-            warningAt("W033", state.tokens.curr.line, state.tokens.curr.character);
-          }
-        }
-      } else {
-        advance(";");
-      }
+      parseFinalSemicolon();
     }
+
 
     // Restore the indentation.
 
