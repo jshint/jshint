@@ -816,7 +816,11 @@ exports.testModuleKeyword = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/module-keyword.js", "utf8");
 
   TestRun(test)
+    .addError(4, "Missing semicolon.")
     .test(src, { esnext: true });
+
+  TestRun(test)
+    .test(src, { esnext: true, asi: true });
 
   test.done();
 };
