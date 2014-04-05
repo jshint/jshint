@@ -1577,7 +1577,7 @@ var JSHINT = (function () {
       res = false;
     }
 
-    // detect a possible module assignment
+    // detect a module import declaration
     if (t.value === "module" && t.type === "(identifier)") {
       if (peek().type === "(identifier)") {
         if (!state.option.inESNext()) {
