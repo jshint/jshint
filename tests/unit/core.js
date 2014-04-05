@@ -811,3 +811,12 @@ exports.testArrayPrototypeExtensions = function (test) {
   delete Array.prototype.undefinedPrototypeProperty;
   test.done();
 };
+
+exports.testModuleKeyword = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/module-keyword.js", "utf8");
+
+  TestRun(test)
+    .test(src, { esnext: true });
+
+  test.done();
+};

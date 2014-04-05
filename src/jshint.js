@@ -1576,6 +1576,23 @@ var JSHINT = (function () {
       res = false;
     }
 
+    // detect a possible module assignment
+    if (t.value === "module" && t.type === "(identifier)") {
+      if (peek().type === "(identifier)") {
+        if (!state.option.inESNext()) {
+          warning("W119", state.tokens.curr, "module");
+        }
+
+        advance("module");
+        var name = identifier();
+        addlabel(name, { type: "unused", token: state.tokens.curr });
+        advance("from");
+        advance("(string)");
+        advance(";");
+        return;
+      }
+    }
+
     // detect a destructuring assignment
     if (_.has(["[", "{"], t.value)) {
       if (lookupBlockType().isDestAssign) {
