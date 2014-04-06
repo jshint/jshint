@@ -1555,6 +1555,21 @@ var JSHINT = (function () {
     }
   }
 
+  function parseFinalSemicolon() {
+    if (state.tokens.next.id !== ";") {
+      if (!state.option.asi) {
+        // If this is the last statement in a block that ends on
+        // the same line *and* option lastsemic is on, ignore the warning.
+        // Otherwise, complain about missing semicolon.
+        if (!state.option.lastsemic || state.tokens.next.id !== "}" ||
+          state.tokens.next.line !== state.tokens.curr.line) {
+          warningAt("W033", state.tokens.curr.line, state.tokens.curr.character);
+        }
+      }
+    } else {
+      advance(";");
+    }
+  }
 
   function statement() {
     var values;
@@ -1575,6 +1590,23 @@ var JSHINT = (function () {
     if (res && t.meta && t.meta.isFutureReservedWord && peek().id === ":") {
       warning("W024", t, t.id);
       res = false;
+    }
+
+    // detect a module import declaration
+    if (t.value === "module" && t.type === "(identifier)") {
+      if (peek().type === "(identifier)") {
+        if (!state.option.inESNext()) {
+          warning("W119", state.tokens.curr, "module");
+        }
+
+        advance("module");
+        var name = identifier();
+        addlabel(name, { type: "unused", token: state.tokens.curr });
+        advance("from");
+        advance("(string)");
+        parseFinalSemicolon();
+        return;
+      }
     }
 
     // detect a destructuring assignment
@@ -1642,21 +1674,9 @@ var JSHINT = (function () {
       } else if (state.option.nonew && r && r.left && r.id === "(" && r.left.id === "new") {
         warning("W031", t);
       }
-
-      if (state.tokens.next.id !== ";") {
-        if (!state.option.asi) {
-          // If this is the last statement in a block that ends on
-          // the same line *and* option lastsemic is on, ignore the warning.
-          // Otherwise, complain about missing semicolon.
-          if (!state.option.lastsemic || state.tokens.next.id !== "}" ||
-            state.tokens.next.line !== state.tokens.curr.line) {
-            warningAt("W033", state.tokens.curr.line, state.tokens.curr.character);
-          }
-        }
-      } else {
-        advance(";");
-      }
+      parseFinalSemicolon();
     }
+
 
     // Restore the indentation.
 
