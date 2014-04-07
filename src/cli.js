@@ -158,6 +158,14 @@ function findFile(name, dir) {
     return null;
   }
 
+  // Do not search up beyond home directory.
+  // More efficient, especially when home directories
+  // are automount points.
+  if (process.env.HOME === dir) {
+    findFileResults[filename] = null;
+    return null;
+  }
+
   return findFile(name, parent);
 }
 
