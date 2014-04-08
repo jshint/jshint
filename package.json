@@ -45,7 +45,6 @@
 
   "devDependencies": {
     "jshint":        "2.5.x",
-    "shelljs":       "0.2.x",
     "browserify":    "3.x",
     "coveraje":      "0.2.x",
     "nodeunit":      "0.8.x",
