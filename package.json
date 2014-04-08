@@ -33,23 +33,23 @@
   "main": "./src/jshint.js",
 
   "dependencies": {
-    "shelljs":     "0.1.x",
-    "underscore":  "1.4.x",
+    "shelljs":     "0.2.x",
+    "underscore":  "1.6.x",
     "cli":         "0.4.x",
     "minimatch":   "0.x.x",
-    "htmlparser2": "3.3.x",
-    "console-browserify": "0.1.x",
+    "htmlparser2": "3.7.x",
+    "console-browserify": "1.1.x",
     "exit": "0.1.x",
     "strip-json-comments": "0.1.x"
   },
 
   "devDependencies": {
-    "jshint":        "2.4.x",
-    "shelljs":       "0.1.x",
+    "jshint":        "2.5.x",
+    "shelljs":       "0.2.x",
     "browserify":    "3.x",
     "coveraje":      "0.2.x",
     "nodeunit":      "0.8.x",
-    "sinon":         "1.7.x",
+    "sinon":         "1.9.x",
     "unicode-6.3.0": "0.1.x",
     "regenerate":    "0.5.x"
   },
