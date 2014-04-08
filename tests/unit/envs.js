@@ -366,6 +366,34 @@ exports.browser = function (test) {
   test.done();
 };
 
+exports.qunit = function (test) {
+  var globals = [
+    "asyncTest",
+    "deepEqual",
+    "equal",
+    "expect",
+    "module",
+    "notDeepEqual",
+    "notEqual",
+    "notPropEqual",
+    "notStrictEqual",
+    "ok",
+    "propEqual",
+    "QUnit",
+    "raises",
+    "start",
+    "stop",
+    "strictEqual",
+    "test",
+    "throws"
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { qunit: true });
+
+  test.done();
+};
+
 exports.rhino = function (test) {
   var globals = [
     'defineClass',
