@@ -20,7 +20,7 @@ bundle.bundle({}, function (err, src) {
   var web   = distDir + "/jshint.js";
   var rhino = distDir + "/jshint-rhino.js";
 
-  [ "// " + version,
+  [ "/*! " + version + " */",
     "var JSHINT;",
     "if (typeof window === 'undefined') window = {};",
     "(function () {",
