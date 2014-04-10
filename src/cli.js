@@ -1,6 +1,7 @@
 "use strict";
 
 var _           = require("underscore");
+var fs          = require("fs");
 var cli         = require("cli");
 var path        = require("path");
 var shjs        = require("shelljs");
@@ -89,8 +90,12 @@ function removeComments(str) {
  * @returns {string} a path to the config file
  */
 function findConfig(file) {
-	var dir  = path.dirname(path.resolve(file));
-	var envs = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
+	var dir = path.dirname(path.resolve(file));
+	var envs = getHomeDir();
+
+	if (!envs)
+		return null;
+
 	var home = path.normalize(path.join(envs, ".jshintrc"));
 
 	var proj = findFile(".jshintrc", dir);
@@ -102,6 +107,22 @@ function findConfig(file) {
 
 	return null;
 }
+
+function getHomeDir() {
+    var environment = global.process.env;
+    var paths = [environment.HOME,
+                 environment.USERPROFILE,
+                 environment.HOMEPATH,
+                 environment.HOMEDRIVE + environment.HOMEPATH];
+
+    for (var homeIndex in paths)
+			if (paths.hasOwnProperty(homeIndex)) {
+				var homePath = paths[homeIndex];
+
+				if (homePath && fs.existsSync(homePath))
+					return homePath;
+			}
+	}
 
 /**
  * Tries to find JSHint configuration within a package.json file
