@@ -46,7 +46,7 @@ var fs = require('fs');
 var writeFile = function(fileName, data) {
   fs.writeFileSync(
     fileName,
-    'module.exports = ' + JSON.stringify(data, null, '\t') + ';\n'
+    'module.exports = ' + JSON.stringify(data, null, '  ') + ';\n'
   );
 };
 
