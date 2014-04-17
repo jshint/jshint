@@ -383,13 +383,14 @@ Lexer.prototype = {
           return;
         }
 
-        if (body.substr(0, str.length) === str) {
+        if (body.charAt(str.length) === " " && body.substr(0, str.length) === str) {
           isSpecial = true;
           label = label + str;
           body = body.substr(str.length);
         }
 
-        if (!isSpecial && body.charAt(0) === " " && body.substr(1, str.length) === str) {
+        if (!isSpecial && body.charAt(0) === " " && body.charAt(str.length + 1) === " " &&
+          body.substr(1, str.length) === str) {
           isSpecial = true;
           label = label + " " + str;
           body = body.substr(str.length + 1);
