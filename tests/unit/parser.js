@@ -4195,3 +4195,21 @@ exports["test destructuring function parameters as legacy JS"] = function (test)
 
   test.done();
 };
+
+exports["test es6 object initator syntax"] = function (test) {
+  var code = [
+    "var a = 1;",
+    "var b = { a };",
+    "var c = { b, a };",
+    "var c = { 1 };" // Only identifiers can be used.
+  ];
+
+  TestRun(test)
+    .addError(4, "Expected ':' and instead saw '}'.")
+    .addError(4, "Expected an identifier and instead saw ';'.")
+    .addError(4, "Unmatched '{'.")
+    .addError(4, "Missing semicolon.")
+    .test(code, { esnext: true });
+
+  test.done();
+};

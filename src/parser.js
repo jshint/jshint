@@ -2625,6 +2625,12 @@ function checkCondAssignment(expr) {
             warn("W104", { token: state.tokens.curr, args: ["concise methods"] });
           }
           doFunction(i, undefined, g);
+        } else if (state.tokens.curr.identifier && api.getEnvironment("es6") &&
+          (state.tokens.next.value === "," || state.tokens.next.value === "}")) {
+
+          if (state.tokens.next.value === "}") {
+            break;
+          }
         } else if (!isclassdef) {
           advance(":");
           expression(10);
