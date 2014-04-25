@@ -139,7 +139,7 @@ exports.group = {
     var config = {
       "asi": true,
       "overrides": {
-        "bar.js$": {
+        "bar.js": {
           "asi": false
         }
       }
