@@ -824,3 +824,11 @@ exports.testModuleKeyword = function (test) {
 
   test.done();
 };
+
+exports.testComments = function (test) {
+  var src = fs.readFileSync(__dirname + '/fixtures/gh1632.js', 'utf8');
+
+  TestRun(test).test(src);
+
+  test.done();
+};
