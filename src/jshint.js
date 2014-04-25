@@ -124,6 +124,7 @@ var JSHINT = (function () {
       proto       : true, // if the `__proto__` property should be allowed
       prototypejs : true, // if Prototype and Scriptaculous globals should be
                           // predefined
+      qunit       : true, // if the QUnit environment globals should be predefined
       rhino       : true, // if the Rhino environment globals should be predefined
       shelljs     : true, // if ShellJS globals should be predefined
       typed       : true, // if typed array globals should be predefined
@@ -332,6 +333,10 @@ var JSHINT = (function () {
 
     if (state.option.couch) {
       combine(predefined, vars.couch);
+    }
+
+    if (state.option.qunit) {
+      combine(predefined, vars.qunit);
     }
 
     if (state.option.rhino) {
