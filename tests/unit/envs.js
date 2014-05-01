@@ -606,7 +606,7 @@ exports.mootools = function (test) {
     "Group",
     "Hash",
     "HtmlTable",
-    "Iframe",
+    "IFrame",
     "IframeShim",
     "InputValidator",
     "instanceOf",
