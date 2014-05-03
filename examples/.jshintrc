@@ -98,18 +98,18 @@
 
     // LEGACY - Do not use
 
-    "gcl"           : false,    // google closre compiler compatible
-    "nomen"         : false,    // disallows dangling _ in variables
+    "gcl"           : true,     // google closre compiler compatible
+    "nomen"         : true,     // disallows dangling _ in variables
     "onevar"        : true,     // one var statement per function
-    "passfail"      : false,    // stop hinting on first failure
-    "smarttabs"     : false,    // suppress warnings about mixed tabs and spaces
+    "passfail"      : true,     // stop hinting on first failure
+    "smarttabs"     : true,     // suppress warnings about mixed tabs and spaces
     "trailing"      : true,     // disallows trailing whitespace on lines
     "white"         : true,     // check against mostly undocumented whitespace rules
 
 
     // OBSOLETE
 
-    "onecase"       : false,     // if one case switch statements should be allowed
+    "onecase"       : true,      // if one case switch statements should be allowed
     "regexp"        : true,      // if the . should not be allowed in regexp literals
     "regexdash"     : true,      // if unescaped first/last dash (-) inside brackets should be tolerated
 
