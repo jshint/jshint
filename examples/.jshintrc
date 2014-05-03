@@ -98,7 +98,7 @@
 
     // LEGACY - Do not use
 
-    "gcl"           : true,     // google closre compiler compatible
+    "gcl"           : true,     // google closure compiler compatible
     "nomen"         : true,     // disallows dangling _ in variables
     "onevar"        : true,     // one var statement per function
     "passfail"      : true,     // stop hinting on first failure
