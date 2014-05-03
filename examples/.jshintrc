@@ -102,7 +102,7 @@
     "nomen"         : false,    // disallows dangling _ in variables
     "onevar"        : true,     // one var statement per function
     "passfail"      : false,    // stop hinting on first failure
-    "smarttabs"     : false,    // suppress warnings about mixes tabs and spaces
+    "smarttabs"     : false,    // suppress warnings about mixed tabs and spaces
     "trailing"      : true,     // disallows trailing whitespace on lines
     "white"         : true,     // check against mostly undocumented whitespace rules
 
