@@ -3009,57 +3009,61 @@ var JSHINT = (function () {
       return;
     }
     
-    var next = state.tokens.next, bras = 1, i = 0, inhop = false;
+    var next = state.tokens.next,
+        peekIdx = 0,
+        brackets = 1, // Number of opening brackets that need to be closed. We already
+                      // have one from the if statement itself: if (<=
+        inHasOwnProperty = false; // Whether we are inside the hasOwnProperty call
     
-    while (bras > 0 && next.type !== "(end)") {
+    while (brackets > 0 && next.type !== "(end)") {
       if (next.type === "(punctuator)") {
         if (next.value === "(") {
-          ++bras;
+          ++brackets;
         } else if (next.value === ")") {
-          if (inhop) {
+          if (inHasOwnProperty) {
             return;
           }
-          --bras;
+          --brackets;
         }
       } else if (next.type === "(identifier)") {
-        if (inhop) {
+        if (inHasOwnProperty) {
           return next.value;
-        } else if (next.value ==="hasOwnProperty") {
-          inhop = true;
+        } else if (next.value === "hasOwnProperty") {
+          inHasOwnProperty = true;
         }
       }
       
-      next = peek(i);
-      ++i;
+      next = peek(peekIdx);
+      ++peekIdx;
     }
   }
   
   // Checks the condition of an if statement within a for-in loop to ensure
   // that the collection that is looped over is the same as the collection that
-  // the hasOwnPropert method is called on.
+  // the hasOwnProperty method is called on.
   function checkForInIfHasOwnPropertyCond(expr, coll) {
     var compareTokens = function(token1, token2) {
-      if (token1 === undefined && token2 === undefined) {
+      if (token1 === token2) { // Two equal strings or two "undefined" tokens
         return true;
       }
       
-      if (typeof token1 !== typeof token2 || typeof token1 === "string" &&
-          token1 !== token2 || token1.type !== token2.type ||
+      if (typeof token1 !== typeof token2 || token1.type !== token2.type ||
           token1.value !== token2.value) {
         return false;
       }
       
-      if (! compareTokens(token1.left, token2.left)) {
+      if (!compareTokens(token1.left, token2.left)) {
         return false;
       }
       
-      if (! compareTokens(token1.right, token2.right)) {
+      if (!compareTokens(token1.right, token2.right)) {
         return false;
       }
       
       return true;
     };
     
+    // Check for negative comparison: if (!collection.hasOwnProperty(key))
     if (expr.type === "(punctuator)" && expr.value === "!") {
       if (expr.right && expr.right.type === "(punctuator)" && expr.right.value === "(") {
         if (expr.right.left && expr.right.left.right === "hasOwnProperty") {
@@ -3068,7 +3072,10 @@ var JSHINT = (function () {
           }
         }
       }
-    } else if (expr.type === "(punctuator)" && expr.value === "(") {
+    }
+    
+    // Check for positive comparison: if (collection.hasOwnProperty(key))
+    if (expr.type === "(punctuator)" && expr.value === "(") {
       if (expr.left && expr.left.type === "(punctuator)" && expr.left.value === ".") {
         if (expr.left.left && expr.left.right === "hasOwnProperty") {
           if (compareTokens(expr.left.left, coll)) {
