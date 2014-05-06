@@ -4220,7 +4220,6 @@ var JSHINT = (function () {
   FutureReservedWord("static", { es5: true, strictOnly: true });
   FutureReservedWord("super", { es5: true });
   FutureReservedWord("synchronized");
-  FutureReservedWord("throws");
   FutureReservedWord("transient");
   FutureReservedWord("volatile");
 
