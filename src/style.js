@@ -127,7 +127,7 @@ exports.register = function (linter) {
   // Warn about script URLs.
 
   linter.on("String", function style_scanJavaScriptURLs(data) {
-    var re = /^(?:javascript|jscript|ecmascript|vbscript|mocha|livescript)\s*:/i;
+    var re = /^(?:javascript|jscript|ecmascript|vbscript|livescript)\s*:/i;
 
     if (linter.getOption("scripturl")) {
       return;
