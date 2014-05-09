@@ -46,7 +46,13 @@ var fs = require('fs');
 var writeFile = function(fileName, data) {
   fs.writeFileSync(
     fileName,
-    'module.exports = ' + JSON.stringify(data, null, '  ') + ';\n'
+    [
+    'var str = \'' + data.join(',') + '\';',
+    'var arr = str.split(\',\').map(function(code) {',
+    '  return parseInt(code, 10);',
+    '});',
+    'module.exports = arr;'
+    ].join('\n')
   );
 };
 
