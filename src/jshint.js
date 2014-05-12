@@ -4137,7 +4137,7 @@ var JSHINT = (function () {
 
     if (state.tokens.next.type === "default") {
       advance("default");
-      if (state.tokens.next.id === "function" || state.tokens.next.id === "class") {
+      if (state.tokens.next.id === "class") {
         this.block = true;
       }
       this.exportee = expression(10);
@@ -4176,7 +4176,6 @@ var JSHINT = (function () {
       exported[state.tokens.next.value] = true;
       state.syntax["const"].fud.call(state.syntax["const"].fud);
     } else if (state.tokens.next.id === "function") {
-      this.block = true;
       advance("function");
       exported[state.tokens.next.value] = true;
       state.syntax["function"].fud();

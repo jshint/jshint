@@ -22,7 +22,7 @@ export default foobar;
 // makes testing a hell of a lot easier
 export default function() {
   return "foobar";
-}
+};
 
 export { foo };
 export { foo, bar };
@@ -31,7 +31,7 @@ export { foo, bar };
 
 export function a() {
   return "a";
-}
+};
 
 export var b = function() {
   return "b";

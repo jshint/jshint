@@ -699,7 +699,7 @@ exports.testES6ModulesNamedExportsAffectUnused = function (test) {
     "var z = 42;",
     "export { a, x };",
     "export var b = { baz: 'baz' };",
-    "export function boo() { return z; }",
+    "export function boo() { return z; };",
     "export class MyClass { }"
   ];
 
@@ -722,7 +722,7 @@ exports.testES6ModulesDefaultExportsAffectUnused = function (test) {
     "var x = 23;",
     "var z = 42;",
     "export default { a: a, x: x };",
-    "export default function boo() { return x + z; }",
+    "export default function boo() { return x + z; };",
     "export default class MyClass { }"
   ];
 
