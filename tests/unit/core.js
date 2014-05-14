@@ -832,3 +832,19 @@ exports.testComments = function (test) {
 
   test.done();
 };
+
+exports.testCommentsBackCompat1 = function (test) {
+  var src = fs.readFileSync(__dirname + '/fixtures/gh1632-1.js', 'utf8');
+
+  TestRun(test).test(src);
+
+  test.done();
+};
+
+exports.testCommentsBackCompat2 = function (test) {
+  var src = fs.readFileSync(__dirname + '/fixtures/gh1632-2.js', 'utf8');
+
+  TestRun(test).test(src);
+
+  test.done();
+};
