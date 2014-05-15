@@ -39,6 +39,13 @@ JSHint including but not limited to:
 Before reporting a bug look around to see if there are any open or closed tickets
 that cover your issue. And remember the wisdom: pull request > bug report > tweet.
 
+#### Issue Priority
+
+- *P1:* Something is throwing exceptions; broken JSHint backward compatibility.
+- *P2:* Something is not being parsed correctly.
+- *P3:* Features that the core team will work on once P2s and P1s are done.
+- *P4:* Patches welcome; The request is good, but low priority.
+
 
 #### License
 
