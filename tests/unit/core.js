@@ -823,3 +823,14 @@ exports.testModuleKeyword = function (test) {
 
   test.done();
 };
+
+exports.testAnonFunctions = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/anon-functions.js", "utf8");
+
+  TestRun(test)
+    .addError(6, "Expected a named function", {character: 3})
+    .addError(9, "Expected a named function", {character: 2})
+    .addError(13, "Expected a named function", {character: 9})
+    .test(src, {anonfuncs: false});
+  test.done()
+};

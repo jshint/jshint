@@ -109,6 +109,7 @@ var JSHINT = (function () {
                           // loops
       mootools    : true, // if MooTools globals should be predefined
       multistr    : true, // allow multiline strings
+      anonfuncs   : true, // allow anonymous functions
       freeze      : true, // if modifying native object prototypes should be disallowed
       newcap      : true, // if constructor names must be capitalized
       noarg       : true, // if arguments.caller and arguments.callee should be
@@ -2896,6 +2897,13 @@ var JSHINT = (function () {
 
     if (name) {
       addlabel(name, { type: "function" });
+    }
+
+    // If false, anonfuncs will raise a warning on anonymous functions.
+    // This is mainly used for debugging as it makes stack traces more readable.
+    // Named functions still have their names stripped by most minifiers.
+    if (state.option.anonfuncs === false && name === undefined) {
+      warning("W126", state.tokens.curr);
     }
 
     funct["(params)"] = functionparams(fatarrowparams);
