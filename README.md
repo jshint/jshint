@@ -6,24 +6,13 @@ JSHint, A Static Code Analysis Tool for JavaScript
 [Install](http://jshint.com/install/) • [Hack](http://jshint.com/hack/) •
 [Blog](http://jshint.com/blog/) • [Twitter](https://twitter.com/jshint/) \]
 
-[![Build Status](https://travis-ci.org/jshint/jshint.svg?branch=2.x)](https://travis-ci.org/jshint/jshint)
+[![Build Status](https://travis-ci.org/jshint/jshint.svg?branch=master)](https://travis-ci.org/jshint/jshint)
 [![NPM version](https://badge.fury.io/js/jshint.svg)](http://badge.fury.io/js/jshint)
 
 JSHint is a community-driven tool to detect errors and potential problems
 in JavaScript code. It is very flexible so you can easily adjust it to your
 particular coding guidelines and the environment you expect your code to
 execute in.
-
-#### JSHint 2.x versus JSHint 3
-
-There's an effort going on to release the next major version of JSHint. All
-development in the `master` branch is for the version 3.0. Current stable
-version is in the `2.x` branch. Keep that in mind when submitting pull requests.
-
-Also, before reporting a bug or thinking about hacking on JSHint, read this:
-[JSHint 3 plans](http://www.jshint.com/blog/jshint-3-plans/). TL;DR: we're
-moving away from style checks within JSHint so no new features around
-style checks will be accepted. Bug fixes are fine for the `2.x` branch.
 
 #### Reporting a bug
 
