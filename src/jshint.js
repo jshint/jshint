@@ -4748,6 +4748,8 @@ var JSHINT = (function () {
 
             if (context[name] === "unused")
               context[name] = "var";
+            else if (context[name] === "const" && getprop(context, name, "unused"))
+              setprop(context, name, { unused: false });
             else if (context[name] === "unction")
               context[name] = "closure";
 
