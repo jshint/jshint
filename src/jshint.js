@@ -318,7 +318,7 @@ var JSHINT = (function () {
 
   function combine(dest, src) {
     Object.keys(src).forEach(function (name) {
-      if (JSHINT.blacklist.hasOwnProperty(name)) return;
+      if (Object.prototype.hasOwnProperty.call(JSHINT.blacklist, name)) return;
       dest[name] = src[name];
     });
   }
