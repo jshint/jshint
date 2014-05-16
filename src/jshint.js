@@ -3007,7 +3007,91 @@ var JSHINT = (function () {
       }
     }
   }
-
+  
+  // Searches for the argument of a hasOwnProperty function within an if conditional.
+  function getForInIfHasOwnPropertyArg() {
+    if (state.tokens.curr.type !== "(punctuator)" || state.tokens.curr.value !== "(") {
+      return;
+    }
+    
+    var next = state.tokens.next,
+        peekIdx = 0,
+        brackets = 1, // Number of opening brackets that need to be closed. We already
+                      // have one from the if statement itself: if (<=
+        inHasOwnProperty = false; // Whether we are inside the hasOwnProperty call
+    
+    while (brackets > 0 && next.type !== "(end)") {
+      if (next.type === "(punctuator)") {
+        if (next.value === "(") {
+          ++brackets;
+        } else if (next.value === ")") {
+          if (inHasOwnProperty) {
+            return;
+          }
+          --brackets;
+        }
+      } else if (next.type === "(identifier)") {
+        if (inHasOwnProperty) {
+          return next.value;
+        } else if (next.value === "hasOwnProperty") {
+          inHasOwnProperty = true;
+        }
+      }
+      
+      next = peek(peekIdx);
+      ++peekIdx;
+    }
+  }
+  
+  // Checks the condition of an if statement within a for-in loop to ensure
+  // that the collection that is looped over is the same as the collection that
+  // the hasOwnProperty method is called on.
+  function checkForInIfHasOwnPropertyCond(expr, coll) {
+    var compareTokens = function(token1, token2) {
+      if (token1 === token2) { // Two equal strings or two "undefined" tokens
+        return true;
+      }
+      
+      if (typeof token1 !== typeof token2 || token1.type !== token2.type ||
+          token1.value !== token2.value) {
+        return false;
+      }
+      
+      if (!compareTokens(token1.left, token2.left)) {
+        return false;
+      }
+      
+      if (!compareTokens(token1.right, token2.right)) {
+        return false;
+      }
+      
+      return true;
+    };
+    
+    // Check for negative comparison: if (!collection.hasOwnProperty(key))
+    if (expr.type === "(punctuator)" && expr.value === "!") {
+      if (expr.right && expr.right.type === "(punctuator)" && expr.right.value === "(") {
+        if (expr.right.left && expr.right.left.right === "hasOwnProperty") {
+          if (compareTokens(expr.right.left.left, coll)) {
+            return "(negative)";
+          }
+        }
+      }
+    }
+    
+    // Check for positive comparison: if (collection.hasOwnProperty(key))
+    if (expr.type === "(punctuator)" && expr.value === "(") {
+      if (expr.left && expr.left.type === "(punctuator)" && expr.left.value === ".") {
+        if (expr.left.left && expr.left.right === "hasOwnProperty") {
+          if (compareTokens(expr.left.left, coll)) {
+            return "(positive)";
+          }
+        }
+      }
+    }
+    
+    return "(none)";
+  }
 
   (function (x) {
     x.nud = function (isclassdef) {
@@ -3578,10 +3662,41 @@ var JSHINT = (function () {
     increaseComplexityCount();
     state.condition = true;
     advance("(");
-    checkCondAssignment(expression(0));
+    
+    // When the if is within a for-in loop, check if the argument of the
+    // hasOwnProperty method equals the loop key.
+    var forinifcheck = null;
+    if (state.option.forin && state.forinifcheckneeded) {
+      forinifcheck = state.forinifchecks[state.forinifchecks.length - 1];
+      if (forinifcheck.key !== getForInIfHasOwnPropertyArg()) {
+        state.forinifcheckneeded = false; // No further checks needed
+      }
+    }
+    
+    var expr = expression(0);
+    checkCondAssignment(expr);
+    
+    // When the if is within a for-in loop, check if the condition contains a
+    // call to hasOwnProperty on the collection that is looped over.
+    if (state.option.forin && state.forinifcheckneeded) {
+      state.forinifcheckneeded = false;
+      forinifcheck.type = checkForInIfHasOwnPropertyCond(expr, forinifcheck.coll);
+    }
+    
     advance(")", t);
     state.condition = false;
-    block(true, true);
+    var s = block(true, true);
+    
+    // When the if is within a for-in loop and the condition has a negative form,
+    // check if the body contains nothing but a continue statement.
+    if (forinifcheck && forinifcheck.type === "(negative)") {
+      if (s.length === 1 && s[0].type === "(identifier)" && s[0].value === "continue") {
+        forinifcheck.type = "(negative-with-continue)";
+      } else {
+        forinifcheck.type = "(none)";
+      }
+    }
+    
     if (state.tokens.next.id === "else") {
       advance("else");
       if (state.tokens.next.id === "if" || state.tokens.next.id === "switch") {
@@ -3898,14 +4013,43 @@ var JSHINT = (function () {
         }
         advance();
       }
+      var key = state.tokens.curr.value;
       advance(nextop.value);
-      expression(20);
+      var coll = expression(20);
       advance(")", t);
-      s = block(true, true);
-      if (state.option.forin && s && (s.length > 1 || typeof s[0] !== "object" ||
-          s[0].value !== "if")) {
-        warning("W089", this);
+      
+      if (state.option.forin) {
+        state.forinifcheckneeded = true;
+        
+        if (state.forinifchecks === undefined) {
+          state.forinifchecks = [];
+        }
+        
+        // Push a new for-in-if check onto the stack. The type will be modified
+        // when the loop body is parsed and a suitable if statement exists.
+        state.forinifchecks.push({
+          type: "(none)",
+          key:   key,
+          coll:  coll
+        });
       }
+      
+      s = block(true, true);
+      
+      if (state.option.forin) {
+        if (state.forinifchecks && state.forinifchecks.length > 0) {
+          var check = state.forinifchecks.pop();
+          
+          if (check.type === "(none)" && s && s.length > 0 ||
+              s && s.length > 0 && (typeof s[0] !== "object" || s[0].value !== "if") ||
+              check.type === "(positive)" && s.length > 1) {
+            warning("W089", this);
+          }
+        }
+        
+        state.forinifcheckneeded = false;
+      }
+      
       funct["(breakage)"] -= 1;
       funct["(loopage)"] -= 1;
     } else {
