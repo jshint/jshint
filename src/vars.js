@@ -553,7 +553,7 @@ exports.mootools = {
   Group         : false,
   Hash          : false,
   HtmlTable     : false,
-  Iframe        : false,
+  IFrame        : false,
   IframeShim    : false,
   InputValidator: false,
   instanceOf    : false,
