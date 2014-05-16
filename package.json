@@ -65,6 +65,7 @@
   "files": [
     "bin",
     "src",
-    "data"
+    "data",
+    "dist"
   ]
 }
