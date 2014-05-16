@@ -1,6 +1,6 @@
 #!/usr/bin/env rhino
 var window = {};
-// 2.5.0
+/*! 2.5.1 */
 var JSHINT;
 if (typeof window === 'undefined') window = {};
 (function () {
@@ -52846,6 +52846,7 @@ var JSHINT = (function () {
       globalstrict: true, // if global "use strict"; should be allowed (also enables 'strict')
       immed       : true, // if immediate invocations must be wrapped in parens
       iterator    : true, // if the `__iterator__` property should be allowed
+      jasmine     : true, // Jasmine functions should be predefined
       jquery      : true, // if jQuery globals should be predefined
       lastsemic   : true, // if semicolons may be ommitted for the trailing
                           // statements inside of a one-line blocks.
@@ -52871,6 +52872,7 @@ var JSHINT = (function () {
       proto       : true, // if the `__proto__` property should be allowed
       prototypejs : true, // if Prototype and Scriptaculous globals should be
                           // predefined
+      qunit       : true, // if the QUnit environment globals should be predefined
       rhino       : true, // if the Rhino environment globals should be predefined
       shelljs     : true, // if ShellJS globals should be predefined
       typed       : true, // if typed array globals should be predefined
@@ -53081,6 +53083,10 @@ var JSHINT = (function () {
       combine(predefined, vars.couch);
     }
 
+    if (state.option.qunit) {
+      combine(predefined, vars.qunit);
+    }
+
     if (state.option.rhino) {
       combine(predefined, vars.rhino);
     }
@@ -53121,6 +53127,10 @@ var JSHINT = (function () {
 
     if (state.option.nonstandard) {
       combine(predefined, vars.nonstandard);
+    }
+
+    if (state.option.jasmine) {
+      combine(predefined, vars.jasmine);
     }
 
     if (state.option.jquery) {
@@ -54297,6 +54307,21 @@ var JSHINT = (function () {
     }
   }
 
+  function parseFinalSemicolon() {
+    if (state.tokens.next.id !== ";") {
+      if (!state.option.asi) {
+        // If this is the last statement in a block that ends on
+        // the same line *and* option lastsemic is on, ignore the warning.
+        // Otherwise, complain about missing semicolon.
+        if (!state.option.lastsemic || state.tokens.next.id !== "}" ||
+          state.tokens.next.line !== state.tokens.curr.line) {
+          warningAt("W033", state.tokens.curr.line, state.tokens.curr.character);
+        }
+      }
+    } else {
+      advance(";");
+    }
+  }
 
   function statement() {
     var values;
@@ -54317,6 +54342,23 @@ var JSHINT = (function () {
     if (res && t.meta && t.meta.isFutureReservedWord && peek().id === ":") {
       warning("W024", t, t.id);
       res = false;
+    }
+
+    // detect a module import declaration
+    if (t.value === "module" && t.type === "(identifier)") {
+      if (peek().type === "(identifier)") {
+        if (!state.option.inESNext()) {
+          warning("W119", state.tokens.curr, "module");
+        }
+
+        advance("module");
+        var name = identifier();
+        addlabel(name, { type: "unused", token: state.tokens.curr });
+        advance("from");
+        advance("(string)");
+        parseFinalSemicolon();
+        return;
+      }
     }
 
     // detect a destructuring assignment
@@ -54384,21 +54426,9 @@ var JSHINT = (function () {
       } else if (state.option.nonew && r && r.left && r.id === "(" && r.left.id === "new") {
         warning("W031", t);
       }
-
-      if (state.tokens.next.id !== ";") {
-        if (!state.option.asi) {
-          // If this is the last statement in a block that ends on
-          // the same line *and* option lastsemic is on, ignore the warning.
-          // Otherwise, complain about missing semicolon.
-          if (!state.option.lastsemic || state.tokens.next.id !== "}" ||
-            state.tokens.next.line !== state.tokens.curr.line) {
-            warningAt("W033", state.tokens.curr.line, state.tokens.curr.character);
-          }
-        }
-      } else {
-        advance(";");
-      }
+      parseFinalSemicolon();
     }
+
 
     // Restore the indentation.
 
@@ -56937,7 +56967,6 @@ var JSHINT = (function () {
   FutureReservedWord("static", { es5: true, strictOnly: true });
   FutureReservedWord("super", { es5: true });
   FutureReservedWord("synchronized");
-  FutureReservedWord("throws");
   FutureReservedWord("transient");
   FutureReservedWord("volatile");
 
@@ -59648,7 +59677,7 @@ exports.starSlash = /\*\//;
 exports.identifier = /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/;
 
 // JavaScript URL (jx)
-exports.javascriptURL = /^(?:javascript|jscript|ecmascript|vbscript|mocha|livescript)\s*:/i;
+exports.javascriptURL = /^(?:javascript|jscript|ecmascript|vbscript|livescript)\s*:/i;
 
 // Catches /* falls through */ comments (ft)
 exports.fallsThrough = /^\s*\/\*\s*falls?\sthrough\s*\*\/\s*$/;
@@ -59817,7 +59846,7 @@ exports.register = function (linter) {
   // Warn about script URLs.
 
   linter.on("String", function style_scanJavaScriptURLs(data) {
-    var re = /^(?:javascript|jscript|ecmascript|vbscript|mocha|livescript)\s*:/i;
+    var re = /^(?:javascript|jscript|ecmascript|vbscript|livescript)\s*:/i;
 
     if (linter.getOption("scripturl")) {
       return;
@@ -60248,6 +60277,27 @@ exports.phantom = {
   exports      : true  // v1.7+
 };
 
+exports.qunit = {
+  asyncTest      : false,
+  deepEqual      : false,
+  equal          : false,
+  expect         : false,
+  module         : false,
+  notDeepEqual   : false,
+  notEqual       : false,
+  notPropEqual   : false,
+  notStrictEqual : false,
+  ok             : false,
+  propEqual      : false,
+  QUnit          : false,
+  raises         : false,
+  start          : false,
+  stop           : false,
+  strictEqual    : false,
+  test           : false,
+  "throws"       : false
+};
+
 exports.rhino = {
   defineClass  : false,
   deserialize  : false,
@@ -60367,7 +60417,7 @@ exports.mootools = {
   Group         : false,
   Hash          : false,
   HtmlTable     : false,
-  Iframe        : false,
+  IFrame        : false,
   IframeShim    : false,
   InputValidator: false,
   instanceOf    : false,
@@ -60452,6 +60502,23 @@ exports.mocha = {
   test        : false,
   setup       : false,
   teardown    : false
+};
+
+exports.jasmine = {
+  jasmine     : false,
+  describe    : false,
+  it          : false,
+  xit         : false,
+  beforeEach  : false,
+  afterEach   : false,
+  setFixtures : false,
+  loadFixtures: false,
+  spyOn       : false,
+  expect      : false,
+  // Jasmine 1.3
+  runs        : false,
+  waitsFor    : false,
+  waits       : false
 };
 
 },{}]},{},["fNbQ4d"])

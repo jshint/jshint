@@ -6,24 +6,13 @@ JSHint, A Static Code Analysis Tool for JavaScript
 [Install](http://jshint.com/install/) • [Hack](http://jshint.com/hack/) •
 [Blog](http://jshint.com/blog/) • [Twitter](https://twitter.com/jshint/) \]
 
-[![Build Status](https://travis-ci.org/jshint/jshint.svg?branch=2.x)](https://travis-ci.org/jshint/jshint)
+[![Build Status](https://travis-ci.org/jshint/jshint.svg?branch=master)](https://travis-ci.org/jshint/jshint)
 [![NPM version](https://badge.fury.io/js/jshint.svg)](http://badge.fury.io/js/jshint)
 
 JSHint is a community-driven tool to detect errors and potential problems
 in JavaScript code. It is very flexible so you can easily adjust it to your
 particular coding guidelines and the environment you expect your code to
 execute in.
-
-#### JSHint 2.x versus JSHint 3
-
-There's an effort going on to release the next major version of JSHint. All
-development in the `master` branch is for the version 3.0. Current stable
-version is in the `2.x` branch. Keep that in mind when submitting pull requests.
-
-Also, before reporting a bug or thinking about hacking on JSHint, read this:
-[JSHint 3 plans](http://www.jshint.com/blog/jshint-3-plans/). TL;DR: we're
-moving away from style checks within JSHint so no new features around
-style checks will be accepted. Bug fixes are fine for the `2.x` branch.
 
 #### Reporting a bug
 
@@ -38,6 +27,13 @@ JSHint including but not limited to:
 
 Before reporting a bug look around to see if there are any open or closed tickets
 that cover your issue. And remember the wisdom: pull request > bug report > tweet.
+
+#### Issue Priority
+
+- *P1:* Something is throwing exceptions; broken JSHint backward compatibility.
+- *P2:* Something is not being parsed correctly.
+- *P3:* Features that the core team will work on once P2s and P1s are done.
+- *P4:* Patches welcome; The request is good, but low priority.
 
 
 #### License

@@ -519,8 +519,7 @@ exports.testReserved = function (test) {
     .addError(10, "Expected an identifier and instead saw 'let' (a reserved word).")
     .addError(13, "Expected an identifier and instead saw 'class' (a reserved word).")
     .addError(14, "Expected an identifier and instead saw 'else' (a reserved word).")
-    .addError(15, "Expected an identifier and instead saw 'throws' (a reserved word).")
-    .addError(16, "Expected an identifier and instead saw 'protected' (a reserved word).")
+    .addError(15, "Expected an identifier and instead saw 'protected' (a reserved word).")
     .test(src, {es3: true});
 
   TestRun(test)

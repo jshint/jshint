@@ -28,7 +28,7 @@ exports.starSlash = /\*\//;
 exports.identifier = /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/;
 
 // JavaScript URL (jx)
-exports.javascriptURL = /^(?:javascript|jscript|ecmascript|vbscript|mocha|livescript)\s*:/i;
+exports.javascriptURL = /^(?:javascript|jscript|ecmascript|vbscript|livescript)\s*:/i;
 
 // Catches /* falls through */ comments (ft)
 exports.fallsThrough = /^\s*\/\*\s*falls?\sthrough\s*\*\/\s*$/;
