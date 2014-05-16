@@ -1,0 +1,273 @@
+﻿{
+  "title": "JSON schema for JSHint configuration files",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+
+  "definitions": {
+    "jshintrc": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "maxerr": {
+          "description": "Maximum error before stopping",
+          "type": "integer"
+        },
+
+        // Enforcing
+        "bitwise": {
+          "description": "Prohibit bitwise operators (&, |, ^, etc.)",
+          "type": "boolean"
+        },
+        "camelcase": {
+          "description": "Identifiers must be in camelCase",
+          "type": "boolean"
+        },
+        "curly": {
+          "description": "Require {} for every new block or scope",
+          "type": "boolean"
+        },
+        "eqeqeq": {
+          "description": "Require triple equals (===) for comparison",
+          "type": "boolean"
+        },
+        "forin": {
+          "description": "Require filtering for..in loops with obj.hasOwnProperty()",
+          "type": "boolean"
+        },
+        "immed": {
+          "description": "Require immediate invocations to be wrapped in parens e.g. `(function () { } ());`",
+          "type": "boolean"
+        },
+        "indent": {
+          "description": "Number of spaces to use for indentation",
+          "type": "boolean"
+        },
+        "latedef": {
+          "description": "Require variables/functions to be defined before being used",
+          "type": "boolean"
+        },
+        "newcap": {
+          "description": "Require capitalization of all constructor functions e.g. `new F()`",
+          "type": "boolean"
+        },
+        "noarg": {
+          "description": "Prohibit use of `arguments.caller` and `arguments.callee`",
+          "type": "boolean"
+        },
+        "noempty": {
+          "description": "Prohibit use of empty blocks",
+          "type": "boolean"
+        },
+        "nonew": {
+          "description": "Prohibit use of constructors for side-effects (without assignment)",
+          "type": "boolean"
+        },
+        "plusplus": {
+          "description": "Prohibit use of `++` & `--`",
+          "type": "boolean"
+        },
+        "quotmark": {
+          "description": "Quotation mark consistency",
+          "type": ["boolean", "string"],
+          "enum": [true, false, "single", "double"]
+        },
+        "undef": {
+          "description": "Require all non-global variables to be declared (prevents global leaks)",
+          "type": "boolean"
+        },
+        "unused": {
+          "description": "Require all defined variables be used",
+          "type": "boolean"
+        },
+        "strict": {
+          "description": "Requires all functions run in ES5 Strict Mode",
+          "type": "boolean"
+        },
+        "trailing": {
+          "description": "Prohibit trailing whitespaces",
+          "type": "boolean"
+        },
+        "maxparams": {
+          "description": "Max number of formal params allowed per function",
+          "type": ["boolean", "integer"]
+        },
+        "maxdepth": {
+          "description": "Max depth of nested blocks (within functions)",
+          "type": ["boolean", "integer"]
+        },
+        "maxstatements": {
+          "description": "Max number statements per function",
+          "type": ["boolean", "integer"]
+        },
+        "maxcomplexity": {
+          "description": "Max cyclomatic complexity per function",
+          "type": ["boolean", "integer"]
+        },
+        "maxlen": {
+          "description": "Max number of characters per line",
+          "type": ["boolean", "integer"]
+        },
+
+        // Relaxing
+        "asi": {
+          "description": "Tolerate Automatic Semicolon Insertion (no semicolons)",
+          "type": "boolean"
+        },
+        "boss": {
+          "description": "Tolerate assignments where comparisons would be expected",
+          "type": "boolean"
+        },
+        "debug": {
+          "description": "Allow debugger statements e.g. browser breakpoints",
+          "type": "boolean"
+        },
+        "eqnull": {
+          "description": "Tolerate use of `== null`",
+          "type": "boolean"
+        },
+        "es5": {
+          "description": "Allow ES5 syntax (ex: getters and setters)",
+          "type": "boolean"
+        },
+        "esnext": {
+          "description": "Allow ES.next (ES6) syntax (ex: `const`)",
+          "type": "boolean"
+        },
+        "moz": {
+          "description": "Allow Mozilla specific syntax (extends and overrides esnext features)",
+          "type": "boolean"
+        },
+        "evil": {
+          "description": "Tolerate use of `eval` and `new Function()`",
+          "type": "boolean"
+        },
+        "expr": {
+          "description": "Tolerate `ExpressionStatement` as Programs",
+          "type": "boolean"
+        },
+        "funcscope": {
+          "description": "Tolerate defining variables inside control statements",
+          "type": "boolean"
+        },
+        "globalstrict": {
+          "description": "Allow global 'use strict' (also enables 'strict')",
+          "type": "boolean"
+        },
+        "iterator": {
+          "description": "Tolerate using the `__iterator__` property",
+          "type": "boolean"
+        },
+        "lastsemic": {
+          "description": "Tolerate omitting a semicolon for the last statement of a 1-line block",
+          "type": "boolean"
+        },
+        "laxbreak": {
+          "description": "Tolerate possibly unsafe line breakings",
+          "type": "boolean"
+        },
+        "laxcomma": {
+          "description": "Tolerate comma-first style coding",
+          "type": "boolean"
+        },
+        "loopfunc": {
+          "description": "Tolerate functions being defined in loops",
+          "type": "boolean"
+        },
+        "multistr": {
+          "description": "Tolerate multi-line strings",
+          "type": "boolean"
+        },
+        "proto": {
+          "description": "Tolerate using the `__proto__` property",
+          "type": "boolean"
+        },
+        "scripturl": {
+          "description": "Tolerate script-targeted URLs",
+          "type": "boolean"
+        },
+        "smarttabs": {
+          "description": "Tolerate mixed tabs/spaces when used for alignment",
+          "type": "boolean"
+        },
+        "shadow": {
+          "description": "Allows re-define variables later in code e.g. `var x=1; x=2;`",
+          "type": "boolean"
+        },
+        "sub": {
+          "description": "Tolerate using `[]` notation when it can still be expressed in dot notation",
+          "type": "boolean"
+        },
+        "supernew": {
+          "description": "Tolerate `new function () { ... };` and `new Object;`",
+          "type": "boolean"
+        },
+        "validthis": {
+          "description": "Tolerate using this in a non-constructor function",
+          "type": "boolean"
+        },
+        "browser": {
+          "description": "Web Browser (window, document, etc)",
+          "type": "boolean"
+        },
+        "couch": {
+          "description": "CouchDB",
+          "type": "boolean"
+        },
+        "devel": {
+          "description": "Development/debugging (alert, confirm, etc)",
+          "type": "boolean"
+        },
+        "dojo": {
+          "description": "Dojo Toolkit",
+          "type": "boolean"
+        },
+        "jquery": {
+          "description": "jQuery",
+          "type": "boolean"
+        },
+        "mootools": {
+          "description": "MooTools",
+          "type": "boolean"
+        },
+        "node": {
+          "description": "Node.js",
+          "type": "boolean"
+        },
+        "nonstandard": {
+          "description": "Widely adopted globals (escape, unescape, etc)",
+          "type": "boolean"
+        },
+        "prototypejs": {
+          "description": "Prototype and Scriptaculous",
+          "type": "boolean"
+        },
+        "rhino": {
+          "description": "Rhino",
+          "type": "boolean"
+        },
+        "worker": {
+          "description": "Web Workers",
+          "type": "boolean"
+        },
+        "wsh": {
+          "description": "Windows Scripting Host",
+          "type": "boolean"
+        },
+        "yui": {
+          "description": "Yahoo User Interface",
+          "type": "boolean"
+        },
+        "globals": {
+          "description": "additional predefined global variables",
+          "type": "object",
+          "additionalProperties": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  },
+
+  "anyOf": [{ "$ref": "#/definitions/jshintrc" }],
+  "type": "object",
+  "additionalProperties": true
+}
