@@ -1597,18 +1597,8 @@ exports.defaulthard = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/defaulthard.js', 'utf8');
 
 	TestRun(test)
-		.test(src, {  defaulthard: false });
+		.test(src, {  defaulthard: true });
 
-	TestRun(test)
-
-		.test(src, { defaulthard: true, sub: true });
-
-	TestRun(test).test(src, {es3: true}); // By default, everything is fine
-
-
-	TestRun(test)
-
-		.test(src, { es3: true, defaulthard: true });
 
 	test.done();
 };
