@@ -145,7 +145,7 @@ var JSHINT = (function () {
       mocha       : true, // Mocha functions should be predefined
       noyield     : true, // allow generators without a yield
 
-	  defaulthard : false, // option to allow all enforce options on by default and all relax options off by default
+	  defaulthard : false, // option to turn on all enforce options by default and all relax options off by default
 
       // Obsolete options
       onecase     : true, // if one case switch statements should be allowed
