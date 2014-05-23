@@ -1600,20 +1600,14 @@ exports.defaulthard = function (test) {
 		.test(src, {  defaulthard: false });
 
 	TestRun(test)
-		.addError(5, 'A constructor name should start with an uppercase letter.')
-		.addError(9, "Missing 'new' prefix when invoking a constructor.")
-		.addError(14, "A constructor name should start with an uppercase letter.")
-		.addError(2, "This line contains non-breaking spaces: http://jshint.com/doc/options/#nonbsp")
+
 		.test(src, { defaulthard: true, sub: true });
 
 	TestRun(test).test(src, {es3: true}); // By default, everything is fine
 
 
 	TestRun(test)
-		.addError(5, 'A constructor name should start with an uppercase letter.')
-		.addError(9, "Missing 'new' prefix when invoking a constructor.")
-		.addError(14, "A constructor name should start with an uppercase letter.")
-		.addError(2, "This line contains non-breaking spaces: http://jshint.com/doc/options/#nonbsp")
+
 		.test(src, { es3: true, defaulthard: true });
 
 	test.done();
