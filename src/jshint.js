@@ -144,13 +144,13 @@ var JSHINT = (function () {
       mocha       : true, // Mocha functions should be predefined
       noyield     : true, // allow generators without a yield
 
+	  defaulthard : false, // option to allow all enforce options on by default and all relax options off by default
+
       // Obsolete options
       onecase     : true, // if one case switch statements should be allowed
       regexp      : true, // if the . should not be allowed in regexp literals
-      regexdash   : true,  // if unescaped first/last dash (-) inside brackets
+      regexdash   : true  // if unescaped first/last dash (-) inside brackets
                           // should be tolerated
-	  defaulthard : false // option to allow all enforce options on by default and all relax options off by default
-
     },
 
     // These are the JSHint options that can take any value
@@ -328,6 +328,12 @@ var JSHINT = (function () {
     if (state.option.es5) {
       warning("I003");
     }
+
+	if(state.option.defaulthard)
+	{
+		state.option.newcap = true;
+		state.option.nonbsp = true;
+	}
 
     if (state.option.esnext) {
       combine(predefined, vars.newEcmaIdentifiers);
