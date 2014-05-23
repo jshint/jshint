@@ -1597,7 +1597,38 @@ exports.defaulthard = function (test) {
 	var src = fs.readFileSync(__dirname + '/fixtures/defaulthard.js', 'utf8');
 
 	TestRun(test)
-		.test(src, {  defaulthard: true });
+		.test(src, {defaulthard: true});
+
+	//can override defaults from defaulthard
+	TestRun(test)
+		.addError(2,"A constructor name should start with an uppercase letter.")
+		.test(src, {
+            //turn off all enforcing options
+			defaulthard: true,
+			bitwise : false,
+			camelcase : false,
+			curly : false,
+			eqeqeq : false,
+			es3 : false,
+			forin : false,
+			freeze : false,
+			immed : false,
+			indent : false,
+			latedef : false,
+			newcap : true,
+			noarg : false,
+			noempty : false,
+			nonbsp : false,
+			nonew : false,
+			plusplus : false,
+			quotmark : false,
+			undef : false,
+			unused : false,
+			strict : false,
+			trailing : false
+
+
+		});
 
 
 	test.done();

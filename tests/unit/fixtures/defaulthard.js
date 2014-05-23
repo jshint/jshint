@@ -1,2 +1,3 @@
+
 var test = new testclass();
-var stringwithbreak = " ";
+test.t = 1;
