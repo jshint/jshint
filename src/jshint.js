@@ -331,8 +331,63 @@ var JSHINT = (function () {
 
 	if(state.option.defaulthard)
 	{
+        //turn on all enforcing options
+		state.option.bitwise = true;
+		state.option.camelcase = true;
+		state.option.curly = true;
+		state.option.eqeqeq = true;
+		state.option.es3 = true;
+		state.option.forin = true;
+		state.option.freeze = true;
+		state.option.immed = true;
+		state.option.indent = true;
+		state.option.latedef = true;
 		state.option.newcap = true;
+		state.option.noarg = true;
+		state.option.noempty = true;
 		state.option.nonbsp = true;
+		state.option.nonew = true;
+		state.option.plusplus = true;
+		state.option.quotemark = true;
+		state.option.undef = true;
+		state.option.unused = true;
+		state.option.strict = true;
+		state.option.trailing = true;
+		state.option.maxparams = true;
+		state.option.maxdepth = true;
+		state.option.maxstatements = true;
+		state.option.maxcomplexity = true;
+		state.option.maxlen = true;
+
+		//turn off all relaxing options
+		state.option.asi = false;
+		state.option.boss = false;
+		state.option.debug = false;
+		state.option.eqnull = false;
+		state.option.esnext = false;
+		state.option.evil = false;
+		state.option.expr = false;
+		state.option.funcscope = false;
+		state.option.gcl = false;
+		state.option.globalstrict = false;
+		state.option.iterator = false;
+		state.option.lastsemic = false;
+		state.option.laxbreak = false;
+		state.option.laxcomman = false;
+		state.option.loopfunc = false;
+		state.option.maxerr = false;
+		state.option.moz = false;
+		state.option.multistr = false;
+		state.option.notypeof = false;
+		state.option.proto = false;
+		state.option.scripturl = false;
+		state.option.smarttabs = false;
+		state.option.shadow = false;
+		state.option.sub = false;
+		state.option.supernew = false;
+		state.option.validthis = false;
+		state.option.noyield = false;
+
 	}
 
     if (state.option.esnext) {
