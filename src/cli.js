@@ -530,11 +530,11 @@ var exports = {
       config.dirname = path.dirname(fp);
 
       if (config['extends']) {
-        var baseConfig = exports.loadConfig(path.resolve(config.dirname, config['extends']));
-        config.globals = _.extend({}, baseConfig.globals, config.globals);
-        _.defaults(config, baseConfig);
-        delete config['extends'];
-      }
+		    var baseConfig = exports.loadConfig(path.resolve(config.dirname, config['extends']));
+		    config.globals = _.extend({}, baseConfig.globals, config.globals);
+		    _.defaults(config, baseConfig);
+		    delete config['extends'];
+	    }
 
       return config;
     } catch (err) {
