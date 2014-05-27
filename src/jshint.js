@@ -325,163 +325,27 @@ var JSHINT = (function () {
     });
   }
 
-  // I belive this will be reset each time a rc file is run which is the only time
-  // the defaulthard opt should need to be reprocessed
-  var defaulHardProcessed = false;
-  //This should need to be run every time assume is called only run once
+
   function processDefaultHard ()
   {
-    if(defaulHardProcessed === true){
-      return;
-    }
 
-    defaulHardProcessed = true;
+    var relaxingRules = ["asi","boss","debug","eqnull","esnext","evil","expr","funcscope","globalstrict","iterator",
+      "lastsemic","laxbreak","laxcomma","loopfunc","moz","multistr","scripturl","sub","supernew","validthis","noyield"];
+
+    var enforcingRules = ["bitwise","camelcase","curly","eqeqeq","forin","freeze","immed","latedef","newcap","noarg","noempty",
+    "nonbsp","nonew","plusplus","quotemark","undef","unused","strict","trailing"];
+
     if (state.option.defaulthard) {
-      //turn on all enforcing options unless defined independently in rc file
-
-      if (state.option.bitwise === undefined) {
-        state.option.bitwise = true;
+      enforcingRules.forEach(function (opt) {
+        if (state.option[opt] === undefined) {
+          state.option[opt] = true;
+        }
+      });
+      relaxingRules.forEach(function (opt){
+        if (state.option[opt] === undefined) {
+          state.option[opt] = false;
       }
-      if (state.option.camelcase === undefined) {
-        state.option.camelcase = true;
-      }
-      if (state.option.curly === undefined) {
-        state.option.curly = true;
-      }
-      if (state.option.eqeqeq === undefined) {
-        state.option.eqeqeq = true;
-      }
-      if (state.option.forin === undefined) {
-        state.option.forin = true;
-      }
-      if (state.option.freeze === undefined) {
-        state.option.freeze = true;
-      }
-      if (state.option.immed === undefined) {
-        state.option.immed = true;
-      }
-      if (state.option.curly === undefined) {
-        state.option.indent = true;
-      }
-      if (state.option.latedef === undefined) {
-        state.option.latedef = true;
-      }
-      if (state.option.newcap === undefined) {
-        state.option.newcap = true;
-      }
-      if (state.option.noarg === undefined) {
-        state.option.noarg = true;
-      }
-      if (state.option.noempty === undefined) {
-        state.option.noempty = true;
-      }
-      if (state.option.nonbsp === undefined) {
-        state.option.nonbsp = true;
-      }
-      if (state.option.nonew === undefined) {
-        state.option.nonew = true;
-      }
-      if (state.option.plusplus === undefined) {
-        state.option.plusplus = true;
-      }
-      if (state.option.quotmark === undefined) {
-        state.option.quotmark = true;
-      }
-      if (state.option.undef === undefined) {
-        state.option.undef = true;
-      }
-      if (state.option.unused === undefined) {
-        state.option.unused = true;
-      }
-      if (state.option.strict === undefined) {
-        state.option.strict = true;
-      }
-      if (state.option.trailing === undefined) {
-        state.option.trailing = true;
-      }
-
-      //turn off all relaxing options
-      if (state.option.asi === undefined) {
-        state.option.asi = false;
-      }
-      if (state.option.boss === undefined) {
-        state.option.boss = false;
-      }
-      if (state.option.debug === undefined) {
-        state.option.debug = false;
-      }
-      if (state.option.eqnull === undefined) {
-        state.option.eqnull = false;
-      }
-      if (state.option.esnext === undefined) {
-        state.option.esnext = false;
-      }
-      if (state.option.evil === undefined) {
-        state.option.evil = false;
-      }
-      if (state.option.expr === undefined) {
-        state.option.expr = false;
-      }
-      if (state.option.funcscope === undefined) {
-        state.option.funcscope = false;
-      }
-      if (state.option.gcl === undefined) {
-        state.option.gcl = false;
-      }
-      if (state.option.globalstrict === undefined) {
-        state.option.globalstrict = false;
-      }
-      if (state.option.iterator === undefined) {
-        state.option.iterator = false;
-      }
-      if (state.option.lastsemic === undefined) {
-        state.option.lastsemic = false;
-      }
-      if (state.option.laxbreak === undefined) {
-        state.option.laxbreak = false;
-      }
-      if (state.option.laxcomman === undefined) {
-        state.option.laxcomman = false;
-      }
-      if (state.option.loopfunc === undefined) {
-        state.option.loopfunc = false;
-      }
-      if (state.option.maxerr === undefined) {
-        state.option.maxerr = false;
-      }
-      if (state.option.moz === undefined) {
-        state.option.moz = false;
-      }
-      if (state.option.multistr === undefined) {
-        state.option.multistr = false;
-      }
-      if (state.option.notypeof === undefined) {
-        state.option.notypeof = false;
-      }
-      if (state.option.proto === undefined) {
-        state.option.proto = false;
-      }
-      if (state.option.scripturl === undefined) {
-        state.option.scripturl = false;
-      }
-      if (state.option.smarttabs === undefined) {
-        state.option.smarttabs = false;
-      }
-      if (state.option.shadow === undefined) {
-        state.option.shadow = false;
-      }
-      if (state.option.sub === undefined) {
-        state.option.sub = false;
-      }
-      if (state.option.supernew === undefined) {
-        state.option.supernew = false;
-      }
-      if (state.option.validthis === undefined) {
-        state.option.validthis = false;
-      }
-      if (state.option.noyield === undefined) {
-        state.option.noyield = false;
-      }
+      });
 
     }
   }
