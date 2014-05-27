@@ -325,10 +325,174 @@ var JSHINT = (function () {
     });
   }
 
+  // I belive this will be reset each time a rc file is run which is the only time
+  // the defaulthard opt should need to be reprocessed
+  var defaulHardProcessed = false;
+  //This should need to be run every time assume is called only run once
+  function processDefaultHard ()
+  {
+    if(defaulHardProcessed === true){
+      return;
+    }
+
+    defaulHardProcessed = true;
+    if (state.option.defaulthard) {
+      //turn on all enforcing options unless defined independently in rc file
+
+      if (state.option.bitwise === undefined) {
+        state.option.bitwise = true;
+      }
+      if (state.option.camelcase === undefined) {
+        state.option.camelcase = true;
+      }
+      if (state.option.curly === undefined) {
+        state.option.curly = true;
+      }
+      if (state.option.eqeqeq === undefined) {
+        state.option.eqeqeq = true;
+      }
+      if (state.option.forin === undefined) {
+        state.option.forin = true;
+      }
+      if (state.option.freeze === undefined) {
+        state.option.freeze = true;
+      }
+      if (state.option.immed === undefined) {
+        state.option.immed = true;
+      }
+      if (state.option.curly === undefined) {
+        state.option.indent = true;
+      }
+      if (state.option.latedef === undefined) {
+        state.option.latedef = true;
+      }
+      if (state.option.newcap === undefined) {
+        state.option.newcap = true;
+      }
+      if (state.option.noarg === undefined) {
+        state.option.noarg = true;
+      }
+      if (state.option.noempty === undefined) {
+        state.option.noempty = true;
+      }
+      if (state.option.nonbsp === undefined) {
+        state.option.nonbsp = true;
+      }
+      if (state.option.nonew === undefined) {
+        state.option.nonew = true;
+      }
+      if (state.option.plusplus === undefined) {
+        state.option.plusplus = true;
+      }
+      if (state.option.quotmark === undefined) {
+        state.option.quotmark = true;
+      }
+      if (state.option.undef === undefined) {
+        state.option.undef = true;
+      }
+      if (state.option.unused === undefined) {
+        state.option.unused = true;
+      }
+      if (state.option.strict === undefined) {
+        state.option.strict = true;
+      }
+      if (state.option.trailing === undefined) {
+        state.option.trailing = true;
+      }
+
+      //turn off all relaxing options
+      if (state.option.asi === undefined) {
+        state.option.asi = false;
+      }
+      if (state.option.boss === undefined) {
+        state.option.boss = false;
+      }
+      if (state.option.debug === undefined) {
+        state.option.debug = false;
+      }
+      if (state.option.eqnull === undefined) {
+        state.option.eqnull = false;
+      }
+      if (state.option.esnext === undefined) {
+        state.option.esnext = false;
+      }
+      if (state.option.evil === undefined) {
+        state.option.evil = false;
+      }
+      if (state.option.expr === undefined) {
+        state.option.expr = false;
+      }
+      if (state.option.funcscope === undefined) {
+        state.option.funcscope = false;
+      }
+      if (state.option.gcl === undefined) {
+        state.option.gcl = false;
+      }
+      if (state.option.globalstrict === undefined) {
+        state.option.globalstrict = false;
+      }
+      if (state.option.iterator === undefined) {
+        state.option.iterator = false;
+      }
+      if (state.option.lastsemic === undefined) {
+        state.option.lastsemic = false;
+      }
+      if (state.option.laxbreak === undefined) {
+        state.option.laxbreak = false;
+      }
+      if (state.option.laxcomman === undefined) {
+        state.option.laxcomman = false;
+      }
+      if (state.option.loopfunc === undefined) {
+        state.option.loopfunc = false;
+      }
+      if (state.option.maxerr === undefined) {
+        state.option.maxerr = false;
+      }
+      if (state.option.moz === undefined) {
+        state.option.moz = false;
+      }
+      if (state.option.multistr === undefined) {
+        state.option.multistr = false;
+      }
+      if (state.option.notypeof === undefined) {
+        state.option.notypeof = false;
+      }
+      if (state.option.proto === undefined) {
+        state.option.proto = false;
+      }
+      if (state.option.scripturl === undefined) {
+        state.option.scripturl = false;
+      }
+      if (state.option.smarttabs === undefined) {
+        state.option.smarttabs = false;
+      }
+      if (state.option.shadow === undefined) {
+        state.option.shadow = false;
+      }
+      if (state.option.sub === undefined) {
+        state.option.sub = false;
+      }
+      if (state.option.supernew === undefined) {
+        state.option.supernew = false;
+      }
+      if (state.option.validthis === undefined) {
+        state.option.validthis = false;
+      }
+      if (state.option.noyield === undefined) {
+        state.option.noyield = false;
+      }
+
+    }
+  }
+
   function assume() {
     if (state.option.es5) {
       warning("I003");
     }
+
+    processDefaultHard();
+
 
     if (state.option.esnext) {
       combine(predefined, vars.newEcmaIdentifiers);
@@ -442,6 +606,7 @@ var JSHINT = (function () {
       }
       return state.option.es3;
     };
+    processDefaultHard();
   }
 
   // Produce an error warning.
@@ -619,60 +784,6 @@ var JSHINT = (function () {
   }
 
   function doOption() {
-
-    if(state.option.defaulthard)  {
-
-      //turn on all enforcing options
-      state.option.bitwise = true;
-      state.option.camelcase = true;
-      state.option.curly = true;
-      state.option.eqeqeq = true;
-      state.option.forin = true;
-      state.option.freeze = true;
-      state.option.immed = true;
-      state.option.indent = true;
-      state.option.latedef = true;
-      state.option.newcap = true;
-      state.option.noarg = true;
-      state.option.noempty = true;
-      state.option.nonbsp = true;
-      state.option.nonew = true;
-      state.option.plusplus = true;
-      state.option.quotmark = true;
-      state.option.undef = true;
-      state.option.unused = true;
-      state.option.strict = true;
-      state.option.trailing = true;
-
-      //turn off all relaxing options
-      state.option.asi = false;
-      state.option.boss = false;
-      state.option.debug = false;
-      state.option.eqnull = false;
-      state.option.esnext = false;
-      state.option.evil = false;
-      state.option.expr = false;
-      state.option.funcscope = false;
-      state.option.gcl = false;
-      state.option.globalstrict = false;
-      state.option.iterator = false;
-      state.option.lastsemic = false;
-      state.option.laxbreak = false;
-      state.option.laxcomman = false;
-      state.option.loopfunc = false;
-      state.option.maxerr = false;
-      state.option.moz = false;
-      state.option.multistr = false;
-      state.option.notypeof = false;
-      state.option.proto = false;
-      state.option.scripturl = false;
-      state.option.smarttabs = false;
-      state.option.shadow = false;
-      state.option.sub = false;
-      state.option.supernew = false;
-      state.option.validthis = false;
-      state.option.noyield = false;
-    }
 
     var nt = state.tokens.next;
     var body = nt.body.split(",").map(function (s) { return s.trim(); });
@@ -920,6 +1031,7 @@ var JSHINT = (function () {
   // Produce the next token. It looks for programming errors.
 
   function advance(id, t) {
+
     switch (state.tokens.curr.id) {
     case "(number)":
       if (state.tokens.next.id === ".") {

@@ -1,3 +1,1 @@
-
-var test = new testclass();
-test.t = 1;
+var someVar = obj[ "key" ] || 0
