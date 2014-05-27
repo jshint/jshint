@@ -329,11 +329,16 @@ var JSHINT = (function () {
   function processDefaultHard ()
   {
 
-    var relaxingRules = ["asi","boss","debug","eqnull","esnext","evil","expr","funcscope","globalstrict","iterator",
-      "lastsemic","laxbreak","laxcomma","loopfunc","moz","multistr","scripturl","sub","supernew","validthis","noyield"];
+    var relaxingRules = ["asi", "boss", "debug", "eqnull",
+      "esnext", "evil", "expr", "funcscope", "globalstrict",
+      "iterator", "lastsemic", "laxbreak", "laxcomma", "loopfunc",
+      "moz", "multistr", "scripturl", "sub", "supernew",
+      "validthis", "noyield"];
 
-    var enforcingRules = ["bitwise","camelcase","curly","eqeqeq","forin","freeze","immed","latedef","newcap","noarg","noempty",
-    "nonbsp","nonew","plusplus","quotemark","undef","unused","strict","trailing"];
+    var enforcingRules = ["bitwise", "camelcase", "curly", "eqeqeq",
+      "forin", "freeze", "immed", "latedef", "newcap",
+      "noarg", "noempty", "nonbsp", "nonew", "plusplus", "quotemark",
+      "undef", "unused", "strict", "trailing"];
 
     if (state.option.defaulthard) {
       enforcingRules.forEach(function (opt) {
