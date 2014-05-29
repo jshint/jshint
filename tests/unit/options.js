@@ -598,10 +598,10 @@ exports.unused = function (test) {
 
   var unused = JSHINT.data().unused;
   test.equal(12, unused.length);
-  test.ok(unused.some(function (err) { return err.line === 1 && err.name === "a"; }));
-  test.ok(unused.some(function (err) { return err.line === 6 && err.name === "f"; }));
-  test.ok(unused.some(function (err) { return err.line === 7 && err.name === "c"; }));
-  test.ok(unused.some(function (err) { return err.line === 15 && err.name === "foo"; }));
+  test.ok(unused.some(function (err) { return err.line === 1 && err.character == 5 && err.name === "a"; }));
+  test.ok(unused.some(function (err) { return err.line === 6 && err.character == 18 && err.name === "f"; }));
+  test.ok(unused.some(function (err) { return err.line === 7 && err.character == 9 && err.name === "c"; }));
+  test.ok(unused.some(function (err) { return err.line === 15 && err.character == 10 && err.name === "foo"; }));
 
   test.done();
 };
