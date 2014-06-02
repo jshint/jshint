@@ -357,9 +357,10 @@ exports.devel = {
 };
 
 exports.worker = {
-  importScripts: true,
-  postMessage  : true,
-  self         : true
+  importScripts  : true,
+  postMessage    : true,
+  self           : true,
+  FileReaderSync : true
 };
 
 // Widely adopted global names that are not part of ECMAScript standard
