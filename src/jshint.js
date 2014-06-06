@@ -4778,7 +4778,7 @@ var JSHINT = (function () {
 
       var warnUnused = function (name, tkn, type, unused_opt) {
         var line = tkn.line;
-        var chr  = tkn.character;
+        var chr  = tkn.from;
 
         if (unused_opt === undefined) {
           unused_opt = state.option.unused;
