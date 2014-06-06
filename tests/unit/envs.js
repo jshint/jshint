@@ -727,6 +727,7 @@ exports.worker = function (test) {
     'importScripts',
     'postMessage',
     "self",
+    'FileReaderSync'
   ];
 
   globalsImplied(test, globals);
