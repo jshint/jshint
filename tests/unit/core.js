@@ -743,6 +743,17 @@ exports.testES6TemplateLiterals = function (test) {
   test.done();
 };
 
+exports.testES6ExportStarFrom = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/es6-export-star-from.js", "utf8");
+  TestRun(test)
+    .addError(2, "Expected 'from' and instead saw 'foo'.")
+    .addError(2, "Expected '(string)' and instead saw ';'.")
+    .addError(2, "Missing semicolon.")
+    .addError(3, "Expected '(string)' and instead saw '78'.")
+    .test(src, { esnext: true });
+  test.done();
+};
+
 exports.testPotentialVariableLeak = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/leak.js", "utf8");
 
