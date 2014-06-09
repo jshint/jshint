@@ -823,3 +823,12 @@ exports.testModuleKeyword = function (test) {
 
   test.done();
 };
+
+// Issue #1446, PR #1688
+exports.testIncorrectJsonDetection = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/mappingstart.js", "utf8");
+  // Without the bug fix, a JSON lint error will be raised because the parser
+  // thinks it is rendering JSON instead of JavaScript.
+  TestRun(test).test(src);
+  test.done();
+};
