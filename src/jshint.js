@@ -4246,10 +4246,15 @@ var JSHINT = (function () {
         ret.notJson = true;
         break;
       }
-      if (_.contains(["}", "]"], pn.value) && pn1.value === "=" && bracketStack === 0) {
-        ret.isDestAssign = true;
-        ret.notJson = true;
-        break;
+      if (_.contains(["}", "]"], pn.value) && bracketStack === 0) {
+        if (pn1.value === "=") {
+          ret.isDestAssign = true;
+          ret.notJson = true;
+          break;
+        } else if (pn1.value === ".") {
+          ret.notJson = true;
+          break;
+        }
       }
       if (pn.value === ";") {
         ret.isBlock = true;
