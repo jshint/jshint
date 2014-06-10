@@ -4135,6 +4135,13 @@ var JSHINT = (function () {
       warning("W119", state.tokens.curr, "export");
     }
 
+    if (state.tokens.next.value === "*") {
+      advance("*");
+      advance("from");
+      advance("(string)");
+      return this;
+    }
+
     if (state.tokens.next.type === "default") {
       advance("default");
       if (state.tokens.next.id === "function" || state.tokens.next.id === "class") {
