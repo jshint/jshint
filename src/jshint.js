@@ -330,8 +330,7 @@ var JSHINT = (function () {
     });
   }
 
-
-  function processenforceall ()
+  function processenforceall()
   {
     if (state.option.enforceall) {
       for(var enforceopt in boolOptions.enforcing) {
@@ -339,7 +338,6 @@ var JSHINT = (function () {
           state.option[enforceopt] = true;
           }
       }
-
       for(var relaxopt in boolOptions.relaxing){
         if (state.option[relaxopt] === undefined) {
           state.option[relaxopt] = false;
@@ -354,7 +352,6 @@ var JSHINT = (function () {
     }
 
     processenforceall();
-
 
     if (state.option.esnext) {
       combine(predefined, vars.newEcmaIdentifiers);
@@ -646,7 +643,6 @@ var JSHINT = (function () {
   }
 
   function doOption() {
-
     var nt = state.tokens.next;
     var body = nt.body.split(",").map(function (s) { return s.trim(); });
     var predef = {};
