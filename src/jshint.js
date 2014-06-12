@@ -102,7 +102,7 @@ var JSHINT = (function () {
         nonew       : true, // if using `new` for side-effects should be disallowed
         // disallowed
         undef       : true, // if variables should be declared before used
-        defaulthard : false // option to turn on all enforce options
+        enforceall : false // option to turn on all enforce options
         // by default and all relax options off by default
       },
       relaxing: {
@@ -331,9 +331,9 @@ var JSHINT = (function () {
   }
 
 
-  function processDefaultHard ()
+  function processenforceall ()
   {
-    if (state.option.defaulthard) {
+    if (state.option.enforceall) {
       for(var enforceopt in boolOptions.enforcing) {
         if (state.option[enforceopt] === undefined) {
           state.option[enforceopt] = true;
@@ -353,7 +353,7 @@ var JSHINT = (function () {
       warning("I003");
     }
 
-    processDefaultHard();
+    processenforceall();
 
 
     if (state.option.esnext) {

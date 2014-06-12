@@ -1593,19 +1593,19 @@ exports.nonbsp = function (test) {
   test.done();
 };
 
-exports.defaulthard = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/defaulthard.js', 'utf8');
+exports.enforceall = function (test) {
+  var src = fs.readFileSync(__dirname + '/fixtures/enforceall.js', 'utf8');
 
   //throws errors not normally on be default
   TestRun(test)
     .addError(1, "['key'] is better written in dot notation.")
     .addError(1, "'obj' is not defined.")
     .addError(1, "Missing semicolon.")
-    .test(src, { defaulthard: true});
+    .test(src, { enforceall: true});
 
   //Can override default hard
   TestRun(test)
-    .test(src, { defaulthard: true, nonbsp: false, bitwise: false, sub: true, undef: false, unused: false,asi:true});
+    .test(src, { enforceall: true, nonbsp: false, bitwise: false, sub: true, undef: false, unused: false,asi:true});
 
   test.done();
 };
