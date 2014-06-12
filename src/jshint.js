@@ -75,31 +75,31 @@ var JSHINT = (function () {
     // These are the JSHint boolean options.
     boolOptions = {
       enforcing: {
-      bitwise     : true, // if bitwise operators should not be allowed
+        bitwise     : true, // if bitwise operators should not be allowed
         freeze      : true, // if modifying native object prototypes should be disallowed
-      camelcase   : true, // if identifiers should be required in camel case
-      curly       : true, // if curly braces around all blocks should be required
-      dojo        : true, // if Dojo Toolkit globals should be predefined
-      eqeqeq      : true, // if === should be required
-      eqnull      : true, // if == null comparisons should be tolerated
-      notypeof    : true, // if should report typos in typeof comparisons
-      es3         : true, // if ES3 syntax should be allowed
-      es5         : true, // if ES5 syntax should be allowed (is now set per default)
-      esnext      : true, // if es.next specific syntax should be allowed
-      expr        : true, // if ExpressionStatement should be allowed as Programs
-      forin       : true, // if for in statements must filter
-      funcscope   : true, // if only function scope should be used for scope tests
-      globalstrict: true, // if global "use strict"; should be allowed (also enables 'strict')
-      immed       : true, // if immediate invocations must be wrapped in parens
-      iterator    : true, // if the `__iterator__` property should be allowed
-      lastsemic   : true, // if semicolons may be ommitted for the trailing
-                          // statements inside of a one-line blocks.
-      loopfunc    : true, // if functions should be allowed to be defined within
-      newcap      : true, // if constructor names must be capitalized
-      noarg       : true, // if arguments.caller and arguments.callee should be
-      noempty     : true, // if empty blocks should be disallowed
-      nonbsp      : true, // if non-breaking spaces should be disallowed
-      nonew       : true, // if using `new` for side-effects should be disallowed
+        camelcase   : true, // if identifiers should be required in camel case
+        curly       : true, // if curly braces around all blocks should be required
+        dojo        : true, // if Dojo Toolkit globals should be predefined
+        eqeqeq      : true, // if === should be required
+        eqnull      : true, // if == null comparisons should be tolerated
+        notypeof    : true, // if should report typos in typeof comparisons
+        es3         : true, // if ES3 syntax should be allowed
+        es5         : true, // if ES5 syntax should be allowed (is now set per default)
+        esnext      : true, // if es.next specific syntax should be allowed
+        expr        : true, // if ExpressionStatement should be allowed as Programs
+        forin       : true, // if for in statements must filter
+        funcscope   : true, // if only function scope should be used for scope tests
+        globalstrict: true, // if global "use strict"; should be allowed (also enables 'strict')
+        immed       : true, // if immediate invocations must be wrapped in parens
+        iterator    : true, // if the `__iterator__` property should be allowed
+        lastsemic   : true, // if semicolons may be ommitted for the trailing
+        // statements inside of a one-line blocks.
+        loopfunc    : true, // if functions should be allowed to be defined within
+        newcap      : true, // if constructor names must be capitalized
+        noarg       : true, // if arguments.caller and arguments.callee should be
+        noempty     : true, // if empty blocks should be disallowed
+        nonbsp      : true, // if non-breaking spaces should be disallowed
+        nonew       : true, // if using `new` for side-effects should be disallowed
         // disallowed
         undef       : true, // if variables should be declared before used
         defaulthard : false // option to turn on all enforce options
@@ -110,21 +110,21 @@ var JSHINT = (function () {
         multistr    : true, // allow multiline strings
         debug       : true, // if debugger statements should be allowed
         boss        : true, // if advanced usage of assignments should be allowed
-      phantom     : true, // if PhantomJS symbols should be allowed
+        phantom     : true, // if PhantomJS symbols should be allowed
         evil        : true, // if eval should be allowed
-      plusplus    : true, // if increment/decrement should not be allowed
-      proto       : true, // if the `__proto__` property should be allowed
-      typed       : true, // if typed array globals should be predefined
-      scripturl   : true, // if script-targeted URLs should be tolerated
-      strict      : true, // require the "use strict"; pragma
-      sub         : true, // if all forms of subscript notation are tolerated
-      supernew    : true, // if `new function () { ... };` and `new Object;`
-                          // should be tolerated
+        plusplus    : true, // if increment/decrement should not be allowed
+        proto       : true, // if the `__proto__` property should be allowed
+        typed       : true, // if typed array globals should be predefined
+        scripturl   : true, // if script-targeted URLs should be tolerated
+        strict      : true, // require the "use strict"; pragma
+        sub         : true, // if all forms of subscript notation are tolerated
+        supernew    : true, // if `new function () { ... };` and `new Object;`
+        // should be tolerated
         laxbreak    : true, // if line breaks should not be checked
         laxcomma    : true, // if line breaks should not be checked around commas
-      validthis   : true, // if 'this' inside a non-constructor function is valid.
-                          // This is a function scoped option only.
-      withstmt    : true, // if with statements should be allowed
+        validthis   : true, // if 'this' inside a non-constructor function is valid.
+        // This is a function scoped option only.
+        withstmt    : true, // if with statements should be allowed
         moz         : true, // if mozilla specific syntax should be allowed
         noyield     : true  // allow generators without a yield
       },
@@ -279,10 +279,10 @@ var JSHINT = (function () {
   }
 
   function isIdentifier(tkn, value) {
-    if (!tkn)
+    if(!tkn)
       return false;
 
-    if (!tkn.identifier || tkn.value !== value)
+    if(!tkn.identifier || tkn.value !== value)
       return false;
 
     return true;
@@ -333,30 +333,18 @@ var JSHINT = (function () {
 
   function processDefaultHard ()
   {
-
-    var relaxingRules = ["asi", "boss", "debug", "eqnull",
-      "esnext", "evil", "expr", "funcscope", "globalstrict",
-      "iterator", "lastsemic", "laxbreak", "laxcomma", "loopfunc",
-      "moz", "multistr", "scripturl", "sub", "supernew",
-      "validthis", "noyield"];
-
-    var enforcingRules = ["bitwise", "camelcase", "curly", "eqeqeq",
-      "forin", "freeze", "immed", "latedef", "newcap",
-      "noarg", "noempty", "nonbsp", "nonew", "plusplus", "quotemark",
-      "undef", "unused", "strict", "trailing"];
-
     if (state.option.defaulthard) {
-      enforcingRules.forEach(function (opt) {
-        if (state.option[opt] === undefined) {
-          state.option[opt] = true;
-        }
-      });
-      relaxingRules.forEach(function (opt){
-        if (state.option[opt] === undefined) {
-          state.option[opt] = false;
+      for(var enforceopt in boolOptions.enforcing) {
+        if (state.option[enforceopt] === undefined) {
+          state.option[enforceopt] = true;
+          }
       }
-      });
 
+      for(var relaxopt in boolOptions.relaxing){
+        if (state.option[relaxopt] === undefined) {
+          state.option[relaxopt] = false;
+        }
+      }
     }
   }
 
@@ -480,7 +468,7 @@ var JSHINT = (function () {
       }
       return state.option.es3;
     };
-    processDefaultHard();
+
   }
 
   // Produce an error warning.
