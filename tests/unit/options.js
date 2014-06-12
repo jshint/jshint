@@ -1600,7 +1600,6 @@ exports.defaulthard = function (test) {
   TestRun(test)
     .addError(1, "['key'] is better written in dot notation.")
     .addError(1, "'obj' is not defined.")
-    .addError(1, "'someVar' is defined but never used.")
     .addError(1, "Missing semicolon.")
     .test(src, { defaulthard: true});
 
