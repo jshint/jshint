@@ -331,8 +331,7 @@ var JSHINT = (function () {
     });
   }
 
-  function processenforceall()
-  {
+  function processenforceall() {
     if (state.option.enforceall) {
       for(var enforceopt in boolOptions.enforcing) {
         if (state.option[enforceopt] === undefined) {
