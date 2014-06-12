@@ -264,7 +264,8 @@ var JSHINT = (function () {
       return true;
     }
 
-    if (valOptions[name] === undefined && boolOptions[name] === undefined) {
+    if (valOptions[name] === undefined &&
+       (boolOptions[name] === undefined && boolOptions.enforcing[name] === undefined && boolOptions.relaxing[name] === undefined  ) ) {
       if (t.type !== "jslint" && !removedOptions[name]) {
         error("E001", t, name);
         return false;
