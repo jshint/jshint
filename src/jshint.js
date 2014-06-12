@@ -974,6 +974,10 @@ var JSHINT = (function () {
     if (state.tokens.next.id === "(end)")
       error("E006", state.tokens.curr);
 
+    if (state.tokens.next.type === "(template)") {
+      doTemplateLiteral();
+    }
+
     var isDangerous =
       state.option.asi &&
       state.tokens.prev.line < state.tokens.curr.line &&
@@ -1947,10 +1951,6 @@ var JSHINT = (function () {
     return this;
   });
 
-  type("(template)", function () {
-    return this;
-  });
-
   state.syntax["(identifier)"] = {
     type: "(identifier)",
     lbp: 0,
@@ -2098,6 +2098,21 @@ var JSHINT = (function () {
       error("E033", state.tokens.next, state.tokens.next.value);
     }
   };
+
+  state.syntax["(template)"] = {
+    type: "(template)",
+    lbp: 0,
+    identifier: false,
+    fud: doTemplateLiteral
+  };
+
+  type("(template middle)", function () {
+    return this;
+  });
+
+  type("(template tail)", function () {
+    return this;
+  });
 
   type("(regexp)", function () {
     return this;
@@ -2871,6 +2886,22 @@ var JSHINT = (function () {
     }
 
     return funct;
+  }
+
+  function doTemplateLiteral() {
+    while (state.tokens.next.type !== "(template tail)" && state.tokens.next.id !== "(end)") {
+      advance();
+      if (state.tokens.next.type === "(template tail)") {
+        break;
+      } else if (state.tokens.next.type !== "(template middle)" &&
+                 state.tokens.next.type !== "(end)") {
+        expression(10); // should probably have different rbp?
+      }
+    }
+    return {
+      id: "(template)",
+      type: "(template)"
+    };
   }
 
   function doFunction(name, statement, generator, fatarrowparams) {

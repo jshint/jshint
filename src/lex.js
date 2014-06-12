@@ -29,7 +29,9 @@ var Token = {
   NullLiteral: 7,
   BooleanLiteral: 8,
   RegExp: 9,
-  TemplateLiteral: 10
+  TemplateHead: 10,
+  TemplateMiddle: 11,
+  TemplateTail: 12
 };
 
 // Object that handles postponed lexing verifications that checks the parsed
@@ -109,6 +111,9 @@ function Lexer(source) {
   this.from = 1;
   this.input = "";
   this.inComment = false;
+  this.inTemplate = false;
+  this.templateLine = null;
+  this.templateChar = null;
 
   for (var i = 0; i < state.option.indent; i += 1) {
     state.tab += " ";
@@ -852,50 +857,72 @@ Lexer.prototype = {
    * the char pointer.
    */
   scanTemplateLiteral: function () {
+    var tokenType;
+    var value = '';
+    var ch;
+
     // String must start with a backtick.
-    if (!state.option.esnext || this.peek() !== "`") {
+    if (!this.inTemplate) {
+      if (!state.option.esnext || this.peek() !== "`") {
+        return null;
+      }
+      this.templateLine = this.line;
+      this.templateChar = this.char;
+      this.skip(1);
+    } else if (this.peek() !== '}') {
+      // If we're in a template, and we don't have a '}', lex something else instead.
       return null;
     }
 
-    var startLine = this.line;
-    var startChar = this.char;
-    var jump = 1;
-    var value = "";
-
-    // For now, do not perform any linting of the content of the template
-    // string. Just skip until the next backtick is found.
-    this.skip();
-
     while (this.peek() !== "`") {
-      while (this.peek() === "") {
-        // End of line --- For template literals in ES6, no backslash is
-        // required to precede newlines.
+      while ((ch = this.peek()) === "") {
         if (!this.nextLine()) {
+          // Unclosed template literal --- point to the starting line, or the EOF?
+          tokenType = this.inTemplate ? Token.TemplateHead : Token.TemplateMiddle;
+          this.inTemplate = false;
           this.trigger("error", {
             code: "E052",
-            line: startLine,
-            character: startChar
+            line: this.templateLine,
+            character: this.templateChar
           });
-
           return {
-            type: Token.TemplateLiteral,
+            type: tokenType,
             value: value,
             isUnclosed: true
           };
         }
-        value += "\n";
       }
 
-      // TODO: do more interesting linting here, similar to string literal
-      // linting.
-      var char = this.peek();
-      this.skip(jump);
-      value += char;
+      if (ch === '$' && this.peek(1) === '{') {
+        value += '${';
+        tokenType = value.charAt(0) === '}' ? Token.TemplateMiddle : Token.TemplateHead;
+        // Either TokenHead or TokenMiddle --- depending on if the initial value
+        // is '}' or not.
+        this.skip(2);
+        this.inTemplate = true;
+        return {
+          type: tokenType,
+          value: value,
+          isUnclosed: false
+        };
+      } else if (ch === '\\') {
+        // TODO: Parse escape sequence, warn about invalid escae sequences
+        value += ch;
+        this.skip(1);
+      } else {
+        // Otherwise, append the value and continue.
+        value += ch;
+        this.skip(1);
+      }
     }
 
-    this.skip();
+    // Final value is either TokenTail or NoSubstititionTemplate --- essentially a string
+    tokenType = this.inTemplate ? Token.TemplateTail : Token.StringLiteral;
+    this.inTemplate = false;
+    this.skip(1);
+
     return {
-      type: Token.TemplateLiteral,
+      type: tokenType,
       value: value,
       isUnclosed: false
     };
@@ -1556,14 +1583,32 @@ Lexer.prototype = {
 
         return create("(string)", token.value);
 
-      case Token.TemplateLiteral:
-        this.trigger("Template", {
+      case Token.TemplateHead:
+        this.trigger("TemplateHead", {
           line: this.line,
           char: this.char,
           from: this.from,
           value: token.value
         });
         return create("(template)", token.value);
+
+      case Token.TemplateMiddle:
+        this.trigger("TemplateMiddle", {
+          line: this.line,
+          char: this.char,
+          from: this.from,
+          value: token.value
+        });
+        return create("(template middle)", token.value);
+
+      case Token.TemplateTail:
+        this.trigger("TemplateTail", {
+          line: this.line,
+          char: this.char,
+          from: this.from,
+          value: token.value
+        });
+        return create("(template tail)", token.value);
 
       case Token.Identifier:
         this.trigger("Identifier", {
