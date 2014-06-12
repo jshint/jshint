@@ -1258,8 +1258,8 @@ var JSHINT = (function () {
     var x = symbol(s, 42);
 
     x.led = function (left) {
-      if (!state.option.inESNext()) {
-        warning("W104", state.tokens.curr, "arrow function syntax (=>)");
+      if (!state.option.esnext) {
+        warning("W119", state.tokens.curr, "arrow function syntax (=>)");
       }
 
       nobreaknonadjacent(state.tokens.prev, state.tokens.curr);
