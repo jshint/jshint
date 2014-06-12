@@ -2500,7 +2500,7 @@ var JSHINT = (function () {
       }
       if (!left.identifier && left.id !== "." && left.id !== "[" &&
           left.id !== "(" && left.id !== "&&" && left.id !== "||" &&
-          left.id !== "?") {
+          left.id !== "?" && !(state.option.esnext && left.id === "=>")) {
         warning("W067", left);
       }
     }

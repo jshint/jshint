@@ -3432,6 +3432,18 @@ exports["fat arrows support"] = function (test) {
     "    return () => this;",
     "  }",
     "};",
+
+    "let retnObj = () => ({});",
+    "let assgnRetnObj = (() => ({}))();",
+    "let retnObjLong = () => { return {}; };",
+    "let assgnRetnObjLong = (() => { return {}; })();",
+
+    "let objFns = {",
+    "  retnObj: () => ({}),",
+    "  assgnRetnObj: (() => ({}))(),",
+    "  retnObjLong: () => { return {}; },",
+    "  assgnRetnObjLong: (() => { return {}; })()",
+    "};"
   ];
 
   var run = TestRun(test)
@@ -3458,7 +3470,19 @@ exports["fat arrows support"] = function (test) {
     .addError(8, "'z' is not defined.")
     .addError(9, "'print' is not defined.")
     .addError(9, "'j' is not defined.")
-    .addError(13, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).");
+    .addError(13, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(16, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(17, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(17, "Bad invocation.")
+    .addError(18, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(19, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(19, "Bad invocation.")
+    .addError(21, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(22, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(22, "Bad invocation.")
+    .addError(23, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(24, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(24, "Bad invocation.");
 
   run.test(code, { undef: true, moz: true });
 
@@ -3479,7 +3503,24 @@ exports["fat arrows support"] = function (test) {
     .addError(7, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(7, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
     .addError(11, "'const' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
-    .addError(13, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).");
+    .addError(13, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(16, "'let' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(16, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(17, "'let' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(17, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(17, "Bad invocation.")
+    .addError(18, "'let' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(18, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(19, "'let' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(19, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(19, "Bad invocation.")
+    .addError(20, "'let' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(21, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(22, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(22, "Bad invocation.")
+    .addError(23, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(24, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(24, "Bad invocation.");
 
   run.test(code); // es5
   run.test(code, {es3: true});
