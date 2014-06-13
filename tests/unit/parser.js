@@ -66,6 +66,20 @@ exports.confusingOps = function (test) {
   test.done();
 };
 
+exports.division = function (test) {
+  var run;
+  var code = [
+    'var a=4,b=4,i=2;',
+    'a/=b+2;',
+    'a/=b/2;',
+    'a/=b/i;'
+  ];
+
+  run = TestRun(test);
+  run.test(code);
+
+  test.done();
+};
 
 exports.plusplus = function (test) {
   var run;
