@@ -3604,6 +3604,23 @@ exports["concise methods support for 'set' without 'get'"] = function (test) {
   test.done();
 };
 
+exports["object short notation"] = function (test) {
+  var code = [
+    "var foo = 42;",
+    "var bar = {foo};",
+    "var baz = {foo, bar};"
+  ];
+
+  TestRun(test).test(code, {esnext: true});
+
+  TestRun(test)
+    .addError(2, "'object short notation' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(3, "'object short notation' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .test(code);
+
+  test.done();
+};
+
 exports["spread rest operator support"] = function (test) {
   var code = [
     // spread operator
