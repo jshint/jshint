@@ -1487,12 +1487,14 @@ var JSHINT = (function () {
   // argument (see identifier())
   // prop means that this identifier is that of an object property
 
-  function optionalidentifier(fnparam, prop) {
+  function optionalidentifier(fnparam, prop, preserve) {
     if (!state.tokens.next.identifier) {
       return;
     }
 
-    advance();
+    if (!preserve) {
+      advance();
+    }
 
     var curr = state.tokens.curr;
     var val  = state.tokens.curr.value;
@@ -2709,16 +2711,20 @@ var JSHINT = (function () {
   }, 160);
 
 
-  function property_name() {
-    var id = optionalidentifier(false, true);
+  function property_name(preserve) {
+    var id = optionalidentifier(false, true, preserve);
 
     if (!id) {
       if (state.tokens.next.id === "(string)") {
         id = state.tokens.next.value;
-        advance();
+        if (!preserve) {
+          advance();
+        }
       } else if (state.tokens.next.id === "(number)") {
         id = state.tokens.next.value.toString();
-        advance();
+        if (!preserve) {
+          advance();
+        }
       }
     }
 
@@ -3147,21 +3153,33 @@ var JSHINT = (function () {
             advance("*");
             g = true;
           }
-          i = property_name();
-          saveProperty(tag + i, state.tokens.next);
-
-          if (typeof i !== "string") {
-            break;
-          }
-
-          if (state.tokens.next.value === "(") {
+          if (!isclassdef &&
+              state.tokens.next.identifier &&
+              (peek().id === "," || peek().id === "}")) {
             if (!state.option.inESNext()) {
-              warning("W104", state.tokens.curr, "concise methods");
+              warning("W104", state.tokens.curr, "object short notation");
             }
-            doFunction(i, undefined, g);
-          } else if (!isclassdef) {
-            advance(":");
+            i = property_name(true);
+            saveProperty(tag + i, state.tokens.next);
+
             expression(10);
+          } else {
+            i = property_name();
+            saveProperty(tag + i, state.tokens.next);
+
+            if (typeof i !== "string") {
+              break;
+            }
+
+            if (state.tokens.next.value === "(") {
+              if (!state.option.inESNext()) {
+                warning("W104", state.tokens.curr, "concise methods");
+              }
+              doFunction(i, undefined, g);
+            } else if (!isclassdef) {
+              advance(":");
+              expression(10);
+            }
           }
         }
         // It is a Syntax Error if PropName of MethodDefinition is "prototype".
