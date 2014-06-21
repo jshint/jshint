@@ -148,8 +148,9 @@ var JSHINT = (function () {
       // Obsolete options
       onecase     : true, // if one case switch statements should be allowed
       regexp      : true, // if the . should not be allowed in regexp literals
-      regexdash   : true  // if unescaped first/last dash (-) inside brackets
+      regexdash   : true,  // if unescaped first/last dash (-) inside brackets
                           // should be tolerated
+      nojsonglobal : true
     },
 
     // These are the JSHint options that can take any value
@@ -412,6 +413,11 @@ var JSHINT = (function () {
 
     if (state.option.mocha) {
       combine(predefined, vars.mocha);
+    }
+
+    if(state.option.nojsonglobal)
+    {
+     delete predefined.JSON;
     }
 
     // Let's assume that chronologically ES3 < ES5 < ES6/ESNext < Moz

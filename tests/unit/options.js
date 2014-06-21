@@ -1592,3 +1592,18 @@ exports.nonbsp = function (test) {
 
   test.done();
 };
+
+
+exports.nojsonglobal = function (test) {
+  var src = fs.readFileSync(__dirname + '/fixtures/nojsonglobal.js', 'utf8');
+
+  TestRun(test)
+    .test(src, { undef:true });
+
+  TestRun(test)
+    .addError(1,"'JSON' is not defined.")
+    .test(src, { undef:true, nojsonglobal:true });
+
+  test.done();
+};
+
