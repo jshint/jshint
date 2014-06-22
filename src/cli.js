@@ -193,7 +193,8 @@ function findFile(name, dir) {
  * @return {array} a list of files to ignore.
  */
 function loadIgnores(target, exclude, excludePath) {
-  if(!shjs.test("-d", target)) return [];  //if only a single file is being linted then there is nothing to ignore
+  if(!shjs.test("-d", target)) return [];
+  //if only a single file is being linted then there is nothing to ignore
   var file = findFile((excludePath || ".jshintignore"), target);
 
   if (!file && !exclude) {
