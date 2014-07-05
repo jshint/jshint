@@ -3930,8 +3930,8 @@ var JSHINT = (function () {
       expression(20);
       advance(")", t);
       s = block(true, true);
-      if (state.option.forin && s && (s.length > 1 || typeof s[0] !== "object" ||
-          s[0].value !== "if")) {
+      if (nextop.value === "in" && state.option.forin && s &&
+          (s.length > 1 || typeof s[0] !== "object" || s[0].value !== "if")) {
         warning("W089", this);
       }
       funct["(breakage)"] -= 1;
