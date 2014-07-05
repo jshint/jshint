@@ -75,75 +75,82 @@ var JSHINT = (function () {
 
     // These are the JSHint boolean options.
     boolOptions = {
-      asi         : true, // if automatic semicolon insertion should be tolerated
-      bitwise     : true, // if bitwise operators should not be allowed
-      boss        : true, // if advanced usage of assignments should be allowed
-      browser     : true, // if the standard browser globals should be predefined
-      camelcase   : true, // if identifiers should be required in camel case
+      enforcing: {
+        bitwise     : true, // if bitwise operators should not be allowed
+        freeze      : true, // if modifying native object prototypes should be disallowed
+        camelcase   : true, // if identifiers should be required in camel case
+        curly       : true, // if curly braces around all blocks should be required
+        dojo        : true, // if Dojo Toolkit globals should be predefined
+        eqeqeq      : true, // if === should be required
+        eqnull      : true, // if == null comparisons should be tolerated
+        notypeof    : true, // if should report typos in typeof comparisons
+        es3         : true, // if ES3 syntax should be allowed
+        es5         : true, // if ES5 syntax should be allowed (is now set per default)
+        esnext      : true, // if es.next specific syntax should be allowed
+        expr        : true, // if ExpressionStatement should be allowed as Programs
+        forin       : true, // if for in statements must filter
+        funcscope   : true, // if only function scope should be used for scope tests
+        globalstrict: true, // if global "use strict"; should be allowed (also enables 'strict')
+        immed       : true, // if immediate invocations must be wrapped in parens
+        iterator    : true, // if the `__iterator__` property should be allowed
+        lastsemic   : true, // if semicolons may be ommitted for the trailing
+        // statements inside of a one-line blocks.
+        loopfunc    : true, // if functions should be allowed to be defined within
+        newcap      : true, // if constructor names must be capitalized
+        noarg       : true, // if arguments.caller and arguments.callee should be
+        noempty     : true, // if empty blocks should be disallowed
+        nonbsp      : true, // if non-breaking spaces should be disallowed
+        nonew       : true, // if using `new` for side-effects should be disallowed
+        // disallowed
+        undef       : true, // if variables should be declared before used
+        enforceall : false // option to turn on all enforce options
+        // by default and all relax options off by default
+      },
+      relaxing: {
+        asi         : true, // if automatic semicolon insertion should be tolerated
+        multistr    : true, // allow multiline strings
+        debug       : true, // if debugger statements should be allowed
+        boss        : true, // if advanced usage of assignments should be allowed
+        phantom     : true, // if PhantomJS symbols should be allowed
+        evil        : true, // if eval should be allowed
+        plusplus    : true, // if increment/decrement should not be allowed
+        proto       : true, // if the `__proto__` property should be allowed
+        typed       : true, // if typed array globals should be predefined
+        scripturl   : true, // if script-targeted URLs should be tolerated
+        strict      : true, // require the "use strict"; pragma
+        sub         : true, // if all forms of subscript notation are tolerated
+        supernew    : true, // if `new function () { ... };` and `new Object;`
+        // should be tolerated
+        laxbreak    : true, // if line breaks should not be checked
+        laxcomma    : true, // if line breaks should not be checked around commas
+        validthis   : true, // if 'this' inside a non-constructor function is valid.
+        // This is a function scoped option only.
+        withstmt    : true, // if with statements should be allowed
+        moz         : true, // if mozilla specific syntax should be allowed
+        noyield     : true  // allow generators without a yield
+      },
+
+      // Third party globals
+      mootools    : true, // if MooTools globals should be predefined
       couch       : true, // if CouchDB globals should be predefined
-      curly       : true, // if curly braces around all blocks should be required
-      debug       : true, // if debugger statements should be allowed
-      devel       : true, // if logging globals should be predefined (console, alert, etc.)
-      dojo        : true, // if Dojo Toolkit globals should be predefined
-      eqeqeq      : true, // if === should be required
-      eqnull      : true, // if == null comparisons should be tolerated
-      notypeof    : true, // if should report typos in typeof comparisons
-      es3         : true, // if ES3 syntax should be allowed
-      es5         : true, // if ES5 syntax should be allowed (is now set per default)
-      esnext      : true, // if es.next specific syntax should be allowed
-      moz         : true, // if mozilla specific syntax should be allowed
-      evil        : true, // if eval should be allowed
-      expr        : true, // if ExpressionStatement should be allowed as Programs
-      forin       : true, // if for in statements must filter
-      funcscope   : true, // if only function scope should be used for scope tests
-      globalstrict: true, // if global "use strict"; should be allowed (also enables 'strict')
-      immed       : true, // if immediate invocations must be wrapped in parens
-      iterator    : true, // if the `__iterator__` property should be allowed
       jasmine     : true, // Jasmine functions should be predefined
       jquery      : true, // if jQuery globals should be predefined
-      lastsemic   : true, // if semicolons may be ommitted for the trailing
-                          // statements inside of a one-line blocks.
-      laxbreak    : true, // if line breaks should not be checked
-      laxcomma    : true, // if line breaks should not be checked around commas
-      loopfunc    : true, // if functions should be allowed to be defined within
-                          // loops
-      mootools    : true, // if MooTools globals should be predefined
-      multistr    : true, // allow multiline strings
-      freeze      : true, // if modifying native object prototypes should be disallowed
-      newcap      : true, // if constructor names must be capitalized
-      noarg       : true, // if arguments.caller and arguments.callee should be
-                          // disallowed
       node        : true, // if the Node.js environment globals should be
-                          // predefined
-      noempty     : true, // if empty blocks should be disallowed
-      nonbsp      : true, // if non-breaking spaces should be disallowed
-      nonew       : true, // if using `new` for side-effects should be disallowed
-      nonstandard : true, // if non-standard (but widely adopted) globals should
-                          // be predefined
-      phantom     : true, // if PhantomJS symbols should be allowed
-      plusplus    : true, // if increment/decrement should not be allowed
-      proto       : true, // if the `__proto__` property should be allowed
-      prototypejs : true, // if Prototype and Scriptaculous globals should be
-                          // predefined
+      // predefined
       qunit       : true, // if the QUnit environment globals should be predefined
       rhino       : true, // if the Rhino environment globals should be predefined
       shelljs     : true, // if ShellJS globals should be predefined
-      typed       : true, // if typed array globals should be predefined
-      undef       : true, // if variables should be declared before used
-      scripturl   : true, // if script-targeted URLs should be tolerated
-      strict      : true, // require the "use strict"; pragma
-      sub         : true, // if all forms of subscript notation are tolerated
-      supernew    : true, // if `new function () { ... };` and `new Object;`
-                          // should be tolerated
-      validthis   : true, // if 'this' inside a non-constructor function is valid.
-                          // This is a function scoped option only.
-      withstmt    : true, // if with statements should be allowed
-      worker      : true, // if Web Worker script symbols should be allowed
-      wsh         : true, // if the Windows Scripting Host environment globals
-                          // should be predefined
+      prototypejs : true, // if Prototype and Scriptaculous globals should be
+      // predefined
       yui         : true, // YUI variables should be predefined
       mocha       : true, // Mocha functions should be predefined
-      noyield     : true, // allow generators without a yield
+      wsh         : true, // if the Windows Scripting Host environment globals
+      // should be predefined
+      worker      : true, // if Web Worker script symbols should be allowed
+      nonstandard : true, // if non-standard (but widely adopted) globals should
+      // be predefined
+      browser     : true, // if the standard browser globals should be predefined
+      devel       : true, // if logging globals should be predefined (console, alert, etc.)
 
       // Obsolete options
       onecase     : true, // if one case switch statements should be allowed
@@ -257,7 +264,10 @@ var JSHINT = (function () {
       return true;
     }
 
-    if (valOptions[name] === undefined && boolOptions[name] === undefined) {
+    if (valOptions[name] === undefined &&
+       (boolOptions[name] === undefined &&
+        boolOptions.enforcing[name] === undefined &&
+        boolOptions.relaxing[name] === undefined  ) ) {
       if (t.type !== "jslint" && !removedOptions[name]) {
         error("E001", t, name);
         return false;
@@ -272,10 +282,10 @@ var JSHINT = (function () {
   }
 
   function isIdentifier(tkn, value) {
-    if (!tkn)
+    if(!tkn)
       return false;
 
-    if (!tkn.identifier || tkn.value !== value)
+    if(!tkn.identifier || tkn.value !== value)
       return false;
 
     return true;
@@ -323,10 +333,27 @@ var JSHINT = (function () {
     });
   }
 
+  function processenforceall() {
+    if (state.option.enforceall) {
+      for(var enforceopt in boolOptions.enforcing) {
+        if (state.option[enforceopt] === undefined) {
+          state.option[enforceopt] = true;
+          }
+      }
+      for(var relaxopt in boolOptions.relaxing){
+        if (state.option[relaxopt] === undefined) {
+          state.option[relaxopt] = false;
+        }
+      }
+    }
+  }
+
   function assume() {
     if (state.option.es5) {
       warning("I003");
     }
+
+    processenforceall();
 
     if (state.option.esnext) {
       combine(predefined, vars.newEcmaIdentifiers);
@@ -440,6 +467,7 @@ var JSHINT = (function () {
       }
       return state.option.es3;
     };
+
   }
 
   // Produce an error warning.
@@ -863,6 +891,7 @@ var JSHINT = (function () {
   // Produce the next token. It looks for programming errors.
 
   function advance(id, t) {
+
     switch (state.tokens.curr.id) {
     case "(number)":
       if (state.tokens.next.id === ".") {

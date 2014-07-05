@@ -1592,3 +1592,20 @@ exports.nonbsp = function (test) {
 
   test.done();
 };
+
+exports.enforceall = function (test) {
+  var src = fs.readFileSync(__dirname + '/fixtures/enforceall.js', 'utf8');
+
+  // Throws errors not normally on be default
+  TestRun(test)
+    .addError(1, "['key'] is better written in dot notation.")
+    .addError(1, "'obj' is not defined.")
+    .addError(1, "Missing semicolon.")
+    .test(src, { enforceall: true});
+
+  // Can override default hard
+  TestRun(test)
+    .test(src, { enforceall: true, nonbsp: false, bitwise: false, sub: true, undef: false, unused: false,asi:true});
+
+  test.done();
+};
