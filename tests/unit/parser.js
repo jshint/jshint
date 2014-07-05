@@ -4374,3 +4374,9 @@ exports["make sure we don't throw errors on removed options"] = function (test) 
   TestRun(test).test("a();", { nomen: true, onevar: true, passfail: true, white: true });
   test.done();
 };
+
+exports["'for of' shouldn't be subject to 'for in' rules"] = function (test) {
+  TestRun(test)
+    .test("for (let x of [1, 2, 3]) { console.log(x); }", { forin: true, esnext: true });
+  test.done();
+};
