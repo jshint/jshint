@@ -72,6 +72,7 @@ exports.browser = {
   document             : false,
   Element              : false,
   ElementTimeControl   : false,
+  Event                : false,
   event                : false,
   FileReader           : false,
   FormData             : false,
