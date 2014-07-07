@@ -738,8 +738,32 @@ exports.testES6TemplateLiterals = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/es6-template-literal.js", "utf8");
   TestRun(test)
     .addError(6, "Unclosed template literal.")
+    .addError(6, "Expected an identifier and instead saw '(end)'.")
     .addError(6, "Missing semicolon.")
     .test(src, { esnext: true });
+  test.done();
+};
+
+exports.testES6TemplateLiteralsUnused = function (test) {
+  var src = [
+    "var a = 'hello';",
+    "alert(`${a} world`);"
+  ];
+  TestRun(test)
+    .test(src, { esnext: true, unused: true });
+
+  test.done();
+};
+
+exports.testES6TemplateLiteralsUndef = function (test) {
+  var src = [
+    "/* global alert */",
+    "alert(`${a} world`);"
+  ];
+  TestRun(test)
+    .addError(2, "'a' is not defined.")
+    .test(src, { esnext: true, undef: true });
+
   test.done();
 };
 
