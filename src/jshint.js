@@ -82,20 +82,15 @@ var JSHINT = (function () {
         curly       : true, // if curly braces around all blocks should be required
         dojo        : true, // if Dojo Toolkit globals should be predefined
         eqeqeq      : true, // if === should be required
-        eqnull      : true, // if == null comparisons should be tolerated
         notypeof    : true, // if should report typos in typeof comparisons
         es3         : true, // if ES3 syntax should be allowed
         es5         : true, // if ES5 syntax should be allowed (is now set per default)
-        esnext      : true, // if es.next specific syntax should be allowed
-        expr        : true, // if ExpressionStatement should be allowed as Programs
         forin       : true, // if for in statements must filter
         funcscope   : true, // if only function scope should be used for scope tests
         globalstrict: true, // if global "use strict"; should be allowed (also enables 'strict')
         immed       : true, // if immediate invocations must be wrapped in parens
         iterator    : true, // if the `__iterator__` property should be allowed
-        lastsemic   : true, // if semicolons may be ommitted for the trailing
         // statements inside of a one-line blocks.
-        loopfunc    : true, // if functions should be allowed to be defined within
         newcap      : true, // if constructor names must be capitalized
         noarg       : true, // if arguments.caller and arguments.callee should be
         noempty     : true, // if empty blocks should be disallowed
@@ -127,7 +122,12 @@ var JSHINT = (function () {
         // This is a function scoped option only.
         withstmt    : true, // if with statements should be allowed
         moz         : true, // if mozilla specific syntax should be allowed
-        noyield     : true  // allow generators without a yield
+        noyield     : true,  // allow generators without a yield
+        eqnull      : true, // if == null comparisons should be tolerated
+        lastsemic   : true, // if semicolons may be ommitted for the trailing
+        loopfunc    : true, // if functions should be allowed to be defined within
+        expr        : true, // if ExpressionStatement should be allowed as Programs
+        esnext      : true // if es.next specific syntax should be allowed
       },
 
       // Third party globals
@@ -282,10 +282,10 @@ var JSHINT = (function () {
   }
 
   function isIdentifier(tkn, value) {
-    if(!tkn)
+    if (!tkn)
       return false;
 
-    if(!tkn.identifier || tkn.value !== value)
+    if (!tkn.identifier || tkn.value !== value)
       return false;
 
     return true;
@@ -335,12 +335,12 @@ var JSHINT = (function () {
 
   function processenforceall() {
     if (state.option.enforceall) {
-      for(var enforceopt in boolOptions.enforcing) {
+      for (var enforceopt in boolOptions.enforcing) {
         if (state.option[enforceopt] === undefined) {
           state.option[enforceopt] = true;
           }
       }
-      for(var relaxopt in boolOptions.relaxing){
+      for (var relaxopt in boolOptions.relaxing) {
         if (state.option[relaxopt] === undefined) {
           state.option[relaxopt] = false;
         }
@@ -467,7 +467,6 @@ var JSHINT = (function () {
       }
       return state.option.es3;
     };
-
   }
 
   // Produce an error warning.
