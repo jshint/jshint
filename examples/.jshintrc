@@ -43,7 +43,7 @@
                                  // (ex: `for each`, multiple try/catch, function expression…)
     "evil"          : false,     // true: Tolerate use of `eval` and `new Function()`
     "expr"          : false,     // true: Tolerate `ExpressionStatement` as Programs
-    "funcscope"     : false,     // true: Tolerate defining variables inside control statements"
+    "funcscope"     : false,     // true: Tolerate defining variables inside control statements
     "globalstrict"  : false,     // true: Allow global "use strict" (also enables 'strict')
     "iterator"      : false,     // true: Tolerate using the `__iterator__` property
     "lastsemic"     : false,     // true: Tolerate omitting a semicolon for the last statement of a 1-line block
