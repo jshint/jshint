@@ -386,6 +386,15 @@ exports.couch = {
   provides  : false
 };
 
+exports.foxx = {
+  __filename        : false,
+  __dirname         : false,
+  module            : false,
+  exports           : false,
+  require           : false,
+  applicationContext: false
+};
+
 exports.node = {
   __filename    : false,
   __dirname     : false,
