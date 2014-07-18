@@ -409,6 +409,17 @@ exports.node = {
   clearImmediate: true  // v0.9.1+
 };
 
+exports.browserify = {
+  __filename    : false,
+  __dirname     : false,
+  global        : false,
+  module        : false,
+  require       : false,
+  Buffer        : true,
+  exports       : true,
+  process       : true
+};
+
 exports.phantom = {
   phantom      : true,
   require      : true,
