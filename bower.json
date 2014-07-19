@@ -1,0 +1,28 @@
+{
+  "name":     "jshint",
+  "homepage": "http://jshint.com/",
+  "description": "Static analysis tool for JavaScript",
+
+  "authors": [{
+    "name":  "Anton Kovalyov",
+    "email": "anton@kovalyov.net",
+    "homepage":   "http://anton.kovalyov.net/"
+  }],
+
+  "main": "dist/jshint.js",
+
+  "license": "MIT",
+
+  "ignore": [
+    ".*",
+    "*.json",
+    "bin",
+    "data",
+    "node_modules",
+    "examples",
+    "res",
+    "scripts",
+    "src",
+    "tests"
+  ]
+}
