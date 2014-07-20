@@ -4,7 +4,7 @@
 
 /*jshint maxlen:1000 */
 
-"use string";
+"use strict";
 
 // Unsafe comment or string (ax)
 exports.unsafeString =
