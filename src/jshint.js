@@ -133,6 +133,7 @@ var JSHINT = (function () {
       // Third party globals
       mootools    : true, // if MooTools globals should be predefined
       couch       : true, // if CouchDB globals should be predefined
+      foxx        : true, // if ArangoDB Foxx globals should be predefined
       jasmine     : true, // Jasmine functions should be predefined
       jquery      : true, // if jQuery globals should be predefined
       node        : true, // if the Node.js environment globals should be
@@ -361,6 +362,10 @@ var JSHINT = (function () {
 
     if (state.option.couch) {
       combine(predefined, vars.couch);
+    }
+
+    if (state.option.foxx) {
+      combine(predefined, vars.foxx);
     }
 
     if (state.option.qunit) {
@@ -4799,8 +4804,10 @@ var JSHINT = (function () {
         directives();
 
         if (state.directive["use strict"]) {
-          if (!state.option.globalstrict && !(state.option.node || state.option.phantom)) {
-            warning("W097", state.tokens.prev);
+          if (!state.option.globalstrict) {
+            if (!(state.option.node || state.option.phantom || state.option.foxx)) {
+              warning("W097", state.tokens.prev);
+            }
           }
         }
 

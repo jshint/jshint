@@ -61,6 +61,7 @@
     // Environments
     "browser"       : true,     // Web Browser (window, document, etc)
     "couch"         : false,    // CouchDB
+    "foxx"          : false,    // ArangoDB Foxx
     "devel"         : true,     // Development/debugging (alert, confirm, etc)
     "dojo"          : false,    // Dojo Toolkit
     "jquery"        : false,    // jQuery
