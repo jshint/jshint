@@ -150,6 +150,7 @@ var JSHINT = (function () {
       nonstandard : true, // if non-standard (but widely adopted) globals should
       // be predefined
       browser     : true, // if the standard browser globals should be predefined
+      browserify  : true, // if the standard browserify globals should be predefined
       devel       : true, // if logging globals should be predefined (console, alert, etc.)
 
       // Obsolete options
@@ -403,6 +404,12 @@ var JSHINT = (function () {
     if (state.option.browser) {
       combine(predefined, vars.browser);
       combine(predefined, vars.typed);
+    }
+
+    if (state.option.browserify) {
+      combine(predefined, vars.browser);
+      combine(predefined, vars.typed);
+      combine(predefined, vars.browserify);
     }
 
     if (state.option.nonstandard) {
@@ -4799,8 +4806,10 @@ var JSHINT = (function () {
         directives();
 
         if (state.directive["use strict"]) {
-          if (!state.option.globalstrict && !(state.option.node || state.option.phantom)) {
-            warning("W097", state.tokens.prev);
+          if (!state.option.globalstrict) {
+            if (!(state.option.node || state.option.phantom || state.option.browserify)) {
+              warning("W097", state.tokens.prev);
+            }
           }
         }
 

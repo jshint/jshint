@@ -60,9 +60,15 @@ exports.node = function (test) {
   TestRun(test)
     .test(globalStrict, { es3: true, node: true, strict: true });
 
+  TestRun(test)
+    .test(globalStrict, { es3: true, browserify: true, strict: true });
+
   // Don't assume strict:true for Node environments. See bug GH-721.
   TestRun(test)
     .test("function test() { return; }", { es3: true, node: true });
+
+  TestRun(test)
+    .test("function test() { return; }", { es3: true, browserify: true });
 
   // Make sure that we can do fancy Node export
 
@@ -75,6 +81,10 @@ exports.node = function (test) {
   TestRun(test)
     .addError(1, "Read only.")
     .test(overwrites, { es3: true, node: true });
+
+  TestRun(test)
+    .addError(1, "Read only.")
+    .test(overwrites, { es3: true, browserify: true });
 
   test.done();
 };
