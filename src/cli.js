@@ -159,22 +159,22 @@ var findFileResults = {};
  *
  * @returns {string} normalized filename
  */
-function findFile(name, dir) {
-  dir = dir || process.cwd();
+function findFile(name, cwd) {
+  cwd = cwd || process.cwd();
 
-  var filename = path.normalize(path.join(dir, name));
+  var filename = path.normalize(path.join(cwd, name));
   if (findFileResults[filename] !== undefined) {
     return findFileResults[filename];
   }
 
-  var parent = path.resolve(dir, "../");
+  var parent = path.resolve(cwd, "../");
 
   if (shjs.test("-e", filename)) {
     findFileResults[filename] = filename;
     return filename;
   }
 
-  if (dir === parent) {
+  if (cwd === parent) {
     findFileResults[filename] = null;
     return null;
   }
@@ -188,15 +188,15 @@ function findFile(name, dir) {
  *
  * @return {array} a list of files to ignore.
  */
-function loadIgnores(exclude, excludePath) {
-  var file = findFile(excludePath || ".jshintignore");
+function loadIgnores(params) {
+  var file = findFile(params.excludePath || ".jshintignore", params.cwd);
 
-  if (!file && !exclude) {
+  if (!file && !params.exclude) {
     return [];
   }
 
   var lines = (file ? shjs.cat(file) : "").split("\n");
-  lines.unshift(exclude || "");
+  lines.unshift(params.exclude || "");
 
   return lines
     .filter(function (line) {
@@ -558,9 +558,10 @@ var exports = {
       (!opts.extensions ? "" : "|" +
         opts.extensions.replace(/,/g, "|").replace(/[\. ]/g, "")) + ")$");
 
-    var ignores = !opts.ignores ? loadIgnores() : opts.ignores.map(function (target) {
-      return path.resolve(target);
-    });
+    var ignores = !opts.ignores ? loadIgnores({cwd: opts.cwd}) :
+                                  opts.ignores.map(function (target) {
+                                    return path.resolve(target);
+                                  });
 
     opts.args.forEach(function (target) {
       collect(target, files, ignores, reg);
@@ -718,7 +719,7 @@ var exports = {
       args:       cli.args,
       config:     config,
       reporter:   reporter,
-      ignores:    loadIgnores(options.exclude, options["exclude-path"]),
+      ignores:    loadIgnores({exclude: options.exclude, excludePath: options["exclude-path"]}),
       extensions: options["extra-ext"],
       verbose:    options.verbose,
       extract:    options.extract,
