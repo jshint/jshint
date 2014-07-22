@@ -72,7 +72,9 @@ exports.division = function (test) {
     'var a=4,b=4,i=2;',
     'a/=b+2;',
     'a/=b/2;',
-    'a/=b/i;'
+    'a/=b/i;',
+    '/*jshint expr:true*/',
+    '/=b/i;' // valid standalone RegExp expression
   ];
 
   run = TestRun(test);
