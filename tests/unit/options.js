@@ -1597,6 +1597,21 @@ exports.unignored = function (test) {
 };
 
 /*
+ * Tests that the W117 and undef can be toggled per line.
+ */
+exports['per-line undef / -W117'] = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/ignore-w117.js", "utf-8");
+
+  TestRun(test)
+    .addError(5, "'c' is not defined.")
+    .addError(11, "'c' is not defined.")
+    .addError(15, "'c' is not defined.")
+    .test(src, { undef:true });
+
+  test.done();
+};
+
+/*
 * Tests the `freeze` option -- Warn if native object prototype is assigned to.
 */
 exports.freeze = function (test) {
