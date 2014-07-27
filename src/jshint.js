@@ -494,7 +494,9 @@ var JSHINT = (function () {
   }
 
   function isundef(scope, code, token, a) {
-    return JSHINT.undefs.push([scope, code, token, a]);
+    if (!state.ignored[code] && state.option.undef !== false) {
+      JSHINT.undefs.push([scope, code, token, a]);
+    }
   }
 
   function removeIgnoredMessages() {
