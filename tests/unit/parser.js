@@ -354,16 +354,53 @@ exports.regexp = function (test) {
   run.test(code, {moz: true});
 
 
+  // Pre Regular Expression Punctuation
+  //  (See: token method, create function in lex.js)
+  //
+  // "."
+  TestRun(test)
+    .addError(1, "A trailing decimal point can be confused with a dot: '10.'.")
+    .test("var y = 10. / 1;", {es3: true});
+  TestRun(test)
+    .addError(1, "A trailing decimal point can be confused with a dot: '10.'.")
+    .test("var y = 10. / 1;", {}); // es5
+  TestRun(test)
+    .addError(1, "A trailing decimal point can be confused with a dot: '10.'.")
+    .test("var y = 10. / 1;", {esnext: true});
+  TestRun(test)
+    .addError(1, "A trailing decimal point can be confused with a dot: '10.'.")
+    .test("var y = 10. / 1;", {moz: true});
+
+  // ")"
   TestRun(test).test("var y = Math.sqrt(16) / 180;", {es3: true});
   TestRun(test).test("var y = Math.sqrt(16) / 180;", {}); // es5
   TestRun(test).test("var y = Math.sqrt(16) / 180;", {esnext: true});
   TestRun(test).test("var y = Math.sqrt(16) / 180;", {moz: true});
 
-  // GH-803
+  // "~"
+  TestRun(test).test("var y = Math.sqrt(16) / 180;", {es3: true});
+  TestRun(test).test("var y = Math.sqrt(16) / 180;", {}); // es5
+  TestRun(test).test("var y = Math.sqrt(16) / 180;", {esnext: true});
+  TestRun(test).test("var y = Math.sqrt(16) / 180;", {moz: true});
+
+
+  // "]" (GH-803)
   TestRun(test).test("var x = [1]; var y = x[0] / 180;", {es3: true});
   TestRun(test).test("var x = [1]; var y = x[0] / 180;", {}); // es5
   TestRun(test).test("var x = [1]; var y = x[0] / 180;", {esnext: true});
   TestRun(test).test("var x = [1]; var y = x[0] / 180;", {moz: true});
+
+  // "++" (GH-1787)
+  TestRun(test).test("var a = 1; var b = a++ / 10;", {es3: true});
+  TestRun(test).test("var a = 1; var b = a++ / 10;", {}); // es5
+  TestRun(test).test("var a = 1; var b = a++ / 10;", {esnext: true});
+  TestRun(test).test("var a = 1; var b = a++ / 10;", {moz: true});
+
+  // "--" (GH-1787)
+  TestRun(test).test("var a = 1; var b = a-- / 10;", {es3: true});
+  TestRun(test).test("var a = 1; var b = a-- / 10;", {}); // es5
+  TestRun(test).test("var a = 1; var b = a-- / 10;", {esnext: true});
+  TestRun(test).test("var a = 1; var b = a-- / 10;", {moz: true});
 
   test.done();
 };
