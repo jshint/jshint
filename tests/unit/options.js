@@ -1601,11 +1601,11 @@ exports.enforceall = function (test) {
     .addError(1, "['key'] is better written in dot notation.")
     .addError(1, "'obj' is not defined.")
     .addError(1, "Missing semicolon.")
-    .test(src, { enforceall: true});
+    .test(src, { enforceall: true });
 
   // Can override default hard
   TestRun(test)
-    .test(src, { enforceall: true, nonbsp: false, bitwise: false, sub: true, undef: false, unused: false,asi:true});
+    .test(src, { enforceall: true, nonbsp: false, bitwise: false, sub: true, undef: false, unused: false, asi:true });
 
   test.done();
 };
