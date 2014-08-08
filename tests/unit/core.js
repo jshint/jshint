@@ -867,3 +867,33 @@ exports.testIncorrectJsonDetection = function (test) {
   TestRun(test).test(src);
   test.done();
 };
+
+exports.testES4TypeSpecifierErrorsByDefault = function (test) {
+  var code1 = "var i : Number = 3;";
+  var code2 = "function something() : Number { return 1; }";
+  var code3 = "var something = function() : Number { return 1; };";
+  var code4 = "function something(i : Number) { return 1; }";
+  var code5 = "for (var i : Number = 0; i < 3; i++) { }";
+  var code6 = "for each (var i : Number in [1, 3, 5, 7]) { }";
+  TestRun(test).addError(1, "Type annotations are not available in standard ECMA script (use es4type option).").test(code1, {});
+  TestRun(test).addError(1, "Type annotations are not available in standard ECMA script (use es4type option).").test(code2, {});
+  TestRun(test).addError(1, "Type annotations are not available in standard ECMA script (use es4type option).").test(code3, {});
+  TestRun(test).addError(1, "Type annotations are not available in standard ECMA script (use es4type option).").test(code4, {});
+  TestRun(test).addError(1, "Type annotations are not available in standard ECMA script (use es4type option).").test(code5, {});
+  test.done();
+}
+
+exports.testES4TypeSpecifiersAllowed = function (test) {
+  var code1 = "var i : Number = 3;";
+  var code2 = "function something() : Number { return 1; }";
+  var code3 = "var something = function() : Number { return 1; };";
+  var code4 = "function something(i : Number) { return 1; }";
+  var code5 = "for (var i : Number = 0; i < 3; i++) { }";
+  var code6 = "for each (var i : Number in [1, 3, 5, 7]) { }";
+  TestRun(test).test(code1, { es4type: true });
+  TestRun(test).test(code2, { es4type: true });
+  TestRun(test).test(code3, { es4type: true });
+  TestRun(test).test(code4, { es4type: true });
+  TestRun(test).test(code5, { es4type: true });
+  test.done();
+}
