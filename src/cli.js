@@ -92,8 +92,8 @@ function findConfig(file) {
 
 function getHomeDir() {
   var environment = global.process.env;
-  var paths = [environment.HOME,
-               environment.USERPROFILE,
+  var paths = [environment.USERPROFILE,
+               environment.HOME,
                environment.HOMEPATH,
                environment.HOMEDRIVE + environment.HOMEPATH];
 
