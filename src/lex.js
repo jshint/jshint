@@ -323,13 +323,10 @@ Lexer.prototype = {
       };
     }
 
-    // Special case: /=. We need to make sure that this is an
-    // operator and not a regular expression.
+    // Special case: /=.
 
     if (ch1 === "/") {
-      if (ch2 === "=" && /\/=(?!(\S*\/[gim]?))/.test(this.input)) {
-        // /= is not a part of a regular expression, return it as a
-        // punctuator.
+      if (ch2 === "=") {
         return {
           type: Token.Punctuator,
           value: "/="
@@ -1311,7 +1308,7 @@ Lexer.prototype = {
   },
 
   /*
-   * Scan for any occurence of non-breaking spaces. Non-breaking spaces
+   * Scan for any occurrence of non-breaking spaces. Non-breaking spaces
    * can be mistakenly typed on OS X with option-space. Non UTF-8 web
    * pages with non-breaking pages produce syntax errors.
    */
@@ -1453,7 +1450,7 @@ Lexer.prototype = {
 
   /*
    * Produce the next token. This function is called by advance() to get
-   * the next token. It retuns a token in a JSLint-compatible format.
+   * the next token. It returns a token in a JSLint-compatible format.
    */
   token: function () {
     /*jshint loopfunc:true */
