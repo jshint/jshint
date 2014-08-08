@@ -566,6 +566,23 @@ exports.group = {
     test.done();
   },
 
+  testAPIIgnores: function (test) {
+    var dir = __dirname + "/../data/";
+    sinon.stub(process, "cwd").returns(dir);
+    var result = null;
+
+    cli.run({
+      args: [dir + "../tests/unit/fixtures/ignored.js"],
+      cwd: dir + "../tests/unit/fixtures/",
+      reporter: function (results) { result = results; }
+    });
+
+    test.deepEqual(result, []);
+
+    process.cwd.restore();
+    test.done();
+  },
+
   testCollectFiles: function (test) {
     var gather = sinon.stub(cli, "gather");
     var args = [];
