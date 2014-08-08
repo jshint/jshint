@@ -91,19 +91,21 @@ function findConfig(file) {
 }
 
 function getHomeDir() {
+  var homePath = "";
   var environment = global.process.env;
-  var paths = [environment.USERPROFILE,
-               environment.HOME,
-               environment.HOMEPATH,
-               environment.HOMEDRIVE + environment.HOMEPATH];
+  var paths = [
+    environment.USERPROFILE,
+    environment.HOME,
+    environment.HOMEPATH,
+    environment.HOMEDRIVE + environment.HOMEPATH
+  ];
 
-  for (var homeIndex in paths)
-    if (paths.hasOwnProperty(homeIndex)) {
-      var homePath = paths[homeIndex];
-
-      if (homePath && fs.existsSync(homePath))
-        return homePath;
+  while (paths.length) {
+    homePath = paths.shift();
+    if (fs.existsSync(homePath)) {
+      return homePath;
     }
+  }
 }
 
 /**
