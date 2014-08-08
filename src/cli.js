@@ -76,13 +76,13 @@ function findConfig(file) {
   var envs = getHomeDir();
 
   if (!envs)
-    return home;
-
-  var home = path.normalize(path.join(envs, ".jshintrc"));
+    return undefined;
 
   var proj = findFile(".jshintrc", dir);
   if (proj)
     return proj;
+
+  var home = path.normalize(path.join(envs, ".jshintrc"));
 
   if (shjs.test("-e", home))
     return home;
@@ -154,42 +154,48 @@ var findFileResults = {};
  * or hits the root.
  *
  * @param {string} name filename to search for (e.g. .jshintrc)
- * @param {string} dir  directory to start search from (default:
- *                      current working directory)
+ * @param {string} dir  directory to start search from
  *
  * @returns {string} normalized filename
  */
 function findFile(name, dir) {
-  dir = dir || process.cwd();
-
   var filename = path.normalize(path.join(dir, name));
   if (findFileResults[filename] !== undefined) {
     return findFileResults[filename];
   }
 
-  var parent = path.resolve(dir, "../");
-
   if (shjs.test("-e", filename)) {
     findFileResults[filename] = filename;
     return filename;
   }
+  var parent = path.resolve(dir, "../");
 
-  if (dir === parent) {
-    findFileResults[filename] = null;
-    return null;
+  if (dir === parent) {  //if not found and dir is root
+    name = path.normalize(name);
+    if (!shjs.test("-e", name)) {  //if name does not exist as an absolute path
+      name = null;
+    }
+    return name;
   }
 
-  return findFile(name, parent);
+  findFileResults[filename] = findFile(name, parent);
+  return findFileResults[filename];
 }
 
 /**
  * Loads a list of files that have to be skipped. JSHint assumes that
  * the list is located in a file called '.jshintignore'.
  *
+ * @param {string} target file path that is going to be linted
+ * @param {string} exclude (optional) file pattern to exclude
+ * @param {string} excludePath (optional) location of a file that acts as a .jshintignore
+ *
  * @return {array} a list of files to ignore.
  */
-function loadIgnores(exclude, excludePath) {
-  var file = findFile(excludePath || ".jshintignore");
+function loadIgnores(target, exclude, excludePath) {
+  if(!shjs.test("-d", target)) return [];
+  //if only a single file is being linted then there is nothing to ignore
+  var file = findFile((excludePath || ".jshintignore"), target);
 
   if (!file && !exclude) {
     return [];
@@ -204,9 +210,9 @@ function loadIgnores(exclude, excludePath) {
     })
     .map(function (line) {
       if (line[0] === "!")
-        return "!" + path.resolve(path.dirname(file), line.substr(1).trim());
+        return "!" + path.resolve(target, line.substr(1).trim());
 
-      return path.join(path.dirname(file), line.trim());
+      return path.join(target, line.trim());
     });
 }
 
@@ -558,7 +564,9 @@ var exports = {
       (!opts.extensions ? "" : "|" +
         opts.extensions.replace(/,/g, "|").replace(/[\. ]/g, "")) + ")$");
 
-    var ignores = !opts.ignores ? loadIgnores() : opts.ignores.map(function (target) {
+    var ignores = opts.ignores;
+    if(!ignores) ignores = loadIgnores(opts.args[1]);
+    ignores = ignores.map(function (target) {
       return path.resolve(target);
     });
 
@@ -718,7 +726,7 @@ var exports = {
       args:       cli.args,
       config:     config,
       reporter:   reporter,
-      ignores:    loadIgnores(options.exclude, options["exclude-path"]),
+      ignores:    loadIgnores(cli.args[1], options.exclude, options["exclude-path"]),
       extensions: options["extra-ext"],
       verbose:    options.verbose,
       extract:    options.extract,
