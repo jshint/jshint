@@ -1230,6 +1230,34 @@ exports.quotesInline = function (test) {
   test.done();
 };
 
+// Test the `quotmark` option along with TemplateLiterals.
+exports.quotesAndTemplateLiterals = function (test) {
+  var src = fs.readFileSync(__dirname + '/fixtures/quotes4.js', 'utf8');
+
+  // Without esnext
+  TestRun(test)
+    .addError(2, "Unexpected '`'.")
+    .addError(2, "Unexpected early end of program.")
+    .addError(2, "Expected an identifier and instead saw '(end)'.")
+    .addError(2, "Missing semicolon.")
+    .test(src);
+
+  // With esnext
+  TestRun(test)
+    .test(src, {esnext: true});
+
+  // With esnext and single quotemark
+  TestRun(test)
+    .test(src, {esnext: true, quotmark: 'single'});
+
+  // With esnext and double quotemark
+  TestRun(test)
+    .addError(1, "Strings must use doublequote.")
+    .test(src, {esnext: true, quotmark: 'double'});
+
+  test.done();
+};
+
 exports.scope = function (test) {
   var src = fs.readFileSync(__dirname + '/fixtures/scope.js', 'utf8');
 

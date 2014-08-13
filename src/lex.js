@@ -922,7 +922,8 @@ Lexer.prototype = {
     return {
       type: tokenType,
       value: value,
-      isUnclosed: false
+      isUnclosed: false,
+      quote: "`"
     };
   },
 
