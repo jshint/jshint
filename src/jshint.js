@@ -2759,7 +2759,7 @@ var JSHINT = (function () {
     }
     advance("]", this);
     return this;
-  }, 160);
+  });
 
 
   function property_name(preserve) {
