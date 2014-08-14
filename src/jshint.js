@@ -2714,7 +2714,7 @@ var JSHINT = (function () {
   }
 
   prefix("[", function () {
-    var blocktype = lookupBlockType(true);
+    var blocktype = lookupBlockType();
     if (blocktype.isCompArray) {
       if (!state.option.inESNext()) {
         warning("W119", state.tokens.curr, "array comprehension");
