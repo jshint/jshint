@@ -2201,12 +2201,12 @@ var JSHINT = (function () {
   };
   assignop("%=", "assignmod", 20);
 
-  bitwiseassignop("&=", "assignbitand", 20);
-  bitwiseassignop("|=", "assignbitor", 20);
-  bitwiseassignop("^=", "assignbitxor", 20);
-  bitwiseassignop("<<=", "assignshiftleft", 20);
-  bitwiseassignop(">>=", "assignshiftright", 20);
-  bitwiseassignop(">>>=", "assignshiftrightunsigned", 20);
+  bitwiseassignop("&=");
+  bitwiseassignop("|=");
+  bitwiseassignop("^=");
+  bitwiseassignop("<<=");
+  bitwiseassignop(">>=");
+  bitwiseassignop(">>>=");
   infix(",", function (left, that) {
     var expr;
     that.exprs = [left];
