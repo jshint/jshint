@@ -1731,7 +1731,7 @@ var JSHINT = (function () {
   }
 
 
-  function statements(startLine) {
+  function statements() {
     var a = [], p;
 
     while (!state.tokens.next.reach && state.tokens.next.id !== "(end)") {
@@ -1744,7 +1744,7 @@ var JSHINT = (function () {
 
         advance(";");
       } else {
-        a.push(statement(startLine === state.tokens.next.line));
+        a.push(statement());
       }
     }
     return a;
@@ -1870,7 +1870,7 @@ var JSHINT = (function () {
           }
         }
 
-        a = statements(line);
+        a = statements();
 
         metrics.statementCount += a.length;
 
@@ -3668,7 +3668,7 @@ var JSHINT = (function () {
     if (state.tokens.next.id === "else") {
       advance("else");
       if (state.tokens.next.id === "if" || state.tokens.next.id === "switch") {
-        statement(true);
+        statement();
       } else {
         block(true, true);
       }
