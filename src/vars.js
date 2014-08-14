@@ -25,18 +25,24 @@ exports.ecmaIdentifiers = {
   isFinite           : false,
   isNaN              : false,
   JSON               : false,
+  Map                : false,
   Math               : false,
   Number             : false,
   Object             : false,
+  Proxy              : false,
+  Promise            : false,
   parseInt           : false,
   parseFloat         : false,
   RangeError         : false,
   ReferenceError     : false,
   RegExp             : false,
+  Set                : false,
   String             : false,
   SyntaxError        : false,
   TypeError          : false,
   URIError           : false,
+  WeakMap            : false,
+  WeakSet            : false
 };
 
 exports.newEcmaIdentifiers = {
