@@ -2357,11 +2357,11 @@ var JSHINT = (function () {
   infix("/", "div", 140);
   infix("%", "mod", 140);
 
-  suffix("++", "postinc");
+  suffix("++");
   prefix("++", "preinc");
   state.syntax["++"].exps = true;
 
-  suffix("--", "postdec");
+  suffix("--");
   prefix("--", "predec");
   state.syntax["--"].exps = true;
   prefix("delete", function () {
