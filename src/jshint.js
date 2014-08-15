@@ -3474,7 +3474,9 @@ var JSHINT = (function () {
           warning("W080", state.tokens.prev, state.tokens.prev.value);
         }
         if (peek(0).id === "=" && state.tokens.next.identifier) {
-          warning("W120", state.tokens.next, state.tokens.next.value);
+          if (!funct["(params)"] || funct["(params)"].indexOf(state.tokens.next.value) === -1) {
+            warning("W120", state.tokens.next, state.tokens.next.value);
+          }
         }
         value = expression(10);
         if (lone) {

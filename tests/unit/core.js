@@ -779,13 +779,19 @@ exports.testES6ExportStarFrom = function (test) {
 };
 
 exports.testPotentialVariableLeak = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/leak.js", "utf8");
+  var a = fs.readFileSync(__dirname + "/fixtures/leak.js", "utf8");
+  var b = fs.readFileSync(__dirname + "/fixtures/gh1802.js", "utf8");
 
+  // Real Error
   TestRun(test)
     .addError(2, "You might be leaking a variable (b) here.")
     .addError(3, "You might be leaking a variable (d) here.")
     .addError(4, "You might be leaking a variable (f) here.")
-    .test(src, { esnext: true });
+    .test(a, { esnext: true });
+
+  // False Positive
+  TestRun(test)
+    .test(b);
 
   test.done();
 };
