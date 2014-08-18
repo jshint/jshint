@@ -1622,7 +1622,7 @@ exports.nonbsp = function (test) {
 };
 
 exports.enforceall = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/enforceall.js', 'utf8');
+  var src = fs.readFileSync(__dirname + "/fixtures/enforceall.js", "utf8");
 
   // Throws errors not normally on be default
   TestRun(test)
@@ -1634,6 +1634,16 @@ exports.enforceall = function (test) {
   // Can override default hard
   TestRun(test)
     .test(src, { enforceall: true, nonbsp: false, bitwise: false, sub: true, undef: false, unused: false, asi:true });
+
+  test.done();
+};
+
+exports.removeglobal = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/removeglobals.js", "utf8");
+
+  TestRun(test)
+    .addError(1,"'JSON' is not defined.")
+    .test(src, {undef: true, predef: ["-JSON","myglobal"]});
 
   test.done();
 };
