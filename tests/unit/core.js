@@ -50,6 +50,32 @@ exports.testUnusedDefinedGlobals = function (test) {
   test.done();
 };
 
+exports.globalDeclarations = function (test) {
+  var src = "exports = module.exports = function (test) {};";
+
+  // Test should pass
+  TestRun(test).test(src, { es3: true, node: true }, { exports: true });
+
+  // Test should pass as well
+  src = [
+    "/*jshint node:true */",
+    "/*global exports:true */",
+    "exports = module.exports = function (test) {};"
+  ];
+
+  TestRun(test).test(src.join('\n'));
+
+  test.done();
+};
+
+exports.multilineGlobalDeclarations = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/multiline-global-declarations.js", "utf8");
+
+  TestRun(test).test(src);
+
+  test.done();
+};
+
 /** Test that JSHint recognizes `new Array(<expr>)` as a valid expression */
 exports.testNewArray = function (test) {
   var code  = 'new Array(1);';
@@ -277,24 +303,6 @@ exports.returnStatement = function (test) {
     .addError(38, "Missing semicolon.")
     .addError(39, "Unnecessary semicolon.")
     .test(src, { es3: true });
-
-  test.done();
-};
-
-exports.globalDeclarations = function (test) {
-  var src = 'exports = module.exports = function (test) {};';
-
-  // Test should pass
-  TestRun(test).test(src, { es3: true, node: true }, { exports: true });
-
-  // Test should pass as well
-  src = [
-    '/*jshint node:true */',
-    '/*global exports:true */',
-    'exports = module.exports = function (test) {};'
-  ];
-
-  TestRun(test).test(src.join('\n'));
 
   test.done();
 };
