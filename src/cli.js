@@ -463,7 +463,7 @@ function lint(code, results, config, data, file) {
   if (config.overrides) {
     if (file) {
       _.each(config.overrides, function (options, pattern) {
-        if (minimatch(file, pattern, { nocase: true, matchBase: true })) {
+        if (minimatch(path.normalize(file), pattern, { nocase: true, matchBase: true })) {
           if (options.globals) {
             globals = _.extend(globals || {}, options.globals);
             delete options.globals;
