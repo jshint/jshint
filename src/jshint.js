@@ -4678,7 +4678,7 @@ var JSHINT = (function () {
         if (item[0] === "-") {
           slice = item.slice(1);
           JSHINT.blacklist[slice] = slice;
-          //remove from predefined if there
+          // remove from predefined if there
           delete predefined[slice];
         } else {
           prop = Object.getOwnPropertyDescriptor(o.predef, item);
