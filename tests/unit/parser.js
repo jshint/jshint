@@ -208,6 +208,60 @@ exports.options = function (test) {
   test.done();
 };
 
+exports["jshint option comments single line"] = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/gh1768-1.js", "utf8");
+
+  TestRun(test).test(src);
+
+  test.done();
+};
+
+exports["jshint option comments single line, leading and trailing space"] = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/gh1768-2.js", "utf8");
+
+  TestRun(test).test(src);
+
+  test.done();
+};
+
+exports["jshint option comments multi line"] = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/gh1768-3.js", "utf8");
+
+  TestRun(test).test(src);
+
+  test.done();
+};
+
+exports["jshint option comments multi line, leading and trailing space"] = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/gh1768-4.js", "utf8");
+
+  TestRun(test)
+    .addError(4, "'foo' is not defined.")
+    .test(src);
+
+  test.done();
+};
+
+exports["jshint option comments multi line/option"] = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/gh1768-5.js", "utf8");
+
+  TestRun(test)
+    .addError(3, "'foo' is not defined.")
+    .test(src);
+
+  test.done();
+};
+
+exports["jshint option comments multi line/option, leading and trailing space"] = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/gh1768-6.js", "utf8");
+
+  TestRun(test)
+    .addError(4, "'foo' is not defined.")
+    .test(src);
+
+  test.done();
+};
+
 exports.shebang = function (test) {
   var code = [
     "#!test",
