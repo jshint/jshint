@@ -374,6 +374,8 @@ Lexer.prototype = {
         value += "*/";
       }
 
+      body = body.replace(/\n/g, " ");
+
       special.forEach(function (str) {
         if (isSpecial) {
           return;
