@@ -80,8 +80,8 @@ module.exports =
               for (i = 0; i < files[fileName].length; i++) {
                   issue = files[fileName][i];
                   out.push(
-                      "\t\t<" + issue.severity  +
-                          " line=\"" + issue.line + "\" " +
+                      "\t\t<error "+
+                          "line=\"" + issue.line + "\" " +
                           "column=\"" + issue.column + "\" " +
                           "severity=\"" + issue.severity + "\" " +
                           "message=\"" + encode(issue.message) + "\" " +
