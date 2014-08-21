@@ -41,38 +41,57 @@ module.exports =
         errorMessage += ' (' + result.error.code + ')';
       }
 
-      // Add the error
-      files[result.file].push({
-        severity: 'error',
-        line: result.error.line,
-        column: result.error.character,
-        message: errorMessage,
-        source: 'jshint.' + result.error.code
-      });
+        var typeNo = result.error.code;
+        var typeMessages = require('../messages');
+        var message = '';
+        var severity = '';
+        switch(typeNo[0]) {
+            case 'I':
+                message = typeMessages.info[typeNo];
+                severity = 'info';
+                break;
+            case 'W':
+                message = typeMessages.warnings[typeNo];
+                severity = 'warning';
+                break;
+            case 'E':
+                message = typeMessages.errors[typeNo];
+                severity = 'error';
+                break;
+        }
+
+        // Add the error
+        files[result.file].push({
+            severity: severity,
+            line: result.error.line,
+            column: result.error.character,
+            message: errorMessage,
+            source: 'jshint.' + result.error.code
+        });
     });
 
 
-    out.push("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-    out.push("<checkstyle version=\"4.3\">");
+      out.push("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+      out.push("<checkstyle version=\"4.3\">");
 
-    for (fileName in files) {
-      if (files.hasOwnProperty(fileName)) {
-        out.push("\t<file name=\"" + fileName + "\">");
-        for (i = 0; i < files[fileName].length; i++) {
-          issue = files[fileName][i];
-          out.push(
-            "\t\t<error " +
-              "line=\"" + issue.line + "\" " +
-              "column=\"" + issue.column + "\" " +
-              "severity=\"" + issue.severity + "\" " +
-              "message=\"" + encode(issue.message) + "\" " +
-              "source=\"" + encode(issue.source) + "\" " +
-              "/>"
-          );
-        }
-        out.push("\t</file>");
+      for (fileName in files) {
+          if (files.hasOwnProperty(fileName)) {
+              out.push("\t<file name=\"" + fileName + "\">");
+              for (i = 0; i < files[fileName].length; i++) {
+                  issue = files[fileName][i];
+                  out.push(
+                      "\t\t<" + issue.severity  +
+                          " line=\"" + issue.line + "\" " +
+                          "column=\"" + issue.column + "\" " +
+                          "severity=\"" + issue.severity + "\" " +
+                          "message=\"" + encode(issue.message) + "\" " +
+                          "source=\"" + encode(issue.source) + "\" " +
+                          "/>"
+                  );
+              }
+              out.push("\t</file>");
+          }
       }
-    }
 
     out.push("</checkstyle>");
 
