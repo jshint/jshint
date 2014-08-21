@@ -775,6 +775,14 @@ exports.testES6TemplateLiteralsUndef = function (test) {
   test.done();
 };
 
+exports.testES6TemplateLiteralsMultiLine = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/es6-template-literal-multiline.js", "utf8");
+  TestRun(test)
+    .test(src, { esnext: true });
+
+  test.done();
+};
+
 exports.testES6ExportStarFrom = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/es6-export-star-from.js", "utf8");
   TestRun(test)
