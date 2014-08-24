@@ -928,7 +928,14 @@ var JSHINT = (function () {
           error("E020", state.tokens.next, id, t.id, t.line, state.tokens.next.value);
         }
       } else if (state.tokens.next.type !== "(identifier)" || state.tokens.next.value !== id) {
-        warning("W116", state.tokens.next, id, state.tokens.next.value);
+        // parameter destructuring with rest operator
+        if (state.tokens.next.value === "...") {
+          if (!state.option.esnext) {
+            warning("W119", state.tokens.next, "spread/rest operator");
+          }
+        } else {
+          warning("W116", state.tokens.next, id, state.tokens.next.value);
+        }
       }
     }
 
@@ -1568,7 +1575,14 @@ var JSHINT = (function () {
     if (state.tokens.curr.id === "function" && state.tokens.next.id === "(") {
       warning("W025");
     } else {
-      error("E030", state.tokens.next, state.tokens.next.value);
+      // parameter destructuring with rest operator
+      if (state.tokens.next.value === "...") {
+        if (!state.option.esnext) {
+          warning("W119", state.tokens.next, "spread/rest operator");
+        }
+      } else {
+        error("E030", state.tokens.next, state.tokens.next.value);
+      }
     }
   }
 
@@ -2383,8 +2397,8 @@ var JSHINT = (function () {
   });
 
   prefix("...", function () {
-    if (!state.option.inESNext()) {
-      warning("W104", this, "spread/rest operator");
+    if (!state.option.esnext) {
+      warning("W119", this, "spread/rest operator");
     }
     if (!state.tokens.next.identifier) {
       error("E030", state.tokens.next, state.tokens.next.value);
@@ -2799,8 +2813,8 @@ var JSHINT = (function () {
         for (var i in parsed) {
           curr = parsed[i];
           if (curr.value === "...") {
-            if (!state.option.inESNext()) {
-              warning("W104", curr, "spread/rest operator");
+            if (!state.option.esnext) {
+              warning("W119", curr, "spread/rest operator");
             }
             continue;
           } else if (curr.value !== ",") {
@@ -2837,8 +2851,8 @@ var JSHINT = (function () {
           }
         }
       } else if (state.tokens.next.value === "...") {
-        if (!state.option.inESNext()) {
-          warning("W104", state.tokens.next, "spread/rest operator");
+        if (!state.option.esnext) {
+          warning("W119", state.tokens.next, "spread/rest operator");
         }
         advance("...");
         ident = identifier(true);
