@@ -4504,3 +4504,8 @@ exports["'for of' shouldn't be subject to 'for in' rules"] = function (test) {
     .test("for (let x of [1, 2, 3]) { console.log(x); }", { forin: true, esnext: true });
   test.done();
 };
+
+exports["Ignore strings containing braces within array literal declarations"] = function (test) {
+  TestRun(test).test("var a = [ '[' ];");
+  test.done();
+};
