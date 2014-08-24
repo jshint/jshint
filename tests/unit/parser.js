@@ -3711,7 +3711,7 @@ exports["concise methods support for 'set' without 'get'"] = function (test) {
   test.done();
 };
 
-exports["object short notation"] = function (test) {
+exports["object short notation: basic"] = function (test) {
   var code = [
     "var foo = 42;",
     "var bar = {foo};",
@@ -3724,6 +3724,25 @@ exports["object short notation"] = function (test) {
     .addError(2, "'object short notation' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(3, "'object short notation' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .test(code);
+
+  test.done();
+};
+
+exports["object short notation: mixed"] = function (test) {
+  var code = [
+    "var b = 1, c = 2;",
+    "var o1 = {a: 1, b, c};",
+    "var o2 = {b, a: 1, c};"
+  ].join("\n");
+
+  TestRun(test).test(code, { esnext: true });
+
+  TestRun(test)
+    .addError(2, "'object short notation' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(2, "'object short notation' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(3, "'object short notation' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(3, "'object short notation' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+  .test(code);
 
   test.done();
 };

@@ -2761,7 +2761,7 @@ var JSHINT = (function () {
   });
 
 
-  function property_name(preserve) {
+  function propertyName(preserve) {
     var id = optionalidentifier(false, true, preserve);
 
     if (!id) {
@@ -3087,10 +3087,16 @@ var JSHINT = (function () {
       var tag = "";
 
       function saveProperty(name, tkn) {
-        if (props[name] && _.has(props, name))
+
+        if (tkn.identifier) {
+          name = tkn.value;
+        }
+
+        if (props[name] && _.has(props, name)) {
           warning("W075", state.tokens.next, i);
-        else
+        } else {
           props[name] = {};
+        }
 
         props[name].basic = true;
         props[name].basictkn = tkn;
@@ -3098,8 +3104,9 @@ var JSHINT = (function () {
 
       function saveSetter(name, tkn) {
         if (props[name] && _.has(props, name)) {
-          if (props[name].basic || props[name].setter)
+          if (props[name].basic || props[name].setter) {
             warning("W075", state.tokens.next, i);
+          }
         } else {
           props[name] = {};
         }
@@ -3110,8 +3117,9 @@ var JSHINT = (function () {
 
       function saveGetter(name) {
         if (props[name] && _.has(props, name)) {
-          if (props[name].basic || props[name].getter)
+          if (props[name].basic || props[name].getter) {
             warning("W075", state.tokens.next, i);
+          }
         } else {
           props[name] = {};
         }
@@ -3145,7 +3153,7 @@ var JSHINT = (function () {
             error("E034");
           }
 
-          i = property_name();
+          i = propertyName();
 
           // ES6 allows for get() {...} and set() {...} method
           // definition shorthand syntax, so we don't produce an error
@@ -3181,7 +3189,7 @@ var JSHINT = (function () {
             error("E034");
           }
 
-          i = property_name();
+          i = propertyName();
 
           // ES6 allows for get() {...} and set() {...} method
           // definition shorthand syntax, so we don't produce an error
@@ -3225,12 +3233,12 @@ var JSHINT = (function () {
             if (!state.option.inESNext()) {
               warning("W104", state.tokens.curr, "object short notation");
             }
-            i = property_name(true);
+            i = propertyName(true);
             saveProperty(tag + i, state.tokens.next);
 
             expression(10);
           } else {
-            i = property_name();
+            i = propertyName();
             saveProperty(tag + i, state.tokens.next);
 
             if (typeof i !== "string") {
