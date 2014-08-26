@@ -36,19 +36,19 @@
     "shelljs":     "0.3.x",
     "underscore":  "1.6.x",
     "cli":         "0.6.x",
-    "minimatch":   "~1.0.0",
+    "minimatch":   "1.0.x",
     "htmlparser2": "3.7.x",
     "console-browserify": "1.1.x",
     "exit": "0.1.x",
-    "strip-json-comments": "0.1.x"
+    "strip-json-comments": "1.0.x"
   },
 
   "devDependencies": {
     "jshint":        "2.5.x",
-    "browserify":    "4.x",
+    "browserify":    "5.x",
     "coveraje":      "0.2.x",
     "nodeunit":      "0.9.x",
-    "sinon":         "1.9.x",
+    "sinon":         "1.10.x",
     "unicode-6.3.0": "0.1.x",
     "regenerate":    "0.6.x"
   },
