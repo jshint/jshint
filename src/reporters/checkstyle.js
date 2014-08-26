@@ -47,13 +47,13 @@ module.exports =
         case 'I':
           severity = 'info';
           break;
-    	case 'W':
+        case 'W':
           severity = 'warning';
-          break;
-        case 'E':
-          severity = 'error';
-          break;
-	  }
+      	  break;
+      	case 'E':
+      	  severity = 'error';
+      	  break;
+      }
 
       // Add the error
       files[result.file].push({
