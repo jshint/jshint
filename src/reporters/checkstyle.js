@@ -40,7 +40,7 @@ module.exports =
       if (opts.verbose) {
         errorMessage += ' (' + result.error.code + ')';
       }
-      
+
       var typeNo = result.error.code;
       var severity = '';
       switch(typeNo[0]) {
@@ -49,10 +49,10 @@ module.exports =
           break;
         case 'W':
           severity = 'warning';
-      	  break;
-      	case 'E':
-      	  severity = 'error';
-      	  break;
+          break;
+        case 'E':
+          severity = 'error';
+          break;
       }
 
       // Add the error
