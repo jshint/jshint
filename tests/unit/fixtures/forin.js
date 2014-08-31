@@ -1,7 +1,21 @@
 for (var key in objects) {
-    if (objects.hasOwnProperty(key)) {
-        hey();
-    }
+  if (objects.hasOwnProperty(key)) {
+    hey();
+  }
+}
+
+var hasOwn = Object.prototype.hasOwnProperty;
+
+for (var p in o) {
+  if (hasOwn.call(o, p)) {
+    hey();
+  }
+}
+
+for (var p in o) {
+  if (Reflect.has(o, p)) {
+    hey();
+  }
 }
 
 // Empty for in block like the one found in jQuery
@@ -13,3 +27,4 @@ for ( key in objects ) { }
 for (key in objects) {
     hey();
 }
+
