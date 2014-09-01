@@ -548,6 +548,7 @@ exports.group = {
     var dir = __dirname + "/../examples/";
     sinon.stub(process, "cwd").returns(dir);
 
+    cli.clearCachedFiles();
     cli.interpret([
       "node", "jshint", "file.js", "--exclude=exclude.js"
     ]);

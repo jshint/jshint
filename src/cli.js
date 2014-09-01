@@ -76,13 +76,13 @@ function findConfig(file) {
   var envs = getHomeDir();
 
   if (!envs)
-    return home;
-
-  var home = path.normalize(path.join(envs, ".jshintrc"));
+    return;
 
   var proj = findFile(".jshintrc", dir);
   if (proj)
     return proj;
+
+  var home = path.join(envs, ".jshintrc");
 
   if (shjs.test("-e", home))
     return home;
@@ -164,29 +164,32 @@ var findFileResults = {};
 function findFile(name, cwd) {
   cwd = cwd || process.cwd();
 
-  var filename = path.normalize(path.join(cwd, name));
+  var filename = path.join(cwd, name);
   if (findFileResults[filename] !== undefined) {
     return findFileResults[filename];
   }
-
-  var parent = path.resolve(cwd, "../");
 
   if (shjs.test("-e", filename)) {
     findFileResults[filename] = filename;
     return filename;
   }
 
-  if (cwd === parent) {
+  var parent = path.resolve(cwd, "..");
+  if (cwd === parent) {  //if not found and cwd is root
     findFileResults[filename] = null;
     return null;
   }
 
-  return findFile(name, parent);
+  findFileResults[filename] = findFile(name, parent);
+  return findFileResults[filename];
 }
 
 /**
  * Loads a list of files that have to be skipped. JSHint assumes that
  * the list is located in a file called '.jshintignore'.
+ *
+ * @param {string} exclude (optional) file pattern to exclude
+ * @param {string} excludePath (optional) location of a file that acts as a .jshintignore
  *
  * @return {array} a list of files to ignore.
  */
@@ -197,7 +200,7 @@ function loadIgnores(params) {
     return [];
   }
 
-  var lines = (file ? shjs.cat(file) : "").split("\n");
+  var lines = (file ? shjs.cat(file) : "").split(/\r?\n|\r/);
   lines.unshift(params.exclude || "");
 
   return lines
@@ -215,23 +218,23 @@ function loadIgnores(params) {
 /**
  * Checks whether we should ignore a file or not.
  *
- * @param {string} fp       a path to a file
+ * @param {string} filePath a path to a file
  * @param {array}  patterns a list of patterns for files to ignore
  *
  * @return {boolean} 'true' if file should be ignored, 'false' otherwise.
  */
-function isIgnored(fp, patterns) {
-  return patterns.some(function (ip) {
-    if (minimatch(path.resolve(fp), ip, { nocase: true })) {
+function isIgnored(filePath, patterns) {
+  return patterns.some(function (ignorePath) {
+    if (minimatch(path.resolve(filePath), ignorePath, { nocase: true })) {
       return true;
     }
 
-    if (path.resolve(fp) === ip) {
+    if (path.resolve(filePath) === ignorePath) {
       return true;
     }
 
-    if (shjs.test("-d", fp) && ip.match(/^[^\/]*\/?$/) &&
-      fp.match(new RegExp("^" + ip + ".*"))) {
+    if (shjs.test("-d", filePath) && ignorePath.match(/^[^\/]*\/?$/) &&
+      filePath.match(new RegExp("^" + ignorePath + ".*"))) {
       return true;
     }
   });
@@ -272,7 +275,7 @@ function extract(code, when) {
     // in between the last </script> tag and this <script> tag to preserve
     // location information.
     inscript = true;
-    js.push.apply(js, code.slice(index, parser.endIndex).match(/\n\r|\n|\r/g));
+    js.push.apply(js, code.slice(index, parser.endIndex).match(/\r?\n|\r/g));
     startOffset = null;
   }
 
@@ -289,7 +292,7 @@ function extract(code, when) {
     if (!inscript)
       return;
 
-    var lines = data.split(/\n\r|\n|\r/);
+    var lines = data.split(/\r?\n|\r/);
 
     if (!startOffset) {
       lines.some(function (line) {
@@ -354,7 +357,7 @@ function extractOffsets(code, when) {
     // location information.
     inscript = true;
     var fragment = code.slice(index, parser.endIndex);
-    var n = fragment.match(/\n\r|\n|\r/g).length;
+    var n = fragment.match(/\r?\n|\r/g).length;
     lineCounter += n;
     startOffset = null;
   }
@@ -372,7 +375,7 @@ function extractOffsets(code, when) {
     if (!inscript)
       return;
 
-    var lines = data.split(/\n\r|\n|\r/);
+    var lines = data.split(/\r?\n|\r/);
 
     if (!startOffset) {
       lines.some(function (line) {
@@ -384,7 +387,7 @@ function extractOffsets(code, when) {
 
     // check for startOffset again to remove leading white space from first line
     lines.forEach(function () {
-      lineCounter += 1;
+      ++lineCounter;
       if (startOffset) {
         offsets[lineCounter] = startOffset.length;
       } else {
@@ -546,6 +549,15 @@ var exports = {
   },
 
   /**
+   * Helper exposed for testing.
+   * Used to clear the file cache so that the same files may be mocked to
+   * exist or not exist without being dependent on previous tests.
+   */
+  clearCachedFiles: function() {
+    findFileResults={};
+  },
+
+  /**
    * Gathers all files that need to be linted
    *
    * @param {object} post-processed options from 'interpret':
@@ -560,10 +572,11 @@ var exports = {
       (!opts.extensions ? "" : "|" +
         opts.extensions.replace(/,/g, "|").replace(/[\. ]/g, "")) + ")$");
 
-    var ignores = !opts.ignores ? loadIgnores({cwd: opts.cwd}) :
-                                  opts.ignores.map(function (target) {
-                                    return path.resolve(target);
-                                  });
+    var ignores = opts.ignores;
+    if(!ignores) ignores = loadIgnores({cwd: opts.cwd});
+    ignores = ignores.map(function (target) {
+      return path.resolve(target);
+    });
 
     opts.args.forEach(function (target) {
       collect(target, files, ignores, reg);
@@ -707,11 +720,8 @@ var exports = {
     // This is a hack. exports.run is both sync and async function
     // because I needed stdin support (and cli.withStdin is async)
     // and was too lazy to change tests.
-
     function done(passed) {
-      /*jshint eqnull:true */
-
-      if (passed == null)
+      if (passed === null || passed === undefined)
         return;
 
       exports.exit(passed ? 0 : 2);
