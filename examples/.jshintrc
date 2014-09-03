@@ -9,6 +9,7 @@
     "camelcase"     : false,    // true: Identifiers must be in camelCase
     "curly"         : true,     // true: Require {} for every new block or scope
     "eqeqeq"        : true,     // true: Require triple equals (===) for comparison
+    "freeze"        : true,     // true: prohibits overwriting prototypes of native objects such as Array, Date etc.
     "forin"         : true,     // true: Require filtering for..in loops with obj.hasOwnProperty()
     "immed"         : false,    // true: Require immediate invocations to be wrapped in parens e.g. `(function () { } ());`
     "indent"        : 4,        // {int} Number of spaces to use for indentation
@@ -16,6 +17,7 @@
     "newcap"        : false,    // true: Require capitalization of all constructor functions e.g. `new F()`
     "noarg"         : true,     // true: Prohibit use of `arguments.caller` and `arguments.callee`
     "noempty"       : true,     // true: Prohibit use of empty blocks
+    "nonbsp"        : true,     // true: Prohibit "non-breaking whitespace" characters.
     "nonew"         : false,    // true: Prohibit use of constructors for side-effects (without assignment)
     "plusplus"      : false,    // true: Prohibit use of `++` & `--`
     "quotmark"      : false,    // Quotation mark consistency:
@@ -51,6 +53,8 @@
     "laxcomma"      : false,     // true: Tolerate comma-first style coding
     "loopfunc"      : false,     // true: Tolerate functions being defined in loops
     "multistr"      : false,     // true: Tolerate multi-line strings
+    "noyield"       : false,     // true: Tolerate generator functions with no yield statement in them.
+    "notypeof"      : false,     // true: Tolerate invalid typeof operator values
     "proto"         : false,     // true: Tolerate using the `__proto__` property
     "scripturl"     : false,     // true: Tolerate script-targeted URLs
     "shadow"        : false,     // true: Allows re-define variables later in code e.g. `var x=1; x=2;`
@@ -64,12 +68,16 @@
     "couch"         : false,    // CouchDB
     "devel"         : true,     // Development/debugging (alert, confirm, etc)
     "dojo"          : false,    // Dojo Toolkit
+    "jasmine"       : false,    // Jasmine
     "jquery"        : false,    // jQuery
+    "mocha"         : true,     // Mocha
     "mootools"      : false,    // MooTools
     "node"          : false,    // Node.js
     "nonstandard"   : false,    // Widely adopted globals (escape, unescape, etc)
     "prototypejs"   : false,    // Prototype and Scriptaculous
+    "qunit"         : false,    // QUnit
     "rhino"         : false,    // Rhino
+    "shelljs"       : false     // ShellJS
     "worker"        : false,    // Web Workers
     "wsh"           : false,    // Windows Scripting Host
     "yui"           : false,    // Yahoo User Interface
