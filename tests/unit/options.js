@@ -1647,3 +1647,13 @@ exports.removeglobal = function (test) {
 
   test.done();
 };
+
+
+exports.ignoreDelimiters = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/ignoreDelimiters.js", "utf8");
+
+  TestRun(test)
+    .test(src, { ignoreDelimiters: "<%=?.*?%>" });
+
+  test.done();
+};

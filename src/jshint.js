@@ -188,11 +188,14 @@ var JSHINT = (function () {
                             //   false    - don't emit any warnings
                             //   true     - warn if any variable is used before its definition
                             //   "nofunc" - warn for any variable but function declarations
-      ignore       : false  // start/end ignoring lines of code, bypassing the lexer
+      ignore       : false, // start/end ignoring lines of code, bypassing the lexer
                             //   start    - start ignoring lines, including the current line
                             //   end      - stop ignoring lines, starting on the next line
                             //   line     - ignore warnings / errors for just a single line
                             //              (this option does not bypass the lexer)
+
+      ignoreDelimiters: false // string used as a regex to match and remove custom chunks of code
+                              // (e.g. <%= ... %>, <?php ... ?>, etc.)
     },
 
     // These are JSHint boolean options which are shared with JSLint
@@ -4642,7 +4645,7 @@ var JSHINT = (function () {
 
   // The actual JSHINT function itself.
   var itself = function (s, o, g) {
-    var i, k, x;
+    var i, k, x, reIgnore;
     var optionKeys;
     var newOptionObj = {};
     var newIgnoredObj = {};
@@ -4780,6 +4783,11 @@ var JSHINT = (function () {
     });
 
     state.tokens.prev = state.tokens.curr = state.tokens.next = state.syntax["(begin)"];
+
+    if (o && o.ignoreDelimiters) {
+      reIgnore = new RegExp(o.ignoreDelimiters, "ig");
+      s = s.replace(reIgnore, "");
+    }
 
     lex = new Lexer(s);
 
