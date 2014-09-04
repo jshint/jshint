@@ -344,6 +344,7 @@ exports.browser = {
   WebSocket            : false,
   window               : false,
   Worker               : false,
+  XDomainRequest       : false,
   XMLHttpRequest       : false,
   XMLSerializer        : false,
   XPathEvaluator       : false,
