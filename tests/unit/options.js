@@ -696,7 +696,11 @@ exports.forin = function (test) {
 
   // Make sure it fails when forin is true
   TestRun(test)
-    .addError(27, msg)
+    .addError(15, msg)
+    .addError(23, msg)
+    .addError(37, msg)
+    .addError(43, msg)
+    .addError(73, msg)
     .test(src, { es3: true, forin: true });
 
   test.done();

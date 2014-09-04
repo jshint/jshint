@@ -3672,10 +3672,34 @@ var JSHINT = (function () {
     increaseComplexityCount();
     state.condition = true;
     advance("(");
-    checkCondAssignment(expression(0));
+    var expr = expression(0);
+    checkCondAssignment(expr);
+
+    // When the if is within a for-in loop, check if the condition
+    // starts with a negation operator
+    var forinifcheck = null;
+    if (state.option.forin && state.forinifcheckneeded) {
+      state.forinifcheckneeded = false; // We only need to analyze the first if inside the loop
+      forinifcheck = state.forinifchecks[state.forinifchecks.length - 1];
+      if (expr.type === "(punctuator)" && expr.value === "!") {
+        forinifcheck.type = "(negative)";
+      } else {
+        forinifcheck.type = "(positive)";
+      }
+    }
+
     advance(")", t);
     state.condition = false;
-    block(true, true);
+    var s = block(true, true);
+
+    // When the if is within a for-in loop and the condition has a negative form,
+    // check if the body contains nothing but a continue statement
+    if (forinifcheck && forinifcheck.type === "(negative)") {
+      if (s && s.length === 1 && s[0].type === "(identifier)" && s[0].value === "continue") {
+        forinifcheck.type = "(negative-with-continue)";
+      }
+    }
+
     if (state.tokens.next.id === "else") {
       advance("else");
       if (state.tokens.next.id === "if" || state.tokens.next.id === "switch") {
@@ -3995,11 +4019,41 @@ var JSHINT = (function () {
       advance(nextop.value);
       expression(20);
       advance(")", t);
-      s = block(true, true);
-      if (nextop.value === "in" && state.option.forin && s &&
-          (s.length > 1 || typeof s[0] !== "object" || s[0].value !== "if")) {
-        warning("W089", this);
+
+      if (nextop.value === "in" && state.option.forin) {
+        state.forinifcheckneeded = true;
+
+        if (state.forinifchecks === undefined) {
+          state.forinifchecks = [];
+        }
+
+        // Push a new for-in-if check onto the stack. The type will be modified
+        // when the loop's body is parsed and a suitable if statement exists.
+        state.forinifchecks.push({
+          type: "(none)"
+        });
       }
+
+      s = block(true, true);
+
+      if (nextop.value === "in" && state.option.forin) {
+        if (state.forinifchecks && state.forinifchecks.length > 0) {
+          var check = state.forinifchecks.pop();
+          
+          if (// No if statement or not the first statement in loop body
+              s && s.length > 0 && (typeof s[0] !== "object" || s[0].value !== "if") ||
+              // Positive if statement is not the only one in loop body
+              check.type === "(positive)" && s.length > 1 ||
+              // Negative if statement but no continue
+              check.type === "(negative)") {
+            warning("W089", this);
+          }
+        }
+        
+        // Reset the flag in case no if statement was contained in the loop body
+        state.forinifcheckneeded = false;
+      }
+
       funct["(breakage)"] -= 1;
       funct["(loopage)"] -= 1;
     } else {
