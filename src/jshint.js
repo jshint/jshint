@@ -187,11 +187,13 @@ var JSHINT = (function () {
                             //   false    - don't emit any warnings
                             //   true     - warn if any variable is used before its definition
                             //   "nofunc" - warn for any variable but function declarations
-      ignore       : false  // start/end ignoring lines of code, bypassing the lexer
+      ignore       : false, // start/end ignoring lines of code, bypassing the lexer
                             //   start    - start ignoring lines, including the current line
                             //   end      - stop ignoring lines, starting on the next line
                             //   line     - ignore warnings / errors for just a single line
                             //              (this option does not bypass the lexer)
+      ignoreDelimiters: false // array of start/end delimiters used to ignore
+                              // certain chunks from code
     },
 
     // These are JSHint boolean options which are shared with JSLint
@@ -4639,9 +4641,13 @@ var JSHINT = (function () {
     };
   };
 
+  var escapeRegex = function(str) {
+    return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+  };
+
   // The actual JSHINT function itself.
   var itself = function (s, o, g) {
-    var i, k, x;
+    var i, k, x, reIgnoreStr, reIgnore;
     var optionKeys;
     var newOptionObj = {};
     var newIgnoredObj = {};
@@ -4779,6 +4785,26 @@ var JSHINT = (function () {
     });
 
     state.tokens.prev = state.tokens.curr = state.tokens.next = state.syntax["(begin)"];
+
+    if (o && o.ignoreDelimiters) {
+
+      if (!Array.isArray(o.ignoreDelimiters)) {
+        o.ignoreDelimiters = [o.ignoreDelimiters];
+      }
+
+      o.ignoreDelimiters.forEach(function (delimiterPair) {
+        if (!delimiterPair.start || !delimiterPair.end)
+            return;
+
+        reIgnoreStr = escapeRegex(delimiterPair.start) +
+                      ".*?" +
+                      escapeRegex(delimiterPair.end);
+
+        reIgnore = new RegExp(reIgnoreStr, "ig");
+
+        s = s.replace(reIgnore, "");
+      });
+    }
 
     lex = new Lexer(s);
 
