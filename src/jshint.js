@@ -4798,12 +4798,14 @@ var JSHINT = (function () {
             return;
 
         reIgnoreStr = escapeRegex(delimiterPair.start) +
-                      ".*?" +
+                      "[\\s\\S]*?" +
                       escapeRegex(delimiterPair.end);
 
         reIgnore = new RegExp(reIgnoreStr, "ig");
 
-        s = s.replace(reIgnore, "");
+        s = s.replace(reIgnore, function(match) {
+          return match.replace(/./g, " ");
+        });
       });
     }
 
