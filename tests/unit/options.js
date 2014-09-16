@@ -1651,3 +1651,23 @@ exports.removeglobal = function (test) {
 
   test.done();
 };
+
+exports.ignoreDelimiters = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/ignoreDelimiters.js", "utf8");
+
+  TestRun(test)
+    // make sure line/column are still reported properly
+    .addError(6, "Missing semicolon.", { character: 37 })
+    .test(src, {
+      ignoreDelimiters: [
+        { start: "<%=", end: "%>" },
+        { start: "<%", end: "%>" },
+        { start: "<?php", end: "?>" },
+        // make sure single tokens are ignored
+        { start: "foo" },
+        { end: "bar" }
+      ]
+    });
+
+  test.done();
+};
