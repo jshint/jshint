@@ -41,9 +41,23 @@ module.exports =
         errorMessage += ' (' + result.error.code + ')';
       }
 
+      var typeNo = result.error.code;
+      var severity = '';
+      switch(typeNo[0]) {
+        case 'I':
+          severity = 'info';
+          break;
+        case 'W':
+          severity = 'warning';
+          break;
+        case 'E':
+          severity = 'error';
+          break;
+      }
+
       // Add the error
       files[result.file].push({
-        severity: 'error',
+        severity: severity,
         line: result.error.line,
         column: result.error.character,
         message: errorMessage,
