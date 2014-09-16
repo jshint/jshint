@@ -127,6 +127,7 @@ var JSHINT = (function () {
         lastsemic   : true, // if semicolons may be ommitted for the trailing
         loopfunc    : true, // if functions should be allowed to be defined within
         expr        : true, // if ExpressionStatement should be allowed as Programs
+        es4type     : true, // if ES4 type annotations should be allowed
         esnext      : true // if es.next specific syntax should be allowed
       },
 
@@ -1586,6 +1587,17 @@ var JSHINT = (function () {
     }
   }
 
+  function typeannotation() {
+    var i = optionalidentifier();
+    if (i) {
+      while (state.tokens.next.id === ".") {
+        advance(".");
+        i = optionalidentifier();
+      }
+      return i;
+    }
+    error("E030", state.tokens.next, state.tokens.next.value);
+  }
 
   function reachable(s) {
     var i = 0, t;
@@ -2870,6 +2882,13 @@ var JSHINT = (function () {
           error("E051", state.tokens.current);
         }
       }
+      if (state.tokens.next.id === ":") {
+        if (!state.option.es4type) {
+          error("E053");
+        }
+        advance(":");
+        typeannotation();
+      }
       if (state.tokens.next.id === "=") {
         if (!state.option.inESNext()) {
           warning("W119", state.tokens.next, "default parameters");
@@ -2985,6 +3004,13 @@ var JSHINT = (function () {
     }
 
     funct["(params)"] = functionparams(fatarrowparams);
+    if (state.tokens.next.id === ":") {
+      if (!state.option.es4type) {
+        error("E053");
+      }
+      advance(":");
+      typeannotation();
+    }
     funct["(metrics)"].verifyMaxParametersPerFunction(funct["(params)"]);
 
     // So we parse fat-arrow functions after we encounter =>. So basically
@@ -3490,6 +3516,14 @@ var JSHINT = (function () {
       }
 
       this.first = this.first.concat(names);
+      
+      if (state.tokens.next.id === ":") {
+        if (!state.option.es4type) {
+          error("E053");
+        }
+        advance(":");
+        typeannotation();
+      }
 
       if (state.tokens.next.id === "=") {
         advance("=");
@@ -4008,6 +4042,13 @@ var JSHINT = (function () {
       if (state.tokens.next.id === "var") {
         advance("var");
         state.syntax["var"].fud.call(state.syntax["var"].fud, true);
+        if (state.tokens.next.id === ":") {
+          if (!state.option.es4type) {
+            error("E053");
+          }
+          advance(":");
+          typeannotation();
+        }
       } else if (state.tokens.next.id === "let") {
         advance("let");
         // create a new block scope
@@ -4078,6 +4119,13 @@ var JSHINT = (function () {
         if (state.tokens.next.id === "var") {
           advance("var");
           state.syntax["var"].fud.call(state.syntax["var"].fud);
+          if (state.tokens.next.id === ":") {
+            if (!state.option.es4type) {
+              error("E053");
+            }
+            advance(":");
+            typeannotation();
+          }
         } else if (state.tokens.next.id === "let") {
           advance("let");
           // create a new block scope

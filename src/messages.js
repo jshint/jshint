@@ -67,7 +67,8 @@ var errors = {
   E049: "A {a} cannot be named '{b}'.",
   E050: "Mozilla requires the yield expression to be parenthesized here.",
   E051: "Regular parameters cannot come after default parameters.",
-  E052: "Unclosed template literal."
+  E052: "Unclosed template literal.",
+  E053: "Type annotations are not available in standard ECMA script (use es4type option)."
 };
 
 var warnings = {
