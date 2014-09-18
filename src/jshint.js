@@ -3254,11 +3254,21 @@ var JSHINT = (function () {
 
             expression(10);
           } else {
-            i = propertyName();
-            saveProperty(tag + i, state.tokens.next);
+            if (state.tokens.next.value === "[") {
+              // ComputedPropertyName
+              advance();
+              if (!state.option.esnext) {
+                warning("W119", state.tokens.curr, "computed property names");
+              }
+              i = expression(10);
+              advance("]");
+            } else {
+              i = propertyName();
+              saveProperty(tag + i, state.tokens.next);
 
-            if (typeof i !== "string") {
-              break;
+              if (typeof i !== "string") {
+                break;
+              }
             }
 
             if (state.tokens.next.value === "(") {
