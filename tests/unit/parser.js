@@ -3747,6 +3747,39 @@ exports["object short notation: mixed"] = function (test) {
   test.done();
 };
 
+exports["object ComputedPropertyName"] = function (test) {
+  var code = [
+    "function fn(obj) {}",
+    "function p() { return 'key'; }",
+    "var vals = [1];",
+    "var a = 7;",
+    "var o1 = {",
+      "[a++]: true,",
+      "obj: { [a++ + 1]: true },",
+      "[a + 3]() {},",
+      "[p()]: true,",
+      "[vals[0]]: true,",
+      "[(1)]: true,",
+    "};",
+    "fn({ [a / 7]: true });"
+  ];
+
+  TestRun(test).test(code, { esnext: true });
+
+  TestRun(test)
+    .addError(6, "'computed property names' is only available in ES6 (use esnext option).")
+    .addError(7, "'computed property names' is only available in ES6 (use esnext option).")
+    .addError(8, "'concise methods' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(8, "'computed property names' is only available in ES6 (use esnext option).")
+    .addError(9, "'computed property names' is only available in ES6 (use esnext option).")
+    .addError(10, "'computed property names' is only available in ES6 (use esnext option).")
+    .addError(11, "'computed property names' is only available in ES6 (use esnext option).")
+    .addError(13, "'computed property names' is only available in ES6 (use esnext option).")
+  .test(code);
+
+  test.done();
+};
+
 exports["spread & rest operator support"] = function (test) {
   var code = [
     // spread operator
