@@ -1,6 +1,6 @@
 #!/usr/bin/env rhino
 var window = {};
-/*! 2.5.4 */
+/*! 2.5.6 */
 var JSHINT;
 if (typeof window === 'undefined') window = {};
 (function () {
@@ -3032,11 +3032,13 @@ var JSHINT = (function () {
                             //   false    - don't emit any warnings
                             //   true     - warn if any variable is used before its definition
                             //   "nofunc" - warn for any variable but function declarations
-      ignore       : false  // start/end ignoring lines of code, bypassing the lexer
+      ignore       : false, // start/end ignoring lines of code, bypassing the lexer
                             //   start    - start ignoring lines, including the current line
                             //   end      - stop ignoring lines, starting on the next line
                             //   line     - ignore warnings / errors for just a single line
                             //              (this option does not bypass the lexer)
+      ignoreDelimiters: false // array of start/end delimiters used to ignore
+                              // certain chunks from code
     },
 
     // These are JSHint boolean options which are shared with JSLint
@@ -3772,7 +3774,14 @@ var JSHINT = (function () {
           error("E020", state.tokens.next, id, t.id, t.line, state.tokens.next.value);
         }
       } else if (state.tokens.next.type !== "(identifier)" || state.tokens.next.value !== id) {
-        warning("W116", state.tokens.next, id, state.tokens.next.value);
+        // parameter destructuring with rest operator
+        if (state.tokens.next.value === "...") {
+          if (!state.option.esnext) {
+            warning("W119", state.tokens.next, "spread/rest operator");
+          }
+        } else {
+          warning("W116", state.tokens.next, id, state.tokens.next.value);
+        }
       }
     }
 
@@ -4412,7 +4421,14 @@ var JSHINT = (function () {
     if (state.tokens.curr.id === "function" && state.tokens.next.id === "(") {
       warning("W025");
     } else {
-      error("E030", state.tokens.next, state.tokens.next.value);
+      // parameter destructuring with rest operator
+      if (state.tokens.next.value === "...") {
+        if (!state.option.esnext) {
+          warning("W119", state.tokens.next, "spread/rest operator");
+        }
+      } else {
+        error("E030", state.tokens.next, state.tokens.next.value);
+      }
     }
   }
 
@@ -5227,8 +5243,8 @@ var JSHINT = (function () {
   });
 
   prefix("...", function () {
-    if (!state.option.inESNext()) {
-      warning("W104", this, "spread/rest operator");
+    if (!state.option.esnext) {
+      warning("W119", this, "spread/rest operator");
     }
     if (!state.tokens.next.identifier) {
       error("E030", state.tokens.next, state.tokens.next.value);
@@ -5606,7 +5622,7 @@ var JSHINT = (function () {
   });
 
 
-  function property_name(preserve) {
+  function propertyName(preserve) {
     var id = optionalidentifier(false, true, preserve);
 
     if (!id) {
@@ -5643,8 +5659,8 @@ var JSHINT = (function () {
         for (var i in parsed) {
           curr = parsed[i];
           if (curr.value === "...") {
-            if (!state.option.inESNext()) {
-              warning("W104", curr, "spread/rest operator");
+            if (!state.option.esnext) {
+              warning("W119", curr, "spread/rest operator");
             }
             continue;
           } else if (curr.value !== ",") {
@@ -5681,8 +5697,8 @@ var JSHINT = (function () {
           }
         }
       } else if (state.tokens.next.value === "...") {
-        if (!state.option.inESNext()) {
-          warning("W104", state.tokens.next, "spread/rest operator");
+        if (!state.option.esnext) {
+          warning("W119", state.tokens.next, "spread/rest operator");
         }
         advance("...");
         ident = identifier(true);
@@ -5932,10 +5948,16 @@ var JSHINT = (function () {
       var tag = "";
 
       function saveProperty(name, tkn) {
-        if (props[name] && _.has(props, name))
+
+        if (tkn.identifier) {
+          name = tkn.value;
+        }
+
+        if (props[name] && _.has(props, name)) {
           warning("W075", state.tokens.next, i);
-        else
+        } else {
           props[name] = {};
+        }
 
         props[name].basic = true;
         props[name].basictkn = tkn;
@@ -5943,8 +5965,9 @@ var JSHINT = (function () {
 
       function saveSetter(name, tkn) {
         if (props[name] && _.has(props, name)) {
-          if (props[name].basic || props[name].setter)
+          if (props[name].basic || props[name].setter) {
             warning("W075", state.tokens.next, i);
+          }
         } else {
           props[name] = {};
         }
@@ -5955,8 +5978,9 @@ var JSHINT = (function () {
 
       function saveGetter(name) {
         if (props[name] && _.has(props, name)) {
-          if (props[name].basic || props[name].getter)
+          if (props[name].basic || props[name].getter) {
             warning("W075", state.tokens.next, i);
+          }
         } else {
           props[name] = {};
         }
@@ -5990,7 +6014,7 @@ var JSHINT = (function () {
             error("E034");
           }
 
-          i = property_name();
+          i = propertyName();
 
           // ES6 allows for get() {...} and set() {...} method
           // definition shorthand syntax, so we don't produce an error
@@ -6026,7 +6050,7 @@ var JSHINT = (function () {
             error("E034");
           }
 
-          i = property_name();
+          i = propertyName();
 
           // ES6 allows for get() {...} and set() {...} method
           // definition shorthand syntax, so we don't produce an error
@@ -6070,12 +6094,12 @@ var JSHINT = (function () {
             if (!state.option.inESNext()) {
               warning("W104", state.tokens.curr, "object short notation");
             }
-            i = property_name(true);
+            i = propertyName(true);
             saveProperty(tag + i, state.tokens.next);
 
             expression(10);
           } else {
-            i = property_name();
+            i = propertyName();
             saveProperty(tag + i, state.tokens.next);
 
             if (typeof i !== "string") {
@@ -6508,10 +6532,34 @@ var JSHINT = (function () {
     increaseComplexityCount();
     state.condition = true;
     advance("(");
-    checkCondAssignment(expression(0));
+    var expr = expression(0);
+    checkCondAssignment(expr);
+
+    // When the if is within a for-in loop, check if the condition
+    // starts with a negation operator
+    var forinifcheck = null;
+    if (state.option.forin && state.forinifcheckneeded) {
+      state.forinifcheckneeded = false; // We only need to analyze the first if inside the loop
+      forinifcheck = state.forinifchecks[state.forinifchecks.length - 1];
+      if (expr.type === "(punctuator)" && expr.value === "!") {
+        forinifcheck.type = "(negative)";
+      } else {
+        forinifcheck.type = "(positive)";
+      }
+    }
+
     advance(")", t);
     state.condition = false;
-    block(true, true);
+    var s = block(true, true);
+
+    // When the if is within a for-in loop and the condition has a negative form,
+    // check if the body contains nothing but a continue statement
+    if (forinifcheck && forinifcheck.type === "(negative)") {
+      if (s && s.length === 1 && s[0].type === "(identifier)" && s[0].value === "continue") {
+        forinifcheck.type = "(negative-with-continue)";
+      }
+    }
+
     if (state.tokens.next.id === "else") {
       advance("else");
       if (state.tokens.next.id === "if" || state.tokens.next.id === "switch") {
@@ -6831,11 +6879,41 @@ var JSHINT = (function () {
       advance(nextop.value);
       expression(20);
       advance(")", t);
-      s = block(true, true);
-      if (nextop.value === "in" && state.option.forin && s &&
-          (s.length > 1 || typeof s[0] !== "object" || s[0].value !== "if")) {
-        warning("W089", this);
+
+      if (nextop.value === "in" && state.option.forin) {
+        state.forinifcheckneeded = true;
+
+        if (state.forinifchecks === undefined) {
+          state.forinifchecks = [];
+        }
+
+        // Push a new for-in-if check onto the stack. The type will be modified
+        // when the loop's body is parsed and a suitable if statement exists.
+        state.forinifchecks.push({
+          type: "(none)"
+        });
       }
+
+      s = block(true, true);
+
+      if (nextop.value === "in" && state.option.forin) {
+        if (state.forinifchecks && state.forinifchecks.length > 0) {
+          var check = state.forinifchecks.pop();
+          
+          if (// No if statement or not the first statement in loop body
+              s && s.length > 0 && (typeof s[0] !== "object" || s[0].value !== "if") ||
+              // Positive if statement is not the only one in loop body
+              check.type === "(positive)" && s.length > 1 ||
+              // Negative if statement but no continue
+              check.type === "(negative)") {
+            warning("W089", this);
+          }
+        }
+        
+        // Reset the flag in case no if statement was contained in the loop body
+        state.forinifcheckneeded = false;
+      }
+
       funct["(breakage)"] -= 1;
       funct["(loopage)"] -= 1;
     } else {
@@ -7476,9 +7554,13 @@ var JSHINT = (function () {
     };
   };
 
+  var escapeRegex = function(str) {
+    return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+  };
+
   // The actual JSHINT function itself.
   var itself = function (s, o, g) {
-    var i, k, x;
+    var i, k, x, reIgnoreStr, reIgnore;
     var optionKeys;
     var newOptionObj = {};
     var newIgnoredObj = {};
@@ -7616,6 +7698,28 @@ var JSHINT = (function () {
     });
 
     state.tokens.prev = state.tokens.curr = state.tokens.next = state.syntax["(begin)"];
+
+    if (o && o.ignoreDelimiters) {
+
+      if (!Array.isArray(o.ignoreDelimiters)) {
+        o.ignoreDelimiters = [o.ignoreDelimiters];
+      }
+
+      o.ignoreDelimiters.forEach(function (delimiterPair) {
+        if (!delimiterPair.start || !delimiterPair.end)
+            return;
+
+        reIgnoreStr = escapeRegex(delimiterPair.start) +
+                      "[\\s\\S]*?" +
+                      escapeRegex(delimiterPair.end);
+
+        reIgnore = new RegExp(reIgnoreStr, "ig");
+
+        s = s.replace(reIgnore, function(match) {
+          return match.replace(/./g, " ");
+        });
+      });
+    }
 
     lex = new Lexer(s);
 
@@ -10463,6 +10567,7 @@ exports.browser = {
   WebSocket            : false,
   window               : false,
   Worker               : false,
+  XDomainRequest       : false,
   XMLHttpRequest       : false,
   XMLSerializer        : false,
   XPathEvaluator       : false,
