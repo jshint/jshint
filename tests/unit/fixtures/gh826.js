@@ -22,6 +22,7 @@
 			return (
 				/*jshint ignore:start */
 				<div data-foo-id={this.props.foo}>
+					/*some other comment*/
 					<input type="text" value={this.props.bar} />
 				</div>
 				/*jshint ignore:end */
