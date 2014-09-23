@@ -2722,6 +2722,25 @@ exports["test: array comprehension"] = function (test) {
   test.done();
 };
 
+exports["gh-1856 mistakenly identified as array comprehension"] = function (test) {
+  var code = [
+    "function main(value) {",
+    "  var result = ['{'],",
+    "      key;",
+    "  for (key in value) {",
+    "    result.push(key);",
+    "  }",
+    "  return result;",
+    "}",
+    "main({abc:true});"
+  ];
+
+  TestRun(test)
+    .test(code);
+
+  test.done();
+};
+
 exports["test: moz-style array comprehension"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
