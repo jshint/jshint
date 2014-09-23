@@ -4444,6 +4444,10 @@ var JSHINT = (function () {
       }
     } while (bracketStack > 0 && pn.id !== "(end)" && i < 15);
     return ret;
+
+    function checkPunctuators(token, items) {
+      return _.contains(items, token.value) && token.type === "(punctuator)";
+    }
   };
 
   // Test whether a given token is a punctuator matching one of the specified values
