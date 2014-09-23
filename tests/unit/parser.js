@@ -4689,3 +4689,35 @@ exports["Ignore strings containing braces within array literal declarations"] = 
   TestRun(test).test("var a = [ '[' ];");
   test.done();
 };
+
+exports["gh-1016: don't issue W088 if identifier is outside of blockscope"] = function (test) {
+  var code = [
+    "var globalKey;",
+    "function x() {",
+    "  var key;",
+    "  var foo = function () {",
+    "      alert(key);",
+    "  };",
+    "  for (key in {}) {",
+    "      foo();",
+    "  }",
+    "  function y() {",
+    "    for (key in {}) {",
+    "      foo();",
+    "    }",
+    "    for (globalKey in {}) {",
+    "      foo();",
+    "    }",
+    "    for (nonKey in {}) {",
+    "      foo();",
+    "    }",
+    "  }",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(17, "Creating global 'for' variable. Should be 'for (var nonKey ...'.")
+    .test(code);
+
+  test.done();
+};
