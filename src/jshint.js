@@ -4412,15 +4412,15 @@ var JSHINT = (function () {
     var i = -1;
     var bracketStack = 0;
     var ret = {};
-    if (_.contains(["[", "{"], state.tokens.curr.value))
+    if (checkPunctuators(state.tokens.curr, ["[", "{"]))
       bracketStack += 1;
     do {
       pn = (i === -1) ? state.tokens.next : peek(i);
       pn1 = peek(i + 1);
       i = i + 1;
-      if (_.contains(["[", "{"], pn.value)) {
+      if (checkPunctuators(pn, ["[", "{"])) {
         bracketStack += 1;
-      } else if (_.contains(["]", "}"], pn.value)) {
+      } else if (checkPunctuators(pn, ["]", "}"])) {
         bracketStack -= 1;
       }
       if (pn.identifier && pn.value === "for" && bracketStack === 1) {
@@ -4428,7 +4428,7 @@ var JSHINT = (function () {
         ret.notJson = true;
         break;
       }
-      if (_.contains(["}", "]"], pn.value) && bracketStack === 0) {
+      if (checkPunctuators(pn, ["}", "]"]) && bracketStack === 0) {
         if (pn1.value === "=") {
           ret.isDestAssign = true;
           ret.notJson = true;
@@ -4444,6 +4444,10 @@ var JSHINT = (function () {
       }
     } while (bracketStack > 0 && pn.id !== "(end)" && i < 15);
     return ret;
+
+    function checkPunctuators(token, items) {
+      return _.contains(items, token.value) && token.type === "(punctuator)";
+    }
   };
 
   // Check whether this function has been reached for a destructuring assign with undeclared values
