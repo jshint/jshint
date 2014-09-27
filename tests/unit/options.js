@@ -1636,6 +1636,10 @@ exports.nocomma = function (test) {
     .addError(1, "Unexpected use of a comma operator.")
     .test("return 2, 5;", { nocomma: true });
 
+  TestRun(test)
+    .addError(1, "Unexpected use of a comma operator.")
+    .test("(2, 5);", { expr: true, nocomma: true });
+
   test.done();
 };
 
