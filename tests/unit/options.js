@@ -1630,11 +1630,11 @@ exports.nonbsp = function (test) {
 exports.nocomma = function (test) {
   // By default allow comma operator
   TestRun(test)
-    .test('return 2, 5;', {});
+    .test("return 2, 5;", {});
 
   TestRun(test)
     .addError(1, "Unexpected use of a comma operator.")
-    .test('return 2, 5;', { nocomma: true });
+    .test("return 2, 5;", { nocomma: true });
 
   test.done();
 };
