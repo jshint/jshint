@@ -91,6 +91,7 @@ var JSHINT = (function () {
         // statements inside of a one-line blocks.
         newcap      : true, // if constructor names must be capitalized
         noarg       : true, // if arguments.caller and arguments.callee should be
+        nocomma     : true, // if comma operator should be disallowed
         noempty     : true, // if empty blocks should be disallowed
         nonbsp      : true, // if non-breaking spaces should be disallowed
         nonew       : true, // if using `new` for side-effects should be disallowed
@@ -2236,6 +2237,10 @@ var JSHINT = (function () {
   bitwiseassignop(">>=");
   bitwiseassignop(">>>=");
   infix(",", function (left, that) {
+    if (state.option.nocomma) {
+      warning("W127");
+    }
+
     var expr;
     that.exprs = [left];
     if (!comma({peek: true})) {

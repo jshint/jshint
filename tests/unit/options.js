@@ -1626,6 +1626,19 @@ exports.nonbsp = function (test) {
   test.done();
 };
 
+/** Option `nocomma` disallows the use of comma operator. */
+exports.nocomma = function (test) {
+  // By default allow comma operator
+  TestRun(test)
+    .test('return 2, 5;', {});
+
+  TestRun(test)
+    .addError(1, "Unexpected use of a comma operator.")
+    .test('return 2, 5;', { nocomma: true });
+
+  test.done();
+};
+
 exports.enforceall = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/enforceall.js", "utf8");
 
