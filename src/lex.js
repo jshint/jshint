@@ -906,7 +906,7 @@ Lexer.prototype = {
           isUnclosed: false
         };
       } else if (ch === '\\') {
-        // TODO: Parse escape sequence, warn about invalid escae sequences
+        // TODO: Parse escape sequence, warn about invalid escape sequences
         value += ch;
         this.skip(1);
       } else if (ch === '`') {
