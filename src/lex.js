@@ -909,6 +909,8 @@ Lexer.prototype = {
         // TODO: Parse escape sequence, warn about invalid escae sequences
         value += ch;
         this.skip(1);
+      } else if (ch === '`') {
+        break;
       } else {
         // Otherwise, append the value and continue.
         value += ch;
