@@ -596,15 +596,24 @@ var exports = {
     if (opts.useStdin) {
       cli.withStdin(function (code) {
         var config = opts.config;
-        if (opts.filename && !config) {
-          var filename = path.resolve(opts.filename);
+        var filename;
+
+        // There is an if(filename) check in the lint() function called below.
+        // passing a filename of undefined is the same as calling the function
+        // without a filename.  If there is no opts.filename, filename remains
+        // undefined and lint() is effectively called with 4 parameters.
+        if (opts.filename) {
+          filename = path.resolve(opts.filename);
+        }
+
+        if (filename && !config) {
           config = loadNpmConfig(filename) ||
             exports.loadConfig(findConfig(filename));
         }
 
         config = config || {};
 
-        lint(extract(code, opts.extract), results, config, data);
+        lint(extract(code, opts.extract), results, config, data, filename);
         (opts.reporter || defReporter)(results, data, { verbose: opts.verbose });
         cb(results.length === 0);
       });

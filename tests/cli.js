@@ -1062,6 +1062,7 @@ exports.group = {
   },
 
   testFilenameOverridesOptionSTDIN: function (test) {
+    test.expect(4);
     var rep = require("../examples/reporter.js");
     var stdin = require('mock-stdin').stdin();
     var errors = [];
@@ -1090,7 +1091,7 @@ exports.group = {
 
     sinon.stub(shjs, "test")
       .withArgs("-e", sinon.match(/fake\/\.jshintrc$/)).returns(true)
-      .withArgs("-e", sinon.match(/\.jshintrc$/)).returns(false);
+      .withArgs("-e", sinon.match(/\.jshintrc$/)).returns(true);
 
     cli.exit.restore();
     sinon.stub(cli, "exit");
@@ -1111,6 +1112,21 @@ exports.group = {
 
     test.equal(errors.length, 1, "should be a single error.");
     test.equal(cli.exit.args[0][0], 2, "status code should be 2 when there is a linting error.");
+
+    errors.length = 0;
+    cli.exit.restore();
+    sinon.stub(cli, "exit");
+
+    stdin = require('mock-stdin').stdin();
+    cli.interpret([
+      "node", "jshint", "--filename", "fake2/fakescript.js", "--reporter=reporter.js", "-"
+    ]);
+
+    stdin.send(bad);
+    stdin.end();
+
+    test.equal(errors.length, 0, "should be no errors.");
+    test.equal(cli.exit.args[0][0], 0, "status code should be 0 when there is no linting error.");
     rep.reporter.restore();
     process.cwd.restore();
     shjs.cat.restore();
