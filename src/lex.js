@@ -538,7 +538,7 @@ Lexer.prototype = {
       return (/^[0-9a-fA-F]$/).test(str);
     }
 
-    var readUnicodeEscapeSequence = function () {
+    var readUnicodeEscapeSequence = function() {
       /*jshint validthis:true */
       index += 1;
 
@@ -618,6 +618,12 @@ Lexer.prototype = {
       return null;
     }.bind(this);
 
+    function removeEscapeSequences(id) {
+      return id.replace(/\\u([0-9a-fA-F]{4})/g, function(m0, codepoint) {
+        return String.fromCharCode(parseInt(codepoint, 16));
+      });
+    }
+
     char = getIdentifierStart();
     if (char === null) {
       return null;
@@ -648,7 +654,9 @@ Lexer.prototype = {
 
     return {
       type: type,
-      value: id
+      value: removeEscapeSequences(id),
+      text: id,
+      tokenLength: id.length
     };
   },
 
@@ -1368,7 +1376,7 @@ Lexer.prototype = {
       this.scanNumericLiteral();
 
     if (match) {
-      this.skip(match.value.length);
+      this.skip(match.tokenLength || match.value.length);
       return match;
     }
 
@@ -1492,7 +1500,7 @@ Lexer.prototype = {
     }
 
     // Produce a token object.
-    var create = function (type, value, isProperty) {
+    var create = function (type, value, isProperty, token) {
       /*jshint validthis:true */
       var obj;
 
@@ -1543,6 +1551,7 @@ Lexer.prototype = {
       obj.line = this.line;
       obj.character = this.char;
       obj.from = this.from;
+      if (obj.identifier && token) obj.raw_text = token.text || token.value;
 
       if (isProperty && obj.identifier) {
         obj.isProperty = isProperty;
@@ -1621,6 +1630,7 @@ Lexer.prototype = {
           char: this.char,
           from: this.form,
           name: token.value,
+          raw_name: token.text,
           isProperty: state.tokens.curr.id === "."
         });
 
@@ -1628,7 +1638,7 @@ Lexer.prototype = {
       case Token.Keyword:
       case Token.NullLiteral:
       case Token.BooleanLiteral:
-        return create("(identifier)", token.value, state.tokens.curr.id === ".");
+        return create("(identifier)", token.value, state.tokens.curr.id === ".", token);
 
       case Token.NumericLiteral:
         if (token.isMalformed) {

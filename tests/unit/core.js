@@ -378,6 +378,18 @@ exports.insideEval = function (test) {
   test.done();
 };
 
+exports.escapedEvil = function (test) {
+  var code = [
+    "\\u0065val(\"'test'\");"
+  ];
+
+  TestRun(test)
+    .addError(1, "eval can be harmful.")
+    .test(code, { evil: false });
+
+  test.done();
+};
+
 // Regression test for GH-394.
 exports.noExcOnTooManyUndefined = function (test) {
   var code = 'a(); b();';
