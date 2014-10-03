@@ -719,16 +719,18 @@ exports.loopfunc = function (test) {
 
   // By default, not functions are allowed inside loops
   TestRun(test)
-    .addError(2, "Don't make functions within a loop.")
-    .addError(6, "Don't make functions within a loop.")
-    .addError(10, "Function declarations should not be placed in blocks. Use a function " +
+    .addError(4, "Don't make functions within a loop.")
+    .addError(8, "Don't make functions within a loop.")
+    .addError(20, "Don't make functions within a loop.")
+    .addError(25, "Don't make functions within a loop.")
+    .addError(12, "Function declarations should not be placed in blocks. Use a function " +
             "expression or move the statement to the top of the outer function.")
     .test(src, {es3: true});
 
   // When loopfunc is true, only function declaration should fail.
   // Expressions are okay.
   TestRun(test)
-    .addError(10, "Function declarations should not be placed in blocks. Use a function " +
+    .addError(12, "Function declarations should not be placed in blocks. Use a function " +
             "expression or move the statement to the top of the outer function.")
     .test(src, { es3: true, loopfunc: true });
 
