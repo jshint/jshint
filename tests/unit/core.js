@@ -378,6 +378,18 @@ exports.insideEval = function (test) {
   test.done();
 };
 
+exports.escapedEvil = function (test) {
+  var code = [
+    "\\u0065val(\"'test'\");"
+  ];
+
+  TestRun(test)
+    .addError(1, "eval can be harmful.")
+    .test(code, { evil: false });
+
+  test.done();
+};
+
 // Regression test for GH-394.
 exports.noExcOnTooManyUndefined = function (test) {
   var code = 'a(); b();';
@@ -892,5 +904,19 @@ exports.testIncorrectJsonDetection = function (test) {
   // Without the bug fix, a JSON lint error will be raised because the parser
   // thinks it is rendering JSON instead of JavaScript.
   TestRun(test).test(src);
+  test.done();
+};
+
+exports.testEscapedReservedWords = function (test) {
+  var code = [
+    'var v\u0061r = 42;',
+    'alert(va\u0072);'
+  ];
+
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw 'var' (a reserved word).")
+    .addError(2, "Expected an identifier and instead saw 'var'.")
+    .test(code);
+
   test.done();
 };
