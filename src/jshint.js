@@ -4518,7 +4518,7 @@ var JSHINT = (function () {
         unstack: function () {
           _current.variables.filter(function (v) {
             if (v.unused)
-              warning("W098", v.token, v.value);
+              warning("W098", v.token, v.raw_text || v.value);
             if (v.undef)
               isundef(v.funct, "W117", v.token, v.value);
           });
@@ -5002,6 +5002,7 @@ var JSHINT = (function () {
       var warnUnused = function (name, tkn, type, unused_opt) {
         var line = tkn.line;
         var chr  = tkn.from;
+        var raw_name = tkn.raw_text || name;
 
         if (unused_opt === undefined) {
           unused_opt = state.option.unused;
@@ -5019,7 +5020,7 @@ var JSHINT = (function () {
 
         if (unused_opt) {
           if (warnable_types[unused_opt] && warnable_types[unused_opt].indexOf(type) !== -1) {
-            warningAt("W098", line, chr, name);
+            warningAt("W098", line, chr, raw_name);
           }
         }
 
