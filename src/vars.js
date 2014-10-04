@@ -51,7 +51,10 @@ exports.newEcmaIdentifiers = {
   WeakMap : false,
   WeakSet : false,
   Proxy   : false,
-  Promise : false
+  Promise : false,
+  Reflect : false,
+  Symbol  : false,
+  System  : false
 };
 
 // Global variables commonly provided by a web browser environment.

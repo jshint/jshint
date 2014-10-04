@@ -1671,3 +1671,19 @@ exports.ignoreDelimiters = function (test) {
 
   test.done();
 };
+
+exports.esnextPredefs = function (test) {
+  var code = [
+    '/* global alert: true */',
+    'var mySym = Symbol("name");',
+    'var myBadSym = new Symbol("name");',
+    'alert(Reflect);',
+    'alert(System);'
+  ];
+
+  TestRun(test)
+    .addError(3, "Do not use Symbol as a constructor.")
+    .test(code, { esnext: true, undef: true });
+
+  test.done();
+};

@@ -2437,6 +2437,11 @@ var JSHINT = (function () {
         case "JSON":
           warning("W053", state.tokens.prev, c.value);
           break;
+        case "Symbol":
+          if (state.option.esnext) {
+            warning("W053", state.tokens.prev, c.value);
+          }
+          break;
         case "Function":
           if (!state.option.evil) {
             warning("W054");
