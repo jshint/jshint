@@ -4727,13 +4727,19 @@ exports.testES6UnusedExports = function (test) {
     "var unusedGlobalVar = 41;",
     "let unusedGlobalLet = 41;",
     "const unusedGlobalConst = 41;",
+    "function unusedGlobalFunc() {}",
+    "class unusedGlobalClass {}",
     "export let globalExport = 42;",
     "export var globalExport2 = 43;",
     "export const globalExport3 = 44;",
+    "export function unusedFn() {}",
+    "export class unusedClass {}",
     "export {",
     "  unusedGlobalVar,",
     "  unusedGlobalLet,",
-    "  unusedGlobalConst",
+    "  unusedGlobalConst,",
+    "  unusedGlobalFunc,",
+    "  unusedGlobalClass",
     "};"
   ];
 
