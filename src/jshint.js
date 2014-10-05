@@ -4338,6 +4338,11 @@ var JSHINT = (function () {
       ok = false;
     }
 
+    if (!funct["(global)"] || !funct["(blockscope)"].atTop()) {
+      error("E053", state.tokens.curr);
+      ok = false;
+    }
+
     if (state.tokens.next.value === "*") {
       advance("*");
       advance("from");
