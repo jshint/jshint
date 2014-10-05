@@ -4756,3 +4756,47 @@ exports.testES6UnusedExports = function (test) {
 
   test.done();
 };
+
+exports.testES6BlockExports = function (test) {
+  var code = [
+    "var broken = true;",
+    "var broken2 = false;",
+    "function funcScope() {",
+    "  export let exportLet = 42;",
+    "  export var exportVar = 43;",
+    "  export const exportConst = 44;",
+    "  export function exportedFn() {}",
+    "  export {",
+    "    broken,",
+    "    broken2",
+    "  };",
+    "}",
+    "if (true) {",
+    "  export let conditionalExportLet = 42;",
+    "  export var conditionalExportVar = 43;",
+    "  export const conditionalExportConst = 44;",
+    "  export function conditionalExportedFn() {}",
+    "  export {",
+    "    broken,",
+    "    broken2",
+    "  };",
+    "}",
+    "funcScope();"
+  ];
+
+  TestRun(test)
+    .addError(4, "Export declaration must be in global scope.")
+    .addError(5, "Export declaration must be in global scope.")
+    .addError(6, "Export declaration must be in global scope.")
+    .addError(7, "Export declaration must be in global scope.")
+    .addError(8, "Export declaration must be in global scope.")
+    .addError(14, "Export declaration must be in global scope.")
+    .addError(15, "Export declaration must be in global scope.")
+    .addError(16, "Export declaration must be in global scope.")
+    .addError(17, "Export declaration must be in global scope.")
+    .addError(17, "Function declarations should not be placed in blocks. Use a function expression or move the statement to the top of the outer function.")
+    .addError(18, "Export declaration must be in global scope.")
+    .test(code, { esnext: true, unused: true });
+
+  test.done();
+};
