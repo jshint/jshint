@@ -4355,7 +4355,11 @@ var JSHINT = (function () {
     if (state.tokens.next.value === "{") {
       advance("{");
       for (;;) {
-        exported[identifier(false, false, ok)] = ok;
+        var id;
+        exported[id = identifier(false, false, ok)] = ok;
+        if (ok) {
+          funct["(blockscope)"].setExported(id);
+        }
 
         if (state.tokens.next.value === ",") {
           advance(",");
@@ -4750,6 +4754,15 @@ var JSHINT = (function () {
 
       atTop: function () {
         return _variables.length === 1;
+      },
+
+      setExported: function (id) {
+        if (funct["(blockscope)"].atTop()) {
+          var item = _current[id];
+          if (item && item["(token)"]) {
+            item["(token)"].exported = true;
+          }
+        }
       },
 
       current: {
