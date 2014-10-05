@@ -4721,3 +4721,38 @@ exports["gh-1016: don't issue W088 if identifier is outside of blockscope"] = fu
 
   test.done();
 };
+
+exports.testES6UnusedExports = function (test) {
+  var code = [
+    "export {",
+    "  varDefinedLater,",
+    "  letDefinedLater,",
+    "  constDefinedLater",
+    "};",
+    "var unusedGlobalVar = 41;",
+    "let unusedGlobalLet = 41;",
+    "const unusedGlobalConst = 41;",
+    "function unusedGlobalFunc() {}",
+    "class unusedGlobalClass {}",
+    "export let globalExportLet = 42;",
+    "export var globalExportVar = 43;",
+    "export const globalExportConst = 44;",
+    "export function unusedFn() {}",
+    "export class unusedClass {}",
+    "export {",
+    "  unusedGlobalVar,",
+    "  unusedGlobalLet,",
+    "  unusedGlobalConst,",
+    "  unusedGlobalFunc,",
+    "  unusedGlobalClass",
+    "};",
+    "var varDefinedLater = 60;",
+    "let letDefinedLater = 61;",
+    "const constDefinedLater = 62;"
+  ];
+
+  TestRun(test)
+    .test(code, { esnext: true, unused: true });
+
+  test.done();
+};
