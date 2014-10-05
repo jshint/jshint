@@ -623,6 +623,9 @@ var JSHINT = (function () {
     // if the identifier is from a let, adds it only to the current blockscope
     if (islet) {
       funct["(blockscope)"].current.add(name, type, state.tokens.curr);
+      if (funct["(blockscope)"].atTop() && exported[name]) {
+        state.tokens.curr.exported = true;
+      }
     } else {
       funct["(blockscope)"].shadow(name);
       funct[name] = type;
@@ -1534,8 +1537,9 @@ var JSHINT = (function () {
   // fnparam means that this identifier is being defined as a function
   // argument (see identifier())
   // prop means that this identifier is that of an object property
+  // exported means that the identifier is part of a valid ES6 `export` declaration
 
-  function optionalidentifier(fnparam, prop, preserve) {
+  function optionalidentifier(fnparam, prop, preserve, exported) {
     if (!state.tokens.next.identifier) {
       return;
     }
@@ -1546,6 +1550,10 @@ var JSHINT = (function () {
 
     var curr = state.tokens.curr;
     var val  = state.tokens.curr.value;
+
+    if (exported) {
+      state.tokens.curr.exported = true;
+    }
 
     if (!isReserved(curr)) {
       return val;
@@ -1568,8 +1576,9 @@ var JSHINT = (function () {
   // fnparam means that this identifier is being defined as a function
   // argument
   // prop means that this identifier is that of an object property
-  function identifier(fnparam, prop) {
-    var i = optionalidentifier(fnparam, prop);
+  // `exported` means that the identifier token should be exported.
+  function identifier(fnparam, prop, exported) {
+    var i = optionalidentifier(fnparam, prop, false, exported);
     if (i) {
       return i;
     }
@@ -4322,8 +4331,10 @@ var JSHINT = (function () {
   }).exps = true;
 
   stmt("export", function () {
+    var ok = true;
     if (!state.option.inESNext()) {
       warning("W119", state.tokens.curr, "export");
+      ok = false;
     }
 
     if (state.tokens.next.value === "*") {
@@ -4346,7 +4357,11 @@ var JSHINT = (function () {
     if (state.tokens.next.value === "{") {
       advance("{");
       for (;;) {
-        exported[identifier()] = true;
+        var id;
+        exported[id = identifier(false, false, ok)] = ok;
+        if (ok) {
+          funct["(blockscope)"].setExported(id);
+        }
 
         if (state.tokens.next.value === ",") {
           advance(",");
@@ -4363,25 +4378,30 @@ var JSHINT = (function () {
 
     if (state.tokens.next.id === "var") {
       advance("var");
-      exported[state.tokens.next.value] = true;
+      exported[state.tokens.next.value] = ok;
+      state.tokens.next.exported = true;
       state.syntax["var"].fud.call(state.syntax["var"].fud);
     } else if (state.tokens.next.id === "let") {
       advance("let");
-      exported[state.tokens.next.value] = true;
+      exported[state.tokens.next.value] = ok;
+      state.tokens.next.exported = true;
       state.syntax["let"].fud.call(state.syntax["let"].fud);
     } else if (state.tokens.next.id === "const") {
       advance("const");
-      exported[state.tokens.next.value] = true;
+      exported[state.tokens.next.value] = ok;
+      state.tokens.next.exported = true;
       state.syntax["const"].fud.call(state.syntax["const"].fud);
     } else if (state.tokens.next.id === "function") {
       this.block = true;
       advance("function");
-      exported[state.tokens.next.value] = true;
+      exported[state.tokens.next.value] = ok;
+      state.tokens.next.exported = true;
       state.syntax["function"].fud();
     } else if (state.tokens.next.id === "class") {
       this.block = true;
       advance("class");
-      exported[state.tokens.next.value] = true;
+      exported[state.tokens.next.value] = ok;
+      state.tokens.next.exported = true;
       state.syntax["class"].fud();
     } else {
       error("E024", state.tokens.next, state.tokens.next.value);
@@ -4686,6 +4706,10 @@ var JSHINT = (function () {
         if (_current[t]["(type)"] === "unused") {
           if (state.option.unused) {
             var tkn = _current[t]["(token)"];
+            // Don't report exported labels as unused
+            if (tkn.exported) {
+              continue;
+            }
             var line = tkn.line;
             var chr  = tkn.character;
             warningAt("W098", line, chr, t);
@@ -4726,6 +4750,19 @@ var JSHINT = (function () {
         for (var i = _variables.length - 1; i >= 0; i--) {
           if (_.has(_variables[i], name)) {
             _variables[i][name]["(shadowed)"] = false;
+          }
+        }
+      },
+
+      atTop: function () {
+        return _variables.length === 1;
+      },
+
+      setExported: function (id) {
+        if (funct["(blockscope)"].atTop()) {
+          var item = _current[id];
+          if (item && item["(token)"]) {
+            item["(token)"].exported = true;
           }
         }
       },
@@ -5035,7 +5072,9 @@ var JSHINT = (function () {
 
         if (unused_opt) {
           if (warnable_types[unused_opt] && warnable_types[unused_opt].indexOf(type) !== -1) {
-            warningAt("W098", line, chr, raw_name);
+            if (!tkn.exported) {
+              warningAt("W098", line, chr, raw_name);
+            }
           }
         }
 
