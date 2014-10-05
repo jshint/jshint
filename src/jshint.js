@@ -4686,6 +4686,8 @@ var JSHINT = (function () {
       for (var t in _current) {
         if (_current[t]["(type)"] === "unused") {
           if (state.option.unused) {
+            // Don't report exported labels as unused
+            if (exported && exported[t] === true) continue;
             var tkn = _current[t]["(token)"];
             var line = tkn.line;
             var chr  = tkn.character;
@@ -5036,7 +5038,9 @@ var JSHINT = (function () {
 
         if (unused_opt) {
           if (warnable_types[unused_opt] && warnable_types[unused_opt].indexOf(type) !== -1) {
-            warningAt("W098", line, chr, raw_name);
+            if (!exported || exported[raw_name] !== true) {
+              warningAt("W098", line, chr, raw_name);
+            }
           }
         }
 
