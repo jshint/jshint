@@ -4332,6 +4332,7 @@ var JSHINT = (function () {
     var ok = true;
     if (!state.option.inESNext()) {
       warning("W119", state.tokens.curr, "export");
+      ok = false;
     }
 
     if (state.tokens.next.value === "*") {
@@ -4354,7 +4355,7 @@ var JSHINT = (function () {
     if (state.tokens.next.value === "{") {
       advance("{");
       for (;;) {
-        exported[identifier()] = ok;
+        exported[identifier(false, false, ok)] = ok;
 
         if (state.tokens.next.value === ",") {
           advance(",");
