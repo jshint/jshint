@@ -4724,14 +4724,19 @@ exports["gh-1016: don't issue W088 if identifier is outside of blockscope"] = fu
 
 exports.testES6UnusedExports = function (test) {
   var code = [
+    "export {",
+    "  varDefinedLater,",
+    "  letDefinedLater,",
+    "  constDefinedLater",
+    "};",
     "var unusedGlobalVar = 41;",
     "let unusedGlobalLet = 41;",
     "const unusedGlobalConst = 41;",
     "function unusedGlobalFunc() {}",
     "class unusedGlobalClass {}",
-    "export let globalExport = 42;",
-    "export var globalExport2 = 43;",
-    "export const globalExport3 = 44;",
+    "export let globalExportLet = 42;",
+    "export var globalExportVar = 43;",
+    "export const globalExportConst = 44;",
     "export function unusedFn() {}",
     "export class unusedClass {}",
     "export {",
@@ -4740,10 +4745,16 @@ exports.testES6UnusedExports = function (test) {
     "  unusedGlobalConst,",
     "  unusedGlobalFunc,",
     "  unusedGlobalClass",
-    "};"
+    "};",
+    "var varDefinedLater = 60;",
+    "let letDefinedLater = 61;",
+    "const constDefinedLater = 62;"
   ];
 
   TestRun(test)
+    .addError(24, "'letDefinedLater' exported on line 3 before defined.")
+    // TODO: `const` variables should also be defined in block scope
+    // .addError(25, "'constDefinedLater' exported on line 4 before defined.")
     .test(code, { esnext: true, unused: true });
 
   test.done();

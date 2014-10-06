@@ -624,6 +624,14 @@ var JSHINT = (function () {
     // if the identifier is from a let, adds it only to the current blockscope
     if (islet) {
       funct["(blockscope)"].current.add(name, type, state.tokens.curr);
+      if (funct["(blockscope)"].atTop()) {
+        var exportDeclaration = typeof exported[name] === "object" && exported[name];
+        var exportToken = exportDeclaration && exportDeclaration.token;
+        if (exportToken && exportToken !== state.tokens.curr && exportToken.exported) {
+          error("E053", state.tokens.curr, name, exportToken.line);
+          state.tokens.curr.exported = true;
+        }
+      }
     } else {
       funct["(blockscope)"].shadow(name);
       funct[name] = type;
@@ -4356,7 +4364,7 @@ var JSHINT = (function () {
       advance("{");
       for (;;) {
         var id;
-        exported[id = identifier(false, false, ok)] = ok;
+        exported[id = identifier(false, false, ok)] = makeESNextExport(state.tokens.curr, ok);
         if (ok) {
           funct["(blockscope)"].setExported(id);
         }
@@ -4376,29 +4384,25 @@ var JSHINT = (function () {
 
     if (state.tokens.next.id === "var") {
       advance("var");
-      exported[state.tokens.next.value] = ok;
-      state.tokens.next.exported = true;
+      exported[state.tokens.next.value] = makeESNextExport(state.tokens.next, ok);
       state.syntax["var"].fud.call(state.syntax["var"].fud);
     } else if (state.tokens.next.id === "let") {
       advance("let");
-      exported[state.tokens.next.value] = ok;
-      state.tokens.next.exported = true;
+      exported[state.tokens.next.value] = makeESNextExport(state.tokens.next, ok);
       state.syntax["let"].fud.call(state.syntax["let"].fud);
     } else if (state.tokens.next.id === "const") {
       advance("const");
-      exported[state.tokens.next.value] = ok;
-      state.tokens.next.exported = true;
+      exported[state.tokens.next.value] = makeESNextExport(state.tokens.next, ok);
       state.syntax["const"].fud.call(state.syntax["const"].fud);
     } else if (state.tokens.next.id === "function") {
       this.block = true;
       advance("function");
-      exported[state.tokens.next.value] = ok;
-      state.tokens.next.exported = true;
+      exported[state.tokens.next.value] = makeESNextExport(state.tokens.next, ok);
       state.syntax["function"].fud();
     } else if (state.tokens.next.id === "class") {
       this.block = true;
       advance("class");
-      exported[state.tokens.next.value] = ok;
+      exported[state.tokens.next.value] = makeESNextExport(state.tokens.next, ok);
       state.tokens.next.exported = true;
       state.syntax["class"].fud();
     } else {
@@ -5289,6 +5293,15 @@ var JSHINT = (function () {
   };
 
   itself.jshint = itself;
+
+  function makeESNextExport(token, isOk) {
+    var result = {
+      exported: isOk,
+      token: token
+    };
+    token.exported = result;
+    return result;
+  }
 
   return itself;
 }());
