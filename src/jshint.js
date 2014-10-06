@@ -3683,6 +3683,7 @@ var JSHINT = (function () {
 
   prefix("function", function () {
     var generator = false;
+
     if (state.tokens.next.value === "*") {
       if (!state.option.inESNext()) {
         warning("W119", state.tokens.curr, "function*");
@@ -3690,10 +3691,20 @@ var JSHINT = (function () {
       advance("*");
       generator = true;
     }
+
     var i = optionalidentifier();
-    doFunction(i, undefined, generator);
+    var fn = doFunction(i, undefined, generator);
+
+    function isVariable(name) { return name[0] !== "("; }
+    function isLocal(name) { return fn[name] === "var"; }
+
     if (!state.option.loopfunc && funct["(loopage)"]) {
-      warning("W083");
+      // If the function we just parsed accesses any non-local variables
+      // trigger a warning. Otherwise, the function is safe even within
+      // a loop.
+      if (_.some(fn, function (val, name) { return isVariable(name) && !isLocal(name); })) {
+        warning("W083");
+      }
     }
     return this;
   });
@@ -4072,7 +4083,7 @@ var JSHINT = (function () {
       if (nextop.value === "in" && state.option.forin) {
         if (state.forinifchecks && state.forinifchecks.length > 0) {
           var check = state.forinifchecks.pop();
-          
+
           if (// No if statement or not the first statement in loop body
               s && s.length > 0 && (typeof s[0] !== "object" || s[0].value !== "if") ||
               // Positive if statement is not the only one in loop body
@@ -4082,7 +4093,7 @@ var JSHINT = (function () {
             warning("W089", this);
           }
         }
-        
+
         // Reset the flag in case no if statement was contained in the loop body
         state.forinifcheckneeded = false;
       }
