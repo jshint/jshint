@@ -2052,31 +2052,6 @@ var JSHINT = (function () {
           warning("W037", state.tokens.curr, v);
           break;
         }
-      } else if (funct["(global)"]) {
-        // The name is not defined in the function.  If we are in the global
-        // scope, then we have an undefined variable.
-        //
-        // Operators typeof and delete do not raise runtime errors even if
-        // the base object of a reference is null so no need to display warning
-        // if we're inside of typeof or delete.
-
-        // Attempting to subscript a null reference will throw an
-        // error, even within the typeof and delete operators
-        if (!(anonname === "typeof" || anonname === "delete") ||
-          (state.tokens.next && (state.tokens.next.value === "." ||
-            state.tokens.next.value === "["))) {
-
-          // if we're in a list comprehension, variables are declared
-          // locally and used before being defined. So we check
-          // the presence of the given variable in the comp array
-          // before declaring it undefined.
-
-          if (!funct["(comparray)"].check(v)) {
-            isundef(funct, "W117", state.tokens.curr, v);
-          }
-        }
-
-        note_implied(state.tokens.curr);
       } else {
         // If the name is already defined in the current
         // function, but not as outer, then there is a scope error.
@@ -2122,7 +2097,12 @@ var JSHINT = (function () {
                 isundef(funct, "W117", state.tokens.curr, v);
               }
             }
-            funct[v] = true;
+
+            // Explicitly mark the variable as used within function scopes
+            if (!funct["(global)"]) {
+              funct[v] = true;
+            }
+
             note_implied(state.tokens.curr);
           } else {
             switch (s[v]) {
