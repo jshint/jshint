@@ -4733,6 +4733,10 @@ var JSHINT = (function () {
         }
       },
 
+      atTop: function () {
+        return _variables.length === 1;
+      },
+
       current: {
         has: function (t) {
           return _.has(_current, t);
