@@ -2113,7 +2113,14 @@ var JSHINT = (function () {
               (state.tokens.next &&
                 (state.tokens.next.value === "." || state.tokens.next.value === "["))) {
 
-              isundef(funct, "W117", state.tokens.curr, v);
+              // if we're in a list comprehension, variables are declared
+              // locally and used before being defined. So we check
+              // the presence of the given variable in the comp array
+              // before declaring it undefined.
+
+              if (!funct["(comparray)"].check(v)) {
+                isundef(funct, "W117", state.tokens.curr, v);
+              }
             }
             funct[v] = true;
             note_implied(state.tokens.curr);
