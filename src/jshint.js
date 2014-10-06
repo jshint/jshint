@@ -2059,21 +2059,19 @@ var JSHINT = (function () {
         // the base object of a reference is null so no need to display warning
         // if we're inside of typeof or delete.
 
-        if (typeof predefined[v] !== "boolean") {
-          // Attempting to subscript a null reference will throw an
-          // error, even within the typeof and delete operators
-          if (!(anonname === "typeof" || anonname === "delete") ||
-            (state.tokens.next && (state.tokens.next.value === "." ||
-              state.tokens.next.value === "["))) {
+        // Attempting to subscript a null reference will throw an
+        // error, even within the typeof and delete operators
+        if (!(anonname === "typeof" || anonname === "delete") ||
+          (state.tokens.next && (state.tokens.next.value === "." ||
+            state.tokens.next.value === "["))) {
 
-            // if we're in a list comprehension, variables are declared
-            // locally and used before being defined. So we check
-            // the presence of the given variable in the comp array
-            // before declaring it undefined.
+          // if we're in a list comprehension, variables are declared
+          // locally and used before being defined. So we check
+          // the presence of the given variable in the comp array
+          // before declaring it undefined.
 
-            if (!funct["(comparray)"].check(v)) {
-              isundef(funct, "W117", state.tokens.curr, v);
-            }
+          if (!funct["(comparray)"].check(v)) {
+            isundef(funct, "W117", state.tokens.curr, v);
           }
         }
 
