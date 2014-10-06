@@ -4752,9 +4752,6 @@ exports.testES6UnusedExports = function (test) {
   ];
 
   TestRun(test)
-    .addError(24, "'letDefinedLater' exported on line 3 before defined.")
-    // TODO: `const` variables should also be defined in block scope
-    // .addError(25, "'constDefinedLater' exported on line 4 before defined.")
     .test(code, { esnext: true, unused: true });
 
   test.done();
