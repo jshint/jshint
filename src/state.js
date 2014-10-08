@@ -1,4 +1,5 @@
 "use strict";
+var NameStack = require("./name-stack.js");
 
 var state = {
   syntax: {},
@@ -19,6 +20,7 @@ var state = {
     this.tab = "";
     this.cache = {}; // Node.JS doesn't have Map. Sniff.
     this.ignoredLines = {};
+    this.nameStack = new NameStack();
 
     // Blank out non-multi-line-commented lines when ignoring linter errors
     this.ignoreLinterErrors = false;
