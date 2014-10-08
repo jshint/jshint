@@ -35,7 +35,7 @@
     "lastcharacter": 2
   },
   {
-    "name": "\"e\"",
+    "name": "e",
     "param": [
       "x",
       "y"
@@ -53,7 +53,7 @@
     "lastcharacter": 2
   },
   {
-    "name": "\"anonymous\"",
+    "name": "(empty)",
     "line": 24,
     "character": 16,
     "last": 26,
@@ -74,10 +74,164 @@
     "lastcharacter": 56
   },
   {
-    "name": "\"j\"",
+    "name": "j",
     "line": 34,
     "character": 19,
     "last": 34,
     "lastcharacter": 36
+  },
+  {
+    "name": "k",
+    "line": 35,
+    "character": 20,
+    "last": 35,
+    "lastcharacter": 24
+  },
+  {
+    "name": "23",
+    "line": 36,
+    "character": 18,
+    "last": 36,
+    "lastcharacter": 22
+  },
+  {
+    "name": "computedStr",
+    "line": 37,
+    "character": 32,
+    "last": 37,
+    "lastcharacter": 36
+  },
+  {
+    "name": "(expression)",
+    "line": 38,
+    "character": 33,
+    "last": 38,
+    "lastcharacter": 37
+  },
+  {
+    "name": "get getter",
+    "line": 39,
+    "character": 16,
+    "last": 39,
+    "lastcharacter": 20
+  },
+  {
+    "name": "set setter",
+    "line": 40,
+    "character": 16,
+    "last": 40,
+    "lastcharacter": 20
+  },
+  {
+    "name": "(empty)",
+    "line": 43,
+    "character": 17,
+    "last": 43,
+    "lastcharacter": 21
+  },
+  {
+    "name": "(empty)",
+    "line": 48,
+    "character": 27,
+    "last": 48,
+    "lastcharacter": 31
+  },
+  {
+    "name": "(empty)",
+    "line": 50,
+    "character": 37,
+    "last": 50,
+    "lastcharacter": 41
+  },
+  {
+    "name": "(empty)",
+    "line": 52,
+    "character": 13,
+    "last": 52,
+    "lastcharacter": 53
+  },
+  {
+    "name": "l",
+    "line": 52,
+    "character": 34,
+    "last": 52,
+    "lastcharacter": 38
+  },
+  {
+    "name": "(expression)",
+    "line": 52,
+    "character": 69,
+    "last": 52,
+    "lastcharacter": 73
+  },
+  {
+    "name": "viaDot",
+    "line": 54,
+    "character": 21,
+    "last": 54,
+    "lastcharacter": 25
+  },
+  {
+    "name": "viaBracket",
+    "line": 56,
+    "character": 28,
+    "last": 56,
+    "lastcharacter": 32
+  },
+  {
+    "name": "(expression)",
+    "line": 57,
+    "character": 37,
+    "last": 57,
+    "lastcharacter": 41
+  },
+  {
+    "name": "VarDeclClass",
+    "line": 65,
+    "character": 15,
+    "last": 65,
+    "lastcharacter": 19
+  },
+  {
+    "name": "func",
+    "line": 66,
+    "character": 15,
+    "last": 66,
+    "lastcharacter": 19
+  },
+  {
+    "name": "method",
+    "line": 67,
+    "character": 10,
+    "last": 67,
+    "lastcharacter": 14
+  },
+  {
+    "name": "get getter",
+    "line": 68,
+    "character": 14,
+    "last": 68,
+    "lastcharacter": 18
+  },
+  {
+    "name": "set setter",
+    "line": 69,
+    "character": 14,
+    "last": 69,
+    "lastcharacter": 18
+  },
+  {
+    "name": "(empty)",
+    "line": 72,
+    "character": 26,
+    "last": 72,
+    "lastcharacter": 30
+  },
+  {
+    "name": "default",
+    "line": 74,
+    "character": 25,
+    "last": 74,
+    "lastcharacter": 29
   }
 ]
