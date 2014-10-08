@@ -30,7 +30,7 @@
     "lastcharacter": 2
   },
   {
-    "name": "\"e\"",
+    "name": "\"anonymous\"",
     "param": ["x", "y"],
     "line": 16,
     "character": 23,
@@ -66,7 +66,7 @@
     "lastcharacter": 56
   },
   {
-    "name": "\"j\"",
+    "name": "\"anonymous\"",
     "line": 34,
     "character": 19,
     "last": 34,
