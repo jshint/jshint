@@ -2714,7 +2714,11 @@ exports["test: array comprehension"] = function (test) {
     "var ten_squares = [for (i of range(0, 10)) i * i];",
     "var evens = [for (i of range(0, 21)) if (i % 2 === 0) i];",
     "print('squares:', ten_squares);",
-    "print('evens:', evens);"
+    "print('evens:', evens);",
+    "(function() {",
+    "  var ten_squares = [for (i of range(0, 10)) i * i];",
+    "  print('squares:', ten_squares);",
+    "}());"
   ];
   TestRun(test)
     .test(code, {esnext: true, unused: true, undef: true, predef: ["print"]});
