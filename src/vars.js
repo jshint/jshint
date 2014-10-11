@@ -71,6 +71,7 @@ exports.browser = {
   CanvasGradient       : false,
   CanvasPattern        : false,
   CanvasRenderingContext2D: false,
+  CSS                  : false,
   clearInterval        : false,
   clearTimeout         : false,
   close                : false,
