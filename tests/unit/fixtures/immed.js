@@ -35,3 +35,5 @@ var h = (function () {
 var i = (function() {
     return;
 }).should.not['throw']();
+
+(function() {})[i ? 'call' : 'apply']();
