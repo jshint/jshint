@@ -1005,5 +1005,117 @@ exports.group = {
     test.equal(errors[1].error.character, 16, "second error column");
 
     test.done();
+  },
+
+  testFilenameOptionSTDIN: function (test) {
+    var rep = require("../examples/reporter.js");
+    var stdin = require('mock-stdin').stdin();
+    var errors = [];
+    sinon.stub(rep, "reporter", function (res) {
+      errors = errors.concat(res);
+    });
+
+    var dir = __dirname + "/../examples/";
+    sinon.stub(process, "cwd").returns(dir);
+
+    var jshintrc = [
+      "{",
+      "  \"undef\": true,",
+      "  \"browser\": true",
+      "}"
+    ].join("\n");
+
+    sinon.stub(shjs, "cat")
+      .withArgs(sinon.match(/\/fake\/\.jshintrc$/)).returns(jshintrc)
+      .withArgs(sinon.match(/\/\.jshintrc$/)).returns("")
+      .withArgs(sinon.match(/\.jshintignore$/)).returns("");
+
+    sinon.stub(shjs, "test")
+      .withArgs("-e", sinon.match(/fake\/\.jshintrc$/)).returns(true)
+      .withArgs("-e", sinon.match(/\.jshintrc$/)).returns(false);
+
+    cli.exit.restore();
+    sinon.stub(cli, "exit");
+
+    cli.interpret([
+      "node", "jshint", "--filename", "fake/fakescript.js", "--reporter=reporter.js", "-"
+    ]);
+
+    var bad = [
+      'function returnUndef() {',
+      '  return undefinedVariable;',
+      '}',
+      'returnUndef();'
+    ];
+
+    stdin.send(bad);
+    stdin.end();
+
+    test.equal(errors.length, 1, "should be a single error.");
+    test.equal(cli.exit.args[0][0], 2, "status code should be 2 when there is a linting error.");
+    rep.reporter.restore();
+    process.cwd.restore();
+    shjs.cat.restore();
+    shjs.test.restore();
+    stdin.restore();
+    test.done();
+  },
+
+  testFilenameOverridesOptionSTDIN: function (test) {
+    var rep = require("../examples/reporter.js");
+    var stdin = require('mock-stdin').stdin();
+    var errors = [];
+    sinon.stub(rep, "reporter", function (res) {
+      errors = errors.concat(res);
+    });
+
+    var dir = __dirname + "/../examples/";
+    sinon.stub(process, "cwd").returns(dir);
+
+    var jshintrc = [
+      "{",
+      "  \"undef\": false,",
+      "  \"browser\": true,",
+      "  \"overrides\": {",
+      "    \"**/fake/**\": {",
+      "      \"undef\": true",
+      "    }",
+      "  }",
+      "}"
+    ].join("\n");
+
+    sinon.stub(shjs, "cat")
+      .withArgs(sinon.match(/\.jshintrc$/)).returns(jshintrc)
+      .withArgs(sinon.match(/\.jshintignore$/)).returns("");
+
+    sinon.stub(shjs, "test")
+      .withArgs("-e", sinon.match(/fake\/\.jshintrc$/)).returns(true)
+      .withArgs("-e", sinon.match(/\.jshintrc$/)).returns(false);
+
+    cli.exit.restore();
+    sinon.stub(cli, "exit");
+
+    cli.interpret([
+      "node", "jshint", "--filename", "fake/fakescript.js", "--reporter=reporter.js", "-"
+    ]);
+
+    var bad = [
+      'function returnUndef() {',
+      '  return undefinedVariable;',
+      '}',
+      'returnUndef();'
+    ];
+
+    stdin.send(bad);
+    stdin.end();
+
+    test.equal(errors.length, 1, "should be a single error.");
+    test.equal(cli.exit.args[0][0], 2, "status code should be 2 when there is a linting error.");
+    rep.reporter.restore();
+    process.cwd.restore();
+    shjs.cat.restore();
+    shjs.test.restore();
+    stdin.restore();
+    test.done();
   }
 };
