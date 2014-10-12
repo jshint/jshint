@@ -1005,11 +1005,24 @@ exports.group = {
     test.equal(errors[1].error.character, 16, "second error column");
 
     test.done();
+  }
+};
+
+exports.useStdin = {
+  setUp: function (cb) {
+    this.stdin = require('mock-stdin').stdin();
+    sinon.stub(cli, "exit");
+    cb();
   },
 
-  testFilenameOptionSTDIN: function (test) {
+  tearDown: function (cb) {
+    this.stdin.restore();
+    cli.exit.restore();
+    cb();
+  },
+
+  testFilenameOption: function (test) {
     var rep = require("../examples/reporter.js");
-    var stdin = require('mock-stdin').stdin();
     var errors = [];
     sinon.stub(rep, "reporter", function (res) {
       errors = errors.concat(res);
@@ -1018,12 +1031,7 @@ exports.group = {
     var dir = __dirname + "/../examples/";
     sinon.stub(process, "cwd").returns(dir);
 
-    var jshintrc = [
-      "{",
-      "  \"undef\": true,",
-      "  \"browser\": true",
-      "}"
-    ].join("\n");
+    var jshintrc = JSON.stringify({ undef: true });
 
     sinon.stub(shjs, "cat")
       .withArgs(sinon.match(/\/fake\/\.jshintrc$/)).returns(jshintrc)
@@ -1048,8 +1056,8 @@ exports.group = {
       'returnUndef();'
     ];
 
-    stdin.send(bad);
-    stdin.end();
+    this.stdin.send(bad);
+    this.stdin.end();
 
     test.equal(errors.length, 1, "should be a single error.");
     test.equal(cli.exit.args[0][0], 2, "status code should be 2 when there is a linting error.");
@@ -1057,14 +1065,12 @@ exports.group = {
     process.cwd.restore();
     shjs.cat.restore();
     shjs.test.restore();
-    stdin.restore();
     test.done();
   },
 
-  testFilenameOverridesOptionSTDIN: function (test) {
+  testFilenameOverridesOption: function (test) {
     test.expect(4);
     var rep = require("../examples/reporter.js");
-    var stdin = require('mock-stdin').stdin();
     var errors = [];
     sinon.stub(rep, "reporter", function (res) {
       errors = errors.concat(res);
@@ -1073,17 +1079,14 @@ exports.group = {
     var dir = __dirname + "/../examples/";
     sinon.stub(process, "cwd").returns(dir);
 
-    var jshintrc = [
-      "{",
-      "  \"undef\": false,",
-      "  \"browser\": true,",
-      "  \"overrides\": {",
-      "    \"**/fake/**\": {",
-      "      \"undef\": true",
-      "    }",
-      "  }",
-      "}"
-    ].join("\n");
+    var jshintrc = JSON.stringify({
+      undef: false,
+      overrides: {
+        "**/fake/**": {
+          undef: true
+        }
+      }
+    });
 
     sinon.stub(shjs, "cat")
       .withArgs(sinon.match(/\.jshintrc$/)).returns(jshintrc)
@@ -1107,8 +1110,8 @@ exports.group = {
       'returnUndef();'
     ];
 
-    stdin.send(bad);
-    stdin.end();
+    this.stdin.send(bad);
+    this.stdin.end();
 
     test.equal(errors.length, 1, "should be a single error.");
     test.equal(cli.exit.args[0][0], 2, "status code should be 2 when there is a linting error.");
@@ -1117,13 +1120,14 @@ exports.group = {
     cli.exit.restore();
     sinon.stub(cli, "exit");
 
-    stdin = require('mock-stdin').stdin();
+    this.stdin.restore();
+    this.stdin = require('mock-stdin').stdin();
     cli.interpret([
       "node", "jshint", "--filename", "fake2/fakescript.js", "--reporter=reporter.js", "-"
     ]);
 
-    stdin.send(bad);
-    stdin.end();
+    this.stdin.send(bad);
+    this.stdin.end();
 
     test.equal(errors.length, 0, "should be no errors.");
     test.equal(cli.exit.args[0][0], 0, "status code should be 0 when there is no linting error.");
@@ -1131,7 +1135,6 @@ exports.group = {
     process.cwd.restore();
     shjs.cat.restore();
     shjs.test.restore();
-    stdin.restore();
     test.done();
   }
 };
