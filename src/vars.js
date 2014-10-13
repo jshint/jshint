@@ -342,6 +342,8 @@ exports.browser = {
   SVGViewElement       : false,
   SVGViewSpec          : false,
   SVGZoomAndPan        : false,
+  TextDecoder          : false,
+  TextEncoder          : false,
   TimeEvent            : false,
   top                  : false,
   URL                  : false,
