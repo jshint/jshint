@@ -53,7 +53,7 @@ var console = require("console-browserify");
 var JSHINT = (function () {
   "use strict";
 
-  var anonname, // The guessed name for anonymous functions.
+  var prevIdentifier, // The value of the most recently parsed identifier
     api, // Extension API
 
     // These are operators that should not be used with the ! operator.
@@ -921,8 +921,8 @@ var JSHINT = (function () {
       break;
     }
 
-    if (state.tokens.curr.type === "(string)" || state.tokens.curr.identifier) {
-      anonname = state.tokens.curr.value;
+    if (state.tokens.curr.identifier) {
+      prevIdentifier = state.tokens.curr.value;
     }
 
     if (id && state.tokens.next.id !== id) {
@@ -1037,7 +1037,6 @@ var JSHINT = (function () {
     advance();
 
     if (initial) {
-      anonname = "anonymous";
       funct["(verb)"] = state.tokens.curr.value;
     }
 
@@ -2093,7 +2092,7 @@ var JSHINT = (function () {
             // display warning if we're inside of typeof or delete.
             // Attempting to subscript a null reference will throw an
             // error, even within the typeof and delete operators
-            if (!(anonname === "typeof" || anonname === "delete") ||
+            if (!(prevIdentifier === "typeof" || prevIdentifier === "delete") ||
               (state.tokens.next &&
                 (state.tokens.next.value === "." || state.tokens.next.value === "["))) {
 
@@ -2970,7 +2969,7 @@ var JSHINT = (function () {
     state.ignored = Object.create(state.ignored);
     scope = Object.create(scope);
 
-    funct = functor(name || "\"" + anonname + "\"", state.tokens.next, scope, {
+    funct = functor(name || "\"anonymous\"", state.tokens.next, scope, {
       "(statement)": statement,
       "(context)":   funct,
       "(generator)": generator ? true : null
