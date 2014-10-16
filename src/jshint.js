@@ -1583,17 +1583,14 @@ var JSHINT = (function () {
     if (i) {
       return i;
     }
-    if (state.tokens.curr.id === "function" && state.tokens.next.id === "(") {
-      warning("W025");
-    } else {
-      // parameter destructuring with rest operator
-      if (state.tokens.next.value === "...") {
-        if (!state.option.esnext) {
-          warning("W119", state.tokens.next, "spread/rest operator");
-        }
-      } else {
-        error("E030", state.tokens.next, state.tokens.next.value);
+
+    // parameter destructuring with rest operator
+    if (state.tokens.next.value === "...") {
+      if (!state.option.esnext) {
+        warning("W119", state.tokens.next, "spread/rest operator");
       }
+    } else {
+      error("E030", state.tokens.next, state.tokens.next.value);
     }
   }
 
@@ -3662,7 +3659,12 @@ var JSHINT = (function () {
       warning("W082", state.tokens.curr);
 
     }
-    var i = identifier();
+    var i = optionalidentifier();
+
+    if (i === undefined) {
+      warning("W025");
+    }
+
     if (funct[i] === "const") {
       warning("E011", null, i);
     }
