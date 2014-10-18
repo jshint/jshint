@@ -1854,7 +1854,8 @@ var JSHINT = (function() {
     } else {
 
       // check to avoid let declaration not within a block
-      state.funct["(noblockscopedvar)"] = true;
+      // though is fine inside for loop initializer section
+      state.funct["(noblockscopedvar)"] = state.tokens.next.id !== "for";
 
       if (!stmt || state.option.curly) {
         warning("W116", state.tokens.next, "{", state.tokens.next.value);
