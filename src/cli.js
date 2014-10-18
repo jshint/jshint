@@ -64,28 +64,27 @@ function deprecated(text, alt) {
 }
 
 /**
- * Tries to find a configuration file in either project directory
- * or in the home directory. Configuration files are named
- * '.jshintrc'.
+ * Tries to find a configuration file in either project directory,
+ * the home directory, or $home/lib. Configuration files are named
+ * '.jshintrc' or 'jshintrc' if in $home/lib.
  *
  * @param {string} file path to the file to be linted
- * @returns {string} a path to the config file
+ * @returns {string} a path to the config file, or null if not found
  */
 function findConfig(file) {
   var dir  = path.dirname(path.resolve(file));
-  var envs = getHomeDir();
-
-  if (!envs)
-    return home;
-
-  var home = path.normalize(path.join(envs, ".jshintrc"));
-
   var proj = findFile(".jshintrc", dir);
   if (proj)
     return proj;
 
-  if (shjs.test("-e", home))
-    return home;
+  var home = getHomeDir();
+  var pathEls = [".jshintrc"];
+  if (typeof global.process.env.home !== undefined)
+    pathEls = ["lib", "jshintrc"];
+  pathEls.unshift(home);
+  var rc = path.normalize(path.join.apply(null, pathEls));
+  if (shjs.test("-e", rc))
+    return rc;
 
   return null;
 }
@@ -97,7 +96,8 @@ function getHomeDir() {
     environment.USERPROFILE,
     environment.HOME,
     environment.HOMEPATH,
-    environment.HOMEDRIVE + environment.HOMEPATH
+    environment.HOMEDRIVE + environment.HOMEPATH,
+    environment.home
   ];
 
   while (paths.length) {

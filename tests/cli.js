@@ -1,4 +1,5 @@
 "use strict";
+/*jshint maxlen: false*/
 
 var path  = require("path");
 var shjs  = require("shelljs");
@@ -465,7 +466,18 @@ exports.group = {
   },
 
   testHomeRcFile: function (test) {
-    var homeRc = path.join(process.env.HOME || process.env.HOMEPATH, ".jshintrc");
+    function getHomeRc() {
+      var els = [process.env.HOME || process.env.HOMEPATH ||
+        process.env.home];
+      if (typeof process.env.home !== undefined) {
+        els.push("lib", "jshintrc");
+      } else {
+        els.push(".jshintrc");
+      }
+      return path.join.apply(null, els);
+    }
+    var homeRc = getHomeRc();
+
     var testStub = sinon.stub(shjs, "test");
     var catStub = sinon.stub(shjs, "cat");
 
