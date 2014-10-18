@@ -15,6 +15,13 @@ var defReporter       = require("./reporters/default").reporter;
 var OPTIONS = {
   "config": ["c", "Custom configuration file", "string", false ],
   "reporter": ["reporter", "Custom reporter (<PATH>|jslint|checkstyle|unix)", "string", undefined ],
+  "prereq": [
+    "prereq",
+    "Comma-separate list of prerequisite (paths). E.g. files which include" +
+    "definitions of global variabls used throughout your project",
+    "string",
+    null
+  ],
   "exclude": ["exclude",
     "Exclude files matching the given filename pattern (same as .jshintignore)", "string", null],
   "exclude-path": ["exclude-path", "Pass in a custom jshintignore file path", "string", null],
@@ -596,6 +603,12 @@ var exports = {
     var results = [];
     var data = [];
 
+    function mergeCLIPrereq(config) {
+      if (opts.prereq) {
+        config.prereq = (config.prereq || []).concat(opts.prereq.split(/\s*,\s*/));
+      }
+    }
+
     if (opts.useStdin) {
       cli.withStdin(function(code) {
         var config = opts.config;
@@ -616,6 +629,8 @@ var exports = {
 
         config = config || {};
 
+        mergeCLIPrereq(config);
+
         lint(extract(code, opts.extract), results, config, data, filename);
         (opts.reporter || defReporter)(results, data, { verbose: opts.verbose });
         cb(results.length === 0);
@@ -634,6 +649,8 @@ var exports = {
         cli.error("Can't open " + file);
         exports.exit(1);
       }
+
+      mergeCLIPrereq(config);
 
       lint(extract(code, opts.extract), results, config, data, file);
 
@@ -743,6 +760,7 @@ var exports = {
       verbose:    options.verbose,
       extract:    options.extract,
       filename:   options.filename,
+      prereq:     options.prereq,
       useStdin:   { "-": true, "/dev/stdin": true }[args[args.length - 1]]
     }, done));
   }
