@@ -128,10 +128,71 @@ exports.group = {
     cli.exit.restore();
     sinon.stub(cli, "exit")
       .withArgs(0).returns(true)
-      .withArgs(1).throws("ProcessExit");
+      .withArgs(2).throws("ProcessExit");
 
     cli.interpret([
       "node", "jshint", "file.js", "--config", "config.json"
+    ]);
+
+    shjs.cat.restore();
+    shjs.test.restore();
+
+    test.done();
+  },
+
+  // CLI prereqs
+  testPrereqCLIOption: function (test) {
+    sinon.stub(shjs, "cat")
+      .withArgs(sinon.match(/file\.js$/)).returns("a();")
+      .withArgs(sinon.match(/prereq.js$/)).returns("var a = 1;")
+      .withArgs(sinon.match(/config.json$/)).returns("{\"undef\":true}");
+
+    sinon.stub(shjs, "test")
+      .withArgs("-e", sinon.match(/file\.js$/)).returns(true)
+      .withArgs("-e", sinon.match(/prereq.js$/)).returns(true)
+      .withArgs("-e", sinon.match(/config.json$/)).returns(true);
+
+    cli.exit.restore();
+    sinon.stub(cli, "exit")
+      .withArgs(0).returns(true)
+      .withArgs(2).throws("ProcessExit");
+
+    cli.interpret([
+      "node", "jshint", "file.js",
+      "--config", "config.json",
+      "--prereq", "prereq.js  , prereq2.js"
+    ]);
+
+    shjs.cat.restore();
+    shjs.test.restore();
+
+    test.done();
+  },
+
+  // CLI prereqs should get merged with config prereqs
+  testPrereqBothConfigAndCLIOption: function (test) {
+    sinon.stub(shjs, "cat")
+      .withArgs(sinon.match(/file\.js$/)).returns("a(); b();")
+      .withArgs(sinon.match(/prereq.js$/)).returns("var a = 1;")
+      .withArgs(sinon.match(/prereq2.js$/)).returns("var b = 2;")
+      .withArgs(sinon.match(/config.json$/))
+        .returns("{\"undef\":true,\"prereq\":[\"prereq.js\"]}");
+
+    sinon.stub(shjs, "test")
+      .withArgs("-e", sinon.match(/file\.js$/)).returns(true)
+      .withArgs("-e", sinon.match(/prereq.js$/)).returns(true)
+      .withArgs("-e", sinon.match(/prereq2.js$/)).returns(true)
+      .withArgs("-e", sinon.match(/config.json$/)).returns(true);
+
+    cli.exit.restore();
+    sinon.stub(cli, "exit")
+      .withArgs(0).returns(true)
+      .withArgs(2).throws("ProcessExit");
+
+    cli.interpret([
+      "node", "jshint", "file.js",
+      "--config", "config.json",
+      "--prereq", "prereq2.js,prereq3.js"
     ]);
 
     shjs.cat.restore();
