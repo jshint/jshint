@@ -424,7 +424,6 @@ exports.asi = function (test) {
     .test(src, { es3: true });
 
   TestRun(test, 2)
-    .addError(2, "Missing semicolon.") // throw on "use strict", even option asi is used
     .test(src, { es3: true, asi: true });
 
   test.done();

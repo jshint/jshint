@@ -1794,53 +1794,44 @@ var JSHINT = (function () {
   function directives() {
     var i, p, pn;
 
-    for (;;) {
-      if (state.tokens.next.id === "(string)") {
-        p = peek(0);
-        if (p.id === "(endline)") {
-          i = 1;
-          do {
-            pn = peek(i);
-            i = i + 1;
-          } while (pn.id === "(endline)");
-
-          if (pn.id !== ";") {
-            if (pn.id !== "(string)" && pn.id !== "(number)" &&
-              pn.id !== "(regexp)" && pn.identifier !== true &&
-              pn.id !== "}") {
-              break;
-            }
-            warning("W033", state.tokens.next);
-          } else {
-            p = pn;
-          }
-        } else if (p.id === "}") {
-          // Directive with no other statements, warn about missing semicolon
-          warning("W033", p);
-        } else if (p.id !== ";") {
-          break;
+    while (state.tokens.next.id === "(string)") {
+      p = peek(0);
+      if (p.id === "(endline)") {
+        i = 1;
+        do {
+          pn = peek(i++);
+        } while (pn.id === "(endline)");
+        if (pn.id === ";") {
+          p = pn;
+        } else if (pn.value === "[" || pn.value === ".") {
+          // string -> [ | . is a valid production
+          return;
+        } else if (!state.option.asi || pn.value === "(") {
+          // string -> ( is not a valid production
+          warning("W033", state.tokens.next);
         }
-
-        advance();
-        if (state.directive[state.tokens.curr.value]) {
-          warning("W034", state.tokens.curr, state.tokens.curr.value);
-        }
-
-        if (state.tokens.curr.value === "use strict") {
-          if (!state.option["(explicitNewcap)"])
-            state.option.newcap = true;
-          state.option.undef = true;
-        }
-
-        // there's no directive negation, so always set to true
-        state.directive[state.tokens.curr.value] = true;
-
-        if (p.id === ";") {
-          advance(";");
-        }
-        continue;
+      } else if (p.id !== ";") {
+        warning("W033", p);
       }
-      break;
+
+      advance();
+      if (state.directive[state.tokens.curr.value]) {
+        warning("W034", state.tokens.curr, state.tokens.curr.value);
+      }
+
+      if (state.tokens.curr.value === "use strict") {
+        if (!state.option["(explicitNewcap)"]) {
+          state.option.newcap = true;
+        }
+        state.option.undef = true;
+      }
+
+      // there's no directive negation, so always set to true
+      state.directive[state.tokens.curr.value] = true;
+
+      if (p.id === ";") {
+        advance(";");
+      }
     }
   }
 
