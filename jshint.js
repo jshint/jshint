@@ -2724,7 +2724,8 @@ loop:   for (;;) {
                 while (!f && nexttoken.from > indent) {
                     indent += option.indent;
                 }
-                if (!use_strict() && !m && !f && option.strict) {
+                if (!ordinary && !use_strict() && !m && option.strict &&
+                  funct['(context)']['(global)']) {
                     warning("Missing \"use strict\" statement.");
                 }
                 a = statements();
