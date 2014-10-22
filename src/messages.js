@@ -199,7 +199,8 @@ var warnings = {
   W122: "Invalid typeof value '{a}'",
   W123: "'{a}' is already defined in outer scope.",
   W124: "A generator function shall contain a yield statement.",
-  W125: "This line contains non-breaking spaces: http://jshint.com/doc/options/#nonbsp"
+  W125: "This line contains non-breaking spaces: http://jshint.com/doc/options/#nonbsp",
+  W126: "Grouping operator is unecessary for lone expressions."
 };
 
 var info = {
