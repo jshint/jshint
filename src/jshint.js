@@ -97,6 +97,8 @@ var JSHINT = (function () {
         nonew       : true, // if using `new` for side-effects should be disallowed
         // disallowed
         undef       : true, // if variables should be declared before used
+        singleGroups: false,// if grouping operators for single-expression statements
+        // should be disallowed
         enforceall : false // option to turn on all enforce options
         // by default and all relax options off by default
       },
@@ -1010,7 +1012,8 @@ var JSHINT = (function () {
   // They are elements of the parsing method called Top Down Operator Precedence.
 
   function expression(rbp, initial) {
-    var left, isArray = false, isObject = false, isLetExpr = false;
+    var left, isArray = false, isObject = false, isLetExpr = false,
+      isFatArrowBody = state.tokens.curr.value === "=>";
 
     // if current expression is a let expression
     if (!initial && state.tokens.next.value === "let" && peek(0).value === "(") {
@@ -1100,6 +1103,12 @@ var JSHINT = (function () {
     if (isLetExpr) {
       funct["(blockscope)"].unstack();
     }
+
+    if (state.option.singleGroups && left && left.paren && !left.exprs &&
+      !isFatArrowBody && !left.triggerFnExpr) {
+      warning("W126");
+    }
+
     return left;
   }
 
@@ -2578,7 +2587,7 @@ var JSHINT = (function () {
   prefix("(", function () {
     var bracket, brackets = [];
     var pn, pn1, i = 0;
-    var ret;
+    var ret, triggerFnExpr;
     var parens = 1;
 
     do {
@@ -2596,7 +2605,7 @@ var JSHINT = (function () {
              pn1.value !== "=>" && pn1.value !== ";" && pn1.type !== "(end)");
 
     if (state.tokens.next.id === "function") {
-      state.tokens.next.immed = true;
+      triggerFnExpr = state.tokens.next.immed = true;
     }
 
     var exprs = [];
@@ -2642,6 +2651,7 @@ var JSHINT = (function () {
     }
     if (ret) {
       ret.paren = true;
+      ret.triggerFnExpr = triggerFnExpr;
     }
     return ret;
   });

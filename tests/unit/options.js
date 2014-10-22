@@ -1688,3 +1688,17 @@ exports.esnextPredefs = function (test) {
 
   test.done();
 };
+
+exports.singleGroups = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/singleGroups.js", "utf8");
+
+  TestRun(test)
+    .addError(5, "Grouping operator is unecessary for lone expressions.")
+    .addError(7, "Grouping operator is unecessary for lone expressions.")
+    .test(src, {
+      singleGroups: true,
+      esnext: true
+    });
+
+  test.done();
+};
