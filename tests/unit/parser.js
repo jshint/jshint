@@ -3738,14 +3738,20 @@ exports["object short notation: basic"] = function (test) {
   var code = [
     "var foo = 42;",
     "var bar = {foo};",
-    "var baz = {foo, bar};"
+    "var baz = {foo, bar};",
+    "var biz = {",
+    "  foo,",
+    "  bar",
+    "};"
   ];
 
-  TestRun(test).test(code, {esnext: true});
+  TestRun(test, 1).test(code, {esnext: true});
 
-  TestRun(test)
+  TestRun(test, 2)
     .addError(2, "'object short notation' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(3, "'object short notation' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(5, "'object short notation' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(6, "'object short notation' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .test(code);
 
   test.done();
