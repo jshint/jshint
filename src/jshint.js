@@ -898,6 +898,15 @@ var JSHINT = (function () {
     return t;
   }
 
+  function peekIgnoreEOL() {
+    var i = 0;
+    var t;
+    do {
+      t = peek(i++);
+    } while (t.id === "(endline)");
+    return t;
+  }
+
   // Produce the next token. It looks for programming errors.
 
   function advance(id, t) {
@@ -3244,9 +3253,9 @@ var JSHINT = (function () {
           }
           if (!isclassdef &&
               state.tokens.next.identifier &&
-              (peek().id === "," || peek().id === "}")) {
+              (peekIgnoreEOL().id === "," || peekIgnoreEOL().id === "}")) {
             if (!state.option.inESNext()) {
-              warning("W104", state.tokens.curr, "object short notation");
+              warning("W104", state.tokens.next, "object short notation");
             }
             i = propertyName(true);
             saveProperty(tag + i, state.tokens.next);
