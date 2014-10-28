@@ -45,7 +45,7 @@
 
   "devDependencies": {
     "jshint":        "2.5.x",
-    "browserify":    "5.x",
+    "browserify":    "6.x",
     "coveraje":      "0.2.x",
     "nodeunit":      "0.9.x",
     "sinon":         "1.10.x",
