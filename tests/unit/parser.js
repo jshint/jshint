@@ -3790,7 +3790,11 @@ exports["object ComputedPropertyName"] = function (test) {
       "[vals[0]]: true,",
       "[(1)]: true,",
     "};",
-    "fn({ [a / 7]: true });"
+    "fn({ [a / 7]: true });",
+    "var b = { '[': 1 };",
+    "var c = { [b]: 1 };",
+    "var d = { 0: 1 };",
+    "var e = { ['s']: 1 };",
   ];
 
   TestRun(test).test(code, { esnext: true });
@@ -3804,6 +3808,8 @@ exports["object ComputedPropertyName"] = function (test) {
     .addError(10, "'computed property names' is only available in ES6 (use esnext option).")
     .addError(11, "'computed property names' is only available in ES6 (use esnext option).")
     .addError(13, "'computed property names' is only available in ES6 (use esnext option).")
+    .addError(15, "'computed property names' is only available in ES6 (use esnext option).")
+    .addError(17, "'computed property names' is only available in ES6 (use esnext option).")
   .test(code);
 
   test.done();

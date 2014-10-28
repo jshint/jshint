@@ -3226,7 +3226,7 @@ var JSHINT = (function () {
 
             expression(10);
           } else {
-            if (state.tokens.next.value === "[") {
+            if (state.tokens.next.id === "[") {
               // ComputedPropertyName
               advance();
               if (!state.option.esnext) {
