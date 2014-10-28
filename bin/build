@@ -16,7 +16,7 @@ if (!test("-e", distDir))
   mkdir(distDir);
 
 bundle.require(srcDir + "/jshint.js", { expose: "jshint" });
-bundle.bundle({}, function (err, src) {
+bundle.bundle(function (err, src) {
   var web   = distDir + "/jshint.js";
   var rhino = distDir + "/jshint-rhino.js";
 
@@ -33,4 +33,6 @@ bundle.bundle({}, function (err, src) {
 
   ("#!/usr/bin/env rhino\nvar window = {};\n" + cat(web, srcDir + "/platforms/rhino.js")).to(rhino);
   chmod("+x", rhino);
+
+  console.log("Built: ", version);
 });
