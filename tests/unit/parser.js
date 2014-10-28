@@ -4810,3 +4810,31 @@ exports.testES6BlockExports = function (test) {
 
   test.done();
 };
+
+exports.testStrictDirectiveASI = function (test) {
+  var options = { strict: true, asi: true, globalstrict: true };
+
+  TestRun(test, 1)
+    .test("'use strict'\nfunction fn() {}\nfn();", options);
+
+  TestRun(test, 2)
+    .test("'use strict'\n;function fn() {}\nfn();", options);
+
+  TestRun(test, 3)
+    .test("'use strict';function fn() {} fn();", options);
+
+  TestRun(test, 4)
+    .addError(1, "Missing semicolon.")
+    .test("'use strict'\n(function fn() {})();", options);
+
+  TestRun(test, 5)
+    .test("'use strict'\n[0] = '6';", options);
+
+  TestRun(test, 6)
+    .addError(1, "Missing semicolon.")
+    .addError(1, "Expected an identifier and instead saw ','.")
+    .addError(1, "Expected an assignment or function call and instead saw an expression.")
+    .test("'use strict',function fn() {}\nfn();", options);
+
+  test.done();
+};
