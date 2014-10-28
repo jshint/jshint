@@ -202,7 +202,8 @@ function loadIgnores(params) {
 
   return lines
     .filter(function (line) {
-      return !!line.trim();
+      // ignore blank lines and comments
+      return !!line.trim() && !/^#/.test(line);
     })
     .map(function (line) {
       if (line[0] === "!")
