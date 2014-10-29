@@ -37,7 +37,7 @@
     "underscore":  "1.6.x",
     "cli":         "0.6.x",
     "minimatch":   "1.0.x",
-    "htmlparser2": "3.7.x",
+    "htmlparser2": "3.8.x",
     "console-browserify": "1.1.x",
     "exit": "0.1.x",
     "strip-json-comments": "1.0.x"
@@ -48,9 +48,9 @@
     "browserify":    "6.x",
     "coveraje":      "0.2.x",
     "nodeunit":      "0.9.x",
-    "sinon":         "1.10.x",
+    "sinon":         "1.11.x",
     "unicode-6.3.0": "0.1.x",
-    "regenerate":    "0.6.x",
+    "regenerate":    "1.0.x",
     "mock-stdin":    "^0.3.0"
   },
 
