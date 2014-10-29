@@ -3479,56 +3479,58 @@ exports["test: no let not directly within a block"] = function (test) {
 };
 
 exports["test: let declared directly within block"] = function (test) {
-    var code   = [
-        'for (let i;;){',
-        'console.log(i);',
-        '}'
-    ];
+  var code = [
+    "for (let i;;){",
+    "  console.log(i);",
+    "}"
+  ];
 
-    TestRun(test)
-        .test(code, {esnext: true});
+  TestRun(test)
+    .test(code, {esnext: true});
 
-    code   = [
-        'for (let i;;)',
-        'console.log(i);'
-    ];
+  code = [
+    "for (let i;;)",
+    "  console.log(i);"
+  ];
 
-    TestRun(test)
-        .test(code, {esnext: true});
+  TestRun(test)
+    .test(code, {esnext: true});
 
-    test.done();
+  test.done();
 };
 
 exports["test: let is directly within nested block"] = function (test) {
-    var code   = [
-        'if(true) {',
-        'for (let i;;)',
-        'console.log(i);',
-        '}'
-    ];
+  var code   = [
+    "if(true) {",
+    "  for (let i;;)",
+    "    console.log(i);",
+    "}"
+  ];
 
-    TestRun(test)
-        .test(code, {esnext: true});
+  TestRun(test)
+    .test(code, {esnext: true});
 
-    code   = [
-        'if(true)',
-        'for (let i;;)',
-        'console.log(i);'
-    ];
+  code   = [
+    "if(true)",
+    "  for (let i;;)",
+    "    console.log(i);"
+  ];
 
-    TestRun(test)
-        .test(code, {esnext: true});
+  TestRun(test)
+    .test(code, {esnext: true});
 
-    code   = [
-        'if(true) {',
-        'for (let i;;){console.log(i);}',
-        '}'
-    ];
+  code   = [
+    "if(true) {",
+    "  for (let i;;){",
+    "    console.log(i);",
+    "  }",
+    "}"
+  ];
 
-    TestRun(test)
-        .test(code, {esnext: true});
+  TestRun(test)
+    .test(code, {esnext: true});
 
-    test.done();
+  test.done();
 };
 
 exports["regression test for crash from GH-964"] = function (test) {
