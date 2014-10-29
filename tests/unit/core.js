@@ -2,6 +2,7 @@
 
 var JSHINT  = require('../../src/jshint.js').JSHINT;
 var fs      = require('fs');
+var path    = require('path');
 var TestRun = require("../helpers/testhelper").setup.testRun;
 
 /**
@@ -41,7 +42,7 @@ exports.testCustomGlobals = function (test) {
 };
 
 exports.testUnusedDefinedGlobals = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/unusedglobals.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/unusedglobals.js"), "utf8");
 
   TestRun(test)
     .addError(2, "'bar' is defined but never used.")
@@ -69,7 +70,7 @@ exports.globalDeclarations = function (test) {
 };
 
 exports.multilineGlobalDeclarations = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/multiline-global-declarations.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/multiline-global-declarations.js"), "utf8");
 
   TestRun(test).test(src);
 
@@ -200,7 +201,7 @@ exports.noDelete = function (test) {
  * using special comments.
  */
 exports.switchFallThrough = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/switchFallThrough.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/switchFallThrough.js'), 'utf8');
   TestRun(test)
     .addError(3, "Expected a 'break' statement before 'case'.")
     .addError(18, "Expected a 'break' statement before 'default'.")
@@ -213,7 +214,7 @@ exports.switchFallThrough = function (test) {
 // GH-490: JSHint shouldn't require break before default if default is
 // the first switch statement.
 exports.switchDefaultFirst = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/switchDefaultFirst.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/switchDefaultFirst.js"), "utf8");
 
   TestRun(test)
     .addError(5, "Expected a 'break' statement before 'default'.")
@@ -234,7 +235,7 @@ exports.testVoid = function (test) {
 };
 
 exports.functionScopedOptions = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/functionScopedOptions.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/functionScopedOptions.js'), 'utf8');
   TestRun(test)
     .addError(1, "eval can be harmful.")
     .addError(8, "eval can be harmful.")
@@ -245,21 +246,21 @@ exports.functionScopedOptions = function (test) {
 
 /** JSHint should not only read jshint, but also jslint options */
 exports.jslintOptions = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/jslintOptions.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/jslintOptions.js'), 'utf8');
   TestRun(test).test(src);
 
   test.done();
 };
 
 exports.jslintInverted = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/jslintInverted.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/jslintInverted.js'), 'utf8');
   TestRun(test).test(src);
 
   test.done();
 };
 
 exports.jslintRenamed = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/jslintRenamed.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/jslintRenamed.js'), 'utf8');
   TestRun(test)
     .addError(4, "Expected '===' and instead saw '=='.")
     .test(src);
@@ -287,7 +288,7 @@ exports.jslintUnrecognized = function (test) {
 };
 
 exports.caseExpressions = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/caseExpressions.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/caseExpressions.js'), 'utf8');
   TestRun(test)
     .test(src);
 
@@ -295,7 +296,7 @@ exports.caseExpressions = function (test) {
 };
 
 exports.returnStatement = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/return.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/return.js'), 'utf8');
 
   TestRun(test)
     .addError(3, "Did you mean to return a conditional instead of an assignment?")
@@ -308,7 +309,7 @@ exports.returnStatement = function (test) {
 };
 
 exports.argsInCatchReused = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/trycatch.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/trycatch.js'), 'utf8');
   TestRun(test)
     .addError(6, "'e' is already defined.")
     .addError(12, "Do not assign to the exception parameter.")
@@ -328,7 +329,7 @@ exports.testRawOnError = function (test) {
 };
 
 exports.yesEmptyStmt = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/emptystmt.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/emptystmt.js'), 'utf8');
 
   TestRun(test)
     .addError(1, "Expected an identifier and instead saw ';'.")
@@ -347,7 +348,7 @@ exports.yesEmptyStmt = function (test) {
 };
 
 exports.insideEval = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/insideEval.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/insideEval.js'), 'utf8');
 
   TestRun(test)
     .addError(1, "eval can be harmful.")
@@ -409,7 +410,7 @@ exports.noExcOnTooManyUndefined = function (test) {
 };
 
 exports.defensiveSemicolon = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/gh-226.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/gh-226.js'), 'utf8');
 
   TestRun(test)
     .addError(16, "Unnecessary semicolon.")
@@ -442,7 +443,7 @@ exports.invalidOptions = function (test) {
 };
 
 exports.multilineArray = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/gh-334.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/gh-334.js'), 'utf8');
 
   TestRun(test).test(src);
 
@@ -530,7 +531,7 @@ exports.testSparseArrays = function (test) {
 };
 
 exports.testReserved = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/reserved.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/reserved.js"), "utf8");
 
   TestRun(test)
     .addError(1, "Expected an identifier and instead saw 'volatile' (a reserved word).")
@@ -552,7 +553,7 @@ exports.testReserved = function (test) {
 // GH-744: Prohibit the use of reserved words as non-property
 // identifiers.
 exports.testES5Reserved = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/es5Reserved.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/es5Reserved.js"), "utf8");
 
   TestRun(test)
     .addError(2, "Expected an identifier and instead saw 'default' (a reserved word).")
@@ -577,13 +578,13 @@ exports.testES5Reserved = function (test) {
 };
 
 exports.testCatchBlocks = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/gh247.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/gh247.js'), 'utf8');
 
   TestRun(test)
     .addError(11, "'w' is not defined.")
     .test(src, { es3: true, undef: true, devel: true });
 
-  src = fs.readFileSync(__dirname + '/fixtures/gh618.js', 'utf8');
+  src = fs.readFileSync(path.join(__dirname, '/fixtures/gh618.js'), 'utf8');
 
   TestRun(test)
     .addError(5, "Value of 'x' may be overwritten in IE 8 and earlier.")
@@ -640,7 +641,7 @@ exports.testForIn = function (test) {
 };
 
 exports.testRegexArray = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/regex_array.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/regex_array.js"), "utf8");
 
   TestRun(test)
     .test(src, {es3: true});
@@ -666,7 +667,7 @@ exports.testUndefinedAssignment = function (test) {
 };
 
 exports.testES6Modules = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/es6-import-export.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/es6-import-export.js"), "utf8");
 
   TestRun(test)
     .test(src, {esnext: true});
@@ -744,7 +745,7 @@ exports.testES6ModulesNamedExportsAffectUnused = function (test) {
 
 
 exports["class declaration export (default)"] = function (test) {
-  var source = fs.readFileSync(__dirname + "/fixtures/class-declaration.js", "utf8");
+  var source = fs.readFileSync(path.join(__dirname, "/fixtures/class-declaration.js"), "utf8");
 
   TestRun(test).test(source, {
     esnext: true,
@@ -755,7 +756,7 @@ exports["class declaration export (default)"] = function (test) {
 };
 
 exports["function declaration export (default)"] = function (test) {
-  var source = fs.readFileSync(__dirname + "/fixtures/function-declaration.js", "utf8");
+  var source = fs.readFileSync(path.join(__dirname, "/fixtures/function-declaration.js"), "utf8");
 
   TestRun(test).test(source, {
     esnext: true,
@@ -874,7 +875,7 @@ exports.testES6ModulesNameSpaceImportsAffectUnused = function (test) {
 };
 
 exports.testES6TemplateLiterals = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/es6-template-literal.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/es6-template-literal.js"), "utf8");
   TestRun(test)
     .addError(14, "Octal literals are not allowed in strict mode.")
     .addError(21, "Unclosed template literal.")
@@ -883,7 +884,7 @@ exports.testES6TemplateLiterals = function (test) {
 };
 
 exports.testES6TaggedTemplateLiterals = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/es6-template-literal-tagged.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/es6-template-literal-tagged.js"), "utf8");
   TestRun(test)
     .addError(16, "Octal literals are not allowed in strict mode.")
     .addError(23, "Unclosed template literal.")
@@ -1113,7 +1114,7 @@ exports.testMultilineReturnValueStringLiteral = function (test) {
 };
 
 exports.testES6ExportStarFrom = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/es6-export-star-from.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/es6-export-star-from.js"), "utf8");
   TestRun(test)
     .addError(2, "Expected 'from' and instead saw 'foo'.")
     .addError(2, "Expected '(string)' and instead saw ';'.")
@@ -1124,8 +1125,8 @@ exports.testES6ExportStarFrom = function (test) {
 };
 
 exports.testPotentialVariableLeak = function (test) {
-  var a = fs.readFileSync(__dirname + "/fixtures/leak.js", "utf8");
-  var b = fs.readFileSync(__dirname + "/fixtures/gh1802.js", "utf8");
+  var a = fs.readFileSync(path.join(__dirname, "/fixtures/leak.js"), "utf8");
+  var b = fs.readFileSync(path.join(__dirname, "/fixtures/gh1802.js"), "utf8");
 
   // Real Error
   TestRun(test)
@@ -1142,7 +1143,7 @@ exports.testPotentialVariableLeak = function (test) {
 };
 
 exports.testDefaultArguments = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/default-arguments.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/default-arguments.js"), "utf8");
   TestRun(test)
     .addError(11, "Regular parameters cannot come after default parameters.")
     .test(src, { esnext: true });
@@ -1198,7 +1199,7 @@ exports.testArrayPrototypeExtensions = function (test) {
 };
 
 exports.testModuleKeyword = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/module-keyword.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/module-keyword.js"), "utf8");
 
   TestRun(test)
     .addError(4, "Missing semicolon.")
@@ -1212,7 +1213,7 @@ exports.testModuleKeyword = function (test) {
 
 // Issue #1446, PR #1688
 exports.testIncorrectJsonDetection = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/mappingstart.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/mappingstart.js"), "utf8");
   // Without the bug fix, a JSON lint error will be raised because the parser
   // thinks it is rendering JSON instead of JavaScript.
   TestRun(test).test(src);
@@ -1269,8 +1270,8 @@ exports.testUnCleanedForinifcheckneeded = function (test) {
 
 // gh-738 "eval" as an object key should not cause `W061` warnngs
 exports.testPermitEvalAsKey = function (test) {
-  var srcNode = fs.readFileSync(__dirname + "/fixtures/gh-738-node.js", "utf8");
-  var srcBrowser = fs.readFileSync(__dirname + "/fixtures/gh-738-browser.js", "utf8");
+  var srcNode = fs.readFileSync(path.join(__dirname, "/fixtures/gh-738-node.js"), "utf8");
+  var srcBrowser = fs.readFileSync(path.join(__dirname, "/fixtures/gh-738-browser.js"), "utf8");
   // global calls to eval should still cause warning.
   // test a mixture of permitted and disallowed calls
   // `global#eval` in `node:true` should still cause warning
@@ -1300,7 +1301,7 @@ exports.testPermitEvalAsKey = function (test) {
 
 // gh-2194 jshint confusing arrays at beginning of file with JSON
 exports.beginningArraysAreNotJSON = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/gh-2194.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/gh-2194.js"), "utf8");
 
   TestRun(test)
   .test(src);

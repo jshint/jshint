@@ -1,10 +1,11 @@
 "use strict";
 
 var fs = require('fs');
+var path = require('path');
 var TestRun = require("../helpers/testhelper").setup.testRun;
 
 exports["Backbone.js 0.5.3"] = function (test) {
-  var src = fs.readFileSync(__dirname + '/libs/backbone.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/libs/backbone.js'), 'utf8');
 
   TestRun(test)
     .addError(32, "Unnecessary grouping operator.")
@@ -19,7 +20,7 @@ exports["Backbone.js 0.5.3"] = function (test) {
 };
 
 exports.jQuery_1_7 = function (test) {
-  var src = fs.readFileSync(__dirname + '/libs/jquery-1.7.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname,'/libs/jquery-1.7.js'), 'utf8');
   var globals = { DOMParser: false, ActiveXObject: false, define: false };
 
   TestRun(test)
@@ -55,7 +56,7 @@ exports.jQuery_1_7 = function (test) {
 };
 
 exports.prototype_1_7 = function (test) {
-  var src = fs.readFileSync(__dirname + '/libs/prototype-17.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/libs/prototype-17.js'), 'utf8');
 
   TestRun(test)
     .addError(22, "Missing semicolon.")
@@ -134,7 +135,7 @@ exports.prototype_1_7 = function (test) {
 
 
 exports.lodash_0_6_1 = function (test) {
-  var src = fs.readFileSync(__dirname + '/libs/lodash.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/libs/lodash.js'), 'utf8');
   var globals = { _: false, define: false };
   var options = {
     unused   : true,
@@ -180,7 +181,7 @@ exports.lodash_0_6_1 = function (test) {
 };
 
 exports.json2 = function (test) {
-  var src = fs.readFileSync(__dirname + '/libs/json2.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/libs/json2.js'), 'utf8');
 
   TestRun(test)
     .addError(177, "'key' is defined but never used.")
@@ -191,7 +192,7 @@ exports.json2 = function (test) {
 };
 
 exports.codemirror3 = function (test) {
-  var src = fs.readFileSync(__dirname + '/libs/codemirror3.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/libs/codemirror3.js'), 'utf8');
   var opt = {
     newcap:   false,
     undef:    true,

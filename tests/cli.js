@@ -202,7 +202,7 @@ exports.group = {
   },
 
   testOverrides: function (test) {
-    var dir = __dirname + "/../examples/";
+    var dir = path.join(__dirname, "/../examples/");
     var rep = require("../examples/reporter.js");
     var config = {
       "asi": true,
@@ -246,7 +246,7 @@ exports.group = {
   },
 
   testOverridesMatchesRelativePaths: function (test) {
-    var dir = __dirname + "/../examples/";
+    var dir = path.join(__dirname, "/../examples/");
     var rep = require("../examples/reporter.js");
     var config = {
       "asi": true,
@@ -286,7 +286,7 @@ exports.group = {
     var rep = require("../examples/reporter.js");
     var run = this.sinon.stub(cli, "run");
     var out = this.sinon.stub(_cli, "error");
-    var dir = __dirname + "/../examples/";
+    var dir = path.join(__dirname, "/../examples/");
     this.sinon.stub(process, "cwd").returns(dir);
 
     cli.exit.throws("ProcessExit");
@@ -392,8 +392,8 @@ exports.group = {
 
   testMalformedNpmFile: function (test) {
     this.sinon.stub(process, "cwd").returns(__dirname);
-    var localNpm = path.normalize(__dirname + "/package.json");
-    var localRc = path.normalize(__dirname + "/.jshintrc");
+    var localNpm = path.join(__dirname, "/package.json");
+    var localRc = path.join(__dirname, "/.jshintrc");
     var testStub = this.sinon.stub(shjs, "test");
     var catStub = this.sinon.stub(shjs, "cat");
 
@@ -419,7 +419,7 @@ exports.group = {
 
   testRcFile: function (test) {
     this.sinon.stub(process, "cwd").returns(__dirname);
-    var localRc = path.normalize(__dirname + "/.jshintrc");
+    var localRc = path.join(__dirname, "/.jshintrc");
     var testStub = this.sinon.stub(shjs, "test");
     var catStub = this.sinon.stub(shjs, "cat");
 
@@ -461,7 +461,7 @@ exports.group = {
   },
 
   testOneLevelRcLookup: function (test) {
-    var srcDir = __dirname + "../src/";
+    var srcDir = path.join(__dirname, "../src/");
     var parentRc = path.join(srcDir, ".jshintrc");
 
     var cliDir = path.join(srcDir, "cli/");
@@ -489,8 +489,8 @@ exports.group = {
   testTargetRelativeRcLookup: function (test) {
     // working from outside the project
     this.sinon.stub(process, "cwd").returns(process.env.HOME || process.env.HOMEPATH);
-    var projectRc = path.normalize(__dirname + "/.jshintrc");
-    var srcFile = __dirname + "/sub/file.js";
+    var projectRc = path.join(__dirname, "/.jshintrc");
+    var srcFile = path.join(__dirname, "/sub/file.js");
     var testStub = this.sinon.stub(shjs, "test");
     var catStub = this.sinon.stub(shjs, "cat");
 
@@ -512,7 +512,7 @@ exports.group = {
 
   testIgnores: function (test) {
     var run = this.sinon.stub(cli, "run");
-    var dir = __dirname + "/../examples/";
+    var dir = path.join(__dirname, "/../examples/");
     this.sinon.stub(process, "cwd").returns(dir);
 
     cli.interpret([
@@ -524,7 +524,7 @@ exports.group = {
     test.equal(run.args[0][0].ignores[2], path.resolve(dir, "another.js"));
 
     run.restore();
-    process.cwd.returns(__dirname + "/../");
+    process.cwd.returns(path.join(__dirname, "/../"));
 
     this.sinon.stub(shjs, "cat")
       .withArgs(sinon.match(/file.js$/)).returns("console.log('Hello');")
@@ -537,7 +537,7 @@ exports.group = {
 
   testExcludePath: function (test) {
     var run = this.sinon.stub(cli, "run");
-    var dir = __dirname + "/../examples/";
+    var dir = path.join(__dirname, "/../examples/");
     this.sinon.stub(process, "cwd").returns(dir);
 
     cli.interpret([
@@ -547,7 +547,7 @@ exports.group = {
     test.equal(run.args[0][0].ignores[0], path.resolve(dir, "exclude.js"));
 
     run.restore();
-    process.cwd.returns(__dirname + "/../");
+    process.cwd.returns(path.join(__dirname, "/../"));
 
     this.sinon.stub(shjs, "cat")
       .withArgs(sinon.match(/file.js$/)).returns("console.log('Hello');")
@@ -559,7 +559,7 @@ exports.group = {
   },
 
   testAPIIgnores: function (test) {
-    var dir = __dirname + "/../data/";
+    var dir = path.join(__dirname, "/../data/");
     this.sinon.stub(process, "cwd").returns(dir);
     var result = null;
 
@@ -665,7 +665,7 @@ exports.group = {
   },
 
   testGather: function (test) {
-    var dir = __dirname + "/../examples/";
+    var dir = path.join(__dirname, "/../examples/");
     var files = [];
     this.sinon.stub(process, "cwd").returns(dir);
 
@@ -750,7 +750,7 @@ exports.group = {
     shjs.cat.restore();
     process.cwd.restore();
 
-    this.sinon.stub(process, "cwd").returns(__dirname + "/../");
+    this.sinon.stub(process, "cwd").returns(path.join(__dirname, "/../"));
     this.sinon.stub(shjs, "cat")
       .withArgs(sinon.match(/reporter\.js$/)).returns("console.log('Hello');");
 
@@ -769,7 +769,7 @@ exports.group = {
 
   testStatusCode: function (test) {
     var rep = require("../examples/reporter.js");
-    var dir = __dirname + "/../examples/";
+    var dir = path.join(__dirname, "/../examples/");
     this.sinon.stub(rep, "reporter");
     this.sinon.stub(process, "cwd").returns(dir);
 
@@ -861,7 +861,7 @@ exports.extract = {
       errors = errors.concat(res);
     });
 
-    var dir = __dirname + "/../examples/";
+    var dir = path.join(__dirname, "/../examples/");
     this.sinon.stub(process, "cwd").returns(dir);
 
     var html = [
@@ -902,7 +902,7 @@ exports.extract = {
       errors = errors.concat(res);
     });
 
-    var dir = __dirname + "/../examples/";
+    var dir = path.join(__dirname, "/../examples/");
     this.sinon.stub(process, "cwd").returns(dir);
 
     var html = [
@@ -949,7 +949,7 @@ exports.extract = {
       errors = errors.concat(res);
     });
 
-    var dir = __dirname + "/../examples/";
+    var dir = path.join(__dirname, "/../examples/");
     this.sinon.stub(process, "cwd").returns(dir);
 
     var html = [
@@ -993,7 +993,7 @@ exports.extract = {
       errors = errors.concat(res);
     });
 
-    var dir = __dirname + "/../examples/";
+    var dir = path.join(__dirname, "/../examples/");
     this.sinon.stub(process, "cwd").returns(dir);
 
     var html = [
@@ -1053,7 +1053,7 @@ exports.useStdin = {
       errors = errors.concat(res);
     });
 
-    var dir = __dirname + "/../examples/";
+    var dir = path.join(__dirname, "/../examples/");
     this.sinon.stub(process, "cwd").returns(dir);
 
     var jshintrc = JSON.stringify({ undef: true });
@@ -1092,7 +1092,7 @@ exports.useStdin = {
       errors = errors.concat(res);
     });
 
-    var dir = __dirname + "/../examples/";
+    var dir = path.join(__dirname, "/../examples/");
     this.sinon.stub(process, "cwd").returns(dir);
 
     var jshintrc = JSON.stringify({
