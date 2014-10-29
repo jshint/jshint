@@ -1,6 +1,6 @@
 #!/usr/bin/env rhino
 var window = {};
-/*! 2.5.7 */
+/*! 2.5.8 */
 var JSHINT;
 if (typeof window === 'undefined') window = {};
 (function () {
@@ -3235,7 +3235,7 @@ var JSHINT = (function () {
 
             expression(10);
           } else {
-            if (state.tokens.next.value === "[") {
+            if (state.tokens.next.id === "[") {
               // ComputedPropertyName
               advance();
               if (!state.option.esnext) {
