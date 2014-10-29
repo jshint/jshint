@@ -671,7 +671,7 @@ var exports = {
     cli.options = {};
 
     cli.enable("version", "glob", "help");
-    cli.setApp(path.resolve(__dirname + "/../package.json"));
+    cli.setApp(path.join(__dirname, "/../package.json"));
 
     var options = cli.parse(OPTIONS);
     // Use config file if specified

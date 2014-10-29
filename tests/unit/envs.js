@@ -6,6 +6,7 @@
 
 var JSHINT  = require('../../src/jshint.js').JSHINT;
 var fs      = require('fs');
+var path    = require('path');
 var TestRun = require("../helpers/testhelper").setup.testRun;
 
 function wrap(globals) {
@@ -114,7 +115,7 @@ exports.typed = function (test) {
 };
 
 exports.es5 = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/es5.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/es5.js"), "utf8");
 
   TestRun(test)
     .addError(3, "Extra comma. (it breaks older versions of IE)")
@@ -186,7 +187,7 @@ exports.es5 = function (test) {
 
   // Make sure that JSHint parses getters/setters as function expressions
   // (https://github.com/jshint/jshint/issues/96)
-  src = fs.readFileSync(__dirname + "/fixtures/es5.funcexpr.js", "utf8");
+  src = fs.readFileSync(path.join(__dirname, "/fixtures/es5.funcexpr.js"), "utf8");
   TestRun(test).test(src, {  }); // es5
 
   test.done();

@@ -207,13 +207,13 @@ exports.options = function (test) {
   run.test(code, {esnext: true});
   run.test(code, {moz: true});
 
-  TestRun(test).test(fs.readFileSync(__dirname + "/fixtures/gh988.js", "utf8"));
+  TestRun(test).test(fs.readFileSync(path.join(__dirname, "/fixtures/gh988.js"), "utf8"));
 
   test.done();
 };
 
 exports["jshint option comments single line"] = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/gh1768-1.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/gh1768-1.js"), "utf8");
 
   TestRun(test).test(src);
 
@@ -221,7 +221,7 @@ exports["jshint option comments single line"] = function (test) {
 };
 
 exports["jshint option comments single line, leading and trailing space"] = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/gh1768-2.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/gh1768-2.js"), "utf8");
 
   TestRun(test).test(src);
 
@@ -229,7 +229,7 @@ exports["jshint option comments single line, leading and trailing space"] = func
 };
 
 exports["jshint option comments multi line"] = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/gh1768-3.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/gh1768-3.js"), "utf8");
 
   TestRun(test).test(src);
 
@@ -237,7 +237,7 @@ exports["jshint option comments multi line"] = function (test) {
 };
 
 exports["jshint option comments multi line, leading and trailing space"] = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/gh1768-4.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/gh1768-4.js"), "utf8");
 
   TestRun(test)
     .addError(4, "'foo' is not defined.")
@@ -247,7 +247,7 @@ exports["jshint option comments multi line, leading and trailing space"] = funct
 };
 
 exports["jshint option comments multi line/option"] = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/gh1768-5.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/gh1768-5.js"), "utf8");
 
   TestRun(test)
     .addError(3, "'foo' is not defined.")
@@ -257,7 +257,7 @@ exports["jshint option comments multi line/option"] = function (test) {
 };
 
 exports["jshint option comments multi line/option, leading and trailing space"] = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/gh1768-6.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/gh1768-6.js"), "utf8");
 
   TestRun(test)
     .addError(4, "'foo' is not defined.")
@@ -390,7 +390,7 @@ exports.comments = function (test) {
 
   var src = "/* this is a comment /* with nested slash-start */";
   TestRun(test).test(src);
-  TestRun(test).test(fs.readFileSync(__dirname + "/fixtures/gruntComment.js", "utf8"));
+  TestRun(test).test(fs.readFileSync(path.join(__dirname, "/fixtures/gruntComment.js"), "utf8"));
 
   test.done();
 };
@@ -609,7 +609,7 @@ exports.jsonMode = function (test) {
 };
 
 exports.comma = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/comma.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/comma.js"), "utf8");
 
   TestRun(test)
     .addError(2, "Expected an assignment or function call and instead saw an expression.")
@@ -628,7 +628,7 @@ exports.comma = function (test) {
   // Regression test (GH-56)
   TestRun(test)
     .addError(4, "Expected an assignment or function call and instead saw an expression.")
-    .test(fs.readFileSync(__dirname + "/fixtures/gh56.js", "utf8"));
+    .test(fs.readFileSync(path.join(__dirname, "/fixtures/gh56.js"), "utf8"));
 
   // Regression test (GH-363)
   TestRun(test)
@@ -639,7 +639,7 @@ exports.comma = function (test) {
 };
 
 exports.withStatement = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/with.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/with.js"), "utf8");
   var run;
 
   run = TestRun(test)
@@ -661,7 +661,7 @@ exports.withStatement = function (test) {
 };
 
 exports.blocks = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/blocks.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/blocks.js"), "utf8");
 
   var run = TestRun(test)
     .addError(29, "Unmatched \'{\'.")
@@ -676,10 +676,10 @@ exports.blocks = function (test) {
 
 exports.functionCharacterLocation = function (test) {
   var i;
-  var src = fs.readFileSync(__dirname + "/fixtures/nestedFunctions.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/nestedFunctions.js"), "utf8");
   var locations = JSON.parse(
     fs.readFileSync(
-      __dirname + "/fixtures/nestedFunctions-locations.js", "utf8"
+      path.join(__dirname, "/fixtures/nestedFunctions-locations.js"), "utf8"
     )
   );
   JSHINT(src);
@@ -698,7 +698,7 @@ exports.functionCharacterLocation = function (test) {
 };
 
 exports.exported = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/exported.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/exported.js"), "utf8");
 
   var run = TestRun(test)
     .addError(5, "'unused' is defined but never used.")
@@ -720,7 +720,7 @@ exports.exported = function (test) {
 };
 
 exports.testIdentifiers = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/identifiers.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/identifiers.js"), "utf8");
 
   TestRun(test).test(src, {es3: true});
   var run = TestRun(test)
@@ -768,7 +768,7 @@ exports.testIdentifiers = function (test) {
 };
 
 exports["regression for GH-878"] = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/gh878.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/gh878.js"), "utf8");
 
   TestRun(test).test(src, {es3: true});
 
@@ -4570,7 +4570,7 @@ exports["test for line breaks with 'yield'"] = function (test) {
 
 exports.unreachable = {
   "regression for GH-1227": function (test) {
-    var src = fs.readFileSync(__dirname + "/fixtures/gh1227.js", "utf8");
+    var src = fs.readFileSync(path.join(__dirname, "/fixtures/gh1227.js"), "utf8");
 
     TestRun(test)
       .addError(14, "Unreachable 'return' after 'return'.")
@@ -4747,7 +4747,7 @@ exports["/*jshint ignore */ should be a good option and only accept start, end o
 };
 
 exports["/*jshint ignore */ should allow the linter to skip blocked-out lines to continue finding errors in the rest of the code"] = function (test) {
-  var code = fs.readFileSync(__dirname + "/fixtures/gh826.js", "utf8");
+  var code = fs.readFileSync(path.join(__dirname, "/fixtures/gh826.js"), "utf8");
 
   TestRun(test)
     .addError(34, "Use '===' to compare with '0'.")
@@ -4805,7 +4805,7 @@ exports["/*jshint ignore */ should be detected even with leading and/or trailing
 };
 
 exports["should be able to ignore a single line with a trailing comment: // jshint:ignore"] = function (test) {
-  var code = fs.readFileSync(__dirname + "/fixtures/gh870.js", "utf8");
+  var code = fs.readFileSync(path.join(__dirname, "/fixtures/gh870.js"), "utf8");
   TestRun(test).test(code, { unused: true });
   test.done();
 };
@@ -4840,7 +4840,7 @@ exports["jshint ignore:start/end should be detected using single line comments"]
 };
 
 exports["test destructuring function parameters as es5"] = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/destparam.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/destparam.js"), "utf8");
   TestRun(test)
     .addError(4, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(4, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
@@ -4901,7 +4901,7 @@ exports["test destructuring function parameters as es5"] = function (test) {
 };
 
 exports["test destructuring function parameters as legacy JS"] = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/destparam.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/destparam.js"), "utf8");
   TestRun(test)
     .addError(4, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(4, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
