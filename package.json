@@ -24,34 +24,34 @@
   },
 
   "scripts": {
-    "data": "node scripts/generate-identifier-data",
     "build": "node bin/build",
-    "test": "nodeunit tests tests/regression tests/unit",
-    "pretest": "jshint src"
+    "data": "node scripts/generate-identifier-data",
+    "pretest": "jshint src",
+    "test": "nodeunit tests tests/regression tests/unit"
   },
 
   "main": "./src/jshint.js",
 
   "dependencies": {
-    "shelljs":     "0.3.x",
-    "underscore":  "1.6.x",
-    "cli":         "0.6.x",
-    "minimatch":   "1.0.x",
-    "htmlparser2": "3.7.x",
-    "console-browserify": "1.1.x",
-    "exit": "0.1.x",
-    "strip-json-comments": "1.0.x"
+    "cli":                 "0.6.x",
+    "console-browserify":  "1.1.x",
+    "exit":                "0.1.x",
+    "htmlparser2":         "3.8.x",
+    "minimatch":           "1.0.x",
+    "shelljs":             "0.3.x",
+    "strip-json-comments": "1.0.x",
+    "underscore":          "1.6.x"
   },
 
   "devDependencies": {
-    "jshint":        "2.5.x",
     "browserify":    "6.x",
     "coveraje":      "0.2.x",
+    "jshint":        "2.5.x",
+    "mock-stdin":    "0.3.x",
     "nodeunit":      "0.9.x",
-    "sinon":         "1.10.x",
-    "unicode-6.3.0": "0.1.x",
-    "regenerate":    "0.6.x",
-    "mock-stdin":    "^0.3.0"
+    "regenerate":    "1.0.x",
+    "sinon":         "1.11.x",
+    "unicode-6.3.0": "0.1.x"
   },
 
   "licenses": [
@@ -65,8 +65,8 @@
 
   "files": [
     "bin",
-    "src",
     "data",
-    "dist"
+    "dist",
+    "src"
   ]
 }
