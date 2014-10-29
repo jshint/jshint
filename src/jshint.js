@@ -1807,6 +1807,8 @@ var JSHINT = (function () {
           // string -> ( is not a valid production
           warning("W033", state.tokens.next);
         }
+      } else if (p.id === "." || p.id === "[") {
+        return;
       } else if (p.id !== ";") {
         warning("W033", p);
       }
