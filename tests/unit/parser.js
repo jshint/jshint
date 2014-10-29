@@ -4842,5 +4842,12 @@ exports.testStrictDirectiveASI = function (test) {
     .addError(1, "Expected an assignment or function call and instead saw an expression.")
     .test("'use strict',function fn() {}\nfn();", options);
 
+  TestRun(test, 7)
+    .test("'use strict'.split(' ');", options);
+
+  TestRun(test, 8)
+    .addError(1, "Missing \"use strict\" statement.")
+    .test("(function() { var x; \"use strict\"; return x; }());", { strict: true, expr: true });
+
   test.done();
 };
