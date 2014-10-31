@@ -920,3 +920,11 @@ exports.testEscapedReservedWords = function (test) {
 
   test.done();
 };
+
+exports.testUnnamedFuncStatement = function (test) {
+  TestRun(test)
+    .addError(1, "Missing name in function declaration.")
+    .test("function() {}");
+
+  test.done();
+};
