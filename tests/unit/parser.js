@@ -305,7 +305,9 @@ exports.numbers = function (test) {
     "var g = 0033;",
     "var h = 3.;",
     "var i = 3.7.toString();",
-    "var j = 1e-10;" // GH-821
+    "var j = 1e-10;", // GH-821
+    "var k = 0o1234567;",
+    "var l = 0b101;",
   ];
 
   TestRun(test)
@@ -317,6 +319,8 @@ exports.numbers = function (test) {
     .addError(7, "Don't use extra leading zeros '0033'.")
     .addError(8, "A trailing decimal point can be confused with a dot: '3.'.")
     .addError(9, "A dot following a number can be confused with a decimal point.")
+    .addError(11, "'Octal integer literal' is only available in ES6 (use esnext option).")
+    .addError(12, "'Binary integer literal' is only available in ES6 (use esnext option).")
     .test(code, {es3: true});
 
   // Octals are prohibited in strict mode.
@@ -337,6 +341,20 @@ exports.numbers = function (test) {
       "var a = .3 + 1;",
       "var b = 1 + .3;",
     ]);
+
+  TestRun(test)
+    .addError(5, "Missing semicolon.")
+    .addError(5, "Expected an assignment or function call and instead saw an expression.")
+    .addError(6, "Missing semicolon.")
+    .addError(6, "Expected an assignment or function call and instead saw an expression.")
+    .test([
+      "var a = 0o1234567;",
+      "var b = 0O1234567;",
+      "var c = 0b101;",
+      "var d = 0B101;",
+      "var e = 0o12345678;",
+      "var f = 0b1012;",
+    ], {esnext: true});
 
   test.done();
 };

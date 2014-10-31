@@ -675,6 +675,9 @@ Lexer.prototype = {
     var length = this.input.length;
     var char = this.peek(index);
     var bad;
+    var isAllowedDigit;
+    var base;
+    var name;
 
     function isDecimalDigit(str) {
       return (/^[0-9]$/).test(str);
@@ -682,6 +685,10 @@ Lexer.prototype = {
 
     function isOctalDigit(str) {
       return (/^[0-7]$/).test(str);
+    }
+
+    function isBinaryDigit(str) {
+      return (/^[01]$/).test(str);
     }
 
     function isHexDigit(str) {
@@ -705,14 +712,40 @@ Lexer.prototype = {
       char = this.peek(index);
 
       if (value === "0") {
-        // Base-16 numbers.
-        if (char === "x" || char === "X") {
+        // Base-16, Base-8, and Base-2 numbers.
+        if (char === "x" || char === "X" ||
+            char === "o" || char === "O" ||
+            char === "b" || char === "B") {
+          if (char === "x" || char === "X") {
+            isAllowedDigit = isHexDigit;
+            base = 16;
+          } else {
+            if (char === "o" || char === "O") {
+              isAllowedDigit = isOctalDigit;
+              base = 8;
+              name = "Octal integer literal";
+            } else {
+              isAllowedDigit = isBinaryDigit;
+              base = 2;
+              name = "Binary integer literal";
+            }
+
+            if (!state.option.esnext) {
+              this.trigger("warning", {
+                code: "W119",
+                line: this.line,
+                character: this.char,
+                data: [ name ]
+              });
+            }
+          }
+
           index += 1;
           value += char;
 
           while (index < length) {
             char = this.peek(index);
-            if (!isHexDigit(char)) {
+            if (!isAllowedDigit(char)) {
               break;
             }
             value += char;
@@ -737,7 +770,7 @@ Lexer.prototype = {
           return {
             type: Token.NumericLiteral,
             value: value,
-            base: 16,
+            base: base,
             isMalformed: false
           };
         }
@@ -774,6 +807,7 @@ Lexer.prototype = {
             type: Token.NumericLiteral,
             value: value,
             base: 8,
+            isLegacy: true,
             isMalformed: false
           };
         }
@@ -1662,7 +1696,8 @@ Lexer.prototype = {
           line: this.line,
           character: this.char
         }, checks, function () {
-          return state.directive["use strict"] && token.base === 8;
+          return state.directive["use strict"] && token.base === 8 && 'isLegacy' in token &&
+            token.isLegacy;
         });
 
         this.trigger("Number", {
