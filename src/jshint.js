@@ -2633,7 +2633,7 @@ var JSHINT = (function () {
     advance(")", this);
     if (state.option.immed && exprs[0] && exprs[0].id === "function") {
       if (state.tokens.next.id !== "(" &&
-        (state.tokens.next.id !== ".")) {
+        state.tokens.next.id !== "." && state.tokens.next.id !== "[") {
         warning("W068", this);
       }
     }
