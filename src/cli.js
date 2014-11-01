@@ -14,7 +14,7 @@ var defReporter       = require("./reporters/default").reporter;
 
 var OPTIONS = {
   "config": ["c", "Custom configuration file", "string", false ],
-  "reporter": ["reporter", "Custom reporter (<PATH>|jslint|checkstyle)", "string", undefined ],
+  "reporter": ["reporter", "Custom reporter (<PATH>|jslint|checkstyle|unix)", "string", undefined ],
   "exclude": ["exclude",
     "Exclude files matching the given filename pattern (same as .jshintignore)", "string", null],
   "exclude-path": ["exclude-path", "Pass in a custom jshintignore file path", "string", null],
@@ -691,6 +691,11 @@ var exports = {
     case options.reporter === "checkstyle":
     case options["checkstyle-reporter"]:
       options.reporter = "./reporters/checkstyle.js";
+      break;
+
+    // Unix reporter
+    case options.reporter === "unix":
+      options.reporter = "./reporters/unix.js";
       break;
 
     // Reporter that displays additional JSHint data
