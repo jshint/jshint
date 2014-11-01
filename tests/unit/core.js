@@ -679,19 +679,20 @@ exports.testES6Modules = function (test) {
     .addError(6, "'import' is only available in ES6 (use esnext option).")
     .addError(7, "'import' is only available in ES6 (use esnext option).")
     .addError(8, "'import' is only available in ES6 (use esnext option).")
-    .addError(19, "'export' is only available in ES6 (use esnext option).")
-    .addError(23, "'export' is only available in ES6 (use esnext option).")
-    .addError(27, "'export' is only available in ES6 (use esnext option).")
+    .addError(9, "'import' is only available in ES6 (use esnext option).")
+    .addError(20, "'export' is only available in ES6 (use esnext option).")
+    .addError(24, "'export' is only available in ES6 (use esnext option).")
     .addError(28, "'export' is only available in ES6 (use esnext option).")
-    .addError(32, "'export' is only available in ES6 (use esnext option).")
-    .addError(36, "'export' is only available in ES6 (use esnext option).")
-    .addError(40, "'export' is only available in ES6 (use esnext option).")
-    .addError(42, "'export' is only available in ES6 (use esnext option).")
-    .addError(42, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(29, "'export' is only available in ES6 (use esnext option).")
+    .addError(33, "'export' is only available in ES6 (use esnext option).")
+    .addError(37, "'export' is only available in ES6 (use esnext option).")
+    .addError(41, "'export' is only available in ES6 (use esnext option).")
     .addError(43, "'export' is only available in ES6 (use esnext option).")
-    .addError(43, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
-    .addError(44, "'export' is only available in ES6 (use esnext option).")
     .addError(44, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(45, "'export' is only available in ES6 (use esnext option).")
+    .addError(45, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(44, "'export' is only available in ES6 (use esnext option).")
+    .addError(43, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .test(src, {});
 
   var src2 = [
@@ -747,6 +748,21 @@ exports.testES6ModulesDefaultExportsAffectUnused = function (test) {
 
   TestRun(test)
     .test(src1, {
+      esnext: true,
+      unused: true
+    });
+
+  test.done();
+};
+
+exports.testES6ModulesNameSpaceImportsAffectUnused = function (test) {
+  var src = [
+    "import * as angular from 'angular';"
+  ];
+
+  TestRun(test)
+    .addError(1, "'angular' is defined but never used.")
+    .test(src, {
       esnext: true,
       unused: true
     });
