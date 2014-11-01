@@ -6,7 +6,7 @@
 
 module.exports = {
   reporter: function(results, data, opts) {
-    let len = results.length;
+    var len = results.length;
     var str = "";
     var prevfile;
 
