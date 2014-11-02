@@ -16,19 +16,22 @@ module.exports = {
       var file = result.file;
       var error = result.error;
 
-      if (prevfile && prevfile !== file)
+      if (prevfile && prevfile !== file) {
         str += "\n";
+      }
       prevfile = file;
 
       str += file + ":" + error.line + ":" + error.character + ": " + error.reason;
 
-      if (opts.verbose)
+      if (opts.verbose) {
         str += " (" + error.code + ")";
+      }
 
       str += "\n";
     });
 
-    if (str)
+    if (str) {
       console.log(str + "\n" + len + " error" + ((len === 1) ? "" : "s"));
+    }
   }
 };
