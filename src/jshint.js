@@ -2775,8 +2775,20 @@ var JSHINT = (function () {
   });
 
 
-  function propertyName(preserve) {
-    var id = optionalidentifier(false, true, preserve);
+  function isPropertyName(token) {
+    return token.identifier || token.id === "(string)" || token.id === "(number)";
+  }
+
+
+  function propertyName(preserveOrToken) {
+    var id;
+    var preserve = true;
+    if (typeof preserveOrToken === "object") {
+      id = preserveOrToken;
+    } else {
+      preserve = preserveOrToken;
+      id = optionalidentifier(false, true, preserve);
+    }
 
     if (!id) {
       if (state.tokens.next.id === "(string)") {
@@ -3095,52 +3107,9 @@ var JSHINT = (function () {
 
 
   (function (x) {
-    x.nud = function (isclassdef) {
-      var b, f, i, p, t, g, nextVal, propDesc;
+    x.nud = function () {
+      var b, f, i, p, t, g, nextVal;
       var props = {}; // All properties, including accessors
-      var tag = "";
-
-      function saveProperty(name, tkn) {
-
-        if (tkn.identifier) {
-          name = tkn.value;
-        }
-
-        if (props[name] && _.has(props, name)) {
-          warning("W075", state.tokens.next, i);
-        } else {
-          props[name] = {};
-        }
-
-        props[name].basic = true;
-        props[name].basictkn = tkn;
-      }
-
-      function saveSetter(name, tkn) {
-        if (props[name] && _.has(props, name)) {
-          if (props[name].basic || props[name].setter) {
-            warning("W075", state.tokens.next, i);
-          }
-        } else {
-          props[name] = {};
-        }
-
-        props[name].setter = true;
-        props[name].setterToken = tkn;
-      }
-
-      function saveGetter(name) {
-        if (props[name] && _.has(props, name)) {
-          if (props[name].basic || props[name].getter) {
-            warning("W075", state.tokens.next, i);
-          }
-        } else {
-          props[name] = {};
-        }
-
-        props[name].getter = true;
-        props[name].getterToken = state.tokens.curr;
-      }
 
       b = state.tokens.curr.line !== state.tokens.next.line;
       if (b) {
@@ -3155,16 +3124,11 @@ var JSHINT = (function () {
           break;
         }
 
-        if (isclassdef && state.tokens.next.value === "static") {
-          advance("static");
-          tag = "static ";
-        }
-
         nextVal = state.tokens.next.value;
         if (peek().id !== ":" && (nextVal === "get" || nextVal === "set")) {
           advance(nextVal);
 
-          if (!state.option.inES5(!isclassdef)) {
+          if (!state.option.inES5()) {
             error("E034");
           }
 
@@ -3177,24 +3141,13 @@ var JSHINT = (function () {
             error("E035");
           }
 
-          // It is a Syntax Error if PropName of MethodDefinition is
-          // "constructor" and SpecialMethod of MethodDefinition is true.
-          if (isclassdef && i === "constructor") {
-            if (nextVal === "get") {
-              propDesc = "class getter method";
-            } else {
-              propDesc = "class setter method";
-            }
-            error("E049", state.tokens.next, propDesc, i);
-          }
-
           // We don't want to save this getter unless it's an actual getter
           // and not an ES6 concise method
           if (i) {
             if (nextVal === "get") {
-              saveGetter(tag + i);
+              saveGetter(props, i);
             } else {
-              saveSetter(tag + i, state.tokens.next);
+              saveSetter(props, i, state.tokens.next);
             }
           }
 
@@ -3217,28 +3170,21 @@ var JSHINT = (function () {
             advance("*");
             g = true;
           }
-          if (!isclassdef &&
-              state.tokens.next.identifier &&
+          if (state.tokens.next.identifier &&
               (peekIgnoreEOL().id === "," || peekIgnoreEOL().id === "}")) {
             if (!state.option.inESNext()) {
               warning("W104", state.tokens.next, "object short notation");
             }
             i = propertyName(true);
-            saveProperty(tag + i, state.tokens.next);
+            saveProperty(props, i, state.tokens.next);
 
             expression(10);
           } else {
             if (state.tokens.next.id === "[") {
-              // ComputedPropertyName
-              advance();
-              if (!state.option.esnext) {
-                warning("W119", state.tokens.curr, "computed property names");
-              }
-              i = expression(10);
-              advance("]");
+              i = computedPropertyName();
             } else {
               i = propertyName();
-              saveProperty(tag + i, state.tokens.next);
+              saveProperty(props, i, state.tokens.next);
 
               if (typeof i !== "string") {
                 break;
@@ -3250,22 +3196,15 @@ var JSHINT = (function () {
                 warning("W104", state.tokens.curr, "concise methods");
               }
               doFunction(i, undefined, g);
-            } else if (!isclassdef) {
+            } else {
               advance(":");
               expression(10);
             }
           }
         }
-        // It is a Syntax Error if PropName of MethodDefinition is "prototype".
-        if (isclassdef && i === "prototype") {
-          error("E049", state.tokens.next, "class method", i);
-        }
 
         countMember(i);
-        if (isclassdef) {
-          tag = "";
-          continue;
-        }
+
         if (state.tokens.next.id === ",") {
           comma({ allowTrailing: true, property: true });
           if (state.tokens.next.id === ",") {
@@ -3618,8 +3557,89 @@ var JSHINT = (function () {
     state.directive["use strict"] = true;
     advance("{");
     // ClassBody(opt)
-    c.body = state.syntax["{"].nud(true);
+    c.body = classbody(c);
+    advance("}");
     state.directive["use strict"] = strictness;
+  }
+
+  function classbody(c) {
+    var name;
+    var isStatic;
+    var getset;
+    var props = {};
+    var staticProps = {};
+    var computed;
+    for (var i = 0; state.tokens.next.id !== "}"; ++i) {
+      name = state.tokens.next;
+      isStatic = false;
+      getset = null;
+      if (name.id === "[") {
+        name = computedPropertyName();
+      } else if (isPropertyName(name)) {
+        // Non-Computed PropertyName
+        advance();
+        computed = false;
+        if (name.identifier && name.value === "static") {
+          if (isPropertyName(state.tokens.next) || state.tokens.next.id === "[") {
+            computed = state.tokens.next.id === "[";
+            isStatic = true;
+            name = state.tokens.next;
+            if (state.tokens.next.id === "[") {
+              name = computedPropertyName();
+            } else advance();
+          }
+        }
+
+        if (name.identifier && (name.value === "get" || name.value === "set")) {
+          if (isPropertyName(state.tokens.next) || state.tokens.next.id === "[") {
+            computed = state.tokens.next.id === "[";
+            getset = name;
+            name = state.tokens.next;
+            if (state.tokens.next.id === "[") {
+              name = computedPropertyName();
+            } else advance();
+          }
+        }
+      } else {
+        warning("W052", state.tokens.next, state.tokens.next.value || state.tokens.next.type);
+        advance();
+        continue;
+      }
+
+      if (!checkPunctuators(state.tokens.next, ["("])) {
+        // error --- class properties must be methods
+        error("E054", state.tokens.next, state.tokens.next.value);
+        while (state.tokens.next.id !== "}" &&
+               !checkPunctuators(state.tokens.next, ["("])) {
+          advance();
+        }
+        if (state.tokens.next.value !== "(") {
+          doFunction(undefined, c, false, null);
+        }
+      }
+
+      if (!computed) {
+        // We don't know how to determine if we have duplicate computed property names :(
+        if (getset) {
+          if (getset.value === "get") {
+            saveGetter(isStatic ? staticProps : props, name.value, true, isStatic);
+          } else {
+            saveSetter(isStatic ? staticProps : props, name.value, name, true, isStatic);
+          }
+        } else {
+          saveProperty(isStatic ? staticProps : props, name.value, name, true, isStatic);
+        }
+      }
+
+      if (getset && name.value === "constructor") {
+        var propDesc = getset.value === "get" ? "class getter method" : "class setter method";
+        error("E049", name, propDesc, "constructor");
+      } else if (name.value === "prototype") {
+        error("E049", name, "class method", "prototype");
+      }
+
+      doFunction(name, c, false, null);
+    }
   }
 
   blockstmt("function", function () {
@@ -4452,6 +4472,63 @@ var JSHINT = (function () {
     } while (bracketStack > 0 && pn.id !== "(end)" && i < 15);
     return ret;
   };
+
+  function saveProperty(props, name, tkn, isClass, isStatic) {
+    var msg = ["key", "class method", "static class method"];
+    msg = msg[(isClass || false) + (isStatic || false)];
+    if (tkn.identifier) {
+      name = tkn.value;
+    }
+
+    if (props[name] && _.has(props, name)) {
+      warning("W075", state.tokens.next, msg, name);
+    } else {
+      props[name] = {};
+    }
+
+    props[name].basic = true;
+    props[name].basictkn = tkn;
+  }
+
+  function saveSetter(props, name, tkn, isClass, isStatic) {
+    var msg = ["key", "setter method", "static setter method"];
+    msg = msg[(isClass || false) + (isStatic || false)];
+    if (props[name] && _.has(props, name)) {
+      if (props[name].basic || props[name].setter) {
+        warning("W075", state.tokens.next, msg, name);
+      }
+    } else {
+      props[name] = {};
+    }
+
+    props[name].setter = true;
+    props[name].setterToken = tkn;
+  }
+
+  function saveGetter(props, name, isClass, isStatic) {
+    var msg = ["key", "getter method", "static getter method"];
+    msg = msg[(isClass || false) + (isStatic || false)];
+    if (props[name] && _.has(props, name)) {
+      if (props[name].basic || props[name].getter) {
+        warning("W075", state.tokens.next, msg, name);
+      }
+    } else {
+      props[name] = {};
+    }
+
+    props[name].getter = true;
+    props[name].getterToken = state.tokens.curr;
+  }
+
+  function computedPropertyName() {
+    advance("[");
+    if (!state.option.esnext) {
+      warning("W119", state.tokens.curr, "computed property names");
+    }
+    var value = expression(10);
+    advance("]");
+    return value;
+  }
 
   // Test whether a given token is a punctuator matching one of the specified values
   function checkPunctuators(token, values) {

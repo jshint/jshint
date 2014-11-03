@@ -4116,6 +4116,29 @@ exports["class and method naming"] = function (test) {
     "  get constructor() {}",
     "  set constructor(x) {}",
     "  prototype() {}",
+    "  an extra identifier 'in' methodName() {}",
+    "  get foo extraIdent1() {}",
+    "  set foo extraIdent2() {}",
+    "  static some extraIdent3() {}",
+    "  static get an extraIdent4() {}",
+    "  static set an extraIdent5() {}",
+    "  get dupgetter() {}",
+    "  get dupgetter() {}",
+    "  set dupsetter() {}",
+    "  set dupsetter() {}",
+    "  static get dupgetter() {}",
+    "  static get dupgetter() {}",
+    "  static set dupsetter() {}",
+    "  static set dupsetter() {}",
+    "  dupmethod() {}",
+    "  dupmethod() {}",
+    "  static dupmethod() {}",
+    "  static dupmethod() {}",
+    "  ['computed method']() {}",
+    "  static ['computed static']() {}",
+    "  get ['computed getter']() {}",
+    "  set ['computed setter']() {}",
+    "  (typo() {}",
     "}"
   ];
   var run = TestRun(test)
@@ -4123,7 +4146,20 @@ exports["class and method naming"] = function (test) {
     .addError(2, "Expected an identifier and instead saw 'arguments' (a reserved word).")
     .addError(4, "A class getter method cannot be named 'constructor'.")
     .addError(5, "A class setter method cannot be named 'constructor'.")
-    .addError(7, "A class method cannot be named 'prototype'.");
+    .addError(6, "A class method cannot be named 'prototype'.")
+    .addError(7, "Class properties must be methods. Expected '(' but instead saw 'extra'.")
+    .addError(8, "Class properties must be methods. Expected '(' but instead saw 'extraIdent1'.")
+    .addError(9, "Class properties must be methods. Expected '(' but instead saw 'extraIdent2'.")
+    .addError(10, "Class properties must be methods. Expected '(' but instead saw 'extraIdent3'.")
+    .addError(11, "Class properties must be methods. Expected '(' but instead saw 'extraIdent4'.")
+    .addError(12, "Class properties must be methods. Expected '(' but instead saw 'extraIdent5'.")
+    .addError(14, "Duplicate getter method 'dupgetter'.")
+    .addError(16, "Duplicate setter method 'dupsetter'.")
+    .addError(18, "Duplicate static getter method 'dupgetter'.")
+    .addError(20, "Duplicate static setter method 'dupsetter'.")
+    .addError(22, "Duplicate class method 'dupmethod'.")
+    .addError(24, "Duplicate static class method 'dupmethod'.")
+    .addError(29, "Unexpected '('.");
 
   run.test(code, {esnext: true});
 

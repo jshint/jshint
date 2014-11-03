@@ -68,7 +68,8 @@ var errors = {
   E050: "Mozilla requires the yield expression to be parenthesized here.",
   E051: "Regular parameters cannot come after default parameters.",
   E052: "Unclosed template literal.",
-  E053: "Export declaration must be in global scope."
+  E053: "Export declaration must be in global scope.",
+  E054: "Class properties must be methods. Expected '(' but instead saw '{a}'."
 };
 
 var warnings = {
@@ -147,7 +148,7 @@ var warnings = {
   W072: "This function has too many parameters. ({a})",
   W073: "Blocks are nested too deeply. ({a})",
   W074: "This function's cyclomatic complexity is too high. ({a})",
-  W075: "Duplicate key '{a}'.",
+  W075: "Duplicate {a} '{b}'.",
   W076: "Unexpected parameter '{a}' in get {b} function.",
   W077: "Expected a single parameter in set {a} function.",
   W078: "Setter is defined without getter.",
