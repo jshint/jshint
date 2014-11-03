@@ -4217,8 +4217,15 @@ var JSHINT = (function () {
       warning("W104", state.tokens.curr, "yield");
     }
     funct["(generator)"] = "yielded";
+    var delegatingYield = false;
+    if (state.option.inESNext() && peek() == "*") {
+      delegatingYield = true;
+      advance("*");
+    }
     if (this.line === state.tokens.next.line || !state.option.inMoz(true)) {
-      if (state.tokens.next.id !== ";" && !state.tokens.next.reach && state.tokens.next.nud) {
+      if (delegatingYield ||
+          (state.tokens.next.id !== ";" && !state.tokens.next.reach && state.tokens.next.nud)) {
+
         nobreaknonadjacent(state.tokens.curr, state.tokens.next);
         this.first = expression(10);
 
