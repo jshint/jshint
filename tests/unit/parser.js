@@ -2595,6 +2595,27 @@ exports["test: esnext generator without yield and check turned off"] = function 
   test.done();
 };
 
+exports["test: esnext generator with yield delegation, gh-1544"] = function(test) {
+  var code = [
+    "function* G() {",
+    "  yield* (function*(){})();",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(1, "'function*' is only available in ES6 (use esnext option).")
+    .addError(2, "'yield' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(2, "'function*' is only available in ES6 (use esnext option).")
+    .addError(2, "A generator function shall contain a yield statement.")
+    .addError(2, "Expected an assignment or function call and instead saw an expression.")
+    .test(code);
+
+
+  TestRun(test).test(code, {esnext: true, noyield: true});
+
+  test.done();
+};
+
 exports["test: mozilla generator"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
