@@ -4221,7 +4221,7 @@ var JSHINT = (function () {
     funct["(generator)"] = "yielded";
     var delegatingYield = false;
 
-    if (state.option.inESNext() && state.tokens.next.value === "*") {
+    if (state.tokens.next.value === "*") {
       delegatingYield = true;
       advance("*");
     }

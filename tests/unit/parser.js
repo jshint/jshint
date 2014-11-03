@@ -2607,7 +2607,6 @@ exports["test: esnext generator with yield delegation, gh-1544"] = function(test
     .addError(2, "'yield' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(2, "'function*' is only available in ES6 (use esnext option).")
     .addError(2, "A generator function shall contain a yield statement.")
-    .addError(2, "Expected an assignment or function call and instead saw an expression.")
     .test(code);
 
 
