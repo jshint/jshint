@@ -2998,7 +2998,8 @@ var JSHINT = (function () {
 
     block(false, true, true, fatarrowparams ? true : false);
 
-    if (!state.option.noyield && generator && funct["(generator)"] !== "yielded") {
+    if (!state.option.noyield && generator &&
+        funct["(generator)"] !== "yielded") {
       warning("W124", state.tokens.curr);
     }
 
@@ -4219,10 +4220,12 @@ var JSHINT = (function () {
     }
     funct["(generator)"] = "yielded";
     var delegatingYield = false;
-    if (state.option.inESNext() && peek() == "*") {
+
+    if (state.option.inESNext() && state.tokens.next.value === "*") {
       delegatingYield = true;
       advance("*");
     }
+
     if (this.line === state.tokens.next.line || !state.option.inMoz(true)) {
       if (delegatingYield ||
           (state.tokens.next.id !== ";" && !state.tokens.next.reach && state.tokens.next.nud)) {
