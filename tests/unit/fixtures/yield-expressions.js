@@ -82,4 +82,5 @@ function* G() {
     yield ? yield : yield;
     yield ? yield ? yield : yield : yield;
     yield ? yield ? yield : yield : yield ? yield : yield;
+    yield* (function*(){})();
 }
