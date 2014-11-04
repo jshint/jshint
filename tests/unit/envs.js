@@ -153,6 +153,7 @@ exports.es5 = function (test) {
     .addError(69, "Missing property name.")
     .addError(75, "get/set are ES5 features.")
     .addError(76, "get/set are ES5 features.")
+    .addError(80, "get/set are ES5 features.")
     .test(src, { es3: true });
 
   TestRun(test)
@@ -166,6 +167,7 @@ exports.es5 = function (test) {
     .addError(64, "Expected a single parameter in set z function.")
     .addError(68, "Missing property name.")
     .addError(69, "Missing property name.")
+    .addError(80, "Setter is defined without getter.")
     .test(src, {  }); // es5
 
   // JSHint should not throw "Missing property name" error on nameless getters/setters
@@ -179,6 +181,7 @@ exports.es5 = function (test) {
     .addError(59, "Unexpected parameter 'a' in get y function.")
     .addError(62, "Expected a single parameter in set x function.")
     .addError(64, "Expected a single parameter in set z function.")
+    .addError(80, "Setter is defined without getter.")
     .test(src, { esnext: true });
 
   // Make sure that JSHint parses getters/setters as function expressions

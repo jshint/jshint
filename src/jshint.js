@@ -3168,7 +3168,7 @@ var JSHINT = (function () {
             if (nextVal === "get") {
               saveGetter(props, i);
             } else {
-              saveSetter(props, i, state.tokens.next);
+              saveSetter(props, i, state.tokens.curr);
             }
           }
 

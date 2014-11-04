@@ -75,4 +75,9 @@ var b = {
         set x(value) { _x = value; },
         get x() { return _x; }
     };
+
+    var onlySetter2 = {
+        set x
+            (value) { this._x = value; }
+    };
 }());
