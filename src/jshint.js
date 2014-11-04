@@ -216,6 +216,12 @@ var JSHINT = (function () {
       strict  : true
     },
 
+    validOptionNames = Object.keys(valOptions)
+      .concat(Object.keys(boolOptions.relaxing))
+      .concat(Object.keys(boolOptions.enforcing))
+      .concat(Object.keys(boolOptions.obsolete))
+      .concat(Object.keys(boolOptions.environments)),
+
     // These are JSHint boolean options which are shared with JSLint
     // where the name has been changed but the effect is unchanged
     renamedOptions = {
@@ -271,12 +277,8 @@ var JSHINT = (function () {
       return true;
     }
 
-    if (valOptions[name] === undefined &&
-       (boolOptions.environments[name] === undefined &&
-        boolOptions.enforcing[name] === undefined &&
-        boolOptions.obsolete[name] === undefined &&
-        boolOptions.relaxing[name] === undefined  ) ) {
-      if (t.type !== "jslint" && !removedOptions[name]) {
+    if (validOptionNames.indexOf(name) === -1) {
+      if (t.type !== "jslint" && !_.has(removedOptions, name)) {
         error("E001", t, name);
         return false;
       }
