@@ -1,4 +1,4 @@
-if (typeof func === 'funtion') {}
+if (typeof func === 'function') {}
 if ('double' == typeof func) {}
 if (typeof func !== 'bool') {}
 if ('obj' != typeof func) {}
