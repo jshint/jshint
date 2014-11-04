@@ -3126,6 +3126,20 @@ var JSHINT = (function () {
     }
   }
 
+  /**
+   * @param {object} props Collection of property descriptors for a given
+   *                       object.
+   */
+  function checkProperties(props) {
+    // Check for lonely setters if in the ES5 mode.
+    if (state.option.inES5()) {
+      for (var name in props) {
+        if (_.has(props, name) && props[name].setter && !props[name].getter) {
+          warning("W078", props[name].setterToken);
+        }
+      }
+    }
+  }
 
   (function (x) {
     x.nud = function () {
@@ -3242,14 +3256,8 @@ var JSHINT = (function () {
       }
       advance("}", this);
 
-      // Check for lonely setters if in the ES5 mode.
-      if (state.option.inES5()) {
-        for (var name in props) {
-          if (_.has(props, name) && props[name].setter && !props[name].getter) {
-            warning("W078", props[name].setterToken);
-          }
-        }
-      }
+      checkProperties(props);
+
       return this;
     };
     x.fud = function () {
@@ -3661,6 +3669,8 @@ var JSHINT = (function () {
 
       doFunction(!computed && propertyName(name), c, false, null);
     }
+
+    checkProperties(props);
   }
 
   blockstmt("function", function () {
