@@ -4177,6 +4177,9 @@ exports["class and method naming"] = function (test) {
     "  get ['computed getter']() {}",
     "  set ['computed setter']() {}",
     "  (typo() {}",
+    "  set lonely() {}",
+    "  set lonel2",
+    "            () {}",
     "}"
   ];
   var run = TestRun(test)
@@ -4193,11 +4196,14 @@ exports["class and method naming"] = function (test) {
     .addError(12, "Class properties must be methods. Expected '(' but instead saw 'extraIdent5'.")
     .addError(14, "Duplicate getter method 'dupgetter'.")
     .addError(16, "Duplicate setter method 'dupsetter'.")
+    .addError(16, "Setter is defined without getter.")
     .addError(18, "Duplicate static getter method 'dupgetter'.")
     .addError(20, "Duplicate static setter method 'dupsetter'.")
     .addError(22, "Duplicate class method 'dupmethod'.")
     .addError(24, "Duplicate static class method 'dupmethod'.")
-    .addError(29, "Unexpected '('.");
+    .addError(29, "Unexpected '('.")
+    .addError(30, "Setter is defined without getter.")
+    .addError(31, "Setter is defined without getter.");
 
   run.test(code, {esnext: true});
 
