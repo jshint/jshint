@@ -78,7 +78,6 @@ var JSHINT = (function () {
         freeze      : true, // if modifying native object prototypes should be disallowed
         camelcase   : true, // if identifiers should be required in camel case
         curly       : true, // if curly braces around all blocks should be required
-        dojo        : true, // if Dojo Toolkit globals should be predefined
         eqeqeq      : true, // if === should be required
         notypeof    : true, // if should report typos in typeof comparisons
         es3         : true, // if ES3 syntax should be allowed
@@ -131,33 +130,38 @@ var JSHINT = (function () {
       },
 
       // Third party globals
-      mootools    : true, // if MooTools globals should be predefined
-      couch       : true, // if CouchDB globals should be predefined
-      jasmine     : true, // Jasmine functions should be predefined
-      jquery      : true, // if jQuery globals should be predefined
-      node        : true, // if the Node.js environment globals should be
-      // predefined
-      qunit       : true, // if the QUnit environment globals should be predefined
-      rhino       : true, // if the Rhino environment globals should be predefined
-      shelljs     : true, // if ShellJS globals should be predefined
-      prototypejs : true, // if Prototype and Scriptaculous globals should be
-      // predefined
-      yui         : true, // YUI variables should be predefined
-      mocha       : true, // Mocha functions should be predefined
-      wsh         : true, // if the Windows Scripting Host environment globals
-      // should be predefined
-      worker      : true, // if Web Worker script symbols should be allowed
-      nonstandard : true, // if non-standard (but widely adopted) globals should
-      // be predefined
-      browser     : true, // if the standard browser globals should be predefined
-      browserify  : true, // if the standard browserify globals should be predefined
-      devel       : true, // if logging globals should be predefined (console, alert, etc.)
+      environments: {
+        mootools    : true, // if MooTools globals should be predefined
+        couch       : true, // if CouchDB globals should be predefined
+        jasmine     : true, // Jasmine functions should be predefined
+        jquery      : true, // if jQuery globals should be predefined
+        node        : true, // if the Node.js environment globals should be
+        // predefined
+        qunit       : true, // if the QUnit environment globals should be predefined
+        rhino       : true, // if the Rhino environment globals should be predefined
+        shelljs     : true, // if ShellJS globals should be predefined
+        prototypejs : true, // if Prototype and Scriptaculous globals should be
+        // predefined
+        yui         : true, // YUI variables should be predefined
+        mocha       : true, // Mocha functions should be predefined
+        wsh         : true, // if the Windows Scripting Host environment globals
+        // should be predefined
+        worker      : true, // if Web Worker script symbols should be allowed
+        nonstandard : true, // if non-standard (but widely adopted) globals should
+        // be predefined
+        browser     : true, // if the standard browser globals should be predefined
+        browserify  : true, // if the standard browserify globals should be predefined
+        devel       : true, // if logging globals should be predefined (console, alert, etc.)
+        dojo        : true, // if Dojo Toolkit globals should be predefined
+      },
 
       // Obsolete options
-      onecase     : true, // if one case switch statements should be allowed
-      regexp      : true, // if the . should not be allowed in regexp literals
-      regexdash   : true  // if unescaped first/last dash (-) inside brackets
-                          // should be tolerated
+      obsolete: {
+        onecase     : true, // if one case switch statements should be allowed
+        regexp      : true, // if the . should not be allowed in regexp literals
+        regexdash   : true  // if unescaped first/last dash (-) inside brackets
+                            // should be tolerated
+      }
     },
 
     // These are the JSHint options that can take any value
@@ -268,8 +272,9 @@ var JSHINT = (function () {
     }
 
     if (valOptions[name] === undefined &&
-       (boolOptions[name] === undefined &&
+       (boolOptions.environments[name] === undefined &&
         boolOptions.enforcing[name] === undefined &&
+        boolOptions.obsolete[name] === undefined &&
         boolOptions.relaxing[name] === undefined  ) ) {
       if (t.type !== "jslint" && !removedOptions[name]) {
         error("E001", t, name);
