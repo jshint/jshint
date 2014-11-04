@@ -147,7 +147,7 @@ exports['combination of latedef and undef'] = function (test) {
   TestRun(test)
     .test(src, { es3: true, latedef: false, undef: false });
 
-  // If we warn on `latedef` but supress `undef` we only get the
+  // If we warn on `latedef` but suppress `undef` we only get the
   // late definition warnings.
   TestRun(test)
     .addError(5, "'func2' was used before it was defined.")
