@@ -186,6 +186,7 @@ exports.options = function (test) {
     "/*global xxx*/",
     "xxx = 2;",
     "/*jshint relaxing: true */",
+    "/*jshint toString: true */",
   ];
 
   var run = TestRun(test)
@@ -199,7 +200,8 @@ exports.options = function (test) {
     .addError(10, "Expected a small integer or 'false' and instead saw '0'.")
     .addError(13, "Bad option: 'd'.")
     .addError(15, "Read only.")
-    .addError(16, "Bad option: 'relaxing'.");
+    .addError(16, "Bad option: 'relaxing'.")
+    .addError(17, "Bad option: 'toString'.");
   run.test(code, {es3: true});
   run.test(code, {}); // es5
   run.test(code, {esnext: true});
