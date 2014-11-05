@@ -4293,12 +4293,23 @@ var JSHINT = (function () {
     }
 
     if (state.tokens.next.type === "(string)") {
+      // ModuleSpecifier :: StringLiteral
       advance("(string)");
       return this;
     }
+
     if (state.tokens.next.identifier) {
+      // ImportClause :: ImportedDefaultBinding
       this.name = identifier();
       addlabel(this.name, { type: "unused", token: state.tokens.curr });
+    } else if (state.tokens.next.id === "*") {
+      // ImportClause :: NameSpaceImport
+      advance("*");
+      advance("as");
+      if (state.tokens.next.identifier) {
+        this.name = identifier();
+        addlabel(this.name, { type: "unused", token: state.tokens.curr });
+      }
     } else {
       advance("{");
       for (;;) {
@@ -4331,6 +4342,7 @@ var JSHINT = (function () {
       }
     }
 
+    // FromClause
     advance("from");
     advance("(string)");
     return this;
