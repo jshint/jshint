@@ -2203,7 +2203,8 @@ var JSHINT = (function () {
   reservevar("Infinity");
   reservevar("null");
   reservevar("this", function (x) {
-    if (state.directive["use strict"] && !state.option.validthis && ((funct["(statement)"] &&
+    if (state.directive["use strict"] && !isMethod() &&
+        !state.option.validthis && ((funct["(statement)"] &&
         funct["(name)"].charAt(0) > "Z") || funct["(global)"])) {
       warning("W040", x);
     }
@@ -2786,6 +2787,12 @@ var JSHINT = (function () {
   });
 
 
+  function isMethod() {
+    return funct["(statement)"] && funct["(statement)"].type === "class" ||
+           funct["(context)"] && funct["(context)"]["(verb)"] === "class";
+  }
+
+
   function isPropertyName(token) {
     return token.identifier || token.id === "(string)" || token.id === "(number)";
   }
@@ -2813,6 +2820,9 @@ var JSHINT = (function () {
           advance();
         }
       }
+    } else if (typeof id === "object") {
+      if (id.id === "(string)" || id.id === "(identifier)") id = id.value;
+      else if (id.id === "(number)") id = id.value.toString();
     }
 
     if (id === "hasOwnProperty") {
@@ -3650,7 +3660,7 @@ var JSHINT = (function () {
         error("E049", name, "class method", "prototype");
       }
 
-      doFunction(name, c, false, null);
+      doFunction(!computed && propertyName(name), c, false, null);
     }
   }
 
