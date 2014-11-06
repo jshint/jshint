@@ -675,6 +675,9 @@ Lexer.prototype = {
     var length = this.input.length;
     var char = this.peek(index);
     var bad;
+    var isAllowedDigit = isDecimalDigit;
+    var base = 10;
+    var isLegacy = false;
 
     function isDecimalDigit(str) {
       return (/^[0-9]$/).test(str);
@@ -682,6 +685,10 @@ Lexer.prototype = {
 
     function isOctalDigit(str) {
       return (/^[0-7]$/).test(str);
+    }
+
+    function isBinaryDigit(str) {
+      return (/^[01]$/).test(str);
     }
 
     function isHexDigit(str) {
@@ -707,81 +714,64 @@ Lexer.prototype = {
       if (value === "0") {
         // Base-16 numbers.
         if (char === "x" || char === "X") {
+          isAllowedDigit = isHexDigit;
+          base = 16;
+
           index += 1;
           value += char;
-
-          while (index < length) {
-            char = this.peek(index);
-            if (!isHexDigit(char)) {
-              break;
-            }
-            value += char;
-            index += 1;
-          }
-
-          if (value.length <= 2) { // 0x
-            return {
-              type: Token.NumericLiteral,
-              value: value,
-              isMalformed: true
-            };
-          }
-
-          if (index < length) {
-            char = this.peek(index);
-            if (isIdentifierStart(char)) {
-              return null;
-            }
-          }
-
-          return {
-            type: Token.NumericLiteral,
-            value: value,
-            base: 16,
-            isMalformed: false
-          };
         }
 
         // Base-8 numbers.
-        if (isOctalDigit(char)) {
+        if (char === "o" || char === "O") {
+          isAllowedDigit = isOctalDigit;
+          base = 8;
+
+          if (!state.option.esnext) {
+            this.trigger("warning", {
+              code: "W119",
+              line: this.line,
+              character: this.char,
+              data: [ "Octal integer literal" ]
+            });
+          }
+
           index += 1;
           value += char;
+        }
+
+        // Base-2 numbers.
+        if (char === "b" || char === "B") {
+          isAllowedDigit = isBinaryDigit;
+          base = 2;
+
+          if (!state.option.esnext) {
+            this.trigger("warning", {
+              code: "W119",
+              line: this.line,
+              character: this.char,
+              data: [ "Binary integer literal" ]
+            });
+          }
+
+          index += 1;
+          value += char;
+        }
+
+        // Legacy base-8 numbers.
+        if (isOctalDigit(char)) {
+          isAllowedDigit = isOctalDigit;
+          base = 8;
+          isLegacy = true;
           bad = false;
 
-          while (index < length) {
-            char = this.peek(index);
-
-            // Numbers like '019' (note the 9) are not valid octals
-            // but we still parse them and mark as malformed.
-
-            if (isDecimalDigit(char)) {
-              bad = true;
-            } else if (!isOctalDigit(char)) {
-              break;
-            }
-            value += char;
-            index += 1;
-          }
-
-          if (index < length) {
-            char = this.peek(index);
-            if (isIdentifierStart(char)) {
-              return null;
-            }
-          }
-
-          return {
-            type: Token.NumericLiteral,
-            value: value,
-            base: 8,
-            isMalformed: false
-          };
+          index += 1;
+          value += char;
         }
 
         // Decimal numbers that start with '0' such as '09' are illegal
         // but we still parse them and return as malformed.
 
-        if (isDecimalDigit(char)) {
+        if (!isOctalDigit(char) && isDecimalDigit(char)) {
           index += 1;
           value += char;
         }
@@ -789,11 +779,41 @@ Lexer.prototype = {
 
       while (index < length) {
         char = this.peek(index);
-        if (!isDecimalDigit(char)) {
+
+        if (isLegacy && isDecimalDigit(char)) {
+          // Numbers like '019' (note the 9) are not valid octals
+          // but we still parse them and mark as malformed.
+          bad = true;
+        } else if (!isAllowedDigit(char)) {
           break;
         }
         value += char;
         index += 1;
+      }
+
+      if (isAllowedDigit !== isDecimalDigit) {
+        if (!isLegacy && value.length <= 2) { // 0x
+          return {
+            type: Token.NumericLiteral,
+            value: value,
+            isMalformed: true
+          };
+        }
+
+        if (index < length) {
+          char = this.peek(index);
+          if (isIdentifierStart(char)) {
+            return null;
+          }
+        }
+
+        return {
+          type: Token.NumericLiteral,
+          value: value,
+          base: base,
+          isLegacy: isLegacy,
+          isMalformed: false
+        };
       }
     }
 
@@ -853,7 +873,7 @@ Lexer.prototype = {
     return {
       type: Token.NumericLiteral,
       value: value,
-      base: 10,
+      base: base,
       isMalformed: !isFinite(value)
     };
   },
@@ -1662,7 +1682,7 @@ Lexer.prototype = {
           line: this.line,
           character: this.char
         }, checks, function () {
-          return state.directive["use strict"] && token.base === 8;
+          return state.directive["use strict"] && token.base === 8 && token.isLegacy;
         });
 
         this.trigger("Number", {
