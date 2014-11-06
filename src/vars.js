@@ -385,6 +385,10 @@ exports.nonstandard = {
 
 // Globals provided by popular JavaScript environments.
 
+exports.angular = {
+  "angular" : false
+};
+
 exports.couch = {
   "require" : false,
   respond   : false,

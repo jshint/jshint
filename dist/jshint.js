@@ -137,6 +137,7 @@ var JSHINT = (function () {
       },
 
       // Third party globals
+      angular     : true, // if angular.js globals should be predefined
       mootools    : true, // if MooTools globals should be predefined
       couch       : true, // if CouchDB globals should be predefined
       jasmine     : true, // Jasmine functions should be predefined
@@ -454,6 +455,10 @@ var JSHINT = (function () {
 
     if (state.option.mocha) {
       combine(predefined, vars.mocha);
+    }
+
+    if (state.option.angular) {
+      combine(predefined, vars.angular);
     }
 
     // Let's assume that chronologically ES3 < ES5 < ES6/ESNext < Moz
@@ -10674,6 +10679,10 @@ exports.nonstandard = {
 };
 
 // Globals provided by popular JavaScript environments.
+
+exports.angular = {
+  "angular" : false
+};
 
 exports.couch = {
   "require" : false,
