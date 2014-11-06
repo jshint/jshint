@@ -1,6 +1,6 @@
 #!/usr/bin/env rhino
 var window = {};
-/*! 2.5.8 */
+/*! 2.5.9 */
 var JSHINT;
 if (typeof window === 'undefined') window = {};
 (function () {
@@ -106,6 +106,8 @@ var JSHINT = (function () {
         nonew       : true, // if using `new` for side-effects should be disallowed
         // disallowed
         undef       : true, // if variables should be declared before used
+        singleGroups: false,// if grouping operators for single-expression statements
+        // should be disallowed
         enforceall : false // option to turn on all enforce options
         // by default and all relax options off by default
       },
@@ -1019,7 +1021,8 @@ var JSHINT = (function () {
   // They are elements of the parsing method called Top Down Operator Precedence.
 
   function expression(rbp, initial) {
-    var left, isArray = false, isObject = false, isLetExpr = false;
+    var left, isArray = false, isObject = false, isLetExpr = false,
+      isFatArrowBody = state.tokens.curr.value === "=>";
 
     // if current expression is a let expression
     if (!initial && state.tokens.next.value === "let" && peek(0).value === "(") {
@@ -1109,6 +1112,12 @@ var JSHINT = (function () {
     if (isLetExpr) {
       funct["(blockscope)"].unstack();
     }
+
+    if (state.option.singleGroups && left && left.paren && !left.exprs &&
+      !isFatArrowBody && !left.triggerFnExpr) {
+      warning("W126");
+    }
+
     return left;
   }
 
@@ -1815,6 +1824,8 @@ var JSHINT = (function () {
           // string -> ( is not a valid production
           warning("W033", state.tokens.next);
         }
+      } else if (p.id === "." || p.id === "[") {
+        return;
       } else if (p.id !== ";") {
         warning("W033", p);
       }
@@ -2585,7 +2596,7 @@ var JSHINT = (function () {
   prefix("(", function () {
     var bracket, brackets = [];
     var pn, pn1, i = 0;
-    var ret;
+    var ret, triggerFnExpr;
     var parens = 1;
 
     do {
@@ -2603,7 +2614,7 @@ var JSHINT = (function () {
              pn1.value !== "=>" && pn1.value !== ";" && pn1.type !== "(end)");
 
     if (state.tokens.next.id === "function") {
-      state.tokens.next.immed = true;
+      triggerFnExpr = state.tokens.next.immed = true;
     }
 
     var exprs = [];
@@ -2649,6 +2660,7 @@ var JSHINT = (function () {
     }
     if (ret) {
       ret.paren = true;
+      ret.triggerFnExpr = triggerFnExpr;
     }
     return ret;
   });
@@ -2782,8 +2794,20 @@ var JSHINT = (function () {
   });
 
 
-  function propertyName(preserve) {
-    var id = optionalidentifier(false, true, preserve);
+  function isPropertyName(token) {
+    return token.identifier || token.id === "(string)" || token.id === "(number)";
+  }
+
+
+  function propertyName(preserveOrToken) {
+    var id;
+    var preserve = true;
+    if (typeof preserveOrToken === "object") {
+      id = preserveOrToken;
+    } else {
+      preserve = preserveOrToken;
+      id = optionalidentifier(false, true, preserve);
+    }
 
     if (!id) {
       if (state.tokens.next.id === "(string)") {
@@ -3004,7 +3028,8 @@ var JSHINT = (function () {
 
     block(false, true, true, fatarrowparams ? true : false);
 
-    if (!state.option.noyield && generator && funct["(generator)"] !== "yielded") {
+    if (!state.option.noyield && generator &&
+        funct["(generator)"] !== "yielded") {
       warning("W124", state.tokens.curr);
     }
 
@@ -3102,52 +3127,9 @@ var JSHINT = (function () {
 
 
   (function (x) {
-    x.nud = function (isclassdef) {
-      var b, f, i, p, t, g, nextVal, propDesc;
+    x.nud = function () {
+      var b, f, i, p, t, g, nextVal;
       var props = {}; // All properties, including accessors
-      var tag = "";
-
-      function saveProperty(name, tkn) {
-
-        if (tkn.identifier) {
-          name = tkn.value;
-        }
-
-        if (props[name] && _.has(props, name)) {
-          warning("W075", state.tokens.next, i);
-        } else {
-          props[name] = {};
-        }
-
-        props[name].basic = true;
-        props[name].basictkn = tkn;
-      }
-
-      function saveSetter(name, tkn) {
-        if (props[name] && _.has(props, name)) {
-          if (props[name].basic || props[name].setter) {
-            warning("W075", state.tokens.next, i);
-          }
-        } else {
-          props[name] = {};
-        }
-
-        props[name].setter = true;
-        props[name].setterToken = tkn;
-      }
-
-      function saveGetter(name) {
-        if (props[name] && _.has(props, name)) {
-          if (props[name].basic || props[name].getter) {
-            warning("W075", state.tokens.next, i);
-          }
-        } else {
-          props[name] = {};
-        }
-
-        props[name].getter = true;
-        props[name].getterToken = state.tokens.curr;
-      }
 
       b = state.tokens.curr.line !== state.tokens.next.line;
       if (b) {
@@ -3162,16 +3144,11 @@ var JSHINT = (function () {
           break;
         }
 
-        if (isclassdef && state.tokens.next.value === "static") {
-          advance("static");
-          tag = "static ";
-        }
-
         nextVal = state.tokens.next.value;
         if (peek().id !== ":" && (nextVal === "get" || nextVal === "set")) {
           advance(nextVal);
 
-          if (!state.option.inES5(!isclassdef)) {
+          if (!state.option.inES5()) {
             error("E034");
           }
 
@@ -3184,24 +3161,13 @@ var JSHINT = (function () {
             error("E035");
           }
 
-          // It is a Syntax Error if PropName of MethodDefinition is
-          // "constructor" and SpecialMethod of MethodDefinition is true.
-          if (isclassdef && i === "constructor") {
-            if (nextVal === "get") {
-              propDesc = "class getter method";
-            } else {
-              propDesc = "class setter method";
-            }
-            error("E049", state.tokens.next, propDesc, i);
-          }
-
           // We don't want to save this getter unless it's an actual getter
           // and not an ES6 concise method
           if (i) {
             if (nextVal === "get") {
-              saveGetter(tag + i);
+              saveGetter(props, i);
             } else {
-              saveSetter(tag + i, state.tokens.next);
+              saveSetter(props, i, state.tokens.next);
             }
           }
 
@@ -3224,28 +3190,21 @@ var JSHINT = (function () {
             advance("*");
             g = true;
           }
-          if (!isclassdef &&
-              state.tokens.next.identifier &&
+          if (state.tokens.next.identifier &&
               (peekIgnoreEOL().id === "," || peekIgnoreEOL().id === "}")) {
             if (!state.option.inESNext()) {
               warning("W104", state.tokens.next, "object short notation");
             }
             i = propertyName(true);
-            saveProperty(tag + i, state.tokens.next);
+            saveProperty(props, i, state.tokens.next);
 
             expression(10);
           } else {
             if (state.tokens.next.id === "[") {
-              // ComputedPropertyName
-              advance();
-              if (!state.option.esnext) {
-                warning("W119", state.tokens.curr, "computed property names");
-              }
-              i = expression(10);
-              advance("]");
+              i = computedPropertyName();
             } else {
               i = propertyName();
-              saveProperty(tag + i, state.tokens.next);
+              saveProperty(props, i, state.tokens.next);
 
               if (typeof i !== "string") {
                 break;
@@ -3257,22 +3216,15 @@ var JSHINT = (function () {
                 warning("W104", state.tokens.curr, "concise methods");
               }
               doFunction(i, undefined, g);
-            } else if (!isclassdef) {
+            } else {
               advance(":");
               expression(10);
             }
           }
         }
-        // It is a Syntax Error if PropName of MethodDefinition is "prototype".
-        if (isclassdef && i === "prototype") {
-          error("E049", state.tokens.next, "class method", i);
-        }
 
         countMember(i);
-        if (isclassdef) {
-          tag = "";
-          continue;
-        }
+
         if (state.tokens.next.id === ",") {
           comma({ allowTrailing: true, property: true });
           if (state.tokens.next.id === ",") {
@@ -3625,8 +3577,89 @@ var JSHINT = (function () {
     state.directive["use strict"] = true;
     advance("{");
     // ClassBody(opt)
-    c.body = state.syntax["{"].nud(true);
+    c.body = classbody(c);
+    advance("}");
     state.directive["use strict"] = strictness;
+  }
+
+  function classbody(c) {
+    var name;
+    var isStatic;
+    var getset;
+    var props = {};
+    var staticProps = {};
+    var computed;
+    for (var i = 0; state.tokens.next.id !== "}"; ++i) {
+      name = state.tokens.next;
+      isStatic = false;
+      getset = null;
+      if (name.id === "[") {
+        name = computedPropertyName();
+      } else if (isPropertyName(name)) {
+        // Non-Computed PropertyName
+        advance();
+        computed = false;
+        if (name.identifier && name.value === "static") {
+          if (isPropertyName(state.tokens.next) || state.tokens.next.id === "[") {
+            computed = state.tokens.next.id === "[";
+            isStatic = true;
+            name = state.tokens.next;
+            if (state.tokens.next.id === "[") {
+              name = computedPropertyName();
+            } else advance();
+          }
+        }
+
+        if (name.identifier && (name.value === "get" || name.value === "set")) {
+          if (isPropertyName(state.tokens.next) || state.tokens.next.id === "[") {
+            computed = state.tokens.next.id === "[";
+            getset = name;
+            name = state.tokens.next;
+            if (state.tokens.next.id === "[") {
+              name = computedPropertyName();
+            } else advance();
+          }
+        }
+      } else {
+        warning("W052", state.tokens.next, state.tokens.next.value || state.tokens.next.type);
+        advance();
+        continue;
+      }
+
+      if (!checkPunctuators(state.tokens.next, ["("])) {
+        // error --- class properties must be methods
+        error("E054", state.tokens.next, state.tokens.next.value);
+        while (state.tokens.next.id !== "}" &&
+               !checkPunctuators(state.tokens.next, ["("])) {
+          advance();
+        }
+        if (state.tokens.next.value !== "(") {
+          doFunction(undefined, c, false, null);
+        }
+      }
+
+      if (!computed) {
+        // We don't know how to determine if we have duplicate computed property names :(
+        if (getset) {
+          if (getset.value === "get") {
+            saveGetter(isStatic ? staticProps : props, name.value, true, isStatic);
+          } else {
+            saveSetter(isStatic ? staticProps : props, name.value, name, true, isStatic);
+          }
+        } else {
+          saveProperty(isStatic ? staticProps : props, name.value, name, true, isStatic);
+        }
+      }
+
+      if (getset && name.value === "constructor") {
+        var propDesc = getset.value === "get" ? "class getter method" : "class setter method";
+        error("E049", name, propDesc, "constructor");
+      } else if (name.value === "prototype") {
+        error("E049", name, "class method", "prototype");
+      }
+
+      doFunction(name, c, false, null);
+    }
   }
 
   blockstmt("function", function () {
@@ -4224,8 +4257,17 @@ var JSHINT = (function () {
       warning("W104", state.tokens.curr, "yield");
     }
     funct["(generator)"] = "yielded";
+    var delegatingYield = false;
+
+    if (state.tokens.next.value === "*") {
+      delegatingYield = true;
+      advance("*");
+    }
+
     if (this.line === state.tokens.next.line || !state.option.inMoz(true)) {
-      if (state.tokens.next.id !== ";" && !state.tokens.next.reach && state.tokens.next.nud) {
+      if (delegatingYield ||
+          (state.tokens.next.id !== ";" && !state.tokens.next.reach && state.tokens.next.nud)) {
+
         nobreaknonadjacent(state.tokens.curr, state.tokens.next);
         this.first = expression(10);
 
@@ -4259,12 +4301,23 @@ var JSHINT = (function () {
     }
 
     if (state.tokens.next.type === "(string)") {
+      // ModuleSpecifier :: StringLiteral
       advance("(string)");
       return this;
     }
+
     if (state.tokens.next.identifier) {
+      // ImportClause :: ImportedDefaultBinding
       this.name = identifier();
       addlabel(this.name, { type: "unused", token: state.tokens.curr });
+    } else if (state.tokens.next.id === "*") {
+      // ImportClause :: NameSpaceImport
+      advance("*");
+      advance("as");
+      if (state.tokens.next.identifier) {
+        this.name = identifier();
+        addlabel(this.name, { type: "unused", token: state.tokens.curr });
+      }
     } else {
       advance("{");
       for (;;) {
@@ -4297,6 +4350,7 @@ var JSHINT = (function () {
       }
     }
 
+    // FromClause
     advance("from");
     advance("(string)");
     return this;
@@ -4418,7 +4472,7 @@ var JSHINT = (function () {
   FutureReservedWord("transient");
   FutureReservedWord("volatile");
 
-  // this function is used to determine wether a squarebracket or a curlybracket
+  // this function is used to determine whether a squarebracket or a curlybracket
   // expression is a comprehension array, destructuring assignment or a json value.
 
   var lookupBlockType = function () {
@@ -4459,6 +4513,63 @@ var JSHINT = (function () {
     } while (bracketStack > 0 && pn.id !== "(end)" && i < 15);
     return ret;
   };
+
+  function saveProperty(props, name, tkn, isClass, isStatic) {
+    var msg = ["key", "class method", "static class method"];
+    msg = msg[(isClass || false) + (isStatic || false)];
+    if (tkn.identifier) {
+      name = tkn.value;
+    }
+
+    if (props[name] && _.has(props, name)) {
+      warning("W075", state.tokens.next, msg, name);
+    } else {
+      props[name] = {};
+    }
+
+    props[name].basic = true;
+    props[name].basictkn = tkn;
+  }
+
+  function saveSetter(props, name, tkn, isClass, isStatic) {
+    var msg = ["key", "setter method", "static setter method"];
+    msg = msg[(isClass || false) + (isStatic || false)];
+    if (props[name] && _.has(props, name)) {
+      if (props[name].basic || props[name].setter) {
+        warning("W075", state.tokens.next, msg, name);
+      }
+    } else {
+      props[name] = {};
+    }
+
+    props[name].setter = true;
+    props[name].setterToken = tkn;
+  }
+
+  function saveGetter(props, name, isClass, isStatic) {
+    var msg = ["key", "getter method", "static getter method"];
+    msg = msg[(isClass || false) + (isStatic || false)];
+    if (props[name] && _.has(props, name)) {
+      if (props[name].basic || props[name].getter) {
+        warning("W075", state.tokens.next, msg, name);
+      }
+    } else {
+      props[name] = {};
+    }
+
+    props[name].getter = true;
+    props[name].getterToken = state.tokens.curr;
+  }
+
+  function computedPropertyName() {
+    advance("[");
+    if (!state.option.esnext) {
+      warning("W119", state.tokens.curr, "computed property names");
+    }
+    var value = expression(10);
+    advance("]");
+    return value;
+  }
 
   // Test whether a given token is a punctuator matching one of the specified values
   function checkPunctuators(token, values) {
@@ -9913,7 +10024,8 @@ var errors = {
   E050: "Mozilla requires the yield expression to be parenthesized here.",
   E051: "Regular parameters cannot come after default parameters.",
   E052: "Unclosed template literal.",
-  E053: "Export declaration must be in global scope."
+  E053: "Export declaration must be in global scope.",
+  E054: "Class properties must be methods. Expected '(' but instead saw '{a}'."
 };
 
 var warnings = {
@@ -9992,7 +10104,7 @@ var warnings = {
   W072: "This function has too many parameters. ({a})",
   W073: "Blocks are nested too deeply. ({a})",
   W074: "This function's cyclomatic complexity is too high. ({a})",
-  W075: "Duplicate key '{a}'.",
+  W075: "Duplicate {a} '{b}'.",
   W076: "Unexpected parameter '{a}' in get {b} function.",
   W077: "Expected a single parameter in set {a} function.",
   W078: "Setter is defined without getter.",
@@ -10043,7 +10155,8 @@ var warnings = {
   W122: "Invalid typeof value '{a}'",
   W123: "'{a}' is already defined in outer scope.",
   W124: "A generator function shall contain a yield statement.",
-  W125: "This line contains non-breaking spaces: http://jshint.com/doc/options/#nonbsp"
+  W125: "This line contains non-breaking spaces: http://jshint.com/doc/options/#nonbsp",
+  W126: "Grouping operator is unnecessary for lone expressions."
 };
 
 var info = {
