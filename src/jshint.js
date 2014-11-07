@@ -1987,7 +1987,7 @@ var JSHINT = (function () {
     if (!ordinary || !state.option.funcscope) scope = s;
     inblock = b;
     if (ordinary && state.option.noempty && (!a || a.length === 0)) {
-      warning("W035");
+      warning("W035", state.tokens.prev);
     }
     metrics.nestedBlockDepth -= 1;
     return a;
