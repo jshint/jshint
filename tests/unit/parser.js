@@ -4587,6 +4587,36 @@ exports["/*jshint ignore */ should allow the linter to skip blocked-out lines to
   test.done();
 };
 
+exports["/*jshint ignore */ should ignore lines that appear to end with multiline comment endings (GH-1691)"] = function(test) {
+  var code = [
+    "/*jshint ignore: start*/",
+    "var a = {",
+    // The following line ends in a sequence of characters that, if parsed
+    // naively, could be interpreted as an "end multiline comment" token.
+    "  a: /\s*/",
+    "};",
+    "/*jshint ignore: end*/"
+  ];
+
+  TestRun(test)
+    .test(code);
+
+  test.done();
+};
+
+exports["/*jshint ignore */ should ignore lines that end with a multi-line comment (GH-1396)"] = function(test) {
+  var code = [
+    "/*jshint ignore:start */",
+    "var a; /* following comment */",
+    "/*jshint ignore:end */"
+  ];
+
+  TestRun(test)
+    .test(code, { unused: true });
+
+  test.done();
+};
+
 exports["/*jshint ignore */ should be detected even with leading and/or trailing whitespace"] = function (test) {
   var code = [
     "  /*jshint ignore:start */",     // leading whitespace
