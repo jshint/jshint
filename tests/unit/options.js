@@ -305,14 +305,20 @@ exports.curly = function (test) {
 
 /** Option `noempty` prohibits the use of empty blocks. */
 exports.noempty = function (test) {
-  var code = 'for (;;) {}';
+  var code = [
+    "for (;;) {}",
+    "if (true) {",
+    "}",
+    "foo();"
+  ];
 
   // By default, tolerate empty blocks since they are valid JavaScript
   TestRun(test).test(code, { es3: true });
 
   // Do not tolerate, when noempty is true
   TestRun(test)
-    .addError(1, 'Empty block.')
+    .addError(1, "Empty block.")
+    .addError(2, "Empty block.")
     .test(code, { es3: true, noempty: true });
 
   test.done();
