@@ -354,7 +354,7 @@ function extractOffsets(code, when) {
     // location information.
     inscript = true;
     var fragment = code.slice(index, parser.endIndex);
-    var n = fragment.match(/\n\r|\n|\r/g).length;
+    var n = (fragment.match(/\n\r|\n|\r/g) || []).length;
     lineCounter += n;
     startOffset = null;
   }
