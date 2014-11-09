@@ -339,59 +339,6 @@ exports.group = {
     test.done();
   },
 
-  testExtract: function (test) {
-    var html = "<html>text<script>var a = 1;</script></html>";
-    var text = "hello world";
-    var js   = "var a = 1;";
-
-    test.equal(cli.extract(html, "never"), html);
-    test.equal(cli.extract(html, "auto"), js);
-    test.equal(cli.extract(html, "always"), js);
-
-    test.equal(cli.extract(js, "never"), js);
-    test.equal(cli.extract(js, "auto"), js);
-    test.equal(cli.extract(js, "always"), '');
-
-    test.equal(cli.extract(text, "never"), text);
-    test.equal(cli.extract(text, "auto"), text);
-    test.equal(cli.extract(text, "always"), '');
-
-    html = [
-      "<html>",
-        "<script type='text/javascript'>",
-          "var a = 1;",
-        "</script>",
-        "<h1>Hello!</h1>",
-        "<script type='text/coffeescript'>",
-          "a = 1",
-        "</script>",
-        "<script>",
-          "var b = 1;",
-        "</script>",
-      "</html>" ].join("\n");
-
-    js = ["\n", "var a = 1;", "\n\n\n\n\n", "var b = 1;\n" ].join("\n");
-
-    test.equal(cli.extract(html, "auto"), js);
-    test.done();
-  },
-
-  testExtractWithIndent: function (test) {
-    var html = [
-      "<html>",
-        "<script type='text/javascript'>",
-        "  var a = 1;",
-        "    var b = 1;",
-        "</script>",
-      "</html>" ].join("\n");
-
-    // leading whitespace is removed by amount from first js line
-    var js = ["\n", "var a = 1;", "  var b = 1;\n"].join("\n");
-
-    test.equal(cli.extract(html, "auto"), js);
-    test.done();
-  },
-
   testExtensions: function (test) {
     var run = sinon.stub(cli, "run");
 
@@ -897,9 +844,74 @@ exports.group = {
     shjs.cat.restore();
 
     test.done();
+  }
+};
+
+exports.extract = {
+  setUp: function (cb) {
+    sinon.stub(cli, "exit");
+    cb();
   },
 
-  testExtractWithIndentReportLocation: function (test) {
+  tearDown: function (cb) {
+    cli.exit.restore();
+    cb();
+  },
+
+  basic: function (test) {
+    var html = "<html>text<script>var a = 1;</script></html>";
+    var text = "hello world";
+    var js   = "var a = 1;";
+
+    test.equal(cli.extract(html, "never"), html);
+    test.equal(cli.extract(html, "auto"), js);
+    test.equal(cli.extract(html, "always"), js);
+
+    test.equal(cli.extract(js, "never"), js);
+    test.equal(cli.extract(js, "auto"), js);
+    test.equal(cli.extract(js, "always"), "");
+
+    test.equal(cli.extract(text, "never"), text);
+    test.equal(cli.extract(text, "auto"), text);
+    test.equal(cli.extract(text, "always"), "");
+
+    html = [
+      "<html>",
+        "<script type='text/javascript'>",
+          "var a = 1;",
+        "</script>",
+        "<h1>Hello!</h1>",
+        "<script type='text/coffeescript'>",
+          "a = 1",
+        "</script>",
+        "<script>",
+          "var b = 1;",
+        "</script>",
+      "</html>" ].join("\n");
+
+    js = ["\n", "var a = 1;", "\n\n\n\n\n", "var b = 1;\n" ].join("\n");
+
+    test.equal(cli.extract(html, "auto"), js);
+    test.done();
+  },
+
+  withIndent: function (test) {
+    var html = [
+      "<html>",
+        "<script type='text/javascript'>",
+        "  var a = 1;",
+        "    var b = 1;",
+        "</script>",
+      "</html>" ].join("\n");
+
+    // leading whitespace is removed by amount from first js line
+    var js = ["\n", "var a = 1;", "  var b = 1;\n"].join("\n");
+
+    test.equal(cli.extract(html, "auto"), js);
+    test.done();
+  },
+
+  withIndentReportLocation: function (test) {
     var rep = require("../examples/reporter.js");
     var errors = [];
     sinon.stub(rep, "reporter", function (res) {
@@ -921,19 +933,18 @@ exports.group = {
 
     sinon.stub(shjs, "cat")
       .withArgs(sinon.match(/indent\.html$/)).returns(html)
-      .withArgs(sinon.match(/.\jshintignore$/)).returns("");
+      .withArgs(sinon.match(/\.jshintignore$/)).returns("")
+      .withArgs(sinon.match(/\.jshintrc$/)).returns("{}");
 
     sinon.stub(shjs, "test")
       .withArgs("-e", sinon.match(/indent\.html$/)).returns(true)
-      .withArgs("-e", sinon.match(/\.jshintignore$/)).returns(false);
-
-    cli.exit.restore();
-    sinon.stub(cli, "exit");
+      .withArgs("-e", sinon.match(/\.jshintignore$/)).returns(false)
+      .withArgs("-e", sinon.match(/\.jshintrc$/)).returns(true);
 
     cli.interpret([
       "node", "jshint", "indent.html", "--extract", "always", "--reporter=reporter.js"
     ]);
-    test.equal(cli.exit.args[0][0], 1);
+    test.equal(cli.exit.args[0][0], 2);
 
     rep.reporter.restore();
     process.cwd.restore();
@@ -950,7 +961,7 @@ exports.group = {
     test.done();
   },
 
-  testExtractWithIndentReportLocationMultipleFragments: function (test) {
+  withIndentReportLocationMultipleFragments: function (test) {
     var rep = require("../examples/reporter.js");
     var errors = [];
     sinon.stub(rep, "reporter", function (res) {
@@ -977,19 +988,18 @@ exports.group = {
 
     sinon.stub(shjs, "cat")
       .withArgs(sinon.match(/indent\.html$/)).returns(html)
-      .withArgs(sinon.match(/.\jshintignore$/)).returns("");
+      .withArgs(sinon.match(/\.jshintignore$/)).returns("")
+      .withArgs(sinon.match(/\.jshintrc$/)).returns("{}");
 
     sinon.stub(shjs, "test")
       .withArgs("-e", sinon.match(/indent\.html$/)).returns(true)
-      .withArgs("-e", sinon.match(/\.jshintignore$/)).returns(false);
-
-    cli.exit.restore();
-    sinon.stub(cli, "exit");
+      .withArgs("-e", sinon.match(/\.jshintignore$/)).returns(false)
+      .withArgs("-e", sinon.match(/\.jshintrc$/)).returns(true);
 
     cli.interpret([
       "node", "jshint", "indent.html", "--extract", "always", "--reporter=reporter.js"
     ]);
-    test.equal(cli.exit.args[0][0], 1);
+    test.equal(cli.exit.args[0][0], 2);
 
     rep.reporter.restore();
     process.cwd.restore();
@@ -1003,6 +1013,126 @@ exports.group = {
 
     test.equal(errors[1].error.line, 10, "second error line");
     test.equal(errors[1].error.character, 16, "second error column");
+
+    test.done();
+  },
+
+  firstLine: function (test) {
+    var rep = require("../examples/reporter.js");
+    var errors = [];
+    sinon.stub(rep, "reporter", function (res) {
+      errors = errors.concat(res);
+    });
+
+    var dir = __dirname + "/../examples/";
+    sinon.stub(process, "cwd").returns(dir);
+
+    var html = [
+      "<script>",
+      "  function a() {",
+      "    return 5;",
+      "  }",
+      "</script>"
+    ].join("\n");
+
+    sinon.stub(shjs, "cat")
+      .withArgs(sinon.match(/firstLine\.html$/)).returns(html)
+      .withArgs(sinon.match(/\.jshintignore$/)).returns("")
+      .withArgs(sinon.match(/\.jshintrc$/)).returns("{}");
+
+    sinon.stub(shjs, "test")
+      .withArgs("-e", sinon.match(/firstLine\.html$/)).returns(true)
+      .withArgs("-e", sinon.match(/\.jshintignore$/)).returns(false)
+      .withArgs("-e", sinon.match(/\.jshintrc$/)).returns(true);
+
+    cli.exit.restore();
+    sinon.stub(cli, "exit");
+
+    cli.interpret([
+      "node", "jshint", "firstLine.html", "--extract", "always", "--reporter=reporter.js"
+    ]);
+    test.equal(cli.exit.args[0][0], 0);
+
+    rep.reporter.restore();
+    process.cwd.restore();
+    shjs.cat.restore();
+    shjs.test.restore();
+
+    test.equal(errors.length, 0, "found no errors");
+
+    var js = [
+      "",
+      "function a() {",
+      "  return 5;",
+      "}",
+      ""
+    ].join("\n");
+
+    test.equal(cli.extract(html, "auto"), js);
+
+    test.done();
+  },
+
+  sameLine: function (test) {
+    var rep = require("../examples/reporter.js");
+    var errors = [];
+    sinon.stub(rep, "reporter", function (res) {
+      errors = errors.concat(res);
+    });
+
+    var dir = __dirname + "/../examples/";
+    sinon.stub(process, "cwd").returns(dir);
+
+    var html = [
+    "<script>",
+    "  function a() {",
+    "    return 5;",
+    "  }",
+    "</script><script>",
+    "  function b() {",
+    "    return 'hello world';",
+    "  }",
+    "</script>"
+    ].join("\n");
+
+    sinon.stub(shjs, "cat")
+      .withArgs(sinon.match(/sameLine\.html$/)).returns(html)
+      .withArgs(sinon.match(/.\jshintignore$/)).returns("")
+      .withArgs(sinon.match(/.\jshintrc$/)).returns("{}");
+
+    sinon.stub(shjs, "test")
+      .withArgs("-e", sinon.match(/sameLine\.html$/)).returns(true)
+      .withArgs("-e", sinon.match(/\.jshintignore$/)).returns(false)
+      .withArgs("-e", sinon.match(/\.jshintrc$/)).returns(true);
+
+    cli.exit.restore();
+    sinon.stub(cli, "exit");
+
+    cli.interpret([
+      "node", "jshint", "sameLine.html", "--extract", "always", "--reporter=reporter.js"
+    ]);
+    test.equal(cli.exit.args[0][0], 0);
+
+    rep.reporter.restore();
+    process.cwd.restore();
+    shjs.cat.restore();
+    shjs.test.restore();
+
+    test.equal(errors.length, 0, "found no errors");
+
+    var js = [
+      "",
+      "function a() {",
+      "  return 5;",
+      "}",
+      "",
+      "function b() {",
+      "  return 'hello world';",
+      "}",
+      ""
+    ].join("\n");
+
+    test.equal(cli.extract(html, "auto"), js);
 
     test.done();
   }
