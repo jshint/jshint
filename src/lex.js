@@ -399,6 +399,7 @@ Lexer.prototype = {
     var rest = this.input.substr(2);
     var startLine = this.line;
     var startChar = this.char;
+    var self = this;
 
     // Create a comment token object and make sure it
     // has all the data JSHint needs to work with special
@@ -453,6 +454,24 @@ Lexer.prototype = {
           commentType = "globals";
           break;
         default:
+          var options = body.split(":").map(function(v) {
+            return v.replace(/^\s+/, "").replace(/\s+$/, "");
+          });
+
+          if (options.length === 2) {
+            switch (options[0]) {
+            case "ignore":
+              switch (options[1]) {
+              case "start":
+                self.ignoringLinterErrors = true;
+                break;
+              case "end":
+                self.ignoringLinterErrors = false;
+                break;
+              }
+            }
+          }
+
           commentType = str;
         }
       });
@@ -1506,7 +1525,7 @@ Lexer.prototype = {
 
     // If we are ignoring linter errors, replace the input with empty string
     // if it doesn't already at least start or end a multi-line comment
-    if (state.ignoreLinterErrors === true) {
+    if (this.ignoringLinterErrors === true) {
       if (!startsWith("/*", "//") && !(this.inComment && endsWith("*/"))) {
         this.input = "";
       }
