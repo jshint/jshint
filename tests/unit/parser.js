@@ -6652,6 +6652,21 @@ exports.trailingCommaInArrayBindingPatternParameters = function (test) {
   test.done();
 };
 
+exports.testGH1879 = function (test) {
+  var code = [
+    "function Foo() {",
+    "  return;",
+    "  // jshint ignore:start",
+    "  return [];",
+    "  // jshint ignore:end",
+    "}"
+  ];
+
+  TestRun(test)
+    .test(code);
+
+  test.done();
+};
 
 exports.commaAfterRestElementInArrayBindingPattern = function (test) {
   var code = [
