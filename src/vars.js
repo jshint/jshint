@@ -145,6 +145,7 @@ exports.browser = {
   HTMLVideoElement     : false,
   history              : false,
   Image                : false,
+  Intl                 : false,
   length               : false,
   localStorage         : false,
   location             : false,
