@@ -36,101 +36,105 @@ exports.group = {
     cb();
   },
 
-  testConfig: function (test) {
-    var _cli = require("cli");
-    var out = this.sinon.stub(_cli, "error");
-    this.sinon.stub(cli, "run").returns(true);
+  config: {
+    setUp: function (done) {
+      this.sinon.stub(shjs, "cat")
+        .withArgs(sinon.match(/file\.js$/)).returns("var a = function () {}; a();")
+        .withArgs(sinon.match(/file1\.json$/)).returns("wat")
+        .withArgs(sinon.match(/file2\.json$/)).returns("{\"node\":true,\"globals\":{\"foo\":true,\"bar\":true}}")
+        .withArgs(sinon.match(/file4\.json$/)).returns("{\"extends\":\"file3.json\"}")
+        .withArgs(sinon.match(/file5\.json$/)).returns("{\"extends\":\"file2.json\"}")
+        .withArgs(sinon.match(/file6\.json$/)).returns("{\"extends\":\"file2.json\",\"node\":false}")
+        .withArgs(sinon.match(/file7\.json$/)).returns("{\"extends\":\"file2.json\",\"globals\":{\"bar\":false,\"baz\":true}}");
 
-    this.sinon.stub(shjs, "cat")
-      .withArgs(sinon.match(/file\.js$/)).returns("var a = function () {}; a();")
-      .withArgs(sinon.match(/file1\.json$/)).returns("wat")
-      .withArgs(sinon.match(/file2\.json$/)).returns("{\"node\":true,\"globals\":{\"foo\":true,\"bar\":true}}")
-      .withArgs(sinon.match(/file4\.json$/)).returns("{\"extends\":\"file3.json\"}")
-      .withArgs(sinon.match(/file5\.json$/)).returns("{\"extends\":\"file2.json\"}")
-      .withArgs(sinon.match(/file6\.json$/)).returns("{\"extends\":\"file2.json\",\"node\":false}")
-      .withArgs(sinon.match(/file7\.json$/)).returns("{\"extends\":\"file2.json\",\"globals\":{\"bar\":false,\"baz\":true}}");
+      this.sinon.stub(shjs, "test")
+        .withArgs("-e", sinon.match(/file\.js$/)).returns(true)
+        .withArgs("-e", sinon.match(/file1\.json$/)).returns(true)
+        .withArgs("-e", sinon.match(/file2\.json$/)).returns(true)
+        .withArgs("-e", sinon.match(/file3\.json$/)).returns(false)
+        .withArgs("-e", sinon.match(/file4\.json$/)).returns(true)
+        .withArgs("-e", sinon.match(/file5\.json$/)).returns(true)
+        .withArgs("-e", sinon.match(/file6\.json$/)).returns(true);
 
-    this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/file\.js$/)).returns(true)
-      .withArgs("-e", sinon.match(/file1\.json$/)).returns(true)
-      .withArgs("-e", sinon.match(/file2\.json$/)).returns(true)
-      .withArgs("-e", sinon.match(/file3\.json$/)).returns(false)
-      .withArgs("-e", sinon.match(/file4\.json$/)).returns(true)
-      .withArgs("-e", sinon.match(/file5\.json$/)).returns(true)
-      .withArgs("-e", sinon.match(/file6\.json$/)).returns(true);
+      var _cli = require("cli");
+      this.out = this.sinon.stub(_cli, "error");
 
-    cli.exit.restore();
-    this.sinon.stub(cli, "exit").throws("ProcessExit");
+      done();
+    },
 
-    // File doesn't exist.
-    try {
+    normal: function (test) {
+      this.sinon.stub(cli, "run").returns(true);
+
+      // Merges existing valid files
       cli.interpret([
-        "node", "jshint", "file.js", "--config", "file3.json"
+        "node", "jshint", "file.js", "--config", "file5.json"
       ]);
-    } catch (err) {
-      var msg = out.args[0][0];
-      test.equal(msg.slice(0, 23), "Can't find config file:");
-      test.equal(msg.slice(msg.length - 10), "file3.json");
-      test.equal(err, "ProcessExit");
-    }
+      test.equal(cli.run.lastCall.args[0].config.node, true);
+      test.equal(cli.run.lastCall.args[0].config['extends'], void 0);
 
-    // Invalid config
-    try {
+      // Overwrites options after extending
       cli.interpret([
-        "node", "jshint", "file.js", "--config", "file1.json"
+        "node", "jshint", "file.js", "--config", "file6.json"
       ]);
-    } catch (err) {
-      var msg = out.args[1][0];
-      test.equal(msg.slice(0, 24), "Can't parse config file:");
-      test.equal(msg.slice(msg.length - 10), "file1.json");
-      test.equal(err, "ProcessExit");
-    }
+      test.equal(cli.run.lastCall.args[0].config.node, false);
 
-    // Invalid merged filed
-    try {
+      // Valid config
       cli.interpret([
-        "node", "jshint", "file.js", "--config", "file4.json"
+        "node", "jshint", "file.js", "--config", "file2.json"
       ]);
-    } catch (err) {
-      var msg = out.args[2][0];
-      test.equal(msg.slice(0, 23), "Can't find config file:");
-      test.equal(msg.slice(msg.length - 10), "file3.json");
-      test.equal(err, "ProcessExit");
+
+      // Performs a deep merge of "globals" configuration
+      cli.interpret([
+        "node", "jshint", "file2.js", "--config", "file7.json"
+      ]);
+      test.deepEqual(cli.run.lastCall.args[0].config.globals, { foo: true, bar: false, baz: true });
+
+      test.done();
+    },
+
+    failure: function (test) {
+      var out = this.out;
+      cli.exit.throws("ProcessExit");
+
+      // File doesn't exist.
+      try {
+        cli.interpret([
+          "node", "jshint", "file.js", "--config", "file3.json"
+        ]);
+      } catch (err) {
+        var msg = out.args[0][0];
+        test.equal(msg.slice(0, 23), "Can't find config file:");
+        test.equal(msg.slice(msg.length - 10), "file3.json");
+        test.equal(err, "ProcessExit");
+      }
+
+      // Invalid config
+      try {
+        cli.interpret([
+          "node", "jshint", "file.js", "--config", "file1.json"
+        ]);
+      } catch (err) {
+        var msg = out.args[1][0];
+        test.equal(msg.slice(0, 24), "Can't parse config file:");
+        test.equal(msg.slice(msg.length - 10), "file1.json");
+        test.equal(err, "ProcessExit");
+      }
+
+      // Invalid merged filed
+      try {
+        cli.interpret([
+          "node", "jshint", "file.js", "--config", "file4.json"
+        ]);
+      } catch (err) {
+        var msg = out.args[2][0];
+        test.equal(msg.slice(0, 23), "Can't find config file:");
+        test.equal(msg.slice(msg.length - 10), "file3.json");
+        test.equal(err, "ProcessExit");
+      }
+
+
+      test.done();
     }
-
-    cli.exit.restore();
-    this.sinon.stub(cli, "exit");
-
-    // Merges existing valid files
-    cli.interpret([
-      "node", "jshint", "file.js", "--config", "file5.json"
-    ]);
-    test.equal(cli.run.lastCall.args[0].config.node, true);
-    test.equal(cli.run.lastCall.args[0].config['extends'], void 0);
-
-    // Overwrites options after extending
-    cli.interpret([
-      "node", "jshint", "file.js", "--config", "file6.json"
-    ]);
-    test.equal(cli.run.lastCall.args[0].config.node, false);
-
-    // Valid config
-    cli.interpret([
-      "node", "jshint", "file.js", "--config", "file2.json"
-    ]);
-
-    // Performs a deep merge of "globals" configuration
-    cli.interpret([
-      "node", "jshint", "file2.js", "--config", "file7.json"
-    ]);
-    test.deepEqual(cli.run.lastCall.args[0].config.globals, { foo: true, bar: false, baz: true });
-
-    _cli.error.restore();
-    cli.run.restore();
-    shjs.cat.restore();
-    shjs.test.restore();
-
-    test.done();
   },
 
   testPrereq: function (test) {
