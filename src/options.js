@@ -81,7 +81,12 @@ exports.bool = {
      */
     es3         : true,
 
-    es5         : true, // if ES5 syntax should be allowed (is now set per default)
+    /**
+     * This option enables syntax first defined in [the ECMAScript 5.1
+     * specification](http://es5.github.io/). This includes allowing reserved
+     * keywords as object properties.
+     */
+    es5         : true,
 
     /**
      * This option requires all `for in` loops to filter object's items. The
@@ -172,7 +177,12 @@ exports.bool = {
      */
     noarg       : true,
 
-    nocomma     : true, // if comma operator should be disallowed
+    /**
+     * This option prohibits the use of the comma operator. When misused, the
+     * comma operator can obscure the value of a statement and promote
+     * incorrect code.
+     */
+    nocomma     : true,
 
     /**
      * This option warns when you have an empty block in your code. JSLint was
@@ -218,10 +228,22 @@ exports.bool = {
      */
     undef       : true,
 
-    singleGroups: false,// if grouping operators for single-expression statements
-    // should be disallowed
-    enforceall : false // option to turn on all enforce options
-    // by default and all relax options off by default
+    /**
+     * This option prohibits the use of the grouping operator for
+     * single-expression statements. This unecessary usage commonly reflects
+     * a misunderstanding of unary operators, for example:
+     *
+     *     // jshint singleGroups: true
+     *
+     *     delete(obj.attr); // Warning: Grouping operator is unnecessary for lone expressions.
+     */
+    singleGroups: false,
+
+    /**
+     * This option is a short hand for the most strict JSHint configuration. It
+     * enables all enforcing options and disables all relaxing options.
+     */
+    enforceall : false
   },
   relaxing: {
 
@@ -387,7 +409,17 @@ exports.bool = {
      */
     validthis   : true,
 
-    withstmt    : true, // if with statements should be allowed
+    /**
+     * This option suppresses warnings about the use of the `with` statement.
+     * The semantics of the `with` statement can cause confusion among
+     * developers and accidental definition of global variables.
+     *
+     * More info:
+     *
+     * * [with Statement Considered
+     *   Harmful](http://yuiblog.com/blog/2006/04/11/with-statement-considered-harmful/)
+     */
+    withstmt    : true,
 
     /**
      * This options tells JSHint that your code uses Mozilla JavaScript
@@ -491,7 +523,11 @@ exports.bool = {
      */
     couch       : true,
 
-    jasmine     : true, // Jasmine functions should be predefined
+    /**
+     * This option defines globals exposed by [the Jasmine unit testing
+     * framework](https://jasmine.github.io/).
+     */
+    jasmine     : true,
 
     /**
      * This option defines globals exposed by the [jQuery](http://jquery.com/)
@@ -509,7 +545,11 @@ exports.bool = {
      */
     node        : true,
 
-    qunit       : true, // if the QUnit environment globals should be predefined
+    /**
+     * This option defines globals exposed by [the QUnit unit testing
+     * framework](http://qunitjs.com/).
+     */
+    qunit       : true,
 
     /**
      * This option defines globals available when your code is running inside
@@ -518,7 +558,11 @@ exports.bool = {
      */
     rhino       : true,
 
-    shelljs     : true, // if ShellJS globals should be predefined
+    /**
+     * This option defines globals exposed by [the ShellJS
+     * library](http://documentup.com/arturadib/shelljs).
+     */
+    shelljs     : true,
 
     /**
      * This option defines globals exposed by the
@@ -532,7 +576,11 @@ exports.bool = {
      */
     yui         : true,
 
-    mocha       : true, // Mocha functions should be predefined
+    /**
+     * This option defines globals exposed by the "BDD" and "TDD" UIs of the
+     * [Mocha unit testing framework](http://mochajs.org/).
+     */
+    mocha       : true,
 
     /**
      * This option defines globals available when your code is running as a
@@ -565,7 +613,11 @@ exports.bool = {
      */
     browser     : true,
 
-    browserify  : true, // if the standard browserify globals should be predefined
+    /**
+     * This option defines globals available when using [the Browserify
+     * tool](http://browserify.org/) to build a project.
+     */
+    browserify  : true,
 
     /**
      * This option defines globals that are usually used for logging poor-man's
@@ -581,7 +633,15 @@ exports.bool = {
      */
     dojo        : true,
 
-    typed       : true  // if typed array globals should be predefined
+    /**
+     * This option defines globals for typed array constructors.
+     *
+     * More info:
+     *
+     * * [JavaScript typed
+     *   arrays](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays)
+     */
+    typed       : true
   },
 
   // Obsolete options
@@ -614,6 +674,21 @@ exports.val = {
   maxerr       : false,
 
   predef       : false, // predef is deprecated and being replaced by globals
+
+  /**
+   * This option can be used to specify a white list of global variables that
+   * are not formally defined in the source code. This is most useful when
+   * combined with the `undef` option in order to suppress warnings for
+   * project-specific global variables.
+   *
+   * Setting an entry to `true` enables reading and writing to that variable.
+   * Setting it to `false` will trigger JSHint to consider that variable
+   * read-only.
+   *
+   * See also the "environment" options: a set of options to be used as short
+   * hand for enabling global variables defined in common JavaScript
+   * environments.
+   */
   globals      : false,
 
   /**
