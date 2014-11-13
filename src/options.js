@@ -7,7 +7,6 @@ exports.bool = {
     freeze      : true, // if modifying native object prototypes should be disallowed
     camelcase   : true, // if identifiers should be required in camel case
     curly       : true, // if curly braces around all blocks should be required
-    dojo        : true, // if Dojo Toolkit globals should be predefined
     eqeqeq      : true, // if === should be required
     notypeof    : true, // if should report typos in typeof comparisons
     es3         : true, // if ES3 syntax should be allowed
@@ -40,7 +39,6 @@ exports.bool = {
     evil        : true, // if eval should be allowed
     plusplus    : true, // if increment/decrement should not be allowed
     proto       : true, // if the `__proto__` property should be allowed
-    typed       : true, // if typed array globals should be predefined
     scripturl   : true, // if script-targeted URLs should be tolerated
     strict      : true, // require the "use strict"; pragma
     sub         : true, // if all forms of subscript notation are tolerated
@@ -82,7 +80,9 @@ exports.bool = {
     // be predefined
     browser     : true, // if the standard browser globals should be predefined
     browserify  : true, // if the standard browserify globals should be predefined
-    devel       : true  // if logging globals should be predefined (console, alert, etc.)
+    devel       : true, // if logging globals should be predefined (console, alert, etc.)
+    dojo        : true, // if Dojo Toolkit globals should be predefined
+    typed       : true  // if typed array globals should be predefined
   },
 
   // Obsolete options
