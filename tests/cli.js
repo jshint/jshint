@@ -3,15 +3,30 @@
 var path  = require("path");
 var shjs  = require("shelljs");
 var sinon = require("sinon");
-var cli   = require("../src/cli.js");
+
+var cliPath = path.resolve(__dirname, "../src/cli.js");
+var cli;
 
 exports.setUp = function(done) {
   this.sinon = sinon.sandbox.create();
+
+  // The CLI module maintains some internal state in order to optimize
+  // filesystem operations. This state can lead to undesirable test case
+  // interdependencies. While re-loading the CLI module for every test may
+  // negatively effect the execution time of this test suite, it is the most
+  // maintainable way to avoid any current or future problems relating to
+  // shared internal state.
+  cli = require("../src/cli.js");
+
   done();
 };
 
 exports.tearDown = function(done) {
   this.sinon.restore();
+
+  cli = null;
+  delete require.cache[cliPath];
+
   done();
 };
 
@@ -246,14 +261,10 @@ exports.group = {
     run.restore();
     this.sinon.stub(rep, "reporter");
     this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/file\.js$/)).returns(true)
-      .withArgs("-e", sinon.match(/\.jshintrc$/)).returns(true)
-      .withArgs("-e", sinon.match(/\.jshintignore$/)).returns(true);
+      .withArgs("-e", sinon.match(/file\.js$/)).returns(true);
 
     this.sinon.stub(shjs, "cat")
-      .withArgs(sinon.match(/file\.js$/)).returns("func()")
-      .withArgs(sinon.match(/\.jshintrc$/)).returns("{}")
-      .withArgs(sinon.match(/\.jshintignore$/)).returns("");
+      .withArgs(sinon.match(/file\.js$/)).returns("func()");
 
     try {
       cli.interpret([
@@ -471,14 +482,9 @@ exports.group = {
 
     this.sinon.stub(shjs, "cat")
       .withArgs(sinon.match(/file.js$/)).returns("console.log('Hello');")
-      .withArgs(sinon.match(/\.jshintrc$/)).returns("{}")
       .withArgs(sinon.match(/\.jshintignore$/)).returns("examples");
 
-    var args = shjs.cat.args.filter(function (arg) {
-      return !/\.jshintrc$/.test(arg[0]) && !/\.jshintignore$/.test(arg[0]);
-    });
-
-    test.equal(args.length, 0);
+    test.equal(shjs.cat.args.length, 0);
 
     test.done();
   },
@@ -499,14 +505,9 @@ exports.group = {
 
     this.sinon.stub(shjs, "cat")
       .withArgs(sinon.match(/file.js$/)).returns("console.log('Hello');")
-      .withArgs(sinon.match(/\.jshintrc$/)).returns("{}")
       .withArgs(sinon.match(/\.jshintignore$/)).returns("examples");
 
-    var args = shjs.cat.args.filter(function (arg) {
-      return !/\.jshintrc$/.test(arg[0]) && !/\.jshintignore$/.test(arg[0]);
-    });
-
-    test.equal(args.length, 0);
+    test.equal(shjs.cat.args.length, 0);
 
     test.done();
   },
@@ -541,7 +542,6 @@ exports.group = {
       .withArgs(sinon.match(/ignore[\/\\]file\d\.js$/)).returns("console.log('Hello, ignore me');")
       .withArgs(sinon.match(/ignore[\/\\]dir[\/\\]file\d\.js$/)).returns("print('Ignore me');")
       .withArgs(sinon.match(/node_script$/)).returns("console.log('Hello, ignore me');")
-      .withArgs(sinon.match(/\.jshintrc$/)).returns("{}")
       .withArgs(sinon.match(/\.jshintignore$/)).returns(path.join("ignore", "**"));
 
     cli.interpret([
@@ -573,7 +573,6 @@ exports.group = {
       .withArgs(sinon.match(/file3\.json$/)).returns("{}")
       .withArgs(sinon.match(/src[\/\\]file4\.js$/)).returns("print('Hello');")
       .withArgs(sinon.match(/src[\/\\]lib[\/\\]file5\.js$/)).returns("print('Hello');")
-      .withArgs(sinon.match(/\.jshintrc$/)).returns("{}")
       .withArgs(sinon.match(/\.jshintignore$/)).returns("");
 
     cli.interpret([
@@ -607,11 +606,7 @@ exports.group = {
 
   testGatherOptionalParameters: function (test) {
     this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/\.jshintignore$/)).returns(true)
       .withArgs("-e", sinon.match(/file.js$/)).returns(true);
-
-    this.sinon.stub(shjs, "cat")
-      .withArgs(sinon.match(/\.jshintignore$/)).returns(path.join("ignore", "**"));
 
     var files = cli.gather({
       args: ["file.js"]
@@ -632,9 +627,7 @@ exports.group = {
       [ /file2?\.js$/, "console.log('Hello');" ],
       [ /ignore[\/\\]file\d\.js$/, "console.log('Hello, ignore me');" ],
       [ /ignore[\/\\]dir[\/\\]file\d\.js$/, "print('Ignore me');" ],
-      [ /node_script$/, "console.log('Hello, ignore me');" ],
-      [ /\.jshintrc$/, "{}" ],
-      [ /\.jshintignore$/, path.join("ignore", "**") ],
+      [ /node_script$/, "console.log('Hello, ignore me');" ]
     ];
 
     var testStub = this.sinon.stub(shjs, "test");
@@ -657,11 +650,7 @@ exports.group = {
       extensions: ""
     });
 
-    var args = shjs.cat.args.filter(function (arg) {
-      return !/\.jshintrc$/.test(arg[0]) && !/\.jshintignore$/.test(arg[0]);
-    });
-
-    test.equal(args.length, 0);
+    test.equal(shjs.cat.args.length, 0);
     test.equal(files.length, 3);
     test.equal(files[0], "file.js");
     test.equal(files[1], "file2.js");
@@ -671,9 +660,7 @@ exports.group = {
       [ /file2?\.js$/, "console.log('Hello');" ],
       [ /file3\.json$/, "{}" ],
       [ /src[\/\\]file4\.js$/, "print('Hello');" ],
-      [ /src[\/\\]lib[\/\\]file5\.js$/, "print('Hello'); "],
-      [ /\.jshintrc$/, "{}" ],
-      [ /\.jshintignore$/, "" ]
+      [ /src[\/\\]lib[\/\\]file5\.js$/, "print('Hello'); "]
     ];
 
     demoFiles.forEach(function (file) {
@@ -704,11 +691,7 @@ exports.group = {
       ignores: []
     });
 
-    args = shjs.cat.args.filter(function (arg) {
-      return !/\.jshintrc$/.test(arg[0]) && !/\.jshintignore$/.test(arg[0]);
-    });
-
-    test.equal(args.length, 5);
+    test.equal(shjs.cat.args.length, 5);
     test.equal(files.length, 5);
     test.equal(files[0], "file.js");
     test.equal(files[1], "file2.js");
@@ -723,9 +706,7 @@ exports.group = {
 
     this.sinon.stub(process, "cwd").returns(__dirname + "/../");
     this.sinon.stub(shjs, "cat")
-      .withArgs(sinon.match(/reporter\.js$/)).returns("console.log('Hello');")
-      .withArgs(sinon.match(/\.jshintrc$/)).returns("{}")
-      .withArgs(sinon.match(/\.jshintignore$/)).returns("");
+      .withArgs(sinon.match(/reporter\.js$/)).returns("console.log('Hello');");
 
     files = cli.gather({
       args: ["examples"],
@@ -733,11 +714,7 @@ exports.group = {
       ignores: []
     });
 
-    args = shjs.cat.args.filter(function (arg) {
-      return !/\.jshintrc$/.test(arg[0]) && !/\.jshintignore$/.test(arg[0]);
-    });
-
-    test.equal(args.length, 0);
+    test.equal(shjs.cat.args.length, 0);
     test.equal(files.length, 1);
     test.equal(files[0], path.join("examples", "reporter.js"));
 
@@ -751,13 +728,11 @@ exports.group = {
     this.sinon.stub(process, "cwd").returns(dir);
 
     this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/(pass\.js|fail\.js|\.jshintrc|\.jshintignore)$/)).returns(true);
+      .withArgs("-e", sinon.match(/(pass\.js|fail\.js)$/)).returns(true);
 
     this.sinon.stub(shjs, "cat")
       .withArgs(sinon.match(/pass\.js$/)).returns("function test() { return 0; }")
-      .withArgs(sinon.match(/fail\.js$/)).returns("console.log('Hello')")
-      .withArgs(sinon.match(/\.jshintrc$/)).returns("{}")
-      .withArgs(sinon.match(/\.jshintignore$/)).returns("");
+      .withArgs(sinon.match(/fail\.js$/)).returns("console.log('Hello')");
 
     cli.interpret([
       "node", "jshint", "pass.js", "--reporter=reporter.js"
@@ -854,14 +829,10 @@ exports.extract = {
     ].join("\n");
 
     this.sinon.stub(shjs, "cat")
-      .withArgs(sinon.match(/indent\.html$/)).returns(html)
-      .withArgs(sinon.match(/\.jshintignore$/)).returns("")
-      .withArgs(sinon.match(/\.jshintrc$/)).returns("{}");
+      .withArgs(sinon.match(/indent\.html$/)).returns(html);
 
     this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/indent\.html$/)).returns(true)
-      .withArgs("-e", sinon.match(/\.jshintignore$/)).returns(false)
-      .withArgs("-e", sinon.match(/\.jshintrc$/)).returns(true);
+      .withArgs("-e", sinon.match(/indent\.html$/)).returns(true);
 
     cli.interpret([
       "node", "jshint", "indent.html", "--extract", "always", "--reporter=reporter.js"
@@ -904,14 +875,10 @@ exports.extract = {
     ].join("\n");
 
     this.sinon.stub(shjs, "cat")
-      .withArgs(sinon.match(/indent\.html$/)).returns(html)
-      .withArgs(sinon.match(/\.jshintignore$/)).returns("")
-      .withArgs(sinon.match(/\.jshintrc$/)).returns("{}");
+      .withArgs(sinon.match(/indent\.html$/)).returns(html);
 
     this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/indent\.html$/)).returns(true)
-      .withArgs("-e", sinon.match(/\.jshintignore$/)).returns(false)
-      .withArgs("-e", sinon.match(/\.jshintrc$/)).returns(true);
+      .withArgs("-e", sinon.match(/indent\.html$/)).returns(true);
 
     cli.interpret([
       "node", "jshint", "indent.html", "--extract", "always", "--reporter=reporter.js"
@@ -948,14 +915,10 @@ exports.extract = {
     ].join("\n");
 
     this.sinon.stub(shjs, "cat")
-      .withArgs(sinon.match(/firstLine\.html$/)).returns(html)
-      .withArgs(sinon.match(/\.jshintignore$/)).returns("")
-      .withArgs(sinon.match(/\.jshintrc$/)).returns("{}");
+      .withArgs(sinon.match(/firstLine\.html$/)).returns(html);
 
     this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/firstLine\.html$/)).returns(true)
-      .withArgs("-e", sinon.match(/\.jshintignore$/)).returns(false)
-      .withArgs("-e", sinon.match(/\.jshintrc$/)).returns(true);
+      .withArgs("-e", sinon.match(/firstLine\.html$/)).returns(true);
 
     cli.interpret([
       "node", "jshint", "firstLine.html", "--extract", "always", "--reporter=reporter.js"
@@ -1000,14 +963,10 @@ exports.extract = {
     ].join("\n");
 
     this.sinon.stub(shjs, "cat")
-      .withArgs(sinon.match(/sameLine\.html$/)).returns(html)
-      .withArgs(sinon.match(/.\jshintignore$/)).returns("")
-      .withArgs(sinon.match(/.\jshintrc$/)).returns("{}");
+      .withArgs(sinon.match(/sameLine\.html$/)).returns(html);
 
     this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/sameLine\.html$/)).returns(true)
-      .withArgs("-e", sinon.match(/\.jshintignore$/)).returns(false)
-      .withArgs("-e", sinon.match(/\.jshintrc$/)).returns(true);
+      .withArgs("-e", sinon.match(/sameLine\.html$/)).returns(true);
 
     cli.interpret([
       "node", "jshint", "sameLine.html", "--extract", "always", "--reporter=reporter.js"
@@ -1054,13 +1013,10 @@ exports.useStdin = {
     var jshintrc = JSON.stringify({ undef: true });
 
     this.sinon.stub(shjs, "cat")
-      .withArgs(sinon.match(/[\/\\]fake[\/\\]\.jshintrc$/)).returns(jshintrc)
-      .withArgs(sinon.match(/\/\.jshintrc$/)).returns("")
-      .withArgs(sinon.match(/\.jshintignore$/)).returns("");
+      .withArgs(sinon.match(/[\/\\]fake[\/\\]\.jshintrc$/)).returns(jshintrc);
 
     this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/fake[\/\\]\.jshintrc$/)).returns(true)
-      .withArgs("-e", sinon.match(/\.jshintrc$/)).returns(false);
+      .withArgs("-e", sinon.match(/fake[\/\\]\.jshintrc$/)).returns(true);
 
     cli.interpret([
       "node", "jshint", "--filename", "fake/fakescript.js", "--reporter=reporter.js", "-"
@@ -1103,8 +1059,7 @@ exports.useStdin = {
     });
 
     this.sinon.stub(shjs, "cat")
-      .withArgs(sinon.match(/\.jshintrc$/)).returns(jshintrc)
-      .withArgs(sinon.match(/\.jshintignore$/)).returns("");
+      .withArgs(sinon.match(/\.jshintrc$/)).returns(jshintrc);
 
     this.sinon.stub(shjs, "test")
       .withArgs("-e", sinon.match(/fake[\/\\]\.jshintrc$/)).returns(true)
