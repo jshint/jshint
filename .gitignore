@@ -8,3 +8,5 @@ npm-debug.log
 demo.js
 
 .idea
+
+coverage/
