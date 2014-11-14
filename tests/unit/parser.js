@@ -4953,24 +4953,105 @@ exports["test async/await fat arrow"] = function (test) {
 
     .addError(6, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
     .addError(6, "'async()/await()' is only available with the asyncawait option.")
+    .addError(6, "An async function shall contain an await.")
 
     .addError(7, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
     .addError(7, "'async()/await()' is only available with the asyncawait option.")
+    .addError(7, "An async function shall contain an await.")
 
     .addError(8, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
     .addError(8, "'async()/await()' is only available with the asyncawait option.")
     .test(code, {es3: true, asi: true, maxerr: 1000});
 /*
   TestRun(test)
+    .addError(1, "'async()/await()' is only available with the asyncawait option.")
+    .addError(1, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+
+    .addError(2, "'async()/await()' is only available with the asyncawait option.")
+    .addError(2, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+
+    .addError(3, "'async()/await()' is only available with the asyncawait option.")
+    .addError(3, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+
+    .addError(4, "'async()/await()' is only available with the asyncawait option.")
+    .addError(4, "Line breaking error 'async'.")
+
+    .addError(5, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(5, "'async()/await()' is only available with the asyncawait option.")
+
+    .addError(6, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(6, "'async()/await()' is only available with the asyncawait option.")
+
+    .addError(7, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(7, "'async()/await()' is only available with the asyncawait option.")
+
+    .addError(8, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(8, "'async()/await()' is only available with the asyncawait option.")
     .test(code, { asi: true, maxerr: 1000}); //es5
 
   TestRun(test)
+    .addError(1, "'async()/await()' is only available with the asyncawait option.")
+    .addError(1, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+
+    .addError(2, "'async()/await()' is only available with the asyncawait option.")
+    .addError(2, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+
+    .addError(3, "'async()/await()' is only available with the asyncawait option.")
+    .addError(3, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+
+    .addError(4, "'async()/await()' is only available with the asyncawait option.")
+    .addError(4, "Line breaking error 'async'.")
+
+    .addError(5, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(5, "'async()/await()' is only available with the asyncawait option.")
+
+    .addError(6, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(6, "'async()/await()' is only available with the asyncawait option.")
+
+    .addError(7, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(7, "'async()/await()' is only available with the asyncawait option.")
+
+    .addError(8, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(8, "'async()/await()' is only available with the asyncawait option.")
     .test(code, {moz: true, asi: true, maxerr: 1000});
 
-  TestRun(test)
-    .test(code, {esnext: true, asi: true, maxerr: 1000});
 
   TestRun(test)
+    .addError(1, "'async()/await()' is only available with the asyncawait option.")
+
+    .addError(2, "'async()/await()' is only available with the asyncawait option.")
+
+    .addError(3, "'async()/await()' is only available with the asyncawait option.")
+
+    .addError(4, "'async()/await()' is only available with the asyncawait option.")
+    .addError(4, "Line breaking error 'async'.")
+
+    .addError(5, "'async()/await()' is only available with the asyncawait option.")
+
+    .addError(6, "'async()/await()' is only available with the asyncawait option.")
+
+    .addError(7, "'async()/await()' is only available with the asyncawait option.")
+
+    .addError(8, "'async()/await()' is only available with the asyncawait option.")
+    .test(code, {esnext: true, asi: true, maxerr: 1000});
+
+
+  TestRun(test)
+    .addError(1, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+
+    .addError(2, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+
+    .addError(3, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+
+    .addError(4, "Line breaking error 'async'.")
+
+    .addError(5, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+
+    .addError(6, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+
+    .addError(7, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+
+    .addError(8, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
     .test(code, {asyncawait: true, es3: true, asi: true, maxerr: 1000});
 
   TestRun(test)
