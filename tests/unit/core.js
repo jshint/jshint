@@ -944,3 +944,29 @@ exports.testUnnamedFuncStatement = function (test) {
 
   test.done();
 };
+
+// GH-1976 "Fixed set property 'type' of undefined in `if` blockstmt"
+exports.testUnCleanedForinifcheckneeded = function (test) {
+  var forinCode = [
+    "for (var key in a) {",
+    "  console.log(key);",
+    "}"
+  ];
+
+  var ifCode = [
+    "if(true) {",
+    "}"
+  ];
+
+  try {
+    JSHINT(forinCode, { maxerr: 1, forin: true });
+    // Prior to the fix, if the final `forin` check reached the `maxerr` limit,
+    // the internal `state.forinifcheckneeded` maintained its previous value
+    // and triggered an error in subsequent invocations of JSHint.
+    JSHINT(ifCode, { maxerr: 1, forin: true });
+  } catch(e) {
+    test.ok(false, "Exception was thrown");
+  }
+
+  test.done();
+};
