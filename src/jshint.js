@@ -3025,7 +3025,7 @@ var JSHINT = (function () {
     funct["(metrics)"].verifyMaxParametersPerFunction(funct["(params)"]);
 
     // So we parse fat-arrow functions after we encounter =>. So basically
-    // doFunction is called with the left side of => as its last argument.
+    // doFunction is called with the left side of => as its penultimate argument.
     // This means that the parser, at that point, had already added its
     // arguments to the undefs array and here we undo that.
 
@@ -3784,9 +3784,16 @@ var JSHINT = (function () {
 
     if (state.tokens.next.value === "(") {
       // async fatarrow
-      this.exps = true;
-      this.first = expression(10);
-      this.lbp = 25;
+      var func = Object.create(state.syntax["=>"]);
+      var params = functionparams() || [];
+      advance("=>");
+      if (!state.option.esnext) {
+        warning("W119", state.tokens.curr, "arrow function syntax (=>)");
+      }
+      nobreaknonadjacent(state.tokens.prev, state.tokens.curr);
+      func.left = params;
+      func.right = doFunction(undefined, this, false, params, true);
+      return func;
     } else {
       prefixFunctionParse.call(this, true);
     }
