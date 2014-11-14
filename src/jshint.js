@@ -3747,7 +3747,7 @@ var JSHINT = (function () {
     var forinifcheck = null;
     if (state.option.forin && state.forinifcheckneeded) {
       state.forinifcheckneeded = false; // We only need to analyze the first if inside the loop
-      forinifcheck = state.forinifchecks[state.forinifchecks.length - 1];
+      forinifcheck = state.forinifchecks[state.forinifchecks.length - 1] || {};
       if (expr.type === "(punctuator)" && expr.value === "!") {
         forinifcheck.type = "(negative)";
       } else {
