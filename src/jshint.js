@@ -130,7 +130,7 @@ var JSHINT = (function () {
         loopfunc    : true, // if functions should be allowed to be defined within
         expr        : true, // if ExpressionStatement should be allowed as Programs
         esnext      : true, // if es.next specific syntax should be allowed
-        traceur     : true  // if traceur syntax extensions should be allowed
+        asyncawait  : true  // if async/await syntax should be allowed
       },
 
       // Third party globals
@@ -453,24 +453,21 @@ var JSHINT = (function () {
       combine(predefined, vars.mocha);
     }
 
-    // Let's assume that chronologically ES3 < ES5 < ES6/ESNext < Moz < tracuer
+    // Let's assume that chronologically ES3 < ES5 < ES6/ESNext < Moz
 
-    state.option.inTraceur = function (/* strict */) {
-      return state.option.traceur;
-    };
 
     state.option.inMoz = function (strict) {
       if (strict) {
-        return state.option.moz && !state.option.esnext && !state.option.traceur;
+        return state.option.moz && !state.option.esnext;
       }
       return state.option.moz;
     };
 
     state.option.inESNext = function (strict) {
       if (strict) {
-        return !state.option.moz && (state.option.esnext || state.option.traceur);
+        return !state.option.moz && state.option.esnext;
       }
-      return state.option.moz || state.option.esnext || state.option.traceur;
+      return state.option.moz || state.option.esnext;
     };
 
     state.option.inES5 = function (/* strict */) {
@@ -479,10 +476,7 @@ var JSHINT = (function () {
 
     state.option.inES3 = function (strict) {
       if (strict) {
-        return (
-          !state.option.moz && !state.option.esnext && 
-          state.option.es3 && !state.option.traceur
-        );
+        return !state.option.moz && !state.option.esnext && state.option.es3;
       }
       return state.option.es3;
     };
@@ -511,7 +505,7 @@ var JSHINT = (function () {
     var ignored = state.ignoredLines;
 
     if (_.isEmpty(ignored)) return;
-    JSHINT.errors = _.reject(JSHINT.errors, function (err) { return ignored[err.line] });
+    JSHINT.errors = _.reject(JSHINT.errors, function (err) { return ignored[err.line]; });
   }
 
   function warning(code, t, a, b, c, d) {
@@ -3216,7 +3210,7 @@ var JSHINT = (function () {
           g = false;
           a = false;
           if (nextVal === "async" && peekIgnoreEOL().id !== ":") {
-            if (!state.option.inTraceur()) {
+            if (!state.option.asyncawait) {
               warning("W127", state.tokens.next, "async/await");
             }
             advance(nextVal);
@@ -3756,8 +3750,7 @@ var JSHINT = (function () {
       advance("*");
       if (async) {
         warning("W129", state.tokens.curr, "function*");
-      }
-      else {
+      } else {
         generator = true;
       }
     }
@@ -3784,11 +3777,19 @@ var JSHINT = (function () {
   });
 
   prefix("async", function () {
-    if (!state.option.inTraceur()) {
+    if (!state.option.asyncawait) {
       warning("W127", state.tokens.curr, "async/await");
     }
     nolinebreak(this);
-    prefixFunctionParse.call(this, true);
+
+    if (state.tokens.next.value === "(") {
+      // async fatarrow
+      this.exps = true;
+      this.first = expression(10);
+      this.lbp = 25;
+    } else {
+      prefixFunctionParse.call(this, true);
+    }
     return this;
   });
 
@@ -4361,17 +4362,16 @@ var JSHINT = (function () {
     x.exps = true;
     x.lbp = 25;
   }(prefix("await", function () {
-    if (state.option.inTraceur(true) && !funct["(async)"]) {
+    if (state.option.asyncawait && !funct["(async)"]) {
       error("E055", state.tokens.curr, "await");
-    }
-    if (!state.option.inTraceur(true)) {
+    } else if (!state.option.asyncawait) {
       warning("W127", state.tokens.curr, "async/await");
     }
-    
+
     funct["(async)"] = "awaited";
-    
+
     this.first = expression(10);
-    
+
     if (!state.option.asi) {
       nolinebreak(this);
     }
@@ -4532,7 +4532,7 @@ var JSHINT = (function () {
   }).exps = true;
 
   // Future Reserved Words
-  
+
   FutureReservedWord("abstract");
   FutureReservedWord("boolean");
   FutureReservedWord("byte");

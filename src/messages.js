@@ -202,7 +202,7 @@ var warnings = {
   W124: "A generator function shall contain a yield statement.",
   W125: "This line contains non-breaking spaces: http://jshint.com/doc/options/#nonbsp",
   W126: "Grouping operator is unnecessary for lone expressions.",
-  W127: "'{a}' is only available in experimental with Traceur extensions (use traceur option).",
+  W127: "'async()/await()' is only available with the asyncawait option.",
   W128: "An async function shall contain an await.",
   W129: "Cannot mix async functions with generators."
 };

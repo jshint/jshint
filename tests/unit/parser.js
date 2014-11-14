@@ -4919,57 +4919,184 @@ exports.testES6BlockExports = function (test) {
   test.done();
 };
 
-exports["test async/await"] = function (test) {
+exports["test async/await fat arrow"] = function (test) {
   var code = [
-    "async function x() { return await 1; }",
-    "async function x() { await 1; }",
-    "async function () { await 1; }"
+    // valid
+    "var l1 = async () => await 1;", // arrow function
+    "var l2 = async (a,b) => await 1;", // arrow with params
+    "var l3 = async (a,b) => { a += b; return await 1; }", // arrow with complex body
+
+    // invalid
+    "var l4 = async", // linebreak
+    "    () => await 1;",
+    "var l6 = async () => 1;", // missing await
+    "var l7 = async () => 1;", // missing await
+    "var l8 = () => await 1;" // missing async
+  ];
+
+
+  TestRun(test)
+    .addError(1, "'async()/await()' is only available with the asyncawait option.")
+    .addError(1, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+
+    .addError(2, "'async()/await()' is only available with the asyncawait option.")
+    .addError(2, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+
+    .addError(3, "'async()/await()' is only available with the asyncawait option.")
+    .addError(3, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+
+    .addError(4, "'async()/await()' is only available with the asyncawait option.")
+    .addError(4, "Line breaking error 'async'.")
+
+    .addError(5, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(5, "'async()/await()' is only available with the asyncawait option.")
+
+    .addError(6, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(6, "'async()/await()' is only available with the asyncawait option.")
+
+    .addError(7, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(7, "'async()/await()' is only available with the asyncawait option.")
+
+    .addError(8, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(8, "'async()/await()' is only available with the asyncawait option.")
+    .test(code, {es3: true, asi: true, maxerr: 1000});
+/*
+  TestRun(test)
+    .test(code, { asi: true, maxerr: 1000}); //es5
+
+  TestRun(test)
+    .test(code, {moz: true, asi: true, maxerr: 1000});
+
+  TestRun(test)
+    .test(code, {esnext: true, asi: true, maxerr: 1000});
+
+  TestRun(test)
+    .test(code, {asyncawait: true, es3: true, asi: true, maxerr: 1000});
+
+  TestRun(test)
+    .test(code, {asyncawait: true, asi: true, maxerr: 1000}); //es5
+
+  TestRun(test)
+    .test(code, {asyncawait: true,  moz: true, asi: true, maxerr: 1000});
+
+    TestRun(test)
+    .test(code, {asyncawait: true,  esnext: true, asi: true, maxerr: 1000});
+*/
+
+  test.done();
+};
+/*
+exports["test async/await methods"] = function (test) {
+  var code = [
+    //valid
+    "class C { async a() { await 1; } }", // in a class
+    "var o1 = { async a() { await 1; } };", // method
+    "var o2 = { a: 1, async b(d, e) { await 1; } };", // method with params
+    "var o3 = {",
+    "    async", // line breaks in method is allowed
+    "      a() { await 1; }",
+    "};",
+    "class C2 {",
+    "    async", // line breaks in class method is allowed
+    "       a() { await 1; }",
+    "}",
   ];
 
   TestRun(test)
-    .addError(1, "'async/await' is only available in experimental with Traceur extensions (use traceur option).")
-    .addError(1, "'x' is defined but never used.")
-    .addError(2, "'async/await' is only available in experimental with Traceur extensions (use traceur option).")
-    .addError(2, "'x' is defined but never used.")
-    .addError(3, "'async/await' is only available in experimental with Traceur extensions (use traceur option).")
-    .addError(3, "Missing name in function declaration.")
-    .test(code);
+    .test(code, {es3: true, asi: true, maxerr: 1000});
 
   TestRun(test)
-    .addError(1, "'async/await' is only available in experimental with Traceur extensions (use traceur option).")
-    .addError(1, "'x' is defined but never used.")
-    .addError(2, "'async/await' is only available in experimental with Traceur extensions (use traceur option).")
-    .addError(2, "'x' is defined but never used.")
-    .addError(3, "'async/await' is only available in experimental with Traceur extensions (use traceur option).")
-    .addError(3, "Missing name in function declaration.")
-    .test(code, {moz: true, unused: true, undef: true});
-  
+    .test(code, {asi: true, maxerr: 1000}); // es5
+
   TestRun(test)
-    .addError(1, "'async/await' is only available in experimental with Traceur extensions (use traceur option).")
-    .addError(1, "'x' is defined but never used.")
-    .addError(2, "'async/await' is only available in experimental with Traceur extensions (use traceur option).")
-    .addError(2, "'x' is defined but never used.")
-    .addError(3, "'async/await' is only available in experimental with Traceur extensions (use traceur option).")
-    .addError(3, "Missing name in function declaration.")
-    .test(code, {es5: true, unused: true, undef: true});
-  
+    .test(code, {moz: true, asi: true, maxerr: 1000});
+
   TestRun(test)
-    .addError(1, "'async/await' is only available in experimental with Traceur extensions (use traceur option).")
-    .addError(1, "'x' is defined but never used.")
-    .addError(2, "'async/await' is only available in experimental with Traceur extensions (use traceur option).")
-    .addError(2, "'x' is defined but never used.")
-    .addError(3, "'async/await' is only available in experimental with Traceur extensions (use traceur option).")
-    .addError(3, "Missing name in function declaration.")
-    .test(code, {esnext: true, unused: true, undef: true});
-  
+    .test(code, {esnext: true, asi: true, maxerr: 1000});
+
   TestRun(test)
-    .addError(1, "'x' is defined but never used.")
-    .addError(2, "'x' is defined but never used.")
-    .addError(3, "Missing name in function declaration.")
-    .test(code, {traceur: true, unused: true, undef: true});
+    .test(code, {asyncawait: true, es3: true, asi: true, maxerr: 1000});
+
+  TestRun(test)
+    .test(code, {asyncawait: true, asi: true, maxerr: 1000}); //es5
+
+  TestRun(test)
+    .test(code, {asyncawait: true,  moz: true, asi: true, maxerr: 1000});
+
+    TestRun(test)
+    .test(code, {asyncawait: true,  esnext: true, asi: true, maxerr: 1000});
+
 
   test.done();
+};
+*/
+/*
+exports["test async/await !esnext"] = function (test) {
+  var code = [
+    // valid
+    "async function x() { return await 1; }", // await as expr
+    "async function y() { await 1; }", // await as expr_stmt
+    "var a = async function() { await 1; }", // function expr
+    "var b = async function c() { await 1; }", // function expr with name
+
+    // invalid
+    "var c = async", // linebreak
+    "    function() { await 1; }",
+    "async function () { await 1; }", // no name
+    "async ",
+    "    function x() { await 1; }" // linebreak after async
+  ];
+  TestRun(test)
+    .addError(1, "'async()/await()' is only available with the asyncawait option.")
+    .addError(2, "'async()/await()' is only available with the asyncawait option.")
+    .addError(3, "'async()/await()' is only available with the asyncawait option.")
+    .addError(4, "'async()/await()' is only available with the asyncawait option.")
+    .addError(5, "'async()/await()' is only available with the asyncawait option.")
+    .addError(6, "'async()/await()' is only available with the asyncawait option.")
+    .addError(7, "'async()/await()' is only available with the asyncawait option.")
+    .addError(8, "'async()/await()' is only available with the asyncawait option.")
+    .addError(9, "'async()/await()' is only available with the asyncawait option.")
+    .addError(10, "'async()/await()' is only available with the asyncawait option.")
+    .addError(12, "'async()/await()' is only available with the asyncawait option.")
+    .addError(16, "'async()/await()' is only available with the asyncawait option.")
+    .addError(19, "'async()/await()' is only available with the asyncawait option.")
+    .addError(21, "'async()/await()' is only available with the asyncawait option.")
+
+    .test(code, {es3: true, asi: true, maxerr: 1000});
+  TestRun(test)
+    .addError(1, "'async()/await()' is only available with the asyncawait option.")
+    .addError(2, "'async()/await()' is only available with the asyncawait option.")
+    .addError(3, "'async()/await()' is only available with the asyncawait option.")
+    .addError(3, "Missing name in function declaration.")
+    .addError(4, "'async()/await()' is only available with the asyncawait option.")
+    .addError(4, "Line breaking error 'async'")
+    .test(code, {moz: true, asi: true, maxerr: 1000});
+
+  TestRun(test)
+    .addError(1, "'async()/await()' is only available with the asyncawait option.")
+    .addError(2, "'async()/await()' is only available with the asyncawait option.")
+    .addError(3, "'async()/await()' is only available with the asyncawait option.")
+    .addError(3, "Missing name in function declaration.")
+    .addError(4, "'async()/await()' is only available with the asyncawait option.")
+    .addError(4, "Line breaking error 'async'")
+    .test(code, {asi: true, maxerr: 1000}); // es5
+
+  TestRun(test)
+    .addError(1, "'async()/await()' is only available with the asyncawait option.")
+    .addError(2, "'async()/await()' is only available with the asyncawait option.")
+    .addError(3, "'async()/await()' is only available with the asyncawait option.")
+    .addError(3, "Missing name in function declaration.")
+    .addError(4, "'async()/await()' is only available with the asyncawait option.")
+    .addError(4, "Line breaking error 'async'")
+    .test(code, {esnext: true, asi: true, maxerr: 1000});
+
+  TestRun(test)
+    .addError(3, "Missing name in function declaration.")
+    .addError(4, "Line breaking error 'async'")
+    .test(code, {asyncawait: true, asi: true, esnext: true, maxerr: 1000});
+  test.done();
 }
+  */
 
 exports.testStrictDirectiveASI = function (test) {
   var options = { strict: true, asi: true, globalstrict: true };
