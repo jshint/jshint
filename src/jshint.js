@@ -129,7 +129,8 @@ var JSHINT = (function () {
         lastsemic   : true, // if semicolons may be ommitted for the trailing
         loopfunc    : true, // if functions should be allowed to be defined within
         expr        : true, // if ExpressionStatement should be allowed as Programs
-        esnext      : true // if es.next specific syntax should be allowed
+        esnext      : true, // if es.next specific syntax should be allowed
+        traceur     : true  // if traceur syntax extensions should be allowed
       },
 
       // Third party globals
@@ -452,20 +453,24 @@ var JSHINT = (function () {
       combine(predefined, vars.mocha);
     }
 
-    // Let's assume that chronologically ES3 < ES5 < ES6/ESNext < Moz
+    // Let's assume that chronologically ES3 < ES5 < ES6/ESNext < Moz < tracuer
+
+    state.option.inTraceur = function (/* strict */) {
+      return state.option.traceur;
+    };
 
     state.option.inMoz = function (strict) {
       if (strict) {
-        return state.option.moz && !state.option.esnext;
+        return state.option.moz && !state.option.esnext && !state.option.traceur;
       }
       return state.option.moz;
     };
 
     state.option.inESNext = function (strict) {
       if (strict) {
-        return !state.option.moz && state.option.esnext;
+        return !state.option.moz && (state.option.esnext || state.option.traceur);
       }
-      return state.option.moz || state.option.esnext;
+      return state.option.moz || state.option.esnext || state.option.traceur;
     };
 
     state.option.inES5 = function (/* strict */) {
@@ -474,7 +479,10 @@ var JSHINT = (function () {
 
     state.option.inES3 = function (strict) {
       if (strict) {
-        return !state.option.moz && !state.option.esnext && state.option.es3;
+        return (
+          !state.option.moz && !state.option.esnext && 
+          state.option.es3 && !state.option.traceur
+        );
       }
       return state.option.es3;
     };
@@ -1744,7 +1752,8 @@ var JSHINT = (function () {
 
     r = expression(0, true);
 
-    if (r && (!r.identifier || r.value !== "function") && (r.type !== "(punctuator)")) {
+    if (r && (!r.identifier || (r.value !== "function" && r.value !== "async")) &&
+       (r.type !== "(punctuator)")) {
       if (!state.directive["use strict"] &&
           state.option.globalstrict &&
           state.option.strict) {
@@ -2954,7 +2963,8 @@ var JSHINT = (function () {
       "(blockscope)": null,
       "(comparray)" : null,
       "(generator)" : null,
-      "(params)"    : null
+      "(params)"    : null,
+      "(async)"     : null
     };
 
     if (token) {
@@ -2991,7 +3001,7 @@ var JSHINT = (function () {
     };
   }
 
-  function doFunction(name, statement, generator, fatarrowparams) {
+  function doFunction(name, statement, generator, fatarrowparams, async) {
     var f;
     var oldOption = state.option;
     var oldIgnored = state.ignored;
@@ -3004,7 +3014,8 @@ var JSHINT = (function () {
     funct = functor(name || "\"" + anonname + "\"", state.tokens.next, scope, {
       "(statement)": statement,
       "(context)":   funct,
-      "(generator)": generator ? true : null
+      "(generator)": generator ? true : null,
+      "(async)":     async ? true : null
     });
 
     f = funct;
@@ -3033,6 +3044,10 @@ var JSHINT = (function () {
     if (!state.option.noyield && generator &&
         funct["(generator)"] !== "yielded") {
       warning("W124", state.tokens.curr);
+    }
+
+    if (async && funct["(async)"] !== "awaited") {
+      warning("W128", state.tokens.curr);
     }
 
     funct["(metrics)"].verifyMaxStatementsPerFunction();
@@ -3144,7 +3159,7 @@ var JSHINT = (function () {
 
   (function (x) {
     x.nud = function () {
-      var b, f, i, p, t, g, nextVal;
+      var b, f, i, p, t, g, nextVal, a;
       var props = {}; // All properties, including accessors
 
       b = state.tokens.curr.line !== state.tokens.next.line;
@@ -3199,11 +3214,22 @@ var JSHINT = (function () {
           }
         } else {
           g = false;
+          a = false;
+          if (nextVal === "async" && peekIgnoreEOL().id !== ":") {
+            if (!state.option.inTraceur()) {
+              warning("W127", state.tokens.next, "async/await");
+            }
+            advance(nextVal);
+            a = true;
+          }
           if (state.tokens.next.value === "*" && state.tokens.next.type === "(punctuator)") {
             if (!state.option.inESNext()) {
               warning("W104", state.tokens.next, "generator functions");
             }
             advance("*");
+            if (a) {
+              warning("W129", state.tokens.next, "generator functions");
+            }
             g = true;
           }
           if (state.tokens.next.identifier &&
@@ -3231,7 +3257,7 @@ var JSHINT = (function () {
               if (!state.option.inESNext()) {
                 warning("W104", state.tokens.curr, "concise methods");
               }
-              doFunction(i, undefined, g);
+              doFunction(i, undefined, g, undefined, a);
             } else {
               advance(":");
               expression(10);
@@ -3674,11 +3700,14 @@ var JSHINT = (function () {
     checkProperties(props);
   }
 
-  blockstmt("function", function () {
+  function blockFunctionParse(async) {
     var generator = false;
+
     if (state.tokens.next.value === "*") {
       advance("*");
-      if (state.option.inESNext(true)) {
+      if (async) {
+        warning("W129", state.tokens.curr, "function*");
+      } else if (state.option.inESNext(true)) {
         generator = true;
       } else {
         warning("W119", state.tokens.curr, "function*");
@@ -3699,14 +3728,25 @@ var JSHINT = (function () {
     }
     addlabel(i, { type: "unction", token: state.tokens.curr });
 
-    doFunction(i, { statement: true }, generator);
+    doFunction(i, { statement: true }, generator, undefined, async);
     if (state.tokens.next.id === "(" && state.tokens.next.line === state.tokens.curr.line) {
       error("E039");
     }
+  }
+
+  blockstmt("function", function () {
+    blockFunctionParse.call(this, false);
     return this;
   });
 
-  prefix("function", function () {
+  blockstmt("async", function () {
+    nolinebreak(this);
+    advance("function");
+    blockFunctionParse.call(this, true);
+    return this;
+  });
+
+  function prefixFunctionParse(async) {
     var generator = false;
 
     if (state.tokens.next.value === "*") {
@@ -3714,11 +3754,16 @@ var JSHINT = (function () {
         warning("W119", state.tokens.curr, "function*");
       }
       advance("*");
-      generator = true;
+      if (async) {
+        warning("W129", state.tokens.curr, "function*");
+      }
+      else {
+        generator = true;
+      }
     }
 
     var i = optionalidentifier();
-    var fn = doFunction(i, undefined, generator);
+    var fn = doFunction(i, undefined, generator, undefined, async);
 
     function isVariable(name) { return name[0] !== "("; }
     function isLocal(name) { return fn[name] === "var"; }
@@ -3731,6 +3776,19 @@ var JSHINT = (function () {
         warning("W083");
       }
     }
+  }
+
+  prefix("function", function () {
+    prefixFunctionParse.call(this, false);
+    return this;
+  });
+
+  prefix("async", function () {
+    if (!state.option.inTraceur()) {
+      warning("W127", state.tokens.curr, "async/await");
+    }
+    nolinebreak(this);
+    prefixFunctionParse.call(this, true);
     return this;
   });
 
@@ -4299,6 +4357,26 @@ var JSHINT = (function () {
     return this;
   })));
 
+  (function (x) {
+    x.exps = true;
+    x.lbp = 25;
+  }(prefix("await", function () {
+    if (state.option.inTraceur(true) && !funct["(async)"]) {
+      error("E055", state.tokens.curr, "await");
+    }
+    if (!state.option.inTraceur(true)) {
+      warning("W127", state.tokens.curr, "async/await");
+    }
+    
+    funct["(async)"] = "awaited";
+    
+    this.first = expression(10);
+    
+    if (!state.option.asi) {
+      nolinebreak(this);
+    }
+    return this;
+  })));
 
   stmt("throw", function () {
     nolinebreak(this);
@@ -4454,7 +4532,7 @@ var JSHINT = (function () {
   }).exps = true;
 
   // Future Reserved Words
-
+  
   FutureReservedWord("abstract");
   FutureReservedWord("boolean");
   FutureReservedWord("byte");

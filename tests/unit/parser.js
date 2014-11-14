@@ -4919,6 +4919,58 @@ exports.testES6BlockExports = function (test) {
   test.done();
 };
 
+exports["test async/await"] = function (test) {
+  var code = [
+    "async function x() { return await 1; }",
+    "async function x() { await 1; }",
+    "async function () { await 1; }"
+  ];
+
+  TestRun(test)
+    .addError(1, "'async/await' is only available in experimental with Traceur extensions (use traceur option).")
+    .addError(1, "'x' is defined but never used.")
+    .addError(2, "'async/await' is only available in experimental with Traceur extensions (use traceur option).")
+    .addError(2, "'x' is defined but never used.")
+    .addError(3, "'async/await' is only available in experimental with Traceur extensions (use traceur option).")
+    .addError(3, "Missing name in function declaration.")
+    .test(code);
+
+  TestRun(test)
+    .addError(1, "'async/await' is only available in experimental with Traceur extensions (use traceur option).")
+    .addError(1, "'x' is defined but never used.")
+    .addError(2, "'async/await' is only available in experimental with Traceur extensions (use traceur option).")
+    .addError(2, "'x' is defined but never used.")
+    .addError(3, "'async/await' is only available in experimental with Traceur extensions (use traceur option).")
+    .addError(3, "Missing name in function declaration.")
+    .test(code, {moz: true, unused: true, undef: true});
+  
+  TestRun(test)
+    .addError(1, "'async/await' is only available in experimental with Traceur extensions (use traceur option).")
+    .addError(1, "'x' is defined but never used.")
+    .addError(2, "'async/await' is only available in experimental with Traceur extensions (use traceur option).")
+    .addError(2, "'x' is defined but never used.")
+    .addError(3, "'async/await' is only available in experimental with Traceur extensions (use traceur option).")
+    .addError(3, "Missing name in function declaration.")
+    .test(code, {es5: true, unused: true, undef: true});
+  
+  TestRun(test)
+    .addError(1, "'async/await' is only available in experimental with Traceur extensions (use traceur option).")
+    .addError(1, "'x' is defined but never used.")
+    .addError(2, "'async/await' is only available in experimental with Traceur extensions (use traceur option).")
+    .addError(2, "'x' is defined but never used.")
+    .addError(3, "'async/await' is only available in experimental with Traceur extensions (use traceur option).")
+    .addError(3, "Missing name in function declaration.")
+    .test(code, {esnext: true, unused: true, undef: true});
+  
+  TestRun(test)
+    .addError(1, "'x' is defined but never used.")
+    .addError(2, "'x' is defined but never used.")
+    .addError(3, "Missing name in function declaration.")
+    .test(code, {traceur: true, unused: true, undef: true});
+
+  test.done();
+}
+
 exports.testStrictDirectiveASI = function (test) {
   var options = { strict: true, asi: true, globalstrict: true };
 
