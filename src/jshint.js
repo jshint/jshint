@@ -41,6 +41,7 @@ var reg      = require("./reg.js");
 var state    = require("./state.js").state;
 var style    = require("./style.js");
 var options  = require("./options.js");
+var Experimental = require("./experimental").forJSHINT;
 
 // We need this module here because environments such as IE and Rhino
 // don't necessarilly expose the 'console' API and browserify uses
@@ -101,6 +102,11 @@ var JSHINT = (function () {
 
     extraModules = [],
     emitter = new events.EventEmitter();
+
+  var experimental = new Experimental(addlabel, advance, blockstmt, doFunction, error,
+    expression, function () { return funct; }, function() { return inblock; },
+    isEndOfExpr, nobreaknonadjacent, nolinebreak, optionalidentifier, peek, prefix,
+    warning, warningAt);
 
   function checkOption(name, t) {
     name = name.trim();
@@ -315,6 +321,8 @@ var JSHINT = (function () {
       }
       return state.option.es3;
     };
+
+    experimental.applyStateOptionHook();
   }
 
   // Produce an error warning.
@@ -346,7 +354,7 @@ var JSHINT = (function () {
   function warning(code, t, a, b, c, d) {
     var ch, l, w, msg;
 
-    if (/^W\d{3}$/.test(code)) {
+    if (/^W\d{3}/.test(code)) {
       if (state.ignored[code])
         return;
 
@@ -848,6 +856,7 @@ var JSHINT = (function () {
   function expression(rbp, initial) {
     var left, isArray = false, isObject = false, isLetExpr = false,
       isFatArrowBody = state.tokens.curr.value === "=>";
+    var expressionHook = new experimental.ExpressionHook();
 
     state.nameStack.push();
 
@@ -883,11 +892,14 @@ var JSHINT = (function () {
 
     advance();
 
+    expressionHook.parse();
+
     if (initial) {
       funct["(verb)"] = state.tokens.curr.value;
     }
 
-    if (initial === true && state.tokens.curr.fud) {
+    var runFud = expressionHook.updateRunFud(initial === true && state.tokens.curr.fud);
+    if (runFud) {
       left = state.tokens.curr.fud();
     } else {
       if (state.tokens.curr.nud) {
@@ -929,7 +941,7 @@ var JSHINT = (function () {
         }
 
         if (left && state.tokens.curr.led) {
-          left = state.tokens.curr.led(left);
+          left = state.tokens.curr.led(left, expressionHook);
         } else {
           error("E033", state.tokens.curr, state.tokens.curr.id);
         }
@@ -1167,11 +1179,17 @@ var JSHINT = (function () {
   function application(s) {
     var x = symbol(s, 42);
 
-    x.led = function (left) {
+    x.led = function (left, expressionHook) {
+      if (!state.option.esnext) {
+        warning("W119", state.tokens.curr, "arrow function syntax (=>)");
+      }
+      expressionHook.applicationWarning(warning);
       nobreaknonadjacent(state.tokens.prev, state.tokens.curr);
 
       this.left = left;
-      this.right = doFunction({fatarrow: { loneArg: left }});
+      this.right = doFunction({
+        experimental: expressionHook.doFunctionParams() ,
+        fatarrow: { loneArg: left }});
       return this;
     };
     return x;
@@ -1419,6 +1437,10 @@ var JSHINT = (function () {
       return val;
     }
 
+    if(experimental.applyOptionalIdentifierHook(val)){
+      return val;
+    }
+
     if (prop) {
       if (state.option.inES5()) {
         return val;
@@ -1509,6 +1531,7 @@ var JSHINT = (function () {
   function statement() {
     var values;
     var i = indent, r, s = scope, t = state.tokens.next;
+    var statementHook = new experimental.StatementHook(t);
 
     if (t.id === ";") {
       advance(";");
@@ -1603,7 +1626,8 @@ var JSHINT = (function () {
 
     // Look for the final semicolon.
 
-    if (!t.block) {
+    var isBlock = statementHook.isBlock(t.block);
+    if (!isBlock) {
       if (!state.option.expr && (!r || !r.exps)) {
         warning("W030", state.tokens.curr);
       } else if (state.option.nonew && r && r.left && r.id === "(" && r.left.id === "new") {
@@ -2478,7 +2502,9 @@ var JSHINT = (function () {
     // current token marks the beginning of a "fat arrow" function and parsing
     // should proceed accordingly.
     if (pn.value === "=>") {
-      return doFunction({fatarrow: { parsedParen: true }});
+      return doFunction({
+        fatarrow: { parsedParen: true },
+        experimental: experimental.applyBalancedFatArrowHook()});
     }
 
     var exprs = [];
@@ -2824,6 +2850,8 @@ var JSHINT = (function () {
       "(params)"    : null
     };
 
+    experimental.applyInitFunctorHook(funct);
+
     if (token) {
       _.extend(funct, {
         "(line)"     : token.line,
@@ -2871,9 +2899,11 @@ var JSHINT = (function () {
    *                                        argument shorthand.
    * @param {bool} [opts.fatarrow.parsedParen] Whether the opening parenthesis has
    *                                           already been parsed.
+   * @param {Object} [opts.experimental] experimental params
    */
-  function doFunction(opts /*name, statement, generator, fatarrow*/) {
+  function doFunction(opts) {
     opts = opts || {};
+    var doFunctionHook = new experimental.DoFunctionHook(opts);
     var f;
     var oldOption = state.option;
     var oldIgnored = state.ignored;
@@ -2883,11 +2913,15 @@ var JSHINT = (function () {
     state.ignored = Object.create(state.ignored);
     scope = Object.create(scope);
 
-    funct = functor(opts.name || state.nameStack.infer(), state.tokens.next, scope, {
+    var functorParams = {
       "(statement)": opts.statement,
       "(context)":   funct,
       "(generator)": opts.generator ? true : null
-    });
+    };
+    doFunctionHook.updateFunctor(functorParams);
+
+    funct = functor(opts.name || state.nameStack.infer(), state.tokens.next,
+                    scope, functorParams);
 
     f = funct;
     state.tokens.curr.funct = funct;
@@ -2917,6 +2951,8 @@ var JSHINT = (function () {
         funct["(generator)"] !== "yielded") {
       warning("W124", state.tokens.curr);
     }
+
+    doFunctionHook.warnings();
 
     funct["(metrics)"].verifyMaxStatementsPerFunction();
     funct["(metrics)"].verifyMaxComplexityPerFunction();
@@ -3484,10 +3520,27 @@ var JSHINT = (function () {
     var props = {};
     var staticProps = {};
     var computed;
+
+    var skipKeyword = function(keyword) {
+      var found = false;
+      if (name.identifier && name.value === keyword) {
+        if (isPropertyName(state.tokens.next) || state.tokens.next.id === "[") {
+          computed = state.tokens.next.id === "[";
+          name = state.tokens.next;
+          if (computed) {
+            name = computedPropertyName();
+          } else advance();
+          found = true;
+        }
+      }
+      return found;
+    };
+
     for (var i = 0; state.tokens.next.id !== "}"; ++i) {
       name = state.tokens.next;
       isStatic = false;
       isGenerator = false;
+      var classBodyHook = new experimental.ClassBodyHook(skipKeyword);
       getset = null;
       if (name.id === "*") {
         isGenerator = true;
@@ -3514,17 +3567,12 @@ var JSHINT = (function () {
             } else advance();
           }
         }
-
-        if (name.identifier && (name.value === "get" || name.value === "set")) {
-          if (isPropertyName(state.tokens.next) || state.tokens.next.id === "[") {
-            computed = state.tokens.next.id === "[";
-            getset = name;
-            name = state.tokens.next;
-            if (state.tokens.next.id === "[") {
-              name = computedPropertyName();
-            } else advance();
-          }
+        isStatic = isStatic || skipKeyword("static");
+        var currName = name;
+        if(skipKeyword("get") || skipKeyword("set"))  {
+          getset = currName;
         }
+        classBodyHook.parse();
       } else {
         warning("W052", state.tokens.next, state.tokens.next.value || state.tokens.next.type);
         advance();
@@ -3567,11 +3615,14 @@ var JSHINT = (function () {
 
       propertyName(name);
 
-      doFunction({statement: c, generator: isGenerator});
+      doFunction({statement: c,  generator: isGenerator,
+        experimental: classBodyHook.doFunctionParams()});
     }
 
     checkProperties(props);
   }
+
+  experimental.applyBlockstmtHook();
 
   blockstmt("function", function () {
     var generator = false;
@@ -3604,6 +3655,8 @@ var JSHINT = (function () {
     }
     return this;
   });
+
+  experimental.applyPrefixHook();
 
   prefix("function", function () {
     var generator = false;
@@ -4327,6 +4380,8 @@ var JSHINT = (function () {
       return this;
     }
 
+    var exportHook = new experimental.ExportHook(this, ok, exported);
+
     if (state.tokens.next.id === "var") {
       advance("var");
       exported[state.tokens.next.value] = ok;
@@ -4354,6 +4409,8 @@ var JSHINT = (function () {
       exported[state.tokens.next.value] = ok;
       state.tokens.next.exported = true;
       state.syntax["class"].fud();
+    } else if (exportHook.check()) {
+      exportHook.applyHook();
     } else {
       error("E024", state.tokens.next, state.tokens.next.value);
     }
@@ -4960,7 +5017,7 @@ var JSHINT = (function () {
       });
     }
 
-    lex = new Lexer(s);
+    lex = new Lexer(s, experimental);
 
     lex.on("warning", function (ev) {
       warningAt.apply(null, [ ev.code, ev.line, ev.character].concat(ev.data));

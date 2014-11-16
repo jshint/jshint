@@ -8,6 +8,7 @@ var _      = require("underscore");
 var events = require("events");
 var reg    = require("./reg.js");
 var state  = require("./state.js").state;
+var experimental = require('./experimental').forLexer;
 
 var unicodeData = require("../data/ascii-identifier-data.js");
 var asciiIdentifierStartTable = unicodeData.asciiIdentifierStartTable;
@@ -504,6 +505,8 @@ Lexer.prototype = {
       "finally", "extends", "function", "continue",
       "debugger", "instanceof"
     ];
+
+    experimental.applyLexerHook(keywords);
 
     if (result && keywords.indexOf(result[0]) >= 0) {
       return {

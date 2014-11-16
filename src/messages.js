@@ -1,6 +1,7 @@
 "use strict";
 
-var _ = require("underscore");
+var _ = require("underscore"),
+    experimental = require("./experimental").forMessages;
 
 var errors = {
   // JSHint options
@@ -70,7 +71,7 @@ var errors = {
   E052: "Unclosed template literal.",
   E053: "Export declaration must be in global scope.",
   E054: "Class properties must be methods. Expected '(' but instead saw '{a}'."
-};
+ };
 
 var warnings = {
   W001: "'hasOwnProperty' is a really bad name.",
@@ -204,6 +205,8 @@ var warnings = {
   W127: "Unexpected use of a comma operator.",
   W128: "Empty array elements require elision=true."
 };
+
+experimental.applyMessagesHook(errors, warnings);
 
 var info = {
   I001: "Comma warnings can be turned off with 'laxcomma'.",
