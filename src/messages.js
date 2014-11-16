@@ -69,8 +69,9 @@ var errors = {
   E051: "Regular parameters cannot come after default parameters.",
   E052: "Unclosed template literal.",
   E053: "Export declaration must be in global scope.",
-  E054: "Class properties must be methods. Expected '(' but instead saw '{a}'."
-};
+  E054: "Class properties must be methods. Expected '(' but instead saw '{a}'.",
+  E055: "A await statement shall be within an async function (with syntax: `async function`)."
+ };
 
 var warnings = {
   W001: "'hasOwnProperty' is a really bad name.",
@@ -200,8 +201,10 @@ var warnings = {
   W123: "'{a}' is already defined in outer scope.",
   W124: "A generator function shall contain a yield statement.",
   W125: "This line contains non-breaking spaces: http://jshint.com/doc/options/#nonbsp",
-  W126: "Grouping operator is unnecessary for lone expressions."
-};
+  W126: "Grouping operator is unnecessary for lone expressions.",
+  W127: "An async function shall contain an await statement.",
+  W128: "'{a}' is available in async/await extension(use asyncawait option).",
+  };
 
 var info = {
   I001: "Comma warnings can be turned off with 'laxcomma'.",

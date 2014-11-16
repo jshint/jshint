@@ -128,7 +128,7 @@ var JSHINT = (function () {
         lastsemic   : true, // if semicolons may be ommitted for the trailing
         loopfunc    : true, // if functions should be allowed to be defined within
         expr        : true, // if ExpressionStatement should be allowed as Programs
-        esnext      : true // if es.next specific syntax should be allowed
+        esnext      : true  // if es.next specific syntax should be allowed
       },
 
       // Third party globals
@@ -159,7 +159,7 @@ var JSHINT = (function () {
       regexp      : true, // if the . should not be allowed in regexp literals
       regexdash   : true  // if unescaped first/last dash (-) inside brackets
                           // should be tolerated
-    },
+     },
 
     // These are the JSHint options that can take any value
     // (we use this object to detect invalid options)
@@ -194,8 +194,12 @@ var JSHINT = (function () {
                             //   end      - stop ignoring lines, starting on the next line
                             //   line     - ignore warnings / errors for just a single line
                             //              (this option does not bypass the lexer)
-      ignoreDelimiters: false // array of start/end delimiters used to ignore
+      ignoreDelimiters: false, // array of start/end delimiters used to ignore
                               // certain chunks from code
+      experimental: []   // experimental feature, see list below
+                         // asyncawait    : enables async/await functions support.
+                         // asyncreqawait : requires async functions to contain at least
+                         //                  one await statement.
     },
 
     // These are JSHint boolean options which are shared with JSLint
@@ -465,6 +469,16 @@ var JSHINT = (function () {
         return !state.option.moz && state.option.esnext;
       }
       return state.option.moz || state.option.esnext;
+    };
+
+    state.option.asyncAwaitEnabled = function () {
+      return state.option.experimental &&
+        state.option.experimental.indexOf("asyncawait") >= 0;
+    };
+
+    state.option.asyncReqAwait = function () {
+      return state.option.experimental &&
+        state.option.experimental.indexOf("asyncreqawait") >= 0;
     };
 
     state.option.inES5 = function (/* strict */) {
@@ -1048,11 +1062,16 @@ var JSHINT = (function () {
       warning("W014", state.tokens.curr, state.tokens.curr.id);
 
     advance();
-
+    var isAsync = false;
+    if ( state.tokens.curr.value === "async" &&
+         state.tokens.curr.type === "(identifier)" &&
+         state.tokens.next.value !== "function") {
+      isAsync = true;
+      advance();
+    }
     if (initial) {
       funct["(verb)"] = state.tokens.curr.value;
     }
-
     if (initial === true && state.tokens.curr.fud) {
       left = state.tokens.curr.fud();
     } else {
@@ -1095,7 +1114,7 @@ var JSHINT = (function () {
         }
 
         if (left && state.tokens.curr.led) {
-          left = state.tokens.curr.led(left);
+          left = state.tokens.curr.led(left, isAsync);
         } else {
           error("E033", state.tokens.curr, state.tokens.curr.id);
         }
@@ -1329,15 +1348,18 @@ var JSHINT = (function () {
   function application(s) {
     var x = symbol(s, 42);
 
-    x.led = function (left) {
+    x.led = function (left, isAsync) {
       if (!state.option.esnext) {
         warning("W119", state.tokens.curr, "arrow function syntax (=>)");
+      }
+      if (isAsync && !state.option.asyncAwaitEnabled()) {
+        warning("W128", state.tokens.curr, "async");
       }
 
       nobreaknonadjacent(state.tokens.prev, state.tokens.curr);
 
       this.left = left;
-      this.right = doFunction(undefined, undefined, false, left);
+      this.right = doFunction(undefined, undefined, false, isAsync, left);
       return this;
     };
     return x;
@@ -2848,7 +2870,6 @@ var JSHINT = (function () {
     var tokens = [];
     var t;
     var pastDefault = false;
-
     if (parsed) {
       if (Array.isArray(parsed)) {
         for (var i in parsed) {
@@ -2873,7 +2894,6 @@ var JSHINT = (function () {
     }
 
     next = state.tokens.next;
-
     advance("(");
 
     if (state.tokens.next.id === ")") {
@@ -2963,6 +2983,7 @@ var JSHINT = (function () {
       "(blockscope)": null,
       "(comparray)" : null,
       "(generator)" : null,
+      "(async)" : null,
       "(params)"    : null
     };
 
@@ -3000,7 +3021,7 @@ var JSHINT = (function () {
     };
   }
 
-  function doFunction(name, statement, generator, fatarrowparams) {
+  function doFunction(name, statement, generator, isAsync, fatarrowparams) {
     var f;
     var oldOption = state.option;
     var oldIgnored = state.ignored;
@@ -3013,7 +3034,8 @@ var JSHINT = (function () {
     funct = functor(name || state.nameStack.infer(), state.tokens.next, scope, {
       "(statement)": statement,
       "(context)":   funct,
-      "(generator)": generator ? true : null
+      "(generator)": generator ? true : null,
+      "(async)": isAsync ? true : null
     });
 
     f = funct;
@@ -3042,6 +3064,11 @@ var JSHINT = (function () {
     if (!state.option.noyield && generator &&
         funct["(generator)"] !== "yielded") {
       warning("W124", state.tokens.curr);
+    }
+
+    if (state.option.asyncReqAwait() && isAsync &&
+        funct["(async)"] !== "awaited") {
+      warning("W127", state.tokens.curr);
     }
 
     funct["(metrics)"].verifyMaxStatementsPerFunction();
@@ -3238,7 +3265,7 @@ var JSHINT = (function () {
               if (!state.option.inESNext()) {
                 warning("W104", state.tokens.curr, "concise methods");
               }
-              doFunction(i, undefined, g);
+              doFunction(i, undefined, g, false);
             } else {
               advance(":");
               expression(10);
@@ -3605,13 +3632,31 @@ var JSHINT = (function () {
   function classbody(c) {
     var name;
     var isStatic;
+    var isAsync;
     var getset;
     var props = {};
     var staticProps = {};
     var computed;
+
+    var skipKeyword = function(keyword) {
+      var found = false;
+      if (name.identifier && name.value === keyword) {
+        if (isPropertyName(state.tokens.next) || state.tokens.next.id === "[") {
+          computed = state.tokens.next.id === "[";
+          name = state.tokens.next;
+          if (computed) {
+            name = computedPropertyName();
+          } else advance();
+          found = true;
+        }
+      }
+      return found;
+    };
+
     for (var i = 0; state.tokens.next.id !== "}"; ++i) {
       name = state.tokens.next;
       isStatic = false;
+      isAsync = false;
       getset = null;
       if (name.id === "[") {
         name = computedPropertyName();
@@ -3619,25 +3664,17 @@ var JSHINT = (function () {
         // Non-Computed PropertyName
         advance();
         computed = false;
-        if (name.identifier && name.value === "static") {
-          if (isPropertyName(state.tokens.next) || state.tokens.next.id === "[") {
-            computed = state.tokens.next.id === "[";
-            isStatic = true;
-            name = state.tokens.next;
-            if (state.tokens.next.id === "[") {
-              name = computedPropertyName();
-            } else advance();
-          }
-        }
 
-        if (name.identifier && (name.value === "get" || name.value === "set")) {
-          if (isPropertyName(state.tokens.next) || state.tokens.next.id === "[") {
-            computed = state.tokens.next.id === "[";
-            getset = name;
-            name = state.tokens.next;
-            if (state.tokens.next.id === "[") {
-              name = computedPropertyName();
-            } else advance();
+        isStatic = skipKeyword("static");
+        var currName = name;
+        if(skipKeyword("get") || skipKeyword("set"))  {
+          getset = currName;
+        }
+        isAsync = skipKeyword("async");
+
+        if(isAsync) {
+          if (!state.option.asyncAwaitEnabled()) {
+            warning("W128", state.tokens.curr, "async");
           }
         }
       } else {
@@ -3654,7 +3691,7 @@ var JSHINT = (function () {
           advance();
         }
         if (state.tokens.next.value !== "(") {
-          doFunction(undefined, c, false, null);
+          doFunction(undefined, c, false, false, null);
         }
       }
 
@@ -3682,11 +3719,40 @@ var JSHINT = (function () {
 
       propertyName(name);
 
-      doFunction(null, c, false, null);
+      doFunction(null, c, false, isAsync, null);
     }
 
     checkProperties(props);
   }
+
+  blockstmt("async", function () {
+    if (!state.option.asyncAwaitEnabled()) {
+      warning("W128", state.tokens.curr, "async");
+    }
+    if (state.tokens.next.value === "function") {
+      advance("function");
+
+      if (inblock) {
+        warning("W082", state.tokens.curr);
+      }
+      var i = optionalidentifier();
+
+      if (i === undefined) {
+        warning("W025");
+      }
+
+      if (funct[i] === "const") {
+        warning("E011", null, i);
+      }
+      addlabel(i, { type: "unction", token: state.tokens.curr });
+
+      doFunction(i, { statement: true }, false, true);
+      if (state.tokens.next.id === "(" && state.tokens.next.line === state.tokens.curr.line) {
+        error("E039");
+      }
+    }
+    return this;
+  });
 
   blockstmt("function", function () {
     var generator = false;
@@ -3700,7 +3766,6 @@ var JSHINT = (function () {
     }
     if (inblock) {
       warning("W082", state.tokens.curr);
-
     }
     var i = optionalidentifier();
 
@@ -3713,9 +3778,32 @@ var JSHINT = (function () {
     }
     addlabel(i, { type: "unction", token: state.tokens.curr });
 
-    doFunction(i, { statement: true }, generator);
+    doFunction(i, { statement: true }, generator, false);
     if (state.tokens.next.id === "(" && state.tokens.next.line === state.tokens.curr.line) {
       error("E039");
+    }
+    return this;
+  });
+
+  prefix("async", function () {
+    if (!state.option.asyncAwaitEnabled()) {
+      warning("W128", state.tokens.curr, "async");
+    }
+    function isVariable(name) { return name[0] !== "("; }
+    function isLocal(name) { return fn[name] === "var"; }
+    if (state.tokens.next.value === "function") {
+      advance("function");
+
+      var i = optionalidentifier();
+      var fn = doFunction(i, undefined, false, true);
+      if (!state.option.loopfunc && funct["(loopage)"]) {
+        // If the function we just parsed accesses any non-local variables
+        // trigger a warning. Otherwise, the function is safe even within
+        // a loop.
+        if (_.some(fn, function (val, name) { return isVariable(name) && !isLocal(name); })) {
+          warning("W083");
+        }
+      }
     }
     return this;
   });
@@ -3732,7 +3820,7 @@ var JSHINT = (function () {
     }
 
     var i = optionalidentifier();
-    var fn = doFunction(i, undefined, generator);
+    var fn = doFunction(i, undefined, generator, false);
 
     function isVariable(name) { return name[0] !== "("; }
     function isLocal(name) { return fn[name] === "var"; }
@@ -3925,7 +4013,8 @@ var JSHINT = (function () {
       case "case":
         switch (funct["(verb)"]) {
         case "yield":
-        case "break":
+        case "await":
+         case "break":
         case "case":
         case "continue":
         case "return":
@@ -3951,6 +4040,7 @@ var JSHINT = (function () {
       case "default":
         switch (funct["(verb)"]) {
         case "yield":
+        case "await":
         case "break":
         case "continue":
         case "return":
@@ -4313,6 +4403,42 @@ var JSHINT = (function () {
     return this;
   })));
 
+  (function (x) {
+    x.exps = true;
+    x.lbp = 25;
+  }(prefix("await", function () {
+    var prev = state.tokens.prev;
+    if (state.option.asyncAwaitEnabled() && !funct["(async)"]) {
+      // If it's a await within a catch clause inside a generator then that's ok
+      if (!("(catch)" === funct["(name)"] && funct["(context)"]["(async)"])) {
+        error("E055", state.tokens.curr, "await");
+      }
+    } else if (!state.option.asyncAwaitEnabled()) {
+      warning("W128", state.tokens.curr, "await");
+    }
+    funct["(async)"] = "awaited";
+
+    if (this.line === state.tokens.next.line || !state.option.inMoz(true)) {
+      if (state.tokens.next.id !== ";" && !state.tokens.next.reach && state.tokens.next.nud) {
+
+        nobreaknonadjacent(state.tokens.curr, state.tokens.next);
+        this.first = expression(10);
+
+        if (this.first.type === "(punctuator)" && this.first.value === "=" &&
+            !this.first.paren && !state.option.boss) {
+          warningAt("W093", this.first.line, this.first.character);
+        }
+      }
+
+      if (state.option.inMoz(true) && state.tokens.next.id !== ")" &&
+          (prev.lbp > 30 || (!prev.assign && !isEndOfExpr()) || prev.id === "async")) {
+        error("E050", this);
+      }
+    } else if (!state.option.asi) {
+      nolinebreak(this); // always warn (Line breaking error)
+    }
+    return this;
+  })));
 
   stmt("throw", function () {
     nolinebreak(this);
