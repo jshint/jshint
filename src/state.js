@@ -25,8 +25,6 @@ var state = {
 
     // Blank out non-multi-line-commented lines when ignoring linter errors
     this.ignoreLinterErrors = false;
-
-    this.parsingFatArrowParams = false;
   }
 };
 
