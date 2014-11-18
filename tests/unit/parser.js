@@ -3696,6 +3696,38 @@ exports["fat arrows support"] = function (test) {
   test.done();
 };
 
+exports["fat arrow nested function scoping"] = function (test) {
+  var code = [
+    "(() => {",
+    "  for (var i = 0; i < 10; i++) {",
+    "    var x;",
+    "  }",
+    "  var arrow = (x) => {",
+    "    return x;",
+    "  };",
+    "  var arrow2 = (x) => x;",
+    "  arrow();",
+    "  arrow2();",
+    "})();",
+    "(function() {",
+    "  for (var i = 0; i < 10; i++) {",
+    "    var x;",
+    "  }",
+    "  var arrow = (x) => {",
+    "    return x;",
+    "  };",
+    "  var arrow2 = (x) => x;",
+    "  arrow();",
+    "  arrow2();",
+    "})();"
+  ];
+
+  TestRun(test)
+    .test(code, {esnext: true});
+
+  test.done();
+};
+
 exports["concise methods support"] = function (test) {
   var code = [
     "var foobar = {",
