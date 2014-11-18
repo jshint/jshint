@@ -1923,7 +1923,9 @@ var JSHINT = (function () {
         case "function":
         case "var":
         case "unused":
-          warning("W038", state.tokens.curr, v);
+          if (!state.parsingFatArrowParams) {
+            warning("W038", state.tokens.curr, v);
+          }
           break;
         case "label":
           warning("W037", state.tokens.curr, v);
@@ -2472,7 +2474,9 @@ var JSHINT = (function () {
             exprs.push(bracket.left[t].token);
           }
         } else {
+          state.parsingFatArrowParams = pn1.value === "=>";
           exprs.push(expression(10));
+          state.parsingFatArrowParams = false;
         }
         if (state.tokens.next.id !== ",") {
           break;
