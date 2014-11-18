@@ -7,6 +7,7 @@
 var JSHINT  = require('../../src/jshint.js').JSHINT;
 var fs    = require('fs');
 var TestRun = require("../helpers/testhelper").setup.testRun;
+var clearJSHINT = require("../helpers/testhelper").setup.clearJSHINT;
 var path    = require("path");
 
 exports.unsafe = function (test) {
@@ -4955,6 +4956,7 @@ exports.testStrictDirectiveASI = function (test) {
 };
 
 exports["test: asyncawait basics"] = function (test) {
+  clearJSHINT();
   var options = { esnext: true, experimental: ["asyncawait"]};
 
   TestRun(test, 1)
@@ -5028,6 +5030,7 @@ exports["test: asyncawait basics"] = function (test) {
 };
 
 exports["test: asyncawait within classes"] = function (test) {
+  clearJSHINT();
   var options = { esnext: true, experimental: ["asyncawait"] };
 
   TestRun(test, 1)
@@ -5061,6 +5064,7 @@ exports["test: asyncawait within classes"] = function (test) {
 }
 
 exports["test: asyncawait errors"] = function (test) {
+  clearJSHINT();
   var options = { esnext: true, experimental: ["asyncawait", "asyncreqawait"] };
 
   TestRun(test, 1)
@@ -5086,6 +5090,7 @@ exports["test: asyncawait errors"] = function (test) {
       options);
 
   options = { esnext: true, experimental: ["asyncawait"] };
+  clearJSHINT();
 
   TestRun(test, 4)
     .addError(1, "A await statement shall be within an async function (with syntax: `async function`).")
@@ -5109,32 +5114,18 @@ exports["test: asyncawait errors"] = function (test) {
       "}\n",
       options);
 
-  options = { esnext: true };
+  test.done();
+}
 
-  TestRun(test, 7)
-    .addError(1, "'async' is available in async/await extension(use asyncawait option).")
-    .addError(1, "'await' is available in async/await extension(use asyncawait option).")
-     .test(
-      "let fn = async function() { await 1; };",
-      options);
+exports["test: async await keywords allowed when disabled"] = function (test) {
+  clearJSHINT();
+  var options = { esnext: true };
 
-  TestRun(test, 8)
-     .addError(1, "'async' is available in async/await extension(use asyncawait option).")
-     .addError(1, "'await' is available in async/await extension(use asyncawait option).")
-     .test(
-      "let fn = async x => await x;",
-      options);
-
-  TestRun(test, 9)
-    .addError(2, "'async' is available in async/await extension(use asyncawait option).")
-    .addError(2, "'await' is available in async/await extension(use asyncawait option).")
-    .addError(3, "'async' is available in async/await extension(use asyncawait option).")
-    .addError(3, "'await' is available in async/await extension(use asyncawait option).")
-     .test(
-      "class A {\n" +
-      "  async fn1(x) { await x; }\n" +
-      "  static async fn1(x) { await x; }\n" +
-      "}\n",
+  TestRun(test, 1)
+    .test(
+      "var async = require('async');\n" +
+      "async.series([]);" +
+      "var await = 2;",
       options);
 
   test.done();
