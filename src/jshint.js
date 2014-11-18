@@ -2440,13 +2440,11 @@ var JSHINT = (function () {
 
   prefix("(", function () {
     var bracket, brackets = [];
-    var pn, pn1, i = 0;
+    var pn = state.tokens.next, pn1, i = -1;
     var ret, triggerFnExpr;
     var parens = 1;
 
     do {
-      pn = peek(i);
-
       if (pn.value === "(") {
         parens += 1;
       } else if (pn.value === ")") {
@@ -2454,9 +2452,10 @@ var JSHINT = (function () {
       }
 
       i += 1;
-      pn1 = peek(i);
-    } while (!(parens === 0 && pn.value === ")") &&
-             pn1.value !== "=>" && pn1.value !== ";" && pn1.type !== "(end)");
+      pn1 = pn;
+      pn = peek(i);
+    } while (!(parens === 0 && pn1.value === ")") &&
+             pn.value !== "=>" && pn.value !== ";" && pn.type !== "(end)");
 
     if (state.tokens.next.id === "function") {
       triggerFnExpr = state.tokens.next.immed = true;
@@ -2466,7 +2465,7 @@ var JSHINT = (function () {
 
     if (state.tokens.next.id !== ")") {
       for (;;) {
-        if (pn1.value === "=>" && _.contains(["{", "["], state.tokens.next.value)) {
+        if (pn.value === "=>" && _.contains(["{", "["], state.tokens.next.value)) {
           bracket = state.tokens.next;
           bracket.left = destructuringExpression();
           brackets.push(bracket);
