@@ -3732,6 +3732,13 @@ exports["fat arrow nested function scoping"] = function (test) {
   test.done();
 };
 
+exports["default arguments in fat arrow functions"] = function (test) {
+  TestRun(test)
+    .test("(x = 0) => { return x; };", { expr: true, unused: true, esnext: true });
+
+  test.done();
+};
+
 var conciseMethods = exports.conciseMethods = {};
 
 conciseMethods.basicSupport = function (test) {
