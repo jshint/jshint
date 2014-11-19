@@ -1451,6 +1451,14 @@ var JSHINT = (function () {
       }
     } else {
       error("E030", state.tokens.next, state.tokens.next.value);
+
+      // The token should be consumed after a warning is issued so the parser
+      // can continue as though an identifier were found. The semicolon token
+      // should not be consumed in this way so that the parser interprets it as
+      // a statement delimeter;
+      if (state.tokens.next.id !== ";") {
+        advance();
+      }
     }
   }
 
