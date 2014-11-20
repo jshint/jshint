@@ -5026,6 +5026,11 @@ exports["test: asyncawait basics"] = function (test) {
       "let fn = async x => 2*x;",
       options);
 
+  TestRun(test, 9)
+    .test(
+      "export async function myFunc() {}",
+     options);
+
   test.done();
 };
 
