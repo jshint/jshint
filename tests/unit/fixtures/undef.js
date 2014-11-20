@@ -22,3 +22,13 @@ var fn = function () {
         delete localUndef.attr;
     }
 };
+
+// Extraneous grouping operators will not cause a warning
+if (typeof(undef)) {}
+if (typeof((undef))) {}
+
+// Any other expression that includes the null reference should trigger an
+// error
+if (typeof undef()) {}
+if (typeof +undef) {}
+if (typeof(undef, 0)) {}

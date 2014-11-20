@@ -41,3 +41,14 @@ function bazbaz() {
 }
 
 bazbaz();
+
+// GH-1881 "jshint considers user delete() function as keyword, not function,
+// yields 'function not used' for argument"
+var c = {};
+c.typeof(hoistedTypeof);
+c.delete(hoistedDelete);
+
+// These functions should be recognized as "in use" even though they are being
+// passed to methods that look like unresolvable-reference-accepting operators.
+function hoistedDelete() {}
+function hoistedTypeof() {}
