@@ -2742,6 +2742,17 @@ exports["test: mozilla generator as legacy JS"] = function (test) {
   test.done();
 };
 
+exports["test: generator unused export"] = function (test) {
+  var options = { unused: true, esnext: true };
+
+  TestRun(test, 1)
+    .test(
+      "export function* myFunc() { yield 1; }",
+      options);
+
+  test.done();
+}
+
 exports["test: array comprehension"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
