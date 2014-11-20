@@ -4547,7 +4547,7 @@ var JSHINT = (function () {
         this.block = true;
         advance("async");
         exported[state.tokens.next.value] = ok;
-        state.tokens.next.exported = true;
+        peek(0).exported = true;
         state.syntax.async.fud();
        } else {
         error("E024", state.tokens.next, state.tokens.next.value);

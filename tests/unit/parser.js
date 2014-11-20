@@ -5031,6 +5031,13 @@ exports["test: asyncawait basics"] = function (test) {
       "export async function myFunc() {}",
      options);
 
+  options = { unused: true, esnext: true, experimental: ["asyncawait"]};
+
+  TestRun(test, 10)
+    .test(
+      "export async function myFunct() {}",
+      options);
+
   test.done();
 };
 
