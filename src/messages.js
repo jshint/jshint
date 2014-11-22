@@ -69,7 +69,8 @@ var errors = {
   E051: "Regular parameters cannot come after default parameters.",
   E052: "Unclosed template literal.",
   E053: "Export declaration must be in global scope.",
-  E054: "Class properties must be methods. Expected '(' but instead saw '{a}'."
+  E054: "Class properties must be methods. Expected '(' but instead saw '{a}'.",
+  E055: "An await expression shall be within an async function."
 };
 
 var warnings = {
@@ -200,7 +201,10 @@ var warnings = {
   W123: "'{a}' is already defined in outer scope.",
   W124: "A generator function shall contain a yield statement.",
   W125: "This line contains non-breaking spaces: http://jshint.com/doc/options/#nonbsp",
-  W126: "Grouping operator is unnecessary for lone expressions."
+  W126: "Grouping operator is unnecessary for lone expressions.",
+  W127: "'async()/await()' is only available with the asyncawait option.",
+  W128: "An async function shall contain an await.",
+  W129: "Cannot mix async functions with generators."
 };
 
 var info = {
