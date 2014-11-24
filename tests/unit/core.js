@@ -944,3 +944,29 @@ exports.testUnnamedFuncStatement = function (test) {
 
   test.done();
 };
+
+exports.testUnCleanedForinifcheckneeded = function (test) {
+  var forinCode = [
+    'for (var key in a) {',
+    '    console.log(key);',
+    '}'
+  ];
+
+  var ifCode = [
+    'if(true) {',
+    '}'
+  ];
+
+  try {
+    JSHINT(forinCode, { maxerr: 1, forin: true });
+    // if last `forin` check reach the maxerr limit, the check will be quit left
+    // the uncleaned `state.forinifcheckneeded` and the empty `state.forinifchecks`.
+    // That cause the next `if` check access the wrong index of the empty `state.forinifchecks` array.
+    JSHINT(ifCode, { maxerr: 1, forin: true });
+  } catch(e) {
+      console.log(e);
+    test.ok(false, 'Exception was thrown');
+  }
+
+  test.done();
+};

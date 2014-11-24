@@ -4115,7 +4115,14 @@ var JSHINT = (function () {
               check.type === "(positive)" && s.length > 1 ||
               // Negative if statement but no continue
               check.type === "(negative)") {
-            warning("W089", this);
+            try {
+              warning("W089", this);
+            } catch (e) {
+                if (e.code === "E043") {
+                    state.forinifcheckneeded = false;
+                }
+                throw e;
+            }
           }
         }
 
