@@ -4118,10 +4118,10 @@ var JSHINT = (function () {
             try {
               warning("W089", this);
             } catch (e) {
-                if (e.code === "E043") {
-                    state.forinifcheckneeded = false;
-                }
-                throw e;
+              if (e.code === "E043") {
+                state.forinifcheckneeded = false;
+              }
+              throw e;
             }
           }
         }
