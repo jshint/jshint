@@ -1438,7 +1438,7 @@ Lexer.prototype = {
     // If we are ignoring linter errors, replace the input with empty string
     // if it doesn't already at least start or end a multi-line comment
     if (state.ignoreLinterErrors === true) {
-      if (!startsWith("/*", "//") && !endsWith("*/")) {
+      if (!startsWith("/*", "//") && !(this.inComment && endsWith("*/"))) {
         this.input = "";
       }
     }
