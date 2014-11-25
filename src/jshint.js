@@ -260,7 +260,6 @@ var JSHINT = (function () {
     lex,
     member,
     membersOnly,
-    noreach,
     predefined,    // Global variables defined by option
 
     scope,  // The current scope
@@ -1631,9 +1630,9 @@ var JSHINT = (function () {
   }
 
 
-  function reachable(s) {
+  function reachable(controlToken) {
     var i = 0, t;
-    if (state.tokens.next.id !== ";" || noreach) {
+    if (state.tokens.next.id !== ";" || controlToken.inBracelessBlock) {
       return;
     }
     for (;;) {
@@ -1653,7 +1652,7 @@ var JSHINT = (function () {
           break;
         }
 
-        warning("W027", t, t.value, s);
+        warning("W027", t, t.value, controlToken.value);
         break;
       }
     }
@@ -1971,12 +1970,11 @@ var JSHINT = (function () {
         warning("W116", state.tokens.next, "{", state.tokens.next.value);
       }
 
-      noreach = true;
+      state.tokens.next.inBracelessBlock = true;
       indent += state.option.indent;
       // test indentation only if statement is in new line
       a = [statement()];
       indent -= state.option.indent;
-      noreach = false;
 
       delete funct["(nolet)"];
     }
@@ -4227,7 +4225,9 @@ var JSHINT = (function () {
         advance();
       }
     }
-    reachable("break");
+
+    reachable(this);
+
     return this;
   }).exps = true;
 
@@ -4254,7 +4254,9 @@ var JSHINT = (function () {
     } else if (!funct["(loopage)"]) {
       warning("W052", state.tokens.next, this.value);
     }
-    reachable("continue");
+
+    reachable(this);
+
     return this;
   }).exps = true;
 
@@ -4276,7 +4278,9 @@ var JSHINT = (function () {
         nolinebreak(this); // always warn (Line breaking error)
       }
     }
-    reachable("return");
+
+    reachable(this);
+
     return this;
   }).exps = true;
 
@@ -4328,7 +4332,9 @@ var JSHINT = (function () {
   stmt("throw", function () {
     nolinebreak(this);
     this.first = expression(20);
-    reachable("throw");
+
+    reachable(this);
+
     return this;
   }).exps = true;
 

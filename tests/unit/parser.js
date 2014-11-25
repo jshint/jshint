@@ -4583,6 +4583,25 @@ exports.unreachable = {
       .test(src);
 
     test.done();
+  },
+  // Regression test for GH-1387 "false positive: Unreachable 'x' after 'return'"
+  nestedBraceless: function (test) {
+    var src = [
+      "(function() {",
+      "  var x;",
+      "  if (!x)",
+      "    return function() {",
+      "      if (!x) x = 0;",
+      "      return;",
+      "    };",
+      "  return;",
+      "}());"
+    ];
+
+    TestRun(test)
+      .test(src);
+
+    test.done();
   }
 };
 
