@@ -7,6 +7,7 @@ JSHint, A Static Code Analysis Tool for JavaScript
 [Blog](http://jshint.com/blog/) • [Twitter](https://twitter.com/jshint/) \]
 
 [![Build Status](https://travis-ci.org/jshint/jshint.svg?branch=master)](https://travis-ci.org/jshint/jshint)
+[![Windows Build status](https://ci.appveyor.com/api/projects/status/h3nsbuegaes4aakt/branch/appveyor?svg=true)](https://ci.appveyor.com/project/XhmikosR/jshint/branch/appveyor)
 [![NPM version](https://badge.fury.io/js/jshint.svg)](http://badge.fury.io/js/jshint)
 
 JSHint is a community-driven tool to detect errors and potential problems
