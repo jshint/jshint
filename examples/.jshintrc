@@ -77,7 +77,7 @@
     "prototypejs"   : false,    // Prototype and Scriptaculous
     "qunit"         : false,    // QUnit
     "rhino"         : false,    // Rhino
-    "shelljs"       : false,     // ShellJS
+    "shelljs"       : false,    // ShellJS
     "worker"        : false,    // Web Workers
     "wsh"           : false,    // Windows Scripting Host
     "yui"           : false,    // Yahoo User Interface
