@@ -773,9 +773,10 @@ exports.testES6ModulesNameSpaceImportsAffectUnused = function (test) {
 exports.testES6TemplateLiterals = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/es6-template-literal.js", "utf8");
   TestRun(test)
-    .addError(11, "Unclosed template literal.")
-    .addError(12, "Expected an identifier and instead saw '(end)'.")
-    .addError(12, "Missing semicolon.")
+    .addError(14, "Octal literals are not allowed in strict mode.")
+    .addError(17, "Unclosed template literal.")
+    .addError(18, "Expected an identifier and instead saw '(end)'.")
+    .addError(18, "Missing semicolon.")
     .test(src, { esnext: true });
   test.done();
 };

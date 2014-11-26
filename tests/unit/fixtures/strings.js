@@ -17,6 +17,8 @@ this is a faulty multiline string in javascript";
 
 test = "\033\t";
 
+test = "unnecessary \` escaping";
+
 function octal_strictmode() {
   "use strict";
 

@@ -878,13 +878,117 @@ Lexer.prototype = {
     };
   },
 
+
+  // Assumes previously parsed character was \ (=== '\\') and was not skipped.
+  scanEscapeSequence: function (checks, currentString, inTemplateLiteral) {
+    var allowNewLine = false;
+    var jump = 1;
+    this.skip();
+    var char = this.peek();
+
+    switch (char) {
+    case "'":
+      this.triggerAsync("warning", {
+        code: "W114",
+        line: this.line,
+        character: this.char,
+        data: [ "\\'" ]
+      }, checks, function () {return state.jsonMode; });
+      break;
+    case "b":
+      char = "\\b";
+      break;
+    case "f":
+      char = "\\f";
+      break;
+    case "n":
+      char = "\\n";
+      break;
+    case "r":
+      char = "\\r";
+      break;
+    case "t":
+      char = "\\t";
+      break;
+    case "0":
+      char = "\\0";
+
+      // Octal literals fail in strict mode.
+      // Check if the number is between 00 and 07.
+      var n = parseInt(this.peek(1), 10);
+      this.triggerAsync("warning", {
+        code: "W115",
+        line: this.line,
+        character: this.char
+      }, checks,
+      function () { return n >= 0 && n <= 7 && state.directive["use strict"]; });
+      break;
+    case "u":
+      char = String.fromCharCode(parseInt(this.input.substr(1, 4), 16));
+      jump = 5;
+      break;
+    case "v":
+      this.triggerAsync("warning", {
+        code: "W114",
+        line: this.line,
+        character: this.char,
+        data: [ "\\v" ]
+      }, checks, function () { return state.jsonMode; });
+
+      char = "\v";
+      break;
+    case "x":
+      var  x = parseInt(this.input.substr(1, 2), 16);
+
+      this.triggerAsync("warning", {
+        code: "W114",
+        line: this.line,
+        character: this.char,
+        data: [ "\\x-" ]
+      }, checks, function () { return state.jsonMode; });
+
+      char = String.fromCharCode(x);
+      jump = 3;
+      break;
+    case "\\":
+      char = "\\\\";
+      break;
+    case "\"":
+      char = "\\\"";
+      break;
+    case "/":
+      break;
+    case "":
+      allowNewLine = true;
+      char = "";
+      break;
+    default:
+      // Must check multiple other cases here because fallthrough is limited.
+      // We don't want some characters to be treated as unnecessary escapes in
+      // some cases.
+      if ((char === "`" && inTemplateLiteral) ||
+          (char === "!" && currentString.slice(currentString.length - 2) === "<")) {
+        break;
+      }
+
+      // Weird escaping.
+      this.trigger("warning", {
+        code: "W044",
+        line: this.line,
+        character: this.char
+      });
+    }
+
+    return {char: char, jump: jump, allowNewLine: allowNewLine};
+  },
+
   /*
    * Extract a template literal out of the next sequence of characters
    * and/or lines or return 'null' if its not possible. Since template
    * literals can span across multiple lines, this method has to move
    * the char pointer.
    */
-  scanTemplateLiteral: function () {
+  scanTemplateLiteral: function (checks) {
     var tokenType;
     var value = '';
     var ch;
@@ -934,14 +1038,9 @@ Lexer.prototype = {
           isUnclosed: false
         };
       } else if (ch === '\\') {
-        // TODO: Parse escape sequence, warn about invalid escape sequences
-        value += ch;
-        this.skip(1);
-        // Move past escaped backticks (`this \` is valid`)
-        if (this.peek() === '`') {
-          value += '`';
-          this.skip(1);
-        }
+        var escape = this.scanEscapeSequence(checks, value, true);
+        value += escape.char;
+        this.skip(escape.jump);
       } else if (ch === '`') {
         break;
       } else {
@@ -1068,101 +1167,11 @@ Lexer.prototype = {
       }
 
       // Special treatment for some escaped characters.
-
       if (char === "\\") {
-        this.skip();
-        char = this.peek();
-
-        switch (char) {
-        case "'":
-          this.triggerAsync("warning", {
-            code: "W114",
-            line: this.line,
-            character: this.char,
-            data: [ "\\'" ]
-          }, checks, function () {return state.jsonMode; });
-          break;
-        case "b":
-          char = "\\b";
-          break;
-        case "f":
-          char = "\\f";
-          break;
-        case "n":
-          char = "\\n";
-          break;
-        case "r":
-          char = "\\r";
-          break;
-        case "t":
-          char = "\\t";
-          break;
-        case "0":
-          char = "\\0";
-
-          // Octal literals fail in strict mode.
-          // Check if the number is between 00 and 07.
-          var n = parseInt(this.peek(1), 10);
-          this.triggerAsync("warning", {
-            code: "W115",
-            line: this.line,
-            character: this.char
-          }, checks,
-          function () { return n >= 0 && n <= 7 && state.directive["use strict"]; });
-          break;
-        case "u":
-          char = String.fromCharCode(parseInt(this.input.substr(1, 4), 16));
-          jump = 5;
-          break;
-        case "v":
-          this.triggerAsync("warning", {
-            code: "W114",
-            line: this.line,
-            character: this.char,
-            data: [ "\\v" ]
-          }, checks, function () { return state.jsonMode; });
-
-          char = "\v";
-          break;
-        case "x":
-          var  x = parseInt(this.input.substr(1, 2), 16);
-
-          this.triggerAsync("warning", {
-            code: "W114",
-            line: this.line,
-            character: this.char,
-            data: [ "\\x-" ]
-          }, checks, function () { return state.jsonMode; });
-
-          char = String.fromCharCode(x);
-          jump = 3;
-          break;
-        case "\\":
-          char = "\\\\";
-          break;
-        case "\"":
-          char = "\\\"";
-          break;
-        case "/":
-          break;
-        case "":
-          allowNewLine = true;
-          char = "";
-          break;
-        case "!":
-          if (value.slice(value.length - 2) === "<") {
-            break;
-          }
-
-          /*falls through */
-        default:
-          // Weird escaping.
-          this.trigger("warning", {
-            code: "W044",
-            line: this.line,
-            character: this.char
-          });
-        }
+        var parsed = this.scanEscapeSequence(checks, value, false);
+        char = parsed.char;
+        jump = parsed.jump;
+        allowNewLine = parsed.allowNewLine;
       }
 
       value += char;
@@ -1385,7 +1394,7 @@ Lexer.prototype = {
 
     var match = this.scanComments() ||
       this.scanStringLiteral(checks) ||
-      this.scanTemplateLiteral();
+      this.scanTemplateLiteral(checks);
 
     if (match) {
       return match;
