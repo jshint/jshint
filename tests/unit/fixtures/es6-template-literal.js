@@ -8,4 +8,10 @@ can`;
 
 var escaped = `one = \`${one}\``;
 
+function octal_strictmode() {
+  "use strict";
+
+  var test = `\033\t`;
+}
+
 var unterminated = `${one}
