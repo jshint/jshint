@@ -4,7 +4,7 @@
 "use strict";
 
 var browserify = require("browserify");
-var bundle     = browserify("./src/jshint.js");
+var bundle     = browserify();
 var path       = require("path");
 var version    = require("../package.json").version;
 require("shelljs/make");
