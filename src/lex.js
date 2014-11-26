@@ -937,6 +937,11 @@ Lexer.prototype = {
         // TODO: Parse escape sequence, warn about invalid escape sequences
         value += ch;
         this.skip(1);
+        // Move past escaped backticks (`this \` is valid`)
+        if (this.peek() === '`') {
+          value += '`';
+          this.skip(1);
+        }
       } else if (ch === '`') {
         break;
       } else {
