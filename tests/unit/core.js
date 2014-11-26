@@ -773,9 +773,9 @@ exports.testES6ModulesNameSpaceImportsAffectUnused = function (test) {
 exports.testES6TemplateLiterals = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/es6-template-literal.js", "utf8");
   TestRun(test)
-    .addError(6, "Unclosed template literal.")
-    .addError(6, "Expected an identifier and instead saw '(end)'.")
-    .addError(6, "Missing semicolon.")
+    .addError(11, "Unclosed template literal.")
+    .addError(12, "Expected an identifier and instead saw '(end)'.")
+    .addError(12, "Missing semicolon.")
     .test(src, { esnext: true });
   test.done();
 };
