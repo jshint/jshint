@@ -1164,12 +1164,12 @@ exports.useStdin = {
     var jshintrc = JSON.stringify({ undef: true });
 
     sinon.stub(shjs, "cat")
-      .withArgs(sinon.match(/\/fake\/\.jshintrc$/)).returns(jshintrc)
+      .withArgs(sinon.match(/[\/\\]fake[\/\\]\.jshintrc$/)).returns(jshintrc)
       .withArgs(sinon.match(/\/\.jshintrc$/)).returns("")
       .withArgs(sinon.match(/\.jshintignore$/)).returns("");
 
     sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/fake\/\.jshintrc$/)).returns(true)
+      .withArgs("-e", sinon.match(/fake[\/\\]\.jshintrc$/)).returns(true)
       .withArgs("-e", sinon.match(/\.jshintrc$/)).returns(false);
 
     cli.exit.restore();
@@ -1223,7 +1223,7 @@ exports.useStdin = {
       .withArgs(sinon.match(/\.jshintignore$/)).returns("");
 
     sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/fake\/\.jshintrc$/)).returns(true)
+      .withArgs("-e", sinon.match(/fake[\/\\]\.jshintrc$/)).returns(true)
       .withArgs("-e", sinon.match(/\.jshintrc$/)).returns(true);
 
     cli.exit.restore();
