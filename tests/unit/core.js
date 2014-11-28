@@ -947,14 +947,14 @@ exports.testUnnamedFuncStatement = function (test) {
 
 exports.testUnCleanedForinifcheckneeded = function (test) {
   var forinCode = [
-    'for (var key in a) {',
-    '  console.log(key);',
-    '}'
+    "for (var key in a) {",
+    "  console.log(key);",
+    "}"
   ];
 
   var ifCode = [
-    'if(true) {',
-    '}'
+    "if(true) {",
+    "}"
   ];
 
   try {
