@@ -19,6 +19,7 @@ var state = {
     this.tab = "";
     this.cache = {}; // Node.JS doesn't have Map. Sniff.
     this.ignoredLines = {};
+    this.forinifcheckneeded = false;
 
     // Blank out non-multi-line-commented lines when ignoring linter errors
     this.ignoreLinterErrors = false;
