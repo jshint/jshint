@@ -17,3 +17,4 @@ Error();
 Number();
 String();
 Boolean();
+Symbol();
