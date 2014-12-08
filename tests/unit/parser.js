@@ -3778,6 +3778,20 @@ conciseMethods.getWithoutSet = function (test) {
   test.done();
 };
 
+// GH-2022: "Concise method names are colliding with params/variables"
+conciseMethods.nameIsNotLocalVar = function (test) {
+  var code = [
+    "var obj = {",
+    "  foo(foo) {},",
+    "  bar() { var bar; }",
+    "};"
+  ];
+
+  TestRun(test).test(code, {esnext: true});
+
+  test.done();
+};
+
 exports["object short notation: basic"] = function (test) {
   var code = [
     "var foo = 42;",
