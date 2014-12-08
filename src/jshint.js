@@ -3249,7 +3249,7 @@ var JSHINT = (function () {
               if (!state.option.inESNext()) {
                 warning("W104", state.tokens.curr, "concise methods");
               }
-              doFunction(i, undefined, g);
+              doFunction(null, undefined, g);
             } else {
               advance(":");
               expression(10);
