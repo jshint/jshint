@@ -11,13 +11,16 @@ var targets = ["web", "rhino"];
 module.exports = function(target, done) {
   var bundle = browserify();
 
+  done = done || function() {};
+
   if (targets.indexOf(target) === -1) {
     done(new Error("Unrecognized target: '" + target + "'"));
     return;
   }
 
   bundle.require(srcDir + "/jshint.js", { expose: "jshint" });
-  bundle.bundle(function(err, src) {
+
+  return bundle.bundle(function(err, src) {
     var wrapped;
 
     if (err) {
