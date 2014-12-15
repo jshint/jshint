@@ -3700,7 +3700,9 @@ exports["fat arrows support"] = function (test) {
   test.done();
 };
 
-exports["concise methods support"] = function (test) {
+var conciseMethods = exports.conciseMethods = {};
+
+conciseMethods.basicSupport = function (test) {
   var code = [
     "var foobar = {",
     "  foo () {",
@@ -3728,7 +3730,7 @@ exports["concise methods support"] = function (test) {
   test.done();
 };
 
-exports["concise methods support for 'get' and 'set' function names"] = function (test) {
+conciseMethods.getAndSet = function (test) {
   var code = [
     "var a = [1, 2, 3, 4, 5];",
     "var strange = {",
@@ -3746,7 +3748,7 @@ exports["concise methods support for 'get' and 'set' function names"] = function
   test.done();
 };
 
-exports["concise methods support for 'get' without 'set'"] = function (test) {
+conciseMethods.getWithoutSet = function (test) {
   var code = [
     "var a = [1, 2, 3, 4, 5];",
     "var strange = {",
@@ -3761,13 +3763,27 @@ exports["concise methods support for 'get' without 'set'"] = function (test) {
   test.done();
 };
 
-exports["concise methods support for 'set' without 'get'"] = function (test) {
+conciseMethods.getWithoutSet = function (test) {
   var code = [
     "var a = [1, 2, 3, 4, 5];",
     "var strange = {",
     "  set (v) {",
     "    a = v;",
     "  }",
+    "};"
+  ];
+
+  TestRun(test).test(code, {esnext: true});
+
+  test.done();
+};
+
+// GH-2022: "Concise method names are colliding with params/variables"
+conciseMethods.nameIsNotLocalVar = function (test) {
+  var code = [
+    "var obj = {",
+    "  foo(foo) {},",
+    "  bar() { var bar; }",
     "};"
   ];
 
