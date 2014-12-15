@@ -4502,14 +4502,107 @@ exports["test for line breaks with 'yield'"] = function (test) {
   test.done();
 };
 
-exports["regression for GH-1227"] = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/gh1227.js", "utf8");
+exports.unreachable = {
+  "regression for GH-1227": function (test) {
+    var src = fs.readFileSync(__dirname + "/fixtures/gh1227.js", "utf8");
 
-  TestRun(test)
-    .addError(14, "Unreachable 'return' after 'return'.")
-    .test(src);
+    TestRun(test)
+      .addError(14, "Unreachable 'return' after 'return'.")
+      .test(src);
 
-  test.done();
+    test.done();
+  },
+  break: function (test) {
+    var src = [
+      "var i = 0;",
+      "foo: while (i) {",
+      "  break foo;",
+      "  i--;",
+      "}"
+    ];
+
+    TestRun(test)
+      .addError(4, "Unreachable 'i' after 'break'.")
+      .test(src);
+
+    test.done();
+  },
+  continue: function (test) {
+    var src = [
+      "var i = 0;",
+      "while (i) {",
+      "  continue;",
+      "  i--;",
+      "}"
+    ];
+
+    TestRun(test)
+      .addError(4, "Unreachable 'i' after 'continue'.")
+      .test(src);
+
+    test.done();
+  },
+  return: function (test) {
+    var src = [
+      "(function() {",
+      "  var x = 0;",
+      "  return;",
+      "  x++;",
+      "}());"
+    ];
+
+    TestRun(test)
+      .addError(4, "Unreachable 'x' after 'return'.")
+      .test(src);
+
+    test.done();
+  },
+  throw: function (test) {
+    var src = [
+      "throw new Error();",
+      "var x;"
+    ];
+
+    TestRun(test)
+      .addError(2, "Unreachable 'var' after 'throw'.")
+      .test(src);
+
+    test.done();
+  },
+  braceless: function (test) {
+    var src = [
+      "(function() {",
+      "  var x;",
+      "  if (x)",
+      "    return;",
+      "  return;",
+      "}());"
+    ];
+
+    TestRun(test)
+      .test(src);
+
+    test.done();
+  },
+  // Regression test for GH-1387 "false positive: Unreachable 'x' after 'return'"
+  nestedBraceless: function (test) {
+    var src = [
+      "(function() {",
+      "  var x;",
+      "  if (!x)",
+      "    return function() {",
+      "      if (!x) x = 0;",
+      "      return;",
+      "    };",
+      "  return;",
+      "}());"
+    ];
+
+    TestRun(test)
+      .test(src);
+
+    test.done();
+  }
 };
 
 exports["test for 'break' in switch case + curly braces"] = function (test) {
