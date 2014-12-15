@@ -794,7 +794,7 @@ exports.testHtml = function (test) {
   test.done();
 };
 
-exports["test: destructuring var in function scope"] = function (test) {
+exports["destructuring var in function scope"] = function (test) {
   var code = [
     "function foobar() {",
     "  var [ a, b, c ] = [ 1, 2, 3 ];",
@@ -850,7 +850,7 @@ exports["test: destructuring var in function scope"] = function (test) {
   test.done();
 };
 
-exports["test: destructuring var as moz"] = function (test) {
+exports["destructuring var as moz"] = function (test) {
   var code = [
     "var [ a, b, c ] = [ 1, 2, 3 ];",
     "var [ a ] = [ 1 ];",
@@ -877,7 +877,7 @@ exports["test: destructuring var as moz"] = function (test) {
   test.done();
 };
 
-exports["test: destructuring var as esnext"] = function (test) {
+exports["destructuring var as esnext"] = function (test) {
   var code = [
     "var [ a, b, c ] = [ 1, 2, 3 ];",
     "var [ a ] = [ 1 ];",
@@ -904,7 +904,7 @@ exports["test: destructuring var as esnext"] = function (test) {
   test.done();
 };
 
-exports["test: destructuring var as es5"] = function (test) {
+exports["destructuring var as es5"] = function (test) {
   var code = [
     "var [ a, b, c ] = [ 1, 2, 3 ];",
     "var [ a ] = [ 1 ];",
@@ -942,7 +942,7 @@ exports["test: destructuring var as es5"] = function (test) {
   test.done();
 };
 
-exports["test: destructuring var as legacy JS"] = function (test) {
+exports["destructuring var as legacy JS"] = function (test) {
   var code = [
     "var [ a, b, c ] = [ 1, 2, 3 ];",
     "var [ a ] = [ 1 ];",
@@ -980,7 +980,7 @@ exports["test: destructuring var as legacy JS"] = function (test) {
   test.done();
 };
 
-exports["test: destructuring var errors"] = function (test) {
+exports["destructuring var errors"] = function (test) {
   var code = [
     "var [ a, b, c ] = [ 1, 2, 3 ];",
     "var [ a ] = [ 1 ];",
@@ -1020,7 +1020,7 @@ exports["test: destructuring var errors"] = function (test) {
   test.done();
 };
 
-exports["test: destructuring const as moz"] = function (test) {
+exports["destructuring const as moz"] = function (test) {
   var code = [
     "const [ a, b, c ] = [ 1, 2, 3 ];",
     "const [ d ] = [ 1 ];",
@@ -1058,7 +1058,7 @@ exports["test: destructuring const as moz"] = function (test) {
   test.done();
 };
 
-exports["test: destructuring const as esnext"] = function (test) {
+exports["destructuring const as esnext"] = function (test) {
   var code = [
     "const [ a, b, c ] = [ 1, 2, 3 ];",
     "const [ d ] = [ 1 ];",
@@ -1092,7 +1092,7 @@ exports["test: destructuring const as esnext"] = function (test) {
   test.done();
 };
 
-exports["test: destructuring const as es5"] = function (test) {
+exports["destructuring const as es5"] = function (test) {
   var code = [
     "const [ a, b, c ] = [ 1, 2, 3 ];",
     "const [ d ] = [ 1 ];",
@@ -1144,7 +1144,7 @@ exports["test: destructuring const as es5"] = function (test) {
   test.done();
 };
 
-exports["test: destructuring const as legacy JS"] = function (test) {
+exports["destructuring const as legacy JS"] = function (test) {
   var code = [
     "const [ a, b, c ] = [ 1, 2, 3 ];",
     "const [ d ] = [ 1 ];",
@@ -1196,7 +1196,7 @@ exports["test: destructuring const as legacy JS"] = function (test) {
   test.done();
 };
 
-exports["test: destructuring const errors"] = function (test) {
+exports["destructuring const errors"] = function (test) {
   var code = [
     "const [ a, b, c ] = [ 1, 2, 3 ];",
     "const [ a, b, c ] = [ 1, 2, 3 ];",
@@ -1233,7 +1233,7 @@ exports["test: destructuring const errors"] = function (test) {
   test.done();
 };
 
-exports["test: destructuring globals as moz"] = function (test) {
+exports["destructuring globals as moz"] = function (test) {
   var code = [
     "var a, b, c, d, h, w, o;",
     "[ a, b, c ] = [ 1, 2, 3 ];",
@@ -1252,7 +1252,7 @@ exports["test: destructuring globals as moz"] = function (test) {
   test.done();
 };
 
-exports["test: destructuring globals as esnext"] = function (test) {
+exports["destructuring globals as esnext"] = function (test) {
   var code = [
     "var a, b, c, d, h, w, o;",
     "[ a, b, c ] = [ 1, 2, 3 ];",
@@ -1271,7 +1271,7 @@ exports["test: destructuring globals as esnext"] = function (test) {
   test.done();
 };
 
-exports["test: destructuring globals as es5"] = function (test) {
+exports["destructuring globals as es5"] = function (test) {
   var code = [
     "var a, b, c, d, h, w, o;",
     "[ a, b, c ] = [ 1, 2, 3 ];",
@@ -1297,7 +1297,7 @@ exports["test: destructuring globals as es5"] = function (test) {
   test.done();
 };
 
-exports["test: destructuring globals as legacy JS"] = function (test) {
+exports["destructuring globals as legacy JS"] = function (test) {
   var code = [
     "var a, b, c, d, h, w, o;",
     "[ a, b, c ] = [ 1, 2, 3 ];",
@@ -1323,7 +1323,7 @@ exports["test: destructuring globals as legacy JS"] = function (test) {
   test.done();
 };
 
-exports["test: destructuring globals with syntax error"] = function (test) {
+exports["destructuring globals with syntax error"] = function (test) {
   var code = [
     "var a, b, c;",
     "[ a ] = [ z ];",
@@ -1360,7 +1360,7 @@ exports["test: destructuring globals with syntax error"] = function (test) {
   test.done();
 };
 
-exports["test: destructuring assign of empty values as moz"] = function (test) {
+exports["destructuring assign of empty values as moz"] = function (test) {
   var code = [
     "var [ a ] = [ 1, 2 ];",
     "var [ c, d ] = [ 1 ];",
@@ -1378,7 +1378,7 @@ exports["test: destructuring assign of empty values as moz"] = function (test) {
   test.done();
 };
 
-exports["test: destructuring assign of empty values as esnext"] = function (test) {
+exports["destructuring assign of empty values as esnext"] = function (test) {
   var code = [
     "var [ a ] = [ 1, 2 ];",
     "var [ c, d ] = [ 1 ];",
@@ -1396,7 +1396,7 @@ exports["test: destructuring assign of empty values as esnext"] = function (test
   test.done();
 };
 
-exports["test: destructuring assign of empty values as es5"] = function (test) {
+exports["destructuring assign of empty values as es5"] = function (test) {
   var code = [
     "var [ a ] = [ 1, 2 ];",
     "var [ c, d ] = [ 1 ];",
@@ -1417,7 +1417,7 @@ exports["test: destructuring assign of empty values as es5"] = function (test) {
   test.done();
 };
 
-exports["test: destructuring assign of empty values as JS legacy"] = function (test) {
+exports["destructuring assign of empty values as JS legacy"] = function (test) {
   var code = [
     "var [ a ] = [ 1, 2 ];",
     "var [ c, d ] = [ 1 ];",
@@ -1439,7 +1439,7 @@ exports["test: destructuring assign of empty values as JS legacy"] = function (t
   test.done();
 };
 
-exports["test: array element assignment inside array"] = function (test) {
+exports["array element assignment inside array"] = function (test) {
   var code = [
     "var a1 = {};",
     "var a2 = [function f() {a1[0] = 1;}];",
@@ -1451,7 +1451,7 @@ exports["test: array element assignment inside array"] = function (test) {
   test.done();
 };
 
-exports["test: let statement as moz"] = function (test) {
+exports["let statement as moz"] = function (test) {
   var code = [
     "let x = 1;",
     "{",
@@ -1471,7 +1471,7 @@ exports["test: let statement as moz"] = function (test) {
   test.done();
 };
 
-exports["test: let statement as esnext"] = function (test) {
+exports["let statement as esnext"] = function (test) {
   var code = [
     "let x = 1;",
     "{",
@@ -1491,7 +1491,7 @@ exports["test: let statement as esnext"] = function (test) {
   test.done();
 };
 
-exports["test: let statement as es5"] = function (test) {
+exports["let statement as es5"] = function (test) {
   var code = [
     "let x = 1;",
     "{",
@@ -1514,7 +1514,7 @@ exports["test: let statement as es5"] = function (test) {
   test.done();
 };
 
-exports["test: let statement as legacy JS"] = function (test) {
+exports["let statement as legacy JS"] = function (test) {
   var code = [
     "let x = 1;",
     "{",
@@ -1537,7 +1537,7 @@ exports["test: let statement as legacy JS"] = function (test) {
   test.done();
 };
 
-exports["test: let statement out of scope as moz"] = function (test) {
+exports["let statement out of scope as moz"] = function (test) {
   var code = [
     "let x = 1;",
     "{",
@@ -1561,7 +1561,7 @@ exports["test: let statement out of scope as moz"] = function (test) {
   test.done();
 };
 
-exports["test: let statement out of scope as esnext"] = function (test) {
+exports["let statement out of scope as esnext"] = function (test) {
   var code = [
     "let x = 1;",
     "{",
@@ -1585,7 +1585,7 @@ exports["test: let statement out of scope as esnext"] = function (test) {
   test.done();
 };
 
-exports["test: let statement out of scope as es5"] = function (test) {
+exports["let statement out of scope as es5"] = function (test) {
   var code = [
     "let x = 1;",
     "{",
@@ -1612,7 +1612,7 @@ exports["test: let statement out of scope as es5"] = function (test) {
   test.done();
 };
 
-exports["test: let statement out of scope as legacy JS"] = function (test) {
+exports["let statement out of scope as legacy JS"] = function (test) {
   var code = [
     "let x = 1;",
     "{",
@@ -1639,7 +1639,7 @@ exports["test: let statement out of scope as legacy JS"] = function (test) {
   test.done();
 };
 
-exports["test: let statement in functions as moz"] = function (test) {
+exports["let statement in functions as moz"] = function (test) {
   var code = [
     "let x = 1;",
     "function foo() {",
@@ -1661,7 +1661,7 @@ exports["test: let statement in functions as moz"] = function (test) {
   test.done();
 };
 
-exports["test: let statement in functions as esnext"] = function (test) {
+exports["let statement in functions as esnext"] = function (test) {
   var code = [
     "let x = 1;",
     "function foo() {",
@@ -1683,7 +1683,7 @@ exports["test: let statement in functions as esnext"] = function (test) {
   test.done();
 };
 
-exports["test: let statement in functions as es5"] = function (test) {
+exports["let statement in functions as es5"] = function (test) {
   var code = [
     "let x = 1;",
     "function foo() {",
@@ -1708,7 +1708,7 @@ exports["test: let statement in functions as es5"] = function (test) {
   test.done();
 };
 
-exports["test: let statement in functions as legacy JS"] = function (test) {
+exports["let statement in functions as legacy JS"] = function (test) {
   var code = [
     "let x = 1;",
     "function foo() {",
@@ -1733,7 +1733,7 @@ exports["test: let statement in functions as legacy JS"] = function (test) {
   test.done();
 };
 
-exports["test: let statement not in scope as moz"] = function (test) {
+exports["let statement not in scope as moz"] = function (test) {
   var code = [
     "let x = 1;",
     "function foo() {",
@@ -1761,7 +1761,7 @@ exports["test: let statement not in scope as moz"] = function (test) {
   test.done();
 };
 
-exports["test: let statement not in scope as esnext"] = function (test) {
+exports["let statement not in scope as esnext"] = function (test) {
   var code = [
     "let x = 1;",
     "function foo() {",
@@ -1789,39 +1789,7 @@ exports["test: let statement not in scope as esnext"] = function (test) {
   test.done();
 };
 
-exports["test: let statement not in scope as es5"] = function (test) {
-  var code = [
-    "let x = 1;",
-    "function foo() {",
-    "  let y = 3 ;",
-    "  let bar = function () {",
-    "    print(x);",
-    "    let z = 2;",
-    "  };",
-    "  print(z);",
-    "}",
-    "print(y);",
-    "bar();",
-    "foo();",
-  ];
-
-  TestRun(test)
-    .addError(1, "'let' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
-    .addError(3, "'let' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
-    .addError(4, "'let' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
-    .addError(6, "'let' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
-    .addError(6, "'z' is defined but never used.")
-    .addError(3, "'y' is defined but never used.")
-    .addError(4, "'bar' is defined but never used.")
-    .addError(8, "'z' is not defined.")
-    .addError(10, "'y' is not defined.")
-    .addError(11, "'bar' is not defined.")
-    .test(code, {unused: true, undef: true, predef: ["print"]}); // es5
-
-  test.done();
-};
-
-exports["test: let statement not in scope as legacy JS"] = function (test) {
+exports["let statement not in scope as es5"] = function (test) {
   var code = [
     "let x = 1;",
     "function foo() {",
@@ -1848,12 +1816,44 @@ exports["test: let statement not in scope as legacy JS"] = function (test) {
     .addError(8, "'z' is not defined.")
     .addError(10, "'y' is not defined.")
     .addError(11, "'bar' is not defined.")
+    .test(code, {unused: true, undef: true, predef: ["print"]}); // es5
+
+  test.done();
+};
+
+exports["let statement not in scope as legacy JS"] = function (test) {
+  var code = [
+    "let x = 1;",
+    "function foo() {",
+    "  let y = 3 ;",
+    "  let bar = function () {",
+    "    print(x);",
+    "    let z = 2;",
+    "  };",
+    "  print(z);",
+    "}",
+    "print(y);",
+    "bar();",
+    "foo();",
+  ];
+
+  TestRun(test)
+    .addError(1, "'let' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(3, "'let' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(4, "'let' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(6, "'let' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(6, "'z' is defined but never used.")
+    .addError(3, "'y' is defined but never used.")
+    .addError(4, "'bar' is defined but never used.")
+    .addError(8, "'z' is not defined.")
+    .addError(10, "'y' is not defined.")
+    .addError(11, "'bar' is not defined.")
     .test(code, {es3: true, unused: true, undef: true, predef: ["print"]});
 
   test.done();
 };
 
-exports["test: let statement in for loop as moz"] = function (test) {
+exports["let statement in for loop as moz"] = function (test) {
   var code = [
     "var obj={foo: 'bar', bar: 'foo'};",
     "for ( let [n, v] in Iterator(obj) ) {",
@@ -1879,7 +1879,7 @@ exports["test: let statement in for loop as moz"] = function (test) {
   test.done();
 };
 
-exports["test: let statement in for loop as esnext"] = function (test) {
+exports["let statement in for loop as esnext"] = function (test) {
   var code = [
     "var obj={foo: 'bar', bar: 'foo'};",
     "for ( let [n, v] in Iterator(obj) ) {",
@@ -1905,7 +1905,7 @@ exports["test: let statement in for loop as esnext"] = function (test) {
   test.done();
 };
 
-exports["test: let statement in for loop as es5"] = function (test) {
+exports["let statement in for loop as es5"] = function (test) {
   var code = [
     "var obj={foo: 'bar', bar: 'foo'};",
     "for ( let [n, v] in Iterator(obj) ) {",
@@ -1937,7 +1937,7 @@ exports["test: let statement in for loop as es5"] = function (test) {
   test.done();
 };
 
-exports["test: let statement in for loop as legacy JS"] = function (test) {
+exports["let statement in for loop as legacy JS"] = function (test) {
   var code = [
     "var obj={foo: 'bar', bar: 'foo'};",
     "for ( let [n, v] in Iterator(obj) ) {",
@@ -1969,7 +1969,7 @@ exports["test: let statement in for loop as legacy JS"] = function (test) {
   test.done();
 };
 
-exports["test: let statement in destructured for loop as moz"] = function (test) {
+exports["let statement in destructured for loop as moz"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
     "var people = [",
@@ -2004,7 +2004,7 @@ exports["test: let statement in destructured for loop as moz"] = function (test)
   test.done();
 };
 
-exports["test: let statement in destructured for loop as esnext"] = function (test) {
+exports["let statement in destructured for loop as esnext"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
     "var people = [",
@@ -2039,7 +2039,7 @@ exports["test: let statement in destructured for loop as esnext"] = function (te
   test.done();
 };
 
-exports["test: let statement in destructured for loop as es5"] = function (test) {
+exports["let statement in destructured for loop as es5"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
     "var people = [",
@@ -2075,7 +2075,7 @@ exports["test: let statement in destructured for loop as es5"] = function (test)
   test.done();
 };
 
-exports["test: let statement in destructured for loop as legacy JS"] = function (test) {
+exports["let statement in destructured for loop as legacy JS"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
     "var people = [",
@@ -2111,7 +2111,7 @@ exports["test: let statement in destructured for loop as legacy JS"] = function 
   test.done();
 };
 
-exports["test: let statement (as seen in jetpack)"] = function (test) {
+exports["let statement (as seen in jetpack)"] = function (test) {
   // Example taken from jetpack/addons sdk library from Mozilla project
   var code = [
     "const { Cc, Ci } = require('chrome');",
@@ -2135,7 +2135,7 @@ exports["test: let statement (as seen in jetpack)"] = function (test) {
   test.done();
 };
 
-exports["test: let statement (as seen in jetpack) as esnext"] = function (test) {
+exports["let statement (as seen in jetpack) as esnext"] = function (test) {
   // Example taken from jetpack/addons sdk library from Mozilla project
   var code = [
     "const { Cc, Ci } = require('chrome');",
@@ -2160,7 +2160,7 @@ exports["test: let statement (as seen in jetpack) as esnext"] = function (test) 
   test.done();
 };
 
-exports["test: let statement (as seen in jetpack) as es5"] = function (test) {
+exports["let statement (as seen in jetpack) as es5"] = function (test) {
   // Example taken from jetpack/addons sdk library from Mozilla project
   var code = [
     "const { Cc, Ci } = require('chrome');",
@@ -2188,7 +2188,7 @@ exports["test: let statement (as seen in jetpack) as es5"] = function (test) {
   test.done();
 };
 
-exports["test: let statement (as seen in jetpack) as legacy JS"] = function (test) {
+exports["let statement (as seen in jetpack) as legacy JS"] = function (test) {
   // Example taken from jetpack/addons sdk library from Mozilla project
   var code = [
     "const { Cc, Ci } = require('chrome');",
@@ -2216,7 +2216,7 @@ exports["test: let statement (as seen in jetpack) as legacy JS"] = function (tes
   test.done();
 };
 
-exports["test: let block and let expression"] = function (test) {
+exports["let block and let expression"] = function (test) {
   // Example taken from jetpack/addons sdk library from Mozilla project
   var code = [
     "let (x=1, y=2, z=3)",
@@ -2231,7 +2231,7 @@ exports["test: let block and let expression"] = function (test) {
   test.done();
 };
 
-exports["test: let block and let expression as esnext"] = function (test) {
+exports["let block and let expression as esnext"] = function (test) {
   // Example taken from jetpack/addons sdk library from Mozilla project
   var code = [
     "let (x=1, y=2, z=3)",
@@ -2250,7 +2250,7 @@ exports["test: let block and let expression as esnext"] = function (test) {
   test.done();
 };
 
-exports["test: let block and let expression as es5"] = function (test) {
+exports["let block and let expression as es5"] = function (test) {
   // Example taken from jetpack/addons sdk library from Mozilla project
   var code = [
     "let (x=1, y=2, z=3)",
@@ -2272,7 +2272,7 @@ exports["test: let block and let expression as es5"] = function (test) {
   test.done();
 };
 
-exports["test: let block and let expression as legacy JS"] = function (test) {
+exports["let block and let expression as legacy JS"] = function (test) {
   // Example taken from jetpack/addons sdk library from Mozilla project
   var code = [
     "let (x=1, y=2, z=3)",
@@ -2428,7 +2428,7 @@ exports["test destructuring function as legacy JS"] = function (test) {
   test.done();
 };
 
-exports["test: invalid for each"] = function (test) {
+exports["invalid for each"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
     "for each (let i = 0; i<15; ++i) {",
@@ -2443,7 +2443,7 @@ exports["test: invalid for each"] = function (test) {
   test.done();
 };
 
-exports["test: invalid for each as esnext"] = function (test) {
+exports["invalid for each as esnext"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
     "for each (let i = 0; i<15; ++i) {",
@@ -2459,7 +2459,7 @@ exports["test: invalid for each as esnext"] = function (test) {
   test.done();
 };
 
-exports["test: invalid for each as ES5"] = function (test) {
+exports["invalid for each as ES5"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
     "for each (let i = 0; i<15; ++i) {",
@@ -2476,7 +2476,7 @@ exports["test: invalid for each as ES5"] = function (test) {
   test.done();
 };
 
-exports["test: invalid for each as legacy JS"] = function (test) {
+exports["invalid for each as legacy JS"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
     "for each (let i = 0; i<15; ++i) {",
@@ -2492,7 +2492,7 @@ exports["test: invalid for each as legacy JS"] = function (test) {
   test.done();
 };
 
-exports["test: esnext generator"] = function (test) {
+exports["esnext generator"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
     "function* fib() {",
@@ -2513,7 +2513,7 @@ exports["test: esnext generator"] = function (test) {
   test.done();
 };
 
-exports["test: esnext generator as moz extension"] = function (test) {
+exports["esnext generator as moz extension"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
     "function* fib() {",
@@ -2535,7 +2535,7 @@ exports["test: esnext generator as moz extension"] = function (test) {
   test.done();
 };
 
-exports["test: esnext generator as es5"] = function (test) {
+exports["esnext generator as es5"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
     "function* fib() {",
@@ -2559,7 +2559,7 @@ exports["test: esnext generator as es5"] = function (test) {
   test.done();
 };
 
-exports["test: esnext generator as legacy JS"] = function (test) {
+exports["esnext generator as legacy JS"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
     "function* fib() {",
@@ -2583,7 +2583,7 @@ exports["test: esnext generator as legacy JS"] = function (test) {
   test.done();
 };
 
-exports["test: esnext generator without yield"] = function (test) {
+exports["esnext generator without yield"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
     "function* fib() {",
@@ -2605,7 +2605,7 @@ exports["test: esnext generator without yield"] = function (test) {
   test.done();
 };
 
-exports["test: esnext generator without yield and check turned off"] = function (test) {
+exports["esnext generator without yield and check turned off"] = function (test) {
   var code = [
     "function* emptyGenerator() {}",
 
@@ -2617,7 +2617,7 @@ exports["test: esnext generator without yield and check turned off"] = function 
   test.done();
 };
 
-exports["test: esnext generator with yield delegation, gh-1544"] = function(test) {
+exports["esnext generator with yield delegation, gh-1544"] = function(test) {
   var code = [
     "function* G() {",
     "  yield* (function*(){})();",
@@ -2637,7 +2637,7 @@ exports["test: esnext generator with yield delegation, gh-1544"] = function(test
   test.done();
 };
 
-exports["test: mozilla generator"] = function (test) {
+exports["mozilla generator"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
     "function fib() {",
@@ -2657,7 +2657,7 @@ exports["test: mozilla generator"] = function (test) {
   test.done();
 };
 
-exports["test: mozilla generator as esnext"] = function (test) {
+exports["mozilla generator as esnext"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
     "function fib() {",
@@ -2679,7 +2679,7 @@ exports["test: mozilla generator as esnext"] = function (test) {
   test.done();
 };
 
-exports["test: yield statement within try-catch"] = function (test) {
+exports["yield statement within try-catch"] = function (test) {
   // see issue: https://github.com/jshint/jshint/issues/1505
   var code = [
     "function* fib() {",
@@ -2699,7 +2699,7 @@ exports["test: yield statement within try-catch"] = function (test) {
   test.done();
 };
 
-exports["test: mozilla generator as es5"] = function (test) {
+exports["mozilla generator as es5"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
     "function fib() {",
@@ -2722,7 +2722,7 @@ exports["test: mozilla generator as es5"] = function (test) {
   test.done();
 };
 
-exports["test: mozilla generator as legacy JS"] = function (test) {
+exports["mozilla generator as legacy JS"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
     "function fib() {",
@@ -2745,7 +2745,7 @@ exports["test: mozilla generator as legacy JS"] = function (test) {
   test.done();
 };
 
-exports["test: array comprehension"] = function (test) {
+exports["array comprehension"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
     "function *range(begin, end) {",
@@ -2787,7 +2787,7 @@ exports["gh-1856 mistakenly identified as array comprehension"] = function (test
   test.done();
 };
 
-exports["test: moz-style array comprehension"] = function (test) {
+exports["moz-style array comprehension"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
     "function range(begin, end) {",
@@ -2806,7 +2806,7 @@ exports["test: moz-style array comprehension"] = function (test) {
   test.done();
 };
 
-exports["test: array comprehension with for..of"] = function (test) {
+exports["array comprehension with for..of"] = function (test) {
   // example adapted from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
     "function *range(begin, end) {",
@@ -2825,7 +2825,7 @@ exports["test: array comprehension with for..of"] = function (test) {
   test.done();
 };
 
-exports["test: moz-style array comprehension with for..of"] = function (test) {
+exports["moz-style array comprehension with for..of"] = function (test) {
   // example adapted from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
     "function range(begin, end) {",
@@ -2844,7 +2844,7 @@ exports["test: moz-style array comprehension with for..of"] = function (test) {
   test.done();
 };
 
-exports["test: array comprehension with unused variables"] = function (test) {
+exports["array comprehension with unused variables"] = function (test) {
   var code = [
     "var ret = [for (i of unknown) i];",
     "print('ret:', ret);",
@@ -2856,7 +2856,7 @@ exports["test: array comprehension with unused variables"] = function (test) {
   test.done();
 };
 
-exports["test: moz-style array comprehension with unused variables"] = function (test) {
+exports["moz-style array comprehension with unused variables"] = function (test) {
   var code = [
     "var ret = [i for (i of unknown)];",
     "print('ret:', ret);",
@@ -2868,7 +2868,7 @@ exports["test: moz-style array comprehension with unused variables"] = function 
   test.done();
 };
 
-exports["test: moz-style array comprehension as esnext"] = function (test) {
+exports["moz-style array comprehension as esnext"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
     "function range(begin, end) {",
@@ -2893,7 +2893,7 @@ exports["test: moz-style array comprehension as esnext"] = function (test) {
   test.done();
 };
 
-exports["test: array comprehension as es5"] = function (test) {
+exports["array comprehension as es5"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
     "function *range(begin, end) {",
@@ -2919,7 +2919,7 @@ exports["test: array comprehension as es5"] = function (test) {
   test.done();
 };
 
-exports["test: moz-style array comprehension as es5"] = function (test) {
+exports["moz-style array comprehension as es5"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
     "function range(begin, end) {",
@@ -2948,7 +2948,7 @@ exports["test: moz-style array comprehension as es5"] = function (test) {
   test.done();
 };
 
-exports["test: array comprehension as legacy JS"] = function (test) {
+exports["array comprehension as legacy JS"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
     "function range(begin, end) {",
@@ -2973,7 +2973,7 @@ exports["test: array comprehension as legacy JS"] = function (test) {
   test.done();
 };
 
-exports["test: moz-style array comprehension as legacy JS"] = function (test) {
+exports["moz-style array comprehension as legacy JS"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
     "function range(begin, end) {",
@@ -3002,7 +3002,7 @@ exports["test: moz-style array comprehension as legacy JS"] = function (test) {
   test.done();
 };
 
-exports['test: array comprehension with dest array at global scope'] = function (test) {
+exports['array comprehension with dest array at global scope'] = function (test) {
   var code = [
     "[for ([i, j] of [[0,0], [1,1], [2,2]]) [i, j] ];",
     "var destarray_comparray_1 = [for ([i, j] of [[0,0], [1,1], [2,2]]) [i, [j, j] ]];",
@@ -3014,7 +3014,7 @@ exports['test: array comprehension with dest array at global scope'] = function 
   test.done();
 };
 
-exports['test: moz-style array comprehension with dest array at global scope'] = function (test) {
+exports['moz-style array comprehension with dest array at global scope'] = function (test) {
   var code = [
     "[ [i, j] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
     "var destarray_comparray_1 = [ [i, [j, j] ] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
@@ -3026,7 +3026,7 @@ exports['test: moz-style array comprehension with dest array at global scope'] =
   test.done();
 };
 
-exports['test: moz-style array comprehension with dest array at global scope as esnext'] = function (test) {
+exports['moz-style array comprehension with dest array at global scope as esnext'] = function (test) {
   var code = [
     "[ [i, j] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
     "var destarray_comparray_1 = [ [i, [j, j] ] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
@@ -3044,7 +3044,7 @@ exports['test: moz-style array comprehension with dest array at global scope as 
   test.done();
 };
 
-exports['test: array comprehension with dest array at global scope as es5'] = function (test) {
+exports['array comprehension with dest array at global scope as es5'] = function (test) {
   var code = [
     "[for ([i, j] of [[0,0], [1,1], [2,2]]) [i, j] ];",
     "var destarray_comparray_1 = [for ([i, j] of [[0,0], [1,1], [2,2]]) [i, [j, j] ] ];",
@@ -3062,7 +3062,7 @@ exports['test: array comprehension with dest array at global scope as es5'] = fu
   test.done();
 };
 
-exports['test: moz-style array comprehension with dest array at global scope as es5'] = function (test) {
+exports['moz-style array comprehension with dest array at global scope as es5'] = function (test) {
   var code = [
     "[ [i, j] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
     "var destarray_comparray_1 = [ [i, [j, j] ] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
@@ -3086,7 +3086,7 @@ exports['test: moz-style array comprehension with dest array at global scope as 
   test.done();
 };
 
-exports['test: array comprehension with dest array at global scope as JS legacy'] = function (test) {
+exports['array comprehension with dest array at global scope as JS legacy'] = function (test) {
   var code = [
     "[for ([i, j] of [[0,0], [1,1], [2,2]]) [i, j] ];",
     "var destarray_comparray_1 = [for ([i, j] of [[0,0], [1,1], [2,2]]) [i, [j, j] ] ];",
@@ -3104,7 +3104,7 @@ exports['test: array comprehension with dest array at global scope as JS legacy'
   test.done();
 };
 
-exports['test: moz-style array comprehension with dest array at global scope as JS legacy'] = function (test) {
+exports['moz-style array comprehension with dest array at global scope as JS legacy'] = function (test) {
   var code = [
     "[ [i, j] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
     "var destarray_comparray_1 = [ [i, [j, j] ] for each ([i, j] in [[0,0], [1,1], [2,2]])];",
@@ -3128,7 +3128,7 @@ exports['test: moz-style array comprehension with dest array at global scope as 
   test.done();
 };
 
-exports["test: array comprehension imbrication with dest array"] = function (test) {
+exports["array comprehension imbrication with dest array"] = function (test) {
   var code = [
     "[for ([i, j] of [for ([a, b] of [[2,2], [3,4]]) [a, b] ]) [i, j] ];"
   ];
@@ -3139,7 +3139,7 @@ exports["test: array comprehension imbrication with dest array"] = function (tes
   test.done();
 };
 
-exports["test: moz-style array comprehension imbrication with dest array"] = function (test) {
+exports["moz-style array comprehension imbrication with dest array"] = function (test) {
   var code = [
     "[ [i, j] for ([i, j] in [[a, b] for each ([a, b] in [[2,2], [3,4]])]) ];"
   ];
@@ -3150,7 +3150,7 @@ exports["test: moz-style array comprehension imbrication with dest array"] = fun
   test.done();
 };
 
-exports["test: moz-style array comprehension imbrication with dest array using for..of"] = function (test) {
+exports["moz-style array comprehension imbrication with dest array using for..of"] = function (test) {
   var code = [
     "[ [i, j] for ([i, j] of [[a, b] for ([a, b] of [[2,2], [3,4]])]) ];"
   ];
@@ -3161,7 +3161,7 @@ exports["test: moz-style array comprehension imbrication with dest array using f
   test.done();
 };
 
-exports["test: moz-style array comprehension imbrication with dest array as esnext"] = function (test) {
+exports["moz-style array comprehension imbrication with dest array as esnext"] = function (test) {
   var code = [
     "[ [i, j] for each ([i, j] in [[a, b] for each ([a, b] in [[2,2], [3,4]])]) ];"
   ];
@@ -3173,7 +3173,7 @@ exports["test: moz-style array comprehension imbrication with dest array as esne
   test.done();
 };
 
-exports["test: array comprehension imbrication with dest array as es5"] = function (test) {
+exports["array comprehension imbrication with dest array as es5"] = function (test) {
   var code = [
     "[for ([i, j] of [for ([a, b] of [[2,2], [3,4]]) [a, b] ]) [i, j] ];"
   ];
@@ -3187,7 +3187,7 @@ exports["test: array comprehension imbrication with dest array as es5"] = functi
   test.done();
 };
 
-exports["test: moz-style array comprehension imbrication with dest array as es5"] = function (test) {
+exports["moz-style array comprehension imbrication with dest array as es5"] = function (test) {
   var code = [
     "[for ([i, j] of [for ([a, b] of [[2,2], [3,4]]) [a, b] ]) [i, j] ];"
   ];
@@ -3201,7 +3201,7 @@ exports["test: moz-style array comprehension imbrication with dest array as es5"
   test.done();
 };
 
-exports["test: array comprehension imbrication with dest array as legacy JS"] = function (test) {
+exports["array comprehension imbrication with dest array as legacy JS"] = function (test) {
   var code = [
     "[ [i, j] for each ([i, j] in [[a, b] for each ([a, b] in [[2,2], [3,4]])]) ];"
 
@@ -3219,7 +3219,7 @@ exports["test: array comprehension imbrication with dest array as legacy JS"] = 
   test.done();
 };
 
-exports["test: moz-style array comprehension imbrication with dest array as legacy JS"] = function (test) {
+exports["moz-style array comprehension imbrication with dest array as legacy JS"] = function (test) {
   var code = [
     "[ [i, j] for each ([i, j] in [[a, b] for each ([a, b] in [[2,2], [3,4]])]) ];"
 
@@ -3237,7 +3237,7 @@ exports["test: moz-style array comprehension imbrication with dest array as lega
   test.done();
 };
 
-exports["test: no false positive array comprehension"] = function (test) {
+exports["no false positive array comprehension"] = function (test) {
   var code = [
     "var foo = []; for (let i in [1,2,3]) { print(i); }"
   ];
@@ -3313,7 +3313,7 @@ exports["try catch filters as legacy JS"] = function (test) {
   test.done();
 };
 
-exports["test: function closure expression"] = function (test) {
+exports["function closure expression"] = function (test) {
   var code = [
     "let (arr = [1,2,3]) {",
     "  arr.every(function (o) o instanceof Object);",
@@ -3325,7 +3325,7 @@ exports["test: function closure expression"] = function (test) {
   test.done();
 };
 
-exports["test: function closure expression as esnext"] = function (test) {
+exports["function closure expression as esnext"] = function (test) {
   var code = [
     "var arr = [1,2,3];",
     "arr.every(function (o) o instanceof Object);",
@@ -3338,7 +3338,7 @@ exports["test: function closure expression as esnext"] = function (test) {
   test.done();
 };
 
-exports["test: function closure expression as es5"] = function (test) {
+exports["function closure expression as es5"] = function (test) {
   var code = [
     "var arr = [1,2,3];",
     "arr.every(function (o) o instanceof Object);",
@@ -3351,7 +3351,7 @@ exports["test: function closure expression as es5"] = function (test) {
   test.done();
 };
 
-exports["test: function closure expression as legacy JS"] = function (test) {
+exports["function closure expression as legacy JS"] = function (test) {
   var code = [
     "var arr = [1,2,3];",
     "arr.every(function (o) o instanceof Object);",
@@ -3364,7 +3364,7 @@ exports["test: function closure expression as legacy JS"] = function (test) {
   test.done();
 };
 
-exports["test: for of as esnext"] = function (test) {
+exports["for of as esnext"] = function (test) {
   var code = [
     "for (let x of [1,2,3,4]) {",
     "    print(x);",
@@ -3377,7 +3377,7 @@ exports["test: for of as esnext"] = function (test) {
   test.done();
 };
 
-exports["test: for of as es5"] = function (test) {
+exports["for of as es5"] = function (test) {
   var code = [
     "for (let x of [1,2,3,4]) {",
     "    print(x);",
@@ -3394,7 +3394,7 @@ exports["test: for of as es5"] = function (test) {
   test.done();
 };
 
-exports["test: for of as legacy JS"] = function (test) {
+exports["for of as legacy JS"] = function (test) {
   var code = [
     "for (let x of [1,2,3,4]) {",
     "    print(x);",
@@ -3411,7 +3411,7 @@ exports["test: for of as legacy JS"] = function (test) {
   test.done();
 };
 
-exports["test: try multi-catch for moz extensions"] = function (test) {
+exports["try multi-catch for moz extensions"] = function (test) {
   var code = [
     "try {",
     "    print('X');",
@@ -3429,7 +3429,7 @@ exports["test: try multi-catch for moz extensions"] = function (test) {
   test.done();
 };
 
-exports["test: try multi-catch as esnext"] = function (test) {
+exports["try multi-catch as esnext"] = function (test) {
   var code = [
     "try {",
     "    print('X');",
@@ -3449,7 +3449,7 @@ exports["test: try multi-catch as esnext"] = function (test) {
   test.done();
 };
 
-exports["test: try multi-catch as es5"] = function (test) {
+exports["try multi-catch as es5"] = function (test) {
   var code = [
     "try {",
     "    print('X');",
@@ -3469,7 +3469,7 @@ exports["test: try multi-catch as es5"] = function (test) {
   test.done();
 };
 
-exports["test: try multi-catch as legacy JS"] = function (test) {
+exports["try multi-catch as legacy JS"] = function (test) {
   var code = [
     "try {",
     "    print('X');",
@@ -3490,7 +3490,7 @@ exports["test: try multi-catch as legacy JS"] = function (test) {
   test.done();
 };
 
-exports["test: no let not directly within a block"] = function (test) {
+exports["no let not directly within a block"] = function (test) {
   var code = [
     "if (true) let x = 1;",
     "function foo() {",
