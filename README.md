@@ -9,7 +9,8 @@
 [![Build Status](https://travis-ci.org/jshint/jshint.svg?branch=master)](https://travis-ci.org/jshint/jshint)
 [![Windows Build status](https://ci.appveyor.com/api/projects/status/v8w3phg5rkhhsx44/branch/master?svg=true)](https://ci.appveyor.com/project/jshint/jshint)
 [![Dependency Status](https://david-dm.org/jshint/jshint.svg)](https://david-dm.org/jshint/jshint)
-[![devDependency Status](https://david-dm.org/jshint/jshint/dev-status.svg)](https://david-dm.org/jshint/jshint#info=devDependencies)
+[![devDependency Status](https://david-dm.org/jshint/jshint/dev-status.svg)](https://david-dm.org/jshint/jshint#info=devDependencies)  
+[![Coverage Status](https://img.shields.io/coveralls/jshint/jshint.svg)](https://coveralls.io/r/jshint/jshint?branch=master)
 
 JSHint is a community-driven tool to detect errors and potential problems
 in JavaScript code. It is very flexible so you can easily adjust it to your
