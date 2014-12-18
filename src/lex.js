@@ -880,7 +880,7 @@ Lexer.prototype = {
 
 
   // Assumes previously parsed character was \ (=== '\\') and was not skipped.
-  scanEscapeSequence: function (checks, currentString, inTemplateLiteral) {
+  scanEscapeSequence: function (checks) {
     var allowNewLine = false;
     var jump = 1;
     this.skip();
@@ -962,21 +962,6 @@ Lexer.prototype = {
       allowNewLine = true;
       char = "";
       break;
-    default:
-      // Must check multiple other cases here because fallthrough is limited.
-      // We don't want some characters to be treated as unnecessary escapes in
-      // some cases.
-      if ((char === "`" && inTemplateLiteral) ||
-          (char === "!" && currentString.slice(currentString.length - 2) === "<")) {
-        break;
-      }
-
-      // Weird escaping.
-      this.trigger("warning", {
-        code: "W044",
-        line: this.line,
-        character: this.char
-      });
     }
 
     return {char: char, jump: jump, allowNewLine: allowNewLine};
@@ -1038,7 +1023,7 @@ Lexer.prototype = {
           isUnclosed: false
         };
       } else if (ch === '\\') {
-        var escape = this.scanEscapeSequence(checks, value, true);
+        var escape = this.scanEscapeSequence(checks);
         value += escape.char;
         this.skip(escape.jump);
       } else if (ch === '`') {
@@ -1168,7 +1153,7 @@ Lexer.prototype = {
 
       // Special treatment for some escaped characters.
       if (char === "\\") {
-        var parsed = this.scanEscapeSequence(checks, value, false);
+        var parsed = this.scanEscapeSequence(checks);
         char = parsed.char;
         jump = parsed.jump;
         allowNewLine = parsed.allowNewLine;

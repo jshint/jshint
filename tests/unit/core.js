@@ -507,7 +507,6 @@ exports.NumberNaN = function (test) {
 exports.htmlEscapement = function (test) {
   TestRun(test).test("var a = '<\\!--';", {es3: true});
   TestRun(test)
-    .addError(1, "Bad or unnecessary escaping.")
     .test("var a = '\\!';", {es3: true});
 
   test.done();

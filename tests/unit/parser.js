@@ -535,7 +535,6 @@ exports.strings = function (test) {
   var run = TestRun(test)
     .addError(1, "Control character in string: <non-printable>.", {character: 10})
     .addError(1, "This character may get silently deleted by one or more browsers.")
-    .addError(2, "Bad or unnecessary escaping.")
     .addError(5, "Unclosed string.")
     .addError(5, "Missing semicolon.");
   run.test(code, {es3: true});
