@@ -11019,6 +11019,7 @@ var JSHINT = (function () {
   // Future Reserved Words
 
   FutureReservedWord("abstract");
+  FutureReservedWord("await", { es5: true });
   FutureReservedWord("boolean");
   FutureReservedWord("byte");
   FutureReservedWord("char");
