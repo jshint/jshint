@@ -91,7 +91,7 @@ exports.bool = {
     /**
      * This option requires all `for in` loops to filter object's items. The
      * for in statement allows for looping through the names of all of the
-     * properties of an object including those inherited throught the prototype
+     * properties of an object including those inherited through the prototype
      * chain. This behavior can lead to unexpected items in your object so it
      * is generally safer to always filter inherited properties out as shown in
      * the example:
