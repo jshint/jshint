@@ -1221,7 +1221,6 @@ exports.strings = function (test) {
     .addError(9, "Unclosed string.")
     .addError(10, "Unclosed string.")
     .addError(15, "Unclosed string.")
-    .addError(20, "Bad or unnecessary escaping.")
     .addError(25, "Octal literals are not allowed in strict mode.")
     .test(src, { es3: true, multistr: true });
 
@@ -1232,7 +1231,6 @@ exports.strings = function (test) {
     .addError(10, "Unclosed string.")
     .addError(14, "Bad escaping of EOL. Use option multistr if needed.")
     .addError(15, "Unclosed string.")
-    .addError(20, "Bad or unnecessary escaping.")
     .addError(25, "Octal literals are not allowed in strict mode.")
     .test(src, { es3: true });
 
