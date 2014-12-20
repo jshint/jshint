@@ -535,6 +535,9 @@ exports.undef = function (test) {
     .addError(19, "'localUndef' is not defined.")
     .addError(21, "'localUndef' is not defined.")
     .addError(22, "'localUndef' is not defined.")
+    .addError(32, "'undef' is not defined.")
+    .addError(33, "'undef' is not defined.")
+    .addError(34, "'undef' is not defined.")
     .test(src, { es3: true, undef: true });
 
   // Regression test for GH-668.
@@ -544,6 +547,44 @@ exports.undef = function (test) {
 
   test.ok(JSHINT(src));
   test.ok(!JSHINT.data().implieds);
+
+  JSHINT("if (typeof foobar) {}", { undef: true });
+  test.ok(!JSHINT.data().implieds);
+
+  test.done();
+};
+
+exports.undefToOpMethods = function (test) {
+  TestRun(test)
+    .addError(2, "'undef' is not defined.")
+    .addError(3, "'undef' is not defined.")
+    .test([
+      "var obj;",
+      "obj.delete(undef);",
+      "obj.typeof(undef);"
+    ], { undef: true });
+
+  test.done();
+};
+
+/**
+ * In strict mode, the `delete` operator does not accept unresolvable
+ * references:
+ *
+ * http://es5.github.io/#x11.4.1
+ *
+ * This will only be apparent in cases where the user has suppressed warnings
+ * about deleting variables.
+ */
+exports.undefDeleteStrict = function (test) {
+  TestRun(test)
+    .addError(3, "'aNullReference' is not defined.")
+    .test([
+      "(function() {",
+      "  'use strict';",
+      "  delete aNullReference;",
+      "}());"
+    ], { undef: true, "-W051": false });
 
   test.done();
 };

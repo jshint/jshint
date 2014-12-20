@@ -938,10 +938,6 @@ var JSHINT = (function () {
       break;
     }
 
-    if (state.tokens.curr.identifier) {
-      state.prevIdentifier = state.tokens.curr;
-    }
-
     if (id && state.tokens.next.id !== id) {
       if (t) {
         if (state.tokens.next.id === "(end)") {
@@ -2049,7 +2045,6 @@ var JSHINT = (function () {
       var s = scope[v];
       var f;
       var block;
-      var prevIdentifier;
 
       if (typeof s === "function") {
         // Protection against accidental inheritance.
@@ -2114,25 +2109,13 @@ var JSHINT = (function () {
             warning("W039", state.tokens.curr, v);
             note_implied(state.tokens.curr);
           } else if (typeof s !== "object") {
-            // Operators typeof and delete do not raise runtime errors even
-            // if the base object of a reference is null so no need to
-            //
-            // display warning if we're inside of typeof or delete.
-            // Attempting to subscript a null reference will throw an
-            // error, even within the typeof and delete operators
-            prevIdentifier = state.prevIdentifier && state.prevIdentifier.value;
-            if (!(prevIdentifier === "typeof" || prevIdentifier === "delete") ||
-              (state.tokens.next &&
-                (state.tokens.next.value === "." || state.tokens.next.value === "["))) {
+            // if we're in a list comprehension, variables are declared
+            // locally and used before being defined. So we check
+            // the presence of the given variable in the comp array
+            // before declaring it undefined.
 
-              // if we're in a list comprehension, variables are declared
-              // locally and used before being defined. So we check
-              // the presence of the given variable in the comp array
-              // before declaring it undefined.
-
-              if (!funct["(comparray)"].check(v)) {
-                isundef(funct, "W117", state.tokens.curr, v);
-              }
+            if (!funct["(comparray)"].check(v)) {
+              isundef(funct, "W117", state.tokens.curr, v);
             }
 
             // Explicitly mark the variable as used within function scopes
@@ -2410,6 +2393,12 @@ var JSHINT = (function () {
       warning("W051");
     }
     this.first = p;
+
+    // The `delete` operator accepts unresolvable references when not in strict
+    // mode, so the operand may be undefined.
+    if (p.identifier && !state.directive["use strict"]) {
+      p.forgiveUndef = true;
+    }
     return this;
   }).exps = true;
 
@@ -2446,7 +2435,17 @@ var JSHINT = (function () {
     return this;
   });
 
-  prefix("typeof", "typeof");
+  prefix("typeof", (function () {
+    var p = expression(150);
+    this.first = p;
+
+    // The `typeof` operator accepts unresolvable references, so the operand
+    // may be undefined.
+    if (p.identifier) {
+      p.forgiveUndef = true;
+    }
+    return this;
+  }));
   prefix("new", function () {
     var c = expression(155), i;
     if (c && c.id !== "function") {
@@ -5246,7 +5245,7 @@ var JSHINT = (function () {
       for (i = 0; i < JSHINT.undefs.length; i += 1) {
         k = JSHINT.undefs[i].slice(0);
 
-        if (markDefined(k[2].value, k[0])) {
+        if (markDefined(k[2].value, k[0]) || k[2].forgiveUndef) {
           clearImplied(k[2].value, k[2].line);
         } else if (state.option.undef) {
           warning.apply(warning, k.slice(1));
