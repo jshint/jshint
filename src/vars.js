@@ -79,6 +79,7 @@ exports.browser = {
   CustomEvent          : false,
   DOMParser            : false,
   defaultStatus        : false,
+  Document             : false,
   document             : false,
   Element              : false,
   ElementTimeControl   : false,
