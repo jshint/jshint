@@ -616,7 +616,8 @@ var JSHINT = (function () {
           }
         }
       } else {
-        if ((!state.option.shadow || _.contains([ "inner", "outer" ], state.option.shadow)) &&
+        if (((!state.option.shadow && !opts.param) ||
+            _.contains([ "inner", "outer" ], state.option.shadow)) &&
             type !== "exception" || funct["(blockscope)"].getlabel(name)) {
           warning("W004", state.tokens.next, name);
         }
@@ -2870,13 +2871,13 @@ var JSHINT = (function () {
             continue;
           } else if (curr.value !== ",") {
             params.push(curr.value);
-            addlabel(curr.value, { type: "unused", token: curr });
+            addlabel(curr.value, { type: "unused", token: curr, param: true });
           }
         }
         return params;
       } else {
         if (parsed.identifier === true) {
-          addlabel(parsed.value, { type: "unused", token: parsed });
+          addlabel(parsed.value, { type: "unused", token: parsed, param: true });
           return [parsed];
         }
       }
@@ -2898,7 +2899,7 @@ var JSHINT = (function () {
           t = tokens[t];
           if (t.id) {
             params.push(t.id);
-            addlabel(t.id, { type: "unused", token: t.token });
+            addlabel(t.id, { type: "unused", token: t.token, param: true });
           }
         }
       } else if (state.tokens.next.value === "...") {
@@ -2908,11 +2909,11 @@ var JSHINT = (function () {
         advance("...");
         ident = identifier(true);
         params.push(ident);
-        addlabel(ident, { type: "unused", token: state.tokens.curr });
+        addlabel(ident, { type: "unused", token: state.tokens.curr, param: true });
       } else {
         ident = identifier(true);
         params.push(ident);
-        addlabel(ident, { type: "unused", token: state.tokens.curr });
+        addlabel(ident, { type: "unused", token: state.tokens.curr, param: true });
       }
 
       // it is a syntax error to have a regular argument after a default argument
