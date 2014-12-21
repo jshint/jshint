@@ -1680,29 +1680,27 @@ exports.nonbsp = function (test) {
 /** Option `nocomma` disallows the use of comma operator. */
 exports.nocomma = function (test) {
   // By default allow comma operator
-  TestRun(test)
+  TestRun(test, "nocomma off by default")
     .test("return 2, 5;", {});
 
-  TestRun(test)
+  TestRun(test, "nocomma main case")
     .addError(1, "Unexpected use of a comma operator.")
     .test("return 2, 5;", { nocomma: true });
 
-  TestRun(test)
+  TestRun(test, "nocomma in an expression")
     .addError(1, "Unexpected use of a comma operator.")
     .test("(2, 5);", { expr: true, nocomma: true });
 
-  // Do not trigger on object literals or list literals
-  TestRun(test)
+  TestRun(test, "avoid nocomma false positives in value literals")
     .test("return { a: 2, b: [1, 2] };", { nocomma: true });
 
-  // Do not trigger on for statements
-  TestRun(test)
+  TestRun(test, "avoid nocomma false positives in for statements")
     .test("for(;;) { return; }", { nocomma: true });
 
-  // Do not trigger on function arguments
-  TestRun(test)
+  TestRun(test, "avoid nocomma false positives in function expressions")
     .test("return function(a, b) {};", { nocomma: true });
-  TestRun(test)
+
+  TestRun(test, "avoid nocomma false positives in arrow function expressions")
     .test("return (a, b) => a;", { esnext: true, nocomma: true });
 
   test.done();
