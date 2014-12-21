@@ -980,10 +980,6 @@ var JSHINT = (function() {
   function comma(opts) {
     opts = opts || {};
 
-    if (state.option.nocomma) {
-      warning("W127");
-    }
-
     if (!opts.peek) {
       nobreakcomma(state.tokens.curr, state.tokens.next);
       advance(",");
@@ -2062,6 +2058,11 @@ var JSHINT = (function() {
   infix(",", function(left, that) {
     var expr;
     that.exprs = [left];
+
+    if (state.option.nocomma) {
+      warning("W127");
+    }
+
     if (!comma({ peek: true })) {
       return that;
     }
@@ -2475,6 +2476,11 @@ var JSHINT = (function() {
         if (state.tokens.next.id !== ",") {
           break;
         }
+
+        if (pn1.value !== "=>" && state.option.nocomma) {
+          warning("W127");
+        }
+
         comma();
       }
     }
