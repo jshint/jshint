@@ -1691,6 +1691,14 @@ exports.nocomma = function (test) {
     .addError(1, "Unexpected use of a comma operator.")
     .test("(2, 5);", { expr: true, nocomma: true });
 
+  // Do not trigger on object literals or list literals
+  TestRun(test)
+    .test("return { a: 2, b: [1, 2] };", { nocomma: true });
+
+  // Do not trigger on for statements
+  TestRun(test)
+    .test("for(;;) { return; }", { nocomma: true });
+
   test.done();
 };
 
