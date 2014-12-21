@@ -1699,6 +1699,12 @@ exports.nocomma = function (test) {
   TestRun(test)
     .test("for(;;) { return; }", { nocomma: true });
 
+  // Do not trigger on function arguments
+  TestRun(test)
+    .test("return function(a, b) {};", { nocomma: true });
+  TestRun(test)
+    .test("return (a, b) => a;", { esnext: true, nocomma: true });
+
   test.done();
 };
 

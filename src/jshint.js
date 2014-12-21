@@ -2478,7 +2478,7 @@ var JSHINT = (function() {
           break;
         }
 
-        if (state.option.nocomma) {
+        if (pn1.value !== "=>" && state.option.nocomma) {
           warning("W127");
         }
 
