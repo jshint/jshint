@@ -1703,6 +1703,12 @@ exports.nocomma = function (test) {
   TestRun(test, "avoid nocomma false positives in arrow function expressions")
     .test("return (a, b) => a;", { esnext: true, nocomma: true });
 
+  TestRun(test, "avoid nocomma false positives in destructuring arrays")
+    .test("var [a, b] = [1, 2];", { esnext: true, nocomma: true });
+
+  TestRun(test, "avoid nocomma false positives in destructuring objects")
+    .test("var {a, b} = {a:1, b:2};", { esnext: true, nocomma: true });
+
   test.done();
 };
 
