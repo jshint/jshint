@@ -4201,6 +4201,12 @@ exports["class and method naming"] = function (test) {
     "            () {}",
     "  *validGenerator() { yield; }",
     "  static *validStaticGenerator() { yield; }",
+    "  *[1]() { yield; }",
+    "  static *[1]() { yield; }",
+    "  * ['*']() { yield; }",
+    "  static *['*']() { yield; }",
+    "  * [('*')]() { yield; }",
+    "  static *[('*')]() { yield; }",
     "}"
   ];
   var run = TestRun(test)
