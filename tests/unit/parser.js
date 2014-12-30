@@ -4199,6 +4199,8 @@ exports["class and method naming"] = function (test) {
     "  set lonely() {}",
     "  set lonel2",
     "            () {}",
+    "  *validGenerator() { yield; }",
+    "  static *validStaticGenerator() { yield; }",
     "}"
   ];
   var run = TestRun(test)
