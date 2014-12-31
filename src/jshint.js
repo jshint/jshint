@@ -831,6 +831,10 @@ var JSHINT = (function() {
     return false;
   }
 
+  function isBeginOfExpr(prev) {
+    return !prev.left && prev.arity !== "unary";
+  }
+
   // This is the heart of JSHINT, the Pratt parser. In addition to parsing, it
   // is looking for ad hoc lint patterns. We add .fud to Pratt's model, which is
   // like .nud except that it is only used on the first token of a statement.
@@ -846,8 +850,7 @@ var JSHINT = (function() {
   // They are elements of the parsing method called Top Down Operator Precedence.
 
   function expression(rbp, initial) {
-    var left, isArray = false, isObject = false, isLetExpr = false,
-      isFatArrowBody = state.tokens.curr.value === "=>";
+    var left, isArray = false, isObject = false, isLetExpr = false;
 
     state.nameStack.push();
 
@@ -885,6 +888,7 @@ var JSHINT = (function() {
 
     if (initial) {
       funct["(verb)"] = state.tokens.curr.value;
+      state.tokens.curr.beginsStmt = true;
     }
 
     if (initial === true && state.tokens.curr.fud) {
@@ -937,11 +941,6 @@ var JSHINT = (function() {
     }
     if (isLetExpr) {
       funct["(blockscope)"].unstack();
-    }
-
-    if (state.option.singleGroups && left && left.paren && !left.exprs &&
-      !isFatArrowBody && !left.triggerFnExpr) {
-      warning("W126");
     }
 
     state.nameStack.pop();
@@ -1055,7 +1054,9 @@ var JSHINT = (function() {
   }
 
   function delim(s) {
-    return symbol(s, 0);
+    var x = symbol(s, 0);
+    x.delim = true;
+    return x;
   }
 
   function stmt(s, f) {
@@ -1084,8 +1085,8 @@ var JSHINT = (function() {
     reserveName(x);
 
     x.nud = (typeof f === "function") ? f : function() {
-      this.right = expression(150);
       this.arity = "unary";
+      this.right = expression(150);
 
       if (this.id === "++" || this.id === "--") {
         if (state.option.plusplus) {
@@ -2198,8 +2199,8 @@ var JSHINT = (function() {
   prefix("+", "num");
   prefix("+++", function() {
     warning("W007");
-    this.right = expression(150);
     this.arity = "unary";
+    this.right = expression(150);
     return this;
   });
   infix("+++", function(left) {
@@ -2212,8 +2213,8 @@ var JSHINT = (function() {
   prefix("-", "neg");
   prefix("---", function() {
     warning("W006");
-    this.right = expression(150);
     this.arity = "unary";
+    this.right = expression(150);
     return this;
   });
   infix("---", function(left) {
@@ -2252,6 +2253,7 @@ var JSHINT = (function() {
     if (state.option.bitwise) {
       warning("W052", this, "~");
     }
+    this.arity = "unary";
     expression(150);
     return this;
   });
@@ -2268,8 +2270,8 @@ var JSHINT = (function() {
   });
 
   prefix("!", function() {
-    this.right = expression(150);
     this.arity = "unary";
+    this.right = expression(150);
 
     if (!this.right) { // '!' followed by nothing? Give up.
       quit("E041", this.line || 0);
@@ -2454,8 +2456,11 @@ var JSHINT = (function() {
   prefix("(", function() {
     var bracket, brackets = [];
     var pn = state.tokens.next, pn1, i = -1;
-    var ret, triggerFnExpr;
+    var ret, triggerFnExpr, first, last;
     var parens = 1;
+    var opening = state.tokens.curr;
+    var preceeding = state.tokens.prev;
+    var isNecessary = !state.option.singleGroups;
 
     do {
       if (pn.value === "(") {
@@ -2518,13 +2523,46 @@ var JSHINT = (function() {
     if (exprs.length > 1) {
       ret = Object.create(state.syntax[","]);
       ret.exprs = exprs;
+
+      first = exprs[0];
+      last = exprs[exprs.length - 1];
+
+      if (!isNecessary) {
+        isNecessary = preceeding.assign || preceeding.delim;
+      }
     } else {
-      ret = exprs[0];
+      ret = first = last = exprs[0];
+
+      if (!isNecessary) {
+        isNecessary =
+          // Used to distinguish from an ExpressionStatement which may not
+          // begin with the `{` and `function` tokens
+          (opening.beginsStmt && (ret.id === "{" || triggerFnExpr || isFunctor(ret))) ||
+          // Used as the return value of a single-statement arrow function
+          (ret.id === "{" && preceeding.id === "=>") ||
+          // Used to prevent left-to-right application of adjacent addition
+          // operators (the order of which effect type)
+          (first.id === "+" && preceeding.id === "+");
+      }
     }
+
     if (ret) {
+      // The operator may be necessary to override the default binding power of
+      // neighboring operators (whenever there is an operator in use within the
+      // first expression *or* the current group contains multiple expressions)
+      if (!isNecessary && (first.left || ret.exprs)) {
+        isNecessary =
+          (!isBeginOfExpr(preceeding) && first.lbp < preceeding.lbp) ||
+          (!isEndOfExpr() && last.lbp < state.tokens.next.lbp);
+      }
+
+      if (!isNecessary) {
+        warning("W126");
+      }
+
       ret.paren = true;
-      ret.triggerFnExpr = triggerFnExpr;
     }
+
     return ret;
   });
 
@@ -2839,6 +2877,10 @@ var JSHINT = (function() {
     }
 
     return funct;
+  }
+
+  function isFunctor(token) {
+    return "(scope)" in token;
   }
 
   function doTemplateLiteral() {
