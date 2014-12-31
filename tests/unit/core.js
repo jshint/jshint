@@ -524,7 +524,7 @@ exports.testSparseArrays = function (test) {
     .test(src, {es3: true});
 
   TestRun(test)
-    .test(src, {}); // es5
+    .test(src, { elision: true }); // es5
 
   test.done();
 };
