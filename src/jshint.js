@@ -846,8 +846,7 @@ var JSHINT = (function () {
   // They are elements of the parsing method called Top Down Operator Precedence.
 
   function expression(rbp, initial) {
-    var left, isArray = false, isObject = false, isLetExpr = false,
-      isFatArrowBody = state.tokens.curr.value === "=>";
+    var left, isArray = false, isObject = false, isLetExpr = false;
 
     state.nameStack.push();
 
@@ -940,7 +939,7 @@ var JSHINT = (function () {
     }
 
     if (state.option.singleGroups && left && left.paren && !left.exprs &&
-      !isFatArrowBody && !left.triggerFnExpr) {
+      rbp <= left.lbp && !left.triggerFnExpr) {
       warning("W126");
     }
 
