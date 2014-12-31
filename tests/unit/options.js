@@ -1766,3 +1766,40 @@ exports.singleGroups = function (test) {
 
   test.done();
 };
+
+exports.elision = function (test) {
+  var code = [
+    "var a = [1,,2];",
+    "var b = [1,,,,2];",
+    "var c = [1,2,];",
+    "var d = [,1,2];",
+    "var e = [,,1,2];",
+  ];
+
+  TestRun(test, "elision=false ES5")
+    .addError(1, "Empty array elements require elision=true.")
+    .addError(2, "Empty array elements require elision=true.")
+    .addError(4, "Empty array elements require elision=true.")
+    .addError(5, "Empty array elements require elision=true.")
+    .test(code, { elision: false, es3: false });
+
+  TestRun(test, "elision=false ES3")
+    .addError(1, "Extra comma. (it breaks older versions of IE)")
+    .addError(2, "Extra comma. (it breaks older versions of IE)")
+    .addError(2, "Extra comma. (it breaks older versions of IE)")
+    .addError(2, "Extra comma. (it breaks older versions of IE)")
+    .addError(3, "Extra comma. (it breaks older versions of IE)")
+    .addError(4, "Extra comma. (it breaks older versions of IE)")
+    .addError(5, "Extra comma. (it breaks older versions of IE)")
+    .addError(5, "Extra comma. (it breaks older versions of IE)")
+    .test(code, { elision: false, es3: true });
+
+  TestRun(test, "elision=true ES5")
+    .test(code, { elision: true, es3: false });
+
+  TestRun(test, "elision=true ES3")
+    .addError(3, "Extra comma. (it breaks older versions of IE)")
+    .test(code, { elision: true, es3: true });
+
+  test.done();
+};

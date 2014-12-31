@@ -1376,7 +1376,7 @@ exports["destructuring assign of empty values as moz"] = function (test) {
     .addError(2, "'d' is defined but never used.")
     .addError(3, "'e' is defined but never used.")
     .addError(3, "'f' is defined but never used.")
-    .test(code, {moz: true, unused: true, undef: true, laxcomma: true});
+    .test(code, {moz: true, unused: true, undef: true, laxcomma: true, elision: true});
 
   test.done();
 };
@@ -1394,7 +1394,7 @@ exports["destructuring assign of empty values as esnext"] = function (test) {
     .addError(2, "'d' is defined but never used.")
     .addError(3, "'e' is defined but never used.")
     .addError(3, "'f' is defined but never used.")
-    .test(code, {esnext: true, unused: true, undef: true});
+    .test(code, {esnext: true, unused: true, undef: true, elision: true});
 
   test.done();
 };
@@ -1415,7 +1415,7 @@ exports["destructuring assign of empty values as es5"] = function (test) {
     .addError(3, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(3, "'e' is defined but never used.")
     .addError(3, "'f' is defined but never used.")
-    .test(code, {unused: true, undef: true}); // es5
+    .test(code, {unused: true, undef: true, elision: true}); // es5
 
   test.done();
 };

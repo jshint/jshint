@@ -503,7 +503,13 @@ exports.bool = {
      * * [Draft Specification for ES.next (ECMA-262 Ed.
      *   6)](http://wiki.ecmascript.org/doku.php?id=harmony:specification_drafts)
      */
-    esnext      : true
+    esnext      : true,
+
+    /**
+     * This option tells JSHint that your code uses ES3 array elision elements,
+     * or empty elements (for example, `[1, , , 4, , , 7]`).
+     */
+    elision     : true,
   },
 
   // Third party globals

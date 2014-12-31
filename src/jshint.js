@@ -2629,8 +2629,19 @@ var JSHINT = (function () {
     }
     while (state.tokens.next.id !== "(end)") {
       while (state.tokens.next.id === ",") {
-        if (!state.option.inES5())
-          warning("W070");
+        if (!state.option.elision) {
+          if (!state.option.inES5()) {
+            // Maintain compat with old options --- ES5 mode without
+            // elision=true will warn once per comma
+            warning("W070");
+          } else {
+            warning("W128");
+            do {
+              advance(",");
+            } while(state.tokens.next.id === ",");
+            continue;
+          }
+        }
         advance(",");
       }
 
