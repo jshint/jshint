@@ -221,17 +221,31 @@
     "lastcharacter": 18
   },
   {
+    "name": "genMethod",
+    "line": 70,
+    "character": 14,
+    "last": 70,
+    "lastcharacter": 18
+  },
+  {
+    "name": "staticGenMethod",
+    "line": 71,
+    "character": 27,
+    "last": 71,
+    "lastcharacter": 31
+  },
+  {
     "name": "(empty)",
-    "line": 72,
+    "line": 74,
     "character": 26,
-    "last": 72,
+    "last": 74,
     "lastcharacter": 30
   },
   {
     "name": "default",
-    "line": 74,
+    "line": 76,
     "character": 25,
-    "last": 74,
+    "last": 76,
     "lastcharacter": 29
   }
 ]
