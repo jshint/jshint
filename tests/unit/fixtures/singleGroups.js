@@ -6,6 +6,10 @@ if ((a)) {}
 
 if (typeof(a.b)) {}
 
+(a ? a : (a=[])).push('3');
+
+if (a || (1 / 0 == 1 / 0)) {}
+
 // Valid forms:
 
 (function() {})();

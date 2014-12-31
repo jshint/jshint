@@ -7,10 +7,13 @@ exports["Backbone.js 0.5.3"] = function (test) {
   var src = fs.readFileSync(__dirname + '/libs/backbone.js', 'utf8');
 
   TestRun(test)
+    .addError(32, "Grouping operator is unnecessary for lone expressions.")
+    .addError(784, "Grouping operator is unnecessary for lone expressions.")
+    .addError(864, "Grouping operator is unnecessary for lone expressions.")
     .addError(685, "Missing '()' invoking a constructor.")
     .addError(764, "Use '===' to compare with '0'.")
     .addError(859, "Use '!==' to compare with '0'.")
-    .test(src, { expr: true, eqnull: true, boss: true, regexdash: true });
+    .test(src, { expr: true, eqnull: true, boss: true, regexdash: true, singleGroups: true });
 
   test.done();
 };
@@ -182,7 +185,7 @@ exports.json2 = function (test) {
   TestRun(test)
     .addError(177, "'key' is defined but never used.")
     .addError(191, "'key' is defined but never used.")
-    .test(src, { undef: true, unused: true, laxbreak: true }, { JSON: true });
+    .test(src, { singleGroups: true, undef: true, unused: true, laxbreak: true }, { JSON: true });
 
   test.done();
 };

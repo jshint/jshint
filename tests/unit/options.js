@@ -1759,6 +1759,8 @@ exports.singleGroups = function (test) {
   TestRun(test)
     .addError(5, "Grouping operator is unnecessary for lone expressions.")
     .addError(7, "Grouping operator is unnecessary for lone expressions.")
+    .addError(9, "Grouping operator is unnecessary for lone expressions.")
+    .addError(11, "Grouping operator is unnecessary for lone expressions.")
     .test(src, {
       singleGroups: true,
       esnext: true
