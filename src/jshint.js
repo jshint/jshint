@@ -3445,6 +3445,7 @@ var JSHINT = (function () {
   function classbody(c) {
     var name;
     var isStatic;
+    var isGenerator;
     var getset;
     var props = {};
     var staticProps = {};
@@ -3452,7 +3453,13 @@ var JSHINT = (function () {
     for (var i = 0; state.tokens.next.id !== "}"; ++i) {
       name = state.tokens.next;
       isStatic = false;
+      isGenerator = false;
       getset = null;
+      if (name.id === "*") {
+        isGenerator = true;
+        advance("*");
+        name = state.tokens.next;
+      }
       if (name.id === "[") {
         name = computedPropertyName();
       } else if (isPropertyName(name)) {
@@ -3460,6 +3467,10 @@ var JSHINT = (function () {
         advance();
         computed = false;
         if (name.identifier && name.value === "static") {
+          if (checkPunctuators(state.tokens.next, ["*"])) {
+            isGenerator = true;
+            advance("*");
+          }
           if (isPropertyName(state.tokens.next) || state.tokens.next.id === "[") {
             computed = state.tokens.next.id === "[";
             isStatic = true;
@@ -3522,7 +3533,7 @@ var JSHINT = (function () {
 
       propertyName(name);
 
-      doFunction(null, c, false, null);
+      doFunction(null, c, isGenerator, null);
     }
 
     checkProperties(props);
