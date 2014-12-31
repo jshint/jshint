@@ -229,13 +229,13 @@ exports.bool = {
     undef       : true,
 
     /**
-     * This option prohibits the use of the grouping operator for
-     * single-expression statements. This unecessary usage commonly reflects
-     * a misunderstanding of unary operators, for example:
+     * This option prohibits the use of the grouping operator when it is not
+     * strictly required. Such usage commonly reflects a misunderstanding of
+     * unary operators, for example:
      *
      *     // jshint singleGroups: true
      *
-     *     delete(obj.attr); // Warning: Grouping operator is unnecessary for lone expressions.
+     *     delete(obj.attr); // Warning: Unnecessary grouping operator.
      */
     singleGroups: false,
 
