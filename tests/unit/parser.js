@@ -312,6 +312,8 @@ exports.numbers = function (test) {
     "var j = 1e-10;", // GH-821
     "var k = 0o1234567;",
     "var l = 0b101;",
+    "var m = 0x;",
+    "var n = 09;",
   ];
 
   TestRun(test)
@@ -325,6 +327,7 @@ exports.numbers = function (test) {
     .addError(9, "A dot following a number can be confused with a decimal point.")
     .addError(11, "'Octal integer literal' is only available in ES6 (use esnext option).")
     .addError(12, "'Binary integer literal' is only available in ES6 (use esnext option).")
+    .addError(13, "Bad number '0x'.")
     .test(code, {es3: true});
 
   // Octals are prohibited in strict mode.
