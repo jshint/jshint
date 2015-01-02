@@ -695,5 +695,11 @@ exports.jasmine = {
   // Jasmine 1.3
   runs        : false,
   waitsFor    : false,
-  waits       : false
+  waits       : false,
+  // Jasmine 2.1
+  beforeAll   : false,
+  afterAll    : false,
+  fail        : false,
+  fdescribe   : false,
+  fit         : false
 };
