@@ -314,6 +314,8 @@ exports.numbers = function (test) {
     "var l = 0b101;",
     "var m = 0x;",
     "var n = 09;",
+    "var o = 1e-A;",
+    "var p = 1/;",
   ];
 
   TestRun(test)
@@ -328,6 +330,10 @@ exports.numbers = function (test) {
     .addError(11, "'Octal integer literal' is only available in ES6 (use esnext option).")
     .addError(12, "'Binary integer literal' is only available in ES6 (use esnext option).")
     .addError(13, "Bad number '0x'.")
+    .addError(15, "Unexpected '1'.")
+    .addError(16, "Expected an identifier and instead saw ';'.")
+    .addError(16, "Expected an identifier and instead saw 'var'.")
+    .addError(16, "Missing semicolon.")
     .test(code, {es3: true});
 
   // Octals are prohibited in strict mode.
@@ -532,14 +538,15 @@ exports.strings = function (test) {
     "var b = \'\\g\';",
     "var c = '\\u0022\\u0070\\u005C';",
     "var e = '\\x6b..\\x6e';",
-    "var f = 'ax"
+    "var f = '\\b\\f\\n\\/';",
+    "var g = 'ax",
   ];
 
   var run = TestRun(test)
     .addError(1, "Control character in string: <non-printable>.", {character: 10})
     .addError(1, "This character may get silently deleted by one or more browsers.")
-    .addError(5, "Unclosed string.")
-    .addError(5, "Missing semicolon.");
+    .addError(6, "Unclosed string.")
+    .addError(6, "Missing semicolon.");
   run.test(code, {es3: true});
   run.test(code, {}); // es5
   run.test(code, {esnext: true});
