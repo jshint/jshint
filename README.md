@@ -5,12 +5,12 @@
 [Install](http://jshint.com/install/) • [Hack](http://jshint.com/hack/) •
 [Blog](http://jshint.com/blog/) • [Twitter](https://twitter.com/jshint/) \]
 
-[![NPM version](https://badge.fury.io/js/jshint.svg)](http://badge.fury.io/js/jshint)
-[![Build Status](https://travis-ci.org/jshint/jshint.svg?branch=master)](https://travis-ci.org/jshint/jshint)
-[![Windows Build status](https://ci.appveyor.com/api/projects/status/v8w3phg5rkhhsx44/branch/master?svg=true)](https://ci.appveyor.com/project/jshint/jshint)
-[![Dependency Status](https://david-dm.org/jshint/jshint.svg)](https://david-dm.org/jshint/jshint)
-[![devDependency Status](https://david-dm.org/jshint/jshint/dev-status.svg)](https://david-dm.org/jshint/jshint#info=devDependencies)  
-[![Code Coverage](https://img.shields.io/coveralls/jshint/jshint/master.svg)](https://coveralls.io/r/jshint/jshint?branch=master)
+[![NPM version](https://img.shields.io/npm/v/jshint.svg?style=flat)](https://www.npmjs.com/package/jshint)
+[![Linux Build Status](https://img.shields.io/travis/jshint/jshint/master.svg?style=flat&label=Linux%20build)](https://travis-ci.org/jshint/jshint)
+[![Windows Build status](https://img.shields.io/appveyor/ci/jshint/jshint/master.svg?style=flat&label=Windows%20build)](https://ci.appveyor.com/project/jshint/jshint/branch/master)
+[![Dependency Status](https://img.shields.io/david/jshint/jshint.svg?style=flat)](https://david-dm.org/jshint/jshint)
+[![devDependency Status](https://img.shields.io/david/dev/jshint/jshint.svg?style=flat)](https://david-dm.org/jshint/jshint#info=devDependencies)
+[![Coverage Status](https://img.shields.io/coveralls/jshint/jshint.svg?style=flat)](https://coveralls.io/r/jshint/jshint?branch=master)
 
 JSHint is a community-driven tool to detect errors and potential problems
 in JavaScript code. It is very flexible so you can easily adjust it to your
