@@ -2259,7 +2259,42 @@ var JSHINT = (function () {
     if (!state.option.esnext) {
       warning("W119", this, "spread/rest operator");
     }
-    if (!state.tokens.next.identifier) {
+
+    // TODO: Allow all AssignmentExpression
+    // once parsing permits.
+    //
+    // How to handle eg. number, boolean when the built-in
+    // prototype of may have an @@iterator definition?
+    //
+    // Number.prototype[Symbol.iterator] = function * () {
+    //   yield this.valueOf();
+    // };
+    //
+    // var a = [ ...1 ];
+    // console.log(a); // [1];
+    //
+    // for (let n of [...10]) {
+    //    console.log(n);
+    // }
+    // // 10
+    //
+    //
+    // Boolean.prototype[Symbol.iterator] = function * () {
+    //   yield this.valueOf();
+    // };
+    //
+    // var a = [ ...true ];
+    // console.log(a); // [true];
+    //
+    // for (let n of [...false]) {
+    //    console.log(n);
+    // }
+    // // false
+    //
+    if (!state.tokens.next.identifier &&
+        state.tokens.next.type !== "(string)" &&
+          !checkPunctuators(state.tokens.next, ["[", "("])) {
+
       error("E030", state.tokens.next, state.tokens.next.value);
     }
     expression(150);
