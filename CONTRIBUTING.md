@@ -136,14 +136,14 @@ Several commit types are used by jshint:
 1. `[[FIX]]` --- Commit fixes a bug or regression
 2. `[[FEAT]]` --- Commit introduces new functionality
 3. `[[DOCS]]` --- Commit modifies documentation. Docs commits should only touch comments in source code, or scripts and assets which are used to generate the documentation.
-4. `[[TESTS]]` --- Commit modifies tests. 
+4. `[[TEST]]` --- Commit modifies tests or test infrastructure only
 
 ### Body
 
 `<Body>` is a detailed commit message explaining exactly what has changed, and a summary of the
 reason why. Lines in the body should be wrapped to 100 characters for best rendering.
 
-For a historical example, see this [example](https://github.com/jshint/jshint/commit/                                     5751c5ed249b7a035758a3ae876cfa1a360fd144) 
+For a historical example, see this [example](https://github.com/jshint/jshint/commit/5751c5ed249b7a035758a3ae876cfa1a360fd144)
 
 ### Footer
 
