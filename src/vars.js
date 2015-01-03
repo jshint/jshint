@@ -675,10 +675,12 @@ exports.mocha = {
   beforeEach  : false,
   afterEach   : false,
   // TDD
-  suite       : false,
-  test        : false,
-  setup       : false,
-  teardown    : false
+  suite         : false,
+  test          : false,
+  setup         : false,
+  teardown      : false,
+  suiteSetup    : false,
+  suiteTeardown : false
 };
 
 exports.jasmine = {
