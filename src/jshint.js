@@ -447,8 +447,7 @@ var JSHINT = (function () {
           }
         }
       } else {
-        if (((!state.option.shadow && !opts.param) ||
-            _.contains([ "inner", "outer" ], state.option.shadow)) &&
+        if ((!state.option.shadow || _.contains([ "inner", "outer" ], state.option.shadow)) &&
             type !== "exception" || funct["(blockscope)"].getlabel(name)) {
           warning("W004", state.tokens.next, name);
         }
@@ -2736,7 +2735,7 @@ var JSHINT = (function () {
           t = tokens[t];
           if (t.id) {
             params.push(t.id);
-            addlabel(t.id, { type: "unused", token: t.token, param: true });
+            addlabel(t.id, { type: "unused", token: t.token });
           }
         }
       } else if (state.tokens.next.value === "...") {
@@ -2746,11 +2745,11 @@ var JSHINT = (function () {
         advance("...");
         ident = identifier(true);
         params.push(ident);
-        addlabel(ident, { type: "unused", token: state.tokens.curr, param: true });
+        addlabel(ident, { type: "unused", token: state.tokens.curr });
       } else {
         ident = identifier(true);
         params.push(ident);
-        addlabel(ident, { type: "unused", token: state.tokens.curr, param: true });
+        addlabel(ident, { type: "unused", token: state.tokens.curr });
       }
 
       // it is a syntax error to have a regular argument after a default argument
