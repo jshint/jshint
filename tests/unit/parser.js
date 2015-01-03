@@ -820,8 +820,6 @@ exports["destructuring var in function scope"] = function (test) {
     .addError(9,  "'a' is already defined.")
     .addError(9,  "'bar' is already defined.")
     .addError(10,  "Expected an identifier and instead saw '1'.")
-    .addError(10,  "Expected ',' and instead saw '1'.")
-    .addError(10,  "Expected an identifier and instead saw ']'.")
     .addError(11, "Expected ',' and instead saw ';'.")
     .addError(11, "'a' is already defined.")
     .addError(11, "'b' is already defined.")
@@ -996,8 +994,6 @@ exports["destructuring var errors"] = function (test) {
 
   TestRun(test)
     .addError(9,  "Expected an identifier and instead saw '1'.")
-    .addError(9,  "Expected ',' and instead saw '1'.")
-    .addError(9,  "Expected an identifier and instead saw ']'.")
     .addError(10, "Expected ',' and instead saw ';'.")
     .addError(11, "Expected ']' to match '[' from line 11 and instead saw ';'.")
     .addError(11, "Missing semicolon.")
@@ -1217,8 +1213,6 @@ exports["destructuring const errors"] = function (test) {
     .addError(2, "const 'b' has already been declared.")
     .addError(2, "const 'c' has already been declared.")
     .addError(3, "Expected an identifier and instead saw '1'.")
-    .addError(3, "Expected ',' and instead saw '1'.")
-    .addError(3, "Expected an identifier and instead saw ']'.")
     .addError(4, "Expected ',' and instead saw ';'.")
     .addError(5, "Expected ']' to match '[' from line 5 and instead saw ';'.")
     .addError(5, "Missing semicolon.")
@@ -3695,6 +3689,53 @@ exports["fat arrows support"] = function (test) {
 
   run.test(code); // es5
   run.test(code, {es3: true});
+
+  test.done();
+};
+
+exports["fat arrow nested function scoping"] = function (test) {
+  var code = [
+    "(() => {",
+    "  for (var i = 0; i < 10; i++) {",
+    "    var x;",
+    "  }",
+    "  var arrow = (x) => {",
+    "    return x;",
+    "  };",
+    "  var arrow2 = (x) => x;",
+    "  arrow();",
+    "  arrow2();",
+    "})();",
+    "(function() {",
+    "  for (var i = 0; i < 10; i++) {",
+    "    var x;",
+    "  }",
+    "  var arrow = (x) => {",
+    "    return x;",
+    "  };",
+    "  var arrow2 = (x) => x;",
+    "  arrow();",
+    "  arrow2();",
+    "})();"
+  ];
+
+  TestRun(test)
+    .test(code, {esnext: true});
+
+  test.done();
+};
+
+exports["default arguments in fat arrow functions"] = function (test) {
+  TestRun(test)
+    .test("(x = 0) => { return x; };", { expr: true, unused: true, esnext: true });
+
+  test.done();
+};
+
+exports["expressions in place of arrow function parameters"] = function (test) {
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw '1'.")
+    .test("(1) => {};", { expr: true, esnext: true });
 
   test.done();
 };

@@ -1168,14 +1168,10 @@ var JSHINT = (function () {
     var x = symbol(s, 42);
 
     x.led = function (left) {
-      if (!state.option.esnext) {
-        warning("W119", state.tokens.curr, "arrow function syntax (=>)");
-      }
-
       nobreaknonadjacent(state.tokens.prev, state.tokens.curr);
 
       this.left = left;
-      this.right = doFunction(undefined, undefined, false, left);
+      this.right = doFunction(undefined, undefined, false, { loneArg: left });
       return this;
     };
     return x;
@@ -1454,6 +1450,14 @@ var JSHINT = (function () {
       }
     } else {
       error("E030", state.tokens.next, state.tokens.next.value);
+
+      // The token should be consumed after a warning is issued so the parser
+      // can continue as though an identifier were found. The semicolon token
+      // should not be consumed in this way so that the parser interprets it as
+      // a statement delimeter;
+      if (state.tokens.next.id !== ";") {
+        advance();
+      }
     }
   }
 
@@ -1875,6 +1879,18 @@ var JSHINT = (function () {
       var s = scope[v];
       var f;
       var block;
+
+      // If this identifier is the lone parameter to a shorthand "fat arrow"
+      // function definition, i.e.
+      //
+      //     x => x;
+      //
+      // ...it should not be considered as a variable in the current scope. It
+      // will be added to the scope of the new function when the next token is
+      // parsed, so it can be safely ignored for now.
+      if (state.tokens.next.id === "=>") {
+        return this;
+      }
 
       if (typeof s === "function") {
         // Protection against accidental inheritance.
@@ -2426,8 +2442,8 @@ var JSHINT = (function () {
       }
       if (!left.identifier && left.id !== "." && left.id !== "[" &&
           left.id !== "(" && left.id !== "&&" && left.id !== "||" &&
-          left.id !== "?" && !(state.option.esnext && left.id === "=>")) {
-        warning("W067", left);
+          left.id !== "?" && !(state.option.esnext && left["(name)"])) {
+        warning("W067", that);
       }
     }
 
@@ -2437,13 +2453,11 @@ var JSHINT = (function () {
 
   prefix("(", function () {
     var bracket, brackets = [];
-    var pn, pn1, i = 0;
+    var pn = state.tokens.next, pn1, i = -1;
     var ret, triggerFnExpr;
     var parens = 1;
 
     do {
-      pn = peek(i);
-
       if (pn.value === "(") {
         parens += 1;
       } else if (pn.value === ")") {
@@ -2451,19 +2465,27 @@ var JSHINT = (function () {
       }
 
       i += 1;
-      pn1 = peek(i);
-    } while (!(parens === 0 && pn.value === ")") &&
-             pn1.value !== "=>" && pn1.value !== ";" && pn1.type !== "(end)");
+      pn1 = pn;
+      pn = peek(i);
+    } while (!(parens === 0 && pn1.value === ")") &&
+             pn.value !== ";" && pn.type !== "(end)");
 
     if (state.tokens.next.id === "function") {
       triggerFnExpr = state.tokens.next.immed = true;
+    }
+
+    // If the balanced grouping operator is followed by a "fat arrow", the
+    // current token marks the beginning of a "fat arrow" function and parsing
+    // should proceed accordingly.
+    if (pn.value === "=>") {
+      return doFunction(null, null, null, { parsedParen: true });
     }
 
     var exprs = [];
 
     if (state.tokens.next.id !== ")") {
       for (;;) {
-        if (pn1.value === "=>" && _.contains(["{", "["], state.tokens.next.value)) {
+        if (pn.value === "=>" && _.contains(["{", "["], state.tokens.next.value)) {
           bracket = state.tokens.next;
           bracket.left = destructuringExpression();
           brackets.push(bracket);
@@ -2681,40 +2703,25 @@ var JSHINT = (function () {
     return id;
   }
 
-  function functionparams(parsed) {
-    var curr, next;
+  function functionparams(fatarrow) {
+    var next;
     var params = [];
     var ident;
     var tokens = [];
     var t;
     var pastDefault = false;
+    var loneArg = fatarrow && fatarrow.loneArg;
 
-    if (parsed) {
-      if (Array.isArray(parsed)) {
-        for (var i in parsed) {
-          curr = parsed[i];
-          if (curr.value === "...") {
-            if (!state.option.esnext) {
-              warning("W119", curr, "spread/rest operator");
-            }
-            continue;
-          } else if (curr.value !== ",") {
-            params.push(curr.value);
-            addlabel(curr.value, { type: "unused", token: curr, param: true });
-          }
-        }
-        return params;
-      } else {
-        if (parsed.identifier === true) {
-          addlabel(parsed.value, { type: "unused", token: parsed, param: true });
-          return [parsed];
-        }
-      }
+    if (loneArg && loneArg.identifier === true) {
+      addlabel(loneArg.value, { type: "unused", token: loneArg });
+      return [loneArg];
     }
 
     next = state.tokens.next;
 
-    advance("(");
+    if (!fatarrow || !fatarrow.parsedParen) {
+      advance("(");
+    }
 
     if (state.tokens.next.id === ")") {
       advance(")");
@@ -2840,7 +2847,18 @@ var JSHINT = (function () {
     };
   }
 
-  function doFunction(name, statement, generator, fatarrowparams) {
+  /**
+   * @param {Object} [fatarrow] In the case that the function being parsed
+   *                            takes the "fat arrow" form, this object will
+   *                            contain details about the in-progress parsing
+   *                            operation.
+   * @param {Token} [fatarrow.loneArg] The argument to the function in cases
+   *                                   where it was defined using the single-
+   *                                   argument shorthand.
+   * @param {bool} [fatarrow.parsedParen] Whether the opening parenthesis has
+   *                                      already been parsed.
+   */
+  function doFunction(name, statement, generator, fatarrow) {
     var f;
     var oldOption = state.option;
     var oldIgnored = state.ignored;
@@ -2865,19 +2883,20 @@ var JSHINT = (function () {
       addlabel(name, { type: "function" });
     }
 
-    funct["(params)"] = functionparams(fatarrowparams);
+    funct["(params)"] = functionparams(fatarrow);
     funct["(metrics)"].verifyMaxParametersPerFunction(funct["(params)"]);
 
-    // So we parse fat-arrow functions after we encounter =>. So basically
-    // doFunction is called with the left side of => as its last argument.
-    // This means that the parser, at that point, had already added its
-    // arguments to the undefs array and here we undo that.
+    if (fatarrow) {
+      if (!state.option.esnext) {
+        warning("W119", state.tokens.curr, "arrow function syntax (=>)");
+      }
 
-    JSHINT.undefs = _.filter(JSHINT.undefs, function (item) {
-      return !_.contains(_.union(fatarrowparams), item[2]);
-    });
+      if (!fatarrow.loneArg) {
+        advance("=>");
+      }
+    }
 
-    block(false, true, true, fatarrowparams ? true : false);
+    block(false, true, true, !!fatarrow);
 
     if (!state.option.noyield && generator &&
         funct["(generator)"] !== "yielded") {
