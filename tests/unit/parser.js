@@ -5136,17 +5136,3 @@ exports.testStrictDirectiveASI = function (test) {
 
   test.done();
 };
-
-exports.testGH1928 = function (test) {
-  var code = [
-    "var foo = {",
-    "  bar(bar) {",
-    "    return bar;",
-    "  }",
-    "};"
-  ];
-
-  TestRun(test).test(code, { esnext: true });
-
-  test.done();
-};
