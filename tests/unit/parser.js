@@ -2640,6 +2640,18 @@ exports["esnext generator with yield delegation, gh-1544"] = function(test) {
   test.done();
 };
 
+exports["esnext generator export"] = function(test) {
+
+  var options = { unused: true, esnext: true };
+
+  TestRun(test, 1)
+    .test(
+  "export function* myFunc() { yield 1; }",
+  options);
+
+  test.done();
+};
+
 exports["mozilla generator"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
