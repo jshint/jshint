@@ -41,30 +41,30 @@ that's fine but if you're going to send us patches treat this guide as a law.
 * Use one space after `if`, `for`, `while`, etc.
 * Use one space after `function` for anonymous functions but not for named functions:
 
-```javascript
-var a = function () {};
-function a() {}
-```
+    ```javascript
+    var a = function () {};
+    function a() {}
+    ```
 
 * Feel free to indent variable assignments or property definitions if it makes the code look better. But don't abuse that:
 
-```javascript
-// Good
-var next = token.peak();
-var prev = token.peak(-1);
-var cur  = token.current;
+    ```javascript
+    // Good
+    var next = token.peak();
+    var prev = token.peak(-1);
+    var cur  = token.current;
 
-var scope = {
-  name:   "(global)",
-  parent: parentScope,
-  vars:   [],
-  uses:   []
-};
+    var scope = {
+      name:   "(global)",
+      parent: parentScope,
+      vars:   [],
+      uses:   []
+    };
 
-// Bad
-var cur         = token.current;
-var isSemicolon = cur.isPunctuator(";");
-```
+    // Bad
+    var cur         = token.current;
+    var isSemicolon = cur.isPunctuator(";");
+    ```
 
 * Wrap multi-line comments with new lines on both sides.
 
@@ -72,11 +72,11 @@ var isSemicolon = cur.isPunctuator(";");
 
 * Use one `var` per variable unless you don't assign any values to it (and it's short enough):
 
-```javascript
-var token = tokens.find(index);
-var scope = scopes.current;
-var next, prev, cur;
-```
+    ```javascript
+    var token = tokens.find(index);
+    var scope = scopes.current;
+    var next, prev, cur;
+    ```
 
 * Don't be overly descriptive with your variable names but don't abuse one-letter variables either. Find a sweet spot somewhere in between.
 
@@ -94,17 +94,17 @@ var next, prev, cur;
 * Try not to chain stuff unless it **really** helps (e.g. in tests).
 * Don't short-circuit expressions if you're not assigning the result:
 
-```javascript
-// Good
-token = token || tokens.find(0);
+    ```javascript
+    // Good
+    token = token || tokens.find(0);
 
-// Bad
-token.isPunctuator(";") && report.addWarning("W001");
+    // Bad
+    token.isPunctuator(";") && report.addWarning("W001");
 
-// Good
-if (token.isPunctuator(";"))
-  report.addWarning("W001");
-```
+    // Good
+    if (token.isPunctuator(";"))
+      report.addWarning("W001");
+    ```
 
 Commit Message Guidelines
 -------------------------
