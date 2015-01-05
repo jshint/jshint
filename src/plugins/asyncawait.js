@@ -1,29 +1,20 @@
 "use strict";
 
-var state = require("./state.js").state,
-    _     = require("underscore");
+var _     = require("underscore");
 
-exports.forLexer = {
-  applyLexerHook: function(keywords) {
-    keywords.push("async");
-    keywords.push("await");
-  }
-};
+exports.plugin = function() {
+  var state = require("../state.js").state,
+      messages = require("../messages");
+  var api;
 
-exports.forMessages = {
-  applyMessagesHook: function(errors, warnings) {
-    warnings.W001EAA = "An async function shall contain an await statement.";
-    warnings.W002EAA = "'{a}' is available in async/await extension(use asyncawait option).";
+  this.use = function(_api) {
+    api = _api;
+  };
 
-    errors.E001EAA = "A await statement shall be within an async function " +
-      "(with syntax: `async function`).";
-  }
-};
-
-
-exports.forJSHINT = function(addlabel, advance, blockstmt, doFunction, error,
-    expression, funct, inblock, isEndOfExpr, nobreaknonadjacent, nolinebreak,
-    optionalidentifier, peek, prefix, warning, warningAt) {
+  this.isEnabled = function() {
+    return !!(state.option.experimental &&
+      state.option.experimental.indexOf("asyncawait") >= 0);
+  };
 
   var lookupBracketFatArrow = function () {
     if(state.tokens.next.value !== "(") {
@@ -33,11 +24,11 @@ exports.forJSHINT = function(addlabel, advance, blockstmt, doFunction, error,
     var pn;
     var i = -1;
     do {
-      pn = (i === -1) ? state.tokens.next : peek(i);
+      pn = (i === -1) ? state.tokens.next : api.peek(i);
       s += pn.value;
       i++;
     } while (pn.value !== ')' && pn.type !== '(end)');
-    s += peek(i).value;
+    s += api.peek(i).value;
     if(s.match(/\((\w+(,\w+)*)?\)=>/)) {
       return s;
     }
@@ -48,14 +39,28 @@ exports.forJSHINT = function(addlabel, advance, blockstmt, doFunction, error,
   // one await statement.
   this.applyStateOptionHook = function() {
     state.option.asyncAwaitEnabled = function () {
-      return state.option.experimental &&
-        state.option.experimental.indexOf("asyncawait") >= 0;
+      return !!(state.option.experimental &&
+        state.option.experimental.indexOf("asyncawait") >= 0);
     };
 
     state.option.asyncReqAwait = function () {
-      return state.option.experimental &&
-        state.option.experimental.indexOf("asyncreqawait") >= 0;
+      return !!(state.option.experimental &&
+        state.option.experimental.indexOf("asyncreqawait") >= 0);
     };
+  };
+
+
+  this.applyLexerHook = function(keywords) {
+    keywords.push("async");
+    keywords.push("await");
+  };
+
+  this.applyMessagesHook = function() {
+    messages.warnings.W001EAA = { code: "W001EAA",
+      desc: "An async function shall contain an await statement." };
+    messages.errors.E001EAA = { code: "E001EAA",
+      desc: "A await statement shall be within an async function " +
+            "(with syntax: `async function`)." };
   };
 
   this.ExpressionHook = function() {
@@ -67,13 +72,7 @@ exports.forJSHINT = function(addlabel, advance, blockstmt, doFunction, error,
         // 'async function' is processed by async prefix
         if(state.tokens.next.value === "function") { return }
         isAsync = !!lookupBracketFatArrow() || state.tokens.next.type !== "(punctuator)";
-        if(isAsync) { advance(); }
-      }
-    };
-
-    this.applicationWarning = function () {
-      if (isAsync && !state.option.asyncAwaitEnabled()) {
-        warning("W002EAA", state.tokens.curr, "async");
+        if(isAsync) { api.advance(); }
       }
     };
 
@@ -95,7 +94,7 @@ exports.forJSHINT = function(addlabel, advance, blockstmt, doFunction, error,
     if(t.value === "async") {
       var j = 0, next;
       do {
-        next = peek(j++);
+        next = api.peek(j++);
       } while (next.type === "(endline)");
       asyncIsBlock = t.block && next && next.type !== "(punctuator)";
     }
@@ -105,18 +104,23 @@ exports.forJSHINT = function(addlabel, advance, blockstmt, doFunction, error,
     };
   };
 
-  this.ExportHook = function(that, ok, exported) {
+  this.ExportHook = function(that, ok) {
+    var needsApply;
+
     this.check = function() {
-      return state.option.asyncAwaitEnabled() && state.tokens.next.id === "async";
+      needsApply = state.option.asyncAwaitEnabled() && state.tokens.next.id === "async";
+      return needsApply;
     };
 
     this.applyHook = function() {
-      that.block = true;
-      advance("async");
-      exported[state.tokens.next.value] = ok;
-      peek(0).exported = true;
-      state.tokens.next.exported = true;
-      state.syntax.async.fud();
+      if(needsApply) {
+        that.block = true;
+        api.advance("async");
+        api.exported[state.tokens.next.value] = ok;
+        api.peek(0).exported = true;
+        state.tokens.next.exported = true;
+        state.syntax.async.fud();
+      }
     };
   };
 
@@ -140,12 +144,6 @@ exports.forJSHINT = function(addlabel, advance, blockstmt, doFunction, error,
 
     this.parse = function() {
       isAsync = skipKeyword("async");
-
-      if(isAsync) {
-        if (!state.option.asyncAwaitEnabled()) {
-          warning("W002EAA", state.tokens.curr, "async");
-        }
-      }
     };
 
     this.doFunctionParams = function() {
@@ -164,37 +162,35 @@ exports.forJSHINT = function(addlabel, advance, blockstmt, doFunction, error,
 
     this.warnings = function() {
       if (state.option.asyncReqAwait() && opts.async &&
-          funct()["(async)"] !== "awaited") {
-        warning("W001EAA", state.tokens.curr);
+          api.funct()["(async)"] !== "awaited") {
+        api.warning("W001EAA", state.tokens.curr);
       }
     };
   };
 
   this.applyBlockstmtHook = function() {
-    blockstmt("async", function () {
-      if (!state.option.asyncAwaitEnabled()) {
-        warning("W002EAA", state.tokens.curr, "async");
-      }
+    if(!state.option.asyncAwaitEnabled()) return;
+    api.blockstmt("async", function () {
       if (state.tokens.next.value === "function") {
-        advance("function");
+        api.advance("function");
 
-        if (inblock()) {
-          warning("W082", state.tokens.curr);
+        if (api.inblock()) {
+          api.warning("W082", state.tokens.curr);
         }
-        var i = optionalidentifier();
+        var i = api.optionalidentifier();
 
         if (i === undefined) {
-          warning("W025");
+          api.warning("W025");
         }
 
-        if (funct()[i] === "const") {
-          warning("E011", null, i);
+        if (api.funct()[i] === "const") {
+          api.warning("E011", null, i);
         }
-        addlabel(i, { type: "unction", token: state.tokens.curr });
+        api.addlabel(i, { type: "unction", token: state.tokens.curr });
 
-        doFunction({name: i, statement: true, experimental: {asyncAwait:{isAsync: true}}});
+        api.doFunction({name: i, statement: true, experimental: {asyncAwait:{isAsync: true}}});
         if (state.tokens.next.id === "(" && state.tokens.next.line === state.tokens.curr.line) {
-          error("E039");
+          api.error("E039");
         }
       }
       return this;
@@ -202,23 +198,21 @@ exports.forJSHINT = function(addlabel, advance, blockstmt, doFunction, error,
   };
 
   this.applyPrefixHook = function() {
-    prefix("async", function () {
-      if (!state.option.asyncAwaitEnabled()) {
-        warning("W002EAA", state.tokens.curr, "async");
-      }
+    if(!state.option.asyncAwaitEnabled()) return;
+    api.prefix("async", function () {
       function isVariable(name) { return name[0] !== "("; }
       function isLocal(name) { return fn[name] === "var"; }
       if (state.tokens.next.value === "function") {
-        advance("function");
+        api.advance("function");
 
-        var i = optionalidentifier();
-        var fn = doFunction({name: i, async: true});
-        if (!state.option.loopfunc && funct()["(loopage)"]) {
+        var i = api.optionalidentifier();
+        var fn = api.doFunction({name: i, async: true});
+        if (!state.option.loopfunc && api.funct()["(loopage)"]) {
           // If the function we just parsed accesses any non-local variables
           // trigger a warning. Otherwise, the function is safe even within
           // a loop.
           if (_.some(fn, function (val, name) { return isVariable(name) && !isLocal(name); })) {
-            warning("W083");
+            api.warning("W083");
           }
         }
       }
@@ -228,38 +222,37 @@ exports.forJSHINT = function(addlabel, advance, blockstmt, doFunction, error,
     (function (x) {
       x.exps = true;
       x.lbp = 25;
-    }(prefix("await", function () {
+    }(api.prefix("await", function () {
       var prev = state.tokens.prev;
-      if (state.option.asyncAwaitEnabled() && !funct()["(async)"]) {
+      if (state.option.asyncAwaitEnabled() && !api.funct()["(async)"]) {
         // If it's a await within a catch clause inside a generator then that's ok
-        if (!("(catch)" === funct()["(name)"] && funct()["(context)"]["(async)"])) {
-          error("E001EAA", state.tokens.curr, "await");
+        if (!("(catch)" === api.funct()["(name)"] && api.funct()["(context)"]["(async)"])) {
+          api.error("E001EAA", state.tokens.curr, "await");
         }
-      } else if (!state.option.asyncAwaitEnabled()) {
-        warning("W002EAA", state.tokens.curr, "await");
       }
-      funct()["(async)"] = "awaited";
+      api.funct()["(async)"] = "awaited";
 
       if (this.line === state.tokens.next.line || !state.option.inMoz(true)) {
         if (state.tokens.next.id !== ";" && !state.tokens.next.reach && state.tokens.next.nud) {
 
-          nobreaknonadjacent(state.tokens.curr, state.tokens.next);
-          this.first = expression(10);
+          api.nobreaknonadjacent(state.tokens.curr, state.tokens.next);
+          this.first = api.expression(10);
 
           if (this.first.type === "(punctuator)" && this.first.value === "=" &&
               !this.first.paren && !state.option.boss) {
-            warningAt("W093", this.first.line, this.first.character);
+            api.warningAt("W093", this.first.line, this.first.character);
           }
         }
 
         if (state.option.inMoz(true) && state.tokens.next.id !== ")" &&
-            (prev.lbp > 30 || (!prev.assign && !isEndOfExpr()) || prev.id === "async")) {
-          error("E050", this);
+            (prev.lbp > 30 || (!prev.assign && !api.isEndOfExpr()) || prev.id === "async")) {
+          api.error("E050", this);
         }
       } else if (!state.option.asi) {
-        nolinebreak(this); // always warn (Line breaking error)
+        api.nolinebreak(this); // always warn (Line breaking error)
       }
       return this;
     })));
   };
+  return this;
 };

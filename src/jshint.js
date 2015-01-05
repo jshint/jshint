@@ -41,8 +41,7 @@ var reg      = require("./reg.js");
 var state    = require("./state.js").state;
 var style    = require("./style.js");
 var options  = require("./options.js");
-var Experimental = require("./experimental").forJSHINT;
-
+var plugger = require("./plugger");
 // We need this module here because environments such as IE and Rhino
 // don't necessarilly expose the 'console' API and browserify uses
 // it to log things. It's a sad state of affair, really.
@@ -102,11 +101,6 @@ var JSHINT = (function () {
 
     extraModules = [],
     emitter = new events.EventEmitter();
-
-  var experimental = new Experimental(addlabel, advance, blockstmt, doFunction, error,
-    expression, function () { return funct; }, function() { return inblock; },
-    isEndOfExpr, nobreaknonadjacent, nolinebreak, optionalidentifier, peek, prefix,
-    warning, warningAt);
 
   function checkOption(name, t) {
     name = name.trim();
@@ -321,8 +315,6 @@ var JSHINT = (function () {
       }
       return state.option.es3;
     };
-
-    experimental.applyStateOptionHook();
   }
 
   // Produce an error warning.
@@ -856,7 +848,7 @@ var JSHINT = (function () {
   function expression(rbp, initial) {
     var left, isArray = false, isObject = false, isLetExpr = false,
       isFatArrowBody = state.tokens.curr.value === "=>";
-    var expressionHook = new experimental.ExpressionHook();
+    var expressionHook = new plugger.ExpressionHook();
 
     state.nameStack.push();
 
@@ -1183,7 +1175,6 @@ var JSHINT = (function () {
       if (!state.option.esnext) {
         warning("W119", state.tokens.curr, "arrow function syntax (=>)");
       }
-      expressionHook.applicationWarning(warning);
       nobreaknonadjacent(state.tokens.prev, state.tokens.curr);
 
       this.left = left;
@@ -1437,7 +1428,7 @@ var JSHINT = (function () {
       return val;
     }
 
-    if(experimental.applyOptionalIdentifierHook(val)){
+    if(plugger.applyOptionalIdentifierHook(val)){
       return val;
     }
 
@@ -1531,7 +1522,7 @@ var JSHINT = (function () {
   function statement() {
     var values;
     var i = indent, r, s = scope, t = state.tokens.next;
-    var statementHook = new experimental.StatementHook(t);
+    var statementHook = new plugger.StatementHook(t);
 
     if (t.id === ";") {
       advance(";");
@@ -2504,7 +2495,7 @@ var JSHINT = (function () {
     if (pn.value === "=>") {
       return doFunction({
         fatarrow: { parsedParen: true },
-        experimental: experimental.applyBalancedFatArrowHook()});
+        experimental: plugger.applyBalancedFatArrowHook()});
     }
 
     var exprs = [];
@@ -2850,7 +2841,7 @@ var JSHINT = (function () {
       "(params)"    : null
     };
 
-    experimental.applyInitFunctorHook(funct);
+    plugger.applyInitFunctorHook(funct);
 
     if (token) {
       _.extend(funct, {
@@ -2903,7 +2894,7 @@ var JSHINT = (function () {
    */
   function doFunction(opts) {
     opts = opts || {};
-    var doFunctionHook = new experimental.DoFunctionHook(opts);
+    var doFunctionHook = new plugger.DoFunctionHook(opts);
     var f;
     var oldOption = state.option;
     var oldIgnored = state.ignored;
@@ -3540,7 +3531,7 @@ var JSHINT = (function () {
       name = state.tokens.next;
       isStatic = false;
       isGenerator = false;
-      var classBodyHook = new experimental.ClassBodyHook(skipKeyword);
+      var classBodyHook = new plugger.ClassBodyHook(skipKeyword);
       getset = null;
       if (name.id === "*") {
         isGenerator = true;
@@ -3622,8 +3613,6 @@ var JSHINT = (function () {
     checkProperties(props);
   }
 
-  experimental.applyBlockstmtHook();
-
   blockstmt("function", function () {
     var generator = false;
     if (state.tokens.next.value === "*") {
@@ -3656,7 +3645,10 @@ var JSHINT = (function () {
     return this;
   });
 
-  experimental.applyPrefixHook();
+  var initPluginSyntax = function() {
+    plugger.applyBlockstmtHook();
+    plugger.applyPrefixHook();
+  };
 
   prefix("function", function () {
     var generator = false;
@@ -4380,7 +4372,7 @@ var JSHINT = (function () {
       return this;
     }
 
-    var exportHook = new experimental.ExportHook(this, ok, exported);
+    var exportHook = new plugger.ExportHook(this, ok);
 
     if (state.tokens.next.id === "var") {
       advance("var");
@@ -4938,6 +4930,31 @@ var JSHINT = (function () {
     global = Object.create(predefined);
     scope = global;
 
+    var pluginApi = {
+      addlabel: addlabel,
+      advance: advance,
+      doFunction: doFunction,
+      blockstmt: blockstmt,
+      error: error,
+      exported : exported,
+      expression: expression,
+      funct: function () { return funct; },
+      inblock: function() { return inblock; },
+      isEndOfExpr: isEndOfExpr,
+      nobreaknonadjacent: nobreaknonadjacent,
+      nolinebreak: nolinebreak,
+      optionalidentifier: optionalidentifier,
+      peek : peek,
+      prefix: prefix,
+      warning: warning,
+      warningAt: warningAt
+    };
+
+    plugger.use(pluginApi);
+    plugger.applyStateOptionHook();
+    plugger.applyMessagesHook();
+    initPluginSyntax();
+
     funct = functor("(global)", null, scope, {
       "(global)"    : true,
       "(blockscope)": blockScope(),
@@ -5017,7 +5034,7 @@ var JSHINT = (function () {
       });
     }
 
-    lex = new Lexer(s, experimental);
+    lex = new Lexer(s);
 
     lex.on("warning", function (ev) {
       warningAt.apply(null, [ ev.code, ev.line, ev.character].concat(ev.data));
@@ -5274,6 +5291,13 @@ var JSHINT = (function () {
   };
 
   itself.addModule(style.register);
+
+  // Plugins
+  itself.addPlugin = function(plugin) {
+    plugger.addPlugin(plugin);
+  };
+
+  itself.addPlugin(require("./plugins/asyncawait").plugin());
 
   // Data summary.
   itself.data = function () {

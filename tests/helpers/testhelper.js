@@ -26,16 +26,30 @@
  *     options:       optional. the options for jshint
  */
 
+"use strict";
+
 /*jshint node: true, eqnull: true*/
 
-var JSHINT = require('../../src/jshint.js').JSHINT;
+var _ = require('underscore');
 
 if (exports.setup === undefined || exports.setup === null) {
   exports.setup = {};
 }
 
+exports.setup.clearJSHINT = function () {
+ _(require.cache).chain()
+  .keys()
+  .filter(function(key) {
+    return  key.match(/src\/\w+\.js/) || key.match(/data\/[\w-]+\.js/);
+  })
+  .each(function(key) {
+    delete require.cache[key];
+  });
+};
+
 exports.setup.testRun = function (test, name) {
-  var initCounter = 0, runCounter = 0, seq = 0, checked = [], definedErrors = [];
+  var JSHINT = require('../../src/jshint.js').JSHINT;
+  var definedErrors = [];
 
   var helperObj = {
     addError: function (line, message, extras) {

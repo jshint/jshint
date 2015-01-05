@@ -1,7 +1,6 @@
 "use strict";
 
-var _ = require("underscore"),
-    experimental = require("./experimental").forMessages;
+var _ = require("underscore");
 
 var errors = {
   // JSHint options
@@ -205,8 +204,6 @@ var warnings = {
   W127: "Unexpected use of a comma operator.",
   W128: "Empty array elements require elision=true."
 };
-
-experimental.applyMessagesHook(errors, warnings);
 
 var info = {
   I001: "Comma warnings can be turned off with 'laxcomma'.",

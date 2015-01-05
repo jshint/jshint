@@ -1,8 +1,10 @@
 "use strict";
 
-var TestRun = require('../helpers/testhelper').setup.testRun;
+var TestRun = require('../helpers/testhelper').setup.testRun,
+    clearJSHINT = require('../helpers/testhelper').setup.clearJSHINT;
 
 exports["test: asyncawait basics"] = function (test) {
+  clearJSHINT();
   var options = { esnext: true, experimental: ["asyncawait"]};
 
   TestRun(test, 1)
@@ -89,6 +91,7 @@ exports["test: asyncawait basics"] = function (test) {
       "  await 1;\n" +
       "};\n", options);
 
+  clearJSHINT();
   options = { unused: true, esnext: true, experimental: ["asyncawait"]};
 
   TestRun(test, 12)
@@ -96,10 +99,43 @@ exports["test: asyncawait basics"] = function (test) {
       "export async function myFunct() {}",
       options);
 
+
+  clearJSHINT();
+  test.done();
+};
+
+exports["test: async option not set"] = function (test) {
+  clearJSHINT();
+  var options = { esnext: true,  experimental: ["asyncawait"] };
+  TestRun(test, 1)
+    .test(
+      "var async = require('async');\n" +
+      "async([]);\n",
+      options);
+
+  clearJSHINT();
+  options = { esnext: true };
+  TestRun(test, 2)
+    .test(
+      "var async = require('async');\n" +
+      "async([]);\n",
+      options);
+
+  clearJSHINT();
+  options = {};
+  TestRun(test, 3)
+    .test(
+      "var async = require('async');\n" +
+      "async([]);\n",
+      options);
+
+
+  clearJSHINT();
   test.done();
 };
 
 exports["test: async disambiguation"] = function (test) {
+  clearJSHINT();
   var options = { esnext: true, experimental: ["asyncawait"]};
 
   TestRun(test, 1)
@@ -160,10 +196,12 @@ exports["test: async disambiguation"] = function (test) {
       "{}\n",
       options);
 
+  clearJSHINT();
   test.done();
 };
 
 exports["test: asyncawait within classes"] = function (test) {
+  clearJSHINT();
   var options = { esnext: true, experimental: ["asyncawait"] };
 
   TestRun(test, 1)
@@ -193,10 +231,12 @@ exports["test: asyncawait within classes"] = function (test) {
       "}\n",
       options);
 
+  clearJSHINT();
   test.done();
 };
 
 exports["test: asyncawait errors"] = function (test) {
+  clearJSHINT();
   var options = { esnext: true, experimental: ["asyncawait", "asyncreqawait"] };
 
   TestRun(test, 1)
@@ -221,6 +261,7 @@ exports["test: asyncawait errors"] = function (test) {
       "}\n",
       options);
 
+  clearJSHINT();
   options = { esnext: true, experimental: ["asyncawait"] };
 
   TestRun(test, 4)
@@ -245,27 +286,33 @@ exports["test: asyncawait errors"] = function (test) {
       "}\n",
       options);
 
+  clearJSHINT();
   options = { esnext: true };
 
   TestRun(test, 7)
-    .addError(1, "'async' is available in async/await extension(use asyncawait option).")
-    .addError(1, "'await' is available in async/await extension(use asyncawait option).")
-     .test(
+    .addError(1, "Missing semicolon.")
+    .addError(1, "Missing name in function declaration.")
+    .addError(1, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, "Missing semicolon.")
+    .addError(1, "Unnecessary semicolon.")
+    .test(
       "let fn = async function() { await 1; };",
       options);
 
   TestRun(test, 8)
-     .addError(1, "'async' is available in async/await extension(use asyncawait option).")
-     .addError(1, "'await' is available in async/await extension(use asyncawait option).")
+     .addError(1, "Missing semicolon.")
+     .addError(1, "Expected an assignment or function call and instead saw an expression.")
      .test(
       "let fn = async x => await x;",
       options);
 
   TestRun(test, 9)
-    .addError(2, "'async' is available in async/await extension(use asyncawait option).")
-    .addError(2, "'await' is available in async/await extension(use asyncawait option).")
-    .addError(3, "'async' is available in async/await extension(use asyncawait option).")
-    .addError(3, "'await' is available in async/await extension(use asyncawait option).")
+    .addError(2, "Expected an assignment or function call and instead saw an expression.")
+    .addError(2, "Missing semicolon.")
+    .addError(2, "Class properties must be methods. Expected '(' but instead saw 'fn1'.")
+    .addError(3, "Expected an assignment or function call and instead saw an expression.")
+    .addError(3, "Missing semicolon.")
+    .addError(3, "Class properties must be methods. Expected '(' but instead saw 'fn1'.")
      .test(
       "class A {\n" +
       "  async fn1(x) { await x; }\n" +
@@ -273,5 +320,6 @@ exports["test: asyncawait errors"] = function (test) {
       "}\n",
       options);
 
+  clearJSHINT();
   test.done();
 };
