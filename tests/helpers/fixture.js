@@ -1,4 +1,6 @@
-/*jshint node:true, undef:true, maxlen:100 */
+/*jshint node:true */
+
+'use strict';
 
 var fs = require('fs');
 

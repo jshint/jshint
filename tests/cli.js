@@ -41,11 +41,16 @@ exports.group = {
       this.sinon.stub(shjs, "cat")
         .withArgs(sinon.match(/file\.js$/)).returns("var a = function () {}; a();")
         .withArgs(sinon.match(/file1\.json$/)).returns("wat")
-        .withArgs(sinon.match(/file2\.json$/)).returns("{\"node\":true,\"globals\":{\"foo\":true,\"bar\":true}}")
-        .withArgs(sinon.match(/file4\.json$/)).returns("{\"extends\":\"file3.json\"}")
-        .withArgs(sinon.match(/file5\.json$/)).returns("{\"extends\":\"file2.json\"}")
-        .withArgs(sinon.match(/file6\.json$/)).returns("{\"extends\":\"file2.json\",\"node\":false}")
-        .withArgs(sinon.match(/file7\.json$/)).returns("{\"extends\":\"file2.json\",\"globals\":{\"bar\":false,\"baz\":true}}");
+        .withArgs(sinon.match(/file2\.json$/))
+          .returns("{\"node\":true,\"globals\":{\"foo\":true,\"bar\":true}}")
+        .withArgs(sinon.match(/file4\.json$/))
+          .returns("{\"extends\":\"file3.json\"}")
+        .withArgs(sinon.match(/file5\.json$/))
+          .returns("{\"extends\":\"file2.json\"}")
+        .withArgs(sinon.match(/file6\.json$/))
+          .returns("{\"extends\":\"file2.json\",\"node\":false}")
+        .withArgs(sinon.match(/file7\.json$/))
+          .returns("{\"extends\":\"file2.json\",\"globals\":{\"bar\":false,\"baz\":true}}");
 
       this.sinon.stub(shjs, "test")
         .withArgs("-e", sinon.match(/file\.js$/)).returns(true)
