@@ -35,7 +35,7 @@ if (exports.setup === undefined || exports.setup === null) {
 }
 
 exports.setup.testRun = function (test, name) {
-  var initCounter = 0, runCounter = 0, seq = 0, checked = [], definedErrors = [];
+  var definedErrors = [];
 
   var helperObj = {
     addError: function (line, message, extras) {
