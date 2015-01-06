@@ -34,5 +34,5 @@ bundle.bundle(function (err, src) {
   ("#!/usr/bin/env rhino\nvar window = {};\n" + cat(web, srcDir + "/platforms/rhino.js")).to(rhino);
   chmod("+x", rhino);
 
-  console.log("Built: ", version);
+  echo("Built: " + version);
 });
