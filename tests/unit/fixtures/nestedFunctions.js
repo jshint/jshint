@@ -67,6 +67,8 @@ var VarDeclClass = class {
   method() {}                      // "method"
   get getter() {}                  // "get getter"
   set setter() {}                  // "set setter"
+  *genMethod() {}                  // "genMethod"
+  static *staticGenMethod() {}     // "staticGenMethod"
 };
 
 var grouping = (function() {});
