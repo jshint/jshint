@@ -41,7 +41,7 @@ var reg      = require("./reg.js");
 var state    = require("./state.js").state;
 var style    = require("./style.js");
 var options  = require("./options.js");
-
+var plugger = require("./plugger");
 // We need this module here because environments such as IE and Rhino
 // don't necessarilly expose the 'console' API and browserify uses
 // it to log things. It's a sad state of affair, really.
@@ -346,7 +346,7 @@ var JSHINT = (function () {
   function warning(code, t, a, b, c, d) {
     var ch, l, w, msg;
 
-    if (/^W\d{3}$/.test(code)) {
+    if (/^W\d{3}/.test(code)) {
       if (state.ignored[code])
         return;
 
@@ -848,6 +848,7 @@ var JSHINT = (function () {
   function expression(rbp, initial) {
     var left, isArray = false, isObject = false, isLetExpr = false,
       isFatArrowBody = state.tokens.curr.value === "=>";
+    var expressionHook = new plugger.ExpressionHook();
 
     state.nameStack.push();
 
@@ -883,11 +884,14 @@ var JSHINT = (function () {
 
     advance();
 
+    expressionHook.parse();
+
     if (initial) {
       funct["(verb)"] = state.tokens.curr.value;
     }
 
-    if (initial === true && state.tokens.curr.fud) {
+    var runFud = expressionHook.updateRunFud(initial === true && state.tokens.curr.fud);
+    if (runFud) {
       left = state.tokens.curr.fud();
     } else {
       if (state.tokens.curr.nud) {
@@ -929,7 +933,7 @@ var JSHINT = (function () {
         }
 
         if (left && state.tokens.curr.led) {
-          left = state.tokens.curr.led(left);
+          left = state.tokens.curr.led(left, expressionHook);
         } else {
           error("E033", state.tokens.curr, state.tokens.curr.id);
         }
@@ -1167,11 +1171,16 @@ var JSHINT = (function () {
   function application(s) {
     var x = symbol(s, 42);
 
-    x.led = function (left) {
+    x.led = function (left, expressionHook) {
+      if (!state.option.esnext) {
+        warning("W119", state.tokens.curr, "arrow function syntax (=>)");
+      }
       nobreaknonadjacent(state.tokens.prev, state.tokens.curr);
 
       this.left = left;
-      this.right = doFunction(undefined, undefined, false, { loneArg: left });
+      this.right = doFunction({
+        experimental: expressionHook.doFunctionParams() ,
+        fatarrow: { loneArg: left }});
       return this;
     };
     return x;
@@ -1419,6 +1428,10 @@ var JSHINT = (function () {
       return val;
     }
 
+    if(plugger.applyOptionalIdentifierHook(val)){
+      return val;
+    }
+
     if (prop) {
       if (state.option.inES5()) {
         return val;
@@ -1509,6 +1522,7 @@ var JSHINT = (function () {
   function statement() {
     var values;
     var i = indent, r, s = scope, t = state.tokens.next;
+    var statementHook = new plugger.StatementHook(t);
 
     if (t.id === ";") {
       advance(";");
@@ -1603,7 +1617,8 @@ var JSHINT = (function () {
 
     // Look for the final semicolon.
 
-    if (!t.block) {
+    var isBlock = statementHook.isBlock(t.block);
+    if (!isBlock) {
       if (!state.option.expr && (!r || !r.exps)) {
         warning("W030", state.tokens.curr);
       } else if (state.option.nonew && r && r.left && r.id === "(" && r.left.id === "new") {
@@ -2478,7 +2493,9 @@ var JSHINT = (function () {
     // current token marks the beginning of a "fat arrow" function and parsing
     // should proceed accordingly.
     if (pn.value === "=>") {
-      return doFunction(null, null, null, { parsedParen: true });
+      return doFunction({
+        fatarrow: { parsedParen: true },
+        experimental: plugger.applyBalancedFatArrowHook()});
     }
 
     var exprs = [];
@@ -2824,6 +2841,8 @@ var JSHINT = (function () {
       "(params)"    : null
     };
 
+    plugger.applyInitFunctorHook(funct);
+
     if (token) {
       _.extend(funct, {
         "(line)"     : token.line,
@@ -2859,17 +2878,23 @@ var JSHINT = (function () {
   }
 
   /**
-   * @param {Object} [fatarrow] In the case that the function being parsed
-   *                            takes the "fat arrow" form, this object will
-   *                            contain details about the in-progress parsing
-   *                            operation.
-   * @param {Token} [fatarrow.loneArg] The argument to the function in cases
-   *                                   where it was defined using the single-
-   *                                   argument shorthand.
-   * @param {bool} [fatarrow.parsedParen] Whether the opening parenthesis has
-   *                                      already been parsed.
+   * @param {Object} [opts.name] Function name
+   * @param {Object} [opts.statement] boolean indicating whether function is a statement
+   * @param {Object} [opts.generator] boolean indicating whether function is a generator
+   * @param {Object} [opts.fatarrow] In the case that the function being parsed
+   *                                 takes the "fat arrow" form, this object will
+   *                                 contain details about the in-progress parsing
+   *                                 operation.
+   * @param {Token} [opts.fatarrow.loneArg] The argument to the function in cases
+   *                                        where it was defined using the single-
+   *                                        argument shorthand.
+   * @param {bool} [opts.fatarrow.parsedParen] Whether the opening parenthesis has
+   *                                           already been parsed.
+   * @param {Object} [opts.experimental] experimental params
    */
-  function doFunction(name, statement, generator, fatarrow) {
+  function doFunction(opts) {
+    opts = opts || {};
+    var doFunctionHook = new plugger.DoFunctionHook(opts);
     var f;
     var oldOption = state.option;
     var oldIgnored = state.ignored;
@@ -2879,40 +2904,46 @@ var JSHINT = (function () {
     state.ignored = Object.create(state.ignored);
     scope = Object.create(scope);
 
-    funct = functor(name || state.nameStack.infer(), state.tokens.next, scope, {
-      "(statement)": statement,
+    var functorParams = {
+      "(statement)": opts.statement,
       "(context)":   funct,
-      "(generator)": generator ? true : null
-    });
+      "(generator)": opts.generator ? true : null
+    };
+    doFunctionHook.updateFunctor(functorParams);
+
+    funct = functor(opts.name || state.nameStack.infer(), state.tokens.next,
+                    scope, functorParams);
 
     f = funct;
     state.tokens.curr.funct = funct;
 
     functions.push(funct);
 
-    if (name) {
-      addlabel(name, { type: "function" });
+    if (opts.name) {
+      addlabel(opts.name, { type: "function" });
     }
 
-    funct["(params)"] = functionparams(fatarrow);
+    funct["(params)"] = functionparams(opts.fatarrow);
     funct["(metrics)"].verifyMaxParametersPerFunction(funct["(params)"]);
 
-    if (fatarrow) {
+    if (opts.fatarrow) {
       if (!state.option.esnext) {
         warning("W119", state.tokens.curr, "arrow function syntax (=>)");
       }
 
-      if (!fatarrow.loneArg) {
+      if (!opts.fatarrow.loneArg) {
         advance("=>");
       }
     }
 
-    block(false, true, true, !!fatarrow);
+    block(false, true, true, !!opts.fatarrow);
 
-    if (!state.option.noyield && generator &&
+    if (!state.option.noyield && opts.generator &&
         funct["(generator)"] !== "yielded") {
       warning("W124", state.tokens.curr);
     }
+
+    doFunctionHook.warnings();
 
     funct["(metrics)"].verifyMaxStatementsPerFunction();
     funct["(metrics)"].verifyMaxComplexityPerFunction();
@@ -3108,7 +3139,7 @@ var JSHINT = (function () {
               if (!state.option.inESNext()) {
                 warning("W104", state.tokens.curr, "concise methods");
               }
-              doFunction(null, undefined, g);
+              doFunction({generator: g});
             } else {
               advance(":");
               expression(10);
@@ -3480,10 +3511,27 @@ var JSHINT = (function () {
     var props = {};
     var staticProps = {};
     var computed;
+
+    var skipKeyword = function(keyword) {
+      var found = false;
+      if (name.identifier && name.value === keyword) {
+        if (isPropertyName(state.tokens.next) || state.tokens.next.id === "[") {
+          computed = state.tokens.next.id === "[";
+          name = state.tokens.next;
+          if (computed) {
+            name = computedPropertyName();
+          } else advance();
+          found = true;
+        }
+      }
+      return found;
+    };
+
     for (var i = 0; state.tokens.next.id !== "}"; ++i) {
       name = state.tokens.next;
       isStatic = false;
       isGenerator = false;
+      var classBodyHook = new plugger.ClassBodyHook(skipKeyword);
       getset = null;
       if (name.id === "*") {
         isGenerator = true;
@@ -3510,17 +3558,12 @@ var JSHINT = (function () {
             } else advance();
           }
         }
-
-        if (name.identifier && (name.value === "get" || name.value === "set")) {
-          if (isPropertyName(state.tokens.next) || state.tokens.next.id === "[") {
-            computed = state.tokens.next.id === "[";
-            getset = name;
-            name = state.tokens.next;
-            if (state.tokens.next.id === "[") {
-              name = computedPropertyName();
-            } else advance();
-          }
+        isStatic = isStatic || skipKeyword("static");
+        var currName = name;
+        if(skipKeyword("get") || skipKeyword("set"))  {
+          getset = currName;
         }
+        classBodyHook.parse();
       } else {
         warning("W052", state.tokens.next, state.tokens.next.value || state.tokens.next.type);
         advance();
@@ -3535,7 +3578,7 @@ var JSHINT = (function () {
           advance();
         }
         if (state.tokens.next.value !== "(") {
-          doFunction(undefined, c, false, null);
+          doFunction({statement: c});
         }
       }
 
@@ -3563,7 +3606,8 @@ var JSHINT = (function () {
 
       propertyName(name);
 
-      doFunction(null, c, isGenerator, null);
+      doFunction({statement: c,  generator: isGenerator,
+        experimental: classBodyHook.doFunctionParams()});
     }
 
     checkProperties(props);
@@ -3594,12 +3638,17 @@ var JSHINT = (function () {
     }
     addlabel(i, { type: "unction", token: state.tokens.curr });
 
-    doFunction(i, { statement: true }, generator);
+    doFunction({name: i, statement: true, generator: generator});
     if (state.tokens.next.id === "(" && state.tokens.next.line === state.tokens.curr.line) {
       error("E039");
     }
     return this;
   });
+
+  var initPluginSyntax = function() {
+    plugger.applyBlockstmtHook();
+    plugger.applyPrefixHook();
+  };
 
   prefix("function", function () {
     var generator = false;
@@ -3613,7 +3662,7 @@ var JSHINT = (function () {
     }
 
     var i = optionalidentifier();
-    var fn = doFunction(i, undefined, generator);
+    var fn = doFunction({name:i, generator: generator});
 
     function isVariable(name) { return name[0] !== "("; }
     function isLocal(name) { return fn[name] === "var"; }
@@ -4323,6 +4372,8 @@ var JSHINT = (function () {
       return this;
     }
 
+    var exportHook = new plugger.ExportHook(this, ok);
+
     if (state.tokens.next.id === "var") {
       advance("var");
       exported[state.tokens.next.value] = ok;
@@ -4350,6 +4401,8 @@ var JSHINT = (function () {
       exported[state.tokens.next.value] = ok;
       state.tokens.next.exported = true;
       state.syntax["class"].fud();
+    } else if (exportHook.check()) {
+      exportHook.applyHook();
     } else {
       error("E024", state.tokens.next, state.tokens.next.value);
     }
@@ -4877,6 +4930,31 @@ var JSHINT = (function () {
     global = Object.create(predefined);
     scope = global;
 
+    var pluginApi = {
+      addlabel: addlabel,
+      advance: advance,
+      doFunction: doFunction,
+      blockstmt: blockstmt,
+      error: error,
+      exported : exported,
+      expression: expression,
+      funct: function () { return funct; },
+      inblock: function() { return inblock; },
+      isEndOfExpr: isEndOfExpr,
+      nobreaknonadjacent: nobreaknonadjacent,
+      nolinebreak: nolinebreak,
+      optionalidentifier: optionalidentifier,
+      peek : peek,
+      prefix: prefix,
+      warning: warning,
+      warningAt: warningAt
+    };
+
+    plugger.use(pluginApi);
+    plugger.applyStateOptionHook();
+    plugger.applyMessagesHook();
+    initPluginSyntax();
+
     funct = functor("(global)", null, scope, {
       "(global)"    : true,
       "(blockscope)": blockScope(),
@@ -5213,6 +5291,13 @@ var JSHINT = (function () {
   };
 
   itself.addModule(style.register);
+
+  // Plugins
+  itself.addPlugin = function(plugin) {
+    plugger.addPlugin(plugin);
+  };
+
+  itself.addPlugin(require("./plugins/asyncawait").plugin());
 
   // Data summary.
   itself.data = function () {

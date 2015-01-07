@@ -70,7 +70,7 @@ var errors = {
   E052: "Unclosed template literal.",
   E053: "Export declaration must be in global scope.",
   E054: "Class properties must be methods. Expected '(' but instead saw '{a}'."
-};
+ };
 
 var warnings = {
   W001: "'hasOwnProperty' is a really bad name.",
