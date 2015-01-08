@@ -1753,7 +1753,11 @@ exports.esnextPredefs = function (test) {
   test.done();
 };
 
-exports.singleGroups = function (test) {
+var singleGroups = exports.singleGroups = {};
+
+singleGroups.fixture = function (test) {
+  test.done();
+  return;
   var src = fs.readFileSync(__dirname + "/fixtures/singleGroups.js", "utf8");
 
   TestRun(test)
@@ -1761,10 +1765,180 @@ exports.singleGroups = function (test) {
     .addError(7, "Grouping operator is unnecessary for lone expressions.")
     .addError(9, "Grouping operator is unnecessary for lone expressions.")
     .addError(11, "Grouping operator is unnecessary for lone expressions.")
+    .addError(13, "Grouping operator is unnecessary for lone expressions.")
+    .addError(15, "Grouping operator is unnecessary for lone expressions.")
+    .addError(17, "Grouping operator is unnecessary for lone expressions.")
+    .addError(18, "Grouping operator is unnecessary for lone expressions.")
+    .addError(19, "Grouping operator is unnecessary for lone expressions.")
+    .addError(21, "Grouping operator is unnecessary for lone expressions.")
+    .addError(23, "Grouping operator is unnecessary for lone expressions.")
+    .addError(25, "Grouping operator is unnecessary for lone expressions.")
+    .addError(26, "Grouping operator is unnecessary for lone expressions.")
+    .addError(27, "Grouping operator is unnecessary for lone expressions.")
+    .addError(29, "Grouping operator is unnecessary for lone expressions.")
     .test(src, {
       singleGroups: true,
       esnext: true
     });
+
+  test.done();
+};
+
+singleGroups.loneIdentifier = function (test) {
+  var code = [
+    "if ((a)) {}",
+    "if ((a) + b + c) {}",
+    "if (a + (b) + c) {}",
+    "if (a + b + (c)) {}",
+  ];
+
+  TestRun(test)
+    .addError(1, "Grouping operator is unnecessary for lone expressions.")
+    .addError(2, "Grouping operator is unnecessary for lone expressions.")
+    .addError(3, "Grouping operator is unnecessary for lone expressions.")
+    .addError(4, "Grouping operator is unnecessary for lone expressions.")
+    .test(code, { singleGroups: true });
+
+  test.done();
+};
+
+singleGroups.neighborless = function (test) {
+  var code = [
+    "if ((a instanceof b)) {}",
+    "if ((a in b)) {}",
+    "if ((a + b)) {}"
+  ];
+
+  TestRun(test)
+    .addError(1, "Grouping operator is unnecessary for lone expressions.")
+    .addError(2, "Grouping operator is unnecessary for lone expressions.")
+    .addError(3, "Grouping operator is unnecessary for lone expressions.")
+    .test(code, { singleGroups: true });
+
+  test.done();
+};
+
+singleGroups.bindingPower = function (test) {
+  var code = [
+    "var a = !(a instanceof b);",
+    "var b = !(a in b);",
+    "var c = !!(a && a.b);",
+    "var d = (1 - 2) * 3;",
+    "var e = 3 * (1 - 2);",
+    "var f = a && (b || c);",
+    "var g = typeof(a.b);",
+    "var h = 1 - (2 * 3);",
+    "var i = (3 * 1) - 2;",
+    "if (a in c || (b in c)) {}",
+    "if ((a in c) || b in c) {}",
+    "if ((a in c) || (b in c)) {}",
+    "if (a * (b * c)) {}",
+    "if ((a * b) * c) {}",
+    "if (a + (b * c)) {}"
+  ];
+
+  TestRun(test)
+    .addError(7, "Grouping operator is unnecessary for lone expressions.")
+    .addError(8, "Grouping operator is unnecessary for lone expressions.")
+    .addError(9, "Grouping operator is unnecessary for lone expressions.")
+    .addError(10, "Grouping operator is unnecessary for lone expressions.")
+    .addError(11, "Grouping operator is unnecessary for lone expressions.")
+    .addError(12, "Grouping operator is unnecessary for lone expressions.")
+    .addError(13, "Grouping operator is unnecessary for lone expressions.")
+    .addError(14, "Grouping operator is unnecessary for lone expressions.")
+    .addError(15, "Grouping operator is unnecessary for lone expressions.")
+    .test(code, { singleGroups: true });
+
+  test.done();
+};
+
+// Although the following form is redundant in purely mathematical terms, type
+// coercion semantics in JavaScript make it impossible to statically determine
+// whether the grouping operator is necessary. JSHint should err on the side of
+// caution and allow this form.
+singleGroups.concatenation = function (test) {
+  var code = [
+    "var a = b + (c + d);",
+    "var e = (f + g) + h;"
+  ];
+
+  TestRun(test)
+    .addError(2, "Grouping operator is unnecessary for lone expressions.")
+    .test(code, { singleGroups: true });
+
+  test.done();
+};
+
+singleGroups.functionExpression = function (test) {
+  var code = [
+    "(function() {})();",
+    "(function() {}).call();",
+    "(function() {}());",
+    "(function() {}.call());",
+    "var a = (function() {})();",
+    "var b = (function() {}).call();",
+    "var c = (function() {}());",
+    "var d = (function() {}.call());",
+    "var e = { e: (function() {})() };",
+    "var f = { f: (function() {}).call() };",
+    "var g = { g: (function() {}()) };",
+    "var h = { h: (function() {}.call()) };",
+    "if ((function() {})()) {}",
+    "if ((function() {}).call()) {}",
+    "if ((function() {}())) {}",
+    "if ((function() {}.call())) {}"
+  ];
+
+  TestRun(test)
+    .addError(5, "Grouping operator is unnecessary for lone expressions.")
+    .addError(6, "Grouping operator is unnecessary for lone expressions.")
+    .addError(7, "Grouping operator is unnecessary for lone expressions.")
+    .addError(8, "Grouping operator is unnecessary for lone expressions.")
+    .addError(9, "Grouping operator is unnecessary for lone expressions.")
+    .addError(10, "Grouping operator is unnecessary for lone expressions.")
+    .addError(11, "Grouping operator is unnecessary for lone expressions.")
+    .addError(12, "Grouping operator is unnecessary for lone expressions.")
+    .addError(13, "Grouping operator is unnecessary for lone expressions.")
+    .addError(14, "Grouping operator is unnecessary for lone expressions.")
+    .addError(15, "Grouping operator is unnecessary for lone expressions.")
+    .addError(16, "Grouping operator is unnecessary for lone expressions.")
+    .test(code, { singleGroups: true });
+
+  test.done();
+};
+
+singleGroups.arrowFunctionBodies = function (test) {
+  var code = [
+    "var a = () => ({});",
+    "var b = (...c) => (c);",
+    "var d = () => (3);"
+  ];
+
+  TestRun(test)
+    .addError(2, "Grouping operator is unnecessary for lone expressions.")
+    .addError(3, "Grouping operator is unnecessary for lone expressions.")
+    .test(code, { singleGroups: true, esnext: true });
+
+  test.done();
+};
+
+singleGroups.objectLiterals = function (test) {
+  var code = [
+    "({}).method();",
+    "if(true) {} ({}).method();",
+    "g(); ({}).method();",
+
+    // Invalid forms
+    "var a = ({}).method();",
+    "if (({}).method()) {}",
+    "var b = { a: ({}).method() };"
+  ];
+
+  TestRun(test, "grouping operator not required")
+    .addError(4, "Grouping operator is unnecessary for lone expressions.")
+    .addError(5, "Grouping operator is unnecessary for lone expressions.")
+    .addError(6, "Grouping operator is unnecessary for lone expressions.")
+    .test(code, { singleGroups: true });
 
   test.done();
 };
