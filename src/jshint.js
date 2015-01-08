@@ -831,6 +831,16 @@ var JSHINT = (function () {
     return false;
   }
 
+  // TODO: This duplicates logic and is most likely incorrect. Fix it and add
+  // tests.
+  function isBeginOfExpr(prev, curr) {
+    if (prev.id === "(begin)" || prev.id === ";" || prev.id === "}") {
+      return true;
+    }
+
+    return false;
+  }
+
   // This is the heart of JSHINT, the Pratt parser. In addition to parsing, it
   // is looking for ad hoc lint patterns. We add .fud to Pratt's model, which is
   // like .nud except that it is only used on the first token of a statement.
@@ -938,9 +948,11 @@ var JSHINT = (function () {
       funct["(blockscope)"].unstack();
     }
 
-    if (state.option.singleGroups && left && left.paren && !left.exprs &&
-      rbp <= left.lbp && !left.triggerFnExpr) {
-      warning("W126");
+    if (state.option.singleGroups && left && left.paren) {
+      //console.log('after paren: ', left.value, left.lbp);
+      if (!left.exprs && rbp <= left.lbp && !checkPunctuators(left, ["+"])) {
+        //warning("W126");
+      }
     }
 
     state.nameStack.pop();
@@ -2481,6 +2493,8 @@ var JSHINT = (function () {
     }
 
     var exprs = [];
+    var preceeding = state.tokens.prev;
+    var opening = state.tokens.curr;
 
     if (state.tokens.next.id !== ")") {
       for (;;) {
@@ -2520,10 +2534,48 @@ var JSHINT = (function () {
       ret.exprs = exprs;
     } else {
       ret = exprs[0];
+
+      if (false && ret.line === 61) {
+        console.log("preceeding:", preceeding.id, preceeding.lbp);
+        console.log("opening:", opening.id, opening.lbp);
+        console.log("ret:\t", ret.value, ret.lbp);
+        console.log("next:\t", state.tokens.next.value, state.tokens.next.lbp);
+        // TODO: I *think* there is a bug in `isExprBoundary` (originally
+        // implemented as `isEndOfExpr`). If so, fix it, store the result, and
+        // reference it in two checks below:
+        //
+        // 1. before comparing binding powers below (instead of using `isInfix`
+        //    directly)
+        // 2. when checking for object literals
+        //console.log(isExprBoundary(preceeding, opening));
+        console.log(isInfix(preceeding), isInfix(opening));
+        console.log(preceeding, opening);
+        //console.log(preceeding.__proto__, opening.__proto__);
+      }
+
+      var isBeginning = isBeginOfExpr(preceeding, opening);
+      // Warn when a grouping operator only has a single expression, except:
+      if (state.option.singleGroups &&
+        // When used to designate a function expression for immediate invocation
+        !(triggerFnExpr && isBeginning) &&
+        // As the return value of a single-statement arrow function
+        !(ret.id === "{" && preceeding.id === "=>") &&
+        // The binding power of the previous operator is lower than that of the
+        // grouped expression
+        !(!isInfix(preceeding) && ret.lbp < preceeding.lbp) &&
+        !(ret.lbp < state.tokens.next.lbp) &&
+        // When used to signal an object literal as the first token in the
+        // expression
+        !(ret.id === "{" && isBeginning)) {
+        warning("W126");
+      }
+
+        if (preceeding.line === 4) {
+          console.log(ret);
+        }
     }
     if (ret) {
       ret.paren = true;
-      ret.triggerFnExpr = triggerFnExpr;
     }
     return ret;
   });
