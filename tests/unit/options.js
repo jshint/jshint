@@ -1439,6 +1439,10 @@ exports.browser = function (test) {
     .addError(15, "'Node' is not defined.")
     .addError(18, "'MutationObserver' is not defined.")
     .addError(21, "'SVGElement' is not defined.")
+    .addError(24, "'Comment' is not defined.")
+    .addError(25, "'DocumentFragment' is not defined.")
+    .addError(26, "'Range' is not defined.")
+    .addError(27, "'Text' is not defined.")
     .test(src, {es3: true, undef: true });
 
   TestRun(test).test(src, {es3: true, browser: true, undef: true });

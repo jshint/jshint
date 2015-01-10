@@ -19,3 +19,9 @@ var mutationObserver = new MutationObserver(/* callback */);
 
 // SVGElement
 var svgProto = SVGElement.prototype;
+
+// DOM4 Constructors
+var comment = new Comment("");
+var df = new DocumentFragment();
+var range = new Range();
+var text = new Text("");
