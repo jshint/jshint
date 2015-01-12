@@ -593,18 +593,18 @@ var exports = {
     var results = [];
     var data = [];
 
-    if (opts.useStdin) {
+    var filename;
+
+    // There is an if(filename) check in the lint() function called below.
+    // passing a filename of undefined is the same as calling the function
+    // without a filename.  If there is no opts.filename, filename remains
+    // undefined and lint() is effectively called with 4 parameters.
+    if (opts.filename) {
+      filename = path.resolve(opts.filename);
+    }
+    if (opts.useStdin && opts.ignores.indexOf(filename) === -1) {
       cli.withStdin(function(code) {
         var config = opts.config;
-        var filename;
-
-        // There is an if(filename) check in the lint() function called below.
-        // passing a filename of undefined is the same as calling the function
-        // without a filename.  If there is no opts.filename, filename remains
-        // undefined and lint() is effectively called with 4 parameters.
-        if (opts.filename) {
-          filename = path.resolve(opts.filename);
-        }
 
         if (filename && !config) {
           config = loadNpmConfig(filename) ||
@@ -616,8 +616,8 @@ var exports = {
         lint(extract(code, opts.extract), results, config, data, filename);
         (opts.reporter || defReporter)(results, data, { verbose: opts.verbose });
         cb(results.length === 0);
-      });
 
+      });
       return null;
     }
 
