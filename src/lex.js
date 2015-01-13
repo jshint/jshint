@@ -538,7 +538,7 @@ Lexer.prototype = {
       return (/^[0-9a-fA-F]$/).test(str);
     }
 
-    var readUnicodeEscapeSequence = function() {
+    var readUnicodeEscapeSequence = function () {
       /*jshint validthis:true */
       index += 1;
 
@@ -619,7 +619,7 @@ Lexer.prototype = {
     }.bind(this);
 
     function removeEscapeSequences(id) {
-      return id.replace(/\\u([0-9a-fA-F]{4})/g, function(m0, codepoint) {
+      return id.replace(/\\u([0-9a-fA-F]{4})/g, function (m0, codepoint) {
         return String.fromCharCode(parseInt(codepoint, 16));
       });
     }
@@ -964,7 +964,7 @@ Lexer.prototype = {
       break;
     }
 
-    return {char: char, jump: jump, allowNewLine: allowNewLine};
+    return { char: char, jump: jump, allowNewLine: allowNewLine };
   },
 
   /*

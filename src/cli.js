@@ -560,7 +560,7 @@ var exports = {
       (!opts.extensions ? "" : "|" +
         opts.extensions.replace(/,/g, "|").replace(/[\. ]/g, "")) + ")$");
 
-    var ignores = !opts.ignores ? loadIgnores({cwd: opts.cwd}) :
+    var ignores = !opts.ignores ? loadIgnores({ cwd: opts.cwd }) :
                                   opts.ignores.map(function (target) {
                                     return path.resolve(target);
                                   });
@@ -735,12 +735,12 @@ var exports = {
       args:       cli.args,
       config:     config,
       reporter:   reporter,
-      ignores:    loadIgnores({exclude: options.exclude, excludePath: options["exclude-path"]}),
+      ignores:    loadIgnores({ exclude: options.exclude, excludePath: options["exclude-path"] }),
       extensions: options["extra-ext"],
       verbose:    options.verbose,
       extract:    options.extract,
       filename:   options.filename,
-      useStdin:   {"-": true, "/dev/stdin": true}[args[args.length - 1]]
+      useStdin:   { "-": true, "/dev/stdin": true }[args[args.length - 1]]
     }, done));
   }
 };

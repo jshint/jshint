@@ -2,8 +2,7 @@
 // http://github.com/relaxnow
 module.exports =
 {
-  reporter: function (results, data, opts)
-  {
+  reporter: function (results, data, opts) {
     "use strict";
 
     var files = {},
@@ -43,7 +42,7 @@ module.exports =
 
       var typeNo = result.error.code;
       var severity = '';
-      switch(typeNo[0]) {
+      switch (typeNo[0]) {
         case 'I':
           severity = 'info';
           break;
