@@ -1,7 +1,6 @@
 module.exports =
 {
-  reporter: function (results)
-  {
+  reporter: function (results) {
     "use strict";
 
     var files = {},

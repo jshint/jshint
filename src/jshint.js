@@ -180,7 +180,7 @@ var JSHINT = (function () {
       for (var enforceopt in options.bool.enforcing) {
         if (state.option[enforceopt] === undefined) {
           state.option[enforceopt] = true;
-          }
+        }
       }
       for (var relaxopt in options.bool.relaxing) {
         if (state.option[relaxopt] === undefined) {
@@ -2079,7 +2079,7 @@ var JSHINT = (function () {
   infix(",", function (left, that) {
     var expr;
     that.exprs = [left];
-    if (!comma({peek: true})) {
+    if (!comma({ peek: true })) {
       return that;
     }
     while (true) {
@@ -2467,8 +2467,7 @@ var JSHINT = (function () {
       i += 1;
       pn1 = pn;
       pn = peek(i);
-    } while (!(parens === 0 && pn1.value === ")") &&
-             pn.value !== ";" && pn.type !== "(end)");
+    } while (!(parens === 0 && pn1.value === ")") && pn.value !== ";" && pn.type !== "(end)");
 
     if (state.tokens.next.id === "function") {
       triggerFnExpr = state.tokens.next.immed = true;
@@ -2639,7 +2638,7 @@ var JSHINT = (function () {
             warning("W128");
             do {
               advance(",");
-            } while(state.tokens.next.id === ",");
+            } while (state.tokens.next.id === ",");
             continue;
           }
         }
@@ -3944,8 +3943,7 @@ var JSHINT = (function () {
     do {
       nextop = peek(i);
       ++i;
-    } while (!_.contains(inof, nextop.value) && nextop.value !== ";" &&
-          nextop.type !== "(end)");
+    } while (!_.contains(inof, nextop.value) && nextop.value !== ";" && nextop.type !== "(end)");
 
     // if we're in a for (… in|of …) statement
     if (_.contains(inof, nextop.value)) {
@@ -4556,7 +4554,7 @@ var JSHINT = (function () {
       // otherwise we warn about it
       return (l === 0);
     }
-    return {stack: function () {
+    return { stack: function () {
           _current = new CompArray();
           _carrays.push(_current);
         },
@@ -4789,7 +4787,7 @@ var JSHINT = (function () {
     };
   };
 
-  var escapeRegex = function(str) {
+  var escapeRegex = function (str) {
     return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
   };
 
@@ -4950,7 +4948,7 @@ var JSHINT = (function () {
 
         reIgnore = new RegExp(reIgnoreStr, "ig");
 
-        s = s.replace(reIgnore, function(match) {
+        s = s.replace(reIgnore, function (match) {
           return match.replace(/./g, " ");
         });
       });

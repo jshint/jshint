@@ -5,7 +5,7 @@ function NameStack() {
 }
 
 Object.defineProperty(NameStack.prototype, "length", {
-  get: function() {
+  get: function () {
     return this._stack.length;
   }
 });
@@ -14,14 +14,14 @@ Object.defineProperty(NameStack.prototype, "length", {
  * Create a new entry in the stack. Useful for tracking names across
  * expressions.
  */
-NameStack.prototype.push = function() {
+NameStack.prototype.push = function () {
   this._stack.push(null);
 };
 
 /**
  * Discard the most recently-created name on the stack.
  */
-NameStack.prototype.pop = function() {
+NameStack.prototype.pop = function () {
   this._stack.pop();
 };
 
@@ -31,7 +31,7 @@ NameStack.prototype.pop = function() {
  * @param {object} token The token to consider as the source for the most
  *                       recent name.
  */
-NameStack.prototype.set = function(token) {
+NameStack.prototype.set = function (token) {
   this._stack[this.length - 1] = token;
 };
 
@@ -40,7 +40,7 @@ NameStack.prototype.set = function(token) {
  *
  * @returns {string}
  */
-NameStack.prototype.infer = function() {
+NameStack.prototype.infer = function () {
   var nameToken = this._stack[this.length - 1];
   var prefix = "";
   var type;
