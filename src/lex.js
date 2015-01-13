@@ -41,11 +41,11 @@ function asyncTrigger() {
   var _checks = [];
 
   return {
-    push: function (fn) {
+    push: function(fn) {
       _checks.push(fn);
     },
 
-    check: function () {
+    check: function() {
       for (var check = 0; check < _checks.length; ++check) {
         _checks[check]();
       }
@@ -70,7 +70,7 @@ function asyncTrigger() {
  * to token() method returning the next token, the Lexer object also
  * emits events.
  *
- *   lex.on("Identifier", function (data) {
+ *   lex.on("Identifier", function(data) {
  *     if (data.name.indexOf("_") >= 0) {
  *       // Produce a warning.
  *     }
@@ -123,12 +123,12 @@ function Lexer(source) {
 Lexer.prototype = {
   _lines: [],
 
-  getLines: function () {
+  getLines: function() {
     this._lines = state.lines;
     return this._lines;
   },
 
-  setLines: function (val) {
+  setLines: function(val) {
     this._lines = val;
     state.lines = this._lines;
   },
@@ -137,14 +137,14 @@ Lexer.prototype = {
    * Return the next i character without actually moving the
    * char pointer.
    */
-  peek: function (i) {
+  peek: function(i) {
     return this.input.charAt(i || 0);
   },
 
   /*
    * Move the char pointer forward i times.
    */
-  skip: function (i) {
+  skip: function(i) {
     i = i || 1;
     this.char += i;
     this.input = this.input.slice(i);
@@ -155,12 +155,12 @@ Lexer.prototype = {
    * Underscore.js i.e. you can subscribe to multiple events with
    * one call:
    *
-   *   lex.on("Identifier Number", function (data) {
+   *   lex.on("Identifier Number", function(data) {
    *     // ...
    *   });
    */
-  on: function (names, listener) {
-    names.split(" ").forEach(function (name) {
+  on: function(names, listener) {
+    names.split(" ").forEach(function(name) {
       this.emitter.on(name, listener);
     }.bind(this));
   },
@@ -169,7 +169,7 @@ Lexer.prototype = {
    * Trigger a token event. All arguments will be passed to each
    * listener.
    */
-  trigger: function () {
+  trigger: function() {
     this.emitter.emit.apply(this.emitter, Array.prototype.slice.call(arguments));
   },
 
@@ -180,8 +180,8 @@ Lexer.prototype = {
    * by the parser. This avoids parser's peek() to give the lexer
    * a false context.
    */
-  triggerAsync: function (type, args, checks, fn) {
-    checks.push(function () {
+  triggerAsync: function(type, args, checks, fn) {
+    checks.push(function() {
       if (fn()) {
         this.trigger(type, args);
       }
@@ -195,7 +195,7 @@ Lexer.prototype = {
    * This method's implementation was heavily influenced by the
    * scanPunctuator function in the Esprima parser's source code.
    */
-  scanPunctuator: function () {
+  scanPunctuator: function() {
     var ch1 = this.peek();
     var ch2, ch3, ch4;
 
@@ -352,7 +352,7 @@ Lexer.prototype = {
    * also recognizes JSHint- and JSLint-specific comments such as
    * /*jshint, /*jslint, /*globals and so on.
    */
-  scanComments: function () {
+  scanComments: function() {
     var ch1 = this.peek();
     var ch2 = this.peek(1);
     var rest = this.input.substr(2);
@@ -376,7 +376,7 @@ Lexer.prototype = {
 
       body = body.replace(/\n/g, " ");
 
-      special.forEach(function (str) {
+      special.forEach(function(str) {
         if (isSpecial) {
           return;
         }
@@ -492,7 +492,7 @@ Lexer.prototype = {
    * Extract a keyword out of the next sequence of characters or
    * return 'null' if its not possible.
    */
-  scanKeyword: function () {
+  scanKeyword: function() {
     var result = /^[a-zA-Z_$][a-zA-Z0-9_$]*/.exec(this.input);
     var keywords = [
       "if", "in", "do", "var", "for", "new",
@@ -521,7 +521,7 @@ Lexer.prototype = {
    * to Identifier this method can also produce BooleanLiteral
    * (true/false) and NullLiteral (null).
    */
-  scanIdentifier: function () {
+  scanIdentifier: function() {
     var id = "";
     var index = 0;
     var type, char;
@@ -538,7 +538,7 @@ Lexer.prototype = {
       return (/^[0-9a-fA-F]$/).test(str);
     }
 
-    var readUnicodeEscapeSequence = function () {
+    var readUnicodeEscapeSequence = function() {
       /*jshint validthis:true */
       index += 1;
 
@@ -566,7 +566,7 @@ Lexer.prototype = {
       return null;
     }.bind(this);
 
-    var getIdentifierStart = function () {
+    var getIdentifierStart = function() {
       /*jshint validthis:true */
       var chr = this.peek(index);
       var code = chr.charCodeAt(0);
@@ -592,7 +592,7 @@ Lexer.prototype = {
       return null;
     }.bind(this);
 
-    var getIdentifierPart = function () {
+    var getIdentifierPart = function() {
       /*jshint validthis:true */
       var chr = this.peek(index);
       var code = chr.charCodeAt(0);
@@ -619,7 +619,7 @@ Lexer.prototype = {
     }.bind(this);
 
     function removeEscapeSequences(id) {
-      return id.replace(/\\u([0-9a-fA-F]{4})/g, function (m0, codepoint) {
+      return id.replace(/\\u([0-9a-fA-F]{4})/g, function(m0, codepoint) {
         return String.fromCharCode(parseInt(codepoint, 16));
       });
     }
@@ -669,7 +669,7 @@ Lexer.prototype = {
    * This method's implementation was heavily influenced by the
    * scanNumericLiteral function in the Esprima parser's source code.
    */
-  scanNumericLiteral: function () {
+  scanNumericLiteral: function() {
     var index = 0;
     var value = "";
     var length = this.input.length;
@@ -880,7 +880,7 @@ Lexer.prototype = {
 
 
   // Assumes previously parsed character was \ (=== '\\') and was not skipped.
-  scanEscapeSequence: function (checks) {
+  scanEscapeSequence: function(checks) {
     var allowNewLine = false;
     var jump = 1;
     this.skip();
@@ -893,7 +893,7 @@ Lexer.prototype = {
         line: this.line,
         character: this.char,
         data: [ "\\'" ]
-      }, checks, function () {return state.jsonMode; });
+      }, checks, function() {return state.jsonMode; });
       break;
     case "b":
       char = "\\b";
@@ -921,7 +921,7 @@ Lexer.prototype = {
         line: this.line,
         character: this.char
       }, checks,
-      function () { return n >= 0 && n <= 7 && state.directive["use strict"]; });
+      function() { return n >= 0 && n <= 7 && state.directive["use strict"]; });
       break;
     case "u":
       char = String.fromCharCode(parseInt(this.input.substr(1, 4), 16));
@@ -933,7 +933,7 @@ Lexer.prototype = {
         line: this.line,
         character: this.char,
         data: [ "\\v" ]
-      }, checks, function () { return state.jsonMode; });
+      }, checks, function() { return state.jsonMode; });
 
       char = "\v";
       break;
@@ -945,7 +945,7 @@ Lexer.prototype = {
         line: this.line,
         character: this.char,
         data: [ "\\x-" ]
-      }, checks, function () { return state.jsonMode; });
+      }, checks, function() { return state.jsonMode; });
 
       char = String.fromCharCode(x);
       jump = 3;
@@ -973,7 +973,7 @@ Lexer.prototype = {
    * literals can span across multiple lines, this method has to move
    * the char pointer.
    */
-  scanTemplateLiteral: function (checks) {
+  scanTemplateLiteral: function(checks) {
     var tokenType;
     var value = '';
     var ch;
@@ -1059,7 +1059,7 @@ Lexer.prototype = {
    *   var str = "hello\
    *   world";
    */
-  scanStringLiteral: function (checks) {
+  scanStringLiteral: function(checks) {
     /*jshint loopfunc:true */
     var quote = this.peek();
 
@@ -1073,7 +1073,7 @@ Lexer.prototype = {
       code: "W108",
       line: this.line,
       character: this.char // +1?
-    }, checks, function () { return state.jsonMode && quote !== "\""; });
+    }, checks, function() { return state.jsonMode && quote !== "\""; });
 
     var value = "";
     var startLine = this.line;
@@ -1108,13 +1108,13 @@ Lexer.prototype = {
             code: "W043",
             line: this.line,
             character: this.char
-          }, checks, function () { return !state.option.multistr; });
+          }, checks, function() { return !state.option.multistr; });
 
           this.triggerAsync("warning", {
             code: "W042",
             line: this.line,
             character: this.char
-          }, checks, function () { return state.jsonMode && state.option.multistr; });
+          }, checks, function() { return state.jsonMode && state.option.multistr; });
         }
 
         // If we get an EOF inside of an unclosed string, show an
@@ -1182,7 +1182,7 @@ Lexer.prototype = {
    * rare edge cases where one JavaScript engine complains about
    * your regular expression while others don't.
    */
-  scanRegExp: function () {
+  scanRegExp: function() {
     var index = 0;
     var length = this.input.length;
     var char = this.peek();
@@ -1193,7 +1193,7 @@ Lexer.prototype = {
     var isCharSet = false;
     var terminated;
 
-    var scanUnexpectedChars = function () {
+    var scanUnexpectedChars = function() {
       // Unexpected control character
       if (char < " ") {
         malformed = true;
@@ -1344,7 +1344,7 @@ Lexer.prototype = {
    * can be mistakenly typed on OS X with option-space. Non UTF-8 web
    * pages with non-breaking pages produce syntax errors.
    */
-  scanNonBreakingSpaces: function () {
+  scanNonBreakingSpaces: function() {
     return state.option.nonbsp ?
       this.input.search(/(\u00A0)/) : -1;
   },
@@ -1352,7 +1352,7 @@ Lexer.prototype = {
   /*
    * Scan for characters that get silently deleted by one or more browsers.
    */
-  scanUnsafeChars: function () {
+  scanUnsafeChars: function() {
     return this.input.search(reg.unsafeChars);
   },
 
@@ -1360,7 +1360,7 @@ Lexer.prototype = {
    * Produce the next raw token or return 'null' if no tokens can be matched.
    * This method skips over all space characters.
    */
-  next: function (checks) {
+  next: function(checks) {
     this.from = this.char;
 
     // Move to the next non-space character.
@@ -1408,7 +1408,7 @@ Lexer.prototype = {
    * Switch to the next line and reset all char pointers. Once
    * switched, this method also checks for other minor warnings.
    */
-  nextLine: function () {
+  nextLine: function() {
     var char;
 
     if (this.line >= this.getLines().length) {
@@ -1422,14 +1422,14 @@ Lexer.prototype = {
 
     var inputTrimmed = this.input.trim();
 
-    var startsWith = function () {
-      return _.some(arguments, function (prefix) {
+    var startsWith = function() {
+      return _.some(arguments, function(prefix) {
         return inputTrimmed.indexOf(prefix) === 0;
       });
     };
 
-    var endsWith = function () {
-      return _.some(arguments, function (suffix) {
+    var endsWith = function() {
+      return _.some(arguments, function(suffix) {
         return inputTrimmed.indexOf(suffix, inputTrimmed.length - suffix.length) !== -1;
       });
     };
@@ -1476,7 +1476,7 @@ Lexer.prototype = {
    * This is simply a synonym for nextLine() method with a friendlier
    * public name.
    */
-  start: function () {
+  start: function() {
     this.nextLine();
   },
 
@@ -1484,7 +1484,7 @@ Lexer.prototype = {
    * Produce the next token. This function is called by advance() to get
    * the next token. It returns a token in a JSLint-compatible format.
    */
-  token: function () {
+  token: function() {
     /*jshint loopfunc:true */
     var checks = asyncTrigger();
     var token;
@@ -1519,7 +1519,7 @@ Lexer.prototype = {
     }
 
     // Produce a token object.
-    var create = function (type, value, isProperty, token) {
+    var create = function(type, value, isProperty, token) {
       /*jshint validthis:true */
       var obj;
 
@@ -1612,7 +1612,7 @@ Lexer.prototype = {
           from: this.from,
           value: token.value,
           quote: token.quote
-        }, checks, function () { return true; });
+        }, checks, function() { return true; });
 
         return create("(string)", token.value);
 
@@ -1674,13 +1674,13 @@ Lexer.prototype = {
           line: this.line,
           character: this.char,
           data: [ "0x-" ]
-        }, checks, function () { return token.base === 16 && state.jsonMode; });
+        }, checks, function() { return token.base === 16 && state.jsonMode; });
 
         this.triggerAsync("warning", {
           code: "W115",
           line: this.line,
           character: this.char
-        }, checks, function () {
+        }, checks, function() {
           return state.directive["use strict"] && token.base === 8 && token.isLegacy;
         });
 

@@ -4,7 +4,7 @@ var NameStack = require("./name-stack.js");
 var state = {
   syntax: {},
 
-  reset: function () {
+  reset: function() {
     this.tokens = {
       prev: null,
       next: null,
