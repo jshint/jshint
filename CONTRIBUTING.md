@@ -39,10 +39,10 @@ that's fine but if you're going to send us patches treat this guide as a law.
 
 * We use two spaces everywhere.
 * Use one space after `if`, `for`, `while`, etc.
-* Use one space after `function` for anonymous functions but not for named functions:
+* No spaces between `function` and `(` for anonymous functions, no space between name and `(`  for named functions:
 
     ```javascript
-    var a = function () {};
+    var a = function() {};
     function a() {}
     ```
 

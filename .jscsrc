@@ -33,7 +33,7 @@
     "requireSpacesInFunctionExpression": {
         "beforeOpeningCurlyBrace": true
     },
-    "requireSpacesInAnonymousFunctionExpression": {
+    "disallowSpacesInAnonymousFunctionExpression": {
         "beforeOpeningRoundBrace": true
     },
     "requireSpacesInsideObjectBrackets": "all",

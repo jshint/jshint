@@ -2,7 +2,7 @@
 // http://github.com/relaxnow
 module.exports =
 {
-  reporter: function (results, data, opts) {
+  reporter: function(results, data, opts) {
     "use strict";
 
     var files = {},
@@ -27,7 +27,7 @@ module.exports =
       return s || "";
     }
 
-    results.forEach(function (result) {
+    results.forEach(function(result) {
       // Register the file
       result.file = result.file.replace(/^\.\//, '');
       if (!files[result.file]) {

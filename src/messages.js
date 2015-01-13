@@ -215,14 +215,14 @@ exports.errors = {};
 exports.warnings = {};
 exports.info = {};
 
-_.each(errors, function (desc, code) {
+_.each(errors, function(desc, code) {
   exports.errors[code] = { code: code, desc: desc };
 });
 
-_.each(warnings, function (desc, code) {
+_.each(warnings, function(desc, code) {
   exports.warnings[code] = { code: code, desc: desc };
 });
 
-_.each(info, function (desc, code) {
+_.each(info, function(desc, code) {
   exports.info[code] = { code: code, desc: desc };
 });
