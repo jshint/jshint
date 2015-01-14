@@ -2452,7 +2452,6 @@ var JSHINT = (function() {
   }, 155, true).exps = true;
 
   prefix("(", function() {
-    var bracket, brackets = [];
     var pn = state.tokens.next, pn1, i = -1;
     var ret, triggerFnExpr;
     var parens = 1;
@@ -2484,16 +2483,8 @@ var JSHINT = (function() {
 
     if (state.tokens.next.id !== ")") {
       for (;;) {
-        if (pn.value === "=>" && _.contains(["{", "["], state.tokens.next.value)) {
-          bracket = state.tokens.next;
-          bracket.left = destructuringExpression();
-          brackets.push(bracket);
-          for (var t in bracket.left) {
-            exprs.push(bracket.left[t].token);
-          }
-        } else {
-          exprs.push(expression(10));
-        }
+        exprs.push(expression(10));
+
         if (state.tokens.next.id !== ",") {
           break;
         }
@@ -2509,9 +2500,6 @@ var JSHINT = (function() {
       }
     }
 
-    if (state.tokens.next.value === "=>") {
-      return exprs;
-    }
     if (!exprs.length) {
       return;
     }
