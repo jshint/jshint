@@ -78,6 +78,7 @@ exports.browser = {
   closed               : false,
   Comment              : false,
   CustomEvent          : false,
+  Comment              : false,
   DOMParser            : false,
   defaultStatus        : false,
   Document             : false,
