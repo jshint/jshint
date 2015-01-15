@@ -1,24 +1,12 @@
-var a = {};
-
 // Invalid forms:
 
-if ((a)) {}
+(a ? a : (a=[])).push('3');
 
-if (typeof(a.b)) {}
+if (a || (1 / 0 == 1 / 0)) {}
 
 // Valid forms:
 
-(function() {})();
-
-(function() {}).call();
-
-(function() {}());
-
-(function() {}.call());
-
 if ((a.b, a)) {}
-
-if ((a - 3) * 3) {}
 
 var b = () => ({});
 
