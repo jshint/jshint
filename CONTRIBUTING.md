@@ -1,5 +1,4 @@
-How to contribute
-=================
+# How to contribute
 
 The best way to make sure your issue is addressed is to submit a patch. We accept
 patches through all mediums: pull requests, email, issue comment, tweet with a link
@@ -14,18 +13,29 @@ However, before sending a patch, please make sure that the following applies:
 * All tests and lint checks pass (`npm test`).
 * You understand that we're super grateful for your patch.
 
-Coding Style
-------------
+## Development Environment
 
-This section describes our coding style guide. You might not agree with it and that's
-fine but if you're going to send us patches treat this guide as a law.
+JSHint is developed using [Node.js](http://nodejs.org/) and has a number of
+dependencies specified in its `package.json` file. To install them just run the
+following command from within your repo directory:
 
-### Our main rule is simple:
+    $ npm install
 
-> All code in any code-base should look like a single person typed it, no matter how
-many people contributed. —[idiomatic.js](https://github.com/rwldrn/idiomatic.js/)
+After that, you will be able to run the edge version of JSHint using
+`bin/jshint` or build the release bundles using `bin/build`.
 
-### Whitespace:
+## Coding Style
+
+This section describes our coding style guide. You might not agree with it and
+that's fine but if you're going to send us patches treat this guide as a law.
+
+**Our main rule is simple:**
+
+> All code in any code-base should look like a single person typed it, no
+> matter how many people contributed.
+> —[idiomatic.js](https://github.com/rwaldron/idiomatic.js/)
+
+### Whitespace
 
 * We use two spaces everywhere.
 * Use one space after `if`, `for`, `while`, etc.
@@ -72,7 +82,6 @@ var next, prev, cur;
 
 ### Comments
 
-* Use `//` for all comments.
 * Comment everything that is not obvious.
 * If you're adding a new check, write a comment describing why this check is important and what it checks for.
 
@@ -171,4 +180,11 @@ Closes #888888
 Closes #77777
 ```
 
+## License
 
+Most files are published using [the standard MIT Expat
+license](https://www.gnu.org/licenses/license-list.html#Expat). One file,
+however, is provided under a slightly modified version of that license. The
+so-called [JSON license](https://www.gnu.org/licenses/license-list.html#JSON)
+is a non-free license, and unfortunately, we can't change it due to historical
+reasons. This license is included as an in-line within the file it concerns.
