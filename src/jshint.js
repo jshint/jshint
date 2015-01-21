@@ -1507,7 +1507,6 @@ var JSHINT = (function() {
   }
 
   function statement() {
-    var values;
     var i = indent, r, s = scope, t = state.tokens.next;
 
     if (t.id === ";") {
@@ -1544,22 +1543,6 @@ var JSHINT = (function() {
       }
     }
 
-    // detect a destructuring assignment
-    if (_.has(["[", "{"], t.value)) {
-      if (lookupBlockType().isDestAssign) {
-        if (!state.option.inESNext()) {
-          warning("W104", state.tokens.curr, "destructuring expression");
-        }
-        values = destructuringExpression();
-        values.forEach(function(tok) {
-          isundef(funct, "W117", tok.token, tok.id);
-        });
-        advance("=");
-        destructuringExpressionMatch(values, expression(10, true));
-        advance(";");
-        return;
-      }
-    }
     if (t.identifier && !res && peek().id === ":") {
       advance();
       advance(":");
