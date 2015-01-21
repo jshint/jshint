@@ -1,4 +1,4 @@
-/*! 2.5.11 */
+/*! 2.6.0 */
 var JSHINT;
 if (typeof window === 'undefined') window = {};
 (function () {
@@ -2900,11 +2900,11 @@ function asyncTrigger() {
   var _checks = [];
 
   return {
-    push: function (fn) {
+    push: function(fn) {
       _checks.push(fn);
     },
 
-    check: function () {
+    check: function() {
       for (var check = 0; check < _checks.length; ++check) {
         _checks[check]();
       }
@@ -2929,7 +2929,7 @@ function asyncTrigger() {
  * to token() method returning the next token, the Lexer object also
  * emits events.
  *
- *   lex.on("Identifier", function (data) {
+ *   lex.on("Identifier", function(data) {
  *     if (data.name.indexOf("_") >= 0) {
  *       // Produce a warning.
  *     }
@@ -2982,12 +2982,12 @@ function Lexer(source) {
 Lexer.prototype = {
   _lines: [],
 
-  getLines: function () {
+  getLines: function() {
     this._lines = state.lines;
     return this._lines;
   },
 
-  setLines: function (val) {
+  setLines: function(val) {
     this._lines = val;
     state.lines = this._lines;
   },
@@ -2996,14 +2996,14 @@ Lexer.prototype = {
    * Return the next i character without actually moving the
    * char pointer.
    */
-  peek: function (i) {
+  peek: function(i) {
     return this.input.charAt(i || 0);
   },
 
   /*
    * Move the char pointer forward i times.
    */
-  skip: function (i) {
+  skip: function(i) {
     i = i || 1;
     this.char += i;
     this.input = this.input.slice(i);
@@ -3014,12 +3014,12 @@ Lexer.prototype = {
    * Underscore.js i.e. you can subscribe to multiple events with
    * one call:
    *
-   *   lex.on("Identifier Number", function (data) {
+   *   lex.on("Identifier Number", function(data) {
    *     // ...
    *   });
    */
-  on: function (names, listener) {
-    names.split(" ").forEach(function (name) {
+  on: function(names, listener) {
+    names.split(" ").forEach(function(name) {
       this.emitter.on(name, listener);
     }.bind(this));
   },
@@ -3028,7 +3028,7 @@ Lexer.prototype = {
    * Trigger a token event. All arguments will be passed to each
    * listener.
    */
-  trigger: function () {
+  trigger: function() {
     this.emitter.emit.apply(this.emitter, Array.prototype.slice.call(arguments));
   },
 
@@ -3039,8 +3039,8 @@ Lexer.prototype = {
    * by the parser. This avoids parser's peek() to give the lexer
    * a false context.
    */
-  triggerAsync: function (type, args, checks, fn) {
-    checks.push(function () {
+  triggerAsync: function(type, args, checks, fn) {
+    checks.push(function() {
       if (fn()) {
         this.trigger(type, args);
       }
@@ -3054,7 +3054,7 @@ Lexer.prototype = {
    * This method's implementation was heavily influenced by the
    * scanPunctuator function in the Esprima parser's source code.
    */
-  scanPunctuator: function () {
+  scanPunctuator: function() {
     var ch1 = this.peek();
     var ch2, ch3, ch4;
 
@@ -3211,7 +3211,7 @@ Lexer.prototype = {
    * also recognizes JSHint- and JSLint-specific comments such as
    * /*jshint, /*jslint, /*globals and so on.
    */
-  scanComments: function () {
+  scanComments: function() {
     var ch1 = this.peek();
     var ch2 = this.peek(1);
     var rest = this.input.substr(2);
@@ -3235,7 +3235,7 @@ Lexer.prototype = {
 
       body = body.replace(/\n/g, " ");
 
-      special.forEach(function (str) {
+      special.forEach(function(str) {
         if (isSpecial) {
           return;
         }
@@ -3351,7 +3351,7 @@ Lexer.prototype = {
    * Extract a keyword out of the next sequence of characters or
    * return 'null' if its not possible.
    */
-  scanKeyword: function () {
+  scanKeyword: function() {
     var result = /^[a-zA-Z_$][a-zA-Z0-9_$]*/.exec(this.input);
     var keywords = [
       "if", "in", "do", "var", "for", "new",
@@ -3380,7 +3380,7 @@ Lexer.prototype = {
    * to Identifier this method can also produce BooleanLiteral
    * (true/false) and NullLiteral (null).
    */
-  scanIdentifier: function () {
+  scanIdentifier: function() {
     var id = "";
     var index = 0;
     var type, char;
@@ -3425,7 +3425,7 @@ Lexer.prototype = {
       return null;
     }.bind(this);
 
-    var getIdentifierStart = function () {
+    var getIdentifierStart = function() {
       /*jshint validthis:true */
       var chr = this.peek(index);
       var code = chr.charCodeAt(0);
@@ -3451,7 +3451,7 @@ Lexer.prototype = {
       return null;
     }.bind(this);
 
-    var getIdentifierPart = function () {
+    var getIdentifierPart = function() {
       /*jshint validthis:true */
       var chr = this.peek(index);
       var code = chr.charCodeAt(0);
@@ -3528,7 +3528,7 @@ Lexer.prototype = {
    * This method's implementation was heavily influenced by the
    * scanNumericLiteral function in the Esprima parser's source code.
    */
-  scanNumericLiteral: function () {
+  scanNumericLiteral: function() {
     var index = 0;
     var value = "";
     var length = this.input.length;
@@ -3739,7 +3739,7 @@ Lexer.prototype = {
 
 
   // Assumes previously parsed character was \ (=== '\\') and was not skipped.
-  scanEscapeSequence: function (checks) {
+  scanEscapeSequence: function(checks) {
     var allowNewLine = false;
     var jump = 1;
     this.skip();
@@ -3752,7 +3752,7 @@ Lexer.prototype = {
         line: this.line,
         character: this.char,
         data: [ "\\'" ]
-      }, checks, function () {return state.jsonMode; });
+      }, checks, function() {return state.jsonMode; });
       break;
     case "b":
       char = "\\b";
@@ -3780,7 +3780,7 @@ Lexer.prototype = {
         line: this.line,
         character: this.char
       }, checks,
-      function () { return n >= 0 && n <= 7 && state.directive["use strict"]; });
+      function() { return n >= 0 && n <= 7 && state.directive["use strict"]; });
       break;
     case "u":
       char = String.fromCharCode(parseInt(this.input.substr(1, 4), 16));
@@ -3792,7 +3792,7 @@ Lexer.prototype = {
         line: this.line,
         character: this.char,
         data: [ "\\v" ]
-      }, checks, function () { return state.jsonMode; });
+      }, checks, function() { return state.jsonMode; });
 
       char = "\v";
       break;
@@ -3804,7 +3804,7 @@ Lexer.prototype = {
         line: this.line,
         character: this.char,
         data: [ "\\x-" ]
-      }, checks, function () { return state.jsonMode; });
+      }, checks, function() { return state.jsonMode; });
 
       char = String.fromCharCode(x);
       jump = 3;
@@ -3823,7 +3823,7 @@ Lexer.prototype = {
       break;
     }
 
-    return {char: char, jump: jump, allowNewLine: allowNewLine};
+    return { char: char, jump: jump, allowNewLine: allowNewLine };
   },
 
   /*
@@ -3832,7 +3832,7 @@ Lexer.prototype = {
    * literals can span across multiple lines, this method has to move
    * the char pointer.
    */
-  scanTemplateLiteral: function (checks) {
+  scanTemplateLiteral: function(checks) {
     var tokenType;
     var value = '';
     var ch;
@@ -3918,7 +3918,7 @@ Lexer.prototype = {
    *   var str = "hello\
    *   world";
    */
-  scanStringLiteral: function (checks) {
+  scanStringLiteral: function(checks) {
     /*jshint loopfunc:true */
     var quote = this.peek();
 
@@ -3932,7 +3932,7 @@ Lexer.prototype = {
       code: "W108",
       line: this.line,
       character: this.char // +1?
-    }, checks, function () { return state.jsonMode && quote !== "\""; });
+    }, checks, function() { return state.jsonMode && quote !== "\""; });
 
     var value = "";
     var startLine = this.line;
@@ -3967,13 +3967,13 @@ Lexer.prototype = {
             code: "W043",
             line: this.line,
             character: this.char
-          }, checks, function () { return !state.option.multistr; });
+          }, checks, function() { return !state.option.multistr; });
 
           this.triggerAsync("warning", {
             code: "W042",
             line: this.line,
             character: this.char
-          }, checks, function () { return state.jsonMode && state.option.multistr; });
+          }, checks, function() { return state.jsonMode && state.option.multistr; });
         }
 
         // If we get an EOF inside of an unclosed string, show an
@@ -4041,7 +4041,7 @@ Lexer.prototype = {
    * rare edge cases where one JavaScript engine complains about
    * your regular expression while others don't.
    */
-  scanRegExp: function () {
+  scanRegExp: function() {
     var index = 0;
     var length = this.input.length;
     var char = this.peek();
@@ -4052,7 +4052,7 @@ Lexer.prototype = {
     var isCharSet = false;
     var terminated;
 
-    var scanUnexpectedChars = function () {
+    var scanUnexpectedChars = function() {
       // Unexpected control character
       if (char < " ") {
         malformed = true;
@@ -4203,7 +4203,7 @@ Lexer.prototype = {
    * can be mistakenly typed on OS X with option-space. Non UTF-8 web
    * pages with non-breaking pages produce syntax errors.
    */
-  scanNonBreakingSpaces: function () {
+  scanNonBreakingSpaces: function() {
     return state.option.nonbsp ?
       this.input.search(/(\u00A0)/) : -1;
   },
@@ -4211,7 +4211,7 @@ Lexer.prototype = {
   /*
    * Scan for characters that get silently deleted by one or more browsers.
    */
-  scanUnsafeChars: function () {
+  scanUnsafeChars: function() {
     return this.input.search(reg.unsafeChars);
   },
 
@@ -4219,7 +4219,7 @@ Lexer.prototype = {
    * Produce the next raw token or return 'null' if no tokens can be matched.
    * This method skips over all space characters.
    */
-  next: function (checks) {
+  next: function(checks) {
     this.from = this.char;
 
     // Move to the next non-space character.
@@ -4267,7 +4267,7 @@ Lexer.prototype = {
    * Switch to the next line and reset all char pointers. Once
    * switched, this method also checks for other minor warnings.
    */
-  nextLine: function () {
+  nextLine: function() {
     var char;
 
     if (this.line >= this.getLines().length) {
@@ -4281,14 +4281,14 @@ Lexer.prototype = {
 
     var inputTrimmed = this.input.trim();
 
-    var startsWith = function () {
-      return _.some(arguments, function (prefix) {
+    var startsWith = function() {
+      return _.some(arguments, function(prefix) {
         return inputTrimmed.indexOf(prefix) === 0;
       });
     };
 
-    var endsWith = function () {
-      return _.some(arguments, function (suffix) {
+    var endsWith = function() {
+      return _.some(arguments, function(suffix) {
         return inputTrimmed.indexOf(suffix, inputTrimmed.length - suffix.length) !== -1;
       });
     };
@@ -4335,7 +4335,7 @@ Lexer.prototype = {
    * This is simply a synonym for nextLine() method with a friendlier
    * public name.
    */
-  start: function () {
+  start: function() {
     this.nextLine();
   },
 
@@ -4343,7 +4343,7 @@ Lexer.prototype = {
    * Produce the next token. This function is called by advance() to get
    * the next token. It returns a token in a JSLint-compatible format.
    */
-  token: function () {
+  token: function() {
     /*jshint loopfunc:true */
     var checks = asyncTrigger();
     var token;
@@ -4378,7 +4378,7 @@ Lexer.prototype = {
     }
 
     // Produce a token object.
-    var create = function (type, value, isProperty, token) {
+    var create = function(type, value, isProperty, token) {
       /*jshint validthis:true */
       var obj;
 
@@ -4471,7 +4471,7 @@ Lexer.prototype = {
           from: this.from,
           value: token.value,
           quote: token.quote
-        }, checks, function () { return true; });
+        }, checks, function() { return true; });
 
         return create("(string)", token.value);
 
@@ -4533,13 +4533,13 @@ Lexer.prototype = {
           line: this.line,
           character: this.char,
           data: [ "0x-" ]
-        }, checks, function () { return token.base === 16 && state.jsonMode; });
+        }, checks, function() { return token.base === 16 && state.jsonMode; });
 
         this.triggerAsync("warning", {
           code: "W115",
           line: this.line,
           character: this.char
-        }, checks, function () {
+        }, checks, function() {
           return state.directive["use strict"] && token.base === 8 && token.isLegacy;
         });
 
@@ -4790,8 +4790,9 @@ var warnings = {
   W123: "'{a}' is already defined in outer scope.",
   W124: "A generator function shall contain a yield statement.",
   W125: "This line contains non-breaking spaces: http://jshint.com/doc/options/#nonbsp",
-  W126: "Grouping operator is unnecessary for lone expressions.",
-  W127: "Unexpected use of a comma operator."
+  W126: "Unnecessary grouping operator.",
+  W127: "Unexpected use of a comma operator.",
+  W128: "Empty array elements require elision=true."
 };
 
 var info = {
@@ -4804,15 +4805,15 @@ exports.errors = {};
 exports.warnings = {};
 exports.info = {};
 
-_.each(errors, function (desc, code) {
+_.each(errors, function(desc, code) {
   exports.errors[code] = { code: code, desc: desc };
 });
 
-_.each(warnings, function (desc, code) {
+_.each(warnings, function(desc, code) {
   exports.warnings[code] = { code: code, desc: desc };
 });
 
-_.each(info, function (desc, code) {
+_.each(info, function(desc, code) {
   exports.info[code] = { code: code, desc: desc };
 });
 
@@ -5124,13 +5125,13 @@ exports.bool = {
     undef       : true,
 
     /**
-     * This option prohibits the use of the grouping operator for
-     * single-expression statements. This unecessary usage commonly reflects
-     * a misunderstanding of unary operators, for example:
+     * This option prohibits the use of the grouping operator when it is not
+     * strictly required. Such usage commonly reflects a misunderstanding of
+     * unary operators, for example:
      *
      *     // jshint singleGroups: true
      *
-     *     delete(obj.attr); // Warning: Grouping operator is unnecessary for lone expressions.
+     *     delete(obj.attr); // Warning: Unnecessary grouping operator.
      */
     singleGroups: false,
 
@@ -5398,7 +5399,13 @@ exports.bool = {
      * * [Draft Specification for ES.next (ECMA-262 Ed.
      *   6)](http://wiki.ecmascript.org/doku.php?id=harmony:specification_drafts)
      */
-    esnext      : true
+    esnext      : true,
+
+    /**
+     * This option tells JSHint that your code uses ES3 array elision elements,
+     * or empty elements (for example, `[1, , , 4, , , 7]`).
+     */
+    elision     : true,
   },
 
   // Third party globals
@@ -5818,7 +5825,7 @@ var NameStack = require("./name-stack.js");
 var state = {
   syntax: {},
 
-  reset: function () {
+  reset: function() {
     this.tokens = {
       prev: null,
       next: null,
@@ -5847,7 +5854,7 @@ exports.state = state;
 },{"./name-stack.js":15}],19:[function(require,module,exports){
 "use strict";
 
-exports.register = function (linter) {
+exports.register = function(linter) {
   // Check for properties named __proto__. This special property was
   // deprecated and then re-introduced for ES6.
 
@@ -6074,11 +6081,13 @@ exports.browser = {
   clearTimeout         : false,
   close                : false,
   closed               : false,
+  Comment              : false,
   CustomEvent          : false,
   DOMParser            : false,
   defaultStatus        : false,
   Document             : false,
   document             : false,
+  DocumentFragment     : false,
   Element              : false,
   ElementTimeControl   : false,
   Event                : false,
@@ -6160,6 +6169,7 @@ exports.browser = {
   Node                 : false,
   NodeFilter           : false,
   NodeList             : false,
+  Notification         : false,
   navigator            : false,
   onbeforeunload       : true,
   onblur               : true,
@@ -6174,6 +6184,7 @@ exports.browser = {
   Option               : false,
   parent               : false,
   print                : false,
+  Range                : false,
   requestAnimationFrame : false,
   removeEventListener  : false,
   resizeBy             : false,
@@ -6342,6 +6353,7 @@ exports.browser = {
   SVGViewElement       : false,
   SVGViewSpec          : false,
   SVGZoomAndPan        : false,
+  Text                 : false,
   TextDecoder          : false,
   TextEncoder          : false,
   TimeEvent            : false,
@@ -6695,7 +6707,13 @@ exports.jasmine = {
   // Jasmine 1.3
   runs        : false,
   waitsFor    : false,
-  waits       : false
+  waits       : false,
+  // Jasmine 2.1
+  beforeAll   : false,
+  afterAll    : false,
+  fail        : false,
+  fdescribe   : false,
+  fit         : false
 };
 
 },{}],"jshint":[function(require,module,exports){
@@ -6752,7 +6770,7 @@ var console = require("console-browserify");
 // variable. That function will be invoked immediately, and its return value is
 // the JSHINT function itself.
 
-var JSHINT = (function () {
+var JSHINT = (function() {
   "use strict";
 
   var api, // Extension API
@@ -6863,14 +6881,14 @@ var JSHINT = (function () {
   }
 
   function supplant(str, data) {
-    return str.replace(/\{([^{}]*)\}/g, function (a, b) {
+    return str.replace(/\{([^{}]*)\}/g, function(a, b) {
       var r = data[b];
       return typeof r === "string" || typeof r === "number" ? r : a;
     });
   }
 
   function combine(dest, src) {
-    Object.keys(src).forEach(function (name) {
+    Object.keys(src).forEach(function(name) {
       if (_.has(JSHINT.blacklist, name)) return;
       dest[name] = src[name];
     });
@@ -6881,7 +6899,7 @@ var JSHINT = (function () {
       for (var enforceopt in options.bool.enforcing) {
         if (state.option[enforceopt] === undefined) {
           state.option[enforceopt] = true;
-          }
+        }
       }
       for (var relaxopt in options.bool.relaxing) {
         if (state.option[relaxopt] === undefined) {
@@ -6992,25 +7010,25 @@ var JSHINT = (function () {
 
     // Let's assume that chronologically ES3 < ES5 < ES6/ESNext < Moz
 
-    state.option.inMoz = function (strict) {
+    state.option.inMoz = function(strict) {
       if (strict) {
         return state.option.moz && !state.option.esnext;
       }
       return state.option.moz;
     };
 
-    state.option.inESNext = function (strict) {
+    state.option.inESNext = function(strict) {
       if (strict) {
         return !state.option.moz && state.option.esnext;
       }
       return state.option.moz || state.option.esnext;
     };
 
-    state.option.inES5 = function (/* strict */) {
+    state.option.inES5 = function(/* strict */) {
       return !state.option.es3;
     };
 
-    state.option.inES3 = function (strict) {
+    state.option.inES3 = function(strict) {
       if (strict) {
         return !state.option.moz && !state.option.esnext && state.option.es3;
       }
@@ -7041,7 +7059,7 @@ var JSHINT = (function () {
     var ignored = state.ignoredLines;
 
     if (_.isEmpty(ignored)) return;
-    JSHINT.errors = _.reject(JSHINT.errors, function (err) { return ignored[err.line] });
+    JSHINT.errors = _.reject(JSHINT.errors, function(err) { return ignored[err.line] });
   }
 
   function warning(code, t, a, b, c, d) {
@@ -7148,8 +7166,7 @@ var JSHINT = (function () {
           }
         }
       } else {
-        if (((!state.option.shadow && !opts.param) ||
-            _.contains([ "inner", "outer" ], state.option.shadow)) &&
+        if ((!state.option.shadow || _.contains([ "inner", "outer" ], state.option.shadow)) &&
             type !== "exception" || funct["(blockscope)"].getlabel(name)) {
           warning("W004", state.tokens.next, name);
         }
@@ -7198,11 +7215,11 @@ var JSHINT = (function () {
 
   function doOption() {
     var nt = state.tokens.next;
-    var body = nt.body.split(",").map(function (s) { return s.trim(); });
+    var body = nt.body.split(",").map(function(s) { return s.trim(); });
     var predef = {};
 
     if (nt.type === "globals") {
-      body.forEach(function (g) {
+      body.forEach(function(g) {
         g = g.split(":");
         var key = (g[0] || "").trim();
         var val = (g[1] || "").trim();
@@ -7228,7 +7245,7 @@ var JSHINT = (function () {
     }
 
     if (nt.type === "exported") {
-      body.forEach(function (e) {
+      body.forEach(function(e) {
         exported[e] = true;
       });
     }
@@ -7236,7 +7253,7 @@ var JSHINT = (function () {
     if (nt.type === "members") {
       membersOnly = membersOnly || {};
 
-      body.forEach(function (m) {
+      body.forEach(function(m) {
         var ch1 = m.charAt(0);
         var ch2 = m.charAt(m.length - 1);
 
@@ -7261,7 +7278,7 @@ var JSHINT = (function () {
     ];
 
     if (nt.type === "jshint" || nt.type === "jslint") {
-      body.forEach(function (g) {
+      body.forEach(function(g) {
         g = g.split(":");
         var key = (g[0] || "").trim();
         var val = (g[1] || "").trim();
@@ -7533,6 +7550,10 @@ var JSHINT = (function () {
     return false;
   }
 
+  function isBeginOfExpr(prev) {
+    return !prev.left && prev.arity !== "unary";
+  }
+
   // This is the heart of JSHINT, the Pratt parser. In addition to parsing, it
   // is looking for ad hoc lint patterns. We add .fud to Pratt's model, which is
   // like .nud except that it is only used on the first token of a statement.
@@ -7548,8 +7569,7 @@ var JSHINT = (function () {
   // They are elements of the parsing method called Top Down Operator Precedence.
 
   function expression(rbp, initial) {
-    var left, isArray = false, isObject = false, isLetExpr = false,
-      isFatArrowBody = state.tokens.curr.value === "=>";
+    var left, isArray = false, isObject = false, isLetExpr = false;
 
     state.nameStack.push();
 
@@ -7587,6 +7607,7 @@ var JSHINT = (function () {
 
     if (initial) {
       funct["(verb)"] = state.tokens.curr.value;
+      state.tokens.curr.beginsStmt = true;
     }
 
     if (initial === true && state.tokens.curr.fud) {
@@ -7639,11 +7660,6 @@ var JSHINT = (function () {
     }
     if (isLetExpr) {
       funct["(blockscope)"].unstack();
-    }
-
-    if (state.option.singleGroups && left && left.paren && !left.exprs &&
-      !isFatArrowBody && !left.triggerFnExpr) {
-      warning("W126");
     }
 
     state.nameStack.pop();
@@ -7757,7 +7773,9 @@ var JSHINT = (function () {
   }
 
   function delim(s) {
-    return symbol(s, 0);
+    var x = symbol(s, 0);
+    x.delim = true;
+    return x;
   }
 
   function stmt(s, f) {
@@ -7785,9 +7803,9 @@ var JSHINT = (function () {
     var x = symbol(s, 150);
     reserveName(x);
 
-    x.nud = (typeof f === "function") ? f : function () {
-      this.right = expression(150);
+    x.nud = (typeof f === "function") ? f : function() {
       this.arity = "unary";
+      this.right = expression(150);
 
       if (this.id === "++" || this.id === "--") {
         if (state.option.plusplus) {
@@ -7819,7 +7837,7 @@ var JSHINT = (function () {
   }
 
   function FutureReservedWord(name, meta) {
-    var x = type(name, (meta && meta.nud) || function () {
+    var x = type(name, (meta && meta.nud) || function() {
       return this;
     });
 
@@ -7835,7 +7853,7 @@ var JSHINT = (function () {
   }
 
   function reservevar(s, v) {
-    return reserve(s, function () {
+    return reserve(s, function() {
       if (typeof v === "function") {
         v(this);
       }
@@ -7847,7 +7865,7 @@ var JSHINT = (function () {
     var x = symbol(s, p);
     reserveName(x);
     x.infix = true;
-    x.led = function (left) {
+    x.led = function(left) {
       if (!w) {
         nobreaknonadjacent(state.tokens.prev, state.tokens.curr);
       }
@@ -7869,15 +7887,11 @@ var JSHINT = (function () {
   function application(s) {
     var x = symbol(s, 42);
 
-    x.led = function (left) {
-      if (!state.option.esnext) {
-        warning("W119", state.tokens.curr, "arrow function syntax (=>)");
-      }
-
+    x.led = function(left) {
       nobreaknonadjacent(state.tokens.prev, state.tokens.curr);
 
       this.left = left;
-      this.right = doFunction(undefined, undefined, false, left);
+      this.right = doFunction(undefined, undefined, false, { loneArg: left });
       return this;
     };
     return x;
@@ -7886,7 +7900,7 @@ var JSHINT = (function () {
   function relation(s, f) {
     var x = symbol(s, 100);
 
-    x.led = function (left) {
+    x.led = function(left) {
       nobreaknonadjacent(state.tokens.prev, state.tokens.curr);
       var right = expression(100);
 
@@ -7976,7 +7990,7 @@ var JSHINT = (function () {
   }
 
   function assignop(s, f, p) {
-    var x = infix(s, typeof f === "function" ? f : function (left, that) {
+    var x = infix(s, typeof f === "function" ? f : function(left, that) {
       that.left = left;
 
       if (left) {
@@ -8009,7 +8023,7 @@ var JSHINT = (function () {
           return that;
         } else if (left.id === "[") {
           if (state.tokens.curr.left.first) {
-            state.tokens.curr.left.first.forEach(function (t) {
+            state.tokens.curr.left.first.forEach(function(t) {
               if (t && funct[t.value] === "const") {
                 error("E013", t, t.value);
               }
@@ -8050,7 +8064,7 @@ var JSHINT = (function () {
   function bitwise(s, f, p) {
     var x = symbol(s, p);
     reserveName(x);
-    x.led = (typeof f === "function") ? f : function (left) {
+    x.led = (typeof f === "function") ? f : function(left) {
       if (state.option.bitwise) {
         warning("W016", this, this.id);
       }
@@ -8063,7 +8077,7 @@ var JSHINT = (function () {
 
 
   function bitwiseassignop(s) {
-    return assignop(s, function (left, that) {
+    return assignop(s, function(left, that) {
       if (state.option.bitwise) {
         warning("W016", that, that.id);
       }
@@ -8087,7 +8101,7 @@ var JSHINT = (function () {
   function suffix(s) {
     var x = symbol(s, 150);
 
-    x.led = function (left) {
+    x.led = function(left) {
       if (state.option.plusplus) {
         warning("W016", this, this.id);
       } else if ((!left.identifier || isReserved(left)) && left.id !== "." && left.id !== "[") {
@@ -8156,6 +8170,14 @@ var JSHINT = (function () {
       }
     } else {
       error("E030", state.tokens.next, state.tokens.next.value);
+
+      // The token should be consumed after a warning is issued so the parser
+      // can continue as though an identifier were found. The semicolon token
+      // should not be consumed in this way so that the parser interprets it as
+      // a statement delimeter;
+      if (state.tokens.next.id !== ";") {
+        advance();
+      }
     }
   }
 
@@ -8205,7 +8227,6 @@ var JSHINT = (function () {
   }
 
   function statement() {
-    var values;
     var i = indent, r, s = scope, t = state.tokens.next;
 
     if (t.id === ";") {
@@ -8242,22 +8263,6 @@ var JSHINT = (function () {
       }
     }
 
-    // detect a destructuring assignment
-    if (_.has(["[", "{"], t.value)) {
-      if (lookupBlockType().isDestAssign) {
-        if (!state.option.inESNext()) {
-          warning("W104", state.tokens.curr, "destructuring expression");
-        }
-        values = destructuringExpression();
-        values.forEach(function (tok) {
-          isundef(funct, "W117", tok.token, tok.id);
-        });
-        advance("=");
-        destructuringExpressionMatch(values, expression(10, true));
-        advance(";");
-        return;
-      }
-    }
     if (t.identifier && !res && peek().id === ":") {
       advance();
       advance(":");
@@ -8559,11 +8564,11 @@ var JSHINT = (function () {
 
   // Build the syntax table by declaring the syntactic elements of the language.
 
-  type("(number)", function () {
+  type("(number)", function() {
     return this;
   });
 
-  type("(string)", function () {
+  type("(string)", function() {
     return this;
   });
 
@@ -8572,11 +8577,23 @@ var JSHINT = (function () {
     lbp: 0,
     identifier: true,
 
-    nud: function () {
+    nud: function() {
       var v = this.value;
       var s = scope[v];
       var f;
       var block;
+
+      // If this identifier is the lone parameter to a shorthand "fat arrow"
+      // function definition, i.e.
+      //
+      //     x => x;
+      //
+      // ...it should not be considered as a variable in the current scope. It
+      // will be added to the scope of the new function when the next token is
+      // parsed, so it can be safely ignored for now.
+      if (state.tokens.next.id === "=>") {
+        return this;
+      }
 
       if (typeof s === "function") {
         // Protection against accidental inheritance.
@@ -8684,7 +8701,7 @@ var JSHINT = (function () {
       return this;
     },
 
-    led: function () {
+    led: function() {
       error("E033", state.tokens.next, state.tokens.next.value);
     }
   };
@@ -8696,15 +8713,15 @@ var JSHINT = (function () {
     fud: doTemplateLiteral
   };
 
-  type("(template middle)", function () {
+  type("(template middle)", function() {
     return this;
   });
 
-  type("(template tail)", function () {
+  type("(template tail)", function() {
     return this;
   });
 
-  type("(regexp)", function () {
+  type("(regexp)", function() {
     return this;
   });
 
@@ -8728,7 +8745,7 @@ var JSHINT = (function () {
   reserve("catch");
   reserve("default").reach = true;
   reserve("finally");
-  reservevar("arguments", function (x) {
+  reservevar("arguments", function(x) {
     if (state.directive["use strict"] && funct["(global)"]) {
       warning("E008", x);
     }
@@ -8737,7 +8754,7 @@ var JSHINT = (function () {
   reservevar("false");
   reservevar("Infinity");
   reservevar("null");
-  reservevar("this", function (x) {
+  reservevar("this", function(x) {
     if (state.directive["use strict"] && !isMethod() &&
         !state.option.validthis && ((funct["(statement)"] &&
         funct["(name)"].charAt(0) > "Z") || funct["(global)"])) {
@@ -8751,7 +8768,7 @@ var JSHINT = (function () {
   assignop("+=", "assignadd", 20);
   assignop("-=", "assignsub", 20);
   assignop("*=", "assignmult", 20);
-  assignop("/=", "assigndiv", 20).nud = function () {
+  assignop("/=", "assigndiv", 20).nud = function() {
     error("E014");
   };
   assignop("%=", "assignmod", 20);
@@ -8762,10 +8779,10 @@ var JSHINT = (function () {
   bitwiseassignop("<<=");
   bitwiseassignop(">>=");
   bitwiseassignop(">>>=");
-  infix(",", function (left, that) {
+  infix(",", function(left, that) {
     var expr;
     that.exprs = [left];
-    if (!comma({peek: true})) {
+    if (!comma({ peek: true })) {
       return that;
     }
     while (true) {
@@ -8780,7 +8797,7 @@ var JSHINT = (function () {
     return that;
   }, 10, true);
 
-  infix("?", function (left, that) {
+  infix("?", function(left, that) {
     increaseComplexityCount();
     that.left = left;
     that.right = expression(10);
@@ -8790,7 +8807,7 @@ var JSHINT = (function () {
   }, 30);
 
   var orPrecendence = 40;
-  infix("||", function (left, that) {
+  infix("||", function(left, that) {
     increaseComplexityCount();
     that.left = left;
     that.right = expression(orPrecendence);
@@ -8800,7 +8817,7 @@ var JSHINT = (function () {
   bitwise("|", "bitor", 70);
   bitwise("^", "bitxor", 80);
   bitwise("&", "bitand", 90);
-  relation("==", function (left, right) {
+  relation("==", function(left, right) {
     var eqnull = state.option.eqnull && (left.value === "null" || right.value === "null");
 
     switch (true) {
@@ -8824,7 +8841,7 @@ var JSHINT = (function () {
 
     return this;
   });
-  relation("===", function (left, right) {
+  relation("===", function(left, right) {
     if (isTypoTypeof(right, left)) {
       warning("W122", this, right.value);
     } else if (isTypoTypeof(left, right)) {
@@ -8832,7 +8849,7 @@ var JSHINT = (function () {
     }
     return this;
   });
-  relation("!=", function (left, right) {
+  relation("!=", function(left, right) {
     var eqnull = state.option.eqnull &&
         (left.value === "null" || right.value === "null");
 
@@ -8850,7 +8867,7 @@ var JSHINT = (function () {
     }
     return this;
   });
-  relation("!==", function (left, right) {
+  relation("!==", function(left, right) {
     if (isTypoTypeof(right, left)) {
       warning("W122", this, right.value);
     } else if (isTypoTypeof(left, right)) {
@@ -8867,7 +8884,7 @@ var JSHINT = (function () {
   bitwise(">>>", "shiftrightunsigned", 120);
   infix("in", "in", 120);
   infix("instanceof", "instanceof", 120);
-  infix("+", function (left, that) {
+  infix("+", function(left, that) {
     var right = expression(130);
     if (left && right && left.id === "(string)" && right.id === "(string)") {
       left.value += right.value;
@@ -8882,13 +8899,13 @@ var JSHINT = (function () {
     return that;
   }, 130);
   prefix("+", "num");
-  prefix("+++", function () {
+  prefix("+++", function() {
     warning("W007");
-    this.right = expression(150);
     this.arity = "unary";
+    this.right = expression(150);
     return this;
   });
-  infix("+++", function (left) {
+  infix("+++", function(left) {
     warning("W007");
     this.left = left;
     this.right = expression(130);
@@ -8896,13 +8913,13 @@ var JSHINT = (function () {
   }, 130);
   infix("-", "sub", 130);
   prefix("-", "neg");
-  prefix("---", function () {
+  prefix("---", function() {
     warning("W006");
-    this.right = expression(150);
     this.arity = "unary";
+    this.right = expression(150);
     return this;
   });
-  infix("---", function (left) {
+  infix("---", function(left) {
     warning("W006");
     this.left = left;
     this.right = expression(130);
@@ -8919,7 +8936,7 @@ var JSHINT = (function () {
   suffix("--");
   prefix("--", "predec");
   state.syntax["--"].exps = true;
-  prefix("delete", function () {
+  prefix("delete", function() {
     var p = expression(10);
     if (!p || (p.id !== "." && p.id !== "[")) {
       warning("W051");
@@ -8934,15 +8951,16 @@ var JSHINT = (function () {
     return this;
   }).exps = true;
 
-  prefix("~", function () {
+  prefix("~", function() {
     if (state.option.bitwise) {
       warning("W052", this, "~");
     }
+    this.arity = "unary";
     expression(150);
     return this;
   });
 
-  prefix("...", function () {
+  prefix("...", function() {
     if (!state.option.esnext) {
       warning("W119", this, "spread/rest operator");
     }
@@ -8953,9 +8971,9 @@ var JSHINT = (function () {
     return this;
   });
 
-  prefix("!", function () {
-    this.right = expression(150);
+  prefix("!", function() {
     this.arity = "unary";
+    this.right = expression(150);
 
     if (!this.right) { // '!' followed by nothing? Give up.
       quit("E041", this.line || 0);
@@ -8967,7 +8985,7 @@ var JSHINT = (function () {
     return this;
   });
 
-  prefix("typeof", (function () {
+  prefix("typeof", (function() {
     var p = expression(150);
     this.first = p;
 
@@ -8978,7 +8996,7 @@ var JSHINT = (function () {
     }
     return this;
   }));
-  prefix("new", function () {
+  prefix("new", function() {
     var c = expression(155), i;
     if (c && c.id !== "function") {
       if (c.identifier) {
@@ -9032,7 +9050,7 @@ var JSHINT = (function () {
 
   prefix("void").exps = true;
 
-  infix(".", function (left, that) {
+  infix(".", function(left, that) {
     var m = identifier(false, true);
 
     if (typeof m === "string") {
@@ -9063,7 +9081,7 @@ var JSHINT = (function () {
     return that;
   }, 160, true);
 
-  infix("(", function (left, that) {
+  infix("(", function(left, that) {
     if (state.option.immed && left && !left.immed && left.id === "function") {
       warning("W062");
     }
@@ -9128,8 +9146,8 @@ var JSHINT = (function () {
       }
       if (!left.identifier && left.id !== "." && left.id !== "[" &&
           left.id !== "(" && left.id !== "&&" && left.id !== "||" &&
-          left.id !== "?" && !(state.option.esnext && left.id === "=>")) {
-        warning("W067", left);
+          left.id !== "?" && !(state.option.esnext && left["(name)"])) {
+        warning("W067", that);
       }
     }
 
@@ -9137,15 +9155,15 @@ var JSHINT = (function () {
     return that;
   }, 155, true).exps = true;
 
-  prefix("(", function () {
-    var bracket, brackets = [];
-    var pn, pn1, i = 0;
-    var ret, triggerFnExpr;
+  prefix("(", function() {
+    var pn = state.tokens.next, pn1, i = -1;
+    var ret, triggerFnExpr, first, last;
     var parens = 1;
+    var opening = state.tokens.curr;
+    var preceeding = state.tokens.prev;
+    var isNecessary = !state.option.singleGroups;
 
     do {
-      pn = peek(i);
-
       if (pn.value === "(") {
         parens += 1;
       } else if (pn.value === ")") {
@@ -9153,28 +9171,27 @@ var JSHINT = (function () {
       }
 
       i += 1;
-      pn1 = peek(i);
-    } while (!(parens === 0 && pn.value === ")") &&
-             pn1.value !== "=>" && pn1.value !== ";" && pn1.type !== "(end)");
+      pn1 = pn;
+      pn = peek(i);
+    } while (!(parens === 0 && pn1.value === ")") && pn.value !== ";" && pn.type !== "(end)");
 
     if (state.tokens.next.id === "function") {
       triggerFnExpr = state.tokens.next.immed = true;
+    }
+
+    // If the balanced grouping operator is followed by a "fat arrow", the
+    // current token marks the beginning of a "fat arrow" function and parsing
+    // should proceed accordingly.
+    if (pn.value === "=>") {
+      return doFunction(null, null, null, { parsedParen: true });
     }
 
     var exprs = [];
 
     if (state.tokens.next.id !== ")") {
       for (;;) {
-        if (pn1.value === "=>" && _.contains(["{", "["], state.tokens.next.value)) {
-          bracket = state.tokens.next;
-          bracket.left = destructuringExpression();
-          brackets.push(bracket);
-          for (var t in bracket.left) {
-            exprs.push(bracket.left[t].token);
-          }
-        } else {
-          exprs.push(expression(10));
-        }
+        exprs.push(expression(10));
+
         if (state.tokens.next.id !== ",") {
           break;
         }
@@ -9190,28 +9207,58 @@ var JSHINT = (function () {
       }
     }
 
-    if (state.tokens.next.value === "=>") {
-      return exprs;
-    }
     if (!exprs.length) {
       return;
     }
     if (exprs.length > 1) {
       ret = Object.create(state.syntax[","]);
       ret.exprs = exprs;
+
+      first = exprs[0];
+      last = exprs[exprs.length - 1];
+
+      if (!isNecessary) {
+        isNecessary = preceeding.assign || preceeding.delim;
+      }
     } else {
-      ret = exprs[0];
+      ret = first = last = exprs[0];
+
+      if (!isNecessary) {
+        isNecessary =
+          // Used to distinguish from an ExpressionStatement which may not
+          // begin with the `{` and `function` tokens
+          (opening.beginsStmt && (ret.id === "{" || triggerFnExpr || isFunctor(ret))) ||
+          // Used as the return value of a single-statement arrow function
+          (ret.id === "{" && preceeding.id === "=>") ||
+          // Used to prevent left-to-right application of adjacent addition
+          // operators (the order of which effect type)
+          (first.id === "+" && preceeding.id === "+");
+      }
     }
+
     if (ret) {
+      // The operator may be necessary to override the default binding power of
+      // neighboring operators (whenever there is an operator in use within the
+      // first expression *or* the current group contains multiple expressions)
+      if (!isNecessary && (first.left || ret.exprs)) {
+        isNecessary =
+          (!isBeginOfExpr(preceeding) && first.lbp < preceeding.lbp) ||
+          (!isEndOfExpr() && last.lbp < state.tokens.next.lbp);
+      }
+
+      if (!isNecessary) {
+        warning("W126");
+      }
+
       ret.paren = true;
-      ret.triggerFnExpr = triggerFnExpr;
     }
+
     return ret;
   });
 
   application("=>");
 
-  infix("[", function (left, that) {
+  infix("[", function(left, that) {
     var e = expression(10), s;
     if (e && e.type === "(string)") {
       if (!state.option.evil && (e.value === "eval" || e.value === "execScript")) {
@@ -9290,7 +9337,7 @@ var JSHINT = (function () {
     return res;
   }
 
-  prefix("[", function () {
+  prefix("[", function() {
     var blocktype = lookupBlockType();
     if (blocktype.isCompArray) {
       if (!state.option.inESNext()) {
@@ -9310,8 +9357,19 @@ var JSHINT = (function () {
     }
     while (state.tokens.next.id !== "(end)") {
       while (state.tokens.next.id === ",") {
-        if (!state.option.inES5())
-          warning("W070");
+        if (!state.option.elision) {
+          if (!state.option.inES5()) {
+            // Maintain compat with old options --- ES5 mode without
+            // elision=true will warn once per comma
+            warning("W070");
+          } else {
+            warning("W128");
+            do {
+              advance(",");
+            } while (state.tokens.next.id === ",");
+            continue;
+          }
+        }
         advance(",");
       }
 
@@ -9383,40 +9441,25 @@ var JSHINT = (function () {
     return id;
   }
 
-  function functionparams(parsed) {
-    var curr, next;
+  function functionparams(fatarrow) {
+    var next;
     var params = [];
     var ident;
     var tokens = [];
     var t;
     var pastDefault = false;
+    var loneArg = fatarrow && fatarrow.loneArg;
 
-    if (parsed) {
-      if (Array.isArray(parsed)) {
-        for (var i in parsed) {
-          curr = parsed[i];
-          if (curr.value === "...") {
-            if (!state.option.esnext) {
-              warning("W119", curr, "spread/rest operator");
-            }
-            continue;
-          } else if (curr.value !== ",") {
-            params.push(curr.value);
-            addlabel(curr.value, { type: "unused", token: curr, param: true });
-          }
-        }
-        return params;
-      } else {
-        if (parsed.identifier === true) {
-          addlabel(parsed.value, { type: "unused", token: parsed, param: true });
-          return [parsed];
-        }
-      }
+    if (loneArg && loneArg.identifier === true) {
+      addlabel(loneArg.value, { type: "unused", token: loneArg });
+      return [loneArg];
     }
 
     next = state.tokens.next;
 
-    advance("(");
+    if (!fatarrow || !fatarrow.parsedParen) {
+      advance("(");
+    }
 
     if (state.tokens.next.id === ")") {
       advance(")");
@@ -9430,7 +9473,7 @@ var JSHINT = (function () {
           t = tokens[t];
           if (t.id) {
             params.push(t.id);
-            addlabel(t.id, { type: "unused", token: t.token, param: true });
+            addlabel(t.id, { type: "unused", token: t.token });
           }
         }
       } else if (state.tokens.next.value === "...") {
@@ -9440,11 +9483,11 @@ var JSHINT = (function () {
         advance("...");
         ident = identifier(true);
         params.push(ident);
-        addlabel(ident, { type: "unused", token: state.tokens.curr, param: true });
+        addlabel(ident, { type: "unused", token: state.tokens.curr });
       } else {
         ident = identifier(true);
         params.push(ident);
-        addlabel(ident, { type: "unused", token: state.tokens.curr, param: true });
+        addlabel(ident, { type: "unused", token: state.tokens.curr });
       }
 
       // it is a syntax error to have a regular argument after a default argument
@@ -9526,6 +9569,10 @@ var JSHINT = (function () {
     return funct;
   }
 
+  function isFunctor(token) {
+    return "(scope)" in token;
+  }
+
   function doTemplateLiteral() {
     while (state.tokens.next.type !== "(template tail)" && state.tokens.next.id !== "(end)") {
       advance();
@@ -9542,7 +9589,18 @@ var JSHINT = (function () {
     };
   }
 
-  function doFunction(name, statement, generator, fatarrowparams) {
+  /**
+   * @param {Object} [fatarrow] In the case that the function being parsed
+   *                            takes the "fat arrow" form, this object will
+   *                            contain details about the in-progress parsing
+   *                            operation.
+   * @param {Token} [fatarrow.loneArg] The argument to the function in cases
+   *                                   where it was defined using the single-
+   *                                   argument shorthand.
+   * @param {bool} [fatarrow.parsedParen] Whether the opening parenthesis has
+   *                                      already been parsed.
+   */
+  function doFunction(name, statement, generator, fatarrow) {
     var f;
     var oldOption = state.option;
     var oldIgnored = state.ignored;
@@ -9567,19 +9625,20 @@ var JSHINT = (function () {
       addlabel(name, { type: "function" });
     }
 
-    funct["(params)"] = functionparams(fatarrowparams);
+    funct["(params)"] = functionparams(fatarrow);
     funct["(metrics)"].verifyMaxParametersPerFunction(funct["(params)"]);
 
-    // So we parse fat-arrow functions after we encounter =>. So basically
-    // doFunction is called with the left side of => as its last argument.
-    // This means that the parser, at that point, had already added its
-    // arguments to the undefs array and here we undo that.
+    if (fatarrow) {
+      if (!state.option.esnext) {
+        warning("W119", state.tokens.curr, "arrow function syntax (=>)");
+      }
 
-    JSHINT.undefs = _.filter(JSHINT.undefs, function (item) {
-      return !_.contains(_.union(fatarrowparams), item[2]);
-    });
+      if (!fatarrow.loneArg) {
+        advance("=>");
+      }
+    }
 
-    block(false, true, true, fatarrowparams ? true : false);
+    block(false, true, true, !!fatarrow);
 
     if (!state.option.noyield && generator &&
         funct["(generator)"] !== "yielded") {
@@ -9596,7 +9655,7 @@ var JSHINT = (function () {
     funct["(last)"] = state.tokens.curr.line;
     funct["(lastcharacter)"] = state.tokens.curr.character;
 
-    _.map(Object.keys(funct), function (key) {
+    _.map(Object.keys(funct), function(key) {
       if (key[0] === "(") return;
       funct["(blockscope)"].unshadow(key);
     });
@@ -9612,14 +9671,14 @@ var JSHINT = (function () {
       nestedBlockDepth: -1,
       ComplexityCount: 1,
 
-      verifyMaxStatementsPerFunction: function () {
+      verifyMaxStatementsPerFunction: function() {
         if (state.option.maxstatements &&
           this.statementCount > state.option.maxstatements) {
           warning("W071", functionStartToken, this.statementCount);
         }
       },
 
-      verifyMaxParametersPerFunction: function (params) {
+      verifyMaxParametersPerFunction: function(params) {
         params = params || [];
 
         if (state.option.maxparams && params.length > state.option.maxparams) {
@@ -9627,7 +9686,7 @@ var JSHINT = (function () {
         }
       },
 
-      verifyMaxNestedBlockDepthPerFunction: function () {
+      verifyMaxNestedBlockDepthPerFunction: function() {
         if (state.option.maxdepth &&
           this.nestedBlockDepth > 0 &&
           this.nestedBlockDepth === state.option.maxdepth + 1) {
@@ -9635,7 +9694,7 @@ var JSHINT = (function () {
         }
       },
 
-      verifyMaxComplexityPerFunction: function () {
+      verifyMaxComplexityPerFunction: function() {
         var max = state.option.maxcomplexity;
         var cc = this.ComplexityCount;
         if (max && cc > max) {
@@ -9693,8 +9752,8 @@ var JSHINT = (function () {
     }
   }
 
-  (function (x) {
-    x.nud = function () {
+  (function(x) {
+    x.nud = function() {
       var b, f, i, p, t, g, nextVal;
       var props = {}; // All properties, including accessors
 
@@ -9810,7 +9869,7 @@ var JSHINT = (function () {
 
       return this;
     };
-    x.fud = function () {
+    x.fud = function() {
       error("E036", state.tokens.curr);
     };
   }(delim("{")));
@@ -9821,7 +9880,7 @@ var JSHINT = (function () {
     if (!state.option.inESNext()) {
       warning("W104", state.tokens.curr, "destructuring expression");
     }
-    var nextInnerDE = function () {
+    var nextInnerDE = function() {
       var ident;
       if (_.contains(["[", "{"], state.tokens.next.value)) {
         ids = destructuringExpression();
@@ -9879,7 +9938,7 @@ var JSHINT = (function () {
     if (!first)
       return;
 
-    _.zip(tokens, Array.isArray(first) ? first : [ first ]).forEach(function (val) {
+    _.zip(tokens, Array.isArray(first) ? first : [ first ]).forEach(function(val) {
       var token = val[0];
       var value = val[1];
 
@@ -9890,7 +9949,7 @@ var JSHINT = (function () {
     });
   }
 
-  var conststatement = stmt("const", function (prefix) {
+  var conststatement = stmt("const", function(prefix) {
     var tokens;
     var value;
     var lone; // State variable to know if it is a lone identifier, or a destructuring statement.
@@ -9958,7 +10017,7 @@ var JSHINT = (function () {
   });
 
   conststatement.exps = true;
-  var varstatement = stmt("var", function (prefix) {
+  var varstatement = stmt("var", function(prefix) {
     // JavaScript does not have block scope. It only has function scope. So,
     // declaring a variable in a block can have unexpected consequences.
     var tokens, lone, value;
@@ -10022,7 +10081,7 @@ var JSHINT = (function () {
   });
   varstatement.exps = true;
 
-  var letstatement = stmt("let", function (prefix) {
+  var letstatement = stmt("let", function(prefix) {
     var tokens, lone, value, letblock;
 
     if (!state.option.inESNext()) {
@@ -10103,7 +10162,7 @@ var JSHINT = (function () {
   });
   letstatement.exps = true;
 
-  blockstmt("class", function () {
+  blockstmt("class", function() {
     return classdef.call(this, true);
   });
 
@@ -10147,6 +10206,7 @@ var JSHINT = (function () {
   function classbody(c) {
     var name;
     var isStatic;
+    var isGenerator;
     var getset;
     var props = {};
     var staticProps = {};
@@ -10154,7 +10214,13 @@ var JSHINT = (function () {
     for (var i = 0; state.tokens.next.id !== "}"; ++i) {
       name = state.tokens.next;
       isStatic = false;
+      isGenerator = false;
       getset = null;
+      if (name.id === "*") {
+        isGenerator = true;
+        advance("*");
+        name = state.tokens.next;
+      }
       if (name.id === "[") {
         name = computedPropertyName();
       } else if (isPropertyName(name)) {
@@ -10162,6 +10228,10 @@ var JSHINT = (function () {
         advance();
         computed = false;
         if (name.identifier && name.value === "static") {
+          if (checkPunctuators(state.tokens.next, ["*"])) {
+            isGenerator = true;
+            advance("*");
+          }
           if (isPropertyName(state.tokens.next) || state.tokens.next.id === "[") {
             computed = state.tokens.next.id === "[";
             isStatic = true;
@@ -10224,13 +10294,13 @@ var JSHINT = (function () {
 
       propertyName(name);
 
-      doFunction(null, c, false, null);
+      doFunction(null, c, isGenerator, null);
     }
 
     checkProperties(props);
   }
 
-  blockstmt("function", function () {
+  blockstmt("function", function() {
     var generator = false;
     if (state.tokens.next.value === "*") {
       advance("*");
@@ -10262,7 +10332,7 @@ var JSHINT = (function () {
     return this;
   });
 
-  prefix("function", function () {
+  prefix("function", function() {
     var generator = false;
 
     if (state.tokens.next.value === "*") {
@@ -10283,14 +10353,14 @@ var JSHINT = (function () {
       // If the function we just parsed accesses any non-local variables
       // trigger a warning. Otherwise, the function is safe even within
       // a loop.
-      if (_.some(fn, function (val, name) { return isVariable(name) && !isLocal(name); })) {
+      if (_.some(fn, function(val, name) { return isVariable(name) && !isLocal(name); })) {
         warning("W083");
       }
     }
     return this;
   });
 
-  blockstmt("if", function () {
+  blockstmt("if", function() {
     var t = state.tokens.next;
     increaseComplexityCount();
     state.condition = true;
@@ -10334,7 +10404,7 @@ var JSHINT = (function () {
     return this;
   });
 
-  blockstmt("try", function () {
+  blockstmt("try", function() {
     var b;
 
     function doCatch() {
@@ -10412,7 +10482,7 @@ var JSHINT = (function () {
     return this;
   });
 
-  blockstmt("while", function () {
+  blockstmt("while", function() {
     var t = state.tokens.next;
     funct["(breakage)"] += 1;
     funct["(loopage)"] += 1;
@@ -10426,7 +10496,7 @@ var JSHINT = (function () {
     return this;
   }).labelled = true;
 
-  blockstmt("with", function () {
+  blockstmt("with", function() {
     var t = state.tokens.next;
     if (state.directive["use strict"]) {
       error("E010", state.tokens.curr);
@@ -10442,7 +10512,7 @@ var JSHINT = (function () {
     return this;
   });
 
-  blockstmt("switch", function () {
+  blockstmt("switch", function() {
     var t = state.tokens.next;
     var g = false;
     var noindent = false;
@@ -10553,15 +10623,15 @@ var JSHINT = (function () {
     }
   }).labelled = true;
 
-  stmt("debugger", function () {
+  stmt("debugger", function() {
     if (!state.option.debug) {
       warning("W087", this);
     }
     return this;
   }).exps = true;
 
-  (function () {
-    var x = stmt("do", function () {
+  (function() {
+    var x = stmt("do", function() {
       funct["(breakage)"] += 1;
       funct["(loopage)"] += 1;
       increaseComplexityCount();
@@ -10580,7 +10650,7 @@ var JSHINT = (function () {
     x.exps = true;
   }());
 
-  blockstmt("for", function () {
+  blockstmt("for", function() {
     var s, t = state.tokens.next;
     var letscope = false;
     var foreachtok = null;
@@ -10605,8 +10675,7 @@ var JSHINT = (function () {
     do {
       nextop = peek(i);
       ++i;
-    } while (!_.contains(inof, nextop.value) && nextop.value !== ";" &&
-          nextop.type !== "(end)");
+    } while (!_.contains(inof, nextop.value) && nextop.value !== ";" && nextop.type !== "(end)");
 
     // if we're in a for (… in|of …) statement
     if (_.contains(inof, nextop.value)) {
@@ -10738,7 +10807,7 @@ var JSHINT = (function () {
   }).labelled = true;
 
 
-  stmt("break", function () {
+  stmt("break", function() {
     var v = state.tokens.next.value;
 
     if (funct["(breakage)"] === 0)
@@ -10765,7 +10834,7 @@ var JSHINT = (function () {
   }).exps = true;
 
 
-  stmt("continue", function () {
+  stmt("continue", function() {
     var v = state.tokens.next.value;
 
     if (funct["(breakage)"] === 0)
@@ -10794,7 +10863,7 @@ var JSHINT = (function () {
   }).exps = true;
 
 
-  stmt("return", function () {
+  stmt("return", function() {
     if (this.line === state.tokens.next.line) {
       if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
         this.first = expression(0);
@@ -10817,10 +10886,10 @@ var JSHINT = (function () {
     return this;
   }).exps = true;
 
-  (function (x) {
+  (function(x) {
     x.exps = true;
     x.lbp = 25;
-  }(prefix("yield", function () {
+  }(prefix("yield", function() {
     var prev = state.tokens.prev;
     if (state.option.inESNext(true) && !funct["(generator)"]) {
       // If it's a yield within a catch clause inside a generator then that's ok
@@ -10862,7 +10931,7 @@ var JSHINT = (function () {
   })));
 
 
-  stmt("throw", function () {
+  stmt("throw", function() {
     nolinebreak(this);
     this.first = expression(20);
 
@@ -10871,7 +10940,7 @@ var JSHINT = (function () {
     return this;
   }).exps = true;
 
-  stmt("import", function () {
+  stmt("import", function() {
     if (!state.option.inESNext()) {
       warning("W119", state.tokens.curr, "import");
     }
@@ -10932,7 +11001,7 @@ var JSHINT = (function () {
     return this;
   }).exps = true;
 
-  stmt("export", function () {
+  stmt("export", function() {
     var ok = true;
     if (!state.option.inESNext()) {
       warning("W119", state.tokens.curr, "export");
@@ -11052,7 +11121,7 @@ var JSHINT = (function () {
   // this function is used to determine whether a squarebracket or a curlybracket
   // expression is a comprehension array, destructuring assignment or a json value.
 
-  var lookupBlockType = function () {
+  var lookupBlockType = function() {
     var pn, pn1;
     var i = -1;
     var bracketStack = 0;
@@ -11187,15 +11256,15 @@ var JSHINT = (function () {
   //  * "define" which will define the variables local to the list comprehension
   //  * "filter" which will help filter out values
 
-  var arrayComprehension = function () {
-    var CompArray = function () {
+  var arrayComprehension = function() {
+    var CompArray = function() {
       this.mode = "use";
       this.variables = [];
     };
     var _carrays = [];
     var _current;
     function declare(v) {
-      var l = _current.variables.filter(function (elt) {
+      var l = _current.variables.filter(function(elt) {
         // if it has, change its undef state
         if (elt.value === v) {
           elt.undef = false;
@@ -11205,7 +11274,7 @@ var JSHINT = (function () {
       return l !== 0;
     }
     function use(v) {
-      var l = _current.variables.filter(function (elt) {
+      var l = _current.variables.filter(function(elt) {
         // and if it has been defined
         if (elt.value === v && !elt.undef) {
           if (elt.unused === true) {
@@ -11217,12 +11286,12 @@ var JSHINT = (function () {
       // otherwise we warn about it
       return (l === 0);
     }
-    return {stack: function () {
+    return { stack: function() {
           _current = new CompArray();
           _carrays.push(_current);
         },
-        unstack: function () {
-          _current.variables.filter(function (v) {
+        unstack: function() {
+          _current.variables.filter(function(v) {
             if (v.unused)
               warning("W098", v.token, v.raw_text || v.value);
             if (v.undef)
@@ -11231,11 +11300,11 @@ var JSHINT = (function () {
           _carrays.splice(-1, 1);
           _current = _carrays[_carrays.length - 1];
         },
-        setState: function (s) {
+        setState: function(s) {
           if (_.contains(["use", "define", "generate", "filter"], s))
             _current.mode = s;
         },
-        check: function (v) {
+        check: function(v) {
           if (!_current) {
             return;
           }
@@ -11368,7 +11437,7 @@ var JSHINT = (function () {
     }
   }
 
-  var blockScope = function () {
+  var blockScope = function() {
     var _current = {};
     var _variables = [_current];
 
@@ -11390,18 +11459,18 @@ var JSHINT = (function () {
     }
 
     return {
-      stack: function () {
+      stack: function() {
         _current = {};
         _variables.push(_current);
       },
 
-      unstack: function () {
+      unstack: function() {
         _checkBlockLabels();
         _variables.splice(_variables.length - 1, 1);
         _current = _.last(_variables);
       },
 
-      getlabel: function (l) {
+      getlabel: function(l) {
         for (var i = _variables.length - 1 ; i >= 0; --i) {
           if (_.has(_variables[i], l) && !_variables[i][l]["(shadowed)"]) {
             return _variables[i];
@@ -11409,7 +11478,7 @@ var JSHINT = (function () {
         }
       },
 
-      shadow: function (name) {
+      shadow: function(name) {
         for (var i = _variables.length - 1; i >= 0; i--) {
           if (_.has(_variables[i], name)) {
             _variables[i][name]["(shadowed)"] = true;
@@ -11417,7 +11486,7 @@ var JSHINT = (function () {
         }
       },
 
-      unshadow: function (name) {
+      unshadow: function(name) {
         for (var i = _variables.length - 1; i >= 0; i--) {
           if (_.has(_variables[i], name)) {
             _variables[i][name]["(shadowed)"] = false;
@@ -11425,11 +11494,11 @@ var JSHINT = (function () {
         }
       },
 
-      atTop: function () {
+      atTop: function() {
         return _variables.length === 1;
       },
 
-      setExported: function (id) {
+      setExported: function(id) {
         if (funct["(blockscope)"].atTop()) {
           var item = _current[id];
           if (item && item["(token)"]) {
@@ -11439,11 +11508,11 @@ var JSHINT = (function () {
       },
 
       current: {
-        has: function (t) {
+        has: function(t) {
           return _.has(_current, t);
         },
 
-        add: function (t, type, tok) {
+        add: function(t, type, tok) {
           _current[t] = { "(type)" : type, "(token)": tok, "(shadowed)": false };
         }
       }
@@ -11455,7 +11524,7 @@ var JSHINT = (function () {
   };
 
   // The actual JSHINT function itself.
-  var itself = function (s, o, g) {
+  var itself = function(s, o, g) {
     var i, k, x, reIgnoreStr, reIgnore;
     var optionKeys;
     var newOptionObj = {};
@@ -11494,7 +11563,7 @@ var JSHINT = (function () {
     }
 
     if (o) {
-      each(o.predef || null, function (item) {
+      each(o.predef || null, function(item) {
         var slice, prop;
 
         if (item[0] === "-") {
@@ -11508,7 +11577,7 @@ var JSHINT = (function () {
         }
       });
 
-      each(o.exported || null, function (item) {
+      each(o.exported || null, function(item) {
         exported[item] = true;
       });
 
@@ -11565,31 +11634,31 @@ var JSHINT = (function () {
         return state.jsonMode;
       },
 
-      getOption: function (name) {
+      getOption: function(name) {
         return state.option[name] || null;
       },
 
-      getCache: function (name) {
+      getCache: function(name) {
         return state.cache[name];
       },
 
-      setCache: function (name, value) {
+      setCache: function(name, value) {
         state.cache[name] = value;
       },
 
-      warn: function (code, data) {
+      warn: function(code, data) {
         warningAt.apply(null, [ code, data.line, data.char ].concat(data.data));
       },
 
-      on: function (names, listener) {
-        names.split(" ").forEach(function (name) {
+      on: function(names, listener) {
+        names.split(" ").forEach(function(name) {
           emitter.on(name, listener);
         }.bind(this));
       }
     };
 
     emitter.removeAllListeners();
-    (extraModules || []).forEach(function (func) {
+    (extraModules || []).forEach(function(func) {
       func(api);
     });
 
@@ -11601,7 +11670,7 @@ var JSHINT = (function () {
         o.ignoreDelimiters = [o.ignoreDelimiters];
       }
 
-      o.ignoreDelimiters.forEach(function (delimiterPair) {
+      o.ignoreDelimiters.forEach(function(delimiterPair) {
         if (!delimiterPair.start || !delimiterPair.end)
             return;
 
@@ -11619,27 +11688,27 @@ var JSHINT = (function () {
 
     lex = new Lexer(s);
 
-    lex.on("warning", function (ev) {
+    lex.on("warning", function(ev) {
       warningAt.apply(null, [ ev.code, ev.line, ev.character].concat(ev.data));
     });
 
-    lex.on("error", function (ev) {
+    lex.on("error", function(ev) {
       errorAt.apply(null, [ ev.code, ev.line, ev.character ].concat(ev.data));
     });
 
-    lex.on("fatal", function (ev) {
+    lex.on("fatal", function(ev) {
       quit("E041", ev.line, ev.from);
     });
 
-    lex.on("Identifier", function (ev) {
+    lex.on("Identifier", function(ev) {
       emitter.emit("Identifier", ev);
     });
 
-    lex.on("String", function (ev) {
+    lex.on("String", function(ev) {
       emitter.emit("String", ev);
     });
 
-    lex.on("Number", function (ev) {
+    lex.on("Number", function(ev) {
       emitter.emit("Number", ev);
     });
 
@@ -11683,7 +11752,7 @@ var JSHINT = (function () {
       advance((state.tokens.next && state.tokens.next.value !== ".")  ? "(end)" : undefined);
       funct["(blockscope)"].unstack();
 
-      var markDefined = function (name, context) {
+      var markDefined = function(name, context) {
         do {
           if (typeof context[name] === "string") {
             // JSHINT marks unused variables as 'unused' and
@@ -11706,7 +11775,7 @@ var JSHINT = (function () {
         return false;
       };
 
-      var clearImplied = function (name, line) {
+      var clearImplied = function(name, line) {
         if (!implied[name])
           return;
 
@@ -11722,7 +11791,7 @@ var JSHINT = (function () {
           implied[name] = newImplied;
       };
 
-      var warnUnused = function (name, tkn, type, unused_opt) {
+      var warnUnused = function(name, tkn, type, unused_opt) {
         var line = tkn.line;
         var chr  = tkn.from;
         var raw_name = tkn.raw_text || name;
@@ -11756,7 +11825,7 @@ var JSHINT = (function () {
         });
       };
 
-      var checkUnused = function (func, key) {
+      var checkUnused = function(func, key) {
         var type = func[key];
         var tkn = func["(tokens)"][key];
 
@@ -11792,7 +11861,7 @@ var JSHINT = (function () {
         }
       }
 
-      functions.forEach(function (func) {
+      functions.forEach(function(func) {
         if (func["(unusedOption)"] === false) {
           return;
         }
@@ -11815,7 +11884,7 @@ var JSHINT = (function () {
           unused_opt = func["(unusedOption)"] || state.option.unused;
           unused_opt = unused_opt === true ? "last-param" : unused_opt;
 
-          // 'undefined' is a special case for (function (window, undefined) { ... })();
+          // 'undefined' is a special case for (function(window, undefined) { ... })();
           // patterns.
 
           if (param === "undefined")
@@ -11869,14 +11938,14 @@ var JSHINT = (function () {
   };
 
   // Modules.
-  itself.addModule = function (func) {
+  itself.addModule = function(func) {
     extraModules.push(func);
   };
 
   itself.addModule(style.register);
 
   // Data summary.
-  itself.data = function () {
+  itself.data = function() {
     var data = {
       functions: [],
       options: state.option
