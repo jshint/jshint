@@ -28,7 +28,10 @@
     "coverage": "istanbul -- cover ./node_modules/.bin/nodeunit tests/unit",
     "data": "node scripts/generate-identifier-data",
     "pretest": "jshint src && jscs src",
-    "test": "nodeunit tests tests/regression tests/unit"
+    "test-cli": "nodeunit tests/cli.js",
+    "test-regression": "nodeunit tests/regression",
+    "test-unit": "nodeunit tests/unit",
+    "test": "npm run test-unit && npm run test-cli && npm run test-regression"
   },
 
   "main": "./src/jshint.js",
