@@ -460,6 +460,41 @@ exports.group = {
     test.done();
   },
 
+  testNoHomeDir: function (test) {
+    var prevEnv = {};
+
+    // Remove all home dirs from env.
+    [ 'USERPROFILE', 'HOME', 'HOMEPATH' ].forEach(function (key) {
+      prevEnv[key] = process.env[key];
+      delete process.env[key];
+    });
+
+    this.sinon.stub(process, "cwd").returns(__dirname);
+    var localRc = path.normalize(__dirname + "/.jshintrc");
+    var testStub = this.sinon.stub(shjs, "test");
+    var catStub = this.sinon.stub(shjs, "cat");
+
+    // stub rc file
+    testStub.withArgs("-e", localRc).returns(true);
+    catStub.withArgs(localRc).returns('{"evil": true}');
+
+    // stub src file
+    testStub.withArgs("-e", sinon.match(/file\.js$/)).returns(true);
+    catStub.withArgs(sinon.match(/file\.js$/)).returns("eval('a=2');");
+
+    cli.interpret([
+      "node", "jshint", "file.js"
+    ]);
+    test.equal(cli.exit.args[0][0], 0); // eval allowed = rc file found
+
+    test.done();
+
+    // Restore environemnt
+    Object.keys(prevEnv).forEach(function (key) {
+      process.env[key] = prevEnv[key];
+    });
+  },
+
   testOneLevelRcLookup: function (test) {
     var srcDir = __dirname + "../src/";
     var parentRc = path.join(srcDir, ".jshintrc");
