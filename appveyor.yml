@@ -1,9 +1,11 @@
 version: "{build}"
 
+clone_depth: 10
+
 environment:
   matrix:
     - nodejs_version: 0.10
-    - nodejs_version: 0.11
+    - nodejs_version: 0.12
 
 install:
   - ps: Install-Product node $env:nodejs_version
@@ -20,5 +22,3 @@ cache:
 
 matrix:
   fast_finish: true
-  allow_failures:
-    - nodejs_version: 0.11
