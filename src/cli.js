@@ -74,18 +74,18 @@ function deprecated(text, alt) {
 function findConfig(file) {
   var dir  = path.dirname(path.resolve(file));
   var envs = getHomeDir();
-
-  if (!envs)
-    return home;
-
-  var home = path.normalize(path.join(envs, ".jshintrc"));
-
   var proj = findFile(".jshintrc", dir);
+  var home;
+
   if (proj)
     return proj;
 
-  if (shjs.test("-e", home))
-    return home;
+  else if (envs) {
+    home = path.normalize(path.join(envs, ".jshintrc"));
+
+    if (shjs.test("-e", home))
+      return home;
+  }
 
   return null;
 }
