@@ -20,5 +20,3 @@ cache:
 
 matrix:
   fast_finish: true
-  allow_failures:
-    - nodejs_version: 0.11
