@@ -164,6 +164,7 @@ exports.browser = {
   Node                 : false,
   NodeFilter           : false,
   NodeList             : false,
+  Notification         : false,
   navigator            : false,
   onbeforeunload       : true,
   onblur               : true,
