@@ -11,8 +11,8 @@ exec("git log --format='%H|%h|%an|%s' " + version + "..HEAD", { silent: true }, 
     return void console.log("git log return code is non-zero");
 
   var commits = output.split("\n")
-    .filter(function (cmt) { return cmt.trim() !== "" })
-    .map(function (cmt) { return cmt.split("|") });
+    .filter(function (cmt) { return cmt.trim() !== ""; })
+    .map(function (cmt) { return cmt.split("|"); });
 
   var html = "";
   var authors = {};
