@@ -2527,7 +2527,7 @@ var JSHINT = (function() {
       }
 
       if (!isNecessary) {
-        warning("W126");
+        warning("W126", opening);
       }
 
       ret.paren = true;
