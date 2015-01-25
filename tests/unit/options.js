@@ -2048,6 +2048,21 @@ singleGroups.newLine = function(test) {
   test.done();
 };
 
+singleGroups.lineNumber = function (test) {
+  var code = [
+    "var x = (",
+    "  1",
+    ")",
+    ";"
+  ];
+
+  TestRun(test)
+    .addError(1, "Unnecessary grouping operator.")
+    .test(code, { singleGroups: true });
+
+  test.done();
+};
+
 exports.elision = function (test) {
   var code = [
     "var a = [1,,2];",
