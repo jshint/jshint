@@ -36,6 +36,7 @@
   "dependencies": {
     "cli":                 "0.6.x",
     "console-browserify":  "1.1.x",
+    "globals":             "6.2.x",
     "exit":                "0.1.x",
     "htmlparser2":         "3.8.x",
     "minimatch":           "1.0.x",

@@ -1504,6 +1504,278 @@ exports.browser = function (test) {
   test.done();
 };
 
+/*
+ * Tests the `devel` option
+ */
+exports.devel = function (test) {
+  // ensure that jshint reports errors for console and alert
+  var src = fs.readFileSync(__dirname + '/fixtures/devel.js', 'utf8');
+  TestRun(test)
+    .addError(2, "'console' is not defined.")
+    .addError(3, "'alert' is not defined.")
+    .test(src, { browser: true, undef: true });
+
+  // ensure that jshint doesn't report errors with devel
+  TestRun(test)
+    .test(src, { browser: true, undef: true, devel:true });
+
+  test.done();
+};
+
+/*
+ * Tests the `couch` option
+ */
+exports.couch = function (test) {
+  var code = [
+    "log('foo');",
+  ];
+
+  TestRun(test)
+    .addError(1, "'log' is not defined.")
+    .test(code, { undef: true });
+
+  TestRun(test)
+    .test(code, { undef: true, couch: true });
+
+  test.done();
+};
+
+/*
+ * Tests the `qunit` option
+ */
+exports.qunit = function (test) {
+  var code = [
+    "QUnit.test('test', function(assert) {",
+    "  assert.equal('foo', 'foo', 'foo is foo');",
+    "});"
+  ];
+
+  TestRun(test)
+    .addError(1, "'QUnit' is not defined.")
+    .test(code, { undef: true });
+
+  TestRun(test)
+    .test(code, { undef: true, qunit: true });
+
+  test.done();
+};
+
+/*
+ * Tests the `rhino` option
+ */
+exports.rhino = function (test) {
+  var code = [
+    "java.lang.System.out.println('foo');",
+    "print('bar');"
+  ];
+
+  TestRun(test)
+    .addError(1, "'java' is not defined.")
+    .addError(2, "'print' is not defined.")
+    .test(code, { undef: true });
+
+  TestRun(test)
+    .test(code, { undef: true, rhino: true });
+
+  test.done();
+};
+
+/*
+ * Tests the `prototypejs` option
+ */
+exports.prototypejs = function (test) {
+  var code = [
+    "var el = $('foo');",
+    "Element.update(el, 'bar');"
+  ];
+
+  TestRun(test)
+    .addError(1, "'$' is not defined.")
+    .addError(2, "'Element' is not defined.")
+    .test(code, {undef: true });
+
+  TestRun(test)
+    .test(code, {undef: true, prototypejs: true });
+
+  test.done();
+};
+
+/*
+ * Tests the `dojo` option
+ */
+exports.dojo = function (test) {
+  var code = [
+    "require([",
+    "  'dojo/dom',",
+    "], function(dom) {",
+    "  var el = dom.byId('foo');",
+    "  el.innerHTML = 'bar';",
+    "});"
+  ];
+
+  TestRun(test)
+    .addError(1, "'require' is not defined.")
+    .test(code, { undef: true });
+
+  TestRun(test)
+    .test(code, { undef: true, dojo: true });
+
+  test.done();
+};
+
+/*
+ * Tests the `jasmine` option
+ */
+exports.jasmine = function (test) {
+  var code = [
+    "describe('suite', function() {",
+    "  it('spec', function() {",
+    "    expect('foo').toBe('foo');",
+    "  });",
+    "});"
+  ];
+
+  TestRun(test)
+    .addError(1, "'describe' is not defined.")
+    .addError(2, "'it' is not defined.")
+    .addError(3, "'expect' is not defined.")
+    .test(code, { undef: true });
+
+  TestRun(test)
+    .test(code, { undef: true, jasmine: true });
+
+  test.done();
+};
+
+/*
+ * Tests the `mootools` option
+ */
+exports.mootools = function (test) {
+  var code = [
+    "var el = $('foo');",
+    "el.set('html', 'bar');"
+  ];
+
+  TestRun(test)
+    .addError(1, "'$' is not defined.")
+    .test(code, { undef: true });
+
+  TestRun(test)
+    .test(code, { undef: true, mootools: true });
+
+  test.done();
+};
+
+/*
+ * Tests the `worker` option
+ */
+exports.worker = function (test) {
+  var code = [
+    "importScripts('foo.js');",
+    "postMessage('hello');"
+  ];
+
+  TestRun(test)
+    .addError(1, "'importScripts' is not defined.")
+    .addError(2, "'postMessage' is not defined.")
+    .test(code, { undef: true });
+
+  TestRun(test)
+    .test(code, { undef: true, worker: true });
+
+  test.done();
+};
+
+/*
+ * Tests the `wsh` option
+ */
+exports.wsh = function (test) {
+  var code = [
+    "var fso = new ActiveXObject('Scripting.FileSystemObject');",
+    "var file = fso.GetFile('c:\\foo');",
+    "file.Name = 'bar';",
+  ];
+
+  TestRun(test)
+    .addError(1, "'ActiveXObject' is not defined.")
+    .test(code, { undef: true });
+
+  TestRun(test)
+    .test(code, { undef: true, wsh: true });
+
+  test.done();
+};
+
+/*
+ * Tests the `yui` option
+ */
+exports.yui = function (test) {
+  var code = [
+    "YUI().use('node', function(Y) {",
+    "  var el  = Y.one('#foo');",
+    "  el.setHTML('bar');",
+    "});"
+  ];
+
+  TestRun(test)
+    .addError(1, "'YUI' is not defined.")
+    .test(code, { undef: true });
+
+  TestRun(test)
+    .test(code, { undef: true, yui: true });
+
+  test.done();
+};
+
+/*
+ * Tests the `mocha` option
+ */
+exports.mocha = function (test) {
+  var code = [
+    "/* global assert */",
+    "suite('suite', function(){",
+    "  test('foo is foo', function() {",
+    "    assert('foo' === 'foo');",
+    "  });",
+    "});"
+  ];
+
+  TestRun(test)
+    .addError(2, "'suite' is not defined.")
+    .addError(3, "'test' is not defined.")
+    .test(code, { undef: true });
+
+  TestRun(test)
+    .test(code, { undef: true, mocha :true });
+
+  test.done();
+};
+
+/*
+ * Tests the `nonstandard` option
+ */
+exports.nonstandard = function (test) {
+  var code = [
+    "function foo(str) {",
+    "  var escaped = escape(str);",
+    "  if (unescape(escaped) === str) {",
+    "    return true;",
+    "  }",
+    "  return false;",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(2, "'escape' is not defined.")
+    .addError(3, "'unescape' is not defined.")
+    .test(code, { undef: true });
+
+  TestRun(test)
+    .test(code, { undef: true, nonstandard: true });
+
+  test.done();
+};
+
 exports.unnecessarysemicolon = function (test) {
   var code = [
     "function foo() {",

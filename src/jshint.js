@@ -33,6 +33,7 @@
 /*exported console */
 
 var _        = require("underscore");
+var globals  = require("globals");
 var events   = require("events");
 var vars     = require("./vars.js");
 var messages = require("./messages.js");
@@ -175,6 +176,13 @@ var JSHINT = (function() {
     });
   }
 
+  function uncombine(dest, src) {
+    Object.keys(src).forEach(function(name) {
+      delete dest[name];
+    });
+  }
+
+
   function processenforceall() {
     if (state.option.enforceall) {
       for (var enforceopt in options.bool.enforcing) {
@@ -205,41 +213,38 @@ var JSHINT = (function() {
       combine(predefined, vars.ecmaIdentifiers[6]);
     }
 
-    if (state.option.couch) {
-      combine(predefined, vars.couch);
-    }
-
-    if (state.option.qunit) {
-      combine(predefined, vars.qunit);
-    }
-
-    if (state.option.rhino) {
-      combine(predefined, vars.rhino);
-    }
-
-    if (state.option.shelljs) {
-      combine(predefined, vars.shelljs);
-      combine(predefined, vars.node);
-    }
     if (state.option.typed) {
       combine(predefined, vars.typed);
     }
 
+    if (state.option.couch) {
+      combine(predefined, globals.couch);
+    }
+
+    if (state.option.qunit) {
+      combine(predefined, globals.qunit);
+    }
+
+    if (state.option.rhino) {
+      combine(predefined, globals.rhino);
+    }
+
+    if (state.option.shelljs) {
+      combine(predefined, globals.shelljs);
+      combine(predefined, vars.node);
+    }
+
     if (state.option.phantom) {
-      combine(predefined, vars.phantom);
+      combine(predefined, globals.phantomjs);
     }
 
     if (state.option.prototypejs) {
-      combine(predefined, vars.prototypejs);
+      combine(predefined, globals.prototypejs);
     }
 
     if (state.option.node) {
-      combine(predefined, vars.node);
       combine(predefined, vars.typed);
-    }
-
-    if (state.option.devel) {
-      combine(predefined, vars.devel);
+      combine(predefined, vars.node);
     }
 
     if (state.option.dojo) {
@@ -247,26 +252,24 @@ var JSHINT = (function() {
     }
 
     if (state.option.browser) {
-      combine(predefined, vars.browser);
       combine(predefined, vars.typed);
+      combine(predefined, globals.browser);
+      uncombine(predefined, vars.devel);
     }
 
     if (state.option.browserify) {
-      combine(predefined, vars.browser);
       combine(predefined, vars.typed);
+      combine(predefined, globals.browser);
+      uncombine(predefined, vars.devel);
       combine(predefined, vars.browserify);
     }
 
-    if (state.option.nonstandard) {
-      combine(predefined, vars.nonstandard);
-    }
-
     if (state.option.jasmine) {
-      combine(predefined, vars.jasmine);
+      combine(predefined, globals.jasmine);
     }
 
     if (state.option.jquery) {
-      combine(predefined, vars.jquery);
+      combine(predefined, globals.jquery);
     }
 
     if (state.option.mootools) {
@@ -274,23 +277,32 @@ var JSHINT = (function() {
     }
 
     if (state.option.worker) {
-      combine(predefined, vars.worker);
+      combine(predefined, globals.worker);
     }
 
     if (state.option.wsh) {
-      combine(predefined, vars.wsh);
+      combine(predefined, globals.wsh);
+    }
+
+    if (state.option.yui) {
+      combine(predefined, globals.yui);
+    }
+
+    if (state.option.mocha) {
+      combine(predefined, globals.mocha);
+    }
+
+    if (state.option.nonstandard) {
+      combine(predefined, globals.nonstandard);
+    }
+
+    // This must be called after `uncombile(predefined, vars.devel)`
+    if (state.option.devel) {
+      combine(predefined, vars.devel);
     }
 
     if (state.option.globalstrict && state.option.strict !== false) {
       state.option.strict = true;
-    }
-
-    if (state.option.yui) {
-      combine(predefined, vars.yui);
-    }
-
-    if (state.option.mocha) {
-      combine(predefined, vars.mocha);
     }
 
     // Let's assume that chronologically ES3 < ES5 < ES6/ESNext < Moz
