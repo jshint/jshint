@@ -2166,7 +2166,10 @@ var JSHINT = (function() {
   infix("in", "in", 120);
   infix("instanceof", "instanceof", 120);
   infix("+", function(left, that) {
-    var right = expression(130);
+    var right;
+    that.left = left;
+    that.right = right = expression(130);
+
     if (left && right && left.id === "(string)" && right.id === "(string)") {
       left.value += right.value;
       left.character = right.character;
@@ -2175,8 +2178,7 @@ var JSHINT = (function() {
       }
       return left;
     }
-    that.left = left;
-    that.right = right;
+
     return that;
   }, 130);
   prefix("+", "num");
