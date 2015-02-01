@@ -1005,7 +1005,8 @@ Lexer.prototype = {
           return {
             type: tokenType,
             value: value,
-            isUnclosed: true
+            isUnclosed: true,
+            startLine: this.templateLine
           };
         }
       }
@@ -1020,7 +1021,8 @@ Lexer.prototype = {
         return {
           type: tokenType,
           value: value,
-          isUnclosed: false
+          isUnclosed: false,
+          startLine: this.templateLine,
         };
       } else if (ch === '\\') {
         var escape = this.scanEscapeSequence(checks);
@@ -1044,7 +1046,8 @@ Lexer.prototype = {
       type: tokenType,
       value: value,
       isUnclosed: false,
-      quote: "`"
+      quote: "`",
+      startLine: this.templateLine
     };
   },
 
@@ -1568,6 +1571,9 @@ Lexer.prototype = {
       obj.type = obj.type || type;
       obj.value = value;
       obj.line = this.line;
+      if (token && 'startLine' in token) {
+        obj.startLine = token.startLine;
+      }
       obj.character = this.char;
       obj.from = this.from;
       if (obj.identifier && token) obj.raw_text = token.text || token.value;
@@ -1619,29 +1625,32 @@ Lexer.prototype = {
       case Token.TemplateHead:
         this.trigger("TemplateHead", {
           line: this.line,
+          startLine: token.line,
           char: this.char,
           from: this.from,
           value: token.value
         });
-        return create("(template)", token.value);
+        return create("(template)", token.value, null, token);
 
       case Token.TemplateMiddle:
         this.trigger("TemplateMiddle", {
           line: this.line,
+          startLine: token.line,
           char: this.char,
           from: this.from,
           value: token.value
         });
-        return create("(template middle)", token.value);
+        return create("(template middle)", token.value, null, token);
 
       case Token.TemplateTail:
         this.trigger("TemplateTail", {
           line: this.line,
+          startLine: token.line,
           char: this.char,
           from: this.from,
           value: token.value
         });
-        return create("(template tail)", token.value);
+        return create("(template tail)", token.value, null, token);
 
       case Token.Identifier:
         this.trigger("Identifier", {
