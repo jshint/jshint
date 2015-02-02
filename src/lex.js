@@ -1134,7 +1134,8 @@ Lexer.prototype = {
             type: Token.StringLiteral,
             value: value,
             isUnclosed: true,
-            quote: quote
+            quote: quote,
+            startLine: startLine
           };
         }
       }
@@ -1171,7 +1172,8 @@ Lexer.prototype = {
       type: Token.StringLiteral,
       value: value,
       isUnclosed: false,
-      quote: quote
+      quote: quote,
+      startLine: startLine
     };
   },
 
@@ -1614,13 +1616,14 @@ Lexer.prototype = {
       case Token.StringLiteral:
         this.triggerAsync("String", {
           line: this.line,
+          startLine: token.startLine,
           char: this.char,
           from: this.from,
           value: token.value,
           quote: token.quote
         }, checks, function() { return true; });
 
-        return create("(string)", token.value);
+        return create("(string)", token.value, null, token);
 
       case Token.TemplateHead:
         this.trigger("TemplateHead", {

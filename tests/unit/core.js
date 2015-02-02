@@ -843,6 +843,20 @@ exports.testES6TemplateLiteralMultilineReturnValue = function (test) {
   test.done();
 };
 
+exports.tesMultilineReturnValueStringLiteral = function (test) {
+  var src = [
+    'function sayHello(to) {',
+    '  return "Hello, \\',
+    '    " + to;',
+    '}',
+    'print(sayHello("George"));'
+  ];
+
+  TestRun(test).test(src, { multistr: true });
+
+  test.done();
+};
+
 exports.testES6ExportStarFrom = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/es6-export-star-from.js", "utf8");
   TestRun(test)
