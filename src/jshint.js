@@ -4241,7 +4241,22 @@ var JSHINT = (function() {
       // ImportClause :: ImportedDefaultBinding
       this.name = identifier();
       addlabel(this.name, { type: "unused", token: state.tokens.curr });
-    } else if (state.tokens.next.id === "*") {
+      if (state.tokens.next.value === ",") {
+        // ImportClause :: ImportedDefaultBinding , NameSpaceImport
+        // ImportClause :: ImportedDefaultBinding , NamedImports
+        advance(",");
+        // At this point, we intentionally fall through to continue matching
+        // either NameSpaceImport or NamedImports.
+        // Discussion:
+        // https://github.com/jshint/jshint/pull/2144#discussion_r23978406
+      } else {
+        advance("from");
+        advance("(string)");
+        return this;
+      }
+    }
+
+    if (state.tokens.next.id === "*") {
       // ImportClause :: NameSpaceImport
       advance("*");
       advance("as");
@@ -4250,6 +4265,7 @@ var JSHINT = (function() {
         addlabel(this.name, { type: "unused", token: state.tokens.curr });
       }
     } else {
+      // ImportClause :: NamedImports
       advance("{");
       for (;;) {
         if (state.tokens.next.value === "}") {
@@ -4300,6 +4316,7 @@ var JSHINT = (function() {
     }
 
     if (state.tokens.next.value === "*") {
+      // ExportDeclaration :: export * FromClause
       advance("*");
       advance("from");
       advance("(string)");
@@ -4307,6 +4324,8 @@ var JSHINT = (function() {
     }
 
     if (state.tokens.next.type === "default") {
+      // ExportDeclaration :: export default HoistableDeclaration
+      // ExportDeclaration :: export default ClassDeclaration
       state.nameStack.set(state.tokens.next);
       advance("default");
       if (state.tokens.next.id === "function" || state.tokens.next.id === "class") {
@@ -4318,6 +4337,7 @@ var JSHINT = (function() {
     }
 
     if (state.tokens.next.value === "{") {
+      // ExportDeclaration :: export ExportClause
       advance("{");
       for (;;) {
         var id;
@@ -4336,31 +4356,41 @@ var JSHINT = (function() {
           break;
         }
       }
+      if (state.tokens.next.value === "from") {
+        // ExportDeclaration :: export ExportClause FromClause
+        advance("from");
+        advance("(string)");
+      }
       return this;
     }
 
     if (state.tokens.next.id === "var") {
+      // ExportDeclaration :: export VariableStatement
       advance("var");
       exported[state.tokens.next.value] = ok;
       state.tokens.next.exported = true;
       state.syntax["var"].fud.call(state.syntax["var"].fud);
     } else if (state.tokens.next.id === "let") {
+      // ExportDeclaration :: export VariableStatement
       advance("let");
       exported[state.tokens.next.value] = ok;
       state.tokens.next.exported = true;
       state.syntax["let"].fud.call(state.syntax["let"].fud);
     } else if (state.tokens.next.id === "const") {
+      // ExportDeclaration :: export VariableStatement
       advance("const");
       exported[state.tokens.next.value] = ok;
       state.tokens.next.exported = true;
       state.syntax["const"].fud.call(state.syntax["const"].fud);
     } else if (state.tokens.next.id === "function") {
+      // ExportDeclaration :: export Declaration
       this.block = true;
       advance("function");
       exported[state.tokens.next.value] = ok;
       state.tokens.next.exported = true;
       state.syntax["function"].fud();
     } else if (state.tokens.next.id === "class") {
+      // ExportDeclaration :: export Declaration
       this.block = true;
       advance("class");
       exported[state.tokens.next.value] = ok;
