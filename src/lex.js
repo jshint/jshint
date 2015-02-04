@@ -32,12 +32,17 @@ var Token = {
   TemplateHead: 10,
   TemplateMiddle: 11,
   TemplateTail: 12,
-  NoSubstTemplate: 13
+  NoSubstTemplate: 13,
+  JSXTag: 14,
+  JSXText: 15
 };
 
 var Context = {
   Block: 1,
-  Template: 2
+  Template: 2,
+  JSXExpr: 3,
+  JSXTag: 4,
+  JSXEscape: 5
 };
 
 // Object that handles postponed lexing verifications that checks the parsed
@@ -119,6 +124,7 @@ function Lexer(source) {
   this.inComment = false;
   this.context = [];
   this.templateStarts = [];
+  this.prevToken = null;
 
   for (var i = 0; i < state.option.indent; i += 1) {
     state.tab += " ";
@@ -1408,6 +1414,213 @@ Lexer.prototype = {
   },
 
   /*
+   * Extract a JSX token out of the next sequence of characters
+   * and/or lines or return 'null' if its not possible. Since JSX can span
+   * across multiple lines, this method has to move the char pointer.
+   */
+  scanJSX: function() {
+    // Only lex JSX when the option is enabled.
+    if (!state.option.jsx) {
+      return null;
+    }
+
+    var ch = this.peek();
+    var ch2 = this.peek(1);
+
+    // JSX close tag </tag
+    if (ch === "<" && ch2 === "/" && this.inContext(Context.JSXExpr)) {
+      this.popContext(); // JSXExpr
+      this.pushContext(Context.JSXTag);
+      this.skip(2);
+      return {
+        type: Token.Punctuator,
+        value: ch + ch2
+      };
+    }
+
+    // JSX open tag <tag
+    if (ch === "<" && (this.inContext(Context.JSXExpr) || this.primExprAllowed())) {
+      this.pushContext(Context.JSXExpr);
+      this.pushContext(Context.JSXTag);
+      this.skip(1);
+      return {
+        type: Token.JSXTag,
+        value: ch
+      };
+    }
+
+    // JSX end of tag >
+    if (ch === ">" && this.inContext(Context.JSXTag)) {
+      this.popContext(); // JSXTag
+      this.skip(1);
+      return {
+        type: Token.Punctuator,
+        value: ch
+      };
+    }
+
+    // JSX end of singleton tag />
+    if (ch === "/" && ch2 === ">" && this.inContext(Context.JSXTag)) {
+      this.popContext(); // JSXTag
+      this.popContext(); // JSXExpr
+      this.skip(2);
+      return {
+        type: Token.Punctuator,
+        value: ch + ch2
+      };
+    }
+
+    // Open a JSXChild or JSXAttributeValue.
+    if (ch === "{" && (this.inContext(Context.JSXExpr) || this.inContext(Context.JSXTag))) {
+      this.pushContext(Context.JSXEscape);
+      this.skip(1);
+      return {
+        type: Token.Punctuator,
+        value: ch
+      };
+    }
+
+    // Close a JSXChild or JSXAttributeValue.
+    if (ch === '}' && this.inContext(Context.JSXEscape)) {
+      this.popContext();
+      this.skip(1);
+      return {
+        type: Token.Punctuator,
+        value: ch
+      };
+    }
+
+    // If not in an JSX Expression, there's nothing more we can match.
+    if (!this.inContext(Context.JSXExpr)) {
+      return null;
+    }
+
+    // Otherwise, we read JSXText.
+    var value = "";
+
+    while (ch !== "{" && ch !== "<") {
+      while (ch === "") { // End Of Line
+        // If we get an EOF inside of an unclosed tag, show an
+        // error and implicitly close it at the EOF point.
+        if (!this.nextLine()) {
+          return {
+            type: Token.JSXText,
+            value: value
+          };
+        }
+
+        ch = this.peek();
+      }
+
+      if (ch < " ") {
+        // Warn about a control character in text.
+        this.trigger("warning", {
+          code: "W113",
+          line: this.line,
+          character: this.char,
+          data: [ "<non-printable>: " + ch.charCodeAt(0) ]
+        });
+      }
+
+      if (ch !== "&") {
+        value += ch;
+        this.skip();
+        ch = this.peek();
+      } else {
+        var startLine = this.line;
+        var startChar = this.char;
+        this.skip();
+        ch = this.peek();
+
+        if (ch === " ") {
+          value += "&";
+          this.trigger("warning", {
+            code: "W132",
+            line: startLine,
+            character: startChar
+          });
+        } else {
+          var entity = "&";
+          while (ch !== ";" && ch !== "") {
+            entity += ch;
+            this.skip();
+            ch = this.peek();
+          }
+          if (ch === "") {
+            this.trigger("warning", {
+              code: "W133",
+              line: startLine,
+              character: startChar
+            });
+          } else {
+            entity += ch;
+            if (!/^&((#((X[A-F0-9]{2,4})|[0-9]{2,4}))|[a-z]+);$/i.test(entity)) {
+              this.trigger("warning", {
+                code: "W134",
+                line: startLine,
+                character: startChar,
+                data: [ entity ]
+              });
+            }
+            this.skip();
+            ch = this.peek();
+          }
+          value += entity;
+        }
+      }
+    }
+
+    return {
+      type: Token.JSXText,
+      value: value
+    };
+  },
+
+  /**
+   * Return true if a PrimaryExpression is likely to be allowed for the next
+   * token. The return value is used to disambiguate tokens which may have
+   * multiple meanings depending on this contextual information.
+   */
+  primExprAllowed: function() {
+    var token = this.prevToken;
+
+    // Cannot be the first token in a document.
+    if (!token) {
+      return false;
+    }
+
+    // Most punctuators allow PrimaryExpression after them, but a few do not.
+    if (token.type === Token.Punctuator) {
+      switch (token.value) {
+        case ".":
+        case ";":
+        case ")":
+        case "]":
+        case "}":
+          return false;
+        default:
+          return true;
+      }
+    }
+
+    // Only a specific subset of keywords allow PrimaryExpression after them.
+    if (token.type === Token.Keyword) {
+      var keywordBeforePrimExp = [
+        "in", "new", "void", "throw", "yield", "return", "typeof", "instanceof"
+      ];
+      return keywordBeforePrimExp.indexOf(token.value) >= 0;
+    }
+
+    // TemplateHead and TemplateMiddle indicate a PrimaryExpression come next.
+    if (token.type === Token.TemplateHead || token.type === Token.TemplateMiddle) {
+      return true;
+    }
+
+    // Otherwise, a PrimaryExpression is not expected.
+    return false;
+  },
+
+  /*
    * Scan for any occurrence of non-breaking spaces. Non-breaking spaces
    * can be mistakenly typed on OS X with option-space. Non UTF-8 web
    * pages with non-breaking pages produce syntax errors.
@@ -1447,7 +1660,8 @@ Lexer.prototype = {
 
     var match = this.scanComments() ||
       this.scanStringLiteral(checks) ||
-      this.scanTemplateLiteral(checks);
+      this.scanTemplateLiteral(checks) ||
+      this.scanJSX();
 
     if (match) {
       return match;
@@ -1670,6 +1884,7 @@ Lexer.prototype = {
       }
 
       token = this.next(checks);
+      this.prevToken = token;
 
       if (!token) {
         if (this.input.length) {
@@ -1744,6 +1959,24 @@ Lexer.prototype = {
           value: token.value
         });
         return create("(no subst template)", token.value, null, token);
+
+      case Token.JSXTag:
+        this.trigger("JSXTag", {
+          line: this.line,
+          char: this.char,
+          from: this.from,
+          value: token.value
+        });
+        return create('(jsx tag)', token.value);
+
+      case Token.JSXText:
+        this.trigger("JSXText", {
+          line: this.line,
+          char: this.char,
+          from: this.from,
+          value: token.value
+        });
+        return create('(jsx text)', token.value);
 
       case Token.Identifier:
         this.trigger("Identifier", {

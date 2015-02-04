@@ -69,7 +69,9 @@ var errors = {
   E051: "Regular parameters cannot come after default parameters.",
   E052: "Unclosed template literal.",
   E053: "Export declaration must be in global scope.",
-  E054: "Class properties must be methods. Expected '(' but instead saw '{a}'."
+  E054: "Class properties must be methods. Expected '(' but instead saw '{a}'.",
+  E055: "JSX element '<{a}' is never closed.",
+  E056: "JSX element '<{a}' needs to be closed, instead found '{b}'.",
 };
 
 var warnings = {
@@ -206,7 +208,10 @@ var warnings = {
   W129: "'{a}' is defined in a future version of JavaScript. Use a " +
     "different variable name to avoid migration issues.",
   W130: "Invalid element after rest element.",
-  W131: "Invalid parameter after rest parameter."
+  W131: "Invalid parameter after rest parameter.",
+  W132: "JSX text encodes HTML entities, use '&amp;' instead of '&'.",
+  W133: "HTML entity missing ';'.",
+  W134: "Invalid HTML entity '{a}'.",
 };
 
 var info = {
