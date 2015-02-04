@@ -14,4 +14,6 @@ function octal_strictmode() {
   var test = `\033\t`;
 }
 
+var nested = `Look and ${ `Nested ${ `whoaaa` } template` } listen`;
+
 var unterminated = `${one}

@@ -34,6 +34,10 @@ var Token = {
   TemplateTail: 12
 };
 
+var Context = {
+  Template: 1
+};
+
 // Object that handles postponed lexing verifications that checks the parsed
 // environment state.
 
@@ -111,7 +115,7 @@ function Lexer(source) {
   this.from = 1;
   this.input = "";
   this.inComment = false;
-  this.inTemplate = false;
+  this.context = [];
   this.templateLine = null;
   this.templateChar = null;
 
@@ -122,6 +126,10 @@ function Lexer(source) {
 
 Lexer.prototype = {
   _lines: [],
+
+  inContext: function(ctxType) {
+    return this.context.length > 0 && this.context[this.context.length - 1] === ctxType;
+  },
 
   getLines: function() {
     this._lines = state.lines;
@@ -975,28 +983,33 @@ Lexer.prototype = {
    */
   scanTemplateLiteral: function(checks) {
     var tokenType;
-    var value = '';
+    var value = "";
     var ch;
 
-    // String must start with a backtick.
-    if (!this.inTemplate) {
-      if (!state.option.esnext || this.peek() !== "`") {
-        return null;
-      }
+    if (!state.option.esnext) {
+      // Only lex template strings in ESNext mode.
+      return null;
+    } else if (this.peek() === "`") {
+      // Template must start with a backtick.
+      tokenType = Token.TemplateHead;
       this.templateLine = this.line;
       this.templateChar = this.char;
       this.skip(1);
-    } else if (this.peek() !== '}') {
-      // If we're in a template, and we don't have a '}', lex something else instead.
+      this.context.push(Context.Template);
+    } else if (this.inContext(Context.Template) && this.peek() === "}") {
+      // If we're in a template context, and we have a '}', lex a TemplateMiddle.
+      tokenType = Token.TemplateMiddle;
+    } else {
+      // Go lex something else.
       return null;
     }
 
     while (this.peek() !== "`") {
       while ((ch = this.peek()) === "") {
+        value += "\n";
         if (!this.nextLine()) {
           // Unclosed template literal --- point to the starting line, or the EOF?
-          tokenType = this.inTemplate ? Token.TemplateHead : Token.TemplateMiddle;
-          this.inTemplate = false;
+          this.context.pop();
           this.trigger("error", {
             code: "E052",
             line: this.templateLine,
@@ -1012,11 +1025,7 @@ Lexer.prototype = {
 
       if (ch === '$' && this.peek(1) === '{') {
         value += '${';
-        tokenType = value.charAt(0) === '}' ? Token.TemplateMiddle : Token.TemplateHead;
-        // Either TokenHead or TokenMiddle --- depending on if the initial value
-        // is '}' or not.
         this.skip(2);
-        this.inTemplate = true;
         return {
           type: tokenType,
           value: value,
@@ -1026,19 +1035,17 @@ Lexer.prototype = {
         var escape = this.scanEscapeSequence(checks);
         value += escape.char;
         this.skip(escape.jump);
-      } else if (ch === '`') {
-        break;
-      } else {
+      } else if (ch !== '`') {
         // Otherwise, append the value and continue.
         value += ch;
         this.skip(1);
       }
     }
 
-    // Final value is either TokenTail or NoSubstititionTemplate --- essentially a string
-    tokenType = this.inTemplate ? Token.TemplateTail : Token.StringLiteral;
-    this.inTemplate = false;
+    // Final value is either StringLiteral or TemplateTail
+    tokenType = tokenType === Token.TemplateHead ? Token.StringLiteral : Token.TemplateTail;
     this.skip(1);
+    this.context.pop();
 
     return {
       type: tokenType,
