@@ -35,7 +35,8 @@ var Token = {
 };
 
 var Context = {
-  Template: 1
+  Block: 1,
+  Template: 2
 };
 
 // Object that handles postponed lexing verifications that checks the parsed
@@ -224,13 +225,30 @@ Lexer.prototype = {
     case ")":
     case ";":
     case ",":
-    case "{":
-    case "}":
     case "[":
     case "]":
     case ":":
     case "~":
     case "?":
+      return {
+        type: Token.Punctuator,
+        value: ch1
+      };
+
+    // A block/object opener
+    case "{":
+      this.context.push(Context.Block);
+      return {
+        type: Token.Punctuator,
+        value: ch1
+      };
+
+    // A block/object closer
+    case "}":
+      if (!this.inContext(Context.Block)) {
+        return null;
+      }
+      this.context.pop();
       return {
         type: Token.Punctuator,
         value: ch1
