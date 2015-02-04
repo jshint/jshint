@@ -5104,6 +5104,8 @@ exports.testES6BlockExports = function (test) {
   ];
 
   TestRun(test)
+    .addError(1, "'broken' is defined but never used.")
+    .addError(2, "'broken2' is defined but never used.")
     .addError(4, "Export declaration must be in global scope.")
     .addError(5, "Export declaration must be in global scope.")
     .addError(6, "Export declaration must be in global scope.")
