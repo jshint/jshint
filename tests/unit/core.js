@@ -685,15 +685,16 @@ exports.testES6Modules = function (test) {
     .addError(26, "'export' is only available in ES6 (use esnext option).")
     .addError(30, "'export' is only available in ES6 (use esnext option).")
     .addError(31, "'export' is only available in ES6 (use esnext option).")
-    .addError(35, "'export' is only available in ES6 (use esnext option).")
-    .addError(39, "'export' is only available in ES6 (use esnext option).")
-    .addError(43, "'export' is only available in ES6 (use esnext option).")
-    .addError(45, "'export' is only available in ES6 (use esnext option).")
-    .addError(46, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
-    .addError(47, "'export' is only available in ES6 (use esnext option).")
-    .addError(47, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(32, "'export' is only available in ES6 (use esnext option).")
+    .addError(36, "'export' is only available in ES6 (use esnext option).")
+    .addError(40, "'export' is only available in ES6 (use esnext option).")
+    .addError(44, "'export' is only available in ES6 (use esnext option).")
     .addError(46, "'export' is only available in ES6 (use esnext option).")
-    .addError(45, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(47, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(48, "'export' is only available in ES6 (use esnext option).")
+    .addError(48, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(47, "'export' is only available in ES6 (use esnext option).")
+    .addError(46, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .test(src, {});
 
   var src2 = [
@@ -728,6 +729,76 @@ exports.testES6ModulesNamedExportsAffectUnused = function (test) {
     .test(src1, {
       esnext: true,
       unused: true
+    });
+
+  test.done();
+};
+
+exports.testES6ModulesNamedExportsAffectUndef = function (test) {
+  // The identifier "foo" is expected to have been defined in the scope
+  // of this file in order to be exported.
+  // The example below is roughly similar to this Common JS:
+  //
+  //     exports.foo = foo;
+  //
+  // Thus, the "foo" identifier should be seen as undefined.
+  var src1 = [
+    "export { foo };"
+  ];
+
+  TestRun(test)
+    .addError(1, "'foo' is not defined.")
+    .test(src1, {
+      esnext: true,
+      undef: true
+    });
+
+  test.done();
+};
+
+exports.testES6ModulesThroughExportDoNotAffectUnused = function (test) {
+  // "Through" exports do not alter the scope of this file, but instead pass
+  // the exports from one source on through this source.
+  // The example below is roughly similar to this Common JS:
+  //
+  //     var foo;
+  //     exports.foo = require('source').foo;
+  //
+  // Thus, the "foo" identifier should be seen as unused.
+  var src1 = [
+    "var foo;",
+    "export { foo } from \"source\";"
+  ];
+
+  TestRun(test)
+    .addError(1, "'foo' is defined but never used.")
+    .test(src1, {
+      esnext: true,
+      unused: true
+    });
+
+  test.done();
+};
+
+exports.testES6ModulesThroughExportDoNotAffectUndef = function (test) {
+  // "Through" exports do not alter the scope of this file, but instead pass
+  // the exports from one source on through this source.
+  // The example below is roughly similar to this Common JS:
+  //
+  //     exports.foo = require('source').foo;
+  //     var bar = foo;
+  //
+  // Thus, the "foo" identifier should be seen as undefined.
+  var src1 = [
+    "export { foo } from \"source\";",
+    "var bar = foo;"
+  ];
+
+  TestRun(test)
+    .addError(2, "'foo' is not defined.")
+    .test(src1, {
+      esnext: true,
+      undef: true
     });
 
   test.done();
