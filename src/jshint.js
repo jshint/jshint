@@ -1394,9 +1394,8 @@ var JSHINT = (function() {
   // fnparam means that this identifier is being defined as a function
   // argument (see identifier())
   // prop means that this identifier is that of an object property
-  // exported means that the identifier is part of a valid ES6 `export` declaration
 
-  function optionalidentifier(fnparam, prop, preserve, exported) {
+  function optionalidentifier(fnparam, prop, preserve) {
     if (!state.tokens.next.identifier) {
       return;
     }
@@ -1407,10 +1406,6 @@ var JSHINT = (function() {
 
     var curr = state.tokens.curr;
     var val  = state.tokens.curr.value;
-
-    if (exported) {
-      state.tokens.curr.exported = true;
-    }
 
     if (!isReserved(curr)) {
       return val;
@@ -1433,9 +1428,8 @@ var JSHINT = (function() {
   // fnparam means that this identifier is being defined as a function
   // argument
   // prop means that this identifier is that of an object property
-  // `exported` means that the identifier token should be exported.
-  function identifier(fnparam, prop, exported) {
-    var i = optionalidentifier(fnparam, prop, false, exported);
+  function identifier(fnparam, prop) {
+    var i = optionalidentifier(fnparam, prop, false);
     if (i) {
       return i;
     }
@@ -4340,11 +4334,22 @@ var JSHINT = (function() {
     if (state.tokens.next.value === "{") {
       // ExportDeclaration :: export ExportClause
       advance("{");
+      var exportedTokens = [];
       for (;;) {
-        var id;
-        exported[id = identifier(false, false, ok)] = ok;
-        if (ok) {
-          funct["(blockscope)"].setExported(id);
+        if (!state.tokens.next.identifier) {
+          error("E030", state.tokens.next, state.tokens.next.value);
+        }
+        advance();
+
+        state.tokens.curr.exported = ok;
+        exportedTokens.push(state.tokens.curr);
+
+        if (state.tokens.next.value === "as") {
+          advance("as");
+          if (!state.tokens.next.identifier) {
+            error("E030", state.tokens.next, state.tokens.next.value);
+          }
+          advance();
         }
 
         if (state.tokens.next.value === ",") {
@@ -4361,6 +4366,14 @@ var JSHINT = (function() {
         // ExportDeclaration :: export ExportClause FromClause
         advance("from");
         advance("(string)");
+      } else if (ok) {
+        exportedTokens.forEach(function(token) {
+          if (!funct[token.value]) {
+            isundef(funct, "W117", token, token.value);
+          }
+          exported[token.value] = true;
+          funct["(blockscope)"].setExported(token.value);
+        });
       }
       return this;
     }

@@ -29,6 +29,7 @@ export default function() {
 
 export { foo };
 export { foo, bar } from "source";
+export { foo, bar as biz } from "source";
 
 // gettin' fancy
 
