@@ -1991,6 +1991,10 @@ var JSHINT = (function() {
     return this;
   });
 
+  type("(no subst template)", function() {
+    return this;
+  });
+
   type("(regexp)", function() {
     return this;
   });

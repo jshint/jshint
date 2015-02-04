@@ -31,7 +31,8 @@ var Token = {
   RegExp: 9,
   TemplateHead: 10,
   TemplateMiddle: 11,
-  TemplateTail: 12
+  TemplateTail: 12,
+  NoSubstTemplate: 13
 };
 
 var Context = {
@@ -1060,8 +1061,8 @@ Lexer.prototype = {
       }
     }
 
-    // Final value is either StringLiteral or TemplateTail
-    tokenType = tokenType === Token.TemplateHead ? Token.StringLiteral : Token.TemplateTail;
+    // Final value is either NoSubstTemplate or TemplateTail
+    tokenType = tokenType === Token.TemplateHead ? Token.NoSubstTemplate : Token.TemplateTail;
     this.skip(1);
     this.context.pop();
 
@@ -1667,6 +1668,15 @@ Lexer.prototype = {
           value: token.value
         });
         return create("(template tail)", token.value);
+
+      case Token.NoSubstTemplate:
+        this.trigger("NoSubstTemplate", {
+          line: this.line,
+          char: this.char,
+          from: this.from,
+          value: token.value
+        });
+        return create("(no subst template)", token.value);
 
       case Token.Identifier:
         this.trigger("Identifier", {
