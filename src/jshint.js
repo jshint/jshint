@@ -4145,7 +4145,8 @@ var JSHINT = (function() {
 
 
   stmt("return", function() {
-    if (this.line === state.tokens.next.line) {
+    if (this.line === state.tokens.next.line ||
+        this.line === state.tokens.next.startLine) {
       if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
         this.first = expression(0);
 
