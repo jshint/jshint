@@ -825,7 +825,7 @@ var JSHINT = (function() {
       return true;
     }
     if (isInfix(next) === isInfix(curr) || (curr.id === "yield" && state.option.inMoz(true))) {
-      return curr.line !== next.line;
+      return curr.line !== startLine(next);
     }
     return false;
   }
@@ -876,7 +876,7 @@ var JSHINT = (function() {
 
     var isDangerous =
       state.option.asi &&
-      state.tokens.prev.line < state.tokens.curr.line &&
+      state.tokens.prev.line !== startLine(state.tokens.curr) &&
       _.contains(["]", ")"], state.tokens.prev.id) &&
       _.contains(["[", "("], state.tokens.curr.id);
 
@@ -950,23 +950,27 @@ var JSHINT = (function() {
 
   // Functions for conformance of style.
 
+  function startLine(token) {
+    return token.startLine || token.line;
+  }
+
   function nobreaknonadjacent(left, right) {
     left = left || state.tokens.curr;
     right = right || state.tokens.next;
-    if (!state.option.laxbreak && left.line !== right.line) {
+    if (!state.option.laxbreak && left.line !== startLine(right)) {
       warning("W014", right, right.value);
     }
   }
 
   function nolinebreak(t) {
     t = t || state.tokens.curr;
-    if (t.line !== state.tokens.next.line) {
+    if (t.line !== startLine(state.tokens.next)) {
       warning("E022", t, t.value);
     }
   }
 
   function nobreakcomma(left, right) {
-    if (left.line !== right.line) {
+    if (left.line !== startLine(right)) {
       if (!state.option.laxcomma) {
         if (comma.first) {
           warning("I001");
@@ -1487,7 +1491,7 @@ var JSHINT = (function() {
         // the same line *and* option lastsemic is on, ignore the warning.
         // Otherwise, complain about missing semicolon.
         if (!state.option.lastsemic || state.tokens.next.id !== "}" ||
-          state.tokens.next.line !== state.tokens.curr.line) {
+          startLine(state.tokens.next) !== state.tokens.curr.line) {
           warningAt("W033", state.tokens.curr.line, state.tokens.curr.character);
         }
       }
@@ -1980,7 +1984,7 @@ var JSHINT = (function() {
     type: "(template)",
     lbp: 0,
     identifier: false,
-    fud: doTemplateLiteral
+    nud: doTemplateLiteral
   };
 
   type("(template middle)", function() {
@@ -2631,7 +2635,7 @@ var JSHINT = (function() {
     } else if (blocktype.isDestAssign && !state.option.inESNext()) {
       warning("W104", state.tokens.curr, "destructuring assignment");
     }
-    var b = state.tokens.curr.line !== state.tokens.next.line;
+    var b = state.tokens.curr.line !== startLine(state.tokens.next);
     this.first = [];
     if (b) {
       indent += state.option.indent;
@@ -3041,7 +3045,7 @@ var JSHINT = (function() {
       var b, f, i, p, t, g, nextVal;
       var props = {}; // All properties, including accessors
 
-      b = state.tokens.curr.line !== state.tokens.next.line;
+      b = state.tokens.curr.line !== startLine(state.tokens.next);
       if (b) {
         indent += state.option.indent;
         if (state.tokens.next.from === indent + state.option.indent) {
@@ -4101,7 +4105,7 @@ var JSHINT = (function() {
       nolinebreak(this);
 
     if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
-      if (state.tokens.curr.line === state.tokens.next.line) {
+      if (state.tokens.curr.line === startLine(state.tokens.next)) {
         if (funct[v] !== "label") {
           warning("W090", state.tokens.next, v);
         } else if (scope[v] !== funct) {
@@ -4128,7 +4132,7 @@ var JSHINT = (function() {
       nolinebreak(this);
 
     if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
-      if (state.tokens.curr.line === state.tokens.next.line) {
+      if (state.tokens.curr.line === startLine(state.tokens.next)) {
         if (funct[v] !== "label") {
           warning("W090", state.tokens.next, v);
         } else if (scope[v] !== funct) {
@@ -4148,7 +4152,7 @@ var JSHINT = (function() {
 
 
   stmt("return", function() {
-    if (this.line === state.tokens.next.line) {
+    if (this.line === startLine(state.tokens.next)) {
       if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
         this.first = expression(0);
 
@@ -4191,7 +4195,7 @@ var JSHINT = (function() {
       advance("*");
     }
 
-    if (this.line === state.tokens.next.line || !state.option.inMoz(true)) {
+    if (this.line === startLine(state.tokens.next) || !state.option.inMoz(true)) {
       if (delegatingYield ||
           (state.tokens.next.id !== ";" && !state.tokens.next.reach && state.tokens.next.nud)) {
 

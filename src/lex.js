@@ -118,8 +118,7 @@ function Lexer(source) {
   this.input = "";
   this.inComment = false;
   this.context = [];
-  this.templateLine = null;
-  this.templateChar = null;
+  this.templateStarts = [];
 
   for (var i = 0; i < state.option.indent; i += 1) {
     state.tab += " ";
@@ -1004,6 +1003,8 @@ Lexer.prototype = {
     var tokenType;
     var value = "";
     var ch;
+    var startLine = this.line;
+    var startChar = this.char;
 
     if (!state.option.esnext) {
       // Only lex template strings in ESNext mode.
@@ -1011,8 +1012,7 @@ Lexer.prototype = {
     } else if (this.peek() === "`") {
       // Template must start with a backtick.
       tokenType = Token.TemplateHead;
-      this.templateLine = this.line;
-      this.templateChar = this.char;
+      this.templateStarts.push({ line: this.line, char: this.char });
       this.skip(1);
       this.context.push(Context.Template);
     } else if (this.inContext(Context.Template) && this.peek() === "}") {
@@ -1027,16 +1027,19 @@ Lexer.prototype = {
       while ((ch = this.peek()) === "") {
         value += "\n";
         if (!this.nextLine()) {
-          // Unclosed template literal --- point to the starting line, or the EOF?
+          // Unclosed template literal --- point to the starting "`"
           this.context.pop();
+          var startPos = this.templateStarts.pop();
           this.trigger("error", {
             code: "E052",
-            line: this.templateLine,
-            character: this.templateChar
+            line: startPos.line,
+            character: startPos.char
           });
           return {
             type: tokenType,
             value: value,
+            startLine: startLine,
+            startChar: startChar,
             isUnclosed: true
           };
         }
@@ -1048,6 +1051,8 @@ Lexer.prototype = {
         return {
           type: tokenType,
           value: value,
+          startLine: startLine,
+          startChar: startChar,
           isUnclosed: false
         };
       } else if (ch === '\\') {
@@ -1065,10 +1070,13 @@ Lexer.prototype = {
     tokenType = tokenType === Token.TemplateHead ? Token.NoSubstTemplate : Token.TemplateTail;
     this.skip(1);
     this.context.pop();
+    this.templateStarts.pop();
 
     return {
       type: tokenType,
       value: value,
+      startLine: startLine,
+      startChar: startChar,
       isUnclosed: false,
       quote: "`"
     };
@@ -1156,6 +1164,8 @@ Lexer.prototype = {
           return {
             type: Token.StringLiteral,
             value: value,
+            startLine: startLine,
+            startChar: startChar,
             isUnclosed: true,
             quote: quote
           };
@@ -1193,6 +1203,8 @@ Lexer.prototype = {
     return {
       type: Token.StringLiteral,
       value: value,
+      startLine: startLine,
+      startChar: startChar,
       isUnclosed: false,
       quote: quote
     };
@@ -1597,6 +1609,9 @@ Lexer.prototype = {
       obj.character = this.char;
       obj.from = this.from;
       if (obj.identifier && token) obj.raw_text = token.text || token.value;
+      if (token && token.startLine && token.startLine !== this.line) {
+        obj.startLine = token.startLine;
+      }
 
       if (isProperty && obj.identifier) {
         obj.isProperty = isProperty;
@@ -1636,47 +1651,57 @@ Lexer.prototype = {
           line: this.line,
           char: this.char,
           from: this.from,
+          startLine: token.startLine,
+          startChar: token.startChar,
           value: token.value,
           quote: token.quote
         }, checks, function() { return true; });
 
-        return create("(string)", token.value);
+        return create("(string)", token.value, null, token);
 
       case Token.TemplateHead:
         this.trigger("TemplateHead", {
           line: this.line,
           char: this.char,
           from: this.from,
+          startLine: token.startLine,
+          startChar: token.startChar,
           value: token.value
         });
-        return create("(template)", token.value);
+        return create("(template)", token.value, null, token);
 
       case Token.TemplateMiddle:
         this.trigger("TemplateMiddle", {
           line: this.line,
           char: this.char,
           from: this.from,
+          startLine: token.startLine,
+          startChar: token.startChar,
           value: token.value
         });
-        return create("(template middle)", token.value);
+        return create("(template middle)", token.value, null, token);
 
       case Token.TemplateTail:
         this.trigger("TemplateTail", {
           line: this.line,
           char: this.char,
           from: this.from,
+          startLine: token.startLine,
+          startChar: token.startChar,
           value: token.value
         });
-        return create("(template tail)", token.value);
+        return create("(template tail)", token.value, null, token);
 
       case Token.NoSubstTemplate:
         this.trigger("NoSubstTemplate", {
           line: this.line,
           char: this.char,
           from: this.from,
+          startLine: token.startLine,
+          startChar: token.startChar,
           value: token.value
         });
-        return create("(no subst template)", token.value);
+        return create("(no subst template)", token.value, null, token);
 
       case Token.Identifier:
         this.trigger("Identifier", {
