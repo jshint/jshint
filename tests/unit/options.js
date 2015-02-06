@@ -701,6 +701,14 @@ exports['unused overrides'] = function (test) {
     .addError(3, "'i' is defined but never used.")
     .test(code, {es3: true, unused: "strict"});
 
+  code = ['/*jshint unused:badoption */', 'function foo(a, b) {', 'var i = 3;', '}', 'foo();'];
+  TestRun(test)
+    .addError(1, "Bad option value.")
+    .addError(2, "'b' is defined but never used.")
+    .addError(2, "'a' is defined but never used.")
+    .addError(3, "'i' is defined but never used.")
+    .test(code, {es3: true, unused: "strict"});
+
   test.done();
 };
 
