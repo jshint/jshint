@@ -63,11 +63,6 @@ exports.register = function(linter) {
       return;
     }
 
-    // If quotmark is enabled, return if this is a template literal.
-    if (esnext && data.quote === "`") {
-      return;
-    }
-
     // If quotmark is set to 'single' warn about all double-quotes.
 
     if (quotmark === "single" && data.quote !== "'") {

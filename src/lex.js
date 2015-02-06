@@ -1076,8 +1076,7 @@ Lexer.prototype = {
       value: value,
       startLine: startLine,
       startChar: startChar,
-      isUnclosed: false,
-      quote: "`"
+      isUnclosed: false
     };
   },
 
