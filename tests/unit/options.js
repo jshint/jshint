@@ -2139,3 +2139,13 @@ exports.elision = function (test) {
 
   test.done();
 };
+
+exports.badInlineOptionValue = function (test) {
+  var src = [ "/* jshint bitwise:batcrazy */" ];
+
+  TestRun(test)
+    .addError(1, "Bad option value.")
+    .test(src);
+
+  test.done();
+};
