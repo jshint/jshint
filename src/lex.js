@@ -245,10 +245,9 @@ Lexer.prototype = {
 
     // A block/object closer
     case "}":
-      if (!this.inContext(Context.Block)) {
-        return null;
+      if (this.inContext(Context.Block)) {
+        this.context.pop();
       }
-      this.context.pop();
       return {
         type: Token.Punctuator,
         value: ch1
