@@ -316,6 +316,7 @@ exports.numbers = function (test) {
     "var n = 09;",
     "var o = 1e-A;",
     "var p = 1/;",
+    "var q = 1x;"
   ];
 
   TestRun(test)
@@ -334,6 +335,10 @@ exports.numbers = function (test) {
     .addError(16, "Expected an identifier and instead saw ';'.")
     .addError(16, "Expected an identifier and instead saw 'var'.")
     .addError(16, "Missing semicolon.")
+    .addError(17, "Unexpected '1'.")
+    .addError(17, "Unexpected early end of program.")
+    .addError(17, "Expected an identifier and instead saw '(end)'.")
+    .addError(17, "Missing semicolon.")
     .test(code, {es3: true});
 
   // Octals are prohibited in strict mode.
@@ -4785,6 +4790,22 @@ exports["/*jshint ignore */ should ignore lines that end with a multi-line comme
   var code = [
     "/*jshint ignore:start */",
     "var a; /* following comment */",
+    "/*jshint ignore:end */"
+  ];
+
+  TestRun(test)
+    .test(code, { unused: true });
+
+  test.done();
+};
+
+exports["/*jshint ignore */ should ignore multi-line comments"] = function(test) {
+  var code = [
+    "/*jshint ignore:start */",
+    "/*",
+    "following comment",
+    "*/",
+    "var a;",
     "/*jshint ignore:end */"
   ];
 
