@@ -634,6 +634,206 @@ exports.jsonMode = function (test) {
   test.done();
 };
 
+exports.deepJSON = function (test) {
+  var code = [
+    '{',
+    '  "key" : {',
+    '    "deep" : [',
+    '      "value",',
+    '      { "num" : 123, "array": [] }',
+    '    ]',
+    '  },',
+    '  "single": ["x"],',
+    '  "negative": -1.23e2',
+    '}'
+  ];
+
+  var run = TestRun(test);
+
+  run.test(code, {multistr: true, es3: true});
+  run.test(code, {multistr: true}); // es5
+  run.test(code, {multistr: true, esnext: true});
+  run.test(code, {multistr: true, moz: true});
+
+  test.done();
+}
+
+exports.badJSON = function (test) {
+  var objTrailingComma = [
+    '{ "key" : "value", }',
+  ];
+
+  var run1 = TestRun(test)
+    .addError(1, "Unexpected comma.");
+
+  run1.test(objTrailingComma, {multistr: true, es3: true});
+  run1.test(objTrailingComma, {multistr: true}); // es5
+  run1.test(objTrailingComma, {multistr: true, esnext: true});
+  run1.test(objTrailingComma, {multistr: true, moz: true});
+
+  var arrayTrailingComma = [
+    '{ "key" : [,] }',
+  ];
+
+  var run2 = TestRun(test)
+    .addError(1, "Illegal comma.")
+    .addError(1, "Expected a JSON value.")
+    .addError(1, "Unexpected comma.");
+
+  run2.test(arrayTrailingComma, {multistr: true, es3: true});
+  run2.test(arrayTrailingComma, {multistr: true}); // es5
+  run2.test(arrayTrailingComma, {multistr: true, esnext: true});
+  run2.test(arrayTrailingComma, {multistr: true, moz: true});
+
+  var objMissingComma = [
+    '{ "k1":"v1" "k2":"v2" }',
+  ];
+
+  var run3 = TestRun(test)
+    .addError(1, "Expected '}' and instead saw 'k2'.")
+    .addError(1, "Expected '(end)' and instead saw ':'.");
+
+  run3.test(objMissingComma, {multistr: true, es3: true});
+  run3.test(objMissingComma, {multistr: true}); // es5
+  run3.test(objMissingComma, {multistr: true, esnext: true});
+  run3.test(objMissingComma, {multistr: true, moz: true});
+
+  var arrayMissingComma = [
+    '[ "v1" "v2" ]',
+  ];
+
+  var run4 = TestRun(test)
+    .addError(1, "Expected ']' and instead saw 'v2'.")
+    .addError(1, "Expected '(end)' and instead saw ']'.");
+
+  run4.test(arrayMissingComma, {multistr: true, es3: true});
+  run4.test(arrayMissingComma, {multistr: true}); // es5
+  run4.test(arrayMissingComma, {multistr: true, esnext: true});
+  run4.test(arrayMissingComma, {multistr: true, moz: true});
+
+  var objDoubleComma = [
+    '{ "k1":"v1",, "k2":"v2" }',
+  ];
+
+  var run5 = TestRun(test)
+    .addError(1, "Illegal comma.")
+    .addError(1, "Expected ':' and instead saw 'k2'.")
+    .addError(1, "Expected a JSON value.")
+    .addError(1, "Expected '}' and instead saw ':'.")
+    .addError(1, "Expected '(end)' and instead saw 'v2'.");
+
+  run5.test(objDoubleComma, {multistr: true, es3: true});
+  run5.test(objDoubleComma, {multistr: true}); // es5
+  run5.test(objDoubleComma, {multistr: true, esnext: true});
+  run5.test(objDoubleComma, {multistr: true, moz: true});
+
+  var arrayDoubleComma = [
+    '[ "v1",, "v2" ]',
+  ];
+
+  var run6 = TestRun(test)
+    .addError(1, "Illegal comma.")
+    .addError(1, "Expected a JSON value.");
+
+  run6.test(arrayDoubleComma, {multistr: true, es3: true});
+  run6.test(arrayDoubleComma, {multistr: true}); // es5
+  run6.test(arrayDoubleComma, {multistr: true, esnext: true});
+  run6.test(arrayDoubleComma, {multistr: true, moz: true});
+
+  var objUnclosed = [
+    '{ "k1":"v1"',
+  ];
+
+  var run7 = TestRun(test)
+    .addError(1, "Expected '}' and instead saw ''.");
+
+  run7.test(objUnclosed, {multistr: true, es3: true});
+  run7.test(objUnclosed, {multistr: true}); // es5
+  run7.test(objUnclosed, {multistr: true, esnext: true});
+  run7.test(objUnclosed, {multistr: true, moz: true});
+
+  var arrayUnclosed = [
+    '[ "v1"',
+  ];
+
+  var run8 = TestRun(test)
+    .addError(1, "Expected ']' and instead saw ''.");
+
+  run8.test(arrayUnclosed, {multistr: true, es3: true});
+  run8.test(arrayUnclosed, {multistr: true}); // es5
+  run8.test(arrayUnclosed, {multistr: true, esnext: true});
+  run8.test(arrayUnclosed, {multistr: true, moz: true});
+
+  var objUnclosed2 = [
+    '{',
+  ];
+
+  var run9 = TestRun(test)
+    .addError(1, "Missing '}' to match '{' from line 1.")
+    .addError(1, "Expected ':' and instead saw ''.")
+    .addError(1, "Expected a JSON value.")
+    .addError(1, "Expected '}' and instead saw ''.");
+
+  run9.test(objUnclosed2, {multistr: true, es3: true});
+  run9.test(objUnclosed2, {multistr: true}); // es5
+  run9.test(objUnclosed2, {multistr: true, esnext: true});
+  run9.test(objUnclosed2, {multistr: true, moz: true});
+
+  var arrayUnclosed2 = [
+    '[',
+  ];
+
+  var run10 = TestRun(test)
+    .addError(1, "Missing ']' to match '[' from line 1.")
+    .addError(1, "Expected a JSON value.")
+    .addError(1, "Expected ']' and instead saw ''.");
+
+  run10.test(arrayUnclosed2, {multistr: true, es3: true});
+  run10.test(arrayUnclosed2, {multistr: true}); // es5
+  run10.test(arrayUnclosed2, {multistr: true, esnext: true});
+  run10.test(arrayUnclosed2, {multistr: true, moz: true});
+
+  var objDupKeys = [
+    '{ "k1":"v1", "k1":"v1" }',
+  ];
+
+  var run11 = TestRun(test)
+    .addError(1, "Duplicate key 'k1'.");
+
+  run11.test(objDupKeys, {multistr: true, es3: true});
+  run11.test(objDupKeys, {multistr: true}); // es5
+  run11.test(objDupKeys, {multistr: true, esnext: true});
+  run11.test(objDupKeys, {multistr: true, moz: true});
+
+  var objBadKey = [
+    '{ k1:"v1" }',
+  ];
+
+  var run12 = TestRun(test)
+    .addError(1, "Expected a string and instead saw k1.");
+
+  run12.test(objBadKey, {multistr: true, es3: true});
+  run12.test(objBadKey, {multistr: true}); // es5
+  run12.test(objBadKey, {multistr: true, esnext: true});
+  run12.test(objBadKey, {multistr: true, moz: true});
+
+  var objBadValue = [
+    '{ "noRegexpInJSON": /$^/ }',
+  ];
+
+  var run13 = TestRun(test)
+    .addError(1, "Expected a JSON value.")
+    .addError(1, "Expected '}' and instead saw '/$^/'.")
+    .addError(1, "Expected '(end)' and instead saw '}'.");
+
+  run13.test(objBadValue, {multistr: true, es3: true});
+  run13.test(objBadValue, {multistr: true}); // es5
+  run13.test(objBadValue, {multistr: true, esnext: true});
+  run13.test(objBadValue, {multistr: true, moz: true});
+
+  test.done();
+}
+
 exports.comma = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/comma.js", "utf8");
 
