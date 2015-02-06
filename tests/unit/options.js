@@ -133,6 +133,19 @@ exports.latedef = function (test) {
   test.done();
 };
 
+exports.latedefInline = function (test) {
+  var src  = fs.readFileSync(__dirname + '/fixtures/latedef-inline.js', 'utf8');
+
+  TestRun(test)
+    .addError(4, "'foo' was used before it was defined.")
+    .addError(6, "'a' was used before it was defined.")
+    .addError(22, "'a' was used before it was defined.")
+    .addError(26, "Bad option value.")
+    .test(src);
+
+  test.done();
+};
+
 exports.notypeof = function (test) {
   var src = fs.readFileSync(__dirname + '/fixtures/typeofcomp.js', 'utf8');
 
