@@ -949,7 +949,17 @@ Lexer.prototype = {
       function() { return n >= 0 && n <= 7 && state.directive["use strict"]; });
       break;
     case "u":
-      char = String.fromCharCode(parseInt(this.input.substr(1, 4), 16));
+      var hexCode = this.input.substr(1, 4);
+      var code = parseInt(hexCode, 16);
+      if (isNaN(code)) {
+        this.trigger("warning", {
+          code: "W052",
+          line: this.line,
+          character: this.char,
+          data: [ "u" + hexCode ]
+        });
+      }
+      char = String.fromCharCode(code);
       jump = 5;
       break;
     case "v":
