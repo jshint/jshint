@@ -5,8 +5,7 @@
       "allowComments": true,
       "allowRegex": true
     },
-    // disabled due to https://github.com/jscs-dev/node-jscs/issues/915
-    // "validateIndentation": 2,
+    "validateIndentation": 2,
 
     "disallowMultipleLineStrings": true,
     "disallowMixedSpacesAndTabs": true,
