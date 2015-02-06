@@ -529,6 +529,11 @@ exports.testRegexRegressions = function (test) {
   TestRun(test).test("var exp = /function(.*){/gi;", {esnext: true});
   TestRun(test).test("var exp = /function(.*){/gi;", {moz: true});
 
+  TestRun(test).test("var exp = /\\[\\]/;", {es3: true});
+  TestRun(test).test("var exp = /\\[\\]/;", {}); // es5
+  TestRun(test).test("var exp = /\\[\\]/;", {esnext: true});
+  TestRun(test).test("var exp = /\\[\\]/;", {moz: true});
+
   test.done();
 };
 
