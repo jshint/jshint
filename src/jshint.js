@@ -2237,7 +2237,7 @@ var JSHINT = (function() {
 
   prefix("~", function() {
     if (state.option.bitwise) {
-      warning("W052", this, "~");
+      warning("W016", this, "~");
     }
     this.arity = "unary";
     expression(150);
