@@ -68,7 +68,23 @@ exports.scopeshadow = function (test) {
     .test(src, { es3: true, shadow: "outer" });
 
   test.done();
-}
+};
+
+exports.shadowInline = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/shadow-inline.js", "utf8");
+
+  TestRun(test)
+    .addError(6, "'a' is already defined in outer scope.")
+    .addError(7, "'a' is already defined.")
+    .addError(7, "'a' is already defined in outer scope.")
+    .addError(17, "'a' is already defined.")
+    .addError(27, "'a' is already defined.")
+    .addError(42, "Bad option value.")
+    .addError(47, "'a' is already defined.")
+    .test(src);
+
+  test.done();
+};
 
 /**
  * Option `latedef` allows you to prohibit the use of variable before their
