@@ -1889,8 +1889,10 @@ var JSHINT = (function() {
         // the name is in a block scope.
         switch (block ? block[v]["(type)"] : funct[v]) {
         case "unused":
-          if (block) block[v]["(type)"] = "var";
-          else funct[v] = "var";
+          if (state.tokens.next.id !== "=") {
+            if (block) block[v]["(type)"] = "var";
+            else funct[v] = "var";
+          }
           break;
         case "unction":
           if (block) block[v]["(type)"] = "function";

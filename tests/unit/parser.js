@@ -4871,6 +4871,7 @@ exports["jshint ignore:start/end should be detected using single line comments"]
 exports["test destructuring function parameters as es5"] = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/destparam.js", "utf8");
   TestRun(test)
+    .addError(1, "'foo' is defined but never used.")
     .addError(4, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(4, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
     .addError(5, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
@@ -4932,6 +4933,7 @@ exports["test destructuring function parameters as es5"] = function (test) {
 exports["test destructuring function parameters as legacy JS"] = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/destparam.js", "utf8");
   TestRun(test)
+    .addError(1, "'foo' is defined but never used.")
     .addError(4, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(4, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
     .addError(5, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")

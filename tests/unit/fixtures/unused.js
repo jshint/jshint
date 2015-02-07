@@ -52,3 +52,10 @@ c.delete(hoistedDelete);
 // passed to methods that look like unresolvable-reference-accepting operators.
 function hoistedDelete() {}
 function hoistedTypeof() {}
+
+var i = 1;
+var j = 2;
+var k = 3;
+i = 2;
+j++;
+k += 2;

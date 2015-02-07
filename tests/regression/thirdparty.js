@@ -30,6 +30,7 @@ exports.jQuery_1_7 = function (test) {
     .addError(1607, "'table' is defined but never used.")
     .addError(1710, "'internalKey' is defined but never used.")
     .addError(1813, "'internalKey' is defined but never used.")
+    .addError(2174, "'object' is defined but never used.")
     .addError(2818, "Expected an assignment or function call and instead saw an expression.")
     .addError(2822, "Expected an assignment or function call and instead saw an expression.")
     .addError(2859, "'rnamespaces' is defined but never used.")
@@ -49,6 +50,7 @@ exports.jQuery_1_7 = function (test) {
     .addError(5691, "'i' is defined but never used.")
     .addError(7141, "'i' is defined but never used.")
     .addError(6061, "'cur' is defined but never used.")
+    .addError(9022, "'prevOffsetParent' is defined but never used.")
     .test(src, { undef: true, unused: true }, globals);
 
   test.done();
