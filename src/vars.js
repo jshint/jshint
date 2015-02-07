@@ -674,6 +674,7 @@ exports.yui = {
 exports.mocha = {
   // BDD
   describe    : false,
+  context     : false,
   it          : false,
   before      : false,
   after       : false,
