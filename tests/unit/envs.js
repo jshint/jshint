@@ -80,10 +80,21 @@ exports.node = function (test) {
 
   TestRun(test)
     .addError(1, "Read only.")
+    .addError(2, "Read only.")
     .test(overwrites, { es3: true, node: true });
 
   TestRun(test)
     .addError(1, "Read only.")
+    .addError(2, "Read only.")
+    .test(overwrites, { es3: true, browserify: true });
+
+  // Make sure that users are able to make globals writable
+  overwrites.unshift("/* globals global:true, Buffer:true */");
+
+  TestRun(test)
+    .test(overwrites, { es3: true, node: true });
+
+  TestRun(test)
     .test(overwrites, { es3: true, browserify: true });
 
   test.done();

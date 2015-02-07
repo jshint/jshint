@@ -420,24 +420,21 @@ exports.couch = {
 exports.node = {
   __filename    : false,
   __dirname     : false,
-  GLOBAL        : false,
+  Buffer        : false,
+  console       : false,
   global        : false,
-  module        : false,
-  require       : false,
-
-  // These globals are writeable because Node allows the following
-  // usage pattern: var Buffer = require("buffer").Buffer;
-
-  Buffer        : true,
-  console       : true,
+  GLOBAL        : false,
+  // In Node it is ok to exports = module.exports = foo();
   exports       : true,
-  process       : true,
-  setTimeout    : true,
-  clearTimeout  : true,
-  setInterval   : true,
-  clearInterval : true,
-  setImmediate  : true, // v0.9.1+
-  clearImmediate: true  // v0.9.1+
+  module        : false,
+  process       : false,
+  require       : false,
+  setTimeout    : false,
+  clearTimeout  : false,
+  setInterval   : false,
+  clearInterval : false,
+  setImmediate  : false, // v0.9.1+
+  clearImmediate: false, // v0.9.1+
 };
 
 exports.browserify = {
@@ -446,9 +443,9 @@ exports.browserify = {
   global        : false,
   module        : false,
   require       : false,
-  Buffer        : true,
+  Buffer        : false,
   exports       : true,
-  process       : true
+  process       : false
 };
 
 exports.phantom = {
