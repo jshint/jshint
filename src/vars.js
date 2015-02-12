@@ -36,7 +36,6 @@ exports.ecmaIdentifiers = {
   RangeError         : false,
   ReferenceError     : false,
   RegExp             : false,
-  Set                : false,
   String             : false,
   SyntaxError        : false,
   TypeError          : false,
