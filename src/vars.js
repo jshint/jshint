@@ -10,51 +10,47 @@ exports.reservedVars = {
 };
 
 exports.ecmaIdentifiers = {
-  Array              : false,
-  Boolean            : false,
-  Date               : false,
-  decodeURI          : false,
-  decodeURIComponent : false,
-  encodeURI          : false,
-  encodeURIComponent : false,
-  Error              : false,
-  "eval"             : false,
-  EvalError          : false,
-  Function           : false,
-  hasOwnProperty     : false,
-  isFinite           : false,
-  isNaN              : false,
-  JSON               : false,
-  Map                : false,
-  Math               : false,
-  Number             : false,
-  Object             : false,
-  Proxy              : false,
-  Promise            : false,
-  parseInt           : false,
-  parseFloat         : false,
-  RangeError         : false,
-  ReferenceError     : false,
-  RegExp             : false,
-  Set                : false,
-  String             : false,
-  SyntaxError        : false,
-  TypeError          : false,
-  URIError           : false,
-  WeakMap            : false,
-  WeakSet            : false
-};
-
-exports.newEcmaIdentifiers = {
-  Set     : false,
-  Map     : false,
-  WeakMap : false,
-  WeakSet : false,
-  Proxy   : false,
-  Promise : false,
-  Reflect : false,
-  Symbol  : false,
-  System  : false
+  3: {
+    Array              : false,
+    Boolean            : false,
+    Date               : false,
+    decodeURI          : false,
+    decodeURIComponent : false,
+    encodeURI          : false,
+    encodeURIComponent : false,
+    Error              : false,
+    "eval"             : false,
+    EvalError          : false,
+    Function           : false,
+    hasOwnProperty     : false,
+    isFinite           : false,
+    isNaN              : false,
+    Math               : false,
+    Number             : false,
+    Object             : false,
+    parseInt           : false,
+    parseFloat         : false,
+    RangeError         : false,
+    ReferenceError     : false,
+    RegExp             : false,
+    String             : false,
+    SyntaxError        : false,
+    TypeError          : false,
+    URIError           : false
+  },
+  5: {
+    JSON               : false
+  },
+  6: {
+    Map                : false,
+    Promise            : false,
+    Proxy              : false,
+    Reflect            : false,
+    Set                : false,
+    Symbol             : false,
+    WeakMap            : false,
+    WeakSet            : false
+  }
 };
 
 // Global variables commonly provided by a web browser environment.

@@ -1818,8 +1818,7 @@ exports.esnextPredefs = function (test) {
     '/* global alert: true */',
     'var mySym = Symbol("name");',
     'var myBadSym = new Symbol("name");',
-    'alert(Reflect);',
-    'alert(System);'
+    'alert(Reflect);'
   ];
 
   TestRun(test)
@@ -2180,6 +2179,101 @@ exports.badInlineOptionValue = function (test) {
   TestRun(test)
     .addError(1, "Bad option value.")
     .test(src);
+
+  test.done();
+};
+
+exports.futureHostile = function (test) {
+  var code = [
+    "var JSON = {};",
+    "var Map = function() {};",
+    "var Promise = function() {};",
+    "var Proxy = function() {};",
+    "var Reflect = function() {};",
+    "var Set = function() {};",
+    "var Symbol = function() {};",
+    "var WeakMap = function() {};",
+    "var WeakSet = function() {};"
+  ];
+
+  TestRun(test, "ES3 without option")
+    .addError(1, "'JSON' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(2, "'Map' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(3, "'Promise' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(4, "'Proxy' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(5, "'Reflect' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(6, "'Set' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(7, "'Symbol' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(8, "'WeakMap' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(9, "'WeakSet' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .test(code, { es3: true, es5: false });
+
+  TestRun(test, "ES3 with option")
+    .test(code, { es3: true, es5: false, futurehostile: true });
+
+  TestRun(test, "ES5 without option")
+    .addError(1, "Redefinition of 'JSON'.")
+    .addError(2, "'Map' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(3, "'Promise' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(4, "'Proxy' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(5, "'Reflect' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(6, "'Set' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(7, "'Symbol' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(8, "'WeakMap' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(9, "'WeakSet' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .test(code, {});
+
+  TestRun(test, "ES5 with option")
+    .addError(1, "Redefinition of 'JSON'.")
+    .test(code, {
+      futurehostile: true
+    });
+
+  TestRun(test, "ES5 with opt-out")
+    .test(code, {
+      futurehostile: true,
+      predef: ["-JSON"]
+    });
+
+  TestRun(test, "ESNext without option")
+    .addError(1, "Redefinition of 'JSON'.")
+    .addError(2, "Redefinition of 'Map'.")
+    .addError(3, "Redefinition of 'Promise'.")
+    .addError(4, "Redefinition of 'Proxy'.")
+    .addError(5, "Redefinition of 'Reflect'.")
+    .addError(6, "Redefinition of 'Set'.")
+    .addError(7, "Redefinition of 'Symbol'.")
+    .addError(8, "Redefinition of 'WeakMap'.")
+    .addError(9, "Redefinition of 'WeakSet'.")
+    .test(code, { esnext: true });
+
+  TestRun(test, "ESNext with option")
+    .addError(1, "Redefinition of 'JSON'.")
+    .addError(2, "Redefinition of 'Map'.")
+    .addError(3, "Redefinition of 'Promise'.")
+    .addError(4, "Redefinition of 'Proxy'.")
+    .addError(5, "Redefinition of 'Reflect'.")
+    .addError(6, "Redefinition of 'Set'.")
+    .addError(7, "Redefinition of 'Symbol'.")
+    .addError(8, "Redefinition of 'WeakMap'.")
+    .addError(9, "Redefinition of 'WeakSet'.")
+    .test(code, { esnext: true, futurehostile: true });
+
+  TestRun(test, "ESNext with opt-out")
+    .test(code, {
+      esnext: true,
+      predef: [
+        "-JSON",
+        "-Map",
+        "-Promise",
+        "-Proxy",
+        "-Reflect",
+        "-Set",
+        "-Symbol",
+        "-WeakMap",
+        "-WeakSet"
+      ]
+    });
 
   test.done();
 };
