@@ -115,8 +115,10 @@ exports.group = {
         ]);
       } catch (err) {
         var msg = out.args[1][0];
+        console.log(msg);
         test.equal(msg.slice(0, 24), "Can't parse config file:");
-        test.equal(msg.slice(msg.length - 10), "file1.json");
+        test.equal(msg.slice(25, 35), "file1.json");
+        test.equal(msg.slice(msg.length - 37), "Error:SyntaxError: Unexpected token w");
         test.equal(err, "ProcessExit");
       }
 
