@@ -2479,7 +2479,7 @@ var JSHINT = (function() {
           break;
         }
 
-        if (pn1.value !== "=>" && state.option.nocomma) {
+        if (state.option.nocomma) {
           warning("W127");
         }
 
