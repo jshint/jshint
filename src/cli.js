@@ -540,7 +540,7 @@ var exports = {
 
       return config;
     } catch (err) {
-      cli.error("Can't parse config file: " + fp +"\n Error:"+err);
+      cli.error("Can't parse config file: " + fp + "\n Error:" + err);
       exports.exit(1);
     }
   },
