@@ -48,7 +48,7 @@
     "browserify":    "6.x",
     "coveralls":     "2.11.x",
     "istanbul":      "0.3.x",
-    "jscs":          "1.9.x",
+    "jscs":          "1.11.x",
     "jshint":        "2.5.x",
     "mock-stdin":    "0.3.x",
     "nodeunit":      "0.9.x",
