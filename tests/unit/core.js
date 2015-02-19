@@ -1139,3 +1139,11 @@ exports.testUnCleanedForinifcheckneeded = function (test) {
 
   test.done();
 };
+
+exports.testInvocationAfterAssignment = function (test) {
+  var code = "var foo; (foo = function() { })();";
+
+  TestRun(test).test(code);
+
+  test.done();
+};
