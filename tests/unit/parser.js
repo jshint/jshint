@@ -4315,6 +4315,30 @@ exports["class method this"] = function (test) {
   test.done();
 };
 
+exports.classExpression = function (test) {
+  var code = [
+    "void class MyClass {",
+    "  constructor() { MyClass = null; }",
+    "  method() { MyClass = null; }",
+    "  static method() { MyClass = null; }",
+    "  get accessor() { MyClass = null; }",
+    "  set accessor() { MyClass = null; }",
+    "};",
+    "void MyClass;"
+  ];
+
+  TestRun(test)
+    .addError(2, "'MyClass' is a function.")
+    .addError(3, "'MyClass' is a function.")
+    .addError(4, "'MyClass' is a function.")
+    .addError(5, "'MyClass' is a function.")
+    .addError(6, "'MyClass' is a function.")
+    .addError(8, "'MyClass' is not defined.")
+    .test(code, { esnext: true, undef: true });
+
+  test.done();
+};
+
 exports["test for GH-1018"] = function (test) {
   var code = [
     "if (a = 42) {}",
