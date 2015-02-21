@@ -2898,9 +2898,14 @@ var JSHINT = (function() {
    *                                  single-argument shorthand
    * @param {bool} [options.parsedOpening] Whether the opening parenthesis has
    *                                       already been parsed
+   * @param {token} [options.classExprBinding] Define a function with this
+   *                                           identifier in the new function's
+   *                                           scope, mimicking the bahavior of
+   *                                           class expression names within
+   *                                           the body of member functions.
    */
   function doFunction(options) {
-    var f, name, isStatement, isGenerator, isArrow;
+    var f, name, isStatement, classExprBinding, isGenerator, isArrow;
     var oldOption = state.option;
     var oldIgnored = state.ignored;
     var oldScope  = scope;
@@ -2908,6 +2913,7 @@ var JSHINT = (function() {
     if (options) {
       name = options.name;
       isStatement = options.isStatement;
+      classExprBinding = options.classExprBinding;
       isGenerator = options.type === "generator";
       isArrow = options.type === "arrow";
     }
@@ -2929,6 +2935,10 @@ var JSHINT = (function() {
 
     if (name) {
       addlabel(name, { type: "function" });
+    }
+
+    if (classExprBinding) {
+      addlabel(classExprBinding, { type: "function" });
     }
 
     funct["(params)"] = functionparams(options);
@@ -3483,6 +3493,7 @@ var JSHINT = (function() {
     } else if (state.tokens.next.identifier && state.tokens.next.value !== "extends") {
       // BindingIdentifier(opt)
       this.name = identifier();
+      this.namedExpr = true;
     } else {
       this.name = state.nameStack.infer();
     }
@@ -3599,7 +3610,11 @@ var JSHINT = (function() {
 
       propertyName(name);
 
-      doFunction({ isStatement: true, type: isGenerator ? "generator" : null });
+      doFunction({
+        isStatement: true,
+        type: isGenerator ? "generator" : null,
+        classExprBinding: c.namedExpr ? c.name : null
+      });
     }
 
     checkProperties(props);
