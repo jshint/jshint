@@ -2889,8 +2889,9 @@ var JSHINT = (function() {
    * @param {Object} [options]
    * @param {token} [options.name] The identifier belonging to the function (if
    *                               any)
-   * @param {token} [options.statement] The statement to which the function
-   *                                    belongs
+   * @param {boolean} [options.isStatement] Whether the function has been
+   *                                        declared as part of another
+   *                                        statement
    * @param {string} [options.type] If specified, either "generator" or "arrow"
    * @param {token} [options.loneArg] The argument to the function in cases
    *                                  where it was defined using the
@@ -2899,13 +2900,14 @@ var JSHINT = (function() {
    *                                       already been parsed
    */
   function doFunction(options) {
-    var f, name, isGenerator, isArrow;
+    var f, name, isStatement, isGenerator, isArrow;
     var oldOption = state.option;
     var oldIgnored = state.ignored;
     var oldScope  = scope;
 
     if (options) {
       name = options.name;
+      isStatement = options.isStatement;
       isGenerator = options.type === "generator";
       isArrow = options.type === "arrow";
     }
@@ -2915,7 +2917,7 @@ var JSHINT = (function() {
     scope = Object.create(scope);
 
     funct = functor(name || state.nameStack.infer(), state.tokens.next, scope, {
-      "(statement)": options && options.statement,
+      "(statement)": isStatement,
       "(context)":   funct,
       "(generator)": isGenerator
     });
@@ -3569,7 +3571,7 @@ var JSHINT = (function() {
           advance();
         }
         if (state.tokens.next.value !== "(") {
-          doFunction({ statement: c });
+          doFunction({ isStatement: true });
         }
       }
 
@@ -3597,7 +3599,7 @@ var JSHINT = (function() {
 
       propertyName(name);
 
-      doFunction({ statement: c, type: isGenerator ? "generator" : null });
+      doFunction({ isStatement: true, type: isGenerator ? "generator" : null });
     }
 
     checkProperties(props);
@@ -3630,7 +3632,7 @@ var JSHINT = (function() {
 
     doFunction({
       name: i,
-      statement: { statement: true },
+      isStatement: true,
       type: generator ? "generator" : null
     });
     if (state.tokens.next.id === "(" && state.tokens.next.line === state.tokens.curr.line) {
