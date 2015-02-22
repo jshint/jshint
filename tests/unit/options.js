@@ -68,7 +68,23 @@ exports.scopeshadow = function (test) {
     .test(src, { es3: true, shadow: "outer" });
 
   test.done();
-}
+};
+
+exports.shadowInline = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/shadow-inline.js", "utf8");
+
+  TestRun(test)
+    .addError(6, "'a' is already defined in outer scope.")
+    .addError(7, "'a' is already defined.")
+    .addError(7, "'a' is already defined in outer scope.")
+    .addError(17, "'a' is already defined.")
+    .addError(27, "'a' is already defined.")
+    .addError(42, "Bad option value.")
+    .addError(47, "'a' is already defined.")
+    .test(src);
+
+  test.done();
+};
 
 /**
  * Option `latedef` allows you to prohibit the use of variable before their
@@ -113,6 +129,19 @@ exports.latedef = function (test) {
     .addError(10, "'vr' was used before it was defined.")
     .addError(18, "Inner functions should be listed at the top of the outer function.")
     .test(src, { es3: true, latedef: true });
+
+  test.done();
+};
+
+exports.latedefInline = function (test) {
+  var src  = fs.readFileSync(__dirname + '/fixtures/latedef-inline.js', 'utf8');
+
+  TestRun(test)
+    .addError(4, "'foo' was used before it was defined.")
+    .addError(6, "'a' was used before it was defined.")
+    .addError(22, "'a' was used before it was defined.")
+    .addError(26, "Bad option value.")
+    .test(src);
 
   test.done();
 };
@@ -682,6 +711,14 @@ exports['unused overrides'] = function (test) {
 
   code = ['/*jshint unused:vars */', 'function foo(a, b) {', 'var i = 3;', '}', 'foo();'];
   TestRun(test)
+    .addError(3, "'i' is defined but never used.")
+    .test(code, {es3: true, unused: "strict"});
+
+  code = ['/*jshint unused:badoption */', 'function foo(a, b) {', 'var i = 3;', '}', 'foo();'];
+  TestRun(test)
+    .addError(1, "Bad option value.")
+    .addError(2, "'b' is defined but never used.")
+    .addError(2, "'a' is defined but never used.")
     .addError(3, "'i' is defined but never used.")
     .test(code, {es3: true, unused: "strict"});
 
@@ -2133,6 +2170,16 @@ exports.elision = function (test) {
   TestRun(test, "elision=true ES3")
     .addError(3, "Extra comma. (it breaks older versions of IE)")
     .test(code, { elision: true, es3: true });
+
+  test.done();
+};
+
+exports.badInlineOptionValue = function (test) {
+  var src = [ "/* jshint bitwise:batcrazy */" ];
+
+  TestRun(test)
+    .addError(1, "Bad option value.")
+    .test(src);
 
   test.done();
 };
