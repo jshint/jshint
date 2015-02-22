@@ -25,6 +25,11 @@ exports.bool = {
     /**
      * This option allows you to force all variable names to use either
      * camelCase style or UPPER_CASE with underscores.
+     *
+     * @deprecated JSHint is limiting its scope to issues of code correctness.
+     *             If you would like to enforce rules relating to code style,
+     *             check out [the JSCS
+     *             project](https://github.com/jscs-dev/node-jscs).
      */
     camelcase   : true,
 
@@ -143,6 +148,11 @@ exports.bool = {
      * wrapping them in parentheses. Wrapping parentheses assists readers of
      * your code in understanding that the expression is the result of a
      * function, and not the function itself.
+     *
+     * @deprecated JSHint is limiting its scope to issues of code correctness.
+     *             If you would like to enforce rules relating to code style,
+     *             check out [the JSCS
+     *             project](https://github.com/jscs-dev/node-jscs).
      */
     immed       : true,
 
@@ -165,6 +175,11 @@ exports.bool = {
      * important because when the function that was intended to be used with
      * `new` is used without it, `this` will point to the global object instead
      * of a new object.
+     *
+     * @deprecated JSHint is limiting its scope to issues of code correctness.
+     *             If you would like to enforce rules relating to code style,
+     *             check out [the JSCS
+     *             project](https://github.com/jscs-dev/node-jscs).
      */
     newcap      : true,
 
@@ -189,6 +204,11 @@ exports.bool = {
      * originally warning for all empty blocks and we simply made it optional.
      * There were no studies reporting that empty blocks in JavaScript break
      * your code in any way.
+     *
+     * @deprecated JSHint is limiting its scope to issues of code correctness.
+     *             If you would like to enforce rules relating to code style,
+     *             check out [the JSCS
+     *             project](https://github.com/jscs-dev/node-jscs).
      */
     noempty     : true,
 
@@ -242,6 +262,10 @@ exports.bool = {
     /**
      * This option is a short hand for the most strict JSHint configuration. It
      * enables all enforcing options and disables all relaxing options.
+     *
+     * @deprecated The option automatically opts users in to new features which
+     *             can lead to unexpected warnings/errors in when upgrading
+     *             between minor versions of JSHint.
      */
     enforceall : false
   },
@@ -283,6 +307,11 @@ exports.bool = {
      *
      *     text = "Hello\
      *     World"; // Warning, there is a space after \
+     *
+     * @deprecated JSHint is limiting its scope to issues of code correctness.
+     *             If you would like to enforce rules relating to code style,
+     *             check out [the JSCS
+     *             project](https://github.com/jscs-dev/node-jscs).
      */
     multistr    : true,
 
@@ -360,6 +389,11 @@ exports.bool = {
     /**
      * This option suppresses warnings about using `[]` notation when it can be
      * expressed in dot notation: `person['name']` vs. `person.name`.
+     *
+     * @deprecated JSHint is limiting its scope to issues of code correctness.
+     *             If you would like to enforce rules relating to code style,
+     *             check out [the JSCS
+     *             project](https://github.com/jscs-dev/node-jscs).
      */
     sub         : true,
 
@@ -381,6 +415,11 @@ exports.bool = {
      * This option suppresses most of the warnings about possibly unsafe line
      * breakings in your code. It doesn't suppress warnings about comma-first
      * coding style. To suppress those you have to use `laxcomma` (see below).
+     *
+     * @deprecated JSHint is limiting its scope to issues of code correctness.
+     *             If you would like to enforce rules relating to code style,
+     *             check out [the JSCS
+     *             project](https://github.com/jscs-dev/node-jscs).
      */
     laxbreak    : true,
 
@@ -392,6 +431,11 @@ exports.bool = {
      *       , handle: 'valueof'
      *       , role: 'SW Engineer'
      *     };
+     *
+     * @deprecated JSHint is limiting its scope to issues of code correctness.
+     *             If you would like to enforce rules relating to code style,
+     *             check out [the JSCS
+     *             project](https://github.com/jscs-dev/node-jscs).
      */
     laxcomma    : true,
 
@@ -665,11 +709,19 @@ exports.val = {
 
   /**
    * This option lets you set the maximum length of a line.
+   *
+   * @deprecated JSHint is limiting its scope to issues of code correctness. If
+   *             you would like to enforce rules relating to code style, check
+   *             out [the JSCS project](https://github.com/jscs-dev/node-jscs).
    */
   maxlen       : false,
 
   /**
    * This option sets a specific tab width for your code.
+   *
+   * @deprecated JSHint is limiting its scope to issues of code correctness. If
+   *             you would like to enforce rules relating to code style, check
+   *             out [the JSCS project](https://github.com/jscs-dev/node-jscs).
    */
   indent       : false,
 
@@ -703,6 +755,10 @@ exports.val = {
    * one particular style but want some consistency, `"single"` if you want to
    * allow only single quotes and `"double"` if you want to allow only double
    * quotes.
+   *
+   * @deprecated JSHint is limiting its scope to issues of code correctness. If
+   *             you would like to enforce rules relating to code style, check
+   *             out [the JSCS project](https://github.com/jscs-dev/node-jscs).
    */
   quotmark     : false,
 
