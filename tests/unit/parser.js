@@ -542,6 +542,7 @@ exports.strings = function (test) {
     "var a = '\u0012\\r';",
     "var b = \'\\g\';",
     "var c = '\\u0022\\u0070\\u005C';",
+    "var d = '\\\\';",
     "var e = '\\x6b..\\x6e';",
     "var f = '\\b\\f\\n\\/';",
     "var g = 'ax",
@@ -550,8 +551,23 @@ exports.strings = function (test) {
   var run = TestRun(test)
     .addError(1, "Control character in string: <non-printable>.", {character: 10})
     .addError(1, "This character may get silently deleted by one or more browsers.")
-    .addError(6, "Unclosed string.")
-    .addError(6, "Missing semicolon.");
+    .addError(7, "Unclosed string.")
+    .addError(7, "Missing semicolon.");
+  run.test(code, {es3: true});
+  run.test(code, {}); // es5
+  run.test(code, {esnext: true});
+  run.test(code, {moz: true});
+
+  test.done();
+};
+
+exports.badStrings = function (test) {
+  var code = [
+    "var a = '\\uNOTHEX';"
+  ];
+
+  var run = TestRun(test)
+    .addError(1, "Unexpected 'uNOTH'.");
   run.test(code, {es3: true});
   run.test(code, {}); // es5
   run.test(code, {esnext: true});
@@ -768,6 +784,36 @@ exports.testIdentifiers = function (test) {
   run.test(src, {unused: true }); // es5
   run.test(src, {esnext: true, unused: true });
   run.test(src, {moz: true, unused: true });
+
+  test.done();
+};
+
+exports.badIdentifiers = function (test) {
+  var badUnicode = [
+    "var \\uNOTHEX;"
+  ];
+
+  var run = TestRun(test)
+    .addError(1, "Unexpected '\\'.")
+    .addError(1, "Expected an identifier and instead saw ''.")
+    .addError(1, "Missing semicolon.");
+  run.test(badUnicode, {es3: true});
+  run.test(badUnicode, {}); // es5
+  run.test(badUnicode, {esnext: true});
+  run.test(badUnicode, {moz: true});
+
+  var invalidUnicodeIdent = [
+    "var \\u0000;"
+  ];
+
+  var run = TestRun(test)
+    .addError(1, "Unexpected '\\'.")
+    .addError(1, "Expected an identifier and instead saw ''.")
+    .addError(1, "Missing semicolon.");
+  run.test(invalidUnicodeIdent, {es3: true});
+  run.test(invalidUnicodeIdent, {}); // es5
+  run.test(invalidUnicodeIdent, {esnext: true});
+  run.test(invalidUnicodeIdent, {moz: true});
 
   test.done();
 };
