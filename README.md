@@ -44,6 +44,12 @@ that cover your issue. And remember the wisdom: pull request > bug report > twee
 JSHint is distributed under the MIT License. One file and one file only
 (src/stable/jshint.js) is distributed under the slightly modified MIT License.
 
+## The JSHint Team
+
+JSHint is maintained by [Rick Waldron](https://github.com/rwaldron/), [Caitlin
+Potter](https://github.com/caitp/), [Mike
+Sherov](https://github.com/mikesherov/), and [Mike
+Pennisi](https://github.com/jugglinmike/).
 
 ## Thank you!
 
