@@ -14,18 +14,18 @@ var obj = {
 };
 
 // object-key use, permitted
-obj["eval"]('console.log(\'hello world\');');
-obj.eval('console.log(\'hello world\');');
+obj["eval"]("console.log('hello world');");
+obj.eval("console.log('hello world');");
 
 // global use, forbidden
-global["eval"]('console.log(\'hello world\');');
+global["eval"]("console.log('hello world');");
 global.eval("1+1");
-eval('console.log(\'hello world\');');
+eval("console.log('hello world');");
 
-window.eval('4+2');
-window['eval']('4+2');
+window.eval("4+2");
+window["eval"]("4+2");
 
-document.eval('4+2');
-document['eval']('4+2');
+document.eval("4+2");
+document["eval"]("4+2");
 
-this.eval('2+2');
+this.eval("2+2");
