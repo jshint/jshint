@@ -353,6 +353,14 @@ exports.bool = {
     evil        : true,
 
     /**
+     * This option supresses warnings about the use of identifiers which are
+     * defined in future versions of JavaScript. Although overwriting them has
+     * no effect in contexts where they are not implemented, this practice can
+     * cause issues when migrating codebases to newer versions of the language.
+     */
+    futurehostile: true,
+
+    /**
      * This option prohibits the use of unary increment and decrement
      * operators.  Some people think that `++` and `--` reduces the quality of
      * their coding styles and there are programming languages—such as
