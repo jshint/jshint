@@ -1242,6 +1242,27 @@ var JSHINT = (function() {
     return false;
   }
 
+  function isGlobalEval(left, state, funct) {
+    var isGlobal = false;
+
+    // permit methods to refer to an "eval" key in their own context
+    if (left.type === "this" && funct["(context)"] === null) {
+      isGlobal = true;
+    }
+    // permit use of "eval" members of objects
+    else if (left.type === "(identifier)") {
+      if (state.option.node && left.value === "global") {
+        isGlobal = true;
+      }
+
+      else if (state.option.browser && (left.value === "window" || left.value === "document")) {
+        isGlobal = true;
+      }
+    }
+
+    return isGlobal;
+  }
+
   function findNativePrototype(left) {
     var natives = [
       "Array", "ArrayBuffer", "Boolean", "Collator", "DataView", "Date",
@@ -2396,7 +2417,9 @@ var JSHINT = (function() {
     }
 
     if (!state.option.evil && (m === "eval" || m === "execScript")) {
-      warning("W061");
+      if (isGlobalEval(left, state, funct)) {
+        warning("W061");
+      }
     }
 
     return that;
@@ -2588,7 +2611,9 @@ var JSHINT = (function() {
     var e = expression(10), s;
     if (e && e.type === "(string)") {
       if (!state.option.evil && (e.value === "eval" || e.value === "execScript")) {
-        warning("W061", that);
+        if (isGlobalEval(left, state, funct)) {
+          warning("W061");
+        }
       }
 
       countMember(e.value);

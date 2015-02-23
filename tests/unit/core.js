@@ -1139,3 +1139,26 @@ exports.testUnCleanedForinifcheckneeded = function (test) {
 
   test.done();
 };
+
+// gh-738 "eval" as an object key should not cause `W061` warnngs
+exports.testPermitEvalAsKey = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/gh-738.js", "utf8");
+  // global calls to eval should still cause warning.
+  // test a mixture of permitted and disallowed calls
+  // `global#eval` in `node:true` should still cause warning
+  // `(document|window)#eval` in `browser:true` should still cause warning
+
+  TestRun(test)
+    .addError(21, "eval can be harmful.")
+    .addError(22, "eval can be harmful.")
+    .addError(23, "eval can be harmful.")
+    .addError(25, "eval can be harmful.")
+    .addError(26, "eval can be harmful.")
+    .addError(28, "eval can be harmful.")
+    .addError(29, "eval can be harmful.")
+    .addError(31, "eval can be harmful.")
+    .test(src, { browser: true, node: true });
+
+  test.done();
+
+};
