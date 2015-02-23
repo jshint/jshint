@@ -7,6 +7,7 @@ to a snippet, graffiti outside of Anton's apartment, etc.
 However, before sending a patch, please make sure that the following applies:
 
 * Your commit message follows the [Commit Message Guidelines](#commit-message-guidelines).
+* You have signed the [Contributor's License Agreement](https://docs.google.com/forms/d/1BkEC9ds73aQLF73_kTX-9nhKCBJ8U5aFFUb-_Trt8Bc/viewform).
 * Your patch doesn't have useless merge commits.
 * Your coding style is similar to ours (see below).
 * Your patch is 100% tested. We don't accept any test regressions.
