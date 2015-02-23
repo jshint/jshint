@@ -866,27 +866,44 @@ exports.supernew = function (test) {
 
 /** Option `bitwise` disallows the use of bitwise operators. */
 exports.bitwise = function (test) {
-  var ops = [ '&', '|', '^', '<<', '>>', '>>>' ];
-  var moreTests = [
-    'var c = ~a;',
-    'c &= 2;'
-  ];
+  var unOps = [ "~" ];
+  var binOps = [ "&",  "|",  "^",  "<<",  ">>",  ">>>" ];
+  var modOps = [ "&=", "|=", "^=", "<<=", ">>=", ">>>=" ];
 
-  // By default allow bitwise operators
-  for (var i = 0, op; op = ops[i]; i += 1) {
-    TestRun(test).test('var c = a ' + op + ' b;', {es3: true});
-  }
-  TestRun(test).test(moreTests, {es3: true});
+  var i, op;
 
-  for (i = 0, op = null; op = ops[i]; i += 1) {
+  for (i = 0; i < unOps.length; i += 1) {
+    op = unOps[i];
+
+    TestRun(test)
+      .test("var b = " + op + "a;", {es3: true});
+
     TestRun(test)
       .addError(1, "Unexpected use of '" + op + "'.")
-      .test('var c = a ' + op + ' b;', { es3: true, bitwise: true });
+      .test("var b = " + op + "a;", {es3: true, bitwise: true});
   }
-  TestRun(test)
-    .addError(1, "Unexpected '~'.")
-    .addError(2, "Unexpected use of '&='.")
-    .test(moreTests, { es3: true, bitwise: true });
+
+  for (i = 0; i < binOps.length; i += 1) {
+    op = binOps[i];
+
+    TestRun(test)
+      .test("var c = a " + op + " b;", {es3: true});
+
+    TestRun(test)
+      .addError(1, "Unexpected use of '" + op + "'.")
+      .test("var c = a " + op + " b;", {es3: true, bitwise: true});
+  }
+
+  for (i = 0; i < modOps.length; i += 1) {
+    op = modOps[i];
+
+    TestRun(test)
+      .test("b " + op + " a;", {es3: true});
+
+    TestRun(test)
+      .addError(1, "Unexpected use of '" + op + "'.")
+      .test("b " + op + " a;", {es3: true, bitwise: true});
+  }
 
   test.done();
 };
