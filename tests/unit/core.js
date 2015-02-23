@@ -1142,22 +1142,30 @@ exports.testUnCleanedForinifcheckneeded = function (test) {
 
 // gh-738 "eval" as an object key should not cause `W061` warnngs
 exports.testPermitEvalAsKey = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/gh-738.js", "utf8");
+  var srcNode = fs.readFileSync(__dirname + "/fixtures/gh-738-node.js", "utf8");
+  var srcBrowser = fs.readFileSync(__dirname + "/fixtures/gh-738-browser.js", "utf8");
   // global calls to eval should still cause warning.
   // test a mixture of permitted and disallowed calls
   // `global#eval` in `node:true` should still cause warning
   // `(document|window)#eval` in `browser:true` should still cause warning
 
+  // browser globals
   TestRun(test)
-    .addError(21, "eval can be harmful.")
-    .addError(22, "eval can be harmful.")
-    .addError(23, "eval can be harmful.")
-    .addError(25, "eval can be harmful.")
-    .addError(26, "eval can be harmful.")
-    .addError(28, "eval can be harmful.")
-    .addError(29, "eval can be harmful.")
-    .addError(31, "eval can be harmful.")
-    .test(src, { browser: true, node: true });
+  .addError(17, "eval can be harmful.")
+  .addError(19, "eval can be harmful.")
+  .addError(20, "eval can be harmful.")
+  .addError(22, "eval can be harmful.")
+  .addError(23, "eval can be harmful.")
+  .addError(25, "eval can be harmful.")
+  .test(srcBrowser, { browser: true });
+
+  // node globals
+  TestRun(test)
+  .addError(18, "eval can be harmful.")
+  .addError(19, "eval can be harmful.")
+  .addError(20, "eval can be harmful.")
+  .addError(22, "eval can be harmful.")
+  .test(srcNode, { node: true });
 
   test.done();
 
