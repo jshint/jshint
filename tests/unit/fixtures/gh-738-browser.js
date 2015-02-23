@@ -1,6 +1,3 @@
-/* jshint browser:true */
-/* jshint node:true */
-
 // object with "eval" key
 var obj = {
 	eval: function (str) {
@@ -17,9 +14,6 @@ var obj = {
 obj["eval"]("console.log('hello world');");
 obj.eval("console.log('hello world');");
 
-// global use, forbidden
-global["eval"]("console.log('hello world');");
-global.eval("1+1");
 eval("console.log('hello world');");
 
 window.eval("4+2");
