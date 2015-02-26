@@ -961,7 +961,7 @@ exports.testES6TemplateLiteralMultilineReturnValue = function (test) {
   test.done();
 };
 
-exports.tesMultilineReturnValueStringLiteral = function (test) {
+exports.testMultilineReturnValueStringLiteral = function (test) {
   var src = [
     'function sayHello(to) {',
     '  return "Hello, \\',
