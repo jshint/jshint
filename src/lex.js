@@ -129,7 +129,23 @@ Lexer.prototype = {
   _lines: [],
 
   inContext: function(ctxType) {
-    return this.context.length > 0 && this.context[this.context.length - 1] === ctxType;
+    return this.context.length > 0 && this.context[this.context.length - 1].type === ctxType;
+  },
+
+  pushContext: function(ctxType) {
+    this.context.push({ type: ctxType });
+  },
+
+  popContext: function() {
+    return this.context.pop();
+  },
+
+  isContext: function(context) {
+    return this.context.length > 0 && this.context[this.context.length - 1] === context;
+  },
+
+  currentContext: function() {
+    return this.context.length > 0 && this.context[this.context.length - 1];
   },
 
   getLines: function() {
@@ -237,7 +253,7 @@ Lexer.prototype = {
 
     // A block/object opener
     case "{":
-      this.context.push(Context.Block);
+      this.pushContext(Context.Block);
       return {
         type: Token.Punctuator,
         value: ch1
@@ -246,7 +262,7 @@ Lexer.prototype = {
     // A block/object closer
     case "}":
       if (this.inContext(Context.Block)) {
-        this.context.pop();
+        this.popContext();
       }
       return {
         type: Token.Punctuator,
@@ -1014,6 +1030,7 @@ Lexer.prototype = {
     var ch;
     var startLine = this.line;
     var startChar = this.char;
+    var depth = this.templateStarts.length;
 
     if (!state.option.esnext) {
       // Only lex template strings in ESNext mode.
@@ -1022,8 +1039,9 @@ Lexer.prototype = {
       // Template must start with a backtick.
       tokenType = Token.TemplateHead;
       this.templateStarts.push({ line: this.line, char: this.char });
+      depth = this.templateStarts.length;
       this.skip(1);
-      this.context.push(Context.Template);
+      this.pushContext(Context.Template);
     } else if (this.inContext(Context.Template) && this.peek() === "}") {
       // If we're in a template context, and we have a '}', lex a TemplateMiddle.
       tokenType = Token.TemplateMiddle;
@@ -1037,7 +1055,6 @@ Lexer.prototype = {
         value += "\n";
         if (!this.nextLine()) {
           // Unclosed template literal --- point to the starting "`"
-          this.context.pop();
           var startPos = this.templateStarts.pop();
           this.trigger("error", {
             code: "E052",
@@ -1049,7 +1066,9 @@ Lexer.prototype = {
             value: value,
             startLine: startLine,
             startChar: startChar,
-            isUnclosed: true
+            isUnclosed: true,
+            depth: depth,
+            context: this.popContext()
           };
         }
       }
@@ -1062,7 +1081,9 @@ Lexer.prototype = {
           value: value,
           startLine: startLine,
           startChar: startChar,
-          isUnclosed: false
+          isUnclosed: false,
+          depth: depth,
+          context: this.currentContext()
         };
       } else if (ch === '\\') {
         var escape = this.scanEscapeSequence(checks);
@@ -1078,7 +1099,6 @@ Lexer.prototype = {
     // Final value is either NoSubstTemplate or TemplateTail
     tokenType = tokenType === Token.TemplateHead ? Token.NoSubstTemplate : Token.TemplateTail;
     this.skip(1);
-    this.context.pop();
     this.templateStarts.pop();
 
     return {
@@ -1086,7 +1106,9 @@ Lexer.prototype = {
       value: value,
       startLine: startLine,
       startChar: startChar,
-      isUnclosed: false
+      isUnclosed: false,
+      depth: depth,
+      context: this.popContext()
     };
   },
 
@@ -1620,6 +1642,18 @@ Lexer.prototype = {
       if (token && token.startLine && token.startLine !== this.line) {
         obj.startLine = token.startLine;
       }
+      if (token && token.context) {
+        // Context of current token
+        obj.context = token.context;
+      }
+      if (token && token.depth) {
+        // Nested template depth
+        obj.depth = token.depth;
+      }
+      if (token && token.isUnclosed) {
+        // Mark token as unclosed string / template literal
+        obj.isUnclosed = token.isUnclosed;
+      }
 
       if (isProperty && obj.identifier) {
         obj.isProperty = isProperty;
@@ -1795,3 +1829,4 @@ Lexer.prototype = {
 };
 
 exports.Lexer = Lexer;
+exports.Context = Context;
