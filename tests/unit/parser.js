@@ -2605,6 +2605,19 @@ exports["make sure var variables can shadow let variables"] = function (test) {
   test.done();
 };
 
+exports["make sure variables may shadow globals in functions after they are referenced"] = function (test) {
+  var code = [
+    "var foo;",
+    "function x() {",
+    "  foo();",
+    "  var foo;",
+    "}"
+  ];
+
+  TestRun(test).test(code);
+  test.done();
+};
+
 exports["test destructuring function as moz"] = function (test) {
   // Example from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [

@@ -445,7 +445,7 @@ var JSHINT = (function() {
     }
 
     if (_.has(funct, name) && !funct["(global)"]) {
-      if (funct[name] === true) {
+      if (_.contains([ true, "global" ], funct[name])) {
         if (state.option.latedef) {
           if ((state.option.latedef === true && _.contains([funct[name], type], "unction")) ||
               !_.contains([funct[name], type], "unction")) {
