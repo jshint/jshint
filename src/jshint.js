@@ -2228,7 +2228,11 @@ var JSHINT = (function() {
   state.syntax["--"].exps = true;
   prefix("delete", function() {
     var p = expression(10);
-    if (!p || (p.id !== "." && p.id !== "[")) {
+    if (!p) {
+      return this;
+    }
+
+    if (p.id !== "." && p.id !== "[") {
       warning("W051");
     }
     this.first = p;
