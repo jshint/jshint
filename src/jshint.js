@@ -4140,8 +4140,9 @@ var JSHINT = (function() {
         default:
           var ident = state.tokens.next.value;
           if (!funct["(blockscope)"].getlabel(ident) &&
-              !(scope[ident] || {})[ident])
+              !(scope[ident] || {})[ident]) {
             warning("W088", state.tokens.next, state.tokens.next.value);
+          }
         }
         advance();
       }
