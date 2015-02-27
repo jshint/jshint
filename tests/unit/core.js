@@ -1170,3 +1170,14 @@ exports.testPermitEvalAsKey = function (test) {
   test.done();
 
 };
+
+// gh-2194 jshint confusing arrays at beginning of file with JSON
+exports.beginningArraysAreNotJSON = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/gh-2194.js", "utf8");
+
+  TestRun(test)
+  .test(src);
+
+  test.done();
+
+};
