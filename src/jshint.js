@@ -4657,7 +4657,7 @@ var JSHINT = (function() {
         ret.isBlock = true;
         ret.notJson = true;
       }
-    } while (bracketStack > 0 && pn.id !== "(end)" && i < 15);
+    } while (bracketStack > 0 && pn.id !== "(end)");
     return ret;
   };
 
