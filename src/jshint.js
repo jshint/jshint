@@ -877,10 +877,6 @@ var JSHINT = (function() {
     if (state.tokens.next.id === "(end)")
       error("E006", state.tokens.curr);
 
-    if (state.tokens.next.type === "(template)") {
-      doTemplateLiteral();
-    }
-
     var isDangerous =
       state.option.asi &&
       state.tokens.prev.line !== startLine(state.tokens.curr) &&
@@ -906,7 +902,9 @@ var JSHINT = (function() {
         error("E030", state.tokens.curr, state.tokens.curr.id);
       }
 
-      while (rbp < state.tokens.next.lbp && !isEndOfExpr()) {
+      // TODO: use pratt mechanics rather than special casing template tokens
+      while ((rbp < state.tokens.next.lbp || state.tokens.next.type === "(template)") &&
+              !isEndOfExpr()) {
         isArray = state.tokens.curr.value === "Array";
         isObject = state.tokens.curr.value === "Object";
 
@@ -1514,6 +1512,8 @@ var JSHINT = (function() {
 
   function parseFinalSemicolon() {
     if (state.tokens.next.id !== ";") {
+      // don't complain about unclosed templates / strings
+      if (state.tokens.next.isUnclosed) return advance();
       if (!state.option.asi) {
         // If this is the last statement in a block that ends on
         // the same line *and* option lastsemic is on, ignore the warning.
@@ -2008,24 +2008,37 @@ var JSHINT = (function() {
     }
   };
 
-  state.syntax["(template)"] = {
-    type: "(template)",
+  var baseTemplateSyntax = {
     lbp: 0,
     identifier: false,
-    nud: doTemplateLiteral
+    template: true,
   };
+  state.syntax["(template)"] = _.extend({
+    type: "(template)",
+    nud: doTemplateLiteral,
+    led: doTemplateLiteral,
+    noSubst: false
+  }, baseTemplateSyntax);
 
-  type("(template middle)", function() {
-    return this;
-  });
+  state.syntax["(template middle)"] = _.extend({
+    type: "(template middle)",
+    middle: true,
+    noSubst: false
+  }, baseTemplateSyntax);
 
-  type("(template tail)", function() {
-    return this;
-  });
+  state.syntax["(template tail)"] = _.extend({
+    type: "(template tail)",
+    tail: true,
+    noSubst: false
+  }, baseTemplateSyntax);
 
-  type("(no subst template)", function() {
-    return this;
-  });
+  state.syntax["(no subst template)"] = _.extend({
+    type: "(template)",
+    nud: doTemplateLiteral,
+    led: doTemplateLiteral,
+    noSubst: true,
+    tail: true // mark as tail, since it's always the last component
+  }, baseTemplateSyntax);
 
   type("(regexp)", function() {
     return this;
@@ -2942,20 +2955,38 @@ var JSHINT = (function() {
     return "(scope)" in token;
   }
 
-  function doTemplateLiteral() {
-    while (state.tokens.next.type !== "(template tail)" && state.tokens.next.id !== "(end)") {
-      advance();
-      if (state.tokens.next.type === "(template tail)") {
-        break;
-      } else if (state.tokens.next.type !== "(template middle)" &&
-                 state.tokens.next.type !== "(end)") {
-        expression(10); // should probably have different rbp?
+  function doTemplateLiteral(left) {
+    // ASSERT: this.type === "(template)"
+    // jshint validthis: true
+    var ctx = this.context;
+    var noSubst = this.noSubst;
+    var depth = this.depth;
+
+    if (!noSubst) {
+      while (!end() && state.tokens.next.id !== "(end)") {
+        if (!state.tokens.next.template || state.tokens.next.depth > depth) {
+          expression(0); // should probably have different rbp?
+        } else {
+          // skip template start / middle
+          advance();
+        }
       }
     }
+
     return {
       id: "(template)",
-      type: "(template)"
+      type: "(template)",
+      tag: left
     };
+
+    function end() {
+      if (state.tokens.curr.template && state.tokens.curr.tail &&
+          state.tokens.curr.context === ctx) return true;
+      var complete = (state.tokens.next.template && state.tokens.next.tail &&
+                      state.tokens.next.context === ctx);
+      if (complete) advance();
+      return complete || state.tokens.next.isUnclosed;
+    }
   }
 
   /**
