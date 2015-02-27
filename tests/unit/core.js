@@ -734,6 +734,29 @@ exports.testES6ModulesNamedExportsAffectUnused = function (test) {
   test.done();
 };
 
+
+exports["class declaration export (default)"] = function (test) {
+  var source = fs.readFileSync(__dirname + "/fixtures/class-declaration.js", "utf8");
+
+  TestRun(test).test(source, {
+    esnext: true,
+    undef: true
+  });
+
+  test.done();
+};
+
+exports["function declaration export (default)"] = function (test) {
+  var source = fs.readFileSync(__dirname + "/fixtures/function-declaration.js", "utf8");
+
+  TestRun(test).test(source, {
+    esnext: true,
+    undef: true
+  });
+
+  test.done();
+};
+
 exports.testES6ModulesNamedExportsAffectUndef = function (test) {
   // The identifier "foo" is expected to have been defined in the scope
   // of this file in order to be exported.
