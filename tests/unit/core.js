@@ -847,8 +847,15 @@ exports.testES6TemplateLiterals = function (test) {
   TestRun(test)
     .addError(14, "Octal literals are not allowed in strict mode.")
     .addError(21, "Unclosed template literal.")
-    .addError(22, "Expected an identifier and instead saw '(end)'.")
-    .addError(22, "Missing semicolon.")
+    .test(src, { esnext: true });
+  test.done();
+};
+
+exports.testES6TaggedTemplateLiterals = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/es6-template-literal-tagged.js", "utf8");
+  TestRun(test)
+    .addError(16, "Octal literals are not allowed in strict mode.")
+    .addError(23, "Unclosed template literal.")
     .test(src, { esnext: true });
   test.done();
 };
@@ -864,6 +871,19 @@ exports.testES6TemplateLiteralsUnused = function (test) {
   test.done();
 };
 
+exports.testES6TaggedTemplateLiteralsUnused = function (test) {
+  var src = [
+    "function tag() {}",
+    "var a = 'hello';",
+    "alert(tag`${a} world`);"
+  ];
+  TestRun(test)
+    .test(src, { esnext: true, unused: true });
+
+  test.done();
+};
+
+
 exports.testES6TemplateLiteralsUndef = function (test) {
   var src = [
     "/* global alert */",
@@ -875,6 +895,21 @@ exports.testES6TemplateLiteralsUndef = function (test) {
 
   test.done();
 };
+
+
+exports.testES6TaggedTemplateLiteralsUndef = function (test) {
+  var src = [
+    "/* global alert */",
+    "alert(tag`${a} world`);"
+  ];
+  TestRun(test)
+    .addError(2, "'tag' is not defined.")
+    .addError(2, "'a' is not defined.")
+    .test(src, { esnext: true, undef: true });
+
+  test.done();
+};
+
 
 exports.testES6TemplateLiteralMultiline = function (test) {
   var src = [
@@ -961,7 +996,35 @@ exports.testES6TemplateLiteralMultilineReturnValue = function (test) {
   test.done();
 };
 
-exports.tesMultilineReturnValueStringLiteral = function (test) {
+
+exports.testES6TaggedTemplateLiteralMultilineReturnValue = function (test) {
+  var src = [
+    'function tag() {}',
+    'function sayHello(to) {',
+    '  return tag`Hello, ',
+    '    ${to}!`;',
+    '}',
+    'print(sayHello("George"));'
+  ];
+
+  TestRun(test).test(src, { esnext: true });
+
+  var src = [
+    'function tag() {}',
+    'function* sayHello(to) {',
+    '  yield tag`Hello, ',
+    '    ${to}!`;',
+    '}',
+    'print(sayHello("George"));'
+  ];
+
+  TestRun(test).test(src, { esnext: true });
+
+  test.done();
+};
+
+
+exports.testMultilineReturnValueStringLiteral = function (test) {
   var src = [
     'function sayHello(to) {',
     '  return "Hello, \\',
