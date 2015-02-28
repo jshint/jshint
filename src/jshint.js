@@ -3301,15 +3301,15 @@ var JSHINT = (function() {
     }
     var nextInnerDE = function() {
       var ident;
-      if (_.contains(["[", "{"], state.tokens.next.value)) {
+      if (checkPunctuators(state.tokens.next, ["[", "{"])) {
         ids = destructuringExpression();
         for (var id in ids) {
           id = ids[id];
           identifiers.push({ id: id.id, token: id.token });
         }
-      } else if (state.tokens.next.value === ",") {
+      } else if (checkPunctuators(state.tokens.next, [","])) {
         identifiers.push({ id: null, token: state.tokens.curr });
-      } else if (state.tokens.next.value === "(") {
+      } else if (checkPunctuators(state.tokens.next, ["("])) {
         advance("(");
         nextInnerDE();
         advance(")");
@@ -3319,27 +3319,37 @@ var JSHINT = (function() {
           identifiers.push({ id: ident, token: state.tokens.curr });
       }
     };
-    if (state.tokens.next.value === "[") {
+    if (checkPunctuators(state.tokens.next, ["["])) {
       advance("[");
       nextInnerDE();
-      while (state.tokens.next.value !== "]") {
+      while (!checkPunctuators(state.tokens.next, ["]"])) {
         advance(",");
+        if (checkPunctuators(state.tokens.next, ["]"])) {
+          // Trailing commas are not allowed in ArrayBindingPattern
+          warning("W130", state.tokens.next);
+          break;
+        }
         nextInnerDE();
       }
       advance("]");
-    } else if (state.tokens.next.value === "{") {
+    } else if (checkPunctuators(state.tokens.next, ["{"])) {
       advance("{");
       id = identifier();
-      if (state.tokens.next.value === ":") {
+      if (checkPunctuators(state.tokens.next, [":"])) {
         advance(":");
         nextInnerDE();
       } else {
         identifiers.push({ id: id, token: state.tokens.curr });
       }
-      while (state.tokens.next.value !== "}") {
+      while (!checkPunctuators(state.tokens.next, ["}"])) {
         advance(",");
+        if (checkPunctuators(state.tokens.next, ["}"])) {
+          // Trailing comma
+          // ObjectBindingPattern: { BindingPropertyList , }
+          break;
+        }
         id = identifier();
-        if (state.tokens.next.value === ":") {
+        if (checkPunctuators(state.tokens.next, [":"])) {
           advance(":");
           nextInnerDE();
         } else {
