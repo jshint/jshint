@@ -3591,12 +3591,13 @@ var JSHINT = (function() {
     return classdef.call(this, true);
   });
 
-  function classdef(stmt) {
+  function classdef(isStatement) {
+
     /*jshint validthis:true */
     if (!state.option.inESNext()) {
       warning("W104", state.tokens.curr, "class");
     }
-    if (stmt) {
+    if (isStatement) {
       // BindingIdentifier
       this.name = identifier();
       addlabel(this.name, { type: "unused", token: state.tokens.curr });
@@ -4453,6 +4454,9 @@ var JSHINT = (function() {
 
   stmt("export", function() {
     var ok = true;
+    var token;
+    var identifier;
+
     if (!state.option.inESNext()) {
       warning("W119", state.tokens.curr, "export");
       ok = false;
@@ -4479,7 +4483,20 @@ var JSHINT = (function() {
       if (state.tokens.next.id === "function" || state.tokens.next.id === "class") {
         this.block = true;
       }
-      this.exportee = expression(10);
+
+      token = peek();
+
+      expression(10);
+
+      if (state.tokens.next.id === "class") {
+        identifier = token.name;
+      } else {
+        identifier = token.value;
+      }
+
+      addlabel(identifier, {
+        type: "function", token: token
+      });
 
       return this;
     }
