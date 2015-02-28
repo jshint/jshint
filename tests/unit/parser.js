@@ -5511,3 +5511,60 @@ exports.dereferenceDelete = function (test) {
 
   test.done();
 };
+
+exports.trailingCommaInObjectBindingPattern = function (test) {
+  var code = [
+    'function fn(O) {',
+    '  var {a, b, c,} = O;',
+    '}',
+    'fn({ a: 1, b: 2, c: 3 });'
+  ];
+
+  TestRun(test)
+    .test(code, { esnext: true });
+
+  test.done();
+};
+
+
+exports.trailingCommaInObjectBindingPatternParameters = function (test) {
+  var code = [
+    'function fn({a, b, c,}) { }',
+    'fn({ a: 1, b: 2, c: 3 });'
+  ];
+
+  TestRun(test)
+    .test(code, { esnext: true });
+
+  test.done();
+};
+
+
+exports.trailingCommaInArrayBindingPattern = function (test) {
+  var code = [
+    'function fn(O) {',
+    '  var [a, b, c,] = O;',
+    '}',
+    'fn([1, 2, 3]);'
+  ];
+
+  TestRun(test)
+    .addError(2, "Trailing ',' is not valid in array destructuring assignment.")
+    .test(code, { esnext: true });
+
+  test.done();
+};
+
+
+exports.trailingCommaInArrayBindingPatternParameters = function (test) {
+  var code = [
+    'function fn([a, b, c,]) { }',
+    'fn([1, 2, 3]);'
+  ];
+
+  TestRun(test)
+    .addError(1, "Trailing ',' is not valid in array destructuring assignment.")
+    .test(code, { esnext: true });
+
+  test.done();
+};
