@@ -5615,3 +5615,17 @@ exports.extraRestOperator = function (test) {
 
   test.done();
 };
+
+
+exports.restOperatorWithoutIdentifier = function (test) {
+  var code = [
+    'function fn([a, b, ...]) { }',
+    'fn([1, 2, 3]);'
+  ];
+
+  TestRun(test)
+    .addError(1, "Unexpected '...'.")
+    .test(code, { esnext: true });
+
+  test.done();
+};
