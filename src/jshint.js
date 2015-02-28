@@ -1467,6 +1467,9 @@ var JSHINT = (function() {
     if (state.tokens.next.value === "...") {
       if (norest === true) {
         warning("E024", state.tokens.next, "...");
+        while (checkPunctuators(state.tokens.next, ["..."])) {
+          advance("...");
+        }
       } else if (!state.option.esnext) {
         warning("W119", state.tokens.next, "spread/rest operator");
       }
@@ -2838,6 +2841,7 @@ var JSHINT = (function() {
     var tokens = [];
     var t;
     var pastDefault = false;
+    var pastRest = false;
     var loneArg = options && options.loneArg;
 
     if (loneArg && loneArg.identifier === true) {
@@ -2866,18 +2870,16 @@ var JSHINT = (function() {
             addlabel(t.id, { type: "unused", token: t.token });
           }
         }
-      } else if (state.tokens.next.value === "...") {
-        if (!state.option.esnext) {
-          warning("W119", state.tokens.next, "spread/rest operator");
-        }
-        advance("...");
-        ident = identifier(true);
-        params.push(ident);
-        addlabel(ident, { type: "unused", token: state.tokens.curr });
       } else {
+        if (checkPunctuators(state.tokens.next, ["..."])) pastRest = true;
         ident = identifier(true);
-        params.push(ident);
-        addlabel(ident, { type: "unused", token: state.tokens.curr });
+        if (ident) {
+          params.push(ident);
+          addlabel(ident, { type: "unused", token: state.tokens.curr });
+        } else {
+          // Skip invalid parameter.
+          while (!checkPunctuators(state.tokens.next, [",", ")"])) advance();
+        }
       }
 
       // it is a syntax error to have a regular argument after a default argument
@@ -2895,6 +2897,9 @@ var JSHINT = (function() {
         expression(10);
       }
       if (state.tokens.next.id === ",") {
+        if (pastRest) {
+          warning("W131", state.tokens.next);
+        }
         comma();
       } else {
         advance(")", next);

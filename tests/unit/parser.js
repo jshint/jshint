@@ -5603,14 +5603,56 @@ exports.commaAfterRestElementInArrayBindingPatternParameters = function (test) {
 };
 
 
+exports.commaAfterRestParameter = function (test) {
+  var code = [
+    'function fn(a, b, ...c, d) { }',
+    'function fn2(...a, b) { }',
+    'fn(1, 2, 3);',
+    'fn2(1, 2, 3);'
+  ];
+
+  TestRun(test)
+    .addError(1, "Invalid parameter after rest parameter.")
+    .addError(2, "Invalid parameter after rest parameter.")
+    .test(code, { esnext: true });
+
+  test.done();
+};
+
+
 exports.extraRestOperator = function (test) {
   var code = [
     'function fn([a, b, ......c]) { }',
-    'fn([1, 2, 3]);'
+    'function fn2([......c]) { }',
+    'function fn3(a, b, ......) { }',
+    'function fn4(......) { }',
+    'var [......a] = [1, 2, 3];',
+    'var [a, b, ... ...c] = [1, 2, 3];',
+    'var arrow = (......a) => a;',
+    'var arrow2 = (a, b, ......c) => c;',
+    'var arrow3 = ([......a]) => a;',
+    'var arrow4 = ([a, b, ......c]) => c;',
+    'fn([1, 2, 3]);',
+    'fn2([1, 2, 3]);',
+    'fn3(1, 2, 3);',
+    'fn4(1, 2, 3);',
+    'arrow(1, 2, 3);',
+    'arrow2(1, 2, 3);',
+    'arrow3([1, 2, 3]);',
+    'arrow4([1, 2, 3]);',
   ];
 
   TestRun(test)
     .addError(1, "Unexpected '...'.")
+    .addError(2, "Unexpected '...'.")
+    .addError(3, "Unexpected '...'.")
+    .addError(4, "Unexpected '...'.")
+    .addError(5, "Unexpected '...'.")
+    .addError(6, "Unexpected '...'.")
+    .addError(7, "Unexpected '...'.")
+    .addError(8, "Unexpected '...'.")
+    .addError(9, "Unexpected '...'.")
+    .addError(10, "Unexpected '...'.")
     .test(code, { esnext: true });
 
   test.done();
@@ -5620,11 +5662,36 @@ exports.extraRestOperator = function (test) {
 exports.restOperatorWithoutIdentifier = function (test) {
   var code = [
     'function fn([a, b, ...]) { }',
-    'fn([1, 2, 3]);'
+    'function fn2([...]) { }',
+    'function fn3(a, b, ...) { }',
+    'function fn4(...) { }',
+    'var [...] = [1, 2, 3];',
+    'var [a, b, ...] = [1, 2, 3];',
+    'var arrow = (...) => void 0;',
+    'var arrow2 = (a, b, ...) => a;',
+    'var arrow3 = ([...]) => void 0;',
+    'var arrow4 = ([a, b, ...]) => a;',
+    'fn([1, 2, 3]);',
+    'fn2([1, 2, 3]);',
+    'fn3(1, 2, 3);',
+    'fn3(1, 2, 3);',
+    'arrow(1, 2, 3);',
+    'arrow2(1, 2, 3);',
+    'arrow3([1, 2, 3]);',
+    'arrow4([1, 2, 3]);'
   ];
 
   TestRun(test)
     .addError(1, "Unexpected '...'.")
+    .addError(2, "Unexpected '...'.")
+    .addError(3, "Unexpected '...'.")
+    .addError(4, "Unexpected '...'.")
+    .addError(5, "Unexpected '...'.")
+    .addError(6, "Unexpected '...'.")
+    .addError(7, "Unexpected '...'.")
+    .addError(8, "Unexpected '...'.")
+    .addError(9, "Unexpected '...'.")
+    .addError(10, "Unexpected '...'.")
     .test(code, { esnext: true });
 
   test.done();
