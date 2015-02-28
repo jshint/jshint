@@ -5549,7 +5549,6 @@ exports.trailingCommaInArrayBindingPattern = function (test) {
   ];
 
   TestRun(test)
-    .addError(2, "Trailing ',' is not valid in array destructuring assignment.")
     .test(code, { esnext: true });
 
   test.done();
@@ -5563,7 +5562,55 @@ exports.trailingCommaInArrayBindingPatternParameters = function (test) {
   ];
 
   TestRun(test)
-    .addError(1, "Trailing ',' is not valid in array destructuring assignment.")
+    .test(code, { esnext: true });
+
+  test.done();
+};
+
+
+exports.commaAfterRestElementInArrayBindingPattern = function (test) {
+  var code = [
+    'function fn(O) {',
+    '  var [a, b, ...c,] = O;',
+    '  var [...d,] = O;',
+    '}',
+    'fn([1, 2, 3]);'
+  ];
+
+  TestRun(test)
+    .addError(2, "Invalid element after rest element.")
+    .addError(3, "Invalid element after rest element.")
+    .test(code, { esnext: true });
+
+  test.done();
+};
+
+
+exports.commaAfterRestElementInArrayBindingPatternParameters = function (test) {
+  var code = [
+    'function fn([a, b, ...c,]) { }',
+    'function fn2([...c,]) { }',
+    'fn([1, 2, 3]);',
+    'fn2([1,2,3]);'
+  ];
+
+  TestRun(test)
+    .addError(1, "Invalid element after rest element.")
+    .addError(2, "Invalid element after rest element.")
+    .test(code, { esnext: true });
+
+  test.done();
+};
+
+
+exports.extraRestOperator = function (test) {
+  var code = [
+    'function fn([a, b, ......c]) { }',
+    'fn([1, 2, 3]);'
+  ];
+
+  TestRun(test)
+    .addError(1, "Unexpected '...'.")
     .test(code, { esnext: true });
 
   test.done();
