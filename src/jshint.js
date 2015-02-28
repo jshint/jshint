@@ -1470,6 +1470,10 @@ var JSHINT = (function() {
         warning("W119", state.tokens.next, "spread/rest operator");
       }
       advance("...");
+      if (!state.tokens.next.identifier) {
+        warning("E024", state.tokens.curr, "...");
+        return;
+      }
       return identifier(fnparam, prop, true);
     } else {
       error("E030", state.tokens.next, state.tokens.next.value);
