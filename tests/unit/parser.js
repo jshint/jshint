@@ -4623,6 +4623,23 @@ exports.classExpression = function (test) {
   test.done();
 };
 
+exports.classExpressionThis = function (test) {
+  var code = [
+    "void class MyClass {",
+    "  constructor() { return this; }",
+    "  method() { return this; }",
+    "  static method() { return this; }",
+    "  get accessor() { return this; }",
+    "  set accessor() { return this; }",
+    "};"
+  ];
+
+  TestRun(test)
+    .test(code, { esnext: true });
+
+  test.done();
+};
+
 exports["test for GH-1018"] = function (test) {
   var code = [
     "if (a = 42) {}",

@@ -2993,9 +2993,8 @@ var JSHINT = (function() {
    * @param {Object} [options]
    * @param {token} [options.name] The identifier belonging to the function (if
    *                               any)
-   * @param {boolean} [options.isStatement] Whether the function has been
-   *                                        declared as part of another
-   *                                        statement
+   * @param {boolean} [options.statement] The statement that triggered creation
+   *                                      of the current function.
    * @param {string} [options.type] If specified, either "generator" or "arrow"
    * @param {token} [options.loneArg] The argument to the function in cases
    *                                  where it was defined using the
@@ -3009,14 +3008,14 @@ var JSHINT = (function() {
    *                                           the body of member functions.
    */
   function doFunction(options) {
-    var f, name, isStatement, classExprBinding, isGenerator, isArrow;
+    var f, name, statement, classExprBinding, isGenerator, isArrow;
     var oldOption = state.option;
     var oldIgnored = state.ignored;
     var oldScope  = scope;
 
     if (options) {
       name = options.name;
-      isStatement = options.isStatement;
+      statement = options.statement;
       classExprBinding = options.classExprBinding;
       isGenerator = options.type === "generator";
       isArrow = options.type === "arrow";
@@ -3027,7 +3026,7 @@ var JSHINT = (function() {
     scope = Object.create(scope);
 
     funct = functor(name || state.nameStack.infer(), state.tokens.next, scope, {
-      "(statement)": isStatement,
+      "(statement)": statement,
       "(context)":   funct,
       "(generator)": isGenerator
     });
@@ -3694,7 +3693,7 @@ var JSHINT = (function() {
           advance();
         }
         if (state.tokens.next.value !== "(") {
-          doFunction({ isStatement: true });
+          doFunction({ statement: c });
         }
       }
 
@@ -3723,7 +3722,7 @@ var JSHINT = (function() {
       propertyName(name);
 
       doFunction({
-        isStatement: true,
+        statement: c,
         type: isGenerator ? "generator" : null,
         classExprBinding: c.namedExpr ? c.name : null
       });
@@ -3759,7 +3758,7 @@ var JSHINT = (function() {
 
     doFunction({
       name: i,
-      isStatement: true,
+      statement: this,
       type: generator ? "generator" : null
     });
     if (state.tokens.next.id === "(" && state.tokens.next.line === state.tokens.curr.line) {
