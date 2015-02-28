@@ -1,4 +1,4 @@
-/*! 2.6.2 */
+/*! 2.6.3 */
 var JSHINT;
 if (typeof window === 'undefined') window = {};
 (function () {
@@ -4897,7 +4897,8 @@ var warnings = {
   W127: "Unexpected use of a comma operator.",
   W128: "Empty array elements require elision=true.",
   W129: "'{a}' is defined in a future version of JavaScript. Use a " +
-    "different variable name to avoid migration issues."
+    "different variable name to avoid migration issues.",
+  W130: "Trailing ',' is not valid in array destructuring assignment."
 };
 
 var info = {
@@ -9875,9 +9876,8 @@ var JSHINT = (function() {
    * @param {Object} [options]
    * @param {token} [options.name] The identifier belonging to the function (if
    *                               any)
-   * @param {boolean} [options.isStatement] Whether the function has been
-   *                                        declared as part of another
-   *                                        statement
+   * @param {boolean} [options.statement] The statement that triggered creation
+   *                                      of the current function.
    * @param {string} [options.type] If specified, either "generator" or "arrow"
    * @param {token} [options.loneArg] The argument to the function in cases
    *                                  where it was defined using the
@@ -9891,14 +9891,14 @@ var JSHINT = (function() {
    *                                           the body of member functions.
    */
   function doFunction(options) {
-    var f, name, isStatement, classExprBinding, isGenerator, isArrow;
+    var f, name, statement, classExprBinding, isGenerator, isArrow;
     var oldOption = state.option;
     var oldIgnored = state.ignored;
     var oldScope  = scope;
 
     if (options) {
       name = options.name;
-      isStatement = options.isStatement;
+      statement = options.statement;
       classExprBinding = options.classExprBinding;
       isGenerator = options.type === "generator";
       isArrow = options.type === "arrow";
@@ -9909,7 +9909,7 @@ var JSHINT = (function() {
     scope = Object.create(scope);
 
     funct = functor(name || state.nameStack.infer(), state.tokens.next, scope, {
-      "(statement)": isStatement,
+      "(statement)": statement,
       "(context)":   funct,
       "(generator)": isGenerator
     });
@@ -10183,15 +10183,15 @@ var JSHINT = (function() {
     }
     var nextInnerDE = function() {
       var ident;
-      if (_.contains(["[", "{"], state.tokens.next.value)) {
+      if (checkPunctuators(state.tokens.next, ["[", "{"])) {
         ids = destructuringExpression();
         for (var id in ids) {
           id = ids[id];
           identifiers.push({ id: id.id, token: id.token });
         }
-      } else if (state.tokens.next.value === ",") {
+      } else if (checkPunctuators(state.tokens.next, [","])) {
         identifiers.push({ id: null, token: state.tokens.curr });
-      } else if (state.tokens.next.value === "(") {
+      } else if (checkPunctuators(state.tokens.next, ["("])) {
         advance("(");
         nextInnerDE();
         advance(")");
@@ -10201,27 +10201,37 @@ var JSHINT = (function() {
           identifiers.push({ id: ident, token: state.tokens.curr });
       }
     };
-    if (state.tokens.next.value === "[") {
+    if (checkPunctuators(state.tokens.next, ["["])) {
       advance("[");
       nextInnerDE();
-      while (state.tokens.next.value !== "]") {
+      while (!checkPunctuators(state.tokens.next, ["]"])) {
         advance(",");
+        if (checkPunctuators(state.tokens.next, ["]"])) {
+          // Trailing commas are not allowed in ArrayBindingPattern
+          warning("W130", state.tokens.next);
+          break;
+        }
         nextInnerDE();
       }
       advance("]");
-    } else if (state.tokens.next.value === "{") {
+    } else if (checkPunctuators(state.tokens.next, ["{"])) {
       advance("{");
       id = identifier();
-      if (state.tokens.next.value === ":") {
+      if (checkPunctuators(state.tokens.next, [":"])) {
         advance(":");
         nextInnerDE();
       } else {
         identifiers.push({ id: id, token: state.tokens.curr });
       }
-      while (state.tokens.next.value !== "}") {
+      while (!checkPunctuators(state.tokens.next, ["}"])) {
         advance(",");
+        if (checkPunctuators(state.tokens.next, ["}"])) {
+          // Trailing comma
+          // ObjectBindingPattern: { BindingPropertyList , }
+          break;
+        }
         id = identifier();
-        if (state.tokens.next.value === ":") {
+        if (checkPunctuators(state.tokens.next, [":"])) {
           advance(":");
           nextInnerDE();
         } else {
@@ -10576,7 +10586,7 @@ var JSHINT = (function() {
           advance();
         }
         if (state.tokens.next.value !== "(") {
-          doFunction({ isStatement: true });
+          doFunction({ statement: c });
         }
       }
 
@@ -10605,7 +10615,7 @@ var JSHINT = (function() {
       propertyName(name);
 
       doFunction({
-        isStatement: true,
+        statement: c,
         type: isGenerator ? "generator" : null,
         classExprBinding: c.namedExpr ? c.name : null
       });
@@ -10641,7 +10651,7 @@ var JSHINT = (function() {
 
     doFunction({
       name: i,
-      isStatement: true,
+      statement: this,
       type: generator ? "generator" : null
     });
     if (state.tokens.next.id === "(" && state.tokens.next.line === state.tokens.curr.line) {
