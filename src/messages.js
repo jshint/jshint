@@ -206,7 +206,7 @@ var warnings = {
   W129: "'{a}' is defined in a future version of JavaScript. Use a " +
     "different variable name to avoid migration issues.",
   W130: "Invalid element after rest element.",
-  W131: "Unexpected rest operator."
+  W131: "Invalid parameter after rest parameter."
 };
 
 var info = {
