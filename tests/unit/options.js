@@ -2221,10 +2221,10 @@ exports.futureHostile = function (test) {
     .addError(7, "'Symbol' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .addError(8, "'WeakMap' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .addError(9, "'WeakSet' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
-    .test(code, { es3: true, es5: false });
+    .test(code, { es3: true, es5: false, futurehostile: false });
 
   TestRun(test, "ES3 with option")
-    .test(code, { es3: true, es5: false, futurehostile: true });
+    .test(code, { es3: true, es5: false });
 
   TestRun(test, "ES5 without option")
     .addError(1, "Redefinition of 'JSON'.")
@@ -2236,17 +2236,14 @@ exports.futureHostile = function (test) {
     .addError(7, "'Symbol' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .addError(8, "'WeakMap' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .addError(9, "'WeakSet' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
-    .test(code, {});
+    .test(code, { futurehostile: false });
 
   TestRun(test, "ES5 with option")
     .addError(1, "Redefinition of 'JSON'.")
-    .test(code, {
-      futurehostile: true
-    });
+    .test(code, {});
 
   TestRun(test, "ES5 with opt-out")
     .test(code, {
-      futurehostile: true,
       predef: ["-JSON"]
     });
 
@@ -2260,7 +2257,7 @@ exports.futureHostile = function (test) {
     .addError(7, "Redefinition of 'Symbol'.")
     .addError(8, "Redefinition of 'WeakMap'.")
     .addError(9, "Redefinition of 'WeakSet'.")
-    .test(code, { esnext: true });
+    .test(code, { esnext: true, futurehostile: false });
 
   TestRun(test, "ESNext with option")
     .addError(1, "Redefinition of 'JSON'.")
@@ -2272,11 +2269,12 @@ exports.futureHostile = function (test) {
     .addError(7, "Redefinition of 'Symbol'.")
     .addError(8, "Redefinition of 'WeakMap'.")
     .addError(9, "Redefinition of 'WeakSet'.")
-    .test(code, { esnext: true, futurehostile: true });
+    .test(code, { esnext: true });
 
   TestRun(test, "ESNext with opt-out")
     .test(code, {
       esnext: true,
+      futurehostile: false,
       predef: [
         "-JSON",
         "-Map",

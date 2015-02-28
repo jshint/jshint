@@ -62,6 +62,14 @@ exports.bool = {
     eqeqeq      : true,
 
     /**
+     * This option enables warnings about the use of identifiers which are
+     * defined in future versions of JavaScript. Although overwriting them has
+     * no effect in contexts where they are not implemented, this practice can
+     * cause issues when migrating codebases to newer versions of the language.
+     */
+    futurehostile: true,
+
+    /**
      * This option suppresses warnings about invalid `typeof` operator values.
      * This operator has only [a limited set of possible return
      * values](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof).
@@ -351,14 +359,6 @@ exports.bool = {
      * interpreter to do certain optimizations.
     */
     evil        : true,
-
-    /**
-     * This option supresses warnings about the use of identifiers which are
-     * defined in future versions of JavaScript. Although overwriting them has
-     * no effect in contexts where they are not implemented, this practice can
-     * cause issues when migrating codebases to newer versions of the language.
-     */
-    futurehostile: true,
 
     /**
      * This option prohibits the use of unary increment and decrement
