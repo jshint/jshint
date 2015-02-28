@@ -202,7 +202,9 @@ var warnings = {
   W125: "This line contains non-breaking spaces: http://jshint.com/doc/options/#nonbsp",
   W126: "Unnecessary grouping operator.",
   W127: "Unexpected use of a comma operator.",
-  W128: "Empty array elements require elision=true."
+  W128: "Empty array elements require elision=true.",
+  W129: "'{a}' is defined in a future version of JavaScript. Use a " +
+    "different variable name to avoid migration issues."
 };
 
 var info = {

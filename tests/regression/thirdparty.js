@@ -185,7 +185,7 @@ exports.json2 = function (test) {
   TestRun(test)
     .addError(177, "'key' is defined but never used.")
     .addError(191, "'key' is defined but never used.")
-    .test(src, { singleGroups: true, undef: true, unused: true, laxbreak: true }, { JSON: true });
+    .test(src, { singleGroups: true, undef: true, unused: true, laxbreak: true, predef: ["-JSON"] }, { JSON: true });
 
   test.done();
 };

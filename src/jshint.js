@@ -196,8 +196,12 @@ var JSHINT = (function() {
 
     processenforceall();
 
+    if (!state.option.es3) {
+      combine(predefined, vars.ecmaIdentifiers[5]);
+    }
+
     if (state.option.esnext) {
-      combine(predefined, vars.newEcmaIdentifiers);
+      combine(predefined, vars.ecmaIdentifiers[6]);
     }
 
     if (state.option.couch) {
@@ -3363,8 +3367,15 @@ var JSHINT = (function() {
           if (state.option.inESNext() && funct[t.id] === "const") {
             warning("E011", null, t.id);
           }
-          if (funct["(global)"] && predefined[t.id] === false) {
-            warning("W079", t.token, t.id);
+          if (funct["(global)"]) {
+            if (predefined[t.id] === false) {
+              warning("W079", t.token, t.id);
+            } else if (!state.option.futurehostile) {
+              if ((!state.option.inES5() && vars.ecmaIdentifiers[5][t.id] === false) ||
+                (!state.option.inESNext() && vars.ecmaIdentifiers[6][t.id] === false)) {
+                warning("W129", t.token, t.id);
+              }
+            }
           }
           if (t.id) {
             addlabel(t.id, { type: "unused", token: t.token });
@@ -4918,7 +4929,7 @@ var JSHINT = (function() {
     }
 
     predefined = Object.create(null);
-    combine(predefined, vars.ecmaIdentifiers);
+    combine(predefined, vars.ecmaIdentifiers[3]);
     combine(predefined, vars.reservedVars);
 
     combine(predefined, g || {});
