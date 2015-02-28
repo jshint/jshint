@@ -821,7 +821,7 @@ var JSHINT = (function() {
   }
 
   function isInfix(token) {
-    return token.infix || (!token.identifier && !!token.led);
+    return token.infix || (!token.identifier && !token.template && !!token.led);
   }
 
   function isEndOfExpr() {
