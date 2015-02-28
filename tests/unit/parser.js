@@ -5285,3 +5285,12 @@ exports.testStrictDirectiveASI = function (test) {
 
   test.done();
 };
+
+exports.dereferenceDelete = function (test) {
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw '.'.")
+    .addError(1, "Missing semicolon.")
+    .test("delete.foo();");
+
+  test.done();
+};
