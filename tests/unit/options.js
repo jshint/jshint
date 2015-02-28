@@ -1264,6 +1264,15 @@ exports.validthis = function (test) {
   test.done();
 };
 
+exports["validthis checks do not apply to module or class bodies. gh-2217"] = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/gh-2217.js", "utf8");
+
+  TestRun(test)
+    .test(src, {esnext: true});
+
+  test.done();
+};
+
 /*
  * Test string relevant options
  *   multistr   allows multiline strings
