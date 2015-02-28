@@ -3428,7 +3428,7 @@ var JSHINT = (function() {
           if (funct["(global)"]) {
             if (predefined[t.id] === false) {
               warning("W079", t.token, t.id);
-            } else if (!state.option.futurehostile) {
+            } else if (state.option.futurehostile === false) {
               if ((!state.option.inES5() && vars.ecmaIdentifiers[5][t.id] === false) ||
                 (!state.option.inESNext() && vars.ecmaIdentifiers[6][t.id] === false)) {
                 warning("W129", t.token, t.id);
