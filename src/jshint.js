@@ -4821,7 +4821,7 @@ var JSHINT = (function() {
             warning("W095", state.tokens.next, state.tokens.next.value);
           }
           if (o[state.tokens.next.value] === true) {
-            warning("W075", state.tokens.next, state.tokens.next.value);
+            warning("W075", state.tokens.next, "key", state.tokens.next.value);
           } else if ((state.tokens.next.value === "__proto__" &&
             !state.option.proto) || (state.tokens.next.value === "__iterator__" &&
             !state.option.iterator)) {
