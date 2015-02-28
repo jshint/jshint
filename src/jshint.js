@@ -783,14 +783,7 @@ var JSHINT = (function() {
           error("E020", state.tokens.next, id, t.id, t.line, state.tokens.next.value);
         }
       } else if (state.tokens.next.type !== "(identifier)" || state.tokens.next.value !== id) {
-        // parameter destructuring with rest operator
-        if (state.tokens.next.value === "...") {
-          if (!state.option.esnext) {
-            warning("W119", state.tokens.next, "spread/rest operator");
-          }
-        } else {
-          warning("W116", state.tokens.next, id, state.tokens.next.value);
-        }
+        warning("W116", state.tokens.next, id, state.tokens.next.value);
       }
     }
 
@@ -1457,7 +1450,7 @@ var JSHINT = (function() {
   // fnparam means that this identifier is being defined as a function
   // argument
   // prop means that this identifier is that of an object property
-  function identifier(fnparam, prop, norest) {
+  function identifier(fnparam, prop) {
     var i = optionalidentifier(fnparam, prop, false);
     if (i) {
       return i;
@@ -1465,20 +1458,24 @@ var JSHINT = (function() {
 
     // parameter destructuring with rest operator
     if (state.tokens.next.value === "...") {
-      if (norest === true) {
-        warning("E024", state.tokens.next, "...");
-        while (checkPunctuators(state.tokens.next, ["..."])) {
-          advance("...");
-        }
-      } else if (!state.option.esnext) {
+      if (!state.option.esnext) {
         warning("W119", state.tokens.next, "spread/rest operator");
       }
-      advance("...");
+      advance();
+
+      if (checkPunctuators(state.tokens.next, ["..."])) {
+        warning("E024", state.tokens.next, "...");
+        while (checkPunctuators(state.tokens.next, ["..."])) {
+          advance();
+        }
+      }
+
       if (!state.tokens.next.identifier) {
         warning("E024", state.tokens.curr, "...");
         return;
       }
-      return identifier(fnparam, prop, true);
+
+      return identifier(fnparam, prop);
     } else {
       error("E030", state.tokens.next, state.tokens.next.value);
 
