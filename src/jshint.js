@@ -2074,6 +2074,15 @@ var JSHINT = (function() {
   reservevar("Infinity");
   reservevar("null");
   reservevar("this", function(x) {
+    // ModuleBody (and everything contained therein) and ClassBody are
+    // strict by default, therefore cannot subject to "strict-mode violation" checks
+    var verb = funct["(context)"] && funct["(context)"]["(verb)"];
+
+    // "export" implies that this code is within a module
+    if (verb === "class" || verb === "export") {
+      return;
+    }
+
     if (state.directive["use strict"] && !isMethod() &&
         !state.option.validthis && ((funct["(statement)"] &&
         funct["(name)"].charAt(0) > "Z") || funct["(global)"])) {
