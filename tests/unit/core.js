@@ -1047,6 +1047,39 @@ exports.testES6TaggedTemplateLiteralMultilineReturnValue = function (test) {
 };
 
 
+exports.testES6TemplateLiteralMultilineReturnValueWithFunctionCall = function (test) {
+  var src = [
+    'function sayHello() {',
+    '  return `Helo',
+    '      monkey`',
+    '    .replace(\'l\', \'ll\');',
+    '}',
+    'print(sayHello());',
+  ];
+
+  TestRun(test).test(src, { esnext: true });
+
+  test.done();
+};
+
+
+exports.testES6TaggedTemplateLiteralMultilineReturnValueWithFunctionCall = function (test) {
+  var src = [
+    'function tag() {}',
+    'function sayHello() {',
+    '  return tag`Helo',
+    '    monkey!!`',
+    '    .replace(\'l\', \'ll\');',
+    '}',
+    'print(sayHello());',
+  ];
+
+  TestRun(test).test(src, { esnext: true });
+
+  test.done();
+};
+
+
 exports.testMultilineReturnValueStringLiteral = function (test) {
   var src = [
     'function sayHello(to) {',
