@@ -204,7 +204,8 @@ var warnings = {
   W127: "Unexpected use of a comma operator.",
   W128: "Empty array elements require elision=true.",
   W129: "'{a}' is defined in a future version of JavaScript. Use a " +
-    "different variable name to avoid migration issues."
+    "different variable name to avoid migration issues.",
+  W130: "Trailing ',' is not valid in array destructuring assignment."
 };
 
 var info = {
