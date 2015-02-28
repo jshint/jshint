@@ -1,6 +1,6 @@
 #!/usr/bin/env rhino
 var window = {};
-/*! 2.6.1 */
+/*! 2.6.2 */
 var JSHINT;
 if (typeof window === 'undefined') window = {};
 (function () {
@@ -5065,6 +5065,14 @@ exports.bool = {
     eqeqeq      : true,
 
     /**
+     * This option enables warnings about the use of identifiers which are
+     * defined in future versions of JavaScript. Although overwriting them has
+     * no effect in contexts where they are not implemented, this practice can
+     * cause issues when migrating codebases to newer versions of the language.
+     */
+    futurehostile: true,
+
+    /**
      * This option suppresses warnings about invalid `typeof` operator values.
      * This operator has only [a limited set of possible return
      * values](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof).
@@ -5354,14 +5362,6 @@ exports.bool = {
      * interpreter to do certain optimizations.
     */
     evil        : true,
-
-    /**
-     * This option supresses warnings about the use of identifiers which are
-     * defined in future versions of JavaScript. Although overwriting them has
-     * no effect in contexts where they are not implemented, this practice can
-     * cause issues when migrating codebases to newer versions of the language.
-     */
-    futurehostile: true,
 
     /**
      * This option prohibits the use of unary increment and decrement
@@ -10344,7 +10344,7 @@ var JSHINT = (function() {
           if (funct["(global)"]) {
             if (predefined[t.id] === false) {
               warning("W079", t.token, t.id);
-            } else if (!state.option.futurehostile) {
+            } else if (state.option.futurehostile === false) {
               if ((!state.option.inES5() && vars.ecmaIdentifiers[5][t.id] === false) ||
                 (!state.option.inESNext() && vars.ecmaIdentifiers[6][t.id] === false)) {
                 warning("W129", t.token, t.id);
