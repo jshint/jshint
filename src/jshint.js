@@ -1456,7 +1456,7 @@ var JSHINT = (function() {
   // fnparam means that this identifier is being defined as a function
   // argument
   // prop means that this identifier is that of an object property
-  function identifier(fnparam, prop) {
+  function identifier(fnparam, prop, norest) {
     var i = optionalidentifier(fnparam, prop, false);
     if (i) {
       return i;
@@ -1464,9 +1464,13 @@ var JSHINT = (function() {
 
     // parameter destructuring with rest operator
     if (state.tokens.next.value === "...") {
-      if (!state.option.esnext) {
+      if (norest === true) {
+        warning("E024", state.tokens.next, "...");
+      } else if (!state.option.esnext) {
         warning("W119", state.tokens.next, "spread/rest operator");
       }
+      advance("...");
+      return identifier(fnparam, prop, true);
     } else {
       error("E030", state.tokens.next, state.tokens.next.value);
 
@@ -3312,22 +3316,33 @@ var JSHINT = (function() {
         nextInnerDE();
         advance(")");
       } else {
+        var is_rest = checkPunctuators(state.tokens.next, ["..."]);
         ident = identifier();
         if (ident)
           identifiers.push({ id: ident, token: state.tokens.curr });
+        return is_rest;
       }
+      return false;
     };
     if (checkPunctuators(state.tokens.next, ["["])) {
       advance("[");
-      nextInnerDE();
+      var element_after_rest = false;
+      if (nextInnerDE() && checkPunctuators(state.tokens.next, [","]) &&
+          !element_after_rest) {
+        warning("W130", state.tokens.next);
+        element_after_rest = true;
+      }
       while (!checkPunctuators(state.tokens.next, ["]"])) {
         advance(",");
         if (checkPunctuators(state.tokens.next, ["]"])) {
-          // Trailing commas are not allowed in ArrayBindingPattern
-          warning("W130", state.tokens.next);
+          // Trailing comma
           break;
         }
-        nextInnerDE();
+        if (nextInnerDE() && checkPunctuators(state.tokens.next, [","]) &&
+            !element_after_rest) {
+          warning("W130", state.tokens.next);
+          element_after_rest = true;
+        }
       }
       advance("]");
     } else if (checkPunctuators(state.tokens.next, ["{"])) {
