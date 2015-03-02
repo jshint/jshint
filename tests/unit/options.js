@@ -1618,6 +1618,10 @@ exports.maxparams = function (test) {
     .test(src, { es3: true, maxparams: 3 });
 
   TestRun(test)
+    .addError(4, "This function has too many parameters. (3)")
+    .test(src, {es3: true, maxparams: 0 });
+
+  TestRun(test)
     .test(src, { es3: true });
 
   test.done();
