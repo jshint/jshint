@@ -164,7 +164,7 @@ var findFileResults = {};
 function findFile(name, cwd) {
   cwd = cwd || process.cwd();
 
-  var filename = path.normalize(path.join(cwd, name));
+  var filename = path.resolve(cwd, name);
   if (findFileResults[filename] !== undefined) {
     return findFileResults[filename];
   }
@@ -196,11 +196,12 @@ function loadIgnores(params) {
   if (!file && !params.exclude) {
     return [];
   }
+  file = fs.realpathSync(file);
 
   var lines = (file ? shjs.cat(file) : "").split("\n");
   if(params.exclude && path.isAbsolute(params.exclude)) {
     var exclude = fs.realpathSync(params.exclude);
-    exclude = exclude.slice(path.resolve(path.dirname(file)).length + 1);
+    exclude = exclude.slice(path.dirname(file).length + 1);
     lines.unshift(exclude);
   } else {
     lines.unshift(params.exclude || "");
