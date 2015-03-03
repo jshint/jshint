@@ -44,13 +44,26 @@ var generateES5Data = function() { // ES 5.1
 
 var fs = require('fs');
 var writeFile = function(fileName, data) {
-  fs.writeFileSync(
+  var old=data[0], n=1, s="[", c=old;
+  for (var i=1;i<data.length;i++){ // encode continuous sequences of numbers into elements of array [number, sequence length]
+  	p=data[i];
+  	if (old!=p){
+  		s=s+"["+c+","+ n +"],";
+  		n=1;
+  		c=p;
+  	} else {
+  		n=n+1;
+  	}
+  	old=p+1;
+  }
+  s=s+"["+c+","+ n +"]]";
+  fs.writeFileSync( // write array of sequences and the decoding algorithm
     fileName,
     [
-    'var str = \'' + data.join(',') + '\';',
-    'var arr = str.split(\',\').map(function(code) {',
-    '  return parseInt(code, 10);',
-    '});',
+    'var arr = [], str =  ' + s + ';',
+    'for (var i = 0 ; i<str.length ; i++)',
+    '  for (var a=0 ; a<str[i][1] ; a++)',
+    '    arr.push(str[i][0]+a);', // push starting number plus number in the sequence into resulting array
     'module.exports = arr;'
     ].join('\n')
   );
