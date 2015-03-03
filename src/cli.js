@@ -196,10 +196,13 @@ function loadIgnores(params) {
   if (!file && !params.exclude) {
     return [];
   }
-  file = fs.realpathSync(file);
+  if (file)
+    file = fs.realpathSync(file);
 
   var lines = (file ? shjs.cat(file) : "").split("\n");
-  if(params.exclude && path.isAbsolute(params.exclude)) {
+  if (params.exclude && path.resolve(params.exclude) ===
+      path.normalize(params.exclude).replace(RegExp(path.sep + "$"), "")) {
+      // params.exclude is an absolute path
     var exclude = fs.realpathSync(params.exclude);
     exclude = exclude.slice(path.dirname(file).length + 1);
     lines.unshift(exclude);
@@ -229,7 +232,7 @@ function loadIgnores(params) {
  */
 function isIgnored(fp, patterns) {
   return patterns.some(function(ip) {
-    if (minimatch(path.resolve(fp), ip, { nocase: true })) {
+    if (minimatch(fs.realpathSync(fp), ip, { nocase: true })) {
       return true;
     }
 
