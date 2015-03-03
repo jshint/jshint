@@ -198,7 +198,13 @@ function loadIgnores(params) {
   }
 
   var lines = (file ? shjs.cat(file) : "").split("\n");
-  lines.unshift(params.exclude || "");
+  if(params.exclude && path.isAbsolute(params.exclude)) {
+    var exclude = fs.realpathSync(params.exclude);
+    exclude = exclude.slice(path.resolve(path.dirname(file)).length + 1);
+    lines.unshift(exclude);
+  } else {
+    lines.unshift(params.exclude || "");
+  }
 
   return lines
     .filter(function(line) {
