@@ -268,6 +268,16 @@ exports.bool = {
     singleGroups: false,
 
     /**
+     * When set to true, the use of VariableStatements are forbidden.
+     * For example:
+     *
+     *     // jshint varstmt: true
+     *
+     *     var a; // Warning: `var` declarations are forbidden. Use `let` or `const` instead.
+     */
+    varstmt: false,
+
+    /**
      * This option is a short hand for the most strict JSHint configuration. It
      * enables all enforcing options and disables all relaxing options.
      *
@@ -944,4 +954,10 @@ exports.removed = {
   gcl: true,
   smarttabs: true,
   trailing: true
+};
+
+// Add options here which should not be automatically enforced by
+// `enforceall`.
+exports.noenforceall = {
+  varstmt: true
 };
