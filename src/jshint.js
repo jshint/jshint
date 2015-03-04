@@ -177,7 +177,8 @@ var JSHINT = (function() {
   function processenforceall() {
     if (state.option.enforceall) {
       for (var enforceopt in options.bool.enforcing) {
-        if (state.option[enforceopt] === undefined) {
+        if (state.option[enforceopt] === undefined &&
+            !options.noenforceall[enforceopt]) {
           state.option[enforceopt] = true;
         }
       }
@@ -3504,6 +3505,10 @@ var JSHINT = (function() {
       }
       if (prefix) {
         break;
+      }
+
+      if (state.option.varstmt) {
+        warning("W132", this);
       }
 
       this.first = this.first.concat(names);
