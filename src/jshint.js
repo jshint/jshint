@@ -1218,8 +1218,8 @@ var JSHINT = (function() {
 
   var typeofValues = {};
   typeofValues.es3 = [
-    "undefined", "object", "boolean", "number", "string", "function", "xml",
-    "object", "unknown"
+    "undefined", "boolean", "number", "string", "function", "xml", "object",
+    "unknown"
   ];
   typeofValues.es6 = typeofValues.es3.concat("symbol");
 
