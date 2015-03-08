@@ -10,6 +10,7 @@ if (typeof func === 'number') {}
 if (typeof func === 'string') {}
 if (typeof func === 'function') {}
 if (typeof func === 'unknown') {}
+if (typeof func === 'symbol') {}
 if (typeof func === "xml") {}
 if (typeof func === "object") {}
 if ("undefined" === typeof func) {}
