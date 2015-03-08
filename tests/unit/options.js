@@ -154,10 +154,21 @@ exports.notypeof = function (test) {
     .addError(2, "Invalid typeof value 'double'")
     .addError(3, "Invalid typeof value 'bool'")
     .addError(4, "Invalid typeof value 'obj'")
+    .addError(13, "Invalid typeof value 'symbol'")
     .test(src);
 
   TestRun(test)
+    .addError(1, "Invalid typeof value 'funtion'")
+    .addError(2, "Invalid typeof value 'double'")
+    .addError(3, "Invalid typeof value 'bool'")
+    .addError(4, "Invalid typeof value 'obj'")
+    .test(src, { esnext: true });
+
+  TestRun(test)
     .test(src, { notypeof: true });
+
+  TestRun(test)
+    .test(src, { notypeof: true, esnext: true });
 
   test.done();
 }
