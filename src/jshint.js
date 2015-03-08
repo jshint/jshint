@@ -1217,10 +1217,22 @@ var JSHINT = (function() {
   }
 
   var typeofValues = {};
-  typeofValues.es3 = [
-    "undefined", "boolean", "number", "string", "function", "xml", "object",
+  typeofValues.legacy = [
+    // E4X extended the `typeof` operator to return "xml" for the XML and
+    // XMLList types it introduced.
+    // Ref: 11.3.2 The typeof Operator
+    // http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-357.pdf
+    "xml",
+    // IE<9 reports "unknown" when the `typeof` operator is applied to an
+    // object existing across a COM+ bridge. In lieu of official documentation
+    // (which does not exist), see:
+    // http://robertnyman.com/2005/12/21/what-is-typeof-unknown/
     "unknown"
   ];
+  typeofValues.es3 = [
+    "undefined", "boolean", "number", "string", "function", "object",
+  ];
+  typeofValues.es3 = typeofValues.es3.concat(typeofValues.legacy);
   typeofValues.es6 = typeofValues.es3.concat("symbol");
 
   // Checks whether the 'typeof' operator is used with the correct
