@@ -138,6 +138,7 @@ exports.browser = {
   HTMLTableElement     : false,
   HTMLTableRowElement  : false,
   HTMLTableSectionElement: false,
+  HTMLTemplateElement  : false,
   HTMLTextAreaElement  : false,
   HTMLTitleElement     : false,
   HTMLUListElement     : false,
