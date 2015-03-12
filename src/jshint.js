@@ -863,7 +863,7 @@ var JSHINT = (function() {
       funct["(blockscope)"].stack();
       advance("let");
       advance("(");
-      state.syntax["let"].fud.call(state.syntax["let"].fud, false);
+      state.syntax["let"].fud.call(state.syntax["let"].fud);
       advance(")");
     }
 
@@ -3398,7 +3398,9 @@ var JSHINT = (function() {
     });
   }
 
-  var conststatement = stmt("const", function(prefix) {
+  var conststatement = stmt("const", function(context) {
+    var prefix = context && context.prefix;
+    var inexport = context && context.inexport;
     var tokens;
     var value;
     var lone; // State variable to know if it is a lone identifier, or a destructuring statement.
@@ -3413,6 +3415,10 @@ var JSHINT = (function() {
         tokens = destructuringExpression();
         lone = false;
       } else {
+        if (inexport) {
+          exported[state.tokens.next.value] = true;
+          state.tokens.next.exported = true;
+        }
         tokens = [ { id: identifier(), token: state.tokens.curr } ];
         lone = true;
       }
@@ -3466,9 +3472,11 @@ var JSHINT = (function() {
   });
 
   conststatement.exps = true;
-  var varstatement = stmt("var", function(prefix) {
+  var varstatement = stmt("var", function(context) {
     // JavaScript does not have block scope. It only has function scope. So,
     // declaring a variable in a block can have unexpected consequences.
+    var prefix = context && context.prefix;
+    var inexport = context && context.inexport;
     var tokens, lone, value;
 
     this.first = [];
@@ -3478,6 +3486,10 @@ var JSHINT = (function() {
         tokens = destructuringExpression();
         lone = false;
       } else {
+        if (inexport) {
+          exported[state.tokens.next.value] = true;
+          state.tokens.next.exported = true;
+        }
         tokens = [ { id: identifier(), token: state.tokens.curr } ];
         lone = true;
       }
@@ -3537,7 +3549,9 @@ var JSHINT = (function() {
   });
   varstatement.exps = true;
 
-  var letstatement = stmt("let", function(prefix) {
+  var letstatement = stmt("let", function(context) {
+    var prefix = context && context.prefix;
+    var inexport = context && context.inexport;
     var tokens, lone, value, letblock;
 
     if (!state.option.inESNext()) {
@@ -3562,6 +3576,10 @@ var JSHINT = (function() {
         tokens = destructuringExpression();
         lone = false;
       } else {
+        if (inexport) {
+          exported[state.tokens.next.value] = true;
+          state.tokens.next.exported = true;
+        }
         tokens = [ { id: identifier(), token: state.tokens.curr.value } ];
         lone = true;
       }
@@ -4151,13 +4169,13 @@ var JSHINT = (function() {
 
       if (state.tokens.next.id === "var") {
         advance("var");
-        state.syntax["var"].fud.call(state.syntax["var"].fud, true);
+        state.syntax["var"].fud.call(state.syntax["var"].fud, { prefix: true });
       } else if (state.tokens.next.id === "let") {
         advance("let");
         // create a new block scope
         letscope = true;
         funct["(blockscope)"].stack();
-        state.syntax["let"].fud.call(state.syntax["let"].fud, true);
+        state.syntax["let"].fud.call(state.syntax["let"].fud, { prefix: true });
       } else if (!state.tokens.next.identifier) {
         error("E030", state.tokens.next, state.tokens.next.type);
         advance();
@@ -4583,21 +4601,15 @@ var JSHINT = (function() {
     if (state.tokens.next.id === "var") {
       // ExportDeclaration :: export VariableStatement
       advance("var");
-      exported[state.tokens.next.value] = ok;
-      state.tokens.next.exported = true;
-      state.syntax["var"].fud.call(state.syntax["var"].fud);
+      state.syntax["var"].fud.call(state.syntax["var"].fud, { inexport:true });
     } else if (state.tokens.next.id === "let") {
       // ExportDeclaration :: export VariableStatement
       advance("let");
-      exported[state.tokens.next.value] = ok;
-      state.tokens.next.exported = true;
-      state.syntax["let"].fud.call(state.syntax["let"].fud);
+      state.syntax["let"].fud.call(state.syntax["let"].fud, { inexport:true });
     } else if (state.tokens.next.id === "const") {
       // ExportDeclaration :: export VariableStatement
       advance("const");
-      exported[state.tokens.next.value] = ok;
-      state.tokens.next.exported = true;
-      state.syntax["const"].fud.call(state.syntax["const"].fud);
+      state.syntax["const"].fud.call(state.syntax["const"].fud, { inexport:true });
     } else if (state.tokens.next.id === "function") {
       // ExportDeclaration :: export Declaration
       this.block = true;
