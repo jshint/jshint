@@ -863,7 +863,7 @@ var JSHINT = (function() {
       funct["(blockscope)"].stack();
       advance("let");
       advance("(");
-      state.syntax["let"].fud.call(state.syntax["let"].fud);
+      state.tokens.prev.fud();
       advance(")");
     }
 
@@ -3415,12 +3415,12 @@ var JSHINT = (function() {
         tokens = destructuringExpression();
         lone = false;
       } else {
-        if (inexport) {
-          exported[state.tokens.next.value] = true;
-          state.tokens.next.exported = true;
-        }
         tokens = [ { id: identifier(), token: state.tokens.curr } ];
         lone = true;
+        if (inexport) {
+          exported[state.tokens.curr.value] = true;
+          state.tokens.curr.exported = true;
+        }
       }
       for (var t in tokens) {
         if (tokens.hasOwnProperty(t)) {
@@ -3486,12 +3486,12 @@ var JSHINT = (function() {
         tokens = destructuringExpression();
         lone = false;
       } else {
-        if (inexport) {
-          exported[state.tokens.next.value] = true;
-          state.tokens.next.exported = true;
-        }
         tokens = [ { id: identifier(), token: state.tokens.curr } ];
         lone = true;
+        if (inexport) {
+          exported[state.tokens.curr.value] = true;
+          state.tokens.curr.exported = true;
+        }
       }
       for (var t in tokens) {
         if (tokens.hasOwnProperty(t)) {
@@ -3576,12 +3576,12 @@ var JSHINT = (function() {
         tokens = destructuringExpression();
         lone = false;
       } else {
-        if (inexport) {
-          exported[state.tokens.next.value] = true;
-          state.tokens.next.exported = true;
-        }
         tokens = [ { id: identifier(), token: state.tokens.curr.value } ];
         lone = true;
+        if (inexport) {
+          exported[state.tokens.curr.value] = true;
+          state.tokens.curr.exported = true;
+        }
       }
       for (var t in tokens) {
         if (tokens.hasOwnProperty(t)) {
@@ -4169,13 +4169,13 @@ var JSHINT = (function() {
 
       if (state.tokens.next.id === "var") {
         advance("var");
-        state.syntax["var"].fud.call(state.syntax["var"].fud, { prefix: true });
+        state.tokens.curr.fud({ prefix: true });
       } else if (state.tokens.next.id === "let") {
         advance("let");
         // create a new block scope
         letscope = true;
         funct["(blockscope)"].stack();
-        state.syntax["let"].fud.call(state.syntax["let"].fud, { prefix: true });
+        state.tokens.curr.fud({ prefix: true });
       } else if (!state.tokens.next.identifier) {
         error("E030", state.tokens.next, state.tokens.next.type);
         advance();
@@ -4242,13 +4242,13 @@ var JSHINT = (function() {
       if (state.tokens.next.id !== ";") {
         if (state.tokens.next.id === "var") {
           advance("var");
-          state.syntax["var"].fud.call(state.syntax["var"].fud);
+          state.tokens.curr.fud();
         } else if (state.tokens.next.id === "let") {
           advance("let");
           // create a new block scope
           letscope = true;
           funct["(blockscope)"].stack();
-          state.syntax["let"].fud.call(state.syntax["let"].fud);
+          state.tokens.curr.fud();
         } else {
           for (;;) {
             expression(0, "for");
@@ -4601,15 +4601,15 @@ var JSHINT = (function() {
     if (state.tokens.next.id === "var") {
       // ExportDeclaration :: export VariableStatement
       advance("var");
-      state.syntax["var"].fud.call(state.syntax["var"].fud, { inexport:true });
+      state.tokens.curr.fud({ inexport:true });
     } else if (state.tokens.next.id === "let") {
       // ExportDeclaration :: export VariableStatement
       advance("let");
-      state.syntax["let"].fud.call(state.syntax["let"].fud, { inexport:true });
+      state.tokens.curr.fud({ inexport:true });
     } else if (state.tokens.next.id === "const") {
       // ExportDeclaration :: export VariableStatement
       advance("const");
-      state.syntax["const"].fud.call(state.syntax["const"].fud, { inexport:true });
+      state.tokens.curr.fud({ inexport:true });
     } else if (state.tokens.next.id === "function") {
       // ExportDeclaration :: export Declaration
       this.block = true;
