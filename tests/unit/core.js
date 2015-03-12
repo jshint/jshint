@@ -722,7 +722,10 @@ exports.testES6ModulesNamedExportsAffectUnused = function (test) {
     "export { a, x };",
     "export var b = { baz: 'baz' };",
     "export function boo() { return z; }",
-    "export class MyClass { }"
+    "export class MyClass { }",
+    "export var varone = 1, vartwo = 2;",
+    "export const constone = 1, consttwo = 2;",
+    "export let letone = 1, lettwo = 2;"
   ];
 
   TestRun(test)
