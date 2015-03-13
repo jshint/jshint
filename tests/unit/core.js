@@ -725,10 +725,15 @@ exports.testES6ModulesNamedExportsAffectUnused = function (test) {
     "export class MyClass { }",
     "export var varone = 1, vartwo = 2;",
     "export const constone = 1, consttwo = 2;",
-    "export let letone = 1, lettwo = 2;"
+    "export let letone = 1, lettwo = 2;",
+    "export var v1u, v2u;",
+    "export let l1u, l2u;",
+    "export const c1u, c2u;"
   ];
 
   TestRun(test)
+    .addError(16, "const 'c1u' is initialized to 'undefined'.")
+    .addError(16, "const 'c2u' is initialized to 'undefined'.")
     .test(src1, {
       esnext: true,
       unused: true
