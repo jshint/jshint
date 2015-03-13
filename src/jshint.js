@@ -191,10 +191,6 @@ var JSHINT = (function() {
   }
 
   function assume() {
-    if (state.option.es5) {
-      warning("I003");
-    }
-
     processenforceall();
 
     if (!state.option.es3) {
@@ -363,7 +359,7 @@ var JSHINT = (function() {
       msg = messages.info[code];
     }
 
-    t = t || state.tokens.next;
+    t = t || state.tokens.next || {};
     if (t.id === "(end)") {  // `~
       t = state.tokens.curr;
     }
@@ -504,7 +500,6 @@ var JSHINT = (function() {
     var nt = state.tokens.next;
     var body = nt.body.split(",").map(function(s) { return s.trim(); });
     var predef = {};
-
     if (nt.type === "globals") {
       body.forEach(function(g) {
         g = g.split(":");
@@ -590,6 +585,12 @@ var JSHINT = (function() {
           }
 
           return;
+        }
+
+        if (key === "es5") {
+          if (val === "true" && state.option.es5) {
+            warning("I003");
+          }
         }
 
         if (key === "validthis") {
@@ -5154,9 +5155,15 @@ var JSHINT = (function() {
         if (/^-W\d{3}$/g.test(optionKeys[x])) {
           newIgnoredObj[optionKeys[x].slice(1)] = true;
         } else {
-          newOptionObj[optionKeys[x]] = o[optionKeys[x]];
+          var optionKey = optionKeys[x];
+          newOptionObj[optionKey] = o[optionKey];
+          if (optionKey === "es5") {
+            if (o[optionKey]) {
+              warning("I003");
+            }
+          }
 
-          if (optionKeys[x] === "newcap" && o[optionKeys[x]] === false)
+          if (optionKeys[x] === "newcap" && o[optionKey] === false)
             newOptionObj["(explicitNewcap)"] = true;
         }
       }
