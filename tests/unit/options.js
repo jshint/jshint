@@ -1286,6 +1286,7 @@ exports.strings = function (test) {
     .addError(14, "Bad escaping of EOL. Use option multistr if needed.")
     .addError(15, "Unclosed string.")
     .addError(25, "Octal literals are not allowed in strict mode.")
+    .addError(29, "Bad escaping of EOL. Use option multistr if needed.")
     .test(src, { es3: true });
 
   test.done();

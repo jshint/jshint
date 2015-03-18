@@ -25,3 +25,6 @@ function octal_strictmode() {
   var test = "\033\t";
   test = "\0"; // Regression for false positives on \0
 }
+
+test = "closing quote on next line\
+";
