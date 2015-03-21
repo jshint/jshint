@@ -1179,7 +1179,8 @@ var JSHINT = (function() {
 
     x.led = function(left) {
       nobreaknonadjacent(state.tokens.prev, state.tokens.curr);
-      var right = expression(100);
+      this.left = left;
+      var right = this.right = expression(100);
 
       if (isIdentifier(left, "NaN") || isIdentifier(right, "NaN")) {
         warning("W019", this);
@@ -1199,8 +1200,6 @@ var JSHINT = (function() {
         warning("W018", right, "!");
       }
 
-      this.left = left;
-      this.right = right;
       return this;
     };
     return x;
