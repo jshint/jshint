@@ -87,6 +87,11 @@ function findConfig(file) {
   if (shjs.test("-e", home))
     return home;
 
+  var etc = "/etc/.jshintrc";
+
+  if (shjs.test("-e", etc))
+    return etc;
+
   return null;
 }
 
