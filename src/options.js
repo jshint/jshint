@@ -70,23 +70,6 @@ exports.bool = {
     futurehostile: true,
 
     /**
-     * This option suppresses warnings about invalid `typeof` operator values.
-     * This operator has only [a limited set of possible return
-     * values](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof).
-     * By default, JSHint warns when you compare its result with an invalid
-     * value which often can be a typo.
-     *
-     *     // 'fuction' instead of 'function'
-     *     if (typeof a == "fuction") { // Invalid typeof value 'fuction'
-     *       // ...
-     *     }
-     *
-     * Do not use this option unless you're absolutely sure you don't want
-     * these checks.
-     */
-    notypeof    : true,
-
-    /**
      * This option tells JSHint that your code needs to adhere to ECMAScript 3
      * specification. Use this option if you need your program to be executable
      * in older browsers—such as Internet Explorer 6/7/8/9—and other legacy
@@ -127,26 +110,6 @@ exports.bool = {
     forin       : true,
 
     /**
-     * This option suppresses warnings about declaring variables inside of
-     * control
-     * structures while accessing them later from the outside. Even though
-     * JavaScript has only two real scopes—global and function—such practice
-     * leads to confusion among people new to the language and hard-to-debug
-     * bugs. This is why, by default, JSHint warns about variables that are
-     * used outside of their intended scope.
-     *
-     *     function test() {
-     *       if (true) {
-     *         var x = 0;
-     *       }
-     *
-     *       x += 1; // Default: 'x' used out of scope.
-     *                 // No warning when funcscope:true
-     *     }
-     */
-    funcscope   : true,
-
-    /**
      * This option prohibits the use of immediate function invocations without
      * wrapping them in parentheses. Wrapping parentheses assists readers of
      * your code in understanding that the expression is the result of a
@@ -158,12 +121,6 @@ exports.bool = {
      *             project](https://github.com/jscs-dev/node-jscs).
      */
     immed       : true,
-
-    /**
-     * This option suppresses warnings about the `__iterator__` property. This
-     * property is not supported by all browsers so use it carefully.
-     */
-    iterator    : true,
 
     /**
      * This option requires you to capitalize names of constructor functions.
@@ -359,6 +316,26 @@ exports.bool = {
     evil        : true,
 
     /**
+     * This option suppresses warnings about declaring variables inside of
+     * control
+     * structures while accessing them later from the outside. Even though
+     * JavaScript has only two real scopes—global and function—such practice
+     * leads to confusion among people new to the language and hard-to-debug
+     * bugs. This is why, by default, JSHint warns about variables that are
+     * used outside of their intended scope.
+     *
+     *     function test() {
+     *       if (true) {
+     *         var x = 0;
+     *       }
+     *
+     *       x += 1; // Default: 'x' used out of scope.
+     *                 // No warning when funcscope:true
+     *     }
+     */
+    funcscope   : true,
+
+    /**
      * This option suppresses warnings about the use of global strict mode.
      * Global strict mode can break third-party widgets so it is not
      * recommended.
@@ -368,6 +345,29 @@ exports.bool = {
      * @deprecated Use `strict: "global"`.
      */
     globalstrict: true,
+
+    /**
+     * This option suppresses warnings about the `__iterator__` property. This
+     * property is not supported by all browsers so use it carefully.
+     */
+    iterator    : true,
+
+     /**
+     * This option suppresses warnings about invalid `typeof` operator values.
+     * This operator has only [a limited set of possible return
+     * values](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof).
+     * By default, JSHint warns when you compare its result with an invalid
+     * value which often can be a typo.
+     *
+     *     // 'fuction' instead of 'function'
+     *     if (typeof a == "fuction") { // Invalid typeof value 'fuction'
+     *       // ...
+     *     }
+     *
+     * Do not use this option unless you're absolutely sure you don't want
+     * these checks.
+     */
+    notypeof    : true,
 
     /**
      * This option prohibits the use of unary increment and decrement
