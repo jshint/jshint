@@ -7,6 +7,7 @@ to a snippet, graffiti outside of Anton's apartment, etc.
 However, before sending a patch, please make sure that the following applies:
 
 * Your commit message follows the [Commit Message Guidelines](#commit-message-guidelines).
+* You have signed the [Contributor's License Agreement](https://www.clahub.com/agreements/jshint/jshint).
 * Your patch doesn't have useless merge commits.
 * Your coding style is similar to ours (see below).
 * Your patch is 100% tested. We don't accept any test regressions.
@@ -39,10 +40,10 @@ that's fine but if you're going to send us patches treat this guide as a law.
 
 * We use two spaces everywhere.
 * Use one space after `if`, `for`, `while`, etc.
-* Use one space after `function` for anonymous functions but not for named functions:
+* No spaces between `function` and `(` for anonymous functions, no space between name and `(`  for named functions:
 
     ```javascript
-    var a = function () {};
+    var a = function() {};
     function a() {}
     ```
 
@@ -146,6 +147,7 @@ Several commit types are used by jshint:
 2. `[[FEAT]]` --- Commit introduces new functionality
 3. `[[DOCS]]` --- Commit modifies documentation. Docs commits should only touch comments in source code, or scripts and assets which are used to generate the documentation.
 4. `[[TEST]]` --- Commit modifies tests or test infrastructure only
+5. `[[CHORE]]` --- Commit affects dev-ops, CI, or package dependencies
 
 ### Body
 

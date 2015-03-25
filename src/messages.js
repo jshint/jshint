@@ -200,10 +200,14 @@ var warnings = {
   W123: "'{a}' is already defined in outer scope.",
   W124: "A generator function shall contain a yield statement.",
   W125: "This line contains non-breaking spaces: http://jshint.com/doc/options/#nonbsp",
-  W126: "Grouping operator is unnecessary for lone expressions.",
+  W126: "Unnecessary grouping operator.",
   W127: "Unexpected use of a comma operator.",
   W128: "Empty array elements require elision=true.",
-  W129: "Missing comma."
+  W129: "'{a}' is defined in a future version of JavaScript. Use a " +
+    "different variable name to avoid migration issues.",
+  W130: "Invalid element after rest element.",
+  W131: "Invalid parameter after rest parameter.",
+  W132: "Missing comma."
 };
 
 var info = {
@@ -216,14 +220,14 @@ exports.errors = {};
 exports.warnings = {};
 exports.info = {};
 
-_.each(errors, function (desc, code) {
+_.each(errors, function(desc, code) {
   exports.errors[code] = { code: code, desc: desc };
 });
 
-_.each(warnings, function (desc, code) {
+_.each(warnings, function(desc, code) {
   exports.warnings[code] = { code: code, desc: desc };
 });
 
-_.each(info, function (desc, code) {
+_.each(info, function(desc, code) {
   exports.info[code] = { code: code, desc: desc };
 });

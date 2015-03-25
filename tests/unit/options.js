@@ -68,7 +68,23 @@ exports.scopeshadow = function (test) {
     .test(src, { es3: true, shadow: "outer" });
 
   test.done();
-}
+};
+
+exports.shadowInline = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/shadow-inline.js", "utf8");
+
+  TestRun(test)
+    .addError(6, "'a' is already defined in outer scope.")
+    .addError(7, "'a' is already defined.")
+    .addError(7, "'a' is already defined in outer scope.")
+    .addError(17, "'a' is already defined.")
+    .addError(27, "'a' is already defined.")
+    .addError(42, "Bad option value.")
+    .addError(47, "'a' is already defined.")
+    .test(src);
+
+  test.done();
+};
 
 /**
  * Option `latedef` allows you to prohibit the use of variable before their
@@ -113,6 +129,19 @@ exports.latedef = function (test) {
     .addError(10, "'vr' was used before it was defined.")
     .addError(18, "Inner functions should be listed at the top of the outer function.")
     .test(src, { es3: true, latedef: true });
+
+  test.done();
+};
+
+exports.latedefInline = function (test) {
+  var src  = fs.readFileSync(__dirname + '/fixtures/latedef-inline.js', 'utf8');
+
+  TestRun(test)
+    .addError(4, "'foo' was used before it was defined.")
+    .addError(6, "'a' was used before it was defined.")
+    .addError(22, "'a' was used before it was defined.")
+    .addError(26, "Bad option value.")
+    .test(src);
 
   test.done();
 };
@@ -685,6 +714,14 @@ exports['unused overrides'] = function (test) {
     .addError(3, "'i' is defined but never used.")
     .test(code, {es3: true, unused: "strict"});
 
+  code = ['/*jshint unused:badoption */', 'function foo(a, b) {', 'var i = 3;', '}', 'foo();'];
+  TestRun(test)
+    .addError(1, "Bad option value.")
+    .addError(2, "'b' is defined but never used.")
+    .addError(2, "'a' is defined but never used.")
+    .addError(3, "'i' is defined but never used.")
+    .test(code, {es3: true, unused: "strict"});
+
   test.done();
 };
 
@@ -866,27 +903,44 @@ exports.supernew = function (test) {
 
 /** Option `bitwise` disallows the use of bitwise operators. */
 exports.bitwise = function (test) {
-  var ops = [ '&', '|', '^', '<<', '>>', '>>>' ];
-  var moreTests = [
-    'var c = ~a;',
-    'c &= 2;'
-  ];
+  var unOps = [ "~" ];
+  var binOps = [ "&",  "|",  "^",  "<<",  ">>",  ">>>" ];
+  var modOps = [ "&=", "|=", "^=", "<<=", ">>=", ">>>=" ];
 
-  // By default allow bitwise operators
-  for (var i = 0, op; op = ops[i]; i += 1) {
-    TestRun(test).test('var c = a ' + op + ' b;', {es3: true});
-  }
-  TestRun(test).test(moreTests, {es3: true});
+  var i, op;
 
-  for (i = 0, op = null; op = ops[i]; i += 1) {
+  for (i = 0; i < unOps.length; i += 1) {
+    op = unOps[i];
+
+    TestRun(test)
+      .test("var b = " + op + "a;", {es3: true});
+
     TestRun(test)
       .addError(1, "Unexpected use of '" + op + "'.")
-      .test('var c = a ' + op + ' b;', { es3: true, bitwise: true });
+      .test("var b = " + op + "a;", {es3: true, bitwise: true});
   }
-  TestRun(test)
-    .addError(1, "Unexpected '~'.")
-    .addError(2, "Unexpected use of '&='.")
-    .test(moreTests, { es3: true, bitwise: true });
+
+  for (i = 0; i < binOps.length; i += 1) {
+    op = binOps[i];
+
+    TestRun(test)
+      .test("var c = a " + op + " b;", {es3: true});
+
+    TestRun(test)
+      .addError(1, "Unexpected use of '" + op + "'.")
+      .test("var c = a " + op + " b;", {es3: true, bitwise: true});
+  }
+
+  for (i = 0; i < modOps.length; i += 1) {
+    op = modOps[i];
+
+    TestRun(test)
+      .test("b " + op + " a;", {es3: true});
+
+    TestRun(test)
+      .addError(1, "Unexpected use of '" + op + "'.")
+      .test("b " + op + " a;", {es3: true, bitwise: true});
+  }
 
   test.done();
 };
@@ -1439,6 +1493,10 @@ exports.browser = function (test) {
     .addError(15, "'Node' is not defined.")
     .addError(18, "'MutationObserver' is not defined.")
     .addError(21, "'SVGElement' is not defined.")
+    .addError(24, "'Comment' is not defined.")
+    .addError(25, "'DocumentFragment' is not defined.")
+    .addError(26, "'Range' is not defined.")
+    .addError(27, "'Text' is not defined.")
     .test(src, {es3: true, undef: true });
 
   TestRun(test).test(src, {es3: true, browser: true, undef: true });
@@ -1644,6 +1702,21 @@ exports.unignored = function (test) {
 };
 
 /*
+ * Tests that the W117 and undef can be toggled per line.
+ */
+exports['per-line undef / -W117'] = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/ignore-w117.js", "utf-8");
+
+  TestRun(test)
+    .addError(5, "'c' is not defined.")
+    .addError(11, "'c' is not defined.")
+    .addError(15, "'c' is not defined.")
+    .test(src, { undef:true });
+
+  test.done();
+};
+
+/*
 * Tests the `freeze` option -- Warn if native object prototype is assigned to.
 */
 exports.freeze = function (test) {
@@ -1676,16 +1749,34 @@ exports.nonbsp = function (test) {
 /** Option `nocomma` disallows the use of comma operator. */
 exports.nocomma = function (test) {
   // By default allow comma operator
-  TestRun(test)
+  TestRun(test, "nocomma off by default")
     .test("return 2, 5;", {});
 
-  TestRun(test)
+  TestRun(test, "nocomma main case")
     .addError(1, "Unexpected use of a comma operator.")
     .test("return 2, 5;", { nocomma: true });
 
-  TestRun(test)
+  TestRun(test, "nocomma in an expression")
     .addError(1, "Unexpected use of a comma operator.")
     .test("(2, 5);", { expr: true, nocomma: true });
+
+  TestRun(test, "avoid nocomma false positives in value literals")
+    .test("return { a: 2, b: [1, 2] };", { nocomma: true });
+
+  TestRun(test, "avoid nocomma false positives in for statements")
+    .test("for(;;) { return; }", { nocomma: true });
+
+  TestRun(test, "avoid nocomma false positives in function expressions")
+    .test("return function(a, b) {};", { nocomma: true });
+
+  TestRun(test, "avoid nocomma false positives in arrow function expressions")
+    .test("return (a, b) => a;", { esnext: true, nocomma: true });
+
+  TestRun(test, "avoid nocomma false positives in destructuring arrays")
+    .test("var [a, b] = [1, 2];", { esnext: true, nocomma: true });
+
+  TestRun(test, "avoid nocomma false positives in destructuring objects")
+    .test("var {a, b} = {a:1, b:2};", { esnext: true, nocomma: true });
 
   test.done();
 };
@@ -1742,8 +1833,7 @@ exports.esnextPredefs = function (test) {
     '/* global alert: true */',
     'var mySym = Symbol("name");',
     'var myBadSym = new Symbol("name");',
-    'alert(Reflect);',
-    'alert(System);'
+    'alert(Reflect);'
   ];
 
   TestRun(test)
@@ -1753,16 +1843,310 @@ exports.esnextPredefs = function (test) {
   test.done();
 };
 
-exports.singleGroups = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/singleGroups.js", "utf8");
+var singleGroups = exports.singleGroups = {};
+
+singleGroups.loneIdentifier = function (test) {
+  var code = [
+    "if ((a)) {}",
+    "if ((a) + b + c) {}",
+    "if (a + (b) + c) {}",
+    "if (a + b + (c)) {}",
+  ];
 
   TestRun(test)
-    .addError(5, "Grouping operator is unnecessary for lone expressions.")
-    .addError(7, "Grouping operator is unnecessary for lone expressions.")
-    .test(src, {
-      singleGroups: true,
-      esnext: true
-    });
+    .addError(1, "Unnecessary grouping operator.")
+    .addError(2, "Unnecessary grouping operator.")
+    .addError(3, "Unnecessary grouping operator.")
+    .addError(4, "Unnecessary grouping operator.")
+    .test(code, { singleGroups: true });
+
+  test.done();
+};
+
+singleGroups.neighborless = function (test) {
+  var code = [
+    "if ((a instanceof b)) {}",
+    "if ((a in b)) {}",
+    "if ((a + b)) {}"
+  ];
+
+  TestRun(test)
+    .addError(1, "Unnecessary grouping operator.")
+    .addError(2, "Unnecessary grouping operator.")
+    .addError(3, "Unnecessary grouping operator.")
+    .test(code, { singleGroups: true });
+
+  test.done();
+};
+
+singleGroups.bindingPower = {};
+
+singleGroups.bindingPower.singleExpr = function (test) {
+  var code = [
+    "var a = !(a instanceof b);",
+    "var b = !(a in b);",
+    "var c = !!(a && a.b);",
+    "var d = (1 - 2) * 3;",
+    "var e = 3 * (1 - 2);",
+    "var f = a && (b || c);",
+    "var g = ~(a * b);",
+    "var h = void (a || b);",
+    "var i = 2 * (3 - 4 - 5) * 6;",
+    "var j = (a = 1) + 2;",
+    "var j = (a += 1) / 2;",
+    "var k = 'foo' + ('bar' ? 'baz' : 'qux');",
+    "var l = 1 + (0 || 3);",
+    // Invalid forms:
+    "var j = 2 * ((3 - 4) - 5) * 6;",
+    "var k = 2 * (3 - (4 - 5)) * 6;",
+    "var l = 2 * ((3 - 4 - 5)) * 6;",
+    "var m = typeof(a.b);",
+    "var n = 1 - (2 * 3);",
+    "var o = (3 * 1) - 2;",
+    "var p = ~(Math.abs(a));",
+    "var q = -(a[b]);",
+    "var r = +(a.b);",
+    "var s = --(a.b);",
+    "var t = ++(a[b]);",
+    "if (a in c || (b in c)) {}",
+    "if ((a in c) || b in c) {}",
+    "if ((a in c) || (b in c)) {}",
+    "if (a * (b * c)) {}",
+    "if ((a * b) * c) {}",
+    "if (a + (b * c)) {}",
+    "(a ? a : (a=[])).push(b);",
+    "if (a || (1 / 0 == 1 / 0)) {}",
+  ];
+
+  TestRun(test)
+    .addError(14, "Unnecessary grouping operator.")
+    .addError(15, "Unnecessary grouping operator.")
+    .addError(16, "Unnecessary grouping operator.")
+    .addError(17, "Unnecessary grouping operator.")
+    .addError(18, "Unnecessary grouping operator.")
+    .addError(19, "Unnecessary grouping operator.")
+    .addError(20, "Unnecessary grouping operator.")
+    .addError(21, "Unnecessary grouping operator.")
+    .addError(22, "Unnecessary grouping operator.")
+    .addError(23, "Unnecessary grouping operator.")
+    .addError(24, "Unnecessary grouping operator.")
+    .addError(25, "Unnecessary grouping operator.")
+    .addError(26, "Unnecessary grouping operator.")
+    .addError(27, "Unnecessary grouping operator.")
+    .addError(28, "Unnecessary grouping operator.")
+    .addError(29, "Unnecessary grouping operator.")
+    .addError(30, "Unnecessary grouping operator.")
+    .addError(31, "Unnecessary grouping operator.")
+    .addError(32, "Unnecessary grouping operator.")
+    .test(code, { singleGroups: true });
+
+  test.done();
+};
+
+singleGroups.bindingPower.multiExpr = function (test) {
+  var code = [
+    "var j = (a, b);",
+    "var k = -(a, b);",
+    "var i = (1, a = 1) + 2;",
+    "var k = a ? (b, c) : (d, e);",
+    "var j = (a, b + c) * d;",
+    "if (a, (b * c)) {}",
+    "if ((a * b), c) {}",
+    "if ((a, b, c)) {}",
+    "if ((a + 1)) {}"
+  ];
+
+  TestRun(test)
+    .addError(6, "Unnecessary grouping operator.")
+    .addError(7, "Unnecessary grouping operator.")
+    .addError(8, "Unnecessary grouping operator.")
+    .addError(9, "Unnecessary grouping operator.")
+    .test(code, { singleGroups: true });
+
+  test.done();
+};
+
+singleGroups.multiExpr = function (test) {
+  var code = [
+    "var a = (1, 2);",
+    "var b = (true, false) ? 1 : 2;",
+    "var c = true ? (1, 2) : false;",
+    "var d = true ? false : (1, 2);",
+    "foo((1, 2));"
+  ];
+
+  TestRun(test)
+    .addError(5, "Unnecessary grouping operator.")
+    .test(code, { singleGroups: true });
+
+  test.done();
+};
+
+// Although the following form is redundant in purely mathematical terms, type
+// coercion semantics in JavaScript make it impossible to statically determine
+// whether the grouping operator is necessary. JSHint should err on the side of
+// caution and allow this form.
+singleGroups.concatenation = function (test) {
+  var code = [
+    "var a = b + (c + d);",
+    "var e = (f + g) + h;"
+  ];
+
+  TestRun(test)
+    .addError(2, "Unnecessary grouping operator.")
+    .test(code, { singleGroups: true });
+
+  test.done();
+};
+
+singleGroups.functionExpression = function (test) {
+  var code = [
+    "(function() {})();",
+    "(function() {}).call();",
+    "(function() {}());",
+    "(function() {}.call());",
+    "if (true) {} (function() {}());",
+    "var a",
+    "(function() {}());",
+    "var a = (function() {})();",
+    // Invalid forms:
+    "var b = (function() {}).call();",
+    "var c = (function() {}());",
+    "var d = (function() {}.call());",
+    "var e = { e: (function() {})() };",
+    "var f = { f: (function() {}).call() };",
+    "var g = { g: (function() {}()) };",
+    "var h = { h: (function() {}.call()) };",
+    "if ((function() {})()) {}",
+    "if ((function() {}).call()) {}",
+    "if ((function() {}())) {}",
+    "if ((function() {}.call())) {}"
+  ];
+
+  TestRun(test)
+    .addError(8, "Unnecessary grouping operator.")
+    .addError(9, "Unnecessary grouping operator.")
+    .addError(10, "Unnecessary grouping operator.")
+    .addError(11, "Unnecessary grouping operator.")
+    .addError(12, "Unnecessary grouping operator.")
+    .addError(13, "Unnecessary grouping operator.")
+    .addError(14, "Unnecessary grouping operator.")
+    .addError(15, "Unnecessary grouping operator.")
+    .addError(16, "Unnecessary grouping operator.")
+    .addError(17, "Unnecessary grouping operator.")
+    .addError(18, "Unnecessary grouping operator.")
+    .addError(19, "Unnecessary grouping operator.")
+    .test(code, { singleGroups: true, asi: true });
+
+  test.done();
+};
+
+singleGroups.generatorExpression = function (test) {
+  var code = [
+    "(function*() { yield; })();",
+    "(function*() { yield; }).call();",
+    "(function*() { yield; }());",
+    "(function*() { yield; }.call());",
+    "if (true) {} (function*() { yield; }());",
+    "var a",
+    "(function*() { yield; }());",
+    "var a = (function*() { yield; })();",
+    // Invalid forms:
+    "var b = (function*() { yield; }).call();",
+    "var c = (function*() { yield; }());",
+    "var d = (function*() { yield; }.call());",
+    "var e = { e: (function*() { yield; })() };",
+    "var f = { f: (function*() { yield; }).call() };",
+    "var g = { g: (function*() { yield; }()) };",
+    "var h = { h: (function*() { yield; }.call()) };",
+    "if ((function*() { yield; })()) {}",
+    "if ((function*() { yield; }).call()) {}",
+    "if ((function*() { yield; }())) {}",
+    "if ((function*() { yield; }.call())) {}"
+  ];
+
+  TestRun(test)
+    .addError(8, "Unnecessary grouping operator.")
+    .addError(9, "Unnecessary grouping operator.")
+    .addError(10, "Unnecessary grouping operator.")
+    .addError(11, "Unnecessary grouping operator.")
+    .addError(12, "Unnecessary grouping operator.")
+    .addError(13, "Unnecessary grouping operator.")
+    .addError(14, "Unnecessary grouping operator.")
+    .addError(15, "Unnecessary grouping operator.")
+    .addError(16, "Unnecessary grouping operator.")
+    .addError(17, "Unnecessary grouping operator.")
+    .addError(18, "Unnecessary grouping operator.")
+    .addError(19, "Unnecessary grouping operator.")
+    .test(code, { singleGroups: true, asi: true, esnext: true });
+
+  test.done();
+};
+
+singleGroups.arrowFunctions = function (test) {
+  var code = [
+    "var a = () => ({});",
+    "var b = (c) => {};",
+    "(() => {})();",
+    "var d = () => (e);",
+    "var f = () => (3);"
+  ];
+
+  TestRun(test)
+    .addError(4, "Unnecessary grouping operator.")
+    .addError(5, "Unnecessary grouping operator.")
+    .test(code, { singleGroups: true, esnext: true });
+
+  test.done();
+};
+
+singleGroups.objectLiterals = function (test) {
+  var code = [
+    "({}).method();",
+    "if(true) {} ({}).method();",
+    "g(); ({}).method();",
+
+    // Invalid forms
+    "var a = ({}).method();",
+    "if (({}).method()) {}",
+    "var b = { a: ({}).method() };"
+  ];
+
+  TestRun(test, "grouping operator not required")
+    .addError(4, "Unnecessary grouping operator.")
+    .addError(5, "Unnecessary grouping operator.")
+    .addError(6, "Unnecessary grouping operator.")
+    .test(code, { singleGroups: true });
+
+  test.done();
+};
+
+singleGroups.newLine = function(test) {
+  var code = [
+    "function x() {",
+    "  return f",
+    "    ();",
+    "}",
+    "x({ f: null });"
+  ];
+
+  TestRun(test)
+    .test(code, { singleGroups: true });
+
+  test.done();
+};
+
+singleGroups.lineNumber = function (test) {
+  var code = [
+    "var x = (",
+    "  1",
+    ")",
+    ";"
+  ];
+
+  TestRun(test)
+    .addError(1, "Unnecessary grouping operator.")
+    .test(code, { singleGroups: true });
 
   test.done();
 };
@@ -1833,6 +2217,109 @@ exports.trailingcomma = function (test) {
     .addError(8, "Extra comma. (it breaks older versions of IE)")
     .addError(10, "Extra comma. (it breaks older versions of IE)")
     .test(code, { trailingcomma: true, es3: true });
+
+    test.done();
+};
+
+exports.badInlineOptionValue = function (test) {
+  var src = [ "/* jshint bitwise:batcrazy */" ];
+
+  TestRun(test)
+    .addError(1, "Bad option value.")
+    .test(src);
+
+  test.done();
+};
+
+exports.futureHostile = function (test) {
+  var code = [
+    "var JSON = {};",
+    "var Map = function() {};",
+    "var Promise = function() {};",
+    "var Proxy = function() {};",
+    "var Reflect = function() {};",
+    "var Set = function() {};",
+    "var Symbol = function() {};",
+    "var WeakMap = function() {};",
+    "var WeakSet = function() {};"
+  ];
+
+  TestRun(test, "ES3 without option")
+    .addError(1, "'JSON' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(2, "'Map' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(3, "'Promise' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(4, "'Proxy' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(5, "'Reflect' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(6, "'Set' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(7, "'Symbol' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(8, "'WeakMap' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(9, "'WeakSet' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .test(code, { es3: true, es5: false, futurehostile: false });
+
+  TestRun(test, "ES3 with option")
+    .test(code, { es3: true, es5: false });
+
+  TestRun(test, "ES5 without option")
+    .addError(1, "Redefinition of 'JSON'.")
+    .addError(2, "'Map' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(3, "'Promise' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(4, "'Proxy' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(5, "'Reflect' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(6, "'Set' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(7, "'Symbol' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(8, "'WeakMap' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(9, "'WeakSet' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .test(code, { futurehostile: false });
+
+  TestRun(test, "ES5 with option")
+    .addError(1, "Redefinition of 'JSON'.")
+    .test(code, {});
+
+  TestRun(test, "ES5 with opt-out")
+    .test(code, {
+      predef: ["-JSON"]
+    });
+
+  TestRun(test, "ESNext without option")
+    .addError(1, "Redefinition of 'JSON'.")
+    .addError(2, "Redefinition of 'Map'.")
+    .addError(3, "Redefinition of 'Promise'.")
+    .addError(4, "Redefinition of 'Proxy'.")
+    .addError(5, "Redefinition of 'Reflect'.")
+    .addError(6, "Redefinition of 'Set'.")
+    .addError(7, "Redefinition of 'Symbol'.")
+    .addError(8, "Redefinition of 'WeakMap'.")
+    .addError(9, "Redefinition of 'WeakSet'.")
+    .test(code, { esnext: true, futurehostile: false });
+
+  TestRun(test, "ESNext with option")
+    .addError(1, "Redefinition of 'JSON'.")
+    .addError(2, "Redefinition of 'Map'.")
+    .addError(3, "Redefinition of 'Promise'.")
+    .addError(4, "Redefinition of 'Proxy'.")
+    .addError(5, "Redefinition of 'Reflect'.")
+    .addError(6, "Redefinition of 'Set'.")
+    .addError(7, "Redefinition of 'Symbol'.")
+    .addError(8, "Redefinition of 'WeakMap'.")
+    .addError(9, "Redefinition of 'WeakSet'.")
+    .test(code, { esnext: true });
+
+  TestRun(test, "ESNext with opt-out")
+    .test(code, {
+      esnext: true,
+      futurehostile: false,
+      predef: [
+        "-JSON",
+        "-Map",
+        "-Promise",
+        "-Proxy",
+        "-Reflect",
+        "-Set",
+        "-Symbol",
+        "-WeakMap",
+        "-WeakSet"
+      ]
+    });
 
   test.done();
 };

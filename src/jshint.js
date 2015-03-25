@@ -51,7 +51,7 @@ var console = require("console-browserify");
 // variable. That function will be invoked immediately, and its return value is
 // the JSHINT function itself.
 
-var JSHINT = (function () {
+var JSHINT = (function() {
   "use strict";
 
   var api, // Extension API
@@ -162,14 +162,14 @@ var JSHINT = (function () {
   }
 
   function supplant(str, data) {
-    return str.replace(/\{([^{}]*)\}/g, function (a, b) {
+    return str.replace(/\{([^{}]*)\}/g, function(a, b) {
       var r = data[b];
       return typeof r === "string" || typeof r === "number" ? r : a;
     });
   }
 
   function combine(dest, src) {
-    Object.keys(src).forEach(function (name) {
+    Object.keys(src).forEach(function(name) {
       if (_.has(JSHINT.blacklist, name)) return;
       dest[name] = src[name];
     });
@@ -180,7 +180,7 @@ var JSHINT = (function () {
       for (var enforceopt in options.bool.enforcing) {
         if (state.option[enforceopt] === undefined) {
           state.option[enforceopt] = true;
-          }
+        }
       }
       for (var relaxopt in options.bool.relaxing) {
         if (state.option[relaxopt] === undefined) {
@@ -197,8 +197,12 @@ var JSHINT = (function () {
 
     processenforceall();
 
+    if (!state.option.es3) {
+      combine(predefined, vars.ecmaIdentifiers[5]);
+    }
+
     if (state.option.esnext) {
-      combine(predefined, vars.newEcmaIdentifiers);
+      combine(predefined, vars.ecmaIdentifiers[6]);
     }
 
     if (state.option.couch) {
@@ -291,25 +295,25 @@ var JSHINT = (function () {
 
     // Let's assume that chronologically ES3 < ES5 < ES6/ESNext < Moz
 
-    state.option.inMoz = function (strict) {
+    state.option.inMoz = function(strict) {
       if (strict) {
         return state.option.moz && !state.option.esnext;
       }
       return state.option.moz;
     };
 
-    state.option.inESNext = function (strict) {
+    state.option.inESNext = function(strict) {
       if (strict) {
         return !state.option.moz && state.option.esnext;
       }
       return state.option.moz || state.option.esnext;
     };
 
-    state.option.inES5 = function (/* strict */) {
+    state.option.inES5 = function(/* strict */) {
       return !state.option.es3;
     };
 
-    state.option.inES3 = function (strict) {
+    state.option.inES3 = function(strict) {
       if (strict) {
         return !state.option.moz && !state.option.esnext && state.option.es3;
       }
@@ -333,14 +337,16 @@ var JSHINT = (function () {
   }
 
   function isundef(scope, code, token, a) {
-    return JSHINT.undefs.push([scope, code, token, a]);
+    if (!state.ignored[code] && state.option.undef !== false) {
+      JSHINT.undefs.push([scope, code, token, a]);
+    }
   }
 
   function removeIgnoredMessages() {
     var ignored = state.ignoredLines;
 
     if (_.isEmpty(ignored)) return;
-    JSHINT.errors = _.reject(JSHINT.errors, function (err) { return ignored[err.line] });
+    JSHINT.errors = _.reject(JSHINT.errors, function(err) { return ignored[err.line] });
   }
 
   function warning(code, t, a, b, c, d) {
@@ -496,11 +502,11 @@ var JSHINT = (function () {
 
   function doOption() {
     var nt = state.tokens.next;
-    var body = nt.body.split(",").map(function (s) { return s.trim(); });
+    var body = nt.body.split(",").map(function(s) { return s.trim(); });
     var predef = {};
 
     if (nt.type === "globals") {
-      body.forEach(function (g) {
+      body.forEach(function(g) {
         g = g.split(":");
         var key = (g[0] || "").trim();
         var val = (g[1] || "").trim();
@@ -526,7 +532,7 @@ var JSHINT = (function () {
     }
 
     if (nt.type === "exported") {
-      body.forEach(function (e) {
+      body.forEach(function(e) {
         exported[e] = true;
       });
     }
@@ -534,7 +540,7 @@ var JSHINT = (function () {
     if (nt.type === "members") {
       membersOnly = membersOnly || {};
 
-      body.forEach(function (m) {
+      body.forEach(function(m) {
         var ch1 = m.charAt(0);
         var ch2 = m.charAt(m.length - 1);
 
@@ -559,7 +565,7 @@ var JSHINT = (function () {
     ];
 
     if (nt.type === "jshint" || nt.type === "jslint") {
-      body.forEach(function (g) {
+      body.forEach(function(g) {
         g = g.split(":");
         var key = (g[0] || "").trim();
         var val = (g[1] || "").trim();
@@ -777,14 +783,7 @@ var JSHINT = (function () {
           error("E020", state.tokens.next, id, t.id, t.line, state.tokens.next.value);
         }
       } else if (state.tokens.next.type !== "(identifier)" || state.tokens.next.value !== id) {
-        // parameter destructuring with rest operator
-        if (state.tokens.next.value === "...") {
-          if (!state.option.esnext) {
-            warning("W119", state.tokens.next, "spread/rest operator");
-          }
-        } else {
-          warning("W116", state.tokens.next, id, state.tokens.next.value);
-        }
+        warning("W116", state.tokens.next, id, state.tokens.next.value);
       }
     }
 
@@ -816,7 +815,7 @@ var JSHINT = (function () {
   }
 
   function isInfix(token) {
-    return token.infix || (!token.identifier && !!token.led);
+    return token.infix || (!token.identifier && !token.template && !!token.led);
   }
 
   function isEndOfExpr() {
@@ -826,9 +825,13 @@ var JSHINT = (function () {
       return true;
     }
     if (isInfix(next) === isInfix(curr) || (curr.id === "yield" && state.option.inMoz(true))) {
-      return curr.line !== next.line;
+      return curr.line !== startLine(next);
     }
     return false;
+  }
+
+  function isBeginOfExpr(prev) {
+    return !prev.left && prev.arity !== "unary";
   }
 
   // This is the heart of JSHINT, the Pratt parser. In addition to parsing, it
@@ -846,8 +849,7 @@ var JSHINT = (function () {
   // They are elements of the parsing method called Top Down Operator Precedence.
 
   function expression(rbp, initial) {
-    var left, isArray = false, isObject = false, isLetExpr = false,
-      isFatArrowBody = state.tokens.curr.value === "=>";
+    var left, isArray = false, isObject = false, isLetExpr = false;
 
     state.nameStack.push();
 
@@ -861,20 +863,16 @@ var JSHINT = (function () {
       funct["(blockscope)"].stack();
       advance("let");
       advance("(");
-      state.syntax["let"].fud.call(state.syntax["let"].fud, false);
+      state.tokens.prev.fud();
       advance(")");
     }
 
     if (state.tokens.next.id === "(end)")
       error("E006", state.tokens.curr);
 
-    if (state.tokens.next.type === "(template)") {
-      doTemplateLiteral();
-    }
-
     var isDangerous =
       state.option.asi &&
-      state.tokens.prev.line < state.tokens.curr.line &&
+      state.tokens.prev.line !== startLine(state.tokens.curr) &&
       _.contains(["]", ")"], state.tokens.prev.id) &&
       _.contains(["[", "("], state.tokens.curr.id);
 
@@ -885,6 +883,7 @@ var JSHINT = (function () {
 
     if (initial) {
       funct["(verb)"] = state.tokens.curr.value;
+      state.tokens.curr.beginsStmt = true;
     }
 
     if (initial === true && state.tokens.curr.fud) {
@@ -896,7 +895,9 @@ var JSHINT = (function () {
         error("E030", state.tokens.curr, state.tokens.curr.id);
       }
 
-      while (rbp < state.tokens.next.lbp && !isEndOfExpr()) {
+      // TODO: use pratt mechanics rather than special casing template tokens
+      while ((rbp < state.tokens.next.lbp || state.tokens.next.type === "(template)") &&
+              !isEndOfExpr()) {
         isArray = state.tokens.curr.value === "Array";
         isObject = state.tokens.curr.value === "Object";
 
@@ -939,11 +940,6 @@ var JSHINT = (function () {
       funct["(blockscope)"].unstack();
     }
 
-    if (state.option.singleGroups && left && left.paren && !left.exprs &&
-      !isFatArrowBody && !left.triggerFnExpr) {
-      warning("W126");
-    }
-
     state.nameStack.pop();
 
     return left;
@@ -952,23 +948,27 @@ var JSHINT = (function () {
 
   // Functions for conformance of style.
 
+  function startLine(token) {
+    return token.startLine || token.line;
+  }
+
   function nobreaknonadjacent(left, right) {
     left = left || state.tokens.curr;
     right = right || state.tokens.next;
-    if (!state.option.laxbreak && left.line !== right.line) {
+    if (!state.option.laxbreak && left.line !== startLine(right)) {
       warning("W014", right, right.value);
     }
   }
 
   function nolinebreak(t) {
     t = t || state.tokens.curr;
-    if (t.line !== state.tokens.next.line) {
+    if (t.line !== startLine(state.tokens.next)) {
       warning("E022", t, t.value);
     }
   }
 
   function nobreakcomma(left, right) {
-    if (left.line !== right.line) {
+    if (left.line !== startLine(right)) {
       if (!state.option.laxcomma) {
         if (comma.first) {
           warning("I001");
@@ -981,10 +981,6 @@ var JSHINT = (function () {
 
   function comma(opts) {
     opts = opts || {};
-
-    if (state.option.nocomma) {
-      warning("W127");
-    }
 
     if (!opts.peek) {
       nobreakcomma(state.tokens.curr, state.tokens.next);
@@ -1055,7 +1051,9 @@ var JSHINT = (function () {
   }
 
   function delim(s) {
-    return symbol(s, 0);
+    var x = symbol(s, 0);
+    x.delim = true;
+    return x;
   }
 
   function stmt(s, f) {
@@ -1083,9 +1081,9 @@ var JSHINT = (function () {
     var x = symbol(s, 150);
     reserveName(x);
 
-    x.nud = (typeof f === "function") ? f : function () {
-      this.right = expression(150);
+    x.nud = (typeof f === "function") ? f : function() {
       this.arity = "unary";
+      this.right = expression(150);
 
       if (this.id === "++" || this.id === "--") {
         if (state.option.plusplus) {
@@ -1117,7 +1115,7 @@ var JSHINT = (function () {
   }
 
   function FutureReservedWord(name, meta) {
-    var x = type(name, (meta && meta.nud) || function () {
+    var x = type(name, (meta && meta.nud) || function() {
       return this;
     });
 
@@ -1133,7 +1131,7 @@ var JSHINT = (function () {
   }
 
   function reservevar(s, v) {
-    return reserve(s, function () {
+    return reserve(s, function() {
       if (typeof v === "function") {
         v(this);
       }
@@ -1145,7 +1143,7 @@ var JSHINT = (function () {
     var x = symbol(s, p);
     reserveName(x);
     x.infix = true;
-    x.led = function (left) {
+    x.led = function(left) {
       if (!w) {
         nobreaknonadjacent(state.tokens.prev, state.tokens.curr);
       }
@@ -1167,11 +1165,11 @@ var JSHINT = (function () {
   function application(s) {
     var x = symbol(s, 42);
 
-    x.led = function (left) {
+    x.led = function(left) {
       nobreaknonadjacent(state.tokens.prev, state.tokens.curr);
 
       this.left = left;
-      this.right = doFunction(undefined, undefined, false, { loneArg: left });
+      this.right = doFunction({ type: "arrow", loneArg: left });
       return this;
     };
     return x;
@@ -1180,7 +1178,7 @@ var JSHINT = (function () {
   function relation(s, f) {
     var x = symbol(s, 100);
 
-    x.led = function (left) {
+    x.led = function(left) {
       nobreaknonadjacent(state.tokens.prev, state.tokens.curr);
       var right = expression(100);
 
@@ -1232,13 +1230,34 @@ var JSHINT = (function () {
 
     var values = [
       "undefined", "object", "boolean", "number",
-      "string", "function", "xml", "object", "unknown"
+      "string", "function", "xml", "object", "unknown", "symbol"
     ];
 
     if (right.type === "(identifier)" && right.value === "typeof" && left.type === "(string)")
       return !_.contains(values, left.value);
 
     return false;
+  }
+
+  function isGlobalEval(left, state, funct) {
+    var isGlobal = false;
+
+    // permit methods to refer to an "eval" key in their own context
+    if (left.type === "this" && funct["(context)"] === null) {
+      isGlobal = true;
+    }
+    // permit use of "eval" members of objects
+    else if (left.type === "(identifier)") {
+      if (state.option.node && left.value === "global") {
+        isGlobal = true;
+      }
+
+      else if (state.option.browser && (left.value === "window" || left.value === "document")) {
+        isGlobal = true;
+      }
+    }
+
+    return isGlobal;
   }
 
   function findNativePrototype(left) {
@@ -1270,7 +1289,7 @@ var JSHINT = (function () {
   }
 
   function assignop(s, f, p) {
-    var x = infix(s, typeof f === "function" ? f : function (left, that) {
+    var x = infix(s, typeof f === "function" ? f : function(left, that) {
       that.left = left;
 
       if (left) {
@@ -1303,7 +1322,7 @@ var JSHINT = (function () {
           return that;
         } else if (left.id === "[") {
           if (state.tokens.curr.left.first) {
-            state.tokens.curr.left.first.forEach(function (t) {
+            state.tokens.curr.left.first.forEach(function(t) {
               if (t && funct[t.value] === "const") {
                 error("E013", t, t.value);
               }
@@ -1344,7 +1363,7 @@ var JSHINT = (function () {
   function bitwise(s, f, p) {
     var x = symbol(s, p);
     reserveName(x);
-    x.led = (typeof f === "function") ? f : function (left) {
+    x.led = (typeof f === "function") ? f : function(left) {
       if (state.option.bitwise) {
         warning("W016", this, this.id);
       }
@@ -1357,7 +1376,7 @@ var JSHINT = (function () {
 
 
   function bitwiseassignop(s) {
-    return assignop(s, function (left, that) {
+    return assignop(s, function(left, that) {
       if (state.option.bitwise) {
         warning("W016", that, that.id);
       }
@@ -1381,7 +1400,7 @@ var JSHINT = (function () {
   function suffix(s) {
     var x = symbol(s, 150);
 
-    x.led = function (left) {
+    x.led = function(left) {
       if (state.option.plusplus) {
         warning("W016", this, this.id);
       } else if ((!left.identifier || isReserved(left)) && left.id !== "." && left.id !== "[") {
@@ -1397,9 +1416,8 @@ var JSHINT = (function () {
   // fnparam means that this identifier is being defined as a function
   // argument (see identifier())
   // prop means that this identifier is that of an object property
-  // exported means that the identifier is part of a valid ES6 `export` declaration
 
-  function optionalidentifier(fnparam, prop, preserve, exported) {
+  function optionalidentifier(fnparam, prop, preserve) {
     if (!state.tokens.next.identifier) {
       return;
     }
@@ -1410,10 +1428,6 @@ var JSHINT = (function () {
 
     var curr = state.tokens.curr;
     var val  = state.tokens.curr.value;
-
-    if (exported) {
-      state.tokens.curr.exported = true;
-    }
 
     if (!isReserved(curr)) {
       return val;
@@ -1436,9 +1450,8 @@ var JSHINT = (function () {
   // fnparam means that this identifier is being defined as a function
   // argument
   // prop means that this identifier is that of an object property
-  // `exported` means that the identifier token should be exported.
-  function identifier(fnparam, prop, exported) {
-    var i = optionalidentifier(fnparam, prop, false, exported);
+  function identifier(fnparam, prop) {
+    var i = optionalidentifier(fnparam, prop, false);
     if (i) {
       return i;
     }
@@ -1448,6 +1461,21 @@ var JSHINT = (function () {
       if (!state.option.esnext) {
         warning("W119", state.tokens.next, "spread/rest operator");
       }
+      advance();
+
+      if (checkPunctuators(state.tokens.next, ["..."])) {
+        warning("E024", state.tokens.next, "...");
+        while (checkPunctuators(state.tokens.next, ["..."])) {
+          advance();
+        }
+      }
+
+      if (!state.tokens.next.identifier) {
+        warning("E024", state.tokens.curr, "...");
+        return;
+      }
+
+      return identifier(fnparam, prop);
     } else {
       error("E030", state.tokens.next, state.tokens.next.value);
 
@@ -1492,12 +1520,14 @@ var JSHINT = (function () {
 
   function parseFinalSemicolon() {
     if (state.tokens.next.id !== ";") {
+      // don't complain about unclosed templates / strings
+      if (state.tokens.next.isUnclosed) return advance();
       if (!state.option.asi) {
         // If this is the last statement in a block that ends on
         // the same line *and* option lastsemic is on, ignore the warning.
         // Otherwise, complain about missing semicolon.
         if (!state.option.lastsemic || state.tokens.next.id !== "}" ||
-          state.tokens.next.line !== state.tokens.curr.line) {
+          startLine(state.tokens.next) !== state.tokens.curr.line) {
           warningAt("W033", state.tokens.curr.line, state.tokens.curr.character);
         }
       }
@@ -1507,7 +1537,6 @@ var JSHINT = (function () {
   }
 
   function statement() {
-    var values;
     var i = indent, r, s = scope, t = state.tokens.next;
 
     if (t.id === ";") {
@@ -1544,22 +1573,6 @@ var JSHINT = (function () {
       }
     }
 
-    // detect a destructuring assignment
-    if (_.has(["[", "{"], t.value)) {
-      if (lookupBlockType().isDestAssign) {
-        if (!state.option.inESNext()) {
-          warning("W104", state.tokens.curr, "destructuring expression");
-        }
-        values = destructuringExpression();
-        values.forEach(function (tok) {
-          isundef(funct, "W117", tok.token, tok.id);
-        });
-        advance("=");
-        destructuringExpressionMatch(values, expression(10, true));
-        advance(";");
-        return;
-      }
-    }
     if (t.identifier && !res && peek().id === ":") {
       advance();
       advance(":");
@@ -1861,11 +1874,11 @@ var JSHINT = (function () {
 
   // Build the syntax table by declaring the syntactic elements of the language.
 
-  type("(number)", function () {
+  type("(number)", function() {
     return this;
   });
 
-  type("(string)", function () {
+  type("(string)", function() {
     return this;
   });
 
@@ -1874,7 +1887,7 @@ var JSHINT = (function () {
     lbp: 0,
     identifier: true,
 
-    nud: function () {
+    nud: function() {
       var v = this.value;
       var s = scope[v];
       var f;
@@ -1998,27 +2011,44 @@ var JSHINT = (function () {
       return this;
     },
 
-    led: function () {
+    led: function() {
       error("E033", state.tokens.next, state.tokens.next.value);
     }
   };
 
-  state.syntax["(template)"] = {
-    type: "(template)",
+  var baseTemplateSyntax = {
     lbp: 0,
     identifier: false,
-    fud: doTemplateLiteral
+    template: true,
   };
+  state.syntax["(template)"] = _.extend({
+    type: "(template)",
+    nud: doTemplateLiteral,
+    led: doTemplateLiteral,
+    noSubst: false
+  }, baseTemplateSyntax);
 
-  type("(template middle)", function () {
-    return this;
-  });
+  state.syntax["(template middle)"] = _.extend({
+    type: "(template middle)",
+    middle: true,
+    noSubst: false
+  }, baseTemplateSyntax);
 
-  type("(template tail)", function () {
-    return this;
-  });
+  state.syntax["(template tail)"] = _.extend({
+    type: "(template tail)",
+    tail: true,
+    noSubst: false
+  }, baseTemplateSyntax);
 
-  type("(regexp)", function () {
+  state.syntax["(no subst template)"] = _.extend({
+    type: "(template)",
+    nud: doTemplateLiteral,
+    led: doTemplateLiteral,
+    noSubst: true,
+    tail: true // mark as tail, since it's always the last component
+  }, baseTemplateSyntax);
+
+  type("(regexp)", function() {
     return this;
   });
 
@@ -2042,7 +2072,7 @@ var JSHINT = (function () {
   reserve("catch");
   reserve("default").reach = true;
   reserve("finally");
-  reservevar("arguments", function (x) {
+  reservevar("arguments", function(x) {
     if (state.directive["use strict"] && funct["(global)"]) {
       warning("E008", x);
     }
@@ -2051,7 +2081,7 @@ var JSHINT = (function () {
   reservevar("false");
   reservevar("Infinity");
   reservevar("null");
-  reservevar("this", function (x) {
+  reservevar("this", function(x) {
     if (state.directive["use strict"] && !isMethod() &&
         !state.option.validthis && ((funct["(statement)"] &&
         funct["(name)"].charAt(0) > "Z") || funct["(global)"])) {
@@ -2065,7 +2095,7 @@ var JSHINT = (function () {
   assignop("+=", "assignadd", 20);
   assignop("-=", "assignsub", 20);
   assignop("*=", "assignmult", 20);
-  assignop("/=", "assigndiv", 20).nud = function () {
+  assignop("/=", "assigndiv", 20).nud = function() {
     error("E014");
   };
   assignop("%=", "assignmod", 20);
@@ -2076,14 +2106,19 @@ var JSHINT = (function () {
   bitwiseassignop("<<=");
   bitwiseassignop(">>=");
   bitwiseassignop(">>>=");
-  infix(",", function (left, that) {
+  infix(",", function(left, that) {
     var expr;
     that.exprs = [left];
-    if (!comma({peek: true})) {
+
+    if (state.option.nocomma) {
+      warning("W127");
+    }
+
+    if (!comma({ peek: true })) {
       return that;
     }
     while (true) {
-      if (!(expr = expression(10)))  {
+      if (!(expr = expression(10))) {
         break;
       }
       that.exprs.push(expr);
@@ -2094,7 +2129,7 @@ var JSHINT = (function () {
     return that;
   }, 10, true);
 
-  infix("?", function (left, that) {
+  infix("?", function(left, that) {
     increaseComplexityCount();
     that.left = left;
     that.right = expression(10);
@@ -2104,7 +2139,7 @@ var JSHINT = (function () {
   }, 30);
 
   var orPrecendence = 40;
-  infix("||", function (left, that) {
+  infix("||", function(left, that) {
     increaseComplexityCount();
     that.left = left;
     that.right = expression(orPrecendence);
@@ -2114,7 +2149,7 @@ var JSHINT = (function () {
   bitwise("|", "bitor", 70);
   bitwise("^", "bitxor", 80);
   bitwise("&", "bitand", 90);
-  relation("==", function (left, right) {
+  relation("==", function(left, right) {
     var eqnull = state.option.eqnull && (left.value === "null" || right.value === "null");
 
     switch (true) {
@@ -2138,7 +2173,7 @@ var JSHINT = (function () {
 
     return this;
   });
-  relation("===", function (left, right) {
+  relation("===", function(left, right) {
     if (isTypoTypeof(right, left)) {
       warning("W122", this, right.value);
     } else if (isTypoTypeof(left, right)) {
@@ -2146,7 +2181,7 @@ var JSHINT = (function () {
     }
     return this;
   });
-  relation("!=", function (left, right) {
+  relation("!=", function(left, right) {
     var eqnull = state.option.eqnull &&
         (left.value === "null" || right.value === "null");
 
@@ -2164,7 +2199,7 @@ var JSHINT = (function () {
     }
     return this;
   });
-  relation("!==", function (left, right) {
+  relation("!==", function(left, right) {
     if (isTypoTypeof(right, left)) {
       warning("W122", this, right.value);
     } else if (isTypoTypeof(left, right)) {
@@ -2181,8 +2216,11 @@ var JSHINT = (function () {
   bitwise(">>>", "shiftrightunsigned", 120);
   infix("in", "in", 120);
   infix("instanceof", "instanceof", 120);
-  infix("+", function (left, that) {
-    var right = expression(130);
+  infix("+", function(left, that) {
+    var right;
+    that.left = left;
+    that.right = right = expression(130);
+
     if (left && right && left.id === "(string)" && right.id === "(string)") {
       left.value += right.value;
       left.character = right.character;
@@ -2191,18 +2229,17 @@ var JSHINT = (function () {
       }
       return left;
     }
-    that.left = left;
-    that.right = right;
+
     return that;
   }, 130);
   prefix("+", "num");
-  prefix("+++", function () {
+  prefix("+++", function() {
     warning("W007");
-    this.right = expression(150);
     this.arity = "unary";
+    this.right = expression(150);
     return this;
   });
-  infix("+++", function (left) {
+  infix("+++", function(left) {
     warning("W007");
     this.left = left;
     this.right = expression(130);
@@ -2210,13 +2247,13 @@ var JSHINT = (function () {
   }, 130);
   infix("-", "sub", 130);
   prefix("-", "neg");
-  prefix("---", function () {
+  prefix("---", function() {
     warning("W006");
-    this.right = expression(150);
     this.arity = "unary";
+    this.right = expression(150);
     return this;
   });
-  infix("---", function (left) {
+  infix("---", function(left) {
     warning("W006");
     this.left = left;
     this.right = expression(130);
@@ -2233,9 +2270,13 @@ var JSHINT = (function () {
   suffix("--");
   prefix("--", "predec");
   state.syntax["--"].exps = true;
-  prefix("delete", function () {
+  prefix("delete", function() {
     var p = expression(10);
-    if (!p || (p.id !== "." && p.id !== "[")) {
+    if (!p) {
+      return this;
+    }
+
+    if (p.id !== "." && p.id !== "[") {
       warning("W051");
     }
     this.first = p;
@@ -2248,28 +2289,64 @@ var JSHINT = (function () {
     return this;
   }).exps = true;
 
-  prefix("~", function () {
+  prefix("~", function() {
     if (state.option.bitwise) {
-      warning("W052", this, "~");
+      warning("W016", this, "~");
     }
+    this.arity = "unary";
     expression(150);
     return this;
   });
 
-  prefix("...", function () {
+  prefix("...", function() {
     if (!state.option.esnext) {
       warning("W119", this, "spread/rest operator");
     }
-    if (!state.tokens.next.identifier) {
+
+    // TODO: Allow all AssignmentExpression
+    // once parsing permits.
+    //
+    // How to handle eg. number, boolean when the built-in
+    // prototype of may have an @@iterator definition?
+    //
+    // Number.prototype[Symbol.iterator] = function * () {
+    //   yield this.valueOf();
+    // };
+    //
+    // var a = [ ...1 ];
+    // console.log(a); // [1];
+    //
+    // for (let n of [...10]) {
+    //    console.log(n);
+    // }
+    // // 10
+    //
+    //
+    // Boolean.prototype[Symbol.iterator] = function * () {
+    //   yield this.valueOf();
+    // };
+    //
+    // var a = [ ...true ];
+    // console.log(a); // [true];
+    //
+    // for (let n of [...false]) {
+    //    console.log(n);
+    // }
+    // // false
+    //
+    if (!state.tokens.next.identifier &&
+        state.tokens.next.type !== "(string)" &&
+          !checkPunctuators(state.tokens.next, ["[", "("])) {
+
       error("E030", state.tokens.next, state.tokens.next.value);
     }
     expression(150);
     return this;
   });
 
-  prefix("!", function () {
-    this.right = expression(150);
+  prefix("!", function() {
     this.arity = "unary";
+    this.right = expression(150);
 
     if (!this.right) { // '!' followed by nothing? Give up.
       quit("E041", this.line || 0);
@@ -2281,7 +2358,7 @@ var JSHINT = (function () {
     return this;
   });
 
-  prefix("typeof", (function () {
+  prefix("typeof", (function() {
     var p = expression(150);
     this.first = p;
 
@@ -2292,7 +2369,7 @@ var JSHINT = (function () {
     }
     return this;
   }));
-  prefix("new", function () {
+  prefix("new", function() {
     var c = expression(155), i;
     if (c && c.id !== "function") {
       if (c.identifier) {
@@ -2346,7 +2423,7 @@ var JSHINT = (function () {
 
   prefix("void").exps = true;
 
-  infix(".", function (left, that) {
+  infix(".", function(left, that) {
     var m = identifier(false, true);
 
     if (typeof m === "string") {
@@ -2371,13 +2448,15 @@ var JSHINT = (function () {
     }
 
     if (!state.option.evil && (m === "eval" || m === "execScript")) {
-      warning("W061");
+      if (isGlobalEval(left, state, funct)) {
+        warning("W061");
+      }
     }
 
     return that;
   }, 160, true);
 
-  infix("(", function (left, that) {
+  infix("(", function(left, that) {
     if (state.option.immed && left && !left.immed && left.id === "function") {
       warning("W062");
     }
@@ -2451,11 +2530,13 @@ var JSHINT = (function () {
     return that;
   }, 155, true).exps = true;
 
-  prefix("(", function () {
-    var bracket, brackets = [];
+  prefix("(", function() {
     var pn = state.tokens.next, pn1, i = -1;
-    var ret, triggerFnExpr;
+    var ret, triggerFnExpr, first, last;
     var parens = 1;
+    var opening = state.tokens.curr;
+    var preceeding = state.tokens.prev;
+    var isNecessary = !state.option.singleGroups;
 
     do {
       if (pn.value === "(") {
@@ -2467,8 +2548,7 @@ var JSHINT = (function () {
       i += 1;
       pn1 = pn;
       pn = peek(i);
-    } while (!(parens === 0 && pn1.value === ")") &&
-             pn.value !== ";" && pn.type !== "(end)");
+    } while (!(parens === 0 && pn1.value === ")") && pn.value !== ";" && pn.type !== "(end)");
 
     if (state.tokens.next.id === "function") {
       triggerFnExpr = state.tokens.next.immed = true;
@@ -2478,26 +2558,23 @@ var JSHINT = (function () {
     // current token marks the beginning of a "fat arrow" function and parsing
     // should proceed accordingly.
     if (pn.value === "=>") {
-      return doFunction(null, null, null, { parsedParen: true });
+      return doFunction({ type: "arrow", parsedOpening: true });
     }
 
     var exprs = [];
 
     if (state.tokens.next.id !== ")") {
       for (;;) {
-        if (pn.value === "=>" && _.contains(["{", "["], state.tokens.next.value)) {
-          bracket = state.tokens.next;
-          bracket.left = destructuringExpression();
-          brackets.push(bracket);
-          for (var t in bracket.left) {
-            exprs.push(bracket.left[t].token);
-          }
-        } else {
-          exprs.push(expression(10));
-        }
+        exprs.push(expression(10));
+
         if (state.tokens.next.id !== ",") {
           break;
         }
+
+        if (state.option.nocomma) {
+          warning("W127");
+        }
+
         comma();
       }
     }
@@ -2510,32 +2587,64 @@ var JSHINT = (function () {
       }
     }
 
-    if (state.tokens.next.value === "=>") {
-      return exprs;
-    }
     if (!exprs.length) {
       return;
     }
     if (exprs.length > 1) {
       ret = Object.create(state.syntax[","]);
       ret.exprs = exprs;
+
+      first = exprs[0];
+      last = exprs[exprs.length - 1];
+
+      if (!isNecessary) {
+        isNecessary = preceeding.assign || preceeding.delim;
+      }
     } else {
-      ret = exprs[0];
+      ret = first = last = exprs[0];
+
+      if (!isNecessary) {
+        isNecessary =
+          // Used to distinguish from an ExpressionStatement which may not
+          // begin with the `{` and `function` tokens
+          (opening.beginsStmt && (ret.id === "{" || triggerFnExpr || isFunctor(ret))) ||
+          // Used as the return value of a single-statement arrow function
+          (ret.id === "{" && preceeding.id === "=>") ||
+          // Used to prevent left-to-right application of adjacent addition
+          // operators (the order of which effect type)
+          (first.id === "+" && preceeding.id === "+");
+      }
     }
+
     if (ret) {
+      // The operator may be necessary to override the default binding power of
+      // neighboring operators (whenever there is an operator in use within the
+      // first expression *or* the current group contains multiple expressions)
+      if (!isNecessary && (first.left || ret.exprs)) {
+        isNecessary =
+          (!isBeginOfExpr(preceeding) && first.lbp < preceeding.lbp) ||
+          (!isEndOfExpr() && last.lbp < state.tokens.next.lbp);
+      }
+
+      if (!isNecessary) {
+        warning("W126", opening);
+      }
+
       ret.paren = true;
-      ret.triggerFnExpr = triggerFnExpr;
     }
+
     return ret;
   });
 
   application("=>");
 
-  infix("[", function (left, that) {
+  infix("[", function(left, that) {
     var e = expression(10), s;
     if (e && e.type === "(string)") {
       if (!state.option.evil && (e.value === "eval" || e.value === "execScript")) {
-        warning("W061", that);
+        if (isGlobalEval(left, state, funct)) {
+          warning("W061");
+        }
       }
 
       countMember(e.value);
@@ -2610,7 +2719,7 @@ var JSHINT = (function () {
     return res;
   }
 
-  prefix("[", function () {
+  prefix("[", function() {
     var blocktype = lookupBlockType();
     if (blocktype.isCompArray) {
       if (!state.option.inESNext()) {
@@ -2620,7 +2729,7 @@ var JSHINT = (function () {
     } else if (blocktype.isDestAssign && !state.option.inESNext()) {
       warning("W104", state.tokens.curr, "destructuring assignment");
     }
-    var b = state.tokens.curr.line !== state.tokens.next.line;
+    var b = state.tokens.curr.line !== startLine(state.tokens.next);
     this.first = [];
     if (b) {
       indent += state.option.indent;
@@ -2639,7 +2748,7 @@ var JSHINT = (function () {
             warning("W128");
             do {
               advance(",");
-            } while(state.tokens.next.id === ",");
+            } while (state.tokens.next.id === ",");
             continue;
           }
         }
@@ -2659,7 +2768,7 @@ var JSHINT = (function () {
         }
       } else {
         if (state.option.trailingcomma && state.option.inES5(true)) {
-          warningAt("W129", state.tokens.curr.line, state.tokens.curr.character);
+          warningAt("W132", state.tokens.curr.line, state.tokens.curr.character);
         }
         break;
       }
@@ -2717,14 +2826,23 @@ var JSHINT = (function () {
     return id;
   }
 
-  function functionparams(fatarrow) {
+  /**
+   * @param {Object} [options]
+   * @param {token} [options.loneArg] The argument to the function in cases
+   *                                  where it was defined using the
+   *                                  single-argument shorthand.
+   * @param {bool} [options.parsedOpening] Whether the opening parenthesis has
+   *                                       already been parsed.
+   */
+  function functionparams(options) {
     var next;
     var params = [];
     var ident;
     var tokens = [];
     var t;
     var pastDefault = false;
-    var loneArg = fatarrow && fatarrow.loneArg;
+    var pastRest = false;
+    var loneArg = options && options.loneArg;
 
     if (loneArg && loneArg.identifier === true) {
       addlabel(loneArg.value, { type: "unused", token: loneArg });
@@ -2733,7 +2851,7 @@ var JSHINT = (function () {
 
     next = state.tokens.next;
 
-    if (!fatarrow || !fatarrow.parsedParen) {
+    if (!options || !options.parsedOpening) {
       advance("(");
     }
 
@@ -2752,18 +2870,16 @@ var JSHINT = (function () {
             addlabel(t.id, { type: "unused", token: t.token });
           }
         }
-      } else if (state.tokens.next.value === "...") {
-        if (!state.option.esnext) {
-          warning("W119", state.tokens.next, "spread/rest operator");
-        }
-        advance("...");
-        ident = identifier(true);
-        params.push(ident);
-        addlabel(ident, { type: "unused", token: state.tokens.curr });
       } else {
+        if (checkPunctuators(state.tokens.next, ["..."])) pastRest = true;
         ident = identifier(true);
-        params.push(ident);
-        addlabel(ident, { type: "unused", token: state.tokens.curr });
+        if (ident) {
+          params.push(ident);
+          addlabel(ident, { type: "unused", token: state.tokens.curr });
+        } else {
+          // Skip invalid parameter.
+          while (!checkPunctuators(state.tokens.next, [",", ")"])) advance();
+        }
       }
 
       // it is a syntax error to have a regular argument after a default argument
@@ -2781,6 +2897,9 @@ var JSHINT = (function () {
         expression(10);
       }
       if (state.tokens.next.id === ",") {
+        if (pastRest) {
+          warning("W131", state.tokens.next);
+        }
         comma();
       } else {
         advance(")", next);
@@ -2845,38 +2964,75 @@ var JSHINT = (function () {
     return funct;
   }
 
-  function doTemplateLiteral() {
-    while (state.tokens.next.type !== "(template tail)" && state.tokens.next.id !== "(end)") {
-      advance();
-      if (state.tokens.next.type === "(template tail)") {
-        break;
-      } else if (state.tokens.next.type !== "(template middle)" &&
-                 state.tokens.next.type !== "(end)") {
-        expression(10); // should probably have different rbp?
+  function isFunctor(token) {
+    return "(scope)" in token;
+  }
+
+  function doTemplateLiteral(left) {
+    // ASSERT: this.type === "(template)"
+    // jshint validthis: true
+    var ctx = this.context;
+    var noSubst = this.noSubst;
+    var depth = this.depth;
+
+    if (!noSubst) {
+      while (!end() && state.tokens.next.id !== "(end)") {
+        if (!state.tokens.next.template || state.tokens.next.depth > depth) {
+          expression(0); // should probably have different rbp?
+        } else {
+          // skip template start / middle
+          advance();
+        }
       }
     }
+
     return {
       id: "(template)",
-      type: "(template)"
+      type: "(template)",
+      tag: left
     };
+
+    function end() {
+      if (state.tokens.curr.template && state.tokens.curr.tail &&
+          state.tokens.curr.context === ctx) return true;
+      var complete = (state.tokens.next.template && state.tokens.next.tail &&
+                      state.tokens.next.context === ctx);
+      if (complete) advance();
+      return complete || state.tokens.next.isUnclosed;
+    }
   }
 
   /**
-   * @param {Object} [fatarrow] In the case that the function being parsed
-   *                            takes the "fat arrow" form, this object will
-   *                            contain details about the in-progress parsing
-   *                            operation.
-   * @param {Token} [fatarrow.loneArg] The argument to the function in cases
-   *                                   where it was defined using the single-
-   *                                   argument shorthand.
-   * @param {bool} [fatarrow.parsedParen] Whether the opening parenthesis has
-   *                                      already been parsed.
+   * @param {Object} [options]
+   * @param {token} [options.name] The identifier belonging to the function (if
+   *                               any)
+   * @param {boolean} [options.statement] The statement that triggered creation
+   *                                      of the current function.
+   * @param {string} [options.type] If specified, either "generator" or "arrow"
+   * @param {token} [options.loneArg] The argument to the function in cases
+   *                                  where it was defined using the
+   *                                  single-argument shorthand
+   * @param {bool} [options.parsedOpening] Whether the opening parenthesis has
+   *                                       already been parsed
+   * @param {token} [options.classExprBinding] Define a function with this
+   *                                           identifier in the new function's
+   *                                           scope, mimicking the bahavior of
+   *                                           class expression names within
+   *                                           the body of member functions.
    */
-  function doFunction(name, statement, generator, fatarrow) {
-    var f;
+  function doFunction(options) {
+    var f, name, statement, classExprBinding, isGenerator, isArrow;
     var oldOption = state.option;
     var oldIgnored = state.ignored;
     var oldScope  = scope;
+
+    if (options) {
+      name = options.name;
+      statement = options.statement;
+      classExprBinding = options.classExprBinding;
+      isGenerator = options.type === "generator";
+      isArrow = options.type === "arrow";
+    }
 
     state.option = Object.create(state.option);
     state.ignored = Object.create(state.ignored);
@@ -2885,7 +3041,7 @@ var JSHINT = (function () {
     funct = functor(name || state.nameStack.infer(), state.tokens.next, scope, {
       "(statement)": statement,
       "(context)":   funct,
-      "(generator)": generator ? true : null
+      "(generator)": isGenerator
     });
 
     f = funct;
@@ -2897,22 +3053,26 @@ var JSHINT = (function () {
       addlabel(name, { type: "function" });
     }
 
-    funct["(params)"] = functionparams(fatarrow);
+    if (classExprBinding) {
+      addlabel(classExprBinding, { type: "function" });
+    }
+
+    funct["(params)"] = functionparams(options);
     funct["(metrics)"].verifyMaxParametersPerFunction(funct["(params)"]);
 
-    if (fatarrow) {
+    if (isArrow) {
       if (!state.option.esnext) {
         warning("W119", state.tokens.curr, "arrow function syntax (=>)");
       }
 
-      if (!fatarrow.loneArg) {
+      if (!options.loneArg) {
         advance("=>");
       }
     }
 
-    block(false, true, true, !!fatarrow);
+    block(false, true, true, isArrow);
 
-    if (!state.option.noyield && generator &&
+    if (!state.option.noyield && isGenerator &&
         funct["(generator)"] !== "yielded") {
       warning("W124", state.tokens.curr);
     }
@@ -2927,7 +3087,7 @@ var JSHINT = (function () {
     funct["(last)"] = state.tokens.curr.line;
     funct["(lastcharacter)"] = state.tokens.curr.character;
 
-    _.map(Object.keys(funct), function (key) {
+    _.map(Object.keys(funct), function(key) {
       if (key[0] === "(") return;
       funct["(blockscope)"].unshadow(key);
     });
@@ -2943,14 +3103,14 @@ var JSHINT = (function () {
       nestedBlockDepth: -1,
       ComplexityCount: 1,
 
-      verifyMaxStatementsPerFunction: function () {
+      verifyMaxStatementsPerFunction: function() {
         if (state.option.maxstatements &&
           this.statementCount > state.option.maxstatements) {
           warning("W071", functionStartToken, this.statementCount);
         }
       },
 
-      verifyMaxParametersPerFunction: function (params) {
+      verifyMaxParametersPerFunction: function(params) {
         params = params || [];
 
         if (state.option.maxparams && params.length > state.option.maxparams) {
@@ -2958,7 +3118,7 @@ var JSHINT = (function () {
         }
       },
 
-      verifyMaxNestedBlockDepthPerFunction: function () {
+      verifyMaxNestedBlockDepthPerFunction: function() {
         if (state.option.maxdepth &&
           this.nestedBlockDepth > 0 &&
           this.nestedBlockDepth === state.option.maxdepth + 1) {
@@ -2966,7 +3126,7 @@ var JSHINT = (function () {
         }
       },
 
-      verifyMaxComplexityPerFunction: function () {
+      verifyMaxComplexityPerFunction: function() {
         var max = state.option.maxcomplexity;
         var cc = this.ComplexityCount;
         if (max && cc > max) {
@@ -3024,12 +3184,12 @@ var JSHINT = (function () {
     }
   }
 
-  (function (x) {
-    x.nud = function () {
+  (function(x) {
+    x.nud = function() {
       var b, f, i, p, t, g, nextVal;
       var props = {}; // All properties, including accessors
 
-      b = state.tokens.curr.line !== state.tokens.next.line;
+      b = state.tokens.curr.line !== startLine(state.tokens.next);
       if (b) {
         indent += state.option.indent;
         if (state.tokens.next.from === indent + state.option.indent) {
@@ -3076,7 +3236,6 @@ var JSHINT = (function () {
             warning("W077", t, i);
           }
         } else {
-          g = false;
           if (state.tokens.next.value === "*" && state.tokens.next.type === "(punctuator)") {
             if (!state.option.inESNext()) {
               warning("W104", state.tokens.next, "generator functions");
@@ -3111,7 +3270,7 @@ var JSHINT = (function () {
               if (!state.option.inESNext()) {
                 warning("W104", state.tokens.curr, "concise methods");
               }
-              doFunction(null, undefined, g);
+              doFunction({ type: g ? "generator" : null });
             } else {
               advance(":");
               expression(10);
@@ -3130,7 +3289,7 @@ var JSHINT = (function () {
           }
         } else {
           if (state.option.trailingcomma && state.option.inES5(true)) {
-            warningAt("W129", state.tokens.curr.line, state.tokens.curr.character);
+            warningAt("W132", state.tokens.curr.line, state.tokens.curr.character);
           }
           break;
         }
@@ -3144,7 +3303,7 @@ var JSHINT = (function () {
 
       return this;
     };
-    x.fud = function () {
+    x.fud = function() {
       error("E036", state.tokens.curr);
     };
   }(delim("{")));
@@ -3155,47 +3314,68 @@ var JSHINT = (function () {
     if (!state.option.inESNext()) {
       warning("W104", state.tokens.curr, "destructuring expression");
     }
-    var nextInnerDE = function () {
+    var nextInnerDE = function() {
       var ident;
-      if (_.contains(["[", "{"], state.tokens.next.value)) {
+      if (checkPunctuators(state.tokens.next, ["[", "{"])) {
         ids = destructuringExpression();
         for (var id in ids) {
           id = ids[id];
           identifiers.push({ id: id.id, token: id.token });
         }
-      } else if (state.tokens.next.value === ",") {
+      } else if (checkPunctuators(state.tokens.next, [","])) {
         identifiers.push({ id: null, token: state.tokens.curr });
-      } else if (state.tokens.next.value === "(") {
+      } else if (checkPunctuators(state.tokens.next, ["("])) {
         advance("(");
         nextInnerDE();
         advance(")");
       } else {
+        var is_rest = checkPunctuators(state.tokens.next, ["..."]);
         ident = identifier();
         if (ident)
           identifiers.push({ id: ident, token: state.tokens.curr });
+        return is_rest;
       }
+      return false;
     };
-    if (state.tokens.next.value === "[") {
+    if (checkPunctuators(state.tokens.next, ["["])) {
       advance("[");
-      nextInnerDE();
-      while (state.tokens.next.value !== "]") {
+      var element_after_rest = false;
+      if (nextInnerDE() && checkPunctuators(state.tokens.next, [","]) &&
+          !element_after_rest) {
+        warning("W130", state.tokens.next);
+        element_after_rest = true;
+      }
+      while (!checkPunctuators(state.tokens.next, ["]"])) {
         advance(",");
-        nextInnerDE();
+        if (checkPunctuators(state.tokens.next, ["]"])) {
+          // Trailing comma
+          break;
+        }
+        if (nextInnerDE() && checkPunctuators(state.tokens.next, [","]) &&
+            !element_after_rest) {
+          warning("W130", state.tokens.next);
+          element_after_rest = true;
+        }
       }
       advance("]");
-    } else if (state.tokens.next.value === "{") {
+    } else if (checkPunctuators(state.tokens.next, ["{"])) {
       advance("{");
       id = identifier();
-      if (state.tokens.next.value === ":") {
+      if (checkPunctuators(state.tokens.next, [":"])) {
         advance(":");
         nextInnerDE();
       } else {
         identifiers.push({ id: id, token: state.tokens.curr });
       }
-      while (state.tokens.next.value !== "}") {
+      while (!checkPunctuators(state.tokens.next, ["}"])) {
         advance(",");
+        if (checkPunctuators(state.tokens.next, ["}"])) {
+          // Trailing comma
+          // ObjectBindingPattern: { BindingPropertyList , }
+          break;
+        }
         id = identifier();
-        if (state.tokens.next.value === ":") {
+        if (checkPunctuators(state.tokens.next, [":"])) {
           advance(":");
           nextInnerDE();
         } else {
@@ -3213,7 +3393,7 @@ var JSHINT = (function () {
     if (!first)
       return;
 
-    _.zip(tokens, Array.isArray(first) ? first : [ first ]).forEach(function (val) {
+    _.zip(tokens, Array.isArray(first) ? first : [ first ]).forEach(function(val) {
       var token = val[0];
       var value = val[1];
 
@@ -3224,7 +3404,9 @@ var JSHINT = (function () {
     });
   }
 
-  var conststatement = stmt("const", function (prefix) {
+  var conststatement = stmt("const", function(context) {
+    var prefix = context && context.prefix;
+    var inexport = context && context.inexport;
     var tokens;
     var value;
     var lone; // State variable to know if it is a lone identifier, or a destructuring statement.
@@ -3241,6 +3423,10 @@ var JSHINT = (function () {
       } else {
         tokens = [ { id: identifier(), token: state.tokens.curr } ];
         lone = true;
+        if (inexport) {
+          exported[state.tokens.curr.value] = true;
+          state.tokens.curr.exported = true;
+        }
       }
       for (var t in tokens) {
         if (tokens.hasOwnProperty(t)) {
@@ -3292,9 +3478,11 @@ var JSHINT = (function () {
   });
 
   conststatement.exps = true;
-  var varstatement = stmt("var", function (prefix) {
+  var varstatement = stmt("var", function(context) {
     // JavaScript does not have block scope. It only has function scope. So,
     // declaring a variable in a block can have unexpected consequences.
+    var prefix = context && context.prefix;
+    var inexport = context && context.inexport;
     var tokens, lone, value;
 
     this.first = [];
@@ -3306,6 +3494,10 @@ var JSHINT = (function () {
       } else {
         tokens = [ { id: identifier(), token: state.tokens.curr } ];
         lone = true;
+        if (inexport) {
+          exported[state.tokens.curr.value] = true;
+          state.tokens.curr.exported = true;
+        }
       }
       for (var t in tokens) {
         if (tokens.hasOwnProperty(t)) {
@@ -3313,8 +3505,15 @@ var JSHINT = (function () {
           if (state.option.inESNext() && funct[t.id] === "const") {
             warning("E011", null, t.id);
           }
-          if (funct["(global)"] && predefined[t.id] === false) {
-            warning("W079", t.token, t.id);
+          if (funct["(global)"]) {
+            if (predefined[t.id] === false) {
+              warning("W079", t.token, t.id);
+            } else if (state.option.futurehostile === false) {
+              if ((!state.option.inES5() && vars.ecmaIdentifiers[5][t.id] === false) ||
+                (!state.option.inESNext() && vars.ecmaIdentifiers[6][t.id] === false)) {
+                warning("W129", t.token, t.id);
+              }
+            }
           }
           if (t.id) {
             addlabel(t.id, { type: "unused", token: t.token });
@@ -3356,7 +3555,9 @@ var JSHINT = (function () {
   });
   varstatement.exps = true;
 
-  var letstatement = stmt("let", function (prefix) {
+  var letstatement = stmt("let", function(context) {
+    var prefix = context && context.prefix;
+    var inexport = context && context.inexport;
     var tokens, lone, value, letblock;
 
     if (!state.option.inESNext()) {
@@ -3383,6 +3584,10 @@ var JSHINT = (function () {
       } else {
         tokens = [ { id: identifier(), token: state.tokens.curr.value } ];
         lone = true;
+        if (inexport) {
+          exported[state.tokens.curr.value] = true;
+          state.tokens.curr.exported = true;
+        }
       }
       for (var t in tokens) {
         if (tokens.hasOwnProperty(t)) {
@@ -3437,22 +3642,24 @@ var JSHINT = (function () {
   });
   letstatement.exps = true;
 
-  blockstmt("class", function () {
+  blockstmt("class", function() {
     return classdef.call(this, true);
   });
 
-  function classdef(stmt) {
+  function classdef(isStatement) {
+
     /*jshint validthis:true */
     if (!state.option.inESNext()) {
       warning("W104", state.tokens.curr, "class");
     }
-    if (stmt) {
+    if (isStatement) {
       // BindingIdentifier
       this.name = identifier();
       addlabel(this.name, { type: "unused", token: state.tokens.curr });
     } else if (state.tokens.next.identifier && state.tokens.next.value !== "extends") {
       // BindingIdentifier(opt)
       this.name = identifier();
+      this.namedExpr = true;
     } else {
       this.name = state.nameStack.infer();
     }
@@ -3541,7 +3748,7 @@ var JSHINT = (function () {
           advance();
         }
         if (state.tokens.next.value !== "(") {
-          doFunction(undefined, c, false, null);
+          doFunction({ statement: c });
         }
       }
 
@@ -3569,13 +3776,17 @@ var JSHINT = (function () {
 
       propertyName(name);
 
-      doFunction(null, c, isGenerator, null);
+      doFunction({
+        statement: c,
+        type: isGenerator ? "generator" : null,
+        classExprBinding: c.namedExpr ? c.name : null
+      });
     }
 
     checkProperties(props);
   }
 
-  blockstmt("function", function () {
+  blockstmt("function", function() {
     var generator = false;
     if (state.tokens.next.value === "*") {
       advance("*");
@@ -3600,14 +3811,18 @@ var JSHINT = (function () {
     }
     addlabel(i, { type: "unction", token: state.tokens.curr });
 
-    doFunction(i, { statement: true }, generator);
+    doFunction({
+      name: i,
+      statement: this,
+      type: generator ? "generator" : null
+    });
     if (state.tokens.next.id === "(" && state.tokens.next.line === state.tokens.curr.line) {
       error("E039");
     }
     return this;
   });
 
-  prefix("function", function () {
+  prefix("function", function() {
     var generator = false;
 
     if (state.tokens.next.value === "*") {
@@ -3619,7 +3834,7 @@ var JSHINT = (function () {
     }
 
     var i = optionalidentifier();
-    var fn = doFunction(i, undefined, generator);
+    var fn = doFunction({ name: i, type: generator ? "generator" : null });
 
     function isVariable(name) { return name[0] !== "("; }
     function isLocal(name) { return fn[name] === "var"; }
@@ -3628,14 +3843,14 @@ var JSHINT = (function () {
       // If the function we just parsed accesses any non-local variables
       // trigger a warning. Otherwise, the function is safe even within
       // a loop.
-      if (_.some(fn, function (val, name) { return isVariable(name) && !isLocal(name); })) {
+      if (_.some(fn, function(val, name) { return isVariable(name) && !isLocal(name); })) {
         warning("W083");
       }
     }
     return this;
   });
 
-  blockstmt("if", function () {
+  blockstmt("if", function() {
     var t = state.tokens.next;
     increaseComplexityCount();
     state.condition = true;
@@ -3679,7 +3894,7 @@ var JSHINT = (function () {
     return this;
   });
 
-  blockstmt("try", function () {
+  blockstmt("try", function() {
     var b;
 
     function doCatch() {
@@ -3757,7 +3972,7 @@ var JSHINT = (function () {
     return this;
   });
 
-  blockstmt("while", function () {
+  blockstmt("while", function() {
     var t = state.tokens.next;
     funct["(breakage)"] += 1;
     funct["(loopage)"] += 1;
@@ -3771,7 +3986,7 @@ var JSHINT = (function () {
     return this;
   }).labelled = true;
 
-  blockstmt("with", function () {
+  blockstmt("with", function() {
     var t = state.tokens.next;
     if (state.directive["use strict"]) {
       error("E010", state.tokens.curr);
@@ -3787,7 +4002,7 @@ var JSHINT = (function () {
     return this;
   });
 
-  blockstmt("switch", function () {
+  blockstmt("switch", function() {
     var t = state.tokens.next;
     var g = false;
     var noindent = false;
@@ -3898,15 +4113,15 @@ var JSHINT = (function () {
     }
   }).labelled = true;
 
-  stmt("debugger", function () {
+  stmt("debugger", function() {
     if (!state.option.debug) {
       warning("W087", this);
     }
     return this;
   }).exps = true;
 
-  (function () {
-    var x = stmt("do", function () {
+  (function() {
+    var x = stmt("do", function() {
       funct["(breakage)"] += 1;
       funct["(loopage)"] += 1;
       increaseComplexityCount();
@@ -3925,7 +4140,7 @@ var JSHINT = (function () {
     x.exps = true;
   }());
 
-  blockstmt("for", function () {
+  blockstmt("for", function() {
     var s, t = state.tokens.next;
     var letscope = false;
     var foreachtok = null;
@@ -3950,8 +4165,7 @@ var JSHINT = (function () {
     do {
       nextop = peek(i);
       ++i;
-    } while (!_.contains(inof, nextop.value) && nextop.value !== ";" &&
-          nextop.type !== "(end)");
+    } while (!_.contains(inof, nextop.value) && nextop.value !== ";" && nextop.type !== "(end)");
 
     // if we're in a for (… in|of …) statement
     if (_.contains(inof, nextop.value)) {
@@ -3961,13 +4175,13 @@ var JSHINT = (function () {
 
       if (state.tokens.next.id === "var") {
         advance("var");
-        state.syntax["var"].fud.call(state.syntax["var"].fud, true);
+        state.tokens.curr.fud({ prefix: true });
       } else if (state.tokens.next.id === "let") {
         advance("let");
         // create a new block scope
         letscope = true;
         funct["(blockscope)"].stack();
-        state.syntax["let"].fud.call(state.syntax["let"].fud, true);
+        state.tokens.curr.fud({ prefix: true });
       } else if (!state.tokens.next.identifier) {
         error("E030", state.tokens.next, state.tokens.next.type);
         advance();
@@ -3981,8 +4195,9 @@ var JSHINT = (function () {
         default:
           var ident = state.tokens.next.value;
           if (!funct["(blockscope)"].getlabel(ident) &&
-              !(scope[ident] || {})[ident])
+              !(scope[ident] || {})[ident]) {
             warning("W088", state.tokens.next, state.tokens.next.value);
+          }
         }
         advance();
       }
@@ -4033,13 +4248,13 @@ var JSHINT = (function () {
       if (state.tokens.next.id !== ";") {
         if (state.tokens.next.id === "var") {
           advance("var");
-          state.syntax["var"].fud.call(state.syntax["var"].fud);
+          state.tokens.curr.fud();
         } else if (state.tokens.next.id === "let") {
           advance("let");
           // create a new block scope
           letscope = true;
           funct["(blockscope)"].stack();
-          state.syntax["let"].fud.call(state.syntax["let"].fud);
+          state.tokens.curr.fud();
         } else {
           for (;;) {
             expression(0, "for");
@@ -4083,7 +4298,7 @@ var JSHINT = (function () {
   }).labelled = true;
 
 
-  stmt("break", function () {
+  stmt("break", function() {
     var v = state.tokens.next.value;
 
     if (funct["(breakage)"] === 0)
@@ -4093,7 +4308,7 @@ var JSHINT = (function () {
       nolinebreak(this);
 
     if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
-      if (state.tokens.curr.line === state.tokens.next.line) {
+      if (state.tokens.curr.line === startLine(state.tokens.next)) {
         if (funct[v] !== "label") {
           warning("W090", state.tokens.next, v);
         } else if (scope[v] !== funct) {
@@ -4110,7 +4325,7 @@ var JSHINT = (function () {
   }).exps = true;
 
 
-  stmt("continue", function () {
+  stmt("continue", function() {
     var v = state.tokens.next.value;
 
     if (funct["(breakage)"] === 0)
@@ -4120,7 +4335,7 @@ var JSHINT = (function () {
       nolinebreak(this);
 
     if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
-      if (state.tokens.curr.line === state.tokens.next.line) {
+      if (state.tokens.curr.line === startLine(state.tokens.next)) {
         if (funct[v] !== "label") {
           warning("W090", state.tokens.next, v);
         } else if (scope[v] !== funct) {
@@ -4139,8 +4354,8 @@ var JSHINT = (function () {
   }).exps = true;
 
 
-  stmt("return", function () {
-    if (this.line === state.tokens.next.line) {
+  stmt("return", function() {
+    if (this.line === startLine(state.tokens.next)) {
       if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
         this.first = expression(0);
 
@@ -4162,10 +4377,10 @@ var JSHINT = (function () {
     return this;
   }).exps = true;
 
-  (function (x) {
+  (function(x) {
     x.exps = true;
     x.lbp = 25;
-  }(prefix("yield", function () {
+  }(prefix("yield", function() {
     var prev = state.tokens.prev;
     if (state.option.inESNext(true) && !funct["(generator)"]) {
       // If it's a yield within a catch clause inside a generator then that's ok
@@ -4183,7 +4398,7 @@ var JSHINT = (function () {
       advance("*");
     }
 
-    if (this.line === state.tokens.next.line || !state.option.inMoz(true)) {
+    if (this.line === startLine(state.tokens.next) || !state.option.inMoz(true)) {
       if (delegatingYield ||
           (state.tokens.next.id !== ";" && !state.tokens.next.reach && state.tokens.next.nud)) {
 
@@ -4207,7 +4422,7 @@ var JSHINT = (function () {
   })));
 
 
-  stmt("throw", function () {
+  stmt("throw", function() {
     nolinebreak(this);
     this.first = expression(20);
 
@@ -4216,7 +4431,7 @@ var JSHINT = (function () {
     return this;
   }).exps = true;
 
-  stmt("import", function () {
+  stmt("import", function() {
     if (!state.option.inESNext()) {
       warning("W119", state.tokens.curr, "import");
     }
@@ -4231,7 +4446,22 @@ var JSHINT = (function () {
       // ImportClause :: ImportedDefaultBinding
       this.name = identifier();
       addlabel(this.name, { type: "unused", token: state.tokens.curr });
-    } else if (state.tokens.next.id === "*") {
+      if (state.tokens.next.value === ",") {
+        // ImportClause :: ImportedDefaultBinding , NameSpaceImport
+        // ImportClause :: ImportedDefaultBinding , NamedImports
+        advance(",");
+        // At this point, we intentionally fall through to continue matching
+        // either NameSpaceImport or NamedImports.
+        // Discussion:
+        // https://github.com/jshint/jshint/pull/2144#discussion_r23978406
+      } else {
+        advance("from");
+        advance("(string)");
+        return this;
+      }
+    }
+
+    if (state.tokens.next.id === "*") {
       // ImportClause :: NameSpaceImport
       advance("*");
       advance("as");
@@ -4240,6 +4470,7 @@ var JSHINT = (function () {
         addlabel(this.name, { type: "unused", token: state.tokens.curr });
       }
     } else {
+      // ImportClause :: NamedImports
       advance("{");
       for (;;) {
         if (state.tokens.next.value === "}") {
@@ -4277,8 +4508,11 @@ var JSHINT = (function () {
     return this;
   }).exps = true;
 
-  stmt("export", function () {
+  stmt("export", function() {
     var ok = true;
+    var token;
+    var identifier;
+
     if (!state.option.inESNext()) {
       warning("W119", state.tokens.curr, "export");
       ok = false;
@@ -4290,6 +4524,7 @@ var JSHINT = (function () {
     }
 
     if (state.tokens.next.value === "*") {
+      // ExportDeclaration :: export * FromClause
       advance("*");
       advance("from");
       advance("(string)");
@@ -4297,23 +4532,50 @@ var JSHINT = (function () {
     }
 
     if (state.tokens.next.type === "default") {
+      // ExportDeclaration :: export default HoistableDeclaration
+      // ExportDeclaration :: export default ClassDeclaration
       state.nameStack.set(state.tokens.next);
       advance("default");
       if (state.tokens.next.id === "function" || state.tokens.next.id === "class") {
         this.block = true;
       }
-      this.exportee = expression(10);
+
+      token = peek();
+
+      expression(10);
+
+      if (state.tokens.next.id === "class") {
+        identifier = token.name;
+      } else {
+        identifier = token.value;
+      }
+
+      addlabel(identifier, {
+        type: "function", token: token
+      });
 
       return this;
     }
 
     if (state.tokens.next.value === "{") {
+      // ExportDeclaration :: export ExportClause
       advance("{");
+      var exportedTokens = [];
       for (;;) {
-        var id;
-        exported[id = identifier(false, false, ok)] = ok;
-        if (ok) {
-          funct["(blockscope)"].setExported(id);
+        if (!state.tokens.next.identifier) {
+          error("E030", state.tokens.next, state.tokens.next.value);
+        }
+        advance();
+
+        state.tokens.curr.exported = ok;
+        exportedTokens.push(state.tokens.curr);
+
+        if (state.tokens.next.value === "as") {
+          advance("as");
+          if (!state.tokens.next.identifier) {
+            error("E030", state.tokens.next, state.tokens.next.value);
+          }
+          advance();
         }
 
         if (state.tokens.next.value === ",") {
@@ -4326,31 +4588,43 @@ var JSHINT = (function () {
           break;
         }
       }
+      if (state.tokens.next.value === "from") {
+        // ExportDeclaration :: export ExportClause FromClause
+        advance("from");
+        advance("(string)");
+      } else if (ok) {
+        exportedTokens.forEach(function(token) {
+          if (!funct[token.value]) {
+            isundef(funct, "W117", token, token.value);
+          }
+          exported[token.value] = true;
+          funct["(blockscope)"].setExported(token.value);
+        });
+      }
       return this;
     }
 
     if (state.tokens.next.id === "var") {
+      // ExportDeclaration :: export VariableStatement
       advance("var");
-      exported[state.tokens.next.value] = ok;
-      state.tokens.next.exported = true;
-      state.syntax["var"].fud.call(state.syntax["var"].fud);
+      state.tokens.curr.fud({ inexport:true });
     } else if (state.tokens.next.id === "let") {
+      // ExportDeclaration :: export VariableStatement
       advance("let");
-      exported[state.tokens.next.value] = ok;
-      state.tokens.next.exported = true;
-      state.syntax["let"].fud.call(state.syntax["let"].fud);
+      state.tokens.curr.fud({ inexport:true });
     } else if (state.tokens.next.id === "const") {
+      // ExportDeclaration :: export VariableStatement
       advance("const");
-      exported[state.tokens.next.value] = ok;
-      state.tokens.next.exported = true;
-      state.syntax["const"].fud.call(state.syntax["const"].fud);
+      state.tokens.curr.fud({ inexport:true });
     } else if (state.tokens.next.id === "function") {
+      // ExportDeclaration :: export Declaration
       this.block = true;
       advance("function");
       exported[state.tokens.next.value] = ok;
       state.tokens.next.exported = true;
       state.syntax["function"].fud();
     } else if (state.tokens.next.id === "class") {
+      // ExportDeclaration :: export Declaration
       this.block = true;
       advance("class");
       exported[state.tokens.next.value] = ok;
@@ -4397,7 +4671,7 @@ var JSHINT = (function () {
   // this function is used to determine whether a squarebracket or a curlybracket
   // expression is a comprehension array, destructuring assignment or a json value.
 
-  var lookupBlockType = function () {
+  var lookupBlockType = function() {
     var pn, pn1;
     var i = -1;
     var bracketStack = 0;
@@ -4432,7 +4706,7 @@ var JSHINT = (function () {
         ret.isBlock = true;
         ret.notJson = true;
       }
-    } while (bracketStack > 0 && pn.id !== "(end)" && i < 15);
+    } while (bracketStack > 0 && pn.id !== "(end)");
     return ret;
   };
 
@@ -4532,15 +4806,15 @@ var JSHINT = (function () {
   //  * "define" which will define the variables local to the list comprehension
   //  * "filter" which will help filter out values
 
-  var arrayComprehension = function () {
-    var CompArray = function () {
+  var arrayComprehension = function() {
+    var CompArray = function() {
       this.mode = "use";
       this.variables = [];
     };
     var _carrays = [];
     var _current;
     function declare(v) {
-      var l = _current.variables.filter(function (elt) {
+      var l = _current.variables.filter(function(elt) {
         // if it has, change its undef state
         if (elt.value === v) {
           elt.undef = false;
@@ -4550,7 +4824,7 @@ var JSHINT = (function () {
       return l !== 0;
     }
     function use(v) {
-      var l = _current.variables.filter(function (elt) {
+      var l = _current.variables.filter(function(elt) {
         // and if it has been defined
         if (elt.value === v && !elt.undef) {
           if (elt.unused === true) {
@@ -4562,12 +4836,12 @@ var JSHINT = (function () {
       // otherwise we warn about it
       return (l === 0);
     }
-    return {stack: function () {
+    return { stack: function() {
           _current = new CompArray();
           _carrays.push(_current);
         },
-        unstack: function () {
-          _current.variables.filter(function (v) {
+        unstack: function() {
+          _current.variables.filter(function(v) {
             if (v.unused)
               warning("W098", v.token, v.raw_text || v.value);
             if (v.undef)
@@ -4576,11 +4850,11 @@ var JSHINT = (function () {
           _carrays.splice(-1, 1);
           _current = _carrays[_carrays.length - 1];
         },
-        setState: function (s) {
+        setState: function(s) {
           if (_.contains(["use", "define", "generate", "filter"], s))
             _current.mode = s;
         },
-        check: function (v) {
+        check: function(v) {
           if (!_current) {
             return;
           }
@@ -4647,7 +4921,7 @@ var JSHINT = (function () {
             warning("W095", state.tokens.next, state.tokens.next.value);
           }
           if (o[state.tokens.next.value] === true) {
-            warning("W075", state.tokens.next, state.tokens.next.value);
+            warning("W075", state.tokens.next, "key", state.tokens.next.value);
           } else if ((state.tokens.next.value === "__proto__" &&
             !state.option.proto) || (state.tokens.next.value === "__iterator__" &&
             !state.option.iterator)) {
@@ -4713,7 +4987,7 @@ var JSHINT = (function () {
     }
   }
 
-  var blockScope = function () {
+  var blockScope = function() {
     var _current = {};
     var _variables = [_current];
 
@@ -4735,18 +5009,18 @@ var JSHINT = (function () {
     }
 
     return {
-      stack: function () {
+      stack: function() {
         _current = {};
         _variables.push(_current);
       },
 
-      unstack: function () {
+      unstack: function() {
         _checkBlockLabels();
         _variables.splice(_variables.length - 1, 1);
         _current = _.last(_variables);
       },
 
-      getlabel: function (l) {
+      getlabel: function(l) {
         for (var i = _variables.length - 1 ; i >= 0; --i) {
           if (_.has(_variables[i], l) && !_variables[i][l]["(shadowed)"]) {
             return _variables[i];
@@ -4754,7 +5028,7 @@ var JSHINT = (function () {
         }
       },
 
-      shadow: function (name) {
+      shadow: function(name) {
         for (var i = _variables.length - 1; i >= 0; i--) {
           if (_.has(_variables[i], name)) {
             _variables[i][name]["(shadowed)"] = true;
@@ -4762,7 +5036,7 @@ var JSHINT = (function () {
         }
       },
 
-      unshadow: function (name) {
+      unshadow: function(name) {
         for (var i = _variables.length - 1; i >= 0; i--) {
           if (_.has(_variables[i], name)) {
             _variables[i][name]["(shadowed)"] = false;
@@ -4770,11 +5044,11 @@ var JSHINT = (function () {
         }
       },
 
-      atTop: function () {
+      atTop: function() {
         return _variables.length === 1;
       },
 
-      setExported: function (id) {
+      setExported: function(id) {
         if (funct["(blockscope)"].atTop()) {
           var item = _current[id];
           if (item && item["(token)"]) {
@@ -4784,11 +5058,11 @@ var JSHINT = (function () {
       },
 
       current: {
-        has: function (t) {
+        has: function(t) {
           return _.has(_current, t);
         },
 
-        add: function (t, type, tok) {
+        add: function(t, type, tok) {
           _current[t] = { "(type)" : type, "(token)": tok, "(shadowed)": false };
         }
       }
@@ -4800,7 +5074,7 @@ var JSHINT = (function () {
   };
 
   // The actual JSHINT function itself.
-  var itself = function (s, o, g) {
+  var itself = function(s, o, g) {
     var i, k, x, reIgnoreStr, reIgnore;
     var optionKeys;
     var newOptionObj = {};
@@ -4820,7 +5094,7 @@ var JSHINT = (function () {
     }
 
     predefined = Object.create(null);
-    combine(predefined, vars.ecmaIdentifiers);
+    combine(predefined, vars.ecmaIdentifiers[3]);
     combine(predefined, vars.reservedVars);
 
     combine(predefined, g || {});
@@ -4839,7 +5113,7 @@ var JSHINT = (function () {
     }
 
     if (o) {
-      each(o.predef || null, function (item) {
+      each(o.predef || null, function(item) {
         var slice, prop;
 
         if (item[0] === "-") {
@@ -4853,7 +5127,7 @@ var JSHINT = (function () {
         }
       });
 
-      each(o.exported || null, function (item) {
+      each(o.exported || null, function(item) {
         exported[item] = true;
       });
 
@@ -4910,31 +5184,31 @@ var JSHINT = (function () {
         return state.jsonMode;
       },
 
-      getOption: function (name) {
+      getOption: function(name) {
         return state.option[name] || null;
       },
 
-      getCache: function (name) {
+      getCache: function(name) {
         return state.cache[name];
       },
 
-      setCache: function (name, value) {
+      setCache: function(name, value) {
         state.cache[name] = value;
       },
 
-      warn: function (code, data) {
+      warn: function(code, data) {
         warningAt.apply(null, [ code, data.line, data.char ].concat(data.data));
       },
 
-      on: function (names, listener) {
-        names.split(" ").forEach(function (name) {
+      on: function(names, listener) {
+        names.split(" ").forEach(function(name) {
           emitter.on(name, listener);
         }.bind(this));
       }
     };
 
     emitter.removeAllListeners();
-    (extraModules || []).forEach(function (func) {
+    (extraModules || []).forEach(function(func) {
       func(api);
     });
 
@@ -4946,7 +5220,7 @@ var JSHINT = (function () {
         o.ignoreDelimiters = [o.ignoreDelimiters];
       }
 
-      o.ignoreDelimiters.forEach(function (delimiterPair) {
+      o.ignoreDelimiters.forEach(function(delimiterPair) {
         if (!delimiterPair.start || !delimiterPair.end)
             return;
 
@@ -4964,27 +5238,27 @@ var JSHINT = (function () {
 
     lex = new Lexer(s);
 
-    lex.on("warning", function (ev) {
+    lex.on("warning", function(ev) {
       warningAt.apply(null, [ ev.code, ev.line, ev.character].concat(ev.data));
     });
 
-    lex.on("error", function (ev) {
+    lex.on("error", function(ev) {
       errorAt.apply(null, [ ev.code, ev.line, ev.character ].concat(ev.data));
     });
 
-    lex.on("fatal", function (ev) {
+    lex.on("fatal", function(ev) {
       quit("E041", ev.line, ev.from);
     });
 
-    lex.on("Identifier", function (ev) {
+    lex.on("Identifier", function(ev) {
       emitter.emit("Identifier", ev);
     });
 
-    lex.on("String", function (ev) {
+    lex.on("String", function(ev) {
       emitter.emit("String", ev);
     });
 
-    lex.on("Number", function (ev) {
+    lex.on("Number", function(ev) {
       emitter.emit("Number", ev);
     });
 
@@ -5028,7 +5302,7 @@ var JSHINT = (function () {
       advance((state.tokens.next && state.tokens.next.value !== ".")  ? "(end)" : undefined);
       funct["(blockscope)"].unstack();
 
-      var markDefined = function (name, context) {
+      var markDefined = function(name, context) {
         do {
           if (typeof context[name] === "string") {
             // JSHINT marks unused variables as 'unused' and
@@ -5051,7 +5325,7 @@ var JSHINT = (function () {
         return false;
       };
 
-      var clearImplied = function (name, line) {
+      var clearImplied = function(name, line) {
         if (!implied[name])
           return;
 
@@ -5067,7 +5341,7 @@ var JSHINT = (function () {
           implied[name] = newImplied;
       };
 
-      var warnUnused = function (name, tkn, type, unused_opt) {
+      var warnUnused = function(name, tkn, type, unused_opt) {
         var line = tkn.line;
         var chr  = tkn.from;
         var raw_name = tkn.raw_text || name;
@@ -5101,7 +5375,7 @@ var JSHINT = (function () {
         });
       };
 
-      var checkUnused = function (func, key) {
+      var checkUnused = function(func, key) {
         var type = func[key];
         var tkn = func["(tokens)"][key];
 
@@ -5137,7 +5411,7 @@ var JSHINT = (function () {
         }
       }
 
-      functions.forEach(function (func) {
+      functions.forEach(function(func) {
         if (func["(unusedOption)"] === false) {
           return;
         }
@@ -5160,7 +5434,7 @@ var JSHINT = (function () {
           unused_opt = func["(unusedOption)"] || state.option.unused;
           unused_opt = unused_opt === true ? "last-param" : unused_opt;
 
-          // 'undefined' is a special case for (function (window, undefined) { ... })();
+          // 'undefined' is a special case for (function(window, undefined) { ... })();
           // patterns.
 
           if (param === "undefined")
@@ -5214,14 +5488,14 @@ var JSHINT = (function () {
   };
 
   // Modules.
-  itself.addModule = function (func) {
+  itself.addModule = function(func) {
     extraModules.push(func);
   };
 
   itself.addModule(style.register);
 
   // Data summary.
-  itself.data = function () {
+  itself.data = function() {
     var data = {
       functions: [],
       options: state.option

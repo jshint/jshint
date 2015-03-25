@@ -316,6 +316,7 @@ exports.numbers = function (test) {
     "var n = 09;",
     "var o = 1e-A;",
     "var p = 1/;",
+    "var q = 1x;"
   ];
 
   TestRun(test)
@@ -334,6 +335,10 @@ exports.numbers = function (test) {
     .addError(16, "Expected an identifier and instead saw ';'.")
     .addError(16, "Expected an identifier and instead saw 'var'.")
     .addError(16, "Missing semicolon.")
+    .addError(17, "Unexpected '1'.")
+    .addError(17, "Unexpected early end of program.")
+    .addError(17, "Expected an identifier and instead saw '(end)'.")
+    .addError(17, "Missing semicolon.")
     .test(code, {es3: true});
 
   // Octals are prohibited in strict mode.
@@ -529,6 +534,11 @@ exports.testRegexRegressions = function (test) {
   TestRun(test).test("var exp = /function(.*){/gi;", {esnext: true});
   TestRun(test).test("var exp = /function(.*){/gi;", {moz: true});
 
+  TestRun(test).test("var exp = /\\[\\]/;", {es3: true});
+  TestRun(test).test("var exp = /\\[\\]/;", {}); // es5
+  TestRun(test).test("var exp = /\\[\\]/;", {esnext: true});
+  TestRun(test).test("var exp = /\\[\\]/;", {moz: true});
+
   test.done();
 };
 
@@ -537,6 +547,7 @@ exports.strings = function (test) {
     "var a = '\u0012\\r';",
     "var b = \'\\g\';",
     "var c = '\\u0022\\u0070\\u005C';",
+    "var d = '\\\\';",
     "var e = '\\x6b..\\x6e';",
     "var f = '\\b\\f\\n\\/';",
     "var g = 'ax",
@@ -545,8 +556,23 @@ exports.strings = function (test) {
   var run = TestRun(test)
     .addError(1, "Control character in string: <non-printable>.", {character: 10})
     .addError(1, "This character may get silently deleted by one or more browsers.")
-    .addError(6, "Unclosed string.")
-    .addError(6, "Missing semicolon.");
+    .addError(7, "Unclosed string.")
+    .addError(7, "Missing semicolon.");
+  run.test(code, {es3: true});
+  run.test(code, {}); // es5
+  run.test(code, {esnext: true});
+  run.test(code, {moz: true});
+
+  test.done();
+};
+
+exports.badStrings = function (test) {
+  var code = [
+    "var a = '\\uNOTHEX';"
+  ];
+
+  var run = TestRun(test)
+    .addError(1, "Unexpected 'uNOTH'.");
   run.test(code, {es3: true});
   run.test(code, {}); // es5
   run.test(code, {esnext: true});
@@ -607,6 +633,206 @@ exports.jsonMode = function (test) {
 
   test.done();
 };
+
+exports.deepJSON = function (test) {
+  var code = [
+    '{',
+    '  "key" : {',
+    '    "deep" : [',
+    '      "value",',
+    '      { "num" : 123, "array": [] }',
+    '    ]',
+    '  },',
+    '  "single": ["x"],',
+    '  "negative": -1.23e2',
+    '}'
+  ];
+
+  var run = TestRun(test);
+
+  run.test(code, {multistr: true, es3: true});
+  run.test(code, {multistr: true}); // es5
+  run.test(code, {multistr: true, esnext: true});
+  run.test(code, {multistr: true, moz: true});
+
+  test.done();
+}
+
+exports.badJSON = function (test) {
+  var objTrailingComma = [
+    '{ "key" : "value", }',
+  ];
+
+  var run1 = TestRun(test)
+    .addError(1, "Unexpected comma.");
+
+  run1.test(objTrailingComma, {multistr: true, es3: true});
+  run1.test(objTrailingComma, {multistr: true}); // es5
+  run1.test(objTrailingComma, {multistr: true, esnext: true});
+  run1.test(objTrailingComma, {multistr: true, moz: true});
+
+  var arrayTrailingComma = [
+    '{ "key" : [,] }',
+  ];
+
+  var run2 = TestRun(test)
+    .addError(1, "Illegal comma.")
+    .addError(1, "Expected a JSON value.")
+    .addError(1, "Unexpected comma.");
+
+  run2.test(arrayTrailingComma, {multistr: true, es3: true});
+  run2.test(arrayTrailingComma, {multistr: true}); // es5
+  run2.test(arrayTrailingComma, {multistr: true, esnext: true});
+  run2.test(arrayTrailingComma, {multistr: true, moz: true});
+
+  var objMissingComma = [
+    '{ "k1":"v1" "k2":"v2" }',
+  ];
+
+  var run3 = TestRun(test)
+    .addError(1, "Expected '}' and instead saw 'k2'.")
+    .addError(1, "Expected '(end)' and instead saw ':'.");
+
+  run3.test(objMissingComma, {multistr: true, es3: true});
+  run3.test(objMissingComma, {multistr: true}); // es5
+  run3.test(objMissingComma, {multistr: true, esnext: true});
+  run3.test(objMissingComma, {multistr: true, moz: true});
+
+  var arrayMissingComma = [
+    '[ "v1" "v2" ]',
+  ];
+
+  var run4 = TestRun(test)
+    .addError(1, "Expected ']' and instead saw 'v2'.")
+    .addError(1, "Expected '(end)' and instead saw ']'.");
+
+  run4.test(arrayMissingComma, {multistr: true, es3: true});
+  run4.test(arrayMissingComma, {multistr: true}); // es5
+  run4.test(arrayMissingComma, {multistr: true, esnext: true});
+  run4.test(arrayMissingComma, {multistr: true, moz: true});
+
+  var objDoubleComma = [
+    '{ "k1":"v1",, "k2":"v2" }',
+  ];
+
+  var run5 = TestRun(test)
+    .addError(1, "Illegal comma.")
+    .addError(1, "Expected ':' and instead saw 'k2'.")
+    .addError(1, "Expected a JSON value.")
+    .addError(1, "Expected '}' and instead saw ':'.")
+    .addError(1, "Expected '(end)' and instead saw 'v2'.");
+
+  run5.test(objDoubleComma, {multistr: true, es3: true});
+  run5.test(objDoubleComma, {multistr: true}); // es5
+  run5.test(objDoubleComma, {multistr: true, esnext: true});
+  run5.test(objDoubleComma, {multistr: true, moz: true});
+
+  var arrayDoubleComma = [
+    '[ "v1",, "v2" ]',
+  ];
+
+  var run6 = TestRun(test)
+    .addError(1, "Illegal comma.")
+    .addError(1, "Expected a JSON value.");
+
+  run6.test(arrayDoubleComma, {multistr: true, es3: true});
+  run6.test(arrayDoubleComma, {multistr: true}); // es5
+  run6.test(arrayDoubleComma, {multistr: true, esnext: true});
+  run6.test(arrayDoubleComma, {multistr: true, moz: true});
+
+  var objUnclosed = [
+    '{ "k1":"v1"',
+  ];
+
+  var run7 = TestRun(test)
+    .addError(1, "Expected '}' and instead saw ''.");
+
+  run7.test(objUnclosed, {multistr: true, es3: true});
+  run7.test(objUnclosed, {multistr: true}); // es5
+  run7.test(objUnclosed, {multistr: true, esnext: true});
+  run7.test(objUnclosed, {multistr: true, moz: true});
+
+  var arrayUnclosed = [
+    '[ "v1"',
+  ];
+
+  var run8 = TestRun(test)
+    .addError(1, "Expected ']' and instead saw ''.");
+
+  run8.test(arrayUnclosed, {multistr: true, es3: true});
+  run8.test(arrayUnclosed, {multistr: true}); // es5
+  run8.test(arrayUnclosed, {multistr: true, esnext: true});
+  run8.test(arrayUnclosed, {multistr: true, moz: true});
+
+  var objUnclosed2 = [
+    '{',
+  ];
+
+  var run9 = TestRun(test)
+    .addError(1, "Missing '}' to match '{' from line 1.")
+    .addError(1, "Expected ':' and instead saw ''.")
+    .addError(1, "Expected a JSON value.")
+    .addError(1, "Expected '}' and instead saw ''.");
+
+  run9.test(objUnclosed2, {multistr: true, es3: true});
+  run9.test(objUnclosed2, {multistr: true}); // es5
+  run9.test(objUnclosed2, {multistr: true, esnext: true});
+  run9.test(objUnclosed2, {multistr: true, moz: true});
+
+  var arrayUnclosed2 = [
+    '[',
+  ];
+
+  var run10 = TestRun(test)
+    .addError(1, "Missing ']' to match '[' from line 1.")
+    .addError(1, "Expected a JSON value.")
+    .addError(1, "Expected ']' and instead saw ''.");
+
+  run10.test(arrayUnclosed2, {multistr: true, es3: true});
+  run10.test(arrayUnclosed2, {multistr: true}); // es5
+  run10.test(arrayUnclosed2, {multistr: true, esnext: true});
+  run10.test(arrayUnclosed2, {multistr: true, moz: true});
+
+  var objDupKeys = [
+    '{ "k1":"v1", "k1":"v1" }',
+  ];
+
+  var run11 = TestRun(test)
+    .addError(1, "Duplicate key 'k1'.");
+
+  run11.test(objDupKeys, {multistr: true, es3: true});
+  run11.test(objDupKeys, {multistr: true}); // es5
+  run11.test(objDupKeys, {multistr: true, esnext: true});
+  run11.test(objDupKeys, {multistr: true, moz: true});
+
+  var objBadKey = [
+    '{ k1:"v1" }',
+  ];
+
+  var run12 = TestRun(test)
+    .addError(1, "Expected a string and instead saw k1.");
+
+  run12.test(objBadKey, {multistr: true, es3: true});
+  run12.test(objBadKey, {multistr: true}); // es5
+  run12.test(objBadKey, {multistr: true, esnext: true});
+  run12.test(objBadKey, {multistr: true, moz: true});
+
+  var objBadValue = [
+    '{ "noRegexpInJSON": /$^/ }',
+  ];
+
+  var run13 = TestRun(test)
+    .addError(1, "Expected a JSON value.")
+    .addError(1, "Expected '}' and instead saw '/$^/'.")
+    .addError(1, "Expected '(end)' and instead saw '}'.");
+
+  run13.test(objBadValue, {multistr: true, es3: true});
+  run13.test(objBadValue, {multistr: true}); // es5
+  run13.test(objBadValue, {multistr: true, esnext: true});
+  run13.test(objBadValue, {multistr: true, moz: true});
+
+  test.done();
+}
 
 exports.comma = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/comma.js", "utf8");
@@ -763,6 +989,36 @@ exports.testIdentifiers = function (test) {
   run.test(src, {unused: true }); // es5
   run.test(src, {esnext: true, unused: true });
   run.test(src, {moz: true, unused: true });
+
+  test.done();
+};
+
+exports.badIdentifiers = function (test) {
+  var badUnicode = [
+    "var \\uNOTHEX;"
+  ];
+
+  var run = TestRun(test)
+    .addError(1, "Unexpected '\\'.")
+    .addError(1, "Expected an identifier and instead saw ''.")
+    .addError(1, "Missing semicolon.");
+  run.test(badUnicode, {es3: true});
+  run.test(badUnicode, {}); // es5
+  run.test(badUnicode, {esnext: true});
+  run.test(badUnicode, {moz: true});
+
+  var invalidUnicodeIdent = [
+    "var \\u0000;"
+  ];
+
+  var run = TestRun(test)
+    .addError(1, "Unexpected '\\'.")
+    .addError(1, "Expected an identifier and instead saw ''.")
+    .addError(1, "Missing semicolon.");
+  run.test(invalidUnicodeIdent, {es3: true});
+  run.test(invalidUnicodeIdent, {}); // es5
+  run.test(invalidUnicodeIdent, {esnext: true});
+  run.test(invalidUnicodeIdent, {moz: true});
 
   test.done();
 };
@@ -3925,48 +4181,81 @@ exports["object ComputedPropertyName"] = function (test) {
 
 exports["spread & rest operator support"] = function (test) {
   var code = [
-    // spread operator
-    "function foo(a, b, c) {",
-    "  console.log(a, b, c); ",
-    "}",
-    "var args = [ 0, 1, 2 ];",
+    // 1
+    // Spread Identifier
     "foo(...args);",
 
-    // spread operator
+    // 2
+    // Spread Array Literal
+    "foo(...[]);",
+
+    // 3, 4
+    // Spread String Literal
+    "foo(...'');",
+    'foo(..."");',
+
+    // 5
+    // Spread Group
+    "foo(...([]));",
+
+    // 6, 7, 8
+    // Spread Operator
     "let initial = [ 1, 2, 3, 4, 5 ];",
     "let extended = [ ...initial, 6, 7, 8, 9 ];",
+    "let nest = [ ...[], 6, 7, 8, 9 ];",
 
-    // rest operator
-    "(function foo(i, j, ...args) {",
-    "  return args;",
-    "}());",
+    // 9
+    // Rest Operator
+    "function foo(...args) {}",
 
-    // rest operator on a fat arrow function
-    "let bar = (...args) => args;"
+    // 10
+    // Rest Operator (Fat Arrow Params)
+    "let bar = (...args) => args;",
+
+    // 11
+    "foo(...[].entries());",
+
+    // 12
+    "foo(...(new Map()).set('a', 1).values());"
   ];
 
-  var run = TestRun(test);
-  run.test(code, {esnext: true});
+  TestRun(test)
+    .test(code, {esnext: true});
 
-  run = TestRun(test)
-    .addError(11, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+  TestRun(test)
+    .addError(1, "'spread/rest operator' is only available in ES6 (use esnext option).")
+    .addError(2, "'spread/rest operator' is only available in ES6 (use esnext option).")
+    .addError(3, "'spread/rest operator' is only available in ES6 (use esnext option).")
+    .addError(4, "'spread/rest operator' is only available in ES6 (use esnext option).")
     .addError(5, "'spread/rest operator' is only available in ES6 (use esnext option).")
     .addError(7, "'spread/rest operator' is only available in ES6 (use esnext option).")
     .addError(8, "'spread/rest operator' is only available in ES6 (use esnext option).")
-    .addError(11, "'spread/rest operator' is only available in ES6 (use esnext option).");
+    .addError(9, "'spread/rest operator' is only available in ES6 (use esnext option).")
+    .addError(10, "'spread/rest operator' is only available in ES6 (use esnext option).")
+    .addError(10, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(11, "'spread/rest operator' is only available in ES6 (use esnext option).")
+    .addError(12, "'spread/rest operator' is only available in ES6 (use esnext option).")
+    .test(code, {moz: true});
 
-  run.test(code, {moz: true});
-
-  run = TestRun(test)
+  TestRun(test)
+    .addError(1, "'spread/rest operator' is only available in ES6 (use esnext option).")
+    .addError(2, "'spread/rest operator' is only available in ES6 (use esnext option).")
+    .addError(3, "'spread/rest operator' is only available in ES6 (use esnext option).")
+    .addError(4, "'spread/rest operator' is only available in ES6 (use esnext option).")
     .addError(5, "'spread/rest operator' is only available in ES6 (use esnext option).")
     .addError(6, "'let' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(7, "'let' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+
     .addError(7, "'spread/rest operator' is only available in ES6 (use esnext option).")
+    .addError(8, "'let' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(8, "'spread/rest operator' is only available in ES6 (use esnext option).")
-    .addError(11, "'let' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(9, "'spread/rest operator' is only available in ES6 (use esnext option).")
+    .addError(10, "'let' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(10, "'spread/rest operator' is only available in ES6 (use esnext option).")
+    .addError(10, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
     .addError(11, "'spread/rest operator' is only available in ES6 (use esnext option).")
-    .addError(11, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).");
-  run.test(code);
+    .addError(12, "'spread/rest operator' is only available in ES6 (use esnext option).")
+    .test(code);
 
   test.done();
 };
@@ -4306,6 +4595,47 @@ exports["class method this"] = function (test) {
   TestRun(test)
     .addError(10, "Possible strict violation.")
     .test(code, {esnext: true});
+
+  test.done();
+};
+
+exports.classExpression = function (test) {
+  var code = [
+    "void class MyClass {",
+    "  constructor() { MyClass = null; }",
+    "  method() { MyClass = null; }",
+    "  static method() { MyClass = null; }",
+    "  get accessor() { MyClass = null; }",
+    "  set accessor() { MyClass = null; }",
+    "};",
+    "void MyClass;"
+  ];
+
+  TestRun(test)
+    .addError(2, "'MyClass' is a function.")
+    .addError(3, "'MyClass' is a function.")
+    .addError(4, "'MyClass' is a function.")
+    .addError(5, "'MyClass' is a function.")
+    .addError(6, "'MyClass' is a function.")
+    .addError(8, "'MyClass' is not defined.")
+    .test(code, { esnext: true, undef: true });
+
+  test.done();
+};
+
+exports.classExpressionThis = function (test) {
+  var code = [
+    "void class MyClass {",
+    "  constructor() { return this; }",
+    "  method() { return this; }",
+    "  static method() { return this; }",
+    "  get accessor() { return this; }",
+    "  set accessor() { return this; }",
+    "};"
+  ];
+
+  TestRun(test)
+    .test(code, { esnext: true });
 
   test.done();
 };
@@ -4794,6 +5124,22 @@ exports["/*jshint ignore */ should ignore lines that end with a multi-line comme
   test.done();
 };
 
+exports["/*jshint ignore */ should ignore multi-line comments"] = function(test) {
+  var code = [
+    "/*jshint ignore:start */",
+    "/*",
+    "following comment",
+    "*/",
+    "var a;",
+    "/*jshint ignore:end */"
+  ];
+
+  TestRun(test)
+    .test(code, { unused: true });
+
+  test.done();
+};
+
 exports["/*jshint ignore */ should be detected even with leading and/or trailing whitespace"] = function (test) {
   var code = [
     "  /*jshint ignore:start */",     // leading whitespace
@@ -5104,6 +5450,8 @@ exports.testES6BlockExports = function (test) {
   ];
 
   TestRun(test)
+    .addError(1, "'broken' is defined but never used.")
+    .addError(2, "'broken2' is defined but never used.")
     .addError(4, "Export declaration must be in global scope.")
     .addError(5, "Export declaration must be in global scope.")
     .addError(6, "Export declaration must be in global scope.")
@@ -5151,6 +5499,200 @@ exports.testStrictDirectiveASI = function (test) {
   TestRun(test, 8)
     .addError(1, "Missing \"use strict\" statement.")
     .test("(function() { var x; \"use strict\"; return x; }());", { strict: true, expr: true });
+
+  test.done();
+};
+
+exports.dereferenceDelete = function (test) {
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw '.'.")
+    .addError(1, "Missing semicolon.")
+    .test("delete.foo();");
+
+  test.done();
+};
+
+exports.trailingCommaInObjectBindingPattern = function (test) {
+  var code = [
+    'function fn(O) {',
+    '  var {a, b, c,} = O;',
+    '}',
+    'fn({ a: 1, b: 2, c: 3 });'
+  ];
+
+  TestRun(test)
+    .test(code, { esnext: true });
+
+  test.done();
+};
+
+
+exports.trailingCommaInObjectBindingPatternParameters = function (test) {
+  var code = [
+    'function fn({a, b, c,}) { }',
+    'fn({ a: 1, b: 2, c: 3 });'
+  ];
+
+  TestRun(test)
+    .test(code, { esnext: true });
+
+  test.done();
+};
+
+
+exports.trailingCommaInArrayBindingPattern = function (test) {
+  var code = [
+    'function fn(O) {',
+    '  var [a, b, c,] = O;',
+    '}',
+    'fn([1, 2, 3]);'
+  ];
+
+  TestRun(test)
+    .test(code, { esnext: true });
+
+  test.done();
+};
+
+
+exports.trailingCommaInArrayBindingPatternParameters = function (test) {
+  var code = [
+    'function fn([a, b, c,]) { }',
+    'fn([1, 2, 3]);'
+  ];
+
+  TestRun(test)
+    .test(code, { esnext: true });
+
+  test.done();
+};
+
+
+exports.commaAfterRestElementInArrayBindingPattern = function (test) {
+  var code = [
+    'function fn(O) {',
+    '  var [a, b, ...c,] = O;',
+    '  var [...d,] = O;',
+    '}',
+    'fn([1, 2, 3]);'
+  ];
+
+  TestRun(test)
+    .addError(2, "Invalid element after rest element.")
+    .addError(3, "Invalid element after rest element.")
+    .test(code, { esnext: true });
+
+  test.done();
+};
+
+
+exports.commaAfterRestElementInArrayBindingPatternParameters = function (test) {
+  var code = [
+    'function fn([a, b, ...c,]) { }',
+    'function fn2([...c,]) { }',
+    'fn([1, 2, 3]);',
+    'fn2([1,2,3]);'
+  ];
+
+  TestRun(test)
+    .addError(1, "Invalid element after rest element.")
+    .addError(2, "Invalid element after rest element.")
+    .test(code, { esnext: true });
+
+  test.done();
+};
+
+
+exports.commaAfterRestParameter = function (test) {
+  var code = [
+    'function fn(a, b, ...c, d) { }',
+    'function fn2(...a, b) { }',
+    'fn(1, 2, 3);',
+    'fn2(1, 2, 3);'
+  ];
+
+  TestRun(test)
+    .addError(1, "Invalid parameter after rest parameter.")
+    .addError(2, "Invalid parameter after rest parameter.")
+    .test(code, { esnext: true });
+
+  test.done();
+};
+
+
+exports.extraRestOperator = function (test) {
+  var code = [
+    'function fn([a, b, ......c]) { }',
+    'function fn2([......c]) { }',
+    'function fn3(a, b, ......) { }',
+    'function fn4(......) { }',
+    'var [......a] = [1, 2, 3];',
+    'var [a, b, ... ...c] = [1, 2, 3];',
+    'var arrow = (......a) => a;',
+    'var arrow2 = (a, b, ......c) => c;',
+    'var arrow3 = ([......a]) => a;',
+    'var arrow4 = ([a, b, ......c]) => c;',
+    'fn([1, 2, 3]);',
+    'fn2([1, 2, 3]);',
+    'fn3(1, 2, 3);',
+    'fn4(1, 2, 3);',
+    'arrow(1, 2, 3);',
+    'arrow2(1, 2, 3);',
+    'arrow3([1, 2, 3]);',
+    'arrow4([1, 2, 3]);',
+  ];
+
+  TestRun(test)
+    .addError(1, "Unexpected '...'.")
+    .addError(2, "Unexpected '...'.")
+    .addError(3, "Unexpected '...'.")
+    .addError(4, "Unexpected '...'.")
+    .addError(5, "Unexpected '...'.")
+    .addError(6, "Unexpected '...'.")
+    .addError(7, "Unexpected '...'.")
+    .addError(8, "Unexpected '...'.")
+    .addError(9, "Unexpected '...'.")
+    .addError(10, "Unexpected '...'.")
+    .test(code, { esnext: true });
+
+  test.done();
+};
+
+
+exports.restOperatorWithoutIdentifier = function (test) {
+  var code = [
+    'function fn([a, b, ...]) { }',
+    'function fn2([...]) { }',
+    'function fn3(a, b, ...) { }',
+    'function fn4(...) { }',
+    'var [...] = [1, 2, 3];',
+    'var [a, b, ...] = [1, 2, 3];',
+    'var arrow = (...) => void 0;',
+    'var arrow2 = (a, b, ...) => a;',
+    'var arrow3 = ([...]) => void 0;',
+    'var arrow4 = ([a, b, ...]) => a;',
+    'fn([1, 2, 3]);',
+    'fn2([1, 2, 3]);',
+    'fn3(1, 2, 3);',
+    'fn3(1, 2, 3);',
+    'arrow(1, 2, 3);',
+    'arrow2(1, 2, 3);',
+    'arrow3([1, 2, 3]);',
+    'arrow4([1, 2, 3]);'
+  ];
+
+  TestRun(test)
+    .addError(1, "Unexpected '...'.")
+    .addError(2, "Unexpected '...'.")
+    .addError(3, "Unexpected '...'.")
+    .addError(4, "Unexpected '...'.")
+    .addError(5, "Unexpected '...'.")
+    .addError(6, "Unexpected '...'.")
+    .addError(7, "Unexpected '...'.")
+    .addError(8, "Unexpected '...'.")
+    .addError(9, "Unexpected '...'.")
+    .addError(10, "Unexpected '...'.")
+    .test(code, { esnext: true });
 
   test.done();
 };

@@ -679,19 +679,22 @@ exports.testES6Modules = function (test) {
     .addError(7, "'import' is only available in ES6 (use esnext option).")
     .addError(8, "'import' is only available in ES6 (use esnext option).")
     .addError(9, "'import' is only available in ES6 (use esnext option).")
-    .addError(20, "'export' is only available in ES6 (use esnext option).")
-    .addError(24, "'export' is only available in ES6 (use esnext option).")
-    .addError(28, "'export' is only available in ES6 (use esnext option).")
-    .addError(29, "'export' is only available in ES6 (use esnext option).")
-    .addError(33, "'export' is only available in ES6 (use esnext option).")
-    .addError(37, "'export' is only available in ES6 (use esnext option).")
-    .addError(41, "'export' is only available in ES6 (use esnext option).")
-    .addError(43, "'export' is only available in ES6 (use esnext option).")
-    .addError(44, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
-    .addError(45, "'export' is only available in ES6 (use esnext option).")
-    .addError(45, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(10, "'import' is only available in ES6 (use esnext option).")
+    .addError(11, "'import' is only available in ES6 (use esnext option).")
+    .addError(22, "'export' is only available in ES6 (use esnext option).")
+    .addError(26, "'export' is only available in ES6 (use esnext option).")
+    .addError(30, "'export' is only available in ES6 (use esnext option).")
+    .addError(31, "'export' is only available in ES6 (use esnext option).")
+    .addError(32, "'export' is only available in ES6 (use esnext option).")
+    .addError(36, "'export' is only available in ES6 (use esnext option).")
+    .addError(40, "'export' is only available in ES6 (use esnext option).")
     .addError(44, "'export' is only available in ES6 (use esnext option).")
-    .addError(43, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(46, "'export' is only available in ES6 (use esnext option).")
+    .addError(47, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(48, "'export' is only available in ES6 (use esnext option).")
+    .addError(48, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(47, "'export' is only available in ES6 (use esnext option).")
+    .addError(46, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .test(src, {});
 
   var src2 = [
@@ -719,13 +722,114 @@ exports.testES6ModulesNamedExportsAffectUnused = function (test) {
     "export { a, x };",
     "export var b = { baz: 'baz' };",
     "export function boo() { return z; }",
-    "export class MyClass { }"
+    "export class MyClass { }",
+    "export var varone = 1, vartwo = 2;",
+    "export const constone = 1, consttwo = 2;",
+    "export let letone = 1, lettwo = 2;",
+    "export var v1u, v2u;",
+    "export let l1u, l2u;",
+    "export const c1u, c2u;"
   ];
 
   TestRun(test)
+    .addError(16, "const 'c1u' is initialized to 'undefined'.")
+    .addError(16, "const 'c2u' is initialized to 'undefined'.")
     .test(src1, {
       esnext: true,
       unused: true
+    });
+
+  test.done();
+};
+
+
+exports["class declaration export (default)"] = function (test) {
+  var source = fs.readFileSync(__dirname + "/fixtures/class-declaration.js", "utf8");
+
+  TestRun(test).test(source, {
+    esnext: true,
+    undef: true
+  });
+
+  test.done();
+};
+
+exports["function declaration export (default)"] = function (test) {
+  var source = fs.readFileSync(__dirname + "/fixtures/function-declaration.js", "utf8");
+
+  TestRun(test).test(source, {
+    esnext: true,
+    undef: true
+  });
+
+  test.done();
+};
+
+exports.testES6ModulesNamedExportsAffectUndef = function (test) {
+  // The identifier "foo" is expected to have been defined in the scope
+  // of this file in order to be exported.
+  // The example below is roughly similar to this Common JS:
+  //
+  //     exports.foo = foo;
+  //
+  // Thus, the "foo" identifier should be seen as undefined.
+  var src1 = [
+    "export { foo };"
+  ];
+
+  TestRun(test)
+    .addError(1, "'foo' is not defined.")
+    .test(src1, {
+      esnext: true,
+      undef: true
+    });
+
+  test.done();
+};
+
+exports.testES6ModulesThroughExportDoNotAffectUnused = function (test) {
+  // "Through" exports do not alter the scope of this file, but instead pass
+  // the exports from one source on through this source.
+  // The example below is roughly similar to this Common JS:
+  //
+  //     var foo;
+  //     exports.foo = require('source').foo;
+  //
+  // Thus, the "foo" identifier should be seen as unused.
+  var src1 = [
+    "var foo;",
+    "export { foo } from \"source\";"
+  ];
+
+  TestRun(test)
+    .addError(1, "'foo' is defined but never used.")
+    .test(src1, {
+      esnext: true,
+      unused: true
+    });
+
+  test.done();
+};
+
+exports.testES6ModulesThroughExportDoNotAffectUndef = function (test) {
+  // "Through" exports do not alter the scope of this file, but instead pass
+  // the exports from one source on through this source.
+  // The example below is roughly similar to this Common JS:
+  //
+  //     exports.foo = require('source').foo;
+  //     var bar = foo;
+  //
+  // Thus, the "foo" identifier should be seen as undefined.
+  var src1 = [
+    "export { foo } from \"source\";",
+    "var bar = foo;"
+  ];
+
+  TestRun(test)
+    .addError(2, "'foo' is not defined.")
+    .test(src1, {
+      esnext: true,
+      undef: true
     });
 
   test.done();
@@ -773,9 +877,16 @@ exports.testES6TemplateLiterals = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/es6-template-literal.js", "utf8");
   TestRun(test)
     .addError(14, "Octal literals are not allowed in strict mode.")
-    .addError(17, "Unclosed template literal.")
-    .addError(18, "Expected an identifier and instead saw '(end)'.")
-    .addError(18, "Missing semicolon.")
+    .addError(21, "Unclosed template literal.")
+    .test(src, { esnext: true });
+  test.done();
+};
+
+exports.testES6TaggedTemplateLiterals = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/es6-template-literal-tagged.js", "utf8");
+  TestRun(test)
+    .addError(16, "Octal literals are not allowed in strict mode.")
+    .addError(23, "Unclosed template literal.")
     .test(src, { esnext: true });
   test.done();
 };
@@ -791,6 +902,19 @@ exports.testES6TemplateLiteralsUnused = function (test) {
   test.done();
 };
 
+exports.testES6TaggedTemplateLiteralsUnused = function (test) {
+  var src = [
+    "function tag() {}",
+    "var a = 'hello';",
+    "alert(tag`${a} world`);"
+  ];
+  TestRun(test)
+    .test(src, { esnext: true, unused: true });
+
+  test.done();
+};
+
+
 exports.testES6TemplateLiteralsUndef = function (test) {
   var src = [
     "/* global alert */",
@@ -803,6 +927,21 @@ exports.testES6TemplateLiteralsUndef = function (test) {
   test.done();
 };
 
+
+exports.testES6TaggedTemplateLiteralsUndef = function (test) {
+  var src = [
+    "/* global alert */",
+    "alert(tag`${a} world`);"
+  ];
+  TestRun(test)
+    .addError(2, "'tag' is not defined.")
+    .addError(2, "'a' is not defined.")
+    .test(src, { esnext: true, undef: true });
+
+  test.done();
+};
+
+
 exports.testES6TemplateLiteralMultiline = function (test) {
   var src = [
     'let multiline = `',
@@ -812,6 +951,163 @@ exports.testES6TemplateLiteralMultiline = function (test) {
   ];
 
   TestRun(test).test(src, { esnext: true });
+
+  test.done();
+};
+
+exports.testES6TemplateLiteralsAreNotDirectives = function (test) {
+  var src = [
+    "function fn() {",
+    "`use strict`;",
+    "return \"\\077\";",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(2, "Expected an assignment or function call and instead saw an expression.")
+    .test(src, { esnext: true });
+
+  var src2 = [
+    "function fn() {",
+    "`${\"use strict\"}`;",
+    "return \"\\077\";",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(2, "Expected an assignment or function call and instead saw an expression.")
+    .test(src2, { esnext: true });
+
+  test.done();
+};
+
+exports.testES6TemplateLiteralReturnValue = function (test) {
+  var src = [
+    'function sayHello(to) {',
+    '  return `Hello, ${to}!`;',
+    '}',
+    'print(sayHello("George"));'
+  ];
+
+  TestRun(test).test(src, { esnext: true });
+
+  var src = [
+    'function* sayHello(to) {',
+    '  yield `Hello, ${to}!`;',
+    '}',
+    'print(sayHello("George"));'
+  ];
+
+  TestRun(test).test(src, { esnext: true });
+
+  test.done();
+};
+
+exports.testES6TemplateLiteralMultilineReturnValue = function (test) {
+  var src = [
+    'function sayHello(to) {',
+    '  return `Hello, ',
+    '    ${to}!`;',
+    '}',
+    'print(sayHello("George"));'
+  ];
+
+  TestRun(test).test(src, { esnext: true });
+
+  var src = [
+    'function* sayHello(to) {',
+    '  yield `Hello, ',
+    '    ${to}!`;',
+    '}',
+    'print(sayHello("George"));'
+  ];
+
+  TestRun(test).test(src, { esnext: true });
+
+  test.done();
+};
+
+
+exports.testES6TaggedTemplateLiteralMultilineReturnValue = function (test) {
+  var src = [
+    'function tag() {}',
+    'function sayHello(to) {',
+    '  return tag`Hello, ',
+    '    ${to}!`;',
+    '}',
+    'print(sayHello("George"));'
+  ];
+
+  TestRun(test).test(src, { esnext: true });
+
+  var src = [
+    'function tag() {}',
+    'function* sayHello(to) {',
+    '  yield tag`Hello, ',
+    '    ${to}!`;',
+    '}',
+    'print(sayHello("George"));'
+  ];
+
+  TestRun(test).test(src, { esnext: true });
+
+  test.done();
+};
+
+
+exports.testES6TemplateLiteralMultilineReturnValueWithFunctionCall = function (test) {
+  var src = [
+    'function sayHello() {',
+    '  return `Helo',
+    '      monkey`',
+    '    .replace(\'l\', \'ll\');',
+    '}',
+    'print(sayHello());',
+  ];
+
+  TestRun(test).test(src, { esnext: true });
+
+  test.done();
+};
+
+
+exports.testES6TaggedTemplateLiteralMultilineReturnValueWithFunctionCall = function (test) {
+  var src = [
+    'function tag() {}',
+    'function sayHello() {',
+    '  return tag`Helo',
+    '    monkey!!`',
+    '    .replace(\'l\', \'ll\');',
+    '}',
+    'print(sayHello());',
+  ];
+
+  TestRun(test).test(src, { esnext: true });
+
+  test.done();
+};
+
+
+exports.testMultilineReturnValueStringLiteral = function (test) {
+  var src = [
+    'function sayHello(to) {',
+    '  return "Hello, \\',
+    '    " + to;',
+    '}',
+    'print(sayHello("George"));'
+  ];
+
+  TestRun(test).test(src, { multistr: true });
+
+  var src = [
+    'function* sayHello(to) {',
+    '  yield "Hello, \\',
+    '    " + to;',
+    '}',
+    'print(sayHello("George"));'
+  ];
+
+  TestRun(test).test(src, { esnext: true, multistr: true });
 
   test.done();
 };
@@ -969,4 +1265,46 @@ exports.testUnCleanedForinifcheckneeded = function (test) {
   }
 
   test.done();
+};
+
+// gh-738 "eval" as an object key should not cause `W061` warnngs
+exports.testPermitEvalAsKey = function (test) {
+  var srcNode = fs.readFileSync(__dirname + "/fixtures/gh-738-node.js", "utf8");
+  var srcBrowser = fs.readFileSync(__dirname + "/fixtures/gh-738-browser.js", "utf8");
+  // global calls to eval should still cause warning.
+  // test a mixture of permitted and disallowed calls
+  // `global#eval` in `node:true` should still cause warning
+  // `(document|window)#eval` in `browser:true` should still cause warning
+
+  // browser globals
+  TestRun(test)
+  .addError(17, "eval can be harmful.")
+  .addError(19, "eval can be harmful.")
+  .addError(20, "eval can be harmful.")
+  .addError(22, "eval can be harmful.")
+  .addError(23, "eval can be harmful.")
+  .addError(25, "eval can be harmful.")
+  .test(srcBrowser, { browser: true });
+
+  // node globals
+  TestRun(test)
+  .addError(18, "eval can be harmful.")
+  .addError(19, "eval can be harmful.")
+  .addError(20, "eval can be harmful.")
+  .addError(22, "eval can be harmful.")
+  .test(srcNode, { node: true });
+
+  test.done();
+
+};
+
+// gh-2194 jshint confusing arrays at beginning of file with JSON
+exports.beginningArraysAreNotJSON = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/gh-2194.js", "utf8");
+
+  TestRun(test)
+  .test(src);
+
+  test.done();
+
 };

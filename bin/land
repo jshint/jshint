@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+"use strict";
+
 var url   = "https://github.com/jshint/jshint/pull/" + process.argv[2] + ".patch";
 var https = require("https");
 var shjs  = require("shelljs");
@@ -26,7 +28,7 @@ function succ(res) {
     data = data.replace(/"/g, "");
 
     shjs.exec("git commit -s --author=\"" + data + "\" --message=\"" + msg + "\"");
-  })
+  });
 }
 
 function err(res) {
