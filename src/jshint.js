@@ -2767,6 +2767,9 @@ var JSHINT = (function() {
           break;
         }
       } else {
+        if (state.option.trailingcomma && state.option.inES5(true)) {
+          warningAt("W132", state.tokens.curr.line, state.tokens.curr.character);
+        }
         break;
       }
     }
@@ -3285,6 +3288,9 @@ var JSHINT = (function() {
             warning("W070", state.tokens.curr);
           }
         } else {
+          if (state.option.trailingcomma && state.option.inES5(true)) {
+            warningAt("W132", state.tokens.curr.line, state.tokens.curr.character);
+          }
           break;
         }
       }
