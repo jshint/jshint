@@ -1308,3 +1308,377 @@ exports.beginningArraysAreNotJSON = function (test) {
   test.done();
 
 };
+
+exports.testJSX = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/jsx.js", "utf8");
+
+  TestRun(test)
+    .addError(9, "Expected an identifier and instead saw '<'.")
+    .addError(9, "Expected ')' to match '(' from line 8 and instead saw 'div'.")
+    .addError(9, "Expected an operator and instead saw '>'.")
+    .addError(9, "Missing semicolon.")
+    .addError(10, "Expected an assignment or function call and instead saw an expression.")
+    .addError(10, "Expected an assignment or function call and instead saw an expression.")
+    .addError(10, "Missing semicolon.")
+    .addError(11, "Expected an assignment or function call and instead saw an expression.")
+    .addError(11, "Missing semicolon.")
+    .addError(12, "Expected an identifier and instead saw '<'.")
+    .addError(12, "Expected an assignment or function call and instead saw an expression.")
+    .addError(12, "Missing semicolon.")
+    .addError(12, "Expected an assignment or function call and instead saw an expression.")
+    .addError(12, "Missing semicolon.")
+    .addError(12, "Missing semicolon.")
+    .addError(12, "'object short notation' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(12, "Unclosed regular expression.")
+    .addError(12, "Unrecoverable syntax error. (35% scanned).")
+    .test(src, {});
+
+  TestRun(test)
+    .test(src, { jsx: true });
+
+  TestRun(test)
+    .addError(25, "'unknownValue' is not defined.")
+    .addError(26, "'unknownValue' is not defined.")
+    .addError(28, "'unknownValue' is not defined.")
+    .test(src, { jsx: true, undef: true });
+
+  TestRun(test)
+    .addError(25, "'unknownValue' is not defined.")
+    .addError(26, "'unknownValue' is not defined.")
+    .addError(28, "'UnknownCustom' is not defined.")
+    .addError(28, "'unknownValue' is not defined.")
+    .addError(30, "'unknown' is not defined.")
+    .test(src, { jsx: "react", undef: true });
+
+  test.done();
+};
+
+exports.testJSXPlacement = function (test) {
+  var inTemplate = [
+    "var foo = `",
+    "  ${ <div /> }",
+    "`;"
+  ];
+
+  TestRun(test)
+    .test(inTemplate, { esnext: true, jsx: true });
+
+  var nested = [
+    "function render() {",
+    "  return <div>",
+    "    { <div /> }",
+    "  </div>;",
+    "}"
+  ];
+
+  TestRun(test)
+    .test(nested, { jsx: true });
+
+  test.done();
+}
+
+exports.testJSXMisplaced = function (test) {
+
+  var firstExpression = [
+    "<div />"
+  ];
+
+  var run1 = TestRun(test)
+    .addError(1, "Expected an identifier and instead saw '<'.")
+    .addError(1, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, "Missing semicolon.")
+    .addError(1, "Expected an identifier and instead saw '>'.")
+    .addError(1, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, "Missing semicolon.");
+
+  run1.test(firstExpression);
+  run1.test(firstExpression, { jsx: true });
+
+  var topExpression = [
+    "if (foo) { bar(); }",
+    "<div />"
+  ];
+
+  var run2 = TestRun(test)
+    .addError(2, "Expected an identifier and instead saw '<'.")
+    .addError(2, "Expected an assignment or function call and instead saw an expression.")
+    .addError(2, "Missing semicolon.")
+    .addError(2, "Expected an identifier and instead saw '>'.")
+    .addError(2, "Expected an assignment or function call and instead saw an expression.")
+    .addError(2, "Missing semicolon.");
+
+  run2.test(topExpression);
+  run2.test(topExpression, { jsx: true });
+
+  test.done();
+};
+
+exports.testJSXText = function (test) {
+
+  var badText = [
+    "function render() {",
+    "  return <div>",
+    "    Control character: \u0007",
+    "  </div>;",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(3, "This character may get silently deleted by one or more browsers.")
+    .addError(3, "Control character in string: <non-printable>: 7.")
+    .test(badText, { jsx: true });
+
+  var entitiesSrc = [
+    "function render() {",
+    "  return <div>",
+    "    This is an ampersand: &amp;",
+    "    This is an numeric: &#1234;",
+    "    This is also numeric: &#xCA1E;",
+    "    Look & listen to",
+    "    these &broken",
+    "    Entities. &#xyz;",
+    "  </div>;",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(6, "JSX text encodes HTML entities, use '&amp;' instead of '&'.")
+    .addError(7, "HTML entity missing ';'.")
+    .addError(8, "Invalid HTML entity '&#xyz;'.")
+    .test(entitiesSrc, { jsx: true });
+
+  test.done();
+};
+
+exports.testJSXComplexNames = function (test) {
+  var entitiesSrc = [
+    "function render() {",
+    "  return <div>",
+    "    <ClassReference />",
+    "    <member.expression />",
+    "    <Complex.member.expression />",
+    "    <web-component />",
+    "    <complex-web-component- />",
+    "    <namespaced:component />",
+    "    <complex-namespaced:component />",
+    "  </div>;",
+    "}"
+  ];
+
+  TestRun(test)
+    .test(entitiesSrc, { jsx: true });
+
+  test.done();
+};
+
+exports.testJSXReactInScope = function (test) {
+  var noReactSrc = [
+    "function render() {",
+    "  return <div />;",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(2, "'React' is not defined.")
+    .test(noReactSrc, { jsx: "react", undef: true });
+
+  var reactUsedDeepSrc = [
+    "var React = require('react');",
+    "function x() {",
+    "  function y() {",
+    "    function z() {",
+    "      return <div />;",
+    "    }",
+    "  }",
+    "}"
+  ];
+
+  TestRun(test)
+    .test(reactUsedDeepSrc, { jsx: "react", node: true, undef: true });
+
+  test.done();
+};
+
+exports.testJSXMultiline = function (test) {
+  var reactMultilineTag = [
+    "function render() {",
+    "  return <div",
+    "    prop='value'",
+    "    more={data}",
+    "    {...spread}",
+    "  />;",
+    "}"
+  ];
+
+  TestRun(test)
+    .test(reactMultilineTag, { jsx: true });
+
+  test.done();
+};
+
+exports.testJSXBalancedTags = function (test) {
+  var unbalancedSingle = [
+    "function render() {",
+    "  return (",
+    "    <div>",
+    "      <span>",
+    "    </div>",
+    "  );",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(4, "JSX element '<span' needs to be closed, instead found '</div'.")
+    .addError(5, "Unrecoverable syntax error. (71% scanned).")
+    .test(unbalancedSingle, { jsx: true });
+
+var doubleOpen = [
+    "function render() {",
+    "  return (",
+    "    <div>",
+    "      <span />",
+    "    <div>",
+    "  );",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(5, "JSX element '<div' is never closed.")
+    .addError(3, "JSX element '<div' is never closed.")
+    .addError(2, "Unmatched '('.")
+    .addError(7, "Missing semicolon.")
+    .addError(1, "Unmatched '{'.")
+    .test(doubleOpen, { jsx: true });
+
+  var incompleteTag = [
+    "function render() {",
+    "  return (",
+    "    <div>",
+    "      <span",
+    "    </div>",
+    "  );",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(5, "Unclosed regular expression.")
+    .addError(5, "Unrecoverable syntax error. (71% scanned).")
+    .test(incompleteTag, { jsx: true });
+
+  var unbalancedExpression = [
+    "function render() {",
+    "  return (",
+    "    <a.b.c>",
+    "      <x.y.z>",
+    "    </a.b.c>",
+    "  );",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(4, "JSX element '<x.y.z' needs to be closed, instead found '</a.b.c'.")
+    .addError(5, "Unrecoverable syntax error. (71% scanned).")
+    .test(unbalancedExpression, { jsx: true });
+
+  var unbalancedOuter = [
+    "function render() {",
+    "  return (",
+    "    <div>",
+    "      <span>",
+    "        <foo>",
+    "          <bar>",
+    "            <baz />",
+    "          </bar>",
+    "        </foo>",
+    "      </span>",
+    "    </vid>",
+    "  );",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(3, "JSX element '<div' needs to be closed, instead found '</vid'.")
+    .addError(11, "Unrecoverable syntax error. (84% scanned).")
+    .test(unbalancedOuter, { jsx: true });
+
+  var missingClose = [
+    "function render() {",
+    "  return (",
+    "    <div>",
+    "      <span>",
+    "        <foo>",
+    "          <bar>",
+    "            <baz />",
+    "          </bar>",
+    "        </foo>",
+    "      </span>",
+    "  );",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(3, "JSX element '<div' is never closed.")
+    .addError(2, "Unmatched '('.")
+    .addError(12, "Missing semicolon.")
+    .addError(1, "Unmatched '{'.")
+    .test(missingClose, { jsx: true });
+
+  test.done();
+};
+
+exports.testJSXSyntaxError = function (test) {
+  var badTagName = [
+    "function render() {",
+    "  return <3 />;",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(2, "Expected '(identifier)' and instead saw '3'.")
+    .addError(2, "Expected '(identifier)' and instead saw '3'.")
+    .addError(2, "Expected '=' and instead saw '3'.")
+    .addError(2, "Unexpected '3'.")
+    .addError(2, "Expected '>' and instead saw '3'.")
+    .addError(2, "Unexpected '3'.")
+    .addError(2, "Expected '</' and instead saw '3'.")
+    .addError(2, "Expected '(identifier)' and instead saw '3'.")
+    .addError(2, "Expected '>' and instead saw '3'.")
+    .addError(2, "Missing semicolon.")
+    .addError(2, "Expected an assignment or function call and instead saw an expression.")
+    .addError(2, "Missing semicolon.")
+    .addError(2, "Expected '}' to match '{' from line 1 and instead saw '/>'.")
+    .addError(2, "Unnecessary semicolon.")
+    .addError(3, "Expected '(end)' and instead saw '}'.")
+    .test(badTagName, { jsx: true });
+
+  var badTokenInTag = [
+    "function render() {",
+    "  return <div 3 />;",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(2, "Expected '(identifier)' and instead saw '3'.")
+    .addError(2, "Expected '=' and instead saw '3'.")
+    .addError(2, "Unexpected '3'.")
+    .addError(2, "Expected '>' and instead saw '3'.")
+    .addError(2, "Unexpected '3'.")
+    .addError(2, "Expected '</' and instead saw '3'.")
+    .addError(2, "Expected '(identifier)' and instead saw '3'.")
+    .addError(2, "JSX element '<div' needs to be closed, instead found '</'.")
+    .addError(2, "Unrecoverable syntax error. (66% scanned).")
+    .test(badTokenInTag, { jsx: true });
+
+  var eofInTag = [
+    "function render() {",
+    "  return <div"
+  ];
+
+  TestRun(test)
+    .addError(2, "JSX element '<div' is never closed.")
+    .addError(2, "Missing semicolon.")
+    .addError(1, "Unmatched '{'.")
+    .test(eofInTag, { jsx: true });
+
+  test.done();
+};

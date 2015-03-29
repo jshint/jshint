@@ -898,6 +898,21 @@ exports.val = {
    */
   latedef      : false,
 
+  /**
+   * This option tells JSHint that your code uses the JSX syntactical addition
+   * to JavaScript, often used with the React UI library. Note JSX is not
+   * part of any ECMAScript standard, nor is it proposed to be.
+   *
+   * - "react"  - Assume usage with React, enabling specific lint rules.
+   * - true     - Parse JSX, but make no assumptions about execution behavior.
+   * - false    - Default. Does not parse JSX.
+   *
+   * More info:
+   *
+   * * [JSX Specification](http://facebook.github.io/jsx/)
+   */
+  jsx          : false,
+
   ignore       : false, // start/end ignoring lines of code, bypassing the lexer
                         //   start    - start ignoring lines, including the current line
                         //   end      - stop ignoring lines, starting on the next line

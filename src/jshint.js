@@ -2052,6 +2052,20 @@ var JSHINT = (function() {
     return this;
   });
 
+  state.syntax["(jsx tag)"] = {
+    type: "(jsx tag)",
+    lbp: 0,
+    identifier: false,
+    nud: doJSXTag,
+    led: doJSXTag
+  };
+
+  state.syntax["(jsx text)"] = {
+    type: "(jsx text)",
+    lbp: 0,
+    identifier: false
+  };
+
   // ECMAScript parser
 
   delim("(endline)");
@@ -2997,6 +3011,181 @@ var JSHINT = (function() {
       if (complete) advance();
       return complete || state.tokens.next.isUnclosed;
     }
+  }
+
+  function expect(typeOrValue) {
+    if (state.tokens.next.type === typeOrValue ||
+        state.tokens.next.value === typeOrValue) {
+      advance();
+      return true;
+    }
+    error("E021", state.tokens.next, typeOrValue, state.tokens.next.value);
+    return false;
+  }
+
+  function doJSXTag() {
+    // Open tag
+    var openTagToken = state.tokens.curr;
+
+    if (state.option.jsx === "react") {
+      // React transpiles JSX to a React.createElement() function call.
+      // This assumes React is in scope. To emulate this, we imagine an
+      // identifier token 'React' is at the open tag location.
+      state.syntax["(identifier)"].nud.call({
+        value: "React",
+        line: openTagToken.line,
+        character: openTagToken.character,
+        from: openTagToken.from,
+      });
+    }
+
+    var openTagName = readJSXElementName();
+
+    // Tag attributes
+    while (state.tokens.next.value !== ">" &&
+           state.tokens.next.value !== "/>" &&
+           state.tokens.next.value !== "") {
+      if (state.tokens.next.value === "{") {
+        advance();
+        expect("...");
+        expression(0);
+        expect("}");
+      } else {
+        readJSXAttributeName();
+        expect("=");
+        if (state.tokens.next.type === "(string)") {
+          advance();
+        } else if (state.tokens.next.value === "{") {
+          advance();
+          expression(0);
+          expect("}");
+        } else {
+          error("E024", state.tokens.next, state.tokens.next.value);
+          break;
+        }
+      }
+    }
+
+    if (state.tokens.next.value === "") {
+      error("E055", openTagToken, openTagName);
+      return {
+        id: "(jsx tag)",
+        type: "(jsx tag)",
+      };
+    }
+
+    if (state.tokens.next.value === "/>") {
+      advance();
+      return {
+        id: "(jsx tag)",
+        type: "(jsx tag)",
+      };
+    }
+    expect(">");
+
+    // Tag children
+    while (state.tokens.next.value !== "</" &&
+           state.tokens.next.value !== "") {
+      if (state.tokens.next.value === "{") {
+        advance();
+        expression(0);
+        expect("}");
+      } else if (state.tokens.next.type === "(jsx tag)") {
+        advance();
+        doJSXTag();
+      } else if (state.tokens.next.type === "(jsx text)") {
+        advance();
+      } else {
+        error("E024", state.tokens.next, state.tokens.next.value);
+        break;
+      }
+    }
+
+    if (state.tokens.next.value === "") {
+      error("E055", openTagToken, openTagName);
+      return {
+        id: "(jsx tag)",
+        type: "(jsx tag)",
+      };
+    }
+
+    // Close tag
+    expect("</");
+    var closeTagToken = state.tokens.curr;
+    var closeTagName = readJSXElementName();
+    if (openTagName !== closeTagName) {
+      error("E056", openTagToken, openTagName, "</" + closeTagName);
+      quit("E041", closeTagToken.line, closeTagToken.from);
+    }
+    expect(">");
+    return {
+      id: "(jsx tag)",
+      type: "(jsx tag)",
+    };
+  }
+
+  function readJSXElementName() {
+    var identifier = state.tokens.next;
+    var name = readJSXIdentifier();
+    var isSimpleIdentifier = identifier.value === name;
+
+    if (state.tokens.next.value === ":") {
+      advance();
+      return identifier.value + ":" + readJSXIdentifier();
+    }
+
+    if (isSimpleIdentifier && state.tokens.next.value === ".") {
+      if (state.option.jsx === "react") {
+        // React's interpretation of JSX: If a JSXMemberExpression is used as a
+        // JSXElementName, it is expected to be a binding in the current scope.
+        state.syntax["(identifier)"].nud.call(identifier);
+      }
+
+      while (state.tokens.next.value === ".") {
+        advance();
+        if (expect("(identifier)")) {
+          name += "." + state.tokens.curr.value;
+        }
+      }
+      return name;
+    }
+
+    if (isSimpleIdentifier && state.option.jsx === "react") {
+      // React's interpretation of JSX: If a simple JSXIdentifier starts
+      // with a capital letter, it is expected to be a binding in the current
+      // scope, otherwise it's treated as a string.
+      if (name[0] === name[0].toUpperCase()) {
+        state.syntax["(identifier)"].nud.call(identifier);
+      }
+    }
+
+    return name;
+  }
+
+  function readJSXAttributeName() {
+    var name = readJSXIdentifier();
+    if (state.tokens.next.value === ":") {
+      advance();
+      name += ":" + readJSXIdentifier();
+    }
+    return name;
+  }
+
+  function readJSXIdentifier() {
+    var value = "";
+    if (!expect("(identifier)")) {
+      return value;
+    }
+    value = state.tokens.curr.value;
+    while (state.tokens.next.value === "-") {
+      advance();
+      value += "-";
+      if (state.tokens.next.type === "(identifier)") {
+        advance();
+        value += state.tokens.curr.value;
+      }
+    }
+    return value;
   }
 
   /**
