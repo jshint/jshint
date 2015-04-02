@@ -257,6 +257,13 @@ exports.bool = {
     undef       : true,
 
     /**
+     * This option prohibits the use of Unicode byte-order marks (BOM sequences) anywhere
+     * in a file. This is useful when files are to be concatenated together. These sequences
+     * are typically added by text editors and may creep in without notice.
+     */
+    nobom       : false,
+
+    /**
      * This option prohibits the use of the grouping operator when it is not
      * strictly required. Such usage commonly reflects a misunderstanding of
      * unary operators, for example:
