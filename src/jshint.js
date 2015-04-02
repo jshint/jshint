@@ -5230,6 +5230,70 @@ var JSHINT = (function() {
       });
     }
 
+    if (o && o.nobom) {
+      // nobom:
+      // Report error unicode BOM sequence is found
+      s = (function(s) {
+        var kBOM = /(?:\uFFFE)|(?:\uFEFF)/g;
+        var lines;
+
+        if (Array.isArray(s)) {
+          lines = s;
+          return s.map(warnAndRemoveBOM);
+        } else {
+          return warnAndRemoveBOM(s);
+        }
+
+        function warnAndRemoveBOM(s, lineIndex) {
+          return s.replace(kBOM, function byteOrderMarkError(m, offset) {
+            var off = 0;
+            var didSplit = false;
+            if (!lines) {
+              didSplit = true;
+              lines = s.split(/([^\r\n]*?\r?\n)/);
+            }
+            if (isString(lines[0])) {
+              lines = lines.map(mapLinesToPositions);
+              if (didSplit) {
+                lines = lines.filter(filterPositions);
+              }
+            }
+            warning("W132", offsetToToken(lines, offset, lineIndex));
+
+            // Replace it with spaces, so that it doesn't break linting the rest
+            // of the file.
+            return m.replace(/./g, " ");
+
+            function mapLinesToPositions(l) {
+              return { start: off, end: (off = off + l.length) - 1 };
+            }
+
+            function filterPositions(p) {
+              // Split produces empty items at every even index in the array,
+              // filter them out.
+              return p.end > p.start;
+            }
+          });
+        }
+
+        function offsetToToken(lines, offset, hint) {
+          var line;
+          if (typeof hint === "number") {
+            line = lines[hint];
+            return { line: hint + 1, from: offset + 1 };
+          } else {
+            for (var i = 0; i < lines.length; ++i) {
+              line = lines[i];
+              if (offset >= line.start && offset <= line.end) {
+                return { line: i + 1, from: (offset - line.start) + 1 };
+              }
+            }
+          }
+          return null;
+        }
+      })(s);
+    }
+
     lex = new Lexer(s);
 
     lex.on("warning", function(ev) {

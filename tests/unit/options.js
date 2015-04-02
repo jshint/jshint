@@ -2290,3 +2290,61 @@ exports.futureHostile = function (test) {
 
   test.done();
 };
+
+// Redundantly named test to help when grepping =)
+exports.nobomByteOrderMark = function (test) {
+  var code = [
+    "",
+    "function fn() {",
+    "}",
+    "",
+    "function fn2() {",
+    "}"
+  ];
+
+  code[0] = "\uFEFF";
+  code[3] = "";
+  TestRun(test, "UTF-16 (BE) BOM at start <array>").
+    addError(1, "Unexpected Unicode Byte Order Mark.").
+    test(code, { nobom: true });
+
+  TestRun(test, "UTF-16 (BE) BOM at start <string>").
+    addError(1, "Unexpected Unicode Byte Order Mark.").
+    test(code.join("\n"), { nobom: true });
+
+  code[0] = "\uFEFF";
+  code[3] = "\uFEFF";
+  TestRun(test, "UTF-16 (BE) BOM twice <array>").
+    addError(1, "Unexpected Unicode Byte Order Mark.").
+    addError(4, "Unexpected Unicode Byte Order Mark.").
+    test(code, { nobom: true });
+
+  TestRun(test, "UTF-16 (BE) BOM twice <string>").
+    addError(1, "Unexpected Unicode Byte Order Mark.").
+    addError(4, "Unexpected Unicode Byte Order Mark.").
+    test(code.join("\n"), { nobom: true });
+
+  code[0] = "\uFFFE";
+  code[3] = "";
+  TestRun(test, "UTF-16 (LE) BOM at start <array>").
+    addError(1, "Unexpected Unicode Byte Order Mark.").
+    test(code, { nobom: true });
+
+  TestRun(test, "UTF-16 (LE) BOM at start <string>").
+    addError(1, "Unexpected Unicode Byte Order Mark.").
+    test(code.join("\n"), { nobom: true });
+
+  code[0] = "\uFFFE";
+  code[3] = "\uFFFE";
+  TestRun(test, "UTF-16 (LE) BOM twice <array>").
+    addError(1, "Unexpected Unicode Byte Order Mark.").
+    addError(4, "Unexpected Unicode Byte Order Mark.").
+    test(code, { nobom: true });
+
+  TestRun(test, "UTF-16 (LE) BOM twice <string>").
+    addError(1, "Unexpected Unicode Byte Order Mark.").
+    addError(4, "Unexpected Unicode Byte Order Mark.").
+    test(code.join("\n"), { nobom: true });
+
+  test.done();
+};
