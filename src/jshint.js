@@ -3199,7 +3199,17 @@ var JSHINT = (function() {
         }
 
         nextVal = state.tokens.next.value;
-        if (peek().id !== ":" && (nextVal === "get" || nextVal === "set")) {
+        if (state.tokens.next.identifier &&
+            (peekIgnoreEOL().id === "," || peekIgnoreEOL().id === "}")) {
+          if (!state.option.inESNext()) {
+            warning("W104", state.tokens.next, "object short notation");
+          }
+          i = propertyName(true);
+          saveProperty(props, i, state.tokens.next);
+
+          expression(10);
+
+        } else if (peek().id !== ":" && (nextVal === "get" || nextVal === "set")) {
           advance(nextVal);
 
           if (!state.option.inES5()) {
@@ -3239,38 +3249,28 @@ var JSHINT = (function() {
             advance("*");
             g = true;
           }
-          if (state.tokens.next.identifier &&
-              (peekIgnoreEOL().id === "," || peekIgnoreEOL().id === "}")) {
-            if (!state.option.inESNext()) {
-              warning("W104", state.tokens.next, "object short notation");
-            }
-            i = propertyName(true);
+
+          if (state.tokens.next.id === "[") {
+            i = computedPropertyName();
+            state.nameStack.set(i);
+          } else {
+            state.nameStack.set(state.tokens.next);
+            i = propertyName();
             saveProperty(props, i, state.tokens.next);
 
-            expression(10);
+            if (typeof i !== "string") {
+              break;
+            }
+          }
+
+          if (state.tokens.next.value === "(") {
+            if (!state.option.inESNext()) {
+              warning("W104", state.tokens.curr, "concise methods");
+            }
+            doFunction({ type: g ? "generator" : null });
           } else {
-            if (state.tokens.next.id === "[") {
-              i = computedPropertyName();
-              state.nameStack.set(i);
-            } else {
-              state.nameStack.set(state.tokens.next);
-              i = propertyName();
-              saveProperty(props, i, state.tokens.next);
-
-              if (typeof i !== "string") {
-                break;
-              }
-            }
-
-            if (state.tokens.next.value === "(") {
-              if (!state.option.inESNext()) {
-                warning("W104", state.tokens.curr, "concise methods");
-              }
-              doFunction({ type: g ? "generator" : null });
-            } else {
-              advance(":");
-              expression(10);
-            }
+            advance(":");
+            expression(10);
           }
         }
 

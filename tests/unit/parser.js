@@ -5696,3 +5696,37 @@ exports.restOperatorWithoutIdentifier = function (test) {
 
   test.done();
 };
+
+exports.getAsIdentifierProp = function (test) {
+  TestRun(test)
+    .test('var get; var obj = { get };', { esnext: true });
+
+  TestRun(test)
+    .test('var set; var obj = { set };', { esnext: true });
+
+  TestRun(test)
+    .test('var get, set; var obj = { get, set };', { esnext: true });
+
+  TestRun(test)
+    .test('var get, set; var obj = { set, get };', { esnext: true });
+
+  TestRun(test)
+    .test('var get; var obj = { a: null, get };', { esnext: true });
+
+  TestRun(test)
+    .test('var get; var obj = { a: null, get, b: null };', { esnext: true });
+
+  TestRun(test)
+    .test('var get; var obj = { get, b: null };', { esnext: true });
+
+  TestRun(test)
+    .test('var get; var obj = { get, get a() {} };', { esnext: true });
+
+  TestRun(test)
+    .test([
+      'var set;',
+      'var obj = { set, get a() {}, set a(_) {} };'
+    ], { esnext: true });
+
+  test.done();
+};
