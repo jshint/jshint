@@ -502,7 +502,11 @@ var JSHINT = (function() {
 
   function doOption() {
     var nt = state.tokens.next;
-    var body = nt.body.split(",").map(function(s) { return s.trim(); });
+    var body = nt.body.split(",").map(function(s) {
+      return s.trim();
+    }).filter(function(s) {
+      return s.length > 0;
+    });
     var predef = {};
 
     if (nt.type === "globals") {

@@ -286,6 +286,15 @@ exports.jslintUnrecognized = function (test) {
   test.done();
 };
 
+exports.optionsElidedComma = function (test) {
+  var src = "/*jshint asi: true, */ /*global a, */ var b = a";
+
+  TestRun(test)
+    .test(src);
+
+  test.done();
+};
+
 exports.caseExpressions = function (test) {
   var src = fs.readFileSync(__dirname + '/fixtures/caseExpressions.js', 'utf8');
   TestRun(test)
