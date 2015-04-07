@@ -692,6 +692,7 @@ exports.mocha = {
 exports.jasmine = {
   jasmine     : false,
   describe    : false,
+  xdescribe   : false,
   it          : false,
   xit         : false,
   beforeEach  : false,
