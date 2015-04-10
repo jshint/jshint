@@ -32,7 +32,7 @@
 /*global console:true */
 /*exported console */
 
-var _        = require("underscore");
+var _        = require("lodash");
 var events   = require("events");
 var vars     = require("./vars.js");
 var messages = require("./messages.js");
