@@ -148,6 +148,7 @@ exports.relations = function (test) {
     "var f = (a === !'hi');",
     "var g = (!2 === 1);",
     "var h = (![1, 2, 3] === []);",
+    "var i = (!([]) instanceof Array);"
   ];
 
   var run = TestRun(test)
@@ -159,7 +160,8 @@ exports.relations = function (test) {
     .addError(6, "Confusing use of '!'.", {character : 10})
     .addError(7, "Confusing use of '!'.", {character : 16})
     .addError(8, "Confusing use of '!'.", {character : 10})
-    .addError(9, "Confusing use of '!'.", {character : 10});
+    .addError(9, "Confusing use of '!'.", {character : 10})
+    .addError(10, "Confusing use of '!'.", {character : 10});
   run.test(code, {es3: true});
   run.test(code, {}); // es5
   run.test(code, {esnext: true});

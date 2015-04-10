@@ -1148,7 +1148,7 @@ var JSHINT = (function() {
       if (!w) {
         nobreaknonadjacent(state.tokens.prev, state.tokens.curr);
       }
-      if (s === "in" && left.id === "!") {
+      if ((s === "in" || s === "instanceof") && left.id === "!") {
         warning("W018", left, "!");
       }
       if (typeof f === "function") {
