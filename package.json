@@ -41,7 +41,7 @@
     "minimatch":           "2.0.x",
     "shelljs":             "0.3.x",
     "strip-json-comments": "1.0.x",
-    "underscore":          "1.8.x"
+    "lodash":              "3.6.x"
   },
 
   "devDependencies": {
