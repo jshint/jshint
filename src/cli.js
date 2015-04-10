@@ -534,6 +534,7 @@ var exports = {
       if (config['extends']) {
         var baseConfig = exports.loadConfig(path.resolve(config.dirname, config['extends']));
         config.globals = _.extend({}, baseConfig.globals, config.globals);
+        config.overrides = _.extend({}, baseConfig.overrides, config.overrides);
         _.defaults(config, baseConfig);
         delete config['extends'];
       }
