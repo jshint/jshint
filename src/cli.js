@@ -191,7 +191,7 @@ function findFile(name, cwd) {
  * @return {array} a list of files to ignore.
  */
 function loadIgnores(params) {
-  var file = findFile(params.excludePath || ".jshintignore", params.cwd) || '';
+  var file = findFile(params.excludePath || ".jshintignore", params.cwd) || "";
 
   if (!file && !params.exclude) {
     return [];
