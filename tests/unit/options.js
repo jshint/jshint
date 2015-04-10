@@ -2294,3 +2294,25 @@ exports.futureHostile = function (test) {
 
   test.done();
 };
+
+
+exports.varstmt = function (test) {
+  var code = [
+    "var x;",
+    "var y = 5;",
+    "var fn = function() {",
+    "  var x;",
+    "  var y = 5;",
+    "};"
+  ];
+
+  TestRun(test)
+    .addError(1, "`var` declarations are forbidden. Use `let` or `const` instead.")
+    .addError(2, "`var` declarations are forbidden. Use `let` or `const` instead.")
+    .addError(3, "`var` declarations are forbidden. Use `let` or `const` instead.")
+    .addError(4, "`var` declarations are forbidden. Use `let` or `const` instead.")
+    .addError(5, "`var` declarations are forbidden. Use `let` or `const` instead.")
+    .test(code, { varstmt: true });
+
+  test.done();
+};
