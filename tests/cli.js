@@ -45,7 +45,29 @@ exports.group = {
         .withArgs(sinon.match(/file4\.json$/)).returns("{\"extends\":\"file3.json\"}")
         .withArgs(sinon.match(/file5\.json$/)).returns("{\"extends\":\"file2.json\"}")
         .withArgs(sinon.match(/file6\.json$/)).returns("{\"extends\":\"file2.json\",\"node\":false}")
-        .withArgs(sinon.match(/file7\.json$/)).returns("{\"extends\":\"file2.json\",\"globals\":{\"bar\":false,\"baz\":true}}");
+        .withArgs(sinon.match(/file7\.json$/)).returns("{\"extends\":\"file2.json\",\"globals\":{\"bar\":false,\"baz\":true}}")
+        .withArgs(sinon.match(/file8\.json$/)).returns(JSON.stringify({
+          extends: "file7.json",
+          overrides: {
+            "file.js": {
+              globals: {
+                foo: true,
+                bar: true
+              }
+            }
+          }
+        }))
+        .withArgs(sinon.match(/file9\.json$/)).returns(JSON.stringify({
+          extends: "file8.json",
+          overrides: {
+            "file.js": {
+              globals: {
+                baz: true,
+                bar: false
+              }
+            }
+          }
+        }));
 
       this.sinon.stub(shjs, "test")
         .withArgs("-e", sinon.match(/file\.js$/)).returns(true)
@@ -83,11 +105,23 @@ exports.group = {
         "node", "jshint", "file.js", "--config", "file2.json"
       ]);
 
-      // Performs a deep merge of "globals" configuration
+      // Performs a deep merge of configuration
       cli.interpret([
         "node", "jshint", "file2.js", "--config", "file7.json"
       ]);
       test.deepEqual(cli.run.lastCall.args[0].config.globals, { foo: true, bar: false, baz: true });
+
+      // Performs a deep merge of configuration with overrides
+      cli.interpret([
+        "node", "jshint", "file.js", "--config", "file8.json"
+      ]);
+      test.deepEqual(cli.run.lastCall.args[0].config.overrides["file.js"].globals, { foo: true, bar: true });
+
+      // Performs a deep merge of configuration with overrides for the same glob
+      cli.interpret([
+        "node", "jshint", "file.js", "--config", "file9.json"
+      ]);
+      test.deepEqual(cli.run.lastCall.args[0].config.overrides["file.js"].globals, { foo: true, bar: false, baz: true });
 
       test.done();
     },
