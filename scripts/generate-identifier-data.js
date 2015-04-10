@@ -1,4 +1,7 @@
 // Based on https://gist.github.com/mathiasbynens/6334847 by @mathias
+
+'use strict';
+
 var regenerate = require('regenerate');
 
 // Which Unicode version should be used?
