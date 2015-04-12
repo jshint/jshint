@@ -1147,7 +1147,7 @@ Lexer.prototype = {
     this.skip();
 
     while (this.peek() !== quote) {
-      while (this.peek() === "") { // End Of Line
+      if (this.peek() === "") { // End Of Line
 
         // If an EOL is not preceded by a backslash, show a warning
         // and proceed like it was a legit multi-line string where
@@ -1200,33 +1200,35 @@ Lexer.prototype = {
             quote: quote
           };
         }
+
+      } else { // Any character other than End Of Line
+
+        allowNewLine = false;
+        var char = this.peek();
+        var jump = 1; // A length of a jump, after we're done
+                      // parsing this character.
+
+        if (char < " ") {
+          // Warn about a control character in a string.
+          this.trigger("warning", {
+            code: "W113",
+            line: this.line,
+            character: this.char,
+            data: [ "<non-printable>" ]
+          });
+        }
+
+        // Special treatment for some escaped characters.
+        if (char === "\\") {
+          var parsed = this.scanEscapeSequence(checks);
+          char = parsed.char;
+          jump = parsed.jump;
+          allowNewLine = parsed.allowNewLine;
+        }
+
+        value += char;
+        this.skip(jump);
       }
-
-      allowNewLine = false;
-      var char = this.peek();
-      var jump = 1; // A length of a jump, after we're done
-                    // parsing this character.
-
-      if (char < " ") {
-        // Warn about a control character in a string.
-        this.trigger("warning", {
-          code: "W113",
-          line: this.line,
-          character: this.char,
-          data: [ "<non-printable>" ]
-        });
-      }
-
-      // Special treatment for some escaped characters.
-      if (char === "\\") {
-        var parsed = this.scanEscapeSequence(checks);
-        char = parsed.char;
-        jump = parsed.jump;
-        allowNewLine = parsed.allowNewLine;
-      }
-
-      value += char;
-      this.skip(jump);
     }
 
     this.skip();
