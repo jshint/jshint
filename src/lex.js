@@ -962,7 +962,7 @@ Lexer.prototype = {
         line: this.line,
         character: this.char
       }, checks,
-      function() { return n >= 0 && n <= 7 && state.directive["use strict"]; });
+      function() { return n >= 0 && n <= 7 && state.isStrict(); });
       break;
     case "u":
       var hexCode = this.input.substr(1, 4);
@@ -1575,7 +1575,7 @@ Lexer.prototype = {
         // Some ES5 FutureReservedWord identifiers are active only
         // within a strict mode environment.
         if (meta.strictOnly) {
-          if (!state.option.strict && !state.directive["use strict"]) {
+          if (!state.option.strict && !state.isStrict()) {
             return false;
           }
         }
@@ -1785,7 +1785,7 @@ Lexer.prototype = {
           line: this.line,
           character: this.char
         }, checks, function() {
-          return state.directive["use strict"] && token.base === 8 && token.isLegacy;
+          return state.isStrict() && token.base === 8 && token.isLegacy;
         });
 
         this.trigger("Number", {
