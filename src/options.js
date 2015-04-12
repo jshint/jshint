@@ -354,15 +354,6 @@ exports.bool = {
     boss        : true,
 
     /**
-     * This option defines globals available when your core is running inside
-     * of the PhantomJS runtime environment. [PhantomJS](http://phantomjs.org/)
-     * is a headless WebKit scriptable with a JavaScript API. It has fast and
-     * native support for various web standards: DOM handling, CSS selector,
-     * JSON, Canvas, and SVG.
-     */
-    phantom     : true,
-
-    /**
      * This option suppresses warnings about the use of `eval`. The use of
      * `eval` is discouraged because it can make your code vulnerable to
      * various injection attacks and it makes it hard for JavaScript
@@ -709,7 +700,16 @@ exports.bool = {
      * * [JavaScript typed
      *   arrays](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays)
      */
-    typed       : true
+    typed       : true,
+
+    /**
+     * This option defines globals available when your core is running inside
+     * of the PhantomJS runtime environment. [PhantomJS](http://phantomjs.org/)
+     * is a headless WebKit scriptable with a JavaScript API. It has fast and
+     * native support for various web standards: DOM handling, CSS selector,
+     * JSON, Canvas, and SVG.
+     */
+    phantom     : true
   },
 
   // Obsolete options
