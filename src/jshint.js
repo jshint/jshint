@@ -3109,7 +3109,7 @@ var JSHINT = (function() {
       verifyMaxParametersPerFunction: function(params) {
         params = params || [];
 
-        if (state.option.maxparams && params.length > state.option.maxparams) {
+        if (_.isNumber(state.option.maxparams) && params.length > state.option.maxparams) {
           warning("W072", functionStartToken, params.length);
         }
       },
