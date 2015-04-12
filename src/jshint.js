@@ -1904,18 +1904,18 @@ var JSHINT = (function() {
         return this;
       }
 
+      block = funct["(blockscope)"].getlabel(v);
+
       if (typeof s === "function") {
         // Protection against accidental inheritance.
         s = undefined;
-      } else if (!funct["(blockscope)"].current.has(v) && typeof s === "boolean") {
+      } else if (!block && typeof s === "boolean") {
         f = funct;
         funct = functions[0];
         addlabel(v, { type: "var" });
         s = funct;
         funct = f;
       }
-
-      block = funct["(blockscope)"].getlabel(v);
 
       // The name is in scope and defined in the current function.
       if (funct === s || block) {

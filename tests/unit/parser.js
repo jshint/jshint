@@ -2605,6 +2605,34 @@ exports["make sure var variables can shadow let variables"] = function (test) {
   test.done();
 };
 
+exports["make sure let variables in the closure of functions shadow predefined globals"] = function (test) {
+  var code = [
+    "function x() {",
+    "  let foo;",
+    "  function y() {",
+    "    foo = {};",
+    "  }",
+    "}"
+  ];
+
+  TestRun(test).test(code, { esnext: true, predef: { foo: false } });
+  test.done();
+};
+
+exports["make sure let variables in the closure of blocks shadow predefined globals"] = function (test) {
+  var code = [
+    "function x() {",
+    "  let foo;",
+    "  {",
+    "    foo = {};",
+    "  }",
+    "}"
+  ];
+
+  TestRun(test).test(code, { esnext: true, predef: { foo: false } });
+  test.done();
+};
+
 exports["test destructuring function as moz"] = function (test) {
   // Example from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
