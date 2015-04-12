@@ -1217,21 +1217,38 @@ var JSHINT = (function() {
         node.type === "undefined");
   }
 
+  var typeofValues = {};
+  typeofValues.legacy = [
+    // E4X extended the `typeof` operator to return "xml" for the XML and
+    // XMLList types it introduced.
+    // Ref: 11.3.2 The typeof Operator
+    // http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-357.pdf
+    "xml",
+    // IE<9 reports "unknown" when the `typeof` operator is applied to an
+    // object existing across a COM+ bridge. In lieu of official documentation
+    // (which does not exist), see:
+    // http://robertnyman.com/2005/12/21/what-is-typeof-unknown/
+    "unknown"
+  ];
+  typeofValues.es3 = [
+    "undefined", "boolean", "number", "string", "function", "object",
+  ];
+  typeofValues.es3 = typeofValues.es3.concat(typeofValues.legacy);
+  typeofValues.es6 = typeofValues.es3.concat("symbol");
+
   // Checks whether the 'typeof' operator is used with the correct
   // value. For docs on 'typeof' see:
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof
+  function isTypoTypeof(left, right, option) {
+    var values;
 
-  function isTypoTypeof(left, right) {
-    if (state.option.notypeof)
+    if (option.notypeof)
       return false;
 
     if (!left || !right)
       return false;
 
-    var values = [
-      "undefined", "object", "boolean", "number",
-      "string", "function", "xml", "object", "unknown", "symbol"
-    ];
+    values = option.inESNext() ? typeofValues.es6 : typeofValues.es3;
 
     if (right.type === "(identifier)" && right.value === "typeof" && left.type === "(string)")
       return !_.contains(values, left.value);
@@ -2163,10 +2180,10 @@ var JSHINT = (function() {
       case isPoorRelation(right):
         warning("W041", this, "===", right.value);
         break;
-      case isTypoTypeof(right, left):
+      case isTypoTypeof(right, left, state.option):
         warning("W122", this, right.value);
         break;
-      case isTypoTypeof(left, right):
+      case isTypoTypeof(left, right, state.option):
         warning("W122", this, left.value);
         break;
     }
@@ -2174,9 +2191,9 @@ var JSHINT = (function() {
     return this;
   });
   relation("===", function(left, right) {
-    if (isTypoTypeof(right, left)) {
+    if (isTypoTypeof(right, left, state.option)) {
       warning("W122", this, right.value);
-    } else if (isTypoTypeof(left, right)) {
+    } else if (isTypoTypeof(left, right, state.option)) {
       warning("W122", this, left.value);
     }
     return this;
@@ -2192,17 +2209,17 @@ var JSHINT = (function() {
       warning("W041", this, "!==", left.value);
     } else if (isPoorRelation(right)) {
       warning("W041", this, "!==", right.value);
-    } else if (isTypoTypeof(right, left)) {
+    } else if (isTypoTypeof(right, left, state.option)) {
       warning("W122", this, right.value);
-    } else if (isTypoTypeof(left, right)) {
+    } else if (isTypoTypeof(left, right, state.option)) {
       warning("W122", this, left.value);
     }
     return this;
   });
   relation("!==", function(left, right) {
-    if (isTypoTypeof(right, left)) {
+    if (isTypoTypeof(right, left, state.option)) {
       warning("W122", this, right.value);
-    } else if (isTypoTypeof(left, right)) {
+    } else if (isTypoTypeof(left, right, state.option)) {
       warning("W122", this, left.value);
     }
     return this;
