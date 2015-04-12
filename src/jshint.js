@@ -1181,7 +1181,8 @@ var JSHINT = (function() {
 
     x.led = function(left) {
       nobreaknonadjacent(state.tokens.prev, state.tokens.curr);
-      var right = expression(100);
+      this.left = left;
+      var right = this.right = expression(100);
 
       if (isIdentifier(left, "NaN") || isIdentifier(right, "NaN")) {
         warning("W019", this);
@@ -1201,8 +1202,6 @@ var JSHINT = (function() {
         warning("W018", right, "!");
       }
 
-      this.left = left;
-      this.right = right;
       return this;
     };
     return x;
@@ -2627,10 +2626,7 @@ var JSHINT = (function() {
           // begin with the `{` and `function` tokens
           (opening.beginsStmt && (ret.id === "{" || triggerFnExpr || isFunctor(ret))) ||
           // Used as the return value of a single-statement arrow function
-          (ret.id === "{" && preceeding.id === "=>") ||
-          // Used to prevent left-to-right application of adjacent addition
-          // operators (the order of which effect type)
-          (first.id === "+" && preceeding.id === "+");
+          (ret.id === "{" && preceeding.id === "=>");
       }
     }
 
@@ -2640,7 +2636,7 @@ var JSHINT = (function() {
       // first expression *or* the current group contains multiple expressions)
       if (!isNecessary && (first.left || ret.exprs)) {
         isNecessary =
-          (!isBeginOfExpr(preceeding) && first.lbp < preceeding.lbp) ||
+          (!isBeginOfExpr(preceeding) && first.lbp <= preceeding.lbp) ||
           (!isEndOfExpr() && last.lbp < state.tokens.next.lbp);
       }
 
