@@ -69,7 +69,8 @@ var errors = {
   E051: "Regular parameters cannot come after default parameters.",
   E052: "Unclosed template literal.",
   E053: "Export declaration must be in global scope.",
-  E054: "Class properties must be methods. Expected '(' but instead saw '{a}'."
+  E054: "Class properties must be methods. Expected '(' but instead saw '{a}'.",
+  E055: "The '{a}' option cannot be set after any executable code."
 };
 
 var warnings = {
@@ -208,7 +209,8 @@ var warnings = {
   W130: "Invalid element after rest element.",
   W131: "Invalid parameter after rest parameter.",
   W132: "`var` declarations are forbidden. Use `let` or `const` instead.",
-  W133: "Invalid for-{a} loop left-hand-side: {b}."
+  W133: "Invalid for-{a} loop left-hand-side: {b}.",
+  W134: "The '{a}' option is only available when linting ECMAScript {b} code."
 };
 
 var info = {

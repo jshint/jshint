@@ -10,7 +10,8 @@ var state = {
    * @returns {boolean}
    */
   isStrict: function() {
-    return this.directive["use strict"] || this.inClassBody;
+    return this.directive["use strict"] || this.inClassBody ||
+      this.option.module;
   },
 
   // Assumption: chronologically ES3 < ES5 < ES6/ESNext < Moz
