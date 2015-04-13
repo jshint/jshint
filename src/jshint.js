@@ -1529,8 +1529,9 @@ var JSHINT = (function() {
           }
           break;
         }
-
-        warning("W027", t, t.value, controlToken.value);
+        if (!state.option.brkret) {
+          warning("W027", t, t.value, controlToken.value);
+        }
         break;
       }
     }
