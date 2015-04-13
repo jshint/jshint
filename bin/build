@@ -3,36 +3,85 @@
 
 "use strict";
 
-var browserify = require("browserify");
-var bundle     = browserify();
-var path       = require("path");
-var version    = require("../package.json").version;
 require("shelljs/make");
 
-var distDir    = path.join(__dirname, "../dist");
-var srcDir     = path.join(__dirname, "../src");
-
-if (!test("-e", distDir))
-  mkdir(distDir);
-
-bundle.require(srcDir + "/jshint.js", { expose: "jshint" });
-bundle.bundle(function (err, src) {
-  var web   = distDir + "/jshint.js";
-  var rhino = distDir + "/jshint-rhino.js";
-
-  [ "/*! " + version + " */",
-    "var JSHINT;",
-    "if (typeof window === 'undefined') window = {};",
-    "(function () {",
-      "var require;",
-      src,
-      "JSHINT = require('jshint').JSHINT;",
-      "if (typeof exports === 'object' && exports) exports.JSHINT = JSHINT;",
-    "}());"
-  ].join("\n").to(web);
-
-  ("#!/usr/bin/env rhino\nvar window = {};\n" + cat(web, srcDir + "/platforms/rhino.js")).to(rhino);
-  chmod("+x", rhino);
-
-  echo("Built: " + version);
+var npm = require("npm");
+var browserify = require("browserify");
+var bundle = browserify();
+var path = require("path");
+var pkgJson = require("../package.json");
+var version = pkgJson.version;
+var deps = Object.keys(pkgJson.dependencies).map(function(mod) {
+  return mod + "@" + pkgJson.dependencies[mod];
 });
+
+var dirs = {
+  dist: path.join(__dirname, "../dist"),
+  src: path.join(__dirname, "../src")
+};
+
+if (!test("-e", dirs.dist)) {
+  mkdir(dirs.dist);
+}
+
+npm.load(function(error) {
+  if (error) {
+    console.log("Error (npm.load): ");
+    console.log(error);
+    return;
+  }
+
+  console.log("\nnpm.commands.prune");
+
+  npm.commands.prune(function(error) {
+    if (error) {
+      console.log("Error: (npm.commands.prune)");
+      console.log(error);
+      return;
+    }
+
+    console.log("\nnpm.commands.test");
+
+    npm.commands.test(function(error) {
+      if (error) {
+        console.log("Error: (npm.commands.test)");
+        console.log(error);
+        return;
+      }
+
+      console.log("\nnpm.commands.install");
+      console.log(deps.join("\n"));
+
+      npm.commands.install(deps, function(error, status) {
+        if (error) {
+          console.log("Error: (npm.commands.install)");
+          console.log(error);
+          return;
+        }
+
+        bundle.require(dirs.src + "/jshint.js", { expose: "jshint" });
+        bundle.bundle(function(err, src) {
+          var web   = dirs.dist + "/jshint.js";
+          var rhino = dirs.dist + "/jshint-rhino.js";
+
+          [ "/*! " + version + " */",
+            "var JSHINT;",
+            "if (typeof window === 'undefined') window = {};",
+            "(function () {",
+              "var require;",
+              src,
+              "JSHINT = require('jshint').JSHINT;",
+              "if (typeof exports === 'object' && exports) exports.JSHINT = JSHINT;",
+            "}());"
+          ].join("\n").to(web);
+
+          ("#!/usr/bin/env rhino\nvar window = {};\n" + cat(web, dirs.src + "/platforms/rhino.js")).to(rhino);
+          chmod("+x", rhino);
+
+          echo("Built: " + version);
+        });
+      });
+    })
+  });
+});
+

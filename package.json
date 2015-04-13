@@ -52,6 +52,7 @@
     "jshint":        "2.6.x",
     "mock-stdin":    "0.3.x",
     "nodeunit":      "0.9.x",
+    "npm":           "2.7.6",
     "regenerate":    "1.2.x",
     "sinon":         "1.12.x",
     "unicode-6.3.0": "0.1.x"
