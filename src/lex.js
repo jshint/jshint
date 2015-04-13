@@ -1566,7 +1566,7 @@ Lexer.prototype = {
       }
       var meta = token.meta;
 
-      if (meta && meta.isFutureReservedWord && state.option.inES5()) {
+      if (meta && meta.isFutureReservedWord && state.inES5()) {
         // ES3 FutureReservedWord in an ES5 environment.
         if (!meta.es5) {
           return false;
