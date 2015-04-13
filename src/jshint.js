@@ -201,6 +201,22 @@ var JSHINT = (function() {
       combine(predefined, vars.ecmaIdentifiers[6]);
     }
 
+    if (state.option.module) {
+      /**
+       * TODO: Extend this restriction to *all* "environmental" options.
+       */
+      if (!hasParsedCode(funct)) {
+        error("E055", state.tokens.next, "module");
+      }
+
+      /**
+       * TODO: Extend this restriction to *all* ES6-specific options.
+       */
+      if (!state.inESNext()) {
+        warning("W134", state.tokens.next, "module", 6);
+      }
+    }
+
     if (state.option.couch) {
       combine(predefined, vars.couch);
     }
@@ -2953,6 +2969,17 @@ var JSHINT = (function() {
     return "(scope)" in token;
   }
 
+  /**
+   * Determine if the parser has begun parsing executable code.
+   *
+   * @param {Token} funct - The current "functor" token
+   *
+   * @returns {boolean}
+   */
+  function hasParsedCode(funct) {
+    return funct["(global)"] && !funct["(verb)"];
+  }
+
   function doTemplateLiteral(left) {
     // ASSERT: this.type === "(template)"
     // jshint validthis: true
@@ -5316,7 +5343,8 @@ var JSHINT = (function() {
 
         if (state.isStrict()) {
           if (!state.option.globalstrict) {
-            if (!(state.option.node || state.option.phantom || state.option.browserify)) {
+            if (!(state.option.module || state.option.node || state.option.phantom ||
+              state.option.browserify)) {
               warning("W097", state.tokens.prev);
             }
           }

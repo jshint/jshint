@@ -642,6 +642,12 @@ exports.bool = {
     mocha       : true,
 
     /**
+     * This option informs JSHint that the input code describes an ECMAScript 6
+     * module. All module code is interpreted as strict mode code.
+     */
+    module      : true,
+
+    /**
      * This option defines globals available when your code is running as a
      * script for the [Windows Script
      * Host](http://en.wikipedia.org/wiki/Windows_Script_Host).

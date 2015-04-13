@@ -2397,3 +2397,116 @@ exports.errorI003 = function(test) {
 
   test.done();
 };
+
+exports.module = {};
+exports.module.behavior = function(test) {
+  var code = [
+    "var package = 3;",
+    "function f() { return this; }"
+  ];
+
+  TestRun(test)
+    .test(code, {});
+
+  TestRun(test)
+    .addError(0, "The 'module' option is only available when linting ECMAScript 6 code.")
+    .addError(1, "Expected an identifier and instead saw 'package' (a reserved word).")
+    .addError(2, "Possible strict violation.")
+    .test(code, { module: true });
+
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw 'package' (a reserved word).")
+    .addError(2, "Possible strict violation.")
+    .test(code, { module: true, esnext: true });
+
+  code = [
+    "/* jshint module: true */",
+    "var package = 3;",
+    "function f() { return this; }"
+  ];
+
+  TestRun(test)
+    .addError(1, "The 'module' option is only available when linting ECMAScript 6 code.")
+    .addError(2, "Expected an identifier and instead saw 'package' (a reserved word).")
+    .addError(3, "Possible strict violation.")
+    .test(code);
+
+  code[0] = "/* jshint module: true, esnext: true */";
+
+  TestRun(test)
+    .addError(2, "Expected an identifier and instead saw 'package' (a reserved word).")
+    .addError(3, "Possible strict violation.")
+    .test(code);
+
+  test.done();
+};
+
+exports.module.declarationRestrictions = function( test ) {
+  TestRun(test)
+    .addError(2, "The 'module' option cannot be set after any executable code.")
+    .test([
+      "(function() {",
+      "  /* jshint module: true */",
+      "})();"
+    ], { esnext: true });
+
+  TestRun(test)
+    .addError(2, "The 'module' option cannot be set after any executable code.")
+    .test([
+      "void 0;",
+      "/* jshint module: true */"
+    ], { esnext: true });
+
+  TestRun(test)
+    .addError(3, "The 'module' option cannot be set after any executable code.")
+    .test([
+      "void 0;",
+      "// hide",
+      "/* jshint module: true */"
+    ], { esnext: true });
+
+  TestRun(test, "First line (following statement)")
+    .addError(1, "The 'module' option cannot be set after any executable code.")
+    .test([
+      "(function() {})(); /* jshint module: true */"
+    ], { esnext: true });
+
+  TestRun(test, "First line (within statement)")
+    .addError(1, "The 'module' option cannot be set after any executable code.")
+    .test([
+      "(function() { /* jshint module: true */",
+      "})();"
+    ], { esnext: true });
+
+  TestRun(test, "First line (before statement)")
+    .test([
+      "/* jshint module: true */ (function() {",
+      "})();"
+    ], { esnext: true });
+
+  TestRun(test, "First line (within expression)")
+    .addError(1, "The 'module' option cannot be set after any executable code.")
+    .test("Math.abs(/*jshint module: true */4);", { esnext: true });
+
+  TestRun(test, "Following single-line comment")
+    .test([
+      "// License boilerplate",
+      "/* jshint module: true */"
+    ], { esnext: true });
+
+  TestRun(test, "Following multi-line comment")
+    .test([
+      "/**",
+      " * License boilerplate",
+      " */",
+      "  /* jshint module: true */"
+    ], { esnext: true });
+
+  TestRun(test, "Following shebang")
+    .test([
+      "#!/usr/bin/env node",
+      "/* jshint module: true */"
+    ], { esnext: true });
+
+  test.done();
+};
