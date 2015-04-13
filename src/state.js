@@ -13,6 +13,32 @@ var state = {
     return this.directive["use strict"] || this.inClassBody;
   },
 
+  // Assumption: chronologically ES3 < ES5 < ES6/ESNext < Moz
+  inMoz: function() {
+    return this.option.moz && !this.option.esnext;
+  },
+
+  /**
+   * @param {object} options
+   * @param {boolean} options.strict - When `true`, only consider ESNext when
+   *                                   in "esnext" code and *not* in "moz".
+   */
+  inESNext: function(strict) {
+    if (strict) {
+      return !this.option.moz && this.option.esnext;
+    }
+    return this.option.moz || this.option.esnext;
+  },
+
+  inES5: function() {
+    return !this.option.es3;
+  },
+
+  inES3: function() {
+    return this.option.es3;
+  },
+
+
   reset: function() {
     this.tokens = {
       prev: null,
