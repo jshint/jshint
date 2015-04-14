@@ -1529,9 +1529,13 @@ var JSHINT = (function() {
           }
           break;
         }
-        if (!state.option.brkret) {
-          warning("W027", t, t.value, controlToken.value);
+
+        if (t.value === "break" && controlToken.value === "return") {
+          if (state.option.brkret === true) {
+            return;
+          }
         }
+        warning("W027", t, t.value, controlToken.value);
         break;
       }
     }
