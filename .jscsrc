@@ -40,5 +40,7 @@
     // "disallowSpacesInsideArrayBrackets": "all",
     "disallowSpacesInsideParentheses": true,
 
-    "disallowNewlineBeforeBlockStatements": true
+    "disallowNewlineBeforeBlockStatements": true,
+
+    "excludeFiles": ["tests/regression/libs/**", "tests/unit/fixtures/**"]
 }

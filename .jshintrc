@@ -1,11 +1,10 @@
 {
-  "boss":      true,
-  "node":      true,
-  "eqeqeq":    true,
-  "strict":    true,
-  "newcap":    false,
-  "undef":     true,
-  "unused":    true,
-  "onecase":   true,
-  "lastsemic": true
+  "boss":     true,
+  "eqeqeq":   true,
+  "newcap":   false,
+  "node":     true,
+  "quotmark": "double",
+  "strict":   true,
+  "undef":    true,
+  "unused":   true
 }
