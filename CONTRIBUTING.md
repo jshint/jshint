@@ -16,7 +16,7 @@ However, before sending a patch, please make sure that the following applies:
 
 ## Development Environment
 
-JSHint is developed using [Node.js](http://nodejs.org/) and has a number of
+JSHint is developed using [Node.js](https://nodejs.org/) and has a number of
 dependencies specified in its `package.json` file. To install them just run the
 following command from within your repo directory:
 
@@ -42,14 +42,14 @@ that's fine but if you're going to send us patches treat this guide as a law.
 * Use one space after `if`, `for`, `while`, etc.
 * No spaces between `function` and `(` for anonymous functions, no space between name and `(`  for named functions:
 
-    ```javascript
+    ```js
     var a = function() {};
     function a() {}
     ```
 
 * Feel free to indent variable assignments or property definitions if it makes the code look better. But don't abuse that:
 
-    ```javascript
+    ```js
     // Good
     var next = token.peak();
     var prev = token.peak(-1);
@@ -73,7 +73,7 @@ that's fine but if you're going to send us patches treat this guide as a law.
 
 * Use one `var` per variable unless you don't assign any values to it (and it's short enough):
 
-    ```javascript
+    ```js
     var token = tokens.find(index);
     var scope = scopes.current;
     var next, prev, cur;
@@ -95,7 +95,7 @@ that's fine but if you're going to send us patches treat this guide as a law.
 * Try not to chain stuff unless it **really** helps (e.g. in tests).
 * Don't short-circuit expressions if you're not assigning the result:
 
-    ```javascript
+    ```js
     // Good
     token = token || tokens.find(0);
 
@@ -107,8 +107,7 @@ that's fine but if you're going to send us patches treat this guide as a law.
       report.addWarning("W001");
     ```
 
-Commit Message Guidelines
--------------------------
+## Commit Message Guidelines
 
 ### Overview
 

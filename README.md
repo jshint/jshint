@@ -1,7 +1,7 @@
 # JSHint, A Static Code Analysis Tool for JavaScript
 
 \[ [Use it online](http://jshint.com/) • [About](http://jshint.com/about/) •
-[Docs](http://jshint.com/docs/) • [FAQ](http://jshint.com/docs/faq) •
+[Docs](http://jshint.com/docs/) • [FAQ](http://jshint.com/docs/faq/) •
 [Install](http://jshint.com/install/) • [Hack](http://jshint.com/hack/) •
 [Blog](http://jshint.com/blog/) • [Twitter](https://twitter.com/jshint/) \]
 
@@ -38,7 +38,6 @@ that cover your issue. And remember the wisdom: pull request > bug report > twee
 - *P3:* Features that the core team will work on once P2s and P1s are done.
 - *P4:* Patches welcome; The request is good, but low priority.
 
-
 ## License
 
 JSHint is distributed under the MIT License. One file and one file only
@@ -46,11 +45,12 @@ JSHint is distributed under the MIT License. One file and one file only
 
 ## The JSHint Team
 
-JSHint is maintained by [Rick Waldron](https://github.com/rwaldron/), [Caitlin
-Potter](https://github.com/caitp/), [Mike
-Sherov](https://github.com/mikesherov/), and [Mike
-Pennisi](https://github.com/jugglinmike/).
+JSHint is maintained by [Rick Waldron](https://github.com/rwaldron/),
+[Caitlin Potter](https://github.com/caitp/),
+[Mike Sherov](https://github.com/mikesherov/),
+and [Mike Pennisi](https://github.com/jugglinmike/).
 
 ## Thank you!
 
-We really appreciate all kinds of feedback and contributions. Thanks for using and supporting JSHint!
+We really appreciate all kinds of feedback and contributions.
+Thanks for using and supporting JSHint!
