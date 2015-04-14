@@ -27,7 +27,9 @@
     "build": "node bin/build",
     "coverage": "istanbul -- cover ./node_modules/.bin/nodeunit tests/unit",
     "data": "node scripts/generate-identifier-data",
-    "pretest": "jshint src && jscs src",
+    "jscs": "jscs src",
+    "jshint": "node bin/jshint src",
+    "pretest": "npm run jshint && npm run jscs",
     "test": "nodeunit tests tests/regression tests/unit"
   },
 
@@ -49,7 +51,6 @@
     "coveralls":     "2.11.x",
     "istanbul":      "0.3.x",
     "jscs":          "1.11.x",
-    "jshint":        "2.6.x",
     "mock-stdin":    "0.3.x",
     "nodeunit":      "0.9.x",
     "regenerate":    "1.2.x",
