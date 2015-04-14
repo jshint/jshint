@@ -28,9 +28,8 @@
  *
  */
 
-/*jshint quotmark:double */
-/*global console:true */
-/*exported console */
+/* global console:true */
+/* exported console */
 
 var _        = require("lodash");
 var events   = require("events");
@@ -343,7 +342,7 @@ var JSHINT = (function() {
     var ignored = state.ignoredLines;
 
     if (_.isEmpty(ignored)) return;
-    JSHINT.errors = _.reject(JSHINT.errors, function(err) { return ignored[err.line] });
+    JSHINT.errors = _.reject(JSHINT.errors, function(err) { return ignored[err.line]; });
   }
 
   function warning(code, t, a, b, c, d) {
@@ -1232,7 +1231,7 @@ var JSHINT = (function() {
     "unknown"
   ];
   typeofValues.es3 = [
-    "undefined", "boolean", "number", "string", "function", "object",
+    "undefined", "boolean", "number", "string", "function", "object"
   ];
   typeofValues.es3 = typeofValues.es3.concat(typeofValues.legacy);
   typeofValues.es6 = typeofValues.es3.concat("symbol");
@@ -2037,7 +2036,7 @@ var JSHINT = (function() {
   var baseTemplateSyntax = {
     lbp: 0,
     identifier: false,
-    template: true,
+    template: true
   };
   state.syntax["(template)"] = _.extend({
     type: "(template)",
@@ -3661,7 +3660,7 @@ var JSHINT = (function() {
 
   function classdef(isStatement) {
 
-    /*jshint validthis:true */
+    /* jshint validthis:true */
     if (!state.option.inESNext()) {
       warning("W104", state.tokens.curr, "class");
     }

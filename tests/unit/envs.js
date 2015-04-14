@@ -4,12 +4,12 @@
 
 "use strict";
 
-var JSHINT  = require('../../src/jshint.js').JSHINT;
-var fs      = require('fs');
+var JSHINT  = require("../../src/jshint.js").JSHINT;
+var fs      = require("fs");
 var TestRun = require("../helpers/testhelper").setup.testRun;
 
 function wrap(globals) {
-  return '(function () { return [ ' + globals.join(',') + ' ]; }());';
+  return "(function () { return [ " + globals.join(",") + " ]; }());";
 }
 
 function globalsKnown(test, globals, options) {
@@ -46,15 +46,15 @@ function globalsImplied(test, globals, options) {
  * More info:
  *  + http://nodejs.org/docs/v0.5.9/api/globals.html
  */
-exports.node = function (test) {
+exports.node = function(test) {
   // Node environment assumes `globalstrict`
   var globalStrict = [
-    '"use strict";',
-    "function test() { return; }",
-  ].join('\n');
+    "\"use strict\";",
+    "function test() { return; }"
+  ].join("\n");
 
   TestRun(test)
-    .addError(1, 'Use the function form of "use strict".')
+    .addError(1, "Use the function form of \"use strict\".")
     .test(globalStrict, { es3: true, strict: true });
 
   TestRun(test)
@@ -89,7 +89,7 @@ exports.node = function (test) {
   test.done();
 };
 
-exports.typed = function (test) {
+exports.typed = function(test) {
   var globals = [
     "ArrayBuffer",
     "ArrayBufferView",
@@ -113,7 +113,7 @@ exports.typed = function (test) {
   test.done();
 };
 
-exports.es5 = function (test) {
+exports.es5 = function(test) {
   var src = fs.readFileSync(__dirname + "/fixtures/es5.js", "utf8");
 
   TestRun(test)
@@ -192,15 +192,15 @@ exports.es5 = function (test) {
   test.done();
 };
 
-exports.phantom = function (test) {
+exports.phantom = function(test) {
   // Phantom environment assumes `globalstrict`
   var globalStrict = [
-    '"use strict";',
-    "function test() { return; }",
-  ].join('\n');
+    "\"use strict\";",
+    "function test() { return; }"
+  ].join("\n");
 
   TestRun(test)
-    .addError(1, 'Use the function form of "use strict".')
+    .addError(1, "Use the function form of \"use strict\".")
     .test(globalStrict, { es3: true, strict: true });
 
   TestRun(test)

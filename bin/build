@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/*jshint shelljs:true */
+/* jshint shelljs:true */
 
 "use strict";
 

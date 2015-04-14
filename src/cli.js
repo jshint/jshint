@@ -531,14 +531,14 @@ var exports = {
       var config = JSON.parse(stripJsonComments(shjs.cat(fp)));
       config.dirname = path.dirname(fp);
 
-      if (config['extends']) {
-        var baseConfig = exports.loadConfig(path.resolve(config.dirname, config['extends']));
+      if (config["extends"]) {
+        var baseConfig = exports.loadConfig(path.resolve(config.dirname, config["extends"]));
         config = _.merge({}, baseConfig, config, function(a, b) {
           if (_.isArray(a)) {
             return a.concat(b);
           }
         });
-        delete config['extends'];
+        delete config["extends"];
       }
 
       return config;

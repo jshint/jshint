@@ -1,10 +1,10 @@
 "use strict";
 
-var fs = require('fs');
+var fs = require("fs");
 var TestRun = require("../helpers/testhelper").setup.testRun;
 
-exports["Backbone.js 0.5.3"] = function (test) {
-  var src = fs.readFileSync(__dirname + '/libs/backbone.js', 'utf8');
+exports["Backbone.js 0.5.3"] = function(test) {
+  var src = fs.readFileSync(__dirname + "/libs/backbone.js", "utf8");
 
   TestRun(test)
     .addError(32, "Unnecessary grouping operator.")
@@ -18,8 +18,8 @@ exports["Backbone.js 0.5.3"] = function (test) {
   test.done();
 };
 
-exports.jQuery_1_7 = function (test) {
-  var src = fs.readFileSync(__dirname + '/libs/jquery-1.7.js', 'utf8');
+exports.jQuery_1_7 = function(test) {
+  var src = fs.readFileSync(__dirname + "/libs/jquery-1.7.js", "utf8");
   var globals = { DOMParser: false, ActiveXObject: false, define: false };
 
   TestRun(test)
@@ -54,8 +54,8 @@ exports.jQuery_1_7 = function (test) {
   test.done();
 };
 
-exports.prototype_1_7 = function (test) {
-  var src = fs.readFileSync(__dirname + '/libs/prototype-17.js', 'utf8');
+exports.prototype_1_7 = function(test) {
+  var src = fs.readFileSync(__dirname + "/libs/prototype-17.js", "utf8");
 
   TestRun(test)
     .addError(22, "Missing semicolon.")
@@ -133,8 +133,8 @@ exports.prototype_1_7 = function (test) {
 };
 
 
-exports.lodash_0_6_1 = function (test) {
-  var src = fs.readFileSync(__dirname + '/libs/lodash.js', 'utf8');
+exports.lodash_0_6_1 = function(test) {
+  var src = fs.readFileSync(__dirname + "/libs/lodash.js", "utf8");
   var globals = { _: false, define: false };
   var options = {
     unused   : true,
@@ -179,8 +179,8 @@ exports.lodash_0_6_1 = function (test) {
   test.done();
 };
 
-exports.json2 = function (test) {
-  var src = fs.readFileSync(__dirname + '/libs/json2.js', 'utf8');
+exports.json2 = function(test) {
+  var src = fs.readFileSync(__dirname + "/libs/json2.js", "utf8");
 
   TestRun(test)
     .addError(177, "'key' is defined but never used.")
@@ -190,8 +190,8 @@ exports.json2 = function (test) {
   test.done();
 };
 
-exports.codemirror3 = function (test) {
-  var src = fs.readFileSync(__dirname + '/libs/codemirror3.js', 'utf8');
+exports.codemirror3 = function(test) {
+  var src = fs.readFileSync(__dirname + "/libs/codemirror3.js", "utf8");
   var opt = {
     newcap:   false,
     undef:    true,
@@ -207,7 +207,7 @@ exports.codemirror3 = function (test) {
     "-W008":  true, // Ignore warnings about leading dots in numbers.
     "-W038":  true, // Ignore scope warnings.
     "-W040":  true, // Ignore possible strict violations.
-    "-W041":  true, // Ignore poor relations warnings.
+    "-W041":  true  // Ignore poor relations warnings.
 
   };
 

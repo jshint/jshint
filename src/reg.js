@@ -2,7 +2,7 @@
  * Regular expressions. Some of these are stupidly long.
  */
 
-/*jshint maxlen:1000 */
+/* jshint maxlen:1000 */
 
 "use strict";
 
