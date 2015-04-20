@@ -423,14 +423,15 @@ var JSHINT = (function() {
     return i;
   }
 
+  // adds an indentifier to the relevant current scope and creates warnings/errors as necessary
   // name: string
-  // opts: { type: string, token: token, islet: bool }
+  // opts: { type: string, token: token, isblockscoped: bool }
   function addlabel(name, opts) {
     opts = opts || {};
 
     var type  = opts.type;
     var token = opts.token;
-    var islet = opts.islet;
+    var isblockscoped = opts.isblockscoped;
 
     // Define label in the current function in the current scope.
     if (type === "exception") {
@@ -464,7 +465,7 @@ var JSHINT = (function() {
     }
 
     // if the identifier is from a let, adds it only to the current blockscope
-    if (islet) {
+    if (isblockscoped) {
       funct["(blockscope)"].current.add(name, type, state.tokens.curr);
       if (funct["(blockscope)"].atTop() && exported[name]) {
         state.tokens.curr.exported = true;
@@ -476,8 +477,6 @@ var JSHINT = (function() {
       if (token) {
         funct["(tokens)"][name] = token;
       }
-
-      setprop(funct, name, { unused: opts.unused || false });
 
       if (funct["(global)"]) {
         global[name] = funct;
@@ -1324,7 +1323,8 @@ var JSHINT = (function() {
           warning("W021", left, left.value);
         }
 
-        if (funct[left.value] === "const") {
+        var label = funct["(blockscope)"].getlabel(left.value);
+        if (label && label[left.value]["(type)"] === "const") {
           error("E013", left, left.value);
         }
 
@@ -1827,7 +1827,7 @@ var JSHINT = (function() {
     } else {
 
       // check to avoid let declaration not within a block
-      funct["(nolet)"] = true;
+      funct["(noblockscopedvar)"] = true;
 
       if (!stmt || state.option.curly) {
         warning("W116", state.tokens.next, "{", state.tokens.next.value);
@@ -1839,7 +1839,7 @@ var JSHINT = (function() {
       a = [statement()];
       indent -= state.option.indent;
 
-      delete funct["(nolet)"];
+      delete funct["(noblockscopedvar)"];
     }
 
     // Don't clear and let it propagate out if it is "break", "return" or similar in switch case
@@ -1951,7 +1951,7 @@ var JSHINT = (function() {
           this["function"] = true;
           break;
         case "const":
-          setprop(funct, v, { unused: false });
+          block[v]["(unused)"] = false;
           break;
         case "function":
           this["function"] = true;
@@ -2015,7 +2015,7 @@ var JSHINT = (function() {
               funct[v] = s["(global)"] ? "global" : "outer";
               break;
             case "const":
-              setprop(s, v, { unused: false });
+              s[v]["(type)"] = false;
               break;
             case "closure":
               funct[v] = s["(global)"] ? "global" : "outer";
@@ -2920,21 +2920,6 @@ var JSHINT = (function() {
     }
   }
 
-  function setprop(funct, name, values) {
-    if (!funct["(properties)"][name]) {
-      funct["(properties)"][name] = { unused: false };
-    }
-
-    _.extend(funct["(properties)"][name], values);
-  }
-
-  function getprop(funct, name, prop) {
-    if (!funct["(properties)"][name])
-      return null;
-
-    return funct["(properties)"][name][prop] || null;
-  }
-
   function functor(name, token, scope, overwrites) {
     var funct = {
       "(name)"      : name,
@@ -3413,189 +3398,38 @@ var JSHINT = (function() {
     });
   }
 
-  var conststatement = stmt("const", function(context) {
+  function variableStatement(type, statement, context) {
     var prefix = context && context.prefix;
     var inexport = context && context.inexport;
-    var tokens;
-    var value;
-    var lone; // State variable to know if it is a lone identifier, or a destructuring statement.
+    var isLet = type === "let";
+    var isConst = type === "const";
+    var isVar = type === "var";
+    var isBlockScoped = isLet || isConst;
+    var tokens, lone, value, letblock, existingLabel;
 
-    if (!state.option.inESNext())
-      warning("W104", state.tokens.curr, "const");
-
-    this.first = [];
-    for (;;) {
-      var names = [];
-      if (_.contains(["{", "["], state.tokens.next.value)) {
-        tokens = destructuringExpression();
-        lone = false;
-      } else {
-        tokens = [ { id: identifier(), token: state.tokens.curr } ];
-        lone = true;
-        if (inexport) {
-          exported[state.tokens.curr.value] = true;
-          state.tokens.curr.exported = true;
-        }
-      }
-      for (var t in tokens) {
-        if (tokens.hasOwnProperty(t)) {
-          t = tokens[t];
-          if (funct[t.id] === "const") {
-            warning("E011", null, t.id);
-          }
-          if (funct["(global)"] && predefined[t.id] === false) {
-            warning("W079", t.token, t.id);
-          }
-          if (t.id) {
-            addlabel(t.id, { token: t.token, type: "const", unused: true });
-            names.push(t.token);
-          }
-        }
-      }
-      if (prefix) {
-        break;
-      }
-
-      this.first = this.first.concat(names);
-
-      if (state.tokens.next.id !== "=") {
-        warning("E012", state.tokens.curr, state.tokens.curr.value);
-      }
-
-      if (state.tokens.next.id === "=") {
-        advance("=");
-        if (state.tokens.next.id === "undefined") {
-          warning("W080", state.tokens.prev, state.tokens.prev.value);
-        }
-        if (peek(0).id === "=" && state.tokens.next.identifier) {
-          warning("W120", state.tokens.next, state.tokens.next.value);
-        }
-        value = expression(10);
-        if (lone) {
-          tokens[0].first = value;
-        } else {
-          destructuringExpressionMatch(names, value);
-        }
-      }
-
-      if (state.tokens.next.id !== ",") {
-        break;
-      }
-      comma();
-    }
-    return this;
-  });
-
-  conststatement.exps = true;
-  var varstatement = stmt("var", function(context) {
-    // JavaScript does not have block scope. It only has function scope. So,
-    // declaring a variable in a block can have unexpected consequences.
-    var prefix = context && context.prefix;
-    var inexport = context && context.inexport;
-    var tokens, lone, value;
-
-    this.first = [];
-    for (;;) {
-      var names = [];
-      if (_.contains(["{", "["], state.tokens.next.value)) {
-        tokens = destructuringExpression();
-        lone = false;
-      } else {
-        tokens = [ { id: identifier(), token: state.tokens.curr } ];
-        lone = true;
-        if (inexport) {
-          exported[state.tokens.curr.value] = true;
-          state.tokens.curr.exported = true;
-        }
-      }
-      for (var t in tokens) {
-        if (tokens.hasOwnProperty(t)) {
-          t = tokens[t];
-          if (state.option.inESNext() && funct[t.id] === "const") {
-            warning("E011", null, t.id);
-          }
-          if (funct["(global)"]) {
-            if (predefined[t.id] === false) {
-              warning("W079", t.token, t.id);
-            } else if (state.option.futurehostile === false) {
-              if ((!state.option.inES5() && vars.ecmaIdentifiers[5][t.id] === false) ||
-                (!state.option.inESNext() && vars.ecmaIdentifiers[6][t.id] === false)) {
-                warning("W129", t.token, t.id);
-              }
-            }
-          }
-          if (t.id) {
-            addlabel(t.id, { type: "unused", token: t.token });
-            names.push(t.token);
-          }
-        }
-      }
-      if (prefix) {
-        break;
-      }
-
-      if (state.option.varstmt) {
-        warning("W132", this);
-      }
-
-      this.first = this.first.concat(names);
-
-      if (state.tokens.next.id === "=") {
-        state.nameStack.set(state.tokens.curr);
-        advance("=");
-        if (state.tokens.next.id === "undefined") {
-          warning("W080", state.tokens.prev, state.tokens.prev.value);
-        }
-        if (peek(0).id === "=" && state.tokens.next.identifier) {
-          if (!funct["(params)"] || funct["(params)"].indexOf(state.tokens.next.value) === -1) {
-            warning("W120", state.tokens.next, state.tokens.next.value);
-          }
-        }
-        value = expression(10);
-        if (lone) {
-          tokens[0].first = value;
-        } else {
-          destructuringExpressionMatch(names, value);
-        }
-      }
-
-      if (state.tokens.next.id !== ",") {
-        break;
-      }
-      comma();
-    }
-    return this;
-  });
-  varstatement.exps = true;
-
-  var letstatement = stmt("let", function(context) {
-    var prefix = context && context.prefix;
-    var inexport = context && context.inexport;
-    var tokens, lone, value, letblock;
-
-    if (!state.option.inESNext()) {
-      warning("W104", state.tokens.curr, "let");
+    if (isBlockScoped && !state.option.inESNext()) {
+      warning("W104", state.tokens.curr, type);
     }
 
-    if (state.tokens.next.value === "(") {
+    if (isLet && state.tokens.next.value === "(") {
       if (!state.option.inMoz(true)) {
         warning("W118", state.tokens.next, "let block");
       }
       advance("(");
       funct["(blockscope)"].stack();
       letblock = true;
-    } else if (funct["(nolet)"]) {
+    } else if (isBlockScoped && funct["(noblockscopedvar)"]) {
       error("E048", state.tokens.curr);
     }
 
-    this.first = [];
+    statement.first = [];
     for (;;) {
       var names = [];
       if (_.contains(["{", "["], state.tokens.next.value)) {
         tokens = destructuringExpression();
         lone = false;
       } else {
-        tokens = [ { id: identifier(), token: state.tokens.curr.value } ];
+        tokens = [ { id: identifier(), token: state.tokens.curr } ];
         lone = true;
         if (inexport) {
           exported[state.tokens.curr.value] = true;
@@ -3605,14 +3439,27 @@ var JSHINT = (function() {
       for (var t in tokens) {
         if (tokens.hasOwnProperty(t)) {
           t = tokens[t];
-          if (state.option.inESNext() && funct[t.id] === "const") {
-            warning("E011", null, t.id);
+          if (state.option.inESNext()) {
+            // only look in the latest scope because we can shadow
+            existingLabel = funct["(blockscope)"].current.getlabel(t.id);
+            if (existingLabel && existingLabel["(type)"] === "const") {
+              warning("E011", null, t.id);
+            }
           }
-          if (funct["(global)"] && predefined[t.id] === false) {
-            warning("W079", t.token, t.id);
+          if (funct["(global)"]) {
+            if (predefined[t.id] === false) {
+              warning("W079", t.token, t.id);
+            } else if (isVar && state.option.futurehostile === false) {
+              if ((!state.option.inES5() && vars.ecmaIdentifiers[5][t.id] === false) ||
+                  (!state.option.inESNext() && vars.ecmaIdentifiers[6][t.id] === false)) {
+                warning("W129", t.token, t.id);
+              }
+            }
           }
-          if (t.id && !funct["(nolet)"]) {
-            addlabel(t.id, { type: "unused", token: t.token, islet: true });
+          if (t.id && (!isBlockScoped || !funct["(noblockscopedvar)"])) {
+            addlabel(t.id, { type: isConst ? "const" : "unused",
+              token: t.token,
+              isblockscoped: isBlockScoped }); //todo check in here for else block scoped const specofic
             names.push(t.token);
           }
         }
@@ -3621,15 +3468,30 @@ var JSHINT = (function() {
         break;
       }
 
-      this.first = this.first.concat(names);
+      if (isVar && state.option.varstmt) {
+        warning("W132", statement);
+      }
+
+      statement.first = statement.first.concat(names);
+
+      if (isConst && state.tokens.next.id !== "=") {
+        warning("E012", state.tokens.curr, state.tokens.curr.value);
+      }
 
       if (state.tokens.next.id === "=") {
+        if (isVar) {
+          state.nameStack.set(state.tokens.curr);
+        }
         advance("=");
         if (state.tokens.next.id === "undefined") {
           warning("W080", state.tokens.prev, state.tokens.prev.value);
         }
         if (peek(0).id === "=" && state.tokens.next.identifier) {
-          warning("W120", state.tokens.next, state.tokens.next.value);
+          if (isBlockScoped ||
+              isVar && (!funct["(params)"] ||
+              funct["(params)"].indexOf(state.tokens.next.value) === -1)) {
+            warning("W120", state.tokens.next, state.tokens.next.value);
+          }
         }
         value = expression(10);
         if (lone) {
@@ -3647,11 +3509,25 @@ var JSHINT = (function() {
     if (letblock) {
       advance(")");
       block(true, true);
-      this.block = true;
+      statement.block = true;
       funct["(blockscope)"].unstack();
     }
 
-    return this;
+    return statement;
+  }
+
+  var conststatement = stmt("const", function(context) {
+    return variableStatement("const", this, context);
+  });
+
+  conststatement.exps = true;
+  var varstatement = stmt("var", function(context) {
+    return variableStatement("var", this, context);
+  });
+  varstatement.exps = true;
+
+  var letstatement = stmt("let", function(context) {
+    return variableStatement("let", this, context);
   });
   letstatement.exps = true;
 
@@ -5006,7 +4882,9 @@ var JSHINT = (function() {
 
     function _checkBlockLabels() {
       for (var t in _current) {
-        if (_current[t]["(type)"] === "unused") {
+        var label = _current[t],
+            labelType = label["(type)"];
+        if (labelType === "unused" || (labelType === "const" && label["(unused)"])) {
           if (state.option.unused) {
             var tkn = _current[t]["(token)"];
             // Don't report exported labels as unused
@@ -5016,6 +4894,13 @@ var JSHINT = (function() {
             var line = tkn.line;
             var chr  = tkn.character;
             warningAt("W098", line, chr, t);
+
+            // todo - use warnunused?
+            unuseds.push({
+              name: t,
+              line: line,
+              character: chr
+            });
           }
         }
       }
@@ -5071,12 +4956,16 @@ var JSHINT = (function() {
       },
 
       current: {
+        getlabel: function(t) {
+          return _current[t];
+        },
+
         has: function(t) {
           return _.has(_current, t);
         },
 
         add: function(t, type, tok) {
-          _current[t] = { "(type)" : type, "(token)": tok, "(shadowed)": false };
+          _current[t] = { "(type)" : type, "(token)": tok, "(shadowed)": false, "(unused)": true };
         }
       }
     };
@@ -5401,7 +5290,7 @@ var JSHINT = (function() {
         if (key.charAt(0) === "(")
           return;
 
-        if (type !== "unused" && type !== "unction" && type !== "const")
+        if (type !== "unused" && type !== "unction")
           return;
 
         // Params are checked separately from other variables.
@@ -5410,10 +5299,6 @@ var JSHINT = (function() {
 
         // Variable is in global scope and defined as exported.
         if (func["(global)"] && _.has(exported, key))
-          return;
-
-        // Is this constant unused?
-        if (type === "const" && !getprop(func, key, "unused"))
           return;
 
         warnUnused(key, tkn, "var");

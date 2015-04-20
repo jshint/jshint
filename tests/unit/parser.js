@@ -3795,16 +3795,41 @@ exports["no let not directly within a block"] = function (test) {
   ];
 
   TestRun(test)
-    .addError(1, "Let declaration not directly within block.")
-    .addError(4, "Let declaration not directly within block.")
-    .addError(7, "Let declaration not directly within block.")
-    .addError(8, "Let declaration not directly within block.")
-    .addError(9, "Let declaration not directly within block.")
-    .addError(10, "Let declaration not directly within block.")
-    .addError(11, "Let declaration not directly within block.")
-    .addError(11, "Let declaration not directly within block.")
-    .addError(11, "Let declaration not directly within block.")
+    .addError(1, "Block scoped variable declaration not directly within block.")
+    .addError(4, "Block scoped variable declaration not directly within block.")
+    .addError(7, "Block scoped variable declaration not directly within block.")
+    .addError(8, "Block scoped variable declaration not directly within block.")
+    .addError(9, "Block scoped variable declaration not directly within block.")
+    .addError(10, "Block scoped variable declaration not directly within block.")
+    .addError(11, "Block scoped variable declaration not directly within block.")
+    .addError(11, "Block scoped variable declaration not directly within block.")
+    .addError(11, "Block scoped variable declaration not directly within block.")
     .test(code, {moz: true, predef: ["print"]});
+
+  test.done();
+};
+
+exports["no const not directly within a block"] = function (test) {
+  var code = [
+    "if (true) const x = 1;",
+    "function foo() {",
+    "   if (true)",
+    "       const x = 1;",
+    "}",
+    "for (let x = 0; x < 42; ++x) const a = 1;",
+    "while (true) const a = 1;",
+    "if (false) const a = 1; else if (true) const a = 1; else const a = 2;"
+  ];
+
+  TestRun(test)
+    .addError(1, "Block scoped variable declaration not directly within block.")
+    .addError(4, "Block scoped variable declaration not directly within block.")
+    .addError(6, "Block scoped variable declaration not directly within block.")
+    .addError(7, "Block scoped variable declaration not directly within block.")
+    .addError(8, "Block scoped variable declaration not directly within block.")
+    .addError(8, "Block scoped variable declaration not directly within block.")
+    .addError(8, "Block scoped variable declaration not directly within block.")
+    .test(code, {predef: ["print"], esnext: true});
 
   test.done();
 };
