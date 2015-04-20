@@ -3816,6 +3816,31 @@ exports["no let not directly within a block"] = function (test) {
   test.done();
 };
 
+exports["no const not directly within a block"] = function (test) {
+  var code = [
+    "if (true) const x = 1;",
+    "function foo() {",
+    "   if (true)",
+    "       const x = 1;",
+    "}",
+    "for (let x = 0; x < 42; ++x) const a = 1;",
+    "while (true) const a = 1;",
+    "if (false) const a = 1; else if (true) const a = 1; else const a = 2;"
+  ];
+
+  TestRun(test)
+    .addError(1, "Const declaration not directly within block.")
+    .addError(4, "Const declaration not directly within block.")
+    .addError(6, "Const declaration not directly within block.")
+    .addError(7, "Const declaration not directly within block.")
+    .addError(8, "Const declaration not directly within block.")
+    .addError(8, "Const declaration not directly within block.")
+    .addError(8, "Const declaration not directly within block.")
+    .test(code, {predef: ["print"], esnext: true});
+
+  test.done();
+};
+
 exports["regression test for crash from GH-964"] = function (test) {
   var code = [
     "function test(a, b) {",
