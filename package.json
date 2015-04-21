@@ -36,6 +36,7 @@
     "build": "node bin/build",
     "coverage": "istanbul -- cover ./node_modules/.bin/nodeunit tests/unit",
     "data": "node scripts/generate-identifier-data",
+    "lint": "npm run jshint && npm run jscs",
     "jscs": "jscs scripts src",
     "jshint": "node bin/jshint scripts src tests",
     "pretest": "npm run jshint && npm run jscs",
