@@ -427,7 +427,6 @@ var JSHINT = (function() {
   // name: string
   // opts: { type: string, token: token, isblockscoped: bool }
   function addlabel(name, opts) {
-    opts = opts || {};
 
     var type  = opts.type;
     var token = opts.token;
