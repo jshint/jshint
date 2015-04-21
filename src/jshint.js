@@ -3470,7 +3470,7 @@ var JSHINT = (function() {
           if (t.id && (!isBlockScoped || !funct["(noblockscopedvar)"])) {
             addlabel(t.id, { type: isConst ? "const" : "unused",
               token: t.token,
-              isblockscoped: isBlockScoped }); //todo check in here for else block scoped const specofic
+              isblockscoped: isBlockScoped });
             names.push(t.token);
           }
         }
