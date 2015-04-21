@@ -4887,6 +4887,40 @@ var JSHINT = (function() {
     }
   }
 
+  var warnUnused = function(name, tkn, type, unused_opt) {
+    var line = tkn.line;
+    var chr  = tkn.from;
+    var raw_name = tkn.raw_text || name;
+
+    if (unused_opt === undefined) {
+      unused_opt = state.option.unused;
+    }
+
+    if (unused_opt === true) {
+      unused_opt = "last-param";
+    }
+
+    var warnable_types = {
+      "vars": ["var"],
+      "last-param": ["var", "param"],
+      "strict": ["var", "param", "last-param"]
+    };
+
+    if (unused_opt) {
+      if (warnable_types[unused_opt] && warnable_types[unused_opt].indexOf(type) !== -1) {
+        if (!tkn.exported) {
+          warningAt("W098", line, chr, raw_name);
+        }
+      }
+    }
+
+    unuseds.push({
+      name: name,
+      line: line,
+      character: chr
+    });
+  };
+
   var blockScope = function() {
     var _current = {};
     var _variables = [_current];
@@ -4902,16 +4936,8 @@ var JSHINT = (function() {
             if (tkn.exported) {
               continue;
             }
-            var line = tkn.line;
-            var chr  = tkn.character;
-            warningAt("W098", line, chr, t);
 
-            // todo - use warnunused?
-            unuseds.push({
-              name: t,
-              line: line,
-              character: chr
-            });
+            warnUnused(t, tkn, "var");
           }
         }
       }
@@ -5258,40 +5284,6 @@ var JSHINT = (function() {
           delete implied[name];
         else
           implied[name] = newImplied;
-      };
-
-      var warnUnused = function(name, tkn, type, unused_opt) {
-        var line = tkn.line;
-        var chr  = tkn.from;
-        var raw_name = tkn.raw_text || name;
-
-        if (unused_opt === undefined) {
-          unused_opt = state.option.unused;
-        }
-
-        if (unused_opt === true) {
-          unused_opt = "last-param";
-        }
-
-        var warnable_types = {
-          "vars": ["var"],
-          "last-param": ["var", "param"],
-          "strict": ["var", "param", "last-param"]
-        };
-
-        if (unused_opt) {
-          if (warnable_types[unused_opt] && warnable_types[unused_opt].indexOf(type) !== -1) {
-            if (!tkn.exported) {
-              warningAt("W098", line, chr, raw_name);
-            }
-          }
-        }
-
-        unuseds.push({
-          name: name,
-          line: line,
-          character: chr
-        });
       };
 
       var checkUnused = function(func, key) {
