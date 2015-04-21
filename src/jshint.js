@@ -1092,6 +1092,12 @@ var JSHINT = (function() {
             this.right.id !== "." && this.right.id !== "[") {
           warning("W017", this);
         }
+        if (this.right && this.right.identifier) {
+          var label = funct["(blockscope)"].getlabel(this.right.value);
+          if (label && label[this.right.value]["(type)"] === "const") {
+            error("E013", this, this.right.value);
+          }
+        }
       }
 
       return this;
@@ -1422,6 +1428,12 @@ var JSHINT = (function() {
         warning("W016", this, this.id);
       } else if ((!left.identifier || isReserved(left)) && left.id !== "." && left.id !== "[") {
         warning("W017", this);
+      }
+      if (left && left.identifier) {
+        var label = funct["(blockscope)"].getlabel(left.value);
+        if (label && label[left.value]["(type)"] === "const") {
+          error("E013", this, left.value);
+        }
       }
 
       this.left = left;
