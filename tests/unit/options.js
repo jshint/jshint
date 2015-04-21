@@ -641,7 +641,10 @@ exports.unused = function (test) {
     [20, "'bar' is defined but never used."],
     [22, "'i' is defined but never used."],
     [36, "'cc' is defined but never used."],
-    [39, "'dd' is defined but never used."]
+    [39, "'dd' is defined but never used."],
+    [58, "'constUsed' is defined but never used."],
+    [62, "'letUsed' is defined but never used."],
+    [63, "'anotherUnused' is defined but never used."]
   ];
 
   var last_param_errors = [
@@ -683,7 +686,7 @@ exports.unused = function (test) {
   vars_run.test(src, { esnext: true, unused: "vars"});
 
   var unused = JSHINT.data().unused;
-  test.equal(12, unused.length);
+  test.equal(15, unused.length);
   test.ok(unused.some(function (err) { return err.line === 1 && err.character == 5 && err.name === "a"; }));
   test.ok(unused.some(function (err) { return err.line === 6 && err.character == 18 && err.name === "f"; }));
   test.ok(unused.some(function (err) { return err.line === 7 && err.character == 9 && err.name === "c"; }));
@@ -1413,7 +1416,13 @@ exports.esnext = function (test) {
     'const foo = 9;',
     'var myConst = function (test) { };',
     'foo = "hello world";',
-    'var a = { get x() {} };'
+    'var a = { get x() {} };',
+    'if (a) {',
+    '  const bar = 3;',
+    '} else {',
+    '  const bar = 2;',
+    '  const bar = 3;',
+    '}'
   ];
 
   TestRun(test)
@@ -1427,11 +1436,13 @@ exports.esnext = function (test) {
   TestRun(test)
     .addError(3, "const 'myConst' has already been declared.")
     .addError(4, "Attempting to override 'foo' which is a constant.")
+    .addError(10, "const 'bar' has already been declared.")
     .test(code, { esnext: true });
 
   TestRun(test)
     .addError(3, "const 'myConst' has already been declared.")
     .addError(4, "Attempting to override 'foo' which is a constant.")
+    .addError(10, "const 'bar' has already been declared.")
     .test(code, { moz: true });
 
   test.done();

@@ -52,3 +52,13 @@ c.delete(hoistedDelete);
 // passed to methods that look like unresolvable-reference-accepting operators.
 function hoistedDelete() {}
 function hoistedTypeof() {}
+
+const constUsed = "this is used";
+while(constUsed) {
+    const constUsed = "unused";
+}
+let letUsed = "this is used";
+if (letUsed) {
+    let letUsed = "unused",
+        anotherUnused;
+}
