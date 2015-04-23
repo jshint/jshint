@@ -3658,7 +3658,8 @@ exports["for of as esnext"] = function (test) {
     "for (let x of [1,2,3,4]) {",
     "    print(x);",
     "}",
-    "for (let x of [1,2,3,4]) print(x);"
+    "for (let x of [1,2,3,4]) print(x);",
+    "for (const x of [1,2,3,4]) print(x);"
   ];
   TestRun(test)
     .test(code, {esnext: true, undef: true, predef: ["print"]});
@@ -3671,13 +3672,16 @@ exports["for of as es5"] = function (test) {
     "for (let x of [1,2,3,4]) {",
     "    print(x);",
     "}",
-    "for (let x of [1,2,3,4]) print(x);"
+    "for (let x of [1,2,3,4]) print(x);",
+    "for (const x of [1,2,3,4]) print(x);"
   ];
   TestRun(test)
     .addError(1, "'for of' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(1, "'let' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(4, "'for of' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(4, "'let' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(5, "'for of' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(5, "'const' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .test(code, {undef: true, predef: ["print"]}); // es5
 
   test.done();
@@ -3688,13 +3692,16 @@ exports["for of as legacy JS"] = function (test) {
     "for (let x of [1,2,3,4]) {",
     "    print(x);",
     "}",
-    "for (let x of [1,2,3,4]) print(x);"
+    "for (let x of [1,2,3,4]) print(x);",
+    "for (const x of [1,2,3,4]) print(x);"
   ];
   TestRun(test)
     .addError(1, "'for of' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(1, "'let' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(4, "'for of' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(4, "'let' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(5, "'for of' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(5, "'const' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .test(code, {undef: true, predef: ["print"]}); // es5
 
   test.done();
