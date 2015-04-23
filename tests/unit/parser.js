@@ -30,7 +30,6 @@ exports.other = function (test) {
   TestRun(test)
     .addError(1, "Unexpected '\\'.")
     .addError(2, "Unexpected early end of program.")
-    .addError(2, "Expected an identifier and instead saw '(end)'.")
     .addError(2, "Unrecoverable syntax error. (100% scanned).")
     .test(code, {es3: true});
 
@@ -339,8 +338,7 @@ exports.numbers = function (test) {
     .addError(16, "Missing semicolon.")
     .addError(17, "Unexpected '1'.")
     .addError(17, "Unexpected early end of program.")
-    .addError(17, "Expected an identifier and instead saw '(end)'.")
-    .addError(17, "Missing semicolon.")
+    .addError(17, "Unrecoverable syntax error. (100% scanned).")
     .test(code, {es3: true});
 
   // Octals are prohibited in strict mode.
@@ -693,7 +691,7 @@ exports.badJSON = function (test) {
 
   var run3 = TestRun(test)
     .addError(1, "Expected '}' and instead saw 'k2'.")
-    .addError(1, "Expected '(end)' and instead saw ':'.");
+    .addError(1, "Unrecoverable syntax error. (100% scanned).");
 
   run3.test(objMissingComma, {multistr: true, es3: true});
   run3.test(objMissingComma, {multistr: true}); // es5
@@ -706,7 +704,7 @@ exports.badJSON = function (test) {
 
   var run4 = TestRun(test)
     .addError(1, "Expected ']' and instead saw 'v2'.")
-    .addError(1, "Expected '(end)' and instead saw ']'.");
+    .addError(1, "Unrecoverable syntax error. (100% scanned).");
 
   run4.test(arrayMissingComma, {multistr: true, es3: true});
   run4.test(arrayMissingComma, {multistr: true}); // es5
@@ -722,7 +720,7 @@ exports.badJSON = function (test) {
     .addError(1, "Expected ':' and instead saw 'k2'.")
     .addError(1, "Expected a JSON value.")
     .addError(1, "Expected '}' and instead saw ':'.")
-    .addError(1, "Expected '(end)' and instead saw 'v2'.");
+    .addError(1, "Unrecoverable syntax error. (100% scanned).");
 
   run5.test(objDoubleComma, {multistr: true, es3: true});
   run5.test(objDoubleComma, {multistr: true}); // es5
@@ -747,7 +745,8 @@ exports.badJSON = function (test) {
   ];
 
   var run7 = TestRun(test)
-    .addError(1, "Expected '}' and instead saw ''.");
+    .addError(1, "Expected '}' and instead saw ''.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).");
 
   run7.test(objUnclosed, {multistr: true, es3: true});
   run7.test(objUnclosed, {multistr: true}); // es5
@@ -759,7 +758,8 @@ exports.badJSON = function (test) {
   ];
 
   var run8 = TestRun(test)
-    .addError(1, "Expected ']' and instead saw ''.");
+    .addError(1, "Expected ']' and instead saw ''.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).");
 
   run8.test(arrayUnclosed, {multistr: true, es3: true});
   run8.test(arrayUnclosed, {multistr: true}); // es5
@@ -772,9 +772,7 @@ exports.badJSON = function (test) {
 
   var run9 = TestRun(test)
     .addError(1, "Missing '}' to match '{' from line 1.")
-    .addError(1, "Expected ':' and instead saw ''.")
-    .addError(1, "Expected a JSON value.")
-    .addError(1, "Expected '}' and instead saw ''.");
+    .addError(1, "Unrecoverable syntax error. (100% scanned).");
 
   run9.test(objUnclosed2, {multistr: true, es3: true});
   run9.test(objUnclosed2, {multistr: true}); // es5
@@ -788,7 +786,8 @@ exports.badJSON = function (test) {
   var run10 = TestRun(test)
     .addError(1, "Missing ']' to match '[' from line 1.")
     .addError(1, "Expected a JSON value.")
-    .addError(1, "Expected ']' and instead saw ''.");
+    .addError(1, "Expected ']' and instead saw ''.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).");
 
   run10.test(arrayUnclosed2, {multistr: true, es3: true});
   run10.test(arrayUnclosed2, {multistr: true}); // es5
@@ -826,7 +825,7 @@ exports.badJSON = function (test) {
   var run13 = TestRun(test)
     .addError(1, "Expected a JSON value.")
     .addError(1, "Expected '}' and instead saw '/$^/'.")
-    .addError(1, "Expected '(end)' and instead saw '}'.");
+    .addError(1, "Unrecoverable syntax error. (100% scanned).");
 
   run13.test(objBadValue, {multistr: true, es3: true});
   run13.test(objBadValue, {multistr: true}); // es5
@@ -892,8 +891,8 @@ exports.blocks = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/blocks.js", "utf8");
 
   var run = TestRun(test)
-    .addError(29, "Unmatched \'{\'.")
-    .addError(31, "Unmatched \'{\'.");
+    .addError(31, "Unmatched \'{\'.")
+    .addError(32, "Unrecoverable syntax error. (100% scanned).");
   run.test(src, {es3: true});
   run.test(src, {}); // es5
   run.test(src, {esnext: true});
@@ -1003,7 +1002,7 @@ exports.badIdentifiers = function (test) {
   var run = TestRun(test)
     .addError(1, "Unexpected '\\'.")
     .addError(1, "Expected an identifier and instead saw ''.")
-    .addError(1, "Missing semicolon.");
+    .addError(1, "Unrecoverable syntax error. (100% scanned).");
   run.test(badUnicode, {es3: true});
   run.test(badUnicode, {}); // es5
   run.test(badUnicode, {esnext: true});
@@ -1016,7 +1015,7 @@ exports.badIdentifiers = function (test) {
   var run = TestRun(test)
     .addError(1, "Unexpected '\\'.")
     .addError(1, "Expected an identifier and instead saw ''.")
-    .addError(1, "Missing semicolon.");
+    .addError(1, "Unrecoverable syntax error. (100% scanned).");
   run.test(invalidUnicodeIdent, {es3: true});
   run.test(invalidUnicodeIdent, {}); // es5
   run.test(invalidUnicodeIdent, {esnext: true});
@@ -1042,9 +1041,9 @@ exports["regression for GH-910"] = function (test) {
     .addError(1, "Expected an identifier and instead saw ')'.")
     .addError(1, "Expected an operator and instead saw '('.")
     .addError(1, "Unmatched '{'.")
-    .addError(1, "Unmatched '('.")
     .addError(1, "Expected an assignment or function call and instead saw an expression.")
     .addError(1, "Missing semicolon.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
     .test(src, { es3: true, nonew: true });
   test.done();
 };
@@ -5430,6 +5429,29 @@ exports.classElementEmpty = function (test) {
   test.done();
 };
 
+exports.invalidClasses = function (test) {
+  // Regression test for GH-2324
+  TestRun(test)
+    .addError(1, "Class properties must be methods. Expected '(' but instead saw ''.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .test("class a { b", { esnext: true });
+
+  // Regression test for GH-2339
+  TestRun(test)
+    .addError(2, "Class properties must be methods. Expected '(' but instead saw ':'.")
+    .addError(3, "Expected '(' and instead saw '}'.")
+    .addError(4, "Expected an identifier and instead saw '}'.")
+    .addError(4, "Unrecoverable syntax error. (100% scanned).")
+    .test([
+        "class Test {",
+        "  constructor: {",
+        "  }",
+        "}"
+      ], { esnext: true });
+
+  test.done();
+};
+
 exports["test for GH-1018"] = function (test) {
   var code = [
     "if (a = 42) {}",
@@ -6517,6 +6539,26 @@ exports.getAsIdentifierProp = function (test) {
       'var set;',
       'var obj = { set, get a() {}, set a(_) {} };'
     ], { esnext: true });
+
+  test.done();
+};
+
+exports.invalidParams = function (test) {
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw '!'.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .test("(function(!", { esnext: true });
+
+  test.done();
+};
+
+// Regression test for gh-2362
+exports.functionKeyword = function (test) {
+  TestRun(test)
+    .addError(1, "Missing name in function declaration.")
+    .addError(1, "Expected '(' and instead saw ''.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .test("function");
 
   test.done();
 };

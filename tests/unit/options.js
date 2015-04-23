@@ -1068,10 +1068,9 @@ exports.immed = function (test) {
     .addError(1, "Expected an identifier and instead saw ')'.")
     .addError(1, "Expected an assignment or function call and instead saw an expression.")
     .addError(1, "Unmatched '{'.")
-    .addError(1, "Unmatched '('.")
-    .addError(1, "Wrapping non-IIFE function literals in parens is unnecessary.")
     .addError(1, "Expected an assignment or function call and instead saw an expression.")
     .addError(1, "Missing semicolon.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
     .test("(function () { if (true) { }());", { es3: true, immed: true });
 
   test.done();
@@ -1359,8 +1358,7 @@ exports.quotesAndTemplateLiterals = function (test) {
   TestRun(test)
     .addError(2, "Unexpected '`'.")
     .addError(2, "Unexpected early end of program.")
-    .addError(2, "Expected an identifier and instead saw '(end)'.")
-    .addError(2, "Missing semicolon.")
+    .addError(2, "Unrecoverable syntax error. (100% scanned).")
     .test(src);
 
   // With esnext

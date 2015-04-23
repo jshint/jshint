@@ -363,9 +363,8 @@ exports.insideEval = function (test) {
     // The "TestRun" class (and these errors) probably needs some
     // facility for checking the expected scope of the error
     .addError(1, "Unexpected early end of program.")
-    .addError(1, "Expected an identifier and instead saw '(end)'.")
-    .addError(1, "Expected ')' and instead saw ''.")
-    .addError(1, "Missing semicolon.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
 
     .test(src, { es3: true, evil: false });
 

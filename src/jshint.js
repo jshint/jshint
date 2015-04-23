@@ -730,6 +730,12 @@ var JSHINT = (function() {
       }
       j += 1;
     }
+
+    // Peeking past the end of the program should produce the "(end)" token.
+    if (!t && state.tokens.next.id === "(end)") {
+      return state.tokens.next;
+    }
+
     return t;
   }
 
@@ -3000,7 +3006,7 @@ var JSHINT = (function() {
     var depth = this.depth;
 
     if (!noSubst) {
-      while (!end() && state.tokens.next.id !== "(end)") {
+      while (!end()) {
         if (!state.tokens.next.template || state.tokens.next.depth > depth) {
           expression(0); // should probably have different rbp?
         } else {
@@ -5374,7 +5380,11 @@ var JSHINT = (function() {
 
         statements();
       }
-      advance((state.tokens.next && state.tokens.next.value !== ".")  ? "(end)" : undefined);
+
+      if (state.tokens.next.id !== "(end)") {
+        quit("E041", state.tokens.curr.line);
+      }
+
       funct["(blockscope)"].unstack();
 
       var markDefined = function(name, context) {
