@@ -4189,8 +4189,8 @@ var JSHINT = (function() {
       if (state.tokens.next.id === "var") {
         advance("var");
         state.tokens.curr.fud({ prefix: true });
-      } else if (state.tokens.next.id === "let") {
-        advance("let");
+      } else if (state.tokens.next.id === "let" || state.tokens.next.id === "const") {
+        advance(state.tokens.next.id);
         // create a new block scope
         letscope = true;
         funct["(blockscope)"].stack();
