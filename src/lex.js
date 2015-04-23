@@ -1668,7 +1668,16 @@ Lexer.prototype = {
 
     for (;;) {
       if (!this.input.length) {
-        return create(this.nextLine() ? "(endline)" : "(end)", "");
+        if (this.nextLine()) {
+          return create("(endline)", "");
+        }
+
+        if (this.exhausted) {
+          return null;
+        }
+
+        this.exhausted = true;
+        return create("(end)", "");
       }
 
       token = this.next(checks);
