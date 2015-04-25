@@ -742,6 +742,62 @@ exports.testES6ModulesNamedExportsAffectUnused = function (test) {
   test.done();
 };
 
+exports.testConstRedeclaration = function (test) {
+
+  // consts cannot be redeclared, but they can shadow
+  var src = [
+    "const a = 1;",
+    "const a = 2;",
+    "if (a) {",
+    "  const a = 3;",
+    "}",
+    "for(const a in a) {",
+    "  const a = 4;",
+    "}"
+  ];
+
+  TestRun(test)
+      .addError(2, "const 'a' has already been declared.")
+      .test(src, {
+        esnext: true
+      });
+
+  test.done();
+};
+
+exports.testConstModification = function (test) {
+
+  // consts cannot be modified
+  var src = [
+    "const a = 1;",
+    "const b = { a: 2 };",
+    "a = 2;",
+    "b = 2;",
+    "b.a = 3;",
+    "a++;",
+    "b.a++;",
+    "--a;",
+    "--b.a;",
+    "a += 1;",
+    "a.b += 1;",
+    "const c = () => 1;",
+    "c();",
+    "const d = [1, 2, 3];",
+    "d[0] = 2;",
+  ];
+
+  TestRun(test)
+      .addError(3, "Attempting to override 'a' which is a constant.")
+      .addError(4, "Attempting to override 'b' which is a constant.")
+      .addError(6, "Attempting to override 'a' which is a constant.")
+      .addError(8, "Attempting to override 'a' which is a constant.")
+      .addError(10, "Attempting to override 'a' which is a constant.")
+      .test(src, {
+        esnext: true
+      });
+
+  test.done();
+};
 
 exports["class declaration export (default)"] = function (test) {
   var source = fs.readFileSync(__dirname + "/fixtures/class-declaration.js", "utf8");

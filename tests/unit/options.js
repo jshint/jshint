@@ -1416,16 +1416,7 @@ exports.esnext = function (test) {
     'const foo = 9;',
     'var myConst = function (test) { };',
     'foo = "hello world";',
-    'var a = { get x() {} };',
-    'if (a) {',
-    '  const bar = 3;',
-    '  bar++;',
-    '  bar+=1;',
-    '  --bar;',
-    '} else {',
-    '  const bar = 2;',
-    '  const bar = 3;',
-    '}'
+    'var a = { get x() {} };'
   ];
 
   TestRun(test)
@@ -1439,19 +1430,11 @@ exports.esnext = function (test) {
   TestRun(test)
     .addError(3, "const 'myConst' has already been declared.")
     .addError(4, "Attempting to override 'foo' which is a constant.")
-    .addError(8, "Attempting to override 'bar' which is a constant.")
-    .addError(9, "Attempting to override 'bar' which is a constant.")
-    .addError(10, "Attempting to override 'bar' which is a constant.")
-    .addError(13, "const 'bar' has already been declared.")
     .test(code, { esnext: true });
 
   TestRun(test)
     .addError(3, "const 'myConst' has already been declared.")
     .addError(4, "Attempting to override 'foo' which is a constant.")
-    .addError(8, "Attempting to override 'bar' which is a constant.")
-    .addError(9, "Attempting to override 'bar' which is a constant.")
-    .addError(10, "Attempting to override 'bar' which is a constant.")
-    .addError(13, "const 'bar' has already been declared.")
     .test(code, { moz: true });
 
   test.done();

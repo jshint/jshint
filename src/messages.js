@@ -63,7 +63,7 @@ var errors = {
   E045: "Invalid for each loop.",
   E046: "A yield statement shall be within a generator function (with syntax: `function*`)",
   E047: null, // Vacant
-  E048: "Block scoped variable declaration not directly within block.",
+  E048: "{a} declaration not directly within block.",
   E049: "A {a} cannot be named '{b}'.",
   E050: "Mozilla requires the yield expression to be parenthesized here.",
   E051: "Regular parameters cannot come after default parameters.",

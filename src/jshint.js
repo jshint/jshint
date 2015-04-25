@@ -463,7 +463,7 @@ var JSHINT = (function() {
       }
     }
 
-    // if the identifier is from a let, adds it only to the current blockscope
+    // if the identifier is blockscoped (a let or a const), add it only to the current blockscope
     if (isblockscoped) {
       funct["(blockscope)"].current.add(name, type, state.tokens.curr);
       if (funct["(blockscope)"].atTop() && exported[name]) {
@@ -1092,9 +1092,11 @@ var JSHINT = (function() {
             this.right.id !== "." && this.right.id !== "[") {
           warning("W017", this);
         }
+
+        // detect modification of a const
+        // in the case of a.b, right will be the "." punctuator
         if (this.right && this.right.identifier) {
-          var label = funct["(blockscope)"].getlabel(this.right.value);
-          if (label && label[this.right.value]["(type)"] === "const") {
+          if (funct["(blockscope)"].labeltype(this.right.value) === "const") {
             error("E013", this, this.right.value);
           }
         }
@@ -1328,8 +1330,7 @@ var JSHINT = (function() {
           warning("W021", left, left.value);
         }
 
-        var label = funct["(blockscope)"].getlabel(left.value);
-        if (label && label[left.value]["(type)"] === "const") {
+        if (funct["(blockscope)"].labeltype(left.value) === "const") {
           error("E013", left, left.value);
         }
 
@@ -1424,14 +1425,19 @@ var JSHINT = (function() {
     var x = symbol(s, 150);
 
     x.led = function(left) {
+      // this = suffix e.g. "++" punctuator
+      // left = symbol operated e.g. "a" identifier or "a.b" punctuator
+
       if (state.option.plusplus) {
         warning("W016", this, this.id);
       } else if ((!left.identifier || isReserved(left)) && left.id !== "." && left.id !== "[") {
         warning("W017", this);
       }
+
+      // detect modification of a const.
+      // in the case of a.b, left will be the "." punctuator
       if (left && left.identifier) {
-        var label = funct["(blockscope)"].getlabel(left.value);
-        if (label && label[left.value]["(type)"] === "const") {
+        if (funct["(blockscope)"].labeltype(left.value) === "const") {
           error("E013", this, left.value);
         }
       }
@@ -1962,6 +1968,8 @@ var JSHINT = (function() {
           this["function"] = true;
           break;
         case "const":
+          // consts can only exist inside block
+          // because they are never added to the scope, s
           block[v]["(unused)"] = false;
           break;
         case "function":
@@ -3409,16 +3417,16 @@ var JSHINT = (function() {
     });
   }
 
-  function variableStatement(type, statement, context) {
+  function blockVariableStatement(type, statement, context) {
+    // used for both let and const statements
+
     var prefix = context && context.prefix;
     var inexport = context && context.inexport;
     var isLet = type === "let";
     var isConst = type === "const";
-    var isVar = type === "var";
-    var isBlockScoped = isLet || isConst;
-    var tokens, lone, value, letblock, existingLabel;
+    var tokens, lone, value, letblock;
 
-    if (isBlockScoped && !state.option.inESNext()) {
+    if (!state.option.inESNext()) {
       warning("W104", state.tokens.curr, type);
     }
 
@@ -3429,8 +3437,8 @@ var JSHINT = (function() {
       advance("(");
       funct["(blockscope)"].stack();
       letblock = true;
-    } else if (isBlockScoped && funct["(noblockscopedvar)"]) {
-      error("E048", state.tokens.curr);
+    } else if (funct["(noblockscopedvar)"]) {
+      error("E048", state.tokens.curr, isConst ? "Const" : "Let");
     }
 
     statement.first = [];
@@ -3452,35 +3460,25 @@ var JSHINT = (function() {
           t = tokens[t];
           if (state.option.inESNext()) {
             // only look in the latest scope because we can shadow
-            existingLabel = funct["(blockscope)"].current.getlabel(t.id);
-            if (existingLabel && existingLabel["(type)"] === "const") {
+            if (funct["(blockscope)"].current.labeltype(t.id) === "const") {
               warning("E011", null, t.id);
             }
           }
           if (funct["(global)"]) {
             if (predefined[t.id] === false) {
               warning("W079", t.token, t.id);
-            } else if (isVar && state.option.futurehostile === false) {
-              if ((!state.option.inES5() && vars.ecmaIdentifiers[5][t.id] === false) ||
-                  (!state.option.inESNext() && vars.ecmaIdentifiers[6][t.id] === false)) {
-                warning("W129", t.token, t.id);
-              }
             }
           }
-          if (t.id && (!isBlockScoped || !funct["(noblockscopedvar)"])) {
+          if (t.id && !funct["(noblockscopedvar)"]) {
             addlabel(t.id, { type: isConst ? "const" : "unused",
               token: t.token,
-              isblockscoped: isBlockScoped });
+              isblockscoped: true });
             names.push(t.token);
           }
         }
       }
       if (prefix) {
         break;
-      }
-
-      if (isVar && state.option.varstmt) {
-        warning("W132", statement);
       }
 
       statement.first = statement.first.concat(names);
@@ -3490,19 +3488,12 @@ var JSHINT = (function() {
       }
 
       if (state.tokens.next.id === "=") {
-        if (isVar) {
-          state.nameStack.set(state.tokens.curr);
-        }
         advance("=");
         if (state.tokens.next.id === "undefined") {
           warning("W080", state.tokens.prev, state.tokens.prev.value);
         }
         if (peek(0).id === "=" && state.tokens.next.identifier) {
-          if (isBlockScoped ||
-              isVar && (!funct["(params)"] ||
-              funct["(params)"].indexOf(state.tokens.next.value) === -1)) {
-            warning("W120", state.tokens.next, state.tokens.next.value);
-          }
+          warning("W120", state.tokens.next, state.tokens.next.value);
         }
         value = expression(10);
         if (lone) {
@@ -3528,19 +3519,100 @@ var JSHINT = (function() {
   }
 
   var conststatement = stmt("const", function(context) {
-    return variableStatement("const", this, context);
+    return blockVariableStatement("const", this, context);
   });
-
   conststatement.exps = true;
-  var varstatement = stmt("var", function(context) {
-    return variableStatement("var", this, context);
-  });
-  varstatement.exps = true;
 
   var letstatement = stmt("let", function(context) {
-    return variableStatement("let", this, context);
+    return blockVariableStatement("let", this, context);
   });
   letstatement.exps = true;
+
+  var varstatement = stmt("var", function(context) {
+    var prefix = context && context.prefix;
+    var inexport = context && context.inexport;
+    var tokens, lone, value;
+
+    this.first = [];
+    for (;;) {
+      var names = [];
+      if (_.contains(["{", "["], state.tokens.next.value)) {
+        tokens = destructuringExpression();
+        lone = false;
+      } else {
+        tokens = [ { id: identifier(), token: state.tokens.curr } ];
+        lone = true;
+        if (inexport) {
+          exported[state.tokens.curr.value] = true;
+          state.tokens.curr.exported = true;
+        }
+      }
+      for (var t in tokens) {
+        if (tokens.hasOwnProperty(t)) {
+          t = tokens[t];
+          if (state.option.inESNext()) {
+            // because var is function scoped, look in the whole function
+            if (funct["(blockscope)"].labeltype(t.id) === "const") {
+              warning("E011", null, t.id);
+            }
+          }
+          if (funct["(global)"]) {
+            if (predefined[t.id] === false) {
+              warning("W079", t.token, t.id);
+            } else if (state.option.futurehostile === false) {
+              if ((!state.option.inES5() && vars.ecmaIdentifiers[5][t.id] === false) ||
+                  (!state.option.inESNext() && vars.ecmaIdentifiers[6][t.id] === false)) {
+                warning("W129", t.token, t.id);
+              }
+            }
+          }
+          if (t.id) {
+            addlabel(t.id, { type: "unused",
+              token: t.token });
+            names.push(t.token);
+          }
+        }
+      }
+      if (prefix) {
+        break;
+      }
+
+      if (state.option.varstmt) {
+        warning("W132", this);
+      }
+
+      this.first = this.first.concat(names);
+
+      if (state.tokens.next.id === "=") {
+        state.nameStack.set(state.tokens.curr);
+
+        advance("=");
+        if (state.tokens.next.id === "undefined") {
+          warning("W080", state.tokens.prev, state.tokens.prev.value);
+        }
+        if (peek(0).id === "=" && state.tokens.next.identifier) {
+          if (!funct["(params)"] ||
+              funct["(params)"].indexOf(state.tokens.next.value) === -1) {
+            warning("W120", state.tokens.next, state.tokens.next.value);
+          }
+        }
+        value = expression(10);
+        if (lone) {
+          tokens[0].first = value;
+        } else {
+          destructuringExpressionMatch(names, value);
+        }
+      }
+
+      if (state.tokens.next.id !== ",") {
+        break;
+      }
+      comma();
+    }
+
+    return this;
+  });
+  varstatement.exps = true;
 
   blockstmt("class", function() {
     return classdef.call(this, true);
@@ -4943,6 +5015,14 @@ var JSHINT = (function() {
       }
     }
 
+    function _getLabel(l) {
+      for (var i = _variables.length - 1 ; i >= 0; --i) {
+        if (_.has(_variables[i], l) && !_variables[i][l]["(shadowed)"]) {
+          return _variables[i];
+        }
+      }
+    }
+
     return {
       stack: function() {
         _current = {};
@@ -4955,12 +5035,15 @@ var JSHINT = (function() {
         _current = _.last(_variables);
       },
 
-      getlabel: function(l) {
-        for (var i = _variables.length - 1 ; i >= 0; --i) {
-          if (_.has(_variables[i], l) && !_variables[i][l]["(shadowed)"]) {
-            return _variables[i];
-          }
+      getlabel: _getLabel,
+
+      labeltype: function(l) {
+        // returns a labels type or null if not present
+        var block = _getLabel(l);
+        if (block) {
+          return block[l]["(type)"];
         }
+        return null;
       },
 
       shadow: function(name) {
@@ -4993,8 +5076,11 @@ var JSHINT = (function() {
       },
 
       current: {
-        getlabel: function(t) {
-          return _current[t];
+        labeltype: function(t) {
+          if (_current[t]) {
+            return _current[t]["(type)"];
+          }
+          return null;
         },
 
         has: function(t) {
