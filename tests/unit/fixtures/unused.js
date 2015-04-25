@@ -69,3 +69,10 @@ x = y => {};
 x = (y) => {};
 x = (y, z) => y;
 x = (y, z) => z;
+
+function throwAwayFuncA() { if (testLateDef) {} }
+let testLateDef = true;
+function throwAwayFuncB() { if (testLateDefConst) {} }
+const testLateDefConst = true;
+throwAwayFuncA();
+throwAwayFuncB();

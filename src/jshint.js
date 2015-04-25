@@ -458,6 +458,13 @@ var JSHINT = (function() {
       if (funct["(blockscope)"].atTop() && exported[name]) {
         state.tokens.curr.exported = true;
       }
+
+      if (implied.claimBlockImplied(name)) {
+        if (state.option.latedef) {
+          warning("W003", state.tokens.next, name);
+        }
+        funct["(blockscope)"].current.setUsed(name);
+      }
     } else {
       funct["(blockscope)"].shadow(name);
       funct[name] = type;
@@ -466,18 +473,17 @@ var JSHINT = (function() {
         funct["(tokens)"][name] = token;
       }
 
+      if (implied.claimFunctionImplied(name)) {
+        if (state.option.latedef) {
+          if ((state.option.latedef === true && _.contains([funct[name], type], "unction")) ||
+              !_.contains([funct[name], type], "unction")) {
+            warning("W003", state.tokens.next, name);
+          }
+        }
+      }
+
       if (funct["(global)"]) {
         global[name] = funct;
-        if (_.has(implied, name)) {
-          if (state.option.latedef) {
-            if ((state.option.latedef === true && _.contains([funct[name], type], "unction")) ||
-                !_.contains([funct[name], type], "unction")) {
-              warning("W003", state.tokens.next, name);
-            }
-          }
-
-          delete implied[name];
-        }
       } else {
         scope[name] = funct;
       }
@@ -1888,18 +1894,6 @@ var JSHINT = (function() {
     }
   }
 
-
-  function note_implied(tkn) {
-    var name = tkn.value;
-    var desc = Object.getOwnPropertyDescriptor(implied, name);
-
-    if (!desc)
-      implied[name] = [tkn.line];
-    else
-      desc.value.push(tkn.line);
-  }
-
-
   // Build the syntax table by declaring the syntactic elements of the language.
 
   type("(number)", function() {
@@ -1998,7 +1992,7 @@ var JSHINT = (function() {
             funct[v] = true;
           } else if (s === null) {
             warning("W039", state.tokens.curr, v);
-            note_implied(state.tokens.curr);
+            implied.noteImplied(state.tokens.curr);
           } else if (typeof s !== "object") {
             // if we're in a list comprehension, variables are declared
             // locally and used before being defined. So we check
@@ -2014,7 +2008,7 @@ var JSHINT = (function() {
               funct[v] = true;
             }
 
-            note_implied(state.tokens.curr);
+            implied.noteImplied(state.tokens.curr);
           } else {
             switch (s[v]) {
             case "function":
@@ -3068,6 +3062,8 @@ var JSHINT = (function() {
     state.ignored = Object.create(state.ignored);
     scope = Object.create(scope);
 
+    implied.stackFunction();
+
     funct = functor(name || state.nameStack.infer(), state.tokens.next, scope, {
       "(statement)": statement,
       "(context)":   funct,
@@ -3123,6 +3119,7 @@ var JSHINT = (function() {
     });
 
     funct = funct["(context)"];
+    implied.unstackFunction();
 
     return f;
   }
@@ -5045,6 +5042,130 @@ var JSHINT = (function() {
     });
   };
 
+  var createImpliedManager = function() {
+    var currentFunction = {};
+    var currentSubFunctions = {};
+    var functionStack = [currentFunction];
+    var subFunctionStack = [currentSubFunctions];
+
+    function copyToSubFunction(subFunction, fromFunction) {
+      for (var impliedName in fromFunction) {
+        if (_.has(fromFunction, impliedName)) {
+          if (_.has(subFunction, impliedName)) {
+            subFunction[impliedName].push.apply(
+                subFunction[impliedName], fromFunction[impliedName]);
+          } else {
+            subFunction[impliedName] = fromFunction[impliedName];
+          }
+        }
+      }
+    }
+
+    function clearImplieds(impliedMap, name, line) {
+      if (!_.has(impliedMap, name))
+        return;
+
+      var newImplied = [];
+      for (var i = 0; i < impliedMap[name].length; i += 1) {
+        if (impliedMap[name][i] !== line)
+          newImplied.push(impliedMap[name][i]);
+      }
+
+      if (newImplied.length === 0)
+        delete impliedMap[name];
+      else
+        impliedMap[name] = newImplied;
+    }
+
+    function getData(implieds, impliedMap) {
+      for (var n in impliedMap) {
+        if (_.has(impliedMap, n)) {
+          implieds.push({
+            name: n,
+            line: impliedMap[n]
+          });
+        }
+      }
+    }
+
+    function assertState(valid) {
+      if (!valid) {
+        throw new Error("invalid state");
+      }
+    }
+
+    return {
+      stackFunction: function() {
+        currentFunction = {};
+        functionStack.push(currentFunction);
+        currentSubFunctions = {};
+        subFunctionStack.push(currentSubFunctions);
+      },
+      unstackFunction: function() {
+        assertState(functionStack.length > 1);
+        assertState(subFunctionStack.length > 1);
+
+        functionStack.pop();
+        subFunctionStack.pop();
+        var subFunctions = subFunctionStack[subFunctionStack.length - 1];
+        copyToSubFunction(subFunctions, currentFunction);
+        copyToSubFunction(subFunctions, currentSubFunctions);
+        currentFunction = functionStack[functionStack.length - 1];
+        currentSubFunctions = subFunctions;
+      },
+      noteImplied: function(tkn) {
+        var name = tkn.value;
+        var desc = Object.getOwnPropertyDescriptor(currentFunction, name);
+
+        if (!desc)
+          currentFunction[name] = [tkn.line];
+        else
+          desc.value.push(tkn.line);
+      },
+      claimBlockImplied: function(name) {
+        // only look at sub functions because in the TDZ only functions can capture,
+        // so long as they are invoked after the block statement
+        if (_.has(currentSubFunctions, name)) {
+          delete currentSubFunctions[name];
+          return true;
+        }
+        return false;
+      },
+      claimFunctionImplied: function(name) {
+        var foundImplieds = false;
+        if (_.has(currentSubFunctions, name)) {
+          delete currentSubFunctions[name];
+          foundImplieds = true;
+        }
+        if (_.has(currentFunction, name)) {
+          delete currentFunction[name];
+          foundImplieds = true;
+        }
+        return foundImplieds;
+      },
+      clearImplied: function(name, line) {
+
+        assertState(functionStack.length === 1);
+        assertState(subFunctionStack.length === 1);
+
+        clearImplieds(currentFunction, name, line);
+        clearImplieds(currentSubFunctions, name, line);
+
+      },
+      getData: function() {
+        assertState(functionStack.length === 1);
+        assertState(subFunctionStack.length === 1);
+
+        var implieds = [];
+
+        getData(implieds, currentFunction);
+        getData(implieds, currentSubFunctions);
+
+        return implieds;
+      }
+    };
+  };
+
   var blockScope = function() {
     var _current = {};
     var _variables = [_current];
@@ -5128,11 +5249,20 @@ var JSHINT = (function() {
       },
 
       current: {
-        labeltype: function(t) {
-          if (_current[t]) {
-            return _current[t]["(type)"];
+        labeltype: function(name) {
+          if (_current[name]) {
+            return _current[name]["(type)"];
           }
           return null;
+        },
+
+        setUsed: function(name) {
+          var labelType = _current[name]["(type)"];
+          if (labelType === "const") {
+            _current[name]["(unused)"] = false;
+          } else if (labelType === "unused") {
+            _current[name]["(type)"] = "var";
+          }
         },
 
         has: function(t) {
@@ -5238,6 +5368,7 @@ var JSHINT = (function() {
 
     indent = 1;
     global = Object.create(predefined);
+    implied = createImpliedManager();
     scope = global;
 
     funct = functor("(global)", null, scope, {
@@ -5252,7 +5383,6 @@ var JSHINT = (function() {
     stack = null;
     member = {};
     membersOnly = null;
-    implied = {};
     inblock = false;
     lookahead = [];
     unuseds = [];
@@ -5389,6 +5519,7 @@ var JSHINT = (function() {
       }
 
       funct["(blockscope)"].unstack();
+      // do not unstack the implied scope because it does not need a final unstack
 
       var markDefined = function(name, context) {
         do {
@@ -5411,22 +5542,6 @@ var JSHINT = (function() {
         } while (context);
 
         return false;
-      };
-
-      var clearImplied = function(name, line) {
-        if (!implied[name])
-          return;
-
-        var newImplied = [];
-        for (var i = 0; i < implied[name].length; i += 1) {
-          if (implied[name][i] !== line)
-            newImplied.push(implied[name][i]);
-        }
-
-        if (newImplied.length === 0)
-          delete implied[name];
-        else
-          implied[name] = newImplied;
       };
 
       var checkUnused = function(func, key) {
@@ -5455,7 +5570,7 @@ var JSHINT = (function() {
         k = JSHINT.undefs[i].slice(0);
 
         if (markDefined(k[2].value, k[0]) || k[2].forgiveUndef) {
-          clearImplied(k[2].value, k[2].line);
+          implied.clearImplied(k[2].value, k[2].line);
         } else if (state.option.undef) {
           warning.apply(warning, k.slice(1));
         }
@@ -5551,7 +5666,6 @@ var JSHINT = (function() {
       options: state.option
     };
 
-    var implieds = [];
     var members = [];
     var fu, f, i, j, n, globals;
 
@@ -5563,15 +5677,7 @@ var JSHINT = (function() {
       data.json = true;
     }
 
-    for (n in implied) {
-      if (_.has(implied, n)) {
-        implieds.push({
-          name: n,
-          line: implied[n]
-        });
-      }
-    }
-
+    var implieds = implied.getData();
     if (implieds.length > 0) {
       data.implieds = implieds;
     }

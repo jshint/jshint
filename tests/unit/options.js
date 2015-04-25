@@ -100,11 +100,15 @@ exports.shadowInline = function (test) {
  */
 exports.latedef = function (test) {
   var src  = fs.readFileSync(__dirname + '/fixtures/latedef.js', 'utf8'),
-    src1 = fs.readFileSync(__dirname + '/fixtures/redef.js', 'utf8');
+    src1 = fs.readFileSync(__dirname + '/fixtures/redef.js', 'utf8'),
+    esnextSrc = fs.readFileSync(__dirname + '/fixtures/latedef-esnext.js', 'utf8');
 
   // By default, tolerate the use of variable before its definition
   TestRun(test)
     .test(src, {es3: true});
+
+  TestRun(test)
+      .test(esnextSrc, {esnext: true});
 
   // However, JSHint must complain if variable is actually missing
   TestRun(test)
@@ -127,8 +131,18 @@ exports.latedef = function (test) {
     .addError(2, "'fn' was used before it was defined.")
     .addError(6, "'fn1' was used before it was defined.")
     .addError(10, "'vr' was used before it was defined.")
+    .addError(18, "'bar' was used before it was defined.") // todo - one or the other? what creates error below?
     .addError(18, "Inner functions should be listed at the top of the outer function.")
     .test(src, { es3: true, latedef: true });
+
+  TestRun(test)
+      .addError(4, "'c' was used before it was defined.")
+      .addError(6, "'e' was used before it was defined.")
+      .addError(11, "'ai' was used before it was defined.")
+      // .addError(16, "'ai' was used before it was defined.") TODO
+      .addError(27, "'bi' was used before it was defined.")
+      // .addError(44, "'ci' was used before it was defined.") TODO
+      .test(esnextSrc, {esnext: true, latedef: true});
 
   test.done();
 };

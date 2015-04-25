@@ -860,6 +860,11 @@ exports.testConstModification = function (test) {
     "delete a[0];",
     "new a();",
     "new a;",
+    "function e() {",
+    "  f++;",
+    "}",
+    "const f = 1;",
+    "e();"
   ];
 
   TestRun(test)
@@ -871,6 +876,7 @@ exports.testConstModification = function (test) {
       .addError(8, "Attempting to override 'a' which is a constant.")
       .addError(8, "You might be leaking a variable (a) here.")
       .addError(53, "Missing '()' invoking a constructor.")
+      // .addError(55, "Attempting to override 'f' which is a constant.") todo gh-2368
       .test(src, {
         esnext: true
       });
