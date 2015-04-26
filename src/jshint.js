@@ -1093,7 +1093,7 @@ var JSHINT = (function() {
           warning("W017", this);
         }
 
-        // detect modification of a const
+        // detect increment/decrement of a const
         // in the case of a.b, right will be the "." punctuator
         if (this.right && this.right.identifier) {
           if (funct["(blockscope)"].labeltype(this.right.value) === "const") {
@@ -1420,7 +1420,6 @@ var JSHINT = (function() {
     }, 20);
   }
 
-
   function suffix(s) {
     var x = symbol(s, 150);
 
@@ -1434,7 +1433,7 @@ var JSHINT = (function() {
         warning("W017", this);
       }
 
-      // detect modification of a const.
+      // detect increment/decrement of a const
       // in the case of a.b, left will be the "." punctuator
       if (left && left.identifier) {
         if (funct["(blockscope)"].labeltype(left.value) === "const") {
@@ -3470,7 +3469,8 @@ var JSHINT = (function() {
             }
           }
           if (t.id && !funct["(noblockscopedvar)"]) {
-            addlabel(t.id, { type: isConst ? "const" : "unused",
+            addlabel(t.id, {
+              type: isConst ? "const" : "unused",
               token: t.token,
               isblockscoped: true });
             names.push(t.token);
