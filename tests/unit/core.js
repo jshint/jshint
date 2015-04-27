@@ -753,11 +753,17 @@ exports.testConstRedeclaration = function (test) {
     "}",
     "for(const a in a) {",
     "  const a = 4;",
-    "}"
+    "}",
+    "function a() {",
+    "}",
+    "function b() {",
+    "}",
+    "const b = 1;"
   ];
 
   TestRun(test)
       .addError(2, "const 'a' has already been declared.")
+      .addError(9, "const 'a' has already been declared.")
       .test(src, {
         esnext: true
       });
@@ -767,31 +773,73 @@ exports.testConstRedeclaration = function (test) {
 
 exports.testConstModification = function (test) {
 
-  // consts cannot be modified
   var src = [
     "const a = 1;",
     "const b = { a: 2 };",
+    // const errors
     "a = 2;",
     "b = 2;",
-    "b.a = 3;",
     "a++;",
-    "b.a++;",
     "--a;",
-    "--b.a;",
     "a += 1;",
+    "let y = a = 3;",
+    // valid const access
+    "b.a++;",
+    "--b.a;",
+    "b.a = 3;",
     "a.b += 1;",
     "const c = () => 1;",
     "c();",
     "const d = [1, 2, 3];",
     "d[0] = 2;",
+    "let x = -a;",
+    "x = +a;",
+    "x = a + 1;",
+    "x = a * 2;",
+    "x = a / 2;",
+    "x = a % 2;",
+    "x = a & 1;",
+    "x = a ^ 1;",
+    "x = a === true;",
+    "x = a == 1;",
+    "x = a !== true;",
+    "x = a != 1;",
+    "x = a > 1;",
+    "x = a >= 1;",
+    "x = a < 1;",
+    "x = a <= 1;",
+    "x = 1 + a;",
+    "x = 2 * a;",
+    "x = 2 / a;",
+    "x = 2 % a;",
+    "x = 1 & a;",
+    "x = 1 ^ a;",
+    "x = true === a;",
+    "x = 1 == a;",
+    "x = true !== a;",
+    "x = 1 != a;",
+    "x = 1 > a;",
+    "x = 1 >= a;",
+    "x = 1 < a;",
+    "x = 1 <= a;",
+    "x = typeof a;",
+    "x = a.a;",
+    "x = a[0];",
+    "delete a.a;",
+    "delete a[0];",
+    "new a();",
+    "new a;",
   ];
 
   TestRun(test)
       .addError(3, "Attempting to override 'a' which is a constant.")
       .addError(4, "Attempting to override 'b' which is a constant.")
+      .addError(5, "Attempting to override 'a' which is a constant.")
       .addError(6, "Attempting to override 'a' which is a constant.")
+      .addError(7, "Attempting to override 'a' which is a constant.")
       .addError(8, "Attempting to override 'a' which is a constant.")
-      .addError(10, "Attempting to override 'a' which is a constant.")
+      .addError(8, "You might be leaking a variable (a) here.")
+      .addError(53, "Missing '()' invoking a constructor.")
       .test(src, {
         esnext: true
       });

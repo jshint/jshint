@@ -1426,7 +1426,6 @@ var JSHINT = (function() {
     x.led = function(left) {
       // this = suffix e.g. "++" punctuator
       // left = symbol operated e.g. "a" identifier or "a.b" punctuator
-
       if (state.option.plusplus) {
         warning("W016", this, this.id);
       } else if ((!left.identifier || isReserved(left)) && left.id !== "." && left.id !== "[") {
@@ -1923,6 +1922,8 @@ var JSHINT = (function() {
 
     nud: function() {
       var v = this.value;
+      // s will be either the function object 'funct' that the identifier points at
+      //   or it will be a boolean if it is a predefined variable
       var s = scope[v];
       var f;
       var block;
@@ -1952,7 +1953,7 @@ var JSHINT = (function() {
         funct = f;
       }
 
-      // The name is in scope and defined in the current function.
+      // The name is in scope and defined in the current function or it exists in the blockscope.
       if (funct === s || block) {
         // Change 'unused' to 'var', and reject labels.
         // the name is in a block scope.
@@ -2031,9 +2032,6 @@ var JSHINT = (function() {
             case "unused":
               s[v] = "closure";
               funct[v] = s["(global)"] ? "global" : "outer";
-              break;
-            case "const":
-              s[v]["(type)"] = false;
               break;
             case "closure":
               funct[v] = s["(global)"] ? "global" : "outer";
@@ -3778,7 +3776,9 @@ var JSHINT = (function() {
       warning("W025");
     }
 
-    if (funct[i] === "const") {
+    // check if a identifier with the same name is already defined
+    // in the blockscope as a const
+    if (funct["(blockscope)"].labeltype(i) === "const") {
       warning("E011", null, i);
     }
     addlabel(i, { type: "unction", token: state.tokens.curr });
