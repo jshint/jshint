@@ -3710,6 +3710,16 @@ var JSHINT = (function() {
       isStatic = false;
       isGenerator = false;
       getset = null;
+
+      // The ES6 grammar for ClassElement includes the `;` token, but it is
+      // defined only as a placeholder to facilitate future language
+      // extensions. In ES6 code, it serves no purpose.
+      if (name.id === ";") {
+        warning("W032");
+        advance(";");
+        continue;
+      }
+
       if (name.id === "*") {
         isGenerator = true;
         advance("*");
