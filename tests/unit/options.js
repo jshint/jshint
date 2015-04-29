@@ -2087,14 +2087,30 @@ singleGroups.arrowFunctions = function (test) {
   var code = [
     "var a = () => ({});",
     "var b = (c) => {};",
+    "var g = (() => 3)();",
+    "var h = (() => ({}))();",
+    "var i = (() => 3).length;",
+    "var j = (() => ({})).length;",
+    "var k = (() => 3)[prop];",
+    "var l = (() => ({}))[prop];",
+    "var m = (() => 3) || 3;",
+    "var n = (() => ({})) || 3;",
+    "var o = (() => {})();",
+    "var p = (() => {})[prop];",
+    "var q = (() => {}) || 3;",
     "(() => {})();",
+    // Invalid forms:
     "var d = () => (e);",
-    "var f = () => (3);"
+    "var f = () => (3);",
+    "var r = (() => 3);",
+    "var s = (() => {});"
   ];
 
   TestRun(test)
-    .addError(4, "Unnecessary grouping operator.")
-    .addError(5, "Unnecessary grouping operator.")
+    .addError(15, "Unnecessary grouping operator.")
+    .addError(16, "Unnecessary grouping operator.")
+    .addError(17, "Unnecessary grouping operator.")
+    .addError(18, "Unnecessary grouping operator.")
     .test(code, { singleGroups: true, esnext: true });
 
   test.done();

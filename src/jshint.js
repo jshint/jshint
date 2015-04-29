@@ -2634,6 +2634,9 @@ var JSHINT = (function() {
             // some other operator--either within the parenthesis or directly
             // following them.
             (!isEndOfExpr() || state.tokens.prev.id !== "}")) ||
+          // Used to demarcate an arrow function as the left-hand side of some
+          // operator.
+          (isFunctor(ret) && !isEndOfExpr()) ||
           // Used as the return value of a single-statement arrow function
           (ret.id === "{" && preceeding.id === "=>");
       }
