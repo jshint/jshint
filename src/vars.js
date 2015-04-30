@@ -83,6 +83,7 @@ exports.browser = {
   ElementTimeControl   : false,
   Event                : false,
   event                : false,
+  fetch                : false,
   FileReader           : false,
   FormData             : false,
   focus                : false,
