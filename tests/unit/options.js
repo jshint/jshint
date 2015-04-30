@@ -1509,6 +1509,9 @@ exports.browser = function (test) {
     .addError(25, "'DocumentFragment' is not defined.")
     .addError(26, "'Range' is not defined.")
     .addError(27, "'Text' is not defined.")
+    .addError(31, "'document' is not defined.")
+    .addError(32, "'fetch' is not defined.")
+    .addError(35, "'URL' is not defined.")
     .test(src, {es3: true, undef: true });
 
   TestRun(test).test(src, {es3: true, browser: true, undef: true });
