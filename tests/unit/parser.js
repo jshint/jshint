@@ -3816,6 +3816,61 @@ exports["no let not directly within a block"] = function (test) {
   test.done();
 };
 
+exports["test: let declared directly within block"] = function (test) {
+  var code = [
+    "for (let i;;){",
+    "  console.log(i);",
+    "}"
+  ];
+
+  TestRun(test)
+    .test(code, {esnext: true});
+
+  code = [
+    "for (let i;;)",
+    "  console.log(i);"
+  ];
+
+  TestRun(test)
+    .test(code, {esnext: true});
+
+  test.done();
+};
+
+exports["test: let is directly within nested block"] = function (test) {
+  var code   = [
+    "if(true) {",
+    "  for (let i;;)",
+    "    console.log(i);",
+    "}"
+  ];
+
+  TestRun(test)
+    .test(code, {esnext: true});
+
+  code   = [
+    "if(true)",
+    "  for (let i;;)",
+    "    console.log(i);"
+  ];
+
+  TestRun(test)
+    .test(code, {esnext: true});
+
+  code   = [
+    "if(true) {",
+    "  for (let i;;){",
+    "    console.log(i);",
+    "  }",
+    "}"
+  ];
+
+  TestRun(test)
+    .test(code, {esnext: true});
+
+  test.done();
+};
+
 exports["regression test for crash from GH-964"] = function (test) {
   var code = [
     "function test(a, b) {",

@@ -1827,7 +1827,7 @@ var JSHINT = (function() {
     } else {
 
       // check to avoid let declaration not within a block
-      funct["(nolet)"] = true;
+      funct["(nolet)"] = state.tokens.next.id !== "for";
 
       if (!stmt || state.option.curly) {
         warning("W116", state.tokens.next, "{", state.tokens.next.value);
