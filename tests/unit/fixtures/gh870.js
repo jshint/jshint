@@ -1,4 +1,4 @@
-var s;
+var s; // jshint ignore:line
 var iterator;
 
 while (s = iterator.next()) { // jshint ignore:line
