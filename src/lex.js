@@ -1363,6 +1363,47 @@ Lexer.prototype = {
       value += char;
     }.bind(this);
 
+    var translateUFlag = function(body) {
+      // The BMP character to use as a replacement for astral symbols when
+      // translating an ES6 "u"-flagged pattern to an ES5-compatible
+      // approximation.
+      // Note: replacing with '\uFFFF' enables false positives in unlikely
+      // scenarios. For example, `[\u{1044f}-\u{10440}]` is an invalid pattern
+      // that would not be detected by this substitution.
+      var astralSubstitute = "\uFFFF";
+
+      return body
+        // Replace every Unicode escape sequence with the equivalent BMP
+        // character or a constant ASCII code point in the case of astral
+        // symbols. (See the above note on `astralSubstitute` for more
+        // information.)
+        .replace(/\\u\{([0-9a-fA-F]+)\}|\\u([a-fA-F0-9]{4})/g, function($0, $1, $2) {
+          var codePoint = parseInt($1 || $2, 16);
+          if (codePoint > 0x10FFFF) {
+            malformed = true;
+            this.trigger("error", {
+              code: "E016",
+              line: this.line,
+              character: this.char,
+              data: [ char ]
+            });
+
+            return;
+          }
+          if (codePoint <= 0xFFFF) {
+            return String.fromCharCode(codePoint);
+          }
+          return astralSubstitute;
+        }.bind(this))
+        // Replace each paired surrogate with a single ASCII symbol to avoid
+        // throwing on regular expressions that are only valid in combination
+        // with the "u" flag.
+        .replace(
+          /[\uD800-\uDBFF][\uDC00-\uDFFF]/g,
+          astralSubstitute
+        );
+    }.bind(this);
+
     // Regular expressions must start with '/'
     if (!this.prereg || char !== "/") {
       return null;
@@ -1431,7 +1472,7 @@ Lexer.prototype = {
 
     while (index < length) {
       char = this.peek(index);
-      if (!/[gimy]/.test(char)) {
+      if (!/[gimyu]/.test(char)) {
         break;
       }
       if (char === "y") {
@@ -1448,12 +1489,29 @@ Lexer.prototype = {
             function() { return true; }
           );
         }
-        if (value.indexOf("y") > -1) {
-          malformedDesc = "Duplicate RegExp flag";
+      } else if (char === "u") {
+        if (!state.inES6(true)) {
+          this.triggerAsync(
+            "warning",
+            {
+              code: "W119",
+              line: this.line,
+              character: this.char,
+              data: [ "Unicode RegExp flag", "6" ]
+            },
+            checks,
+            function() { return true; }
+          );
         }
-      } else {
-        flags.push(char);
+
+        body = translateUFlag(body);
       }
+
+      if (flags.indexOf(char) > -1) {
+        malformedDesc = "Duplicate RegExp flag";
+      }
+      flags.push(char);
+
       value += char;
       index += 1;
     }
@@ -1461,7 +1519,7 @@ Lexer.prototype = {
     // Check regular expression for correctness.
 
     try {
-      new RegExp(body, flags.join(""));
+      new RegExp(body);
     } catch (err) {
       /**
        * Because JSHint relies on the current engine's RegExp parser to
