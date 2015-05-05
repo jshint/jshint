@@ -533,7 +533,9 @@ exports.comments = function (test) {
   test.done();
 };
 
-exports.regexp = function (test) {
+exports.regexp = {};
+
+exports.regexp.basic = function (test) {
   var code = [
     "var a1 = /\\\x1f/;",
     "var a2 = /[\\\x1f]/;",
@@ -643,12 +645,149 @@ exports.regexp = function (test) {
   TestRun(test).test("var a = 1; var b = a-- / 10;", {esnext: true});
   TestRun(test).test("var a = 1; var b = a-- / 10;", {moz: true});
 
+
   TestRun(test, "gh-3308").test("void (function() {} / 0);");
+
+  TestRun(test)
+    .addError(1, 9, "Invalid regular expression.")
+    .test("var a = /.*/ii;");
 
   test.done();
 };
 
-exports.testRegexRegressions = function (test) {
+exports.regexp.uFlag = function (test) {
+  // Flag validity
+  TestRun(test)
+    .addError(1, 9, "'Unicode RegExp flag' is only available in ES6 (use 'esversion: 6').")
+    .test("var a = /.*/u;");
+
+  TestRun(test)
+    .test("var a = /.*/u;", { esversion: 6 });
+
+  // Hexidecimal limits
+  TestRun(test)
+    .addError(3, 5, "Invalid regular expression.")
+    .test([
+      "var a = /\\u{0}/u;",
+      "a = /\\u{10FFFF}/u;",
+      "a = /\\u{110000}/u;"
+    ], { esnext: true });
+
+  TestRun(test, "Guard against regression from escape sequence substitution")
+    .test("void /\\u{3f}/u;", { esversion: 6 });
+
+  // Hexidecimal in range patterns
+  TestRun(test)
+    .addError(3, 5, "Invalid regular expression.")
+    .addError(4, 5, "Invalid regular expression.")
+    .test([
+      "var a = /[\\u{61}-b]/u;",
+      "a = /[\\u{061}-b]/u;",
+      "a = /[\\u{63}-b]/u;",
+      "a = /[\\u{0063}-b]/u;",
+    ], { esnext: true });
+
+  TestRun(test)
+    .test("var x = /[\uD834\uDF06-\uD834\uDF08a-z]/u;", { esversion: 6 });
+
+  TestRun(test)
+    .addError(1, 6, "Invalid regular expression.")
+    .test("void /.{}/u;", { esversion: 6 });
+
+  TestRun(test)
+    .addError(1, 6, "Invalid regular expression.")
+    .test("void /.{,2}/u;", { esversion: 6 });
+
+  TestRun(test)
+    .addError(1, 6, "Invalid regular expression.")
+    .test("void /.{2,1}/u;", { esversion: 6 });
+
+  TestRun(test, "Invalid group reference")
+    .addError(1, 6, "Invalid regular expression.")
+    .test("void /(.)(.)\\3/u;", { esversion: 6 });
+
+  TestRun(test, "Invalid group reference (permitted without flag)")
+    .test("void /(.)(.)\\3/;", { esversion: 6 });
+
+  TestRun(test, "Invalid unicode escape sequence")
+    .addError(1, 6, "Invalid regular expression.")
+    .test("void /\\u{123,}/u;", { esversion: 6 });
+
+  TestRun(test, "Invalid unicode escape sequence (permitted without flag)")
+    .test("void /\\u{123,}/;", { esversion: 6 });
+
+  TestRun(test, "Invalid character escape")
+    .addError(1, 6, "Invalid regular expression.")
+    .test("void /\\m/u;", { esversion: 6 });
+
+  TestRun(test, "Invalid character escape (permitted without flag)")
+    .test("void /\\m/;", { esversion: 6 });
+
+  TestRun(test, "Invalid quantifed group")
+    .addError(1, 6, "Invalid regular expression.")
+    .test("void /(?=.)?/u;", { esversion: 6 });
+
+  TestRun(test, "Invalid quantifed group (permitted without flag)")
+    .test("void /(?=.)?/;", { esversion: 6 });
+
+  TestRun(test, "Invalid quantifier - unclosed")
+    .addError(1, 6, "Invalid regular expression.")
+    .test("void /.{1/u;", { esversion: 6 });
+
+  TestRun(test, "Invalid quantifier - unclosed (permitted without flag)")
+    .test("void /.{1/;", { esversion: 6 });
+
+  TestRun(test, "Invalid quantifier - unclosed with comma")
+    .addError(1, 6, "Invalid regular expression.")
+    .test("void /.{1,/u;", { esversion: 6 });
+
+  TestRun(test, "Invalid quantifier - unclosed with comma (permitted without flag)")
+    .test("void /.{1,/;", { esversion: 6 });
+
+  TestRun(test, "Invalid quantifier - unclosed with upper bound")
+    .addError(1, 6, "Invalid regular expression.")
+    .test("void /.{1,2/u;", { esversion: 6 });
+
+  TestRun(test, "Invalid quantifier - unclosed with upper bound (permitted without flag)")
+    .test("void /.{1,2/;", { esversion: 6 });
+
+  TestRun(test, "Character class in lower bound of range (permitted without flag)")
+    .test('void /[\\s-1]/;', { esversion: 6 });
+
+  TestRun(test, "Character class in lower bound of range")
+    .addError(1, 6, "Invalid regular expression.")
+    .test('void /[\\s-1]/u;', { esversion: 6 });
+
+  TestRun(test, "Character class in upper bound of range (permitted without flag)")
+    .test('void /[1-\\W]/;', { esversion: 6 });
+
+  TestRun(test, "Character class in upper bound of range")
+    .addError(1, 6, "Invalid regular expression.")
+    .test('void /[1-\\W]/u;', { esversion: 6 });
+
+  TestRun(test)
+    .test('void /[\\s0-1\\s2-3\\s]/u;', { esversion: 6 });
+
+  test.done();
+};
+
+exports.regexp.yFlag = function (test) {
+  // Flag validity
+  TestRun(test)
+    .addError(1, 9, "'Sticky RegExp flag' is only available in ES6 (use 'esversion: 6').")
+    .test("var a = /.*/y;");
+
+  TestRun(test)
+    .test("var a = /.*/y;", { esversion: 6 });
+
+  TestRun(test)
+    .addError(1, 9, "Invalid regular expression.")
+    .test("var a = /.*/yiy;", { esversion: 6 });
+
+  test.done();
+};
+
+exports.regexp.regressions = function (test) {
   // GH-536
   TestRun(test).test("str /= 5;", {es3: true}, { str: true });
   TestRun(test).test("str /= 5;", {}, { str: true }); // es5
