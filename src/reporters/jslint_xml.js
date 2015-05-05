@@ -7,7 +7,7 @@ module.exports =
     out = [],
     pairs = {
       "&": "&amp;",
-      '"': "&quot;",
+      "\"": "&quot;",
       "'": "&apos;",
       "<": "&lt;",
       ">": "&gt;"
@@ -25,7 +25,7 @@ module.exports =
 
 
     results.forEach(function(result) {
-      result.file = result.file.replace(/^\.\//, '');
+      result.file = result.file.replace(/^\.\//, "");
       if (!files[result.file]) {
         files[result.file] = [];
       }

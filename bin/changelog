@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/*jshint shelljs:true, lastsemic:true, -W101*/
+/* jshint shelljs:true */
 
 "use strict";
 
@@ -15,7 +15,6 @@ exec("git log --format='%H|%h|%an|%s' " + version + "..HEAD", { silent: true }, 
     .map(function (cmt) { return cmt.split("|"); });
 
   var markdown = "";
-  var authors = {};
 
   commits.forEach(function (cmt) {
     if (cmt[3].indexOf("Merge") === 0) {

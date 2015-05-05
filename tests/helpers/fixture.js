@@ -1,9 +1,7 @@
-/*jshint node:true */
+"use strict";
 
-'use strict';
+var fs = require("fs");
 
-var fs = require('fs');
-
-exports.fixture = function (name) {
-  return fs.readFileSync(__dirname + '/../unit/fixtures/' + name).toString();
+exports.fixture = function(name) {
+  return fs.readFileSync(__dirname + "/../unit/fixtures/" + name).toString();
 };

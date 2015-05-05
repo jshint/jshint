@@ -6,10 +6,11 @@
 
 "use strict";
 
-var JSHINT = require('../../src/jshint.js').JSHINT;
-var fs = require('fs');
+var JSHINT  = require("../../src/jshint.js").JSHINT;
+var fs      = require("fs");
 var TestRun = require('../helpers/testhelper').setup.testRun;
-var fixture = require('../helpers/fixture').fixture;
+var TestRun = require("../helpers/testhelper").setup.testRun;
+var fixture = require("../helpers/fixture").fixture;
 
 /**
  * Option `shadow` allows you to re-define variables later in code.
@@ -21,24 +22,24 @@ var fixture = require('../helpers/fixture').fixture;
  *
  * More often than not it is a typo, but sometimes people use it.
  */
-exports.shadow = function (test) {
+exports.shadow = function(test) {
   var src = fs.readFileSync(__dirname + "/fixtures/redef.js", "utf8");
 
   // Do not tolerate variable shadowing by default
   TestRun(test)
     .addError(5, "'a' is already defined.")
     .addError(10, "'foo' is already defined.")
-    .test(src, {es3: true});
+    .test(src, { es3: true });
 
   TestRun(test)
     .addError(5, "'a' is already defined.")
     .addError(10, "'foo' is already defined.")
-    .test(src, {es3: true, shadow: false });
+    .test(src, { es3: true, shadow: false });
 
   TestRun(test)
     .addError(5, "'a' is already defined.")
     .addError(10, "'foo' is already defined.")
-    .test(src, {es3: true, shadow: "inner" });
+    .test(src, { es3: true, shadow: "inner" });
 
   // Allow variable shadowing when shadow is true
   TestRun(test)
@@ -56,7 +57,7 @@ exports.shadow = function (test) {
  *        var a = 2;
  *    }
  */
-exports.scopeshadow = function (test) {
+exports.scopeshadow = function(test) {
   var src = fs.readFileSync(__dirname + "/fixtures/scope-redef.js", "utf8");
 
   // Do not tolarate inner scope variable shadowing by default
@@ -70,7 +71,7 @@ exports.scopeshadow = function (test) {
   test.done();
 };
 
-exports.shadowInline = function (test) {
+exports.shadowInline = function(test) {
   var src = fs.readFileSync(__dirname + "/fixtures/shadow-inline.js", "utf8");
 
   TestRun(test)
@@ -98,13 +99,13 @@ exports.shadowInline = function (test) {
  * functions wherever you want. But if you want to be more strict, use
  * this option.
  */
-exports.latedef = function (test) {
+exports.latedef = function(test) {
   var src  = fs.readFileSync(__dirname + '/fixtures/latedef.js', 'utf8'),
     src1 = fs.readFileSync(__dirname + '/fixtures/redef.js', 'utf8');
 
   // By default, tolerate the use of variable before its definition
   TestRun(test)
-    .test(src, {es3: true});
+    .test(src, { es3: true });
 
   // However, JSHint must complain if variable is actually missing
   TestRun(test)
@@ -133,7 +134,7 @@ exports.latedef = function (test) {
   test.done();
 };
 
-exports.latedefInline = function (test) {
+exports.latedefInline = function(test) {
   var src  = fs.readFileSync(__dirname + '/fixtures/latedef-inline.js', 'utf8');
 
   TestRun(test)
@@ -146,7 +147,7 @@ exports.latedefInline = function (test) {
   test.done();
 };
 
-exports.notypeof = function (test) {
+exports.notypeof = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/typeofcomp.js', 'utf8');
 
   TestRun(test)
@@ -171,10 +172,10 @@ exports.notypeof = function (test) {
     .test(src, { notypeof: true, esnext: true });
 
   test.done();
-}
+};
 
-exports['combination of latedef and undef'] = function (test) {
-  var src = fixture('latedefundef.js');
+exports["combination of latedef and undef"] = function(test) {
+  var src = fixture("latedefundef.js");
 
   // Assures that when `undef` is set to true, it'll report undefined variables
   // and late definitions won't be reported as `latedef` is set to false.
@@ -229,7 +230,7 @@ exports['combination of latedef and undef'] = function (test) {
   test.done();
 };
 
-exports.undefwstrict = function (test) {
+exports.undefwstrict = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/undefstrict.js', 'utf8');
   TestRun(test).test(src, { es3: true, undef: false });
 
@@ -237,7 +238,7 @@ exports.undefwstrict = function (test) {
 };
 
 // Regression test for GH-431
-exports["implied and unused should respect hoisting"] = function (test) {
+exports["implied and unused should respect hoisting"] = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/gh431.js', 'utf8');
   TestRun(test)
     .addError(14, "'fun4' is not defined.")
@@ -260,7 +261,7 @@ exports["implied and unused should respect hoisting"] = function (test) {
  * The `proto` and `iterator` options allow you to prohibit the use of the
  * special `__proto__` and `__iterator__` properties, respectively.
  */
-exports.testProtoAndIterator = function (test) {
+exports.testProtoAndIterator = function(test) {
   var source = fs.readFileSync(__dirname + '/fixtures/protoiterator.js', 'utf8');
   var json = '{"__proto__": true, "__iterator__": false, "_identifier": null, "property": 123}';
 
@@ -273,12 +274,12 @@ exports.testProtoAndIterator = function (test) {
     .addError(27, "'__iterator__' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(33, "The '__proto__' property is deprecated.")
     .addError(37, "The '__proto__' property is deprecated.")
-    .test(source, {es3: true});
+    .test(source, { es3: true });
 
   TestRun(test)
     .addError(1, "The '__proto__' key may produce unexpected results.")
     .addError(1, "The '__iterator__' key may produce unexpected results.")
-    .test(json, {es3: true});
+    .test(json, { es3: true });
 
   // Should not report any errors when proto and iterator
   // options are on
@@ -291,12 +292,12 @@ exports.testProtoAndIterator = function (test) {
 /**
  * The `camelcase` option allows you to enforce use of the camel case convention.
  */
-exports.testCamelcase = function (test) {
+exports.testCamelcase = function(test) {
   var source = fs.readFileSync(__dirname + '/fixtures/camelcase.js', 'utf8');
 
   // By default, tolerate arbitrary identifiers
   TestRun(test)
-    .test(source, {es3: true});
+    .test(source, { es3: true });
 
   // Require identifiers in camel case if camelcase is true
   TestRun(test)
@@ -322,13 +323,13 @@ exports.testCamelcase = function (test) {
  *     vs.
  *   if (cond) { return; }
  */
-exports.curly = function (test) {
+exports.curly = function(test) {
   var src  = fs.readFileSync(__dirname + '/fixtures/curly.js', 'utf8'),
     src1 = fs.readFileSync(__dirname + '/fixtures/curly2.js', 'utf8');
 
   // By default, tolerate one-line blocks since they are valid JavaScript
-  TestRun(test).test(src, {es3: true});
-  TestRun(test).test(src1, {es3: true});
+  TestRun(test).test(src, { es3: true });
+  TestRun(test).test(src1, { es3: true });
 
   // Require all blocks to be wrapped with curly braces if curly is true
   TestRun(test)
@@ -344,7 +345,7 @@ exports.curly = function (test) {
 };
 
 /** Option `noempty` prohibits the use of empty blocks. */
-exports.noempty = function (test) {
+exports.noempty = function(test) {
   var code = [
     "for (;;) {}",
     "if (true) {",
@@ -371,7 +372,7 @@ exports.noempty = function (test) {
  *  - They might prevent an interpreter from doing some optimization tricks
  *  - They are prohibited in the strict mode
  */
-exports.noarg = function (test) {
+exports.noarg = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/noarg.js', 'utf8');
 
   // By default, tolerate both arguments.callee and arguments.caller
@@ -387,7 +388,7 @@ exports.noarg = function (test) {
 };
 
 /** Option `nonew` prohibits the use of constructors for side-effects */
-exports.nonew = function (test) {
+exports.nonew = function(test) {
   var code  = "new Thing();",
     code1 = "var obj = new Thing();";
 
@@ -403,7 +404,7 @@ exports.nonew = function (test) {
   test.done();
 };
 
-exports.shelljs = function (test) {
+exports.shelljs = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/shelljs.js', 'utf8');
 
   TestRun(test, 1)
@@ -444,7 +445,7 @@ exports.shelljs = function (test) {
 };
 
 // Option `asi` allows you to use automatic-semicolon insertion
-exports.asi = function (test) {
+exports.asi = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/asi.js', 'utf8');
 
   TestRun(test, 1)
@@ -476,7 +477,7 @@ exports.asi = function (test) {
 };
 
 // Option `asi` extended for safety -- warn in scenarios that would be unsafe when using asi.
-exports.safeasi = function (test) {
+exports.safeasi = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/safeasi.js', 'utf8');
 
   TestRun(test, 1)
@@ -505,7 +506,7 @@ exports.safeasi = function (test) {
 
 /** Option `lastsemic` allows you to skip the semicolon after last statement in a block,
   * if that statement is followed by the closing brace on the same line. */
-exports.lastsemic = function (test) {
+exports.lastsemic = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/lastsemic.js', 'utf8');
 
   // without lastsemic
@@ -513,7 +514,7 @@ exports.lastsemic = function (test) {
     .addError(2, "Missing semicolon.") // missing semicolon in the middle of a block
     .addError(4, "Missing semicolon.") // missing semicolon in a one-liner function
     .addError(5, "Missing semicolon.") // missing semicolon at the end of a block
-    .test(src, {es3: true});
+    .test(src, { es3: true });
 
   // with lastsemic
   TestRun(test)
@@ -534,13 +535,13 @@ exports.lastsemic = function (test) {
  * That's why by default JSHint complains about it. But if you know what
  * are you doing, there is nothing wrong with it.
  */
-exports.expr = function (test) {
+exports.expr = function(test) {
   var exps = [
     "obj && obj.method && obj.method();",
     "myvar && func(myvar);",
     "1;",
     "true;",
-    "+function (test) {};"
+    "+function(test) {};"
   ];
 
   for (var i = 0, exp; exp = exps[i]; i += 1) {
@@ -557,7 +558,7 @@ exports.expr = function (test) {
 };
 
 // Option `undef` requires you to always define variables you use.
-exports.undef = function (test) {
+exports.undef = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/undef.js', 'utf8');
 
   // Make sure there are no other errors
@@ -594,7 +595,7 @@ exports.undef = function (test) {
   test.done();
 };
 
-exports.undefToOpMethods = function (test) {
+exports.undefToOpMethods = function(test) {
   TestRun(test)
     .addError(2, "'undef' is not defined.")
     .addError(3, "'undef' is not defined.")
@@ -616,7 +617,7 @@ exports.undefToOpMethods = function (test) {
  * This will only be apparent in cases where the user has suppressed warnings
  * about deleting variables.
  */
-exports.undefDeleteStrict = function (test) {
+exports.undefDeleteStrict = function(test) {
   TestRun(test)
     .addError(3, "'aNullReference' is not defined.")
     .test([
@@ -629,7 +630,7 @@ exports.undefDeleteStrict = function (test) {
   test.done();
 };
 
-exports.unused = function (test) {
+exports.unused = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/unused.js', 'utf8');
 
   TestRun(test).test(src, { esnext: true });
@@ -660,9 +661,9 @@ exports.unused = function (test) {
     [28, "'c' is defined but never used."]
   ];
 
-  var true_run = TestRun(test, {esnext: true});
+  var true_run = TestRun(test, { esnext: true });
 
-  var_errors.concat(last_param_errors).forEach(function (e) {
+  var_errors.concat(last_param_errors).forEach(function(e) {
     true_run.addError.apply(true_run, e);
   });
 
@@ -671,59 +672,59 @@ exports.unused = function (test) {
 
   // Test checking all function params via unused="strict"
   var all_run = TestRun(test);
-  var_errors.concat(last_param_errors, all_param_errors).forEach(function (e) {
+  var_errors.concat(last_param_errors, all_param_errors).forEach(function(e) {
     all_run.addError.apply(true_run, e);
   });
 
-  all_run.test(src, { esnext: true, unused: "strict"});
+  all_run.test(src, { esnext: true, unused: "strict" });
 
   // Test checking everything except function params
   var vars_run = TestRun(test);
-  var_errors.forEach(function (e) { vars_run.addError.apply(vars_run, e); });
-  vars_run.test(src, { esnext: true, unused: "vars"});
+  var_errors.forEach(function(e) { vars_run.addError.apply(vars_run, e); });
+  vars_run.test(src, { esnext: true, unused: "vars" });
 
   var unused = JSHINT.data().unused;
   test.equal(12, unused.length);
-  test.ok(unused.some(function (err) { return err.line === 1 && err.character == 5 && err.name === "a"; }));
-  test.ok(unused.some(function (err) { return err.line === 6 && err.character == 18 && err.name === "f"; }));
-  test.ok(unused.some(function (err) { return err.line === 7 && err.character == 9 && err.name === "c"; }));
-  test.ok(unused.some(function (err) { return err.line === 15 && err.character == 10 && err.name === "foo"; }));
+  test.ok(unused.some(function(err) { return err.line === 1  && err.character === 5  && err.name === "a"; }));
+  test.ok(unused.some(function(err) { return err.line === 6  && err.character === 18 && err.name === "f"; }));
+  test.ok(unused.some(function(err) { return err.line === 7  && err.character === 9  && err.name === "c"; }));
+  test.ok(unused.some(function(err) { return err.line === 15 && err.character === 10 && err.name === "foo"; }));
 
   test.done();
 };
 
 // Regressions for "unused" getting overwritten via comment (GH-778)
-exports['unused overrides'] = function (test) {
+exports['unused overrides'] = function(test) {
   var code;
 
   code = ['function foo(a) {', '/*jshint unused:false */', '}', 'foo();'];
-  TestRun(test).test(code, {es3: true, unused: true});
+  TestRun(test).test(code, { es3: true, unused: true });
 
   code = ['function foo(a, b, c) {', '/*jshint unused:vars */', 'var i = b;', '}', 'foo();'];
   TestRun(test)
     .addError(3, "'i' is defined but never used.")
-    .test(code, {es3: true, unused: true});
+    .test(code, { es3: true, unused: true });
 
   code = ['function foo(a, b, c) {', '/*jshint unused:true */', 'var i = b;', '}', 'foo();'];
   TestRun(test)
     .addError(1, "'c' is defined but never used.")
     .addError(3, "'i' is defined but never used.")
-    .test(code, {es3: true, unused: "strict"});
+    .test(code, { es3: true, unused: "strict" });
 
   code = ['function foo(a, b, c) {', '/*jshint unused:strict */', 'var i = b;', '}', 'foo();'];
   TestRun(test)
     .addError(1, "'a' is defined but never used.")
     .addError(1, "'c' is defined but never used.")
     .addError(3, "'i' is defined but never used.")
-    .test(code, {es3: true, unused: true});
+    .test(code, { es3: true, unused: true });
 
   code = ['/*jshint unused:vars */', 'function foo(a, b) {}', 'foo();'];
-  TestRun(test).test(code, {es3: true, unused: "strict"});
+  TestRun(test).test(code, { es3: true, unused: "strict" });
 
   code = ['/*jshint unused:vars */', 'function foo(a, b) {', 'var i = 3;', '}', 'foo();'];
   TestRun(test)
     .addError(3, "'i' is defined but never used.")
-    .test(code, {es3: true, unused: "strict"});
+    .test(code, { es3: true, unused: "strict" });
 
   code = ['/*jshint unused:badoption */', 'function foo(a, b) {', 'var i = 3;', '}', 'foo();'];
   TestRun(test)
@@ -731,24 +732,24 @@ exports['unused overrides'] = function (test) {
     .addError(2, "'b' is defined but never used.")
     .addError(2, "'a' is defined but never used.")
     .addError(3, "'i' is defined but never used.")
-    .test(code, {es3: true, unused: "strict"});
+    .test(code, { es3: true, unused: "strict" });
 
   test.done();
 };
 
 // Regression test for `undef` to make sure that ...
-exports['undef in a function scope'] = function (test) {
+exports['undef in a function scope'] = function(test) {
   var src = fixture('undef_func.js');
 
   // Make sure that the lint is clean with and without undef.
-  TestRun(test).test(src, {es3: true});
-  TestRun(test).test(src, {es3: true, undef: true });
+  TestRun(test).test(src, { es3: true });
+  TestRun(test).test(src, { es3: true, undef: true });
 
   test.done();
 };
 
 /** Option `scripturl` allows the use of javascript-type URLs */
-exports.scripturl = function (test) {
+exports.scripturl = function(test) {
   var code = [
       "var foo = { 'count': 12, 'href': 'javascript:' };",
       "foo = 'javascript:' + 'xyz';"
@@ -760,14 +761,14 @@ exports.scripturl = function (test) {
     .addError(1, "Script URL.")
     .addError(2, "Script URL.") // 2 times?
     .addError(2, "JavaScript URL.")
-    .test(code, {es3: true});
+    .test(code, { es3: true });
 
   // Make sure the error goes away when javascript URLs are tolerated
   TestRun(test).test(code, { es3: true, scripturl: true });
 
   // Make sure an error does not exist for labels that look like URLs (GH-1013)
   TestRun(test)
-    .test(src, {es3: true});
+    .test(src, { es3: true });
 
   test.done();
 };
@@ -780,13 +781,13 @@ exports.scripturl = function (test) {
  * The method hasOwnPropery is used to check if the property belongs to
  * an object or was inherited through the prototype chain.
  */
-exports.forin = function (test) {
+exports.forin = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/forin.js', 'utf8');
   var msg = 'The body of a for in should be wrapped in an if statement to filter unwanted ' +
         'properties from the prototype.';
 
   // Make sure there are no other errors
-  TestRun(test).test(src, {es3: true});
+  TestRun(test).test(src, { es3: true });
 
   // Make sure it fails when forin is true
   TestRun(test)
@@ -803,12 +804,12 @@ exports.forin = function (test) {
 /**
  * Option `loopfunc` allows you to use function expression in the loop.
  * E.g.:
- *   while (true) x = function (test) {};
+ *   while (true) x = function(test) {};
  *
  * This is generally a bad idea since it is too easy to make a
  * closure-related mistake.
  */
-exports.loopfunc = function (test) {
+exports.loopfunc = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/loopfunc.js', 'utf8');
 
   // By default, not functions are allowed inside loops
@@ -819,7 +820,7 @@ exports.loopfunc = function (test) {
     .addError(25, "Don't make functions within a loop.")
     .addError(12, "Function declarations should not be placed in blocks. Use a function " +
             "expression or move the statement to the top of the outer function.")
-    .test(src, {es3: true});
+    .test(src, { es3: true });
 
   // When loopfunc is true, only function declaration should fail.
   // Expressions are okay.
@@ -832,7 +833,7 @@ exports.loopfunc = function (test) {
 };
 
 /** Option `boss` unlocks some useful but unsafe features of JavaScript. */
-exports.boss = function (test) {
+exports.boss = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/boss.js', 'utf8');
 
   // By default, warn about suspicious assignments
@@ -851,7 +852,7 @@ exports.boss = function (test) {
     // GH-670
     .addError(28, "Did you mean to return a conditional instead of an assignment?")
     .addError(32, "Did you mean to return a conditional instead of an assignment?")
-    .test(src, {es3: true});
+    .test(src, { es3: true });
 
   // But if you are the boss, all is good
   TestRun(test).test(src, { es3: true, boss: true });
@@ -863,12 +864,12 @@ exports.boss = function (test) {
  * Options `eqnull` allows you to use '== null' comparisons.
  * It is useful when you want to check if value is null _or_ undefined.
  */
-exports.eqnull = function (test) {
+exports.eqnull = function(test) {
   var code = [
     'if (e == null) doSomething();',
     'if (null == e) doSomething();',
     'if (e != null) doSomething();',
-    'if (null != e) doSomething();',
+    'if (null != e) doSomething();'
   ];
 
   // By default, warn about `== null` comparison
@@ -877,7 +878,7 @@ exports.eqnull = function (test) {
     .addError(2, "Use '===' to compare with 'null'.")
     .addError(3, "Use '!==' to compare with 'null'.")
     .addError(4, "Use '!==' to compare with 'null'.")
-    .test(code, {es3: true});
+    .test(code, { es3: true });
 
   // But when `eqnull` is true, no questions asked
   TestRun(test).test(code, { es3: true, eqnull: true });
@@ -893,10 +894,10 @@ exports.eqnull = function (test) {
  * and objects without invocation.
  *
  * Ex.:
- *   new function (test) { ... };
+ *   new function(test) { ... };
  *   new Date;
  */
-exports.supernew = function (test) {
+exports.supernew = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/supernew.js', 'utf8');
 
   TestRun(test)
@@ -905,7 +906,7 @@ exports.supernew = function (test) {
     .addError(11, "Missing '()' invoking a constructor.", {
       character: 13
     })
-    .test(src, {es3: true});
+    .test(src, { es3: true });
 
   TestRun(test).test(src, { es3: true, supernew: true });
 
@@ -913,7 +914,7 @@ exports.supernew = function (test) {
 };
 
 /** Option `bitwise` disallows the use of bitwise operators. */
-exports.bitwise = function (test) {
+exports.bitwise = function(test) {
   var unOps = [ "~" ];
   var binOps = [ "&",  "|",  "^",  "<<",  ">>",  ">>>" ];
   var modOps = [ "&=", "|=", "^=", "<<=", ">>=", ">>>=" ];
@@ -924,46 +925,46 @@ exports.bitwise = function (test) {
     op = unOps[i];
 
     TestRun(test)
-      .test("var b = " + op + "a;", {es3: true});
+      .test("var b = " + op + "a;", { es3: true });
 
     TestRun(test)
       .addError(1, "Unexpected use of '" + op + "'.")
-      .test("var b = " + op + "a;", {es3: true, bitwise: true});
+      .test("var b = " + op + "a;", { es3: true, bitwise: true });
   }
 
   for (i = 0; i < binOps.length; i += 1) {
     op = binOps[i];
 
     TestRun(test)
-      .test("var c = a " + op + " b;", {es3: true});
+      .test("var c = a " + op + " b;", { es3: true });
 
     TestRun(test)
       .addError(1, "Unexpected use of '" + op + "'.")
-      .test("var c = a " + op + " b;", {es3: true, bitwise: true});
+      .test("var c = a " + op + " b;", { es3: true, bitwise: true });
   }
 
   for (i = 0; i < modOps.length; i += 1) {
     op = modOps[i];
 
     TestRun(test)
-      .test("b " + op + " a;", {es3: true});
+      .test("b " + op + " a;", { es3: true });
 
     TestRun(test)
       .addError(1, "Unexpected use of '" + op + "'.")
-      .test("b " + op + " a;", {es3: true, bitwise: true});
+      .test("b " + op + " a;", { es3: true, bitwise: true });
   }
 
   test.done();
 };
 
 /** Option `debug` allows the use of debugger statements. */
-exports.debug = function (test) {
+exports.debug = function(test) {
   var code = 'function test () { debugger; return true; }';
 
   // By default disallow debugger statements.
   TestRun(test)
     .addError(1, "Forgotten 'debugger' statement?")
-    .test(code, {es3: true});
+    .test(code, { es3: true });
 
   // But allow them if debug is true.
   TestRun(test).test(code, { es3: true, debug: true });
@@ -972,7 +973,7 @@ exports.debug = function (test) {
 };
 
 /** `debugger` statements without semicolons are found on the correct line */
-exports.debug = function (test) {
+exports.debug = function(test) {
   var src = [
     "function test () {",
     "debugger",
@@ -982,18 +983,18 @@ exports.debug = function (test) {
   // Ensure we mark the correct line when finding debugger statements
   TestRun(test)
     .addError(2, "Forgotten 'debugger' statement?")
-    .test(src, {es3: true, asi: true});
+    .test(src, { es3: true, asi: true });
 
   test.done();
 };
 
 /** Option `eqeqeq` requires you to use === all the time. */
-exports.eqeqeq = function (test) {
+exports.eqeqeq = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/eqeqeq.js', 'utf8');
 
   TestRun(test)
     .addError(8, "Use '===' to compare with 'null'.")
-    .test(src, {es3: true});
+    .test(src, { es3: true });
 
   TestRun(test)
     .addError(2, "Expected '===' and instead saw '=='.")
@@ -1005,7 +1006,7 @@ exports.eqeqeq = function (test) {
 };
 
 /** Option `evil` allows the use of eval. */
-exports.evil = function (test) {
+exports.evil = function(test) {
   var src = [
     "eval('hey();');",
     "document.write('');",
@@ -1041,15 +1042,15 @@ exports.evil = function (test) {
  * parens.
  *
  * E.g. (note the parens):
- *   var a = (function (test) {
+ *   var a = (function(test) {
  *     return 'a';
  *   }());
  *   console.log(a); // --> 'a'
  */
-exports.immed = function (test) {
+exports.immed = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/immed.js', 'utf8');
 
-  TestRun(test).test(src, {es3: true});
+  TestRun(test).test(src, { es3: true });
 
   TestRun(test)
     .addError(3, "Wrap an immediate function invocation in parens " +
@@ -1075,12 +1076,12 @@ exports.immed = function (test) {
 };
 
 /** Option `plusplus` prohibits the use of increments/decrements. */
-exports.plusplus = function (test) {
+exports.plusplus = function(test) {
   var ops = [ '++', '--' ];
 
   for (var i = 0, op; op = ops[i]; i += 1) {
-    TestRun(test).test('var i = j' + op + ';', {es3: true});
-    TestRun(test).test('var i = ' + op + 'j;', {es3: true});
+    TestRun(test).test('var i = j' + op + ';', { es3: true });
+    TestRun(test).test('var i = ' + op + 'j;', { es3: true });
   }
 
   for (i = 0, op = null; op = ops[i]; i += 1) {
@@ -1108,10 +1109,10 @@ exports.plusplus = function (test) {
  * constructor. There is a convention to capitalize all constructor names to prevent
  * those mistakes. This option enforces that convention.
  */
-exports.newcap = function (test) {
+exports.newcap = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/newcap.js', 'utf8');
 
-  TestRun(test).test(src, {es3: true}); // By default, everything is fine
+  TestRun(test).test(src, { es3: true }); // By default, everything is fine
 
   // When newcap is true, enforce the conventions
   TestRun(test)
@@ -1124,12 +1125,12 @@ exports.newcap = function (test) {
 };
 
 /** Option `sub` allows all forms of subscription. */
-exports.sub = function (test) {
+exports.sub = function(test) {
   TestRun(test)
     .addError(1, "['prop'] is better written in dot notation.", {
       character: 17
     })
-    .test("window.obj = obj['prop'];", {es3: true});
+    .test("window.obj = obj['prop'];", { es3: true });
 
   TestRun(test).test("window.obj = obj['prop'];", { es3: true, sub: true });
 
@@ -1137,15 +1138,15 @@ exports.sub = function (test) {
 };
 
 /** Option `strict` requires you to use "use strict"; */
-exports.strict = function (test) {
-  var code  = "(function (test) { return; }());";
-  var code1 = '(function (test) { "use strict"; return; }());';
+exports.strict = function(test) {
+  var code  = "(function(test) { return; }());";
+  var code1 = '(function(test) { "use strict"; return; }());';
   var src = fs.readFileSync(__dirname + '/fixtures/strict_violations.js', 'utf8');
   var src2 = fs.readFileSync(__dirname + '/fixtures/strict_incorrect.js', 'utf8');
   var src3 = fs.readFileSync(__dirname + '/fixtures/strict_newcap.js', 'utf8');
 
-  TestRun(test).test(code, {es3: true});
-  TestRun(test).test(code1, {es3: true});
+  TestRun(test).test(code, { es3: true });
+  TestRun(test).test(code1, { es3: true });
 
   TestRun(test)
     .addError(1, 'Missing "use strict" statement.')
@@ -1169,7 +1170,7 @@ exports.strict = function (test) {
 
   TestRun(test)
     .addError(6, "Missing 'new' prefix when invoking a constructor.")
-    .test(src3, {es3 : true});
+    .test(src3, { es3 : true });
 
   TestRun(test).test("var obj = Object({ foo: 'bar' });", { es3: true, strict: true });
 
@@ -1177,7 +1178,7 @@ exports.strict = function (test) {
 };
 
 /** Option `globalstrict` allows you to use global "use strict"; */
-exports.globalstrict = function (test) {
+exports.globalstrict = function(test) {
   var code = [
     '"use strict";',
     'function hello() { return; }'
@@ -1210,14 +1211,14 @@ exports.globalstrict = function (test) {
 
   // globalscript does not prevent you from using only the function-mode
   // "use strict";
-  code = '(function (test) { "use strict"; return; }());';
+  code = '(function(test) { "use strict"; return; }());';
   TestRun(test).test(code, { globalstrict: true, strict: true });
 
   test.done();
 };
 
 /** Option `laxbreak` allows you to insert newlines before some operators. */
-exports.laxbreak = function (test) {
+exports.laxbreak = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/laxbreak.js', 'utf8');
 
   TestRun(test)
@@ -1248,29 +1249,29 @@ exports.laxbreak = function (test) {
   test.done();
 };
 
-exports.validthis = function (test) {
+exports.validthis = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/strict_this.js', 'utf8');
 
   TestRun(test)
     .addError(8, "Possible strict violation.")
     .addError(9, "Possible strict violation.")
     .addError(11, "Possible strict violation.")
-    .test(src, {es3: true});
+    .test(src, { es3: true });
 
   src = fs.readFileSync(__dirname + '/fixtures/strict_this2.js', 'utf8');
-  TestRun(test).test(src, {es3: true});
+  TestRun(test).test(src, { es3: true });
 
   // Test for erroneus use of validthis
 
   var code = ['/*jshint validthis:true */', 'hello();'];
   TestRun(test)
     .addError(1, "Option 'validthis' can't be used in a global scope.")
-    .test(code, {es3: true});
+    .test(code, { es3: true });
 
   code = ['function x() {', '/*jshint validthis:heya */', 'hello();', '}'];
   TestRun(test)
     .addError(2, "Bad option value.")
-    .test(code, {es3: true});
+    .test(code, { es3: true });
 
   test.done();
 };
@@ -1279,7 +1280,7 @@ exports.validthis = function (test) {
  * Test string relevant options
  *   multistr   allows multiline strings
  */
-exports.strings = function (test) {
+exports.strings = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/strings.js', 'utf8');
 
   TestRun(test)
@@ -1307,7 +1308,7 @@ exports.strings = function (test) {
  * Test the `quotmark` option
  *   quotmark   quotation mark or true (=ensure consistency)
  */
-exports.quotes = function (test) {
+exports.quotes = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/quotes.js', 'utf8');
   var src2 = fs.readFileSync(__dirname + '/fixtures/quotes2.js', 'utf8');
 
@@ -1337,7 +1338,7 @@ exports.quotes = function (test) {
 };
 
 // Test the `quotmark` option when defined as a JSHint comment.
-exports.quotesInline = function (test) {
+exports.quotesInline = function(test) {
   TestRun(test)
     .addError(6, "Strings must use doublequote.")
     .addError(14, "Strings must use singlequote.")
@@ -1349,7 +1350,7 @@ exports.quotesInline = function (test) {
 };
 
 // Test the `quotmark` option along with TemplateLiterals.
-exports.quotesAndTemplateLiterals = function (test) {
+exports.quotesAndTemplateLiterals = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/quotes4.js', 'utf8');
 
   // Without esnext
@@ -1362,21 +1363,21 @@ exports.quotesAndTemplateLiterals = function (test) {
 
   // With esnext
   TestRun(test)
-    .test(src, {esnext: true});
+    .test(src, { esnext: true });
 
   // With esnext and single quotemark
   TestRun(test)
-    .test(src, {esnext: true, quotmark: 'single'});
+    .test(src, { esnext: true, quotmark: 'single' });
 
   // With esnext and double quotemark
   TestRun(test)
     .addError(1, "Strings must use doublequote.")
-    .test(src, {esnext: true, quotmark: 'double'});
+    .test(src, { esnext: true, quotmark: 'double' });
 
   test.done();
 };
 
-exports.scope = function (test) {
+exports.scope = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/scope.js', 'utf8');
 
   TestRun(test, 1)
@@ -1388,7 +1389,7 @@ exports.scope = function (test) {
     .addError(42, "'bb' is not defined.")
     .addError(53, "'xx' used out of scope.")
     .addError(54, "'yy' used out of scope.")
-    .test(src, {es3: true});
+    .test(src, { es3: true });
 
   TestRun(test, 2)
     .addError(37, "'cc' is not defined.")
@@ -1405,13 +1406,13 @@ exports.scope = function (test) {
  * and do not reset ES5 mode (see GH-1068)
  *
  */
-exports.esnext = function (test) {
+exports.esnext = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/const.js', 'utf8');
 
   var code = [
     'const myConst = true;',
     'const foo = 9;',
-    'var myConst = function (test) { };',
+    'var myConst = function(test) { };',
     'foo = "hello world";',
     'var a = { get x() {} };'
   ];
@@ -1440,7 +1441,7 @@ exports.esnext = function (test) {
 /*
  * Tests the `maxlen` option
  */
-exports.maxlen = function (test) {
+exports.maxlen = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/maxlen.js', 'utf8');
 
   TestRun(test)
@@ -1457,7 +1458,7 @@ exports.maxlen = function (test) {
 /*
  * Tests the `laxcomma` option
  */
-exports.laxcomma = function (test) {
+exports.laxcomma = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/laxcomma.js', 'utf8');
 
   // All errors.
@@ -1468,7 +1469,7 @@ exports.laxcomma = function (test) {
     .addError(6, "Bad line breaking before ','.")
     .addError(10, "Bad line breaking before '&&'.")
     .addError(15, "Bad line breaking before '?'.")
-    .test(src, {es3: true});
+    .test(src, { es3: true });
 
   // Allows bad line breaking, but not on commas.
   TestRun(test)
@@ -1476,16 +1477,16 @@ exports.laxcomma = function (test) {
     .addError(2, "Comma warnings can be turned off with 'laxcomma'.")
     .addError(2, "Bad line breaking before ','.")
     .addError(6, "Bad line breaking before ','.")
-    .test(src, {es3: true, laxbreak: true });
+    .test(src, { es3: true, laxbreak: true });
 
   // Allows comma-first style but warns on bad line breaking
   TestRun(test)
     .addError(10, "Bad line breaking before '&&'.")
     .addError(15, "Bad line breaking before '?'.")
-    .test(src, {es3: true, laxcomma: true });
+    .test(src, { es3: true, laxcomma: true });
 
   // No errors if both laxbreak and laxcomma are turned on
-  TestRun(test).test(src, {es3: true, laxbreak: true, laxcomma: true });
+  TestRun(test).test(src, { es3: true, laxbreak: true, laxcomma: true });
 
   test.done();
 };
@@ -1493,7 +1494,7 @@ exports.laxcomma = function (test) {
 /*
  * Tests the `browser` option
  */
-exports.browser = function (test) {
+exports.browser = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/browser.js', 'utf8');
 
   TestRun(test)
@@ -1512,14 +1513,14 @@ exports.browser = function (test) {
     .addError(31, "'document' is not defined.")
     .addError(32, "'fetch' is not defined.")
     .addError(35, "'URL' is not defined.")
-    .test(src, {es3: true, undef: true });
+    .test(src, { es3: true, undef: true });
 
-  TestRun(test).test(src, {es3: true, browser: true, undef: true });
+  TestRun(test).test(src, { es3: true, browser: true, undef: true });
 
   test.done();
 };
 
-exports.unnecessarysemicolon = function (test) {
+exports.unnecessarysemicolon = function(test) {
   var code = [
     "function foo() {",
     "    var a;;",
@@ -1528,12 +1529,12 @@ exports.unnecessarysemicolon = function (test) {
 
   TestRun(test)
     .addError(2, "Unnecessary semicolon.")
-    .test(code, {es3: true});
+    .test(code, { es3: true });
 
   test.done();
 };
 
-exports.blacklist = function (test) {
+exports.blacklist = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/browser.js', 'utf8');
   var code = [
     '/*jshint browser: true */',
@@ -1577,7 +1578,7 @@ exports.blacklist = function (test) {
 /*
  * Tests the `maxstatements` option
  */
-exports.maxstatements = function (test) {
+exports.maxstatements = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/max-statements-per-function.js', 'utf8');
 
   TestRun(test)
@@ -1596,7 +1597,7 @@ exports.maxstatements = function (test) {
 /*
  * Tests the `maxdepth` option
  */
-exports.maxdepth = function (test) {
+exports.maxdepth = function(test) {
   var fixture = '/fixtures/max-nested-block-depth-per-function.js';
   var src = fs.readFileSync(__dirname + fixture, 'utf8');
 
@@ -1621,7 +1622,7 @@ exports.maxdepth = function (test) {
 /*
  * Tests the `maxparams` option
  */
-exports.maxparams = function (test) {
+exports.maxparams = function(test) {
   var fixture = '/fixtures/max-parameters-per-function.js';
   var src = fs.readFileSync(__dirname + fixture, 'utf8');
 
@@ -1634,7 +1635,7 @@ exports.maxparams = function (test) {
 
   TestRun(test)
     .addError(4, "This function has too many parameters. (3)")
-    .test(src, {es3: true, maxparams: 0 });
+    .test(src, { es3: true, maxparams: 0 });
 
   TestRun(test)
     .test(src, { es3: true });
@@ -1645,7 +1646,7 @@ exports.maxparams = function (test) {
 /*
  * Tests the `maxcomplexity` option
  */
-exports.maxcomplexity = function (test) {
+exports.maxcomplexity = function(test) {
   var fixture = '/fixtures/max-cyclomatic-complexity-per-function.js';
   var src = fs.readFileSync(__dirname + fixture, 'utf8');
 
@@ -1668,7 +1669,7 @@ exports.maxcomplexity = function (test) {
 };
 
 // Metrics output per function.
-exports.fnmetrics = function (test) {
+exports.fnmetrics = function(test) {
   JSHINT([
     "function foo(a, b) { if (a) return b; }",
     "function bar() { var a = 0; a += 1; return a; }"
@@ -1692,7 +1693,7 @@ exports.fnmetrics = function (test) {
 /*
  * Tests ignored warnings.
  */
-exports.ignored = function (test) {
+exports.ignored = function(test) {
   var src = fs.readFileSync(__dirname + "/fixtures/ignored.js", "utf-8");
 
   TestRun(test)
@@ -1710,7 +1711,7 @@ exports.ignored = function (test) {
 /*
  * Tests ignored warnings being unignored.
  */
-exports.unignored = function (test) {
+exports.unignored = function(test) {
   var src = fs.readFileSync(__dirname + "/fixtures/unignored.js", "utf-8");
 
   TestRun(test)
@@ -1723,7 +1724,7 @@ exports.unignored = function (test) {
 /*
  * Tests that the W117 and undef can be toggled per line.
  */
-exports['per-line undef / -W117'] = function (test) {
+exports['per-line undef / -W117'] = function(test) {
   var src = fs.readFileSync(__dirname + "/fixtures/ignore-w117.js", "utf-8");
 
   TestRun(test)
@@ -1738,7 +1739,7 @@ exports['per-line undef / -W117'] = function (test) {
 /*
 * Tests the `freeze` option -- Warn if native object prototype is assigned to.
 */
-exports.freeze = function (test) {
+exports.freeze = function(test) {
   var src = fs.readFileSync(__dirname + "/fixtures/nativeobject.js", "utf-8");
 
   TestRun(test)
@@ -1752,7 +1753,7 @@ exports.freeze = function (test) {
   test.done();
 };
 
-exports.nonbsp = function (test) {
+exports.nonbsp = function(test) {
   var src = fs.readFileSync(__dirname + '/fixtures/nbsp.js', 'utf8');
 
   TestRun(test)
@@ -1766,7 +1767,7 @@ exports.nonbsp = function (test) {
 };
 
 /** Option `nocomma` disallows the use of comma operator. */
-exports.nocomma = function (test) {
+exports.nocomma = function(test) {
   // By default allow comma operator
   TestRun(test, "nocomma off by default")
     .test("return 2, 5;", {});
@@ -1800,7 +1801,7 @@ exports.nocomma = function (test) {
   test.done();
 };
 
-exports.enforceall = function (test) {
+exports.enforceall = function(test) {
   var src = fs.readFileSync(__dirname + "/fixtures/enforceall.js", "utf8");
 
   // Throws errors not normally on be default
@@ -1817,7 +1818,7 @@ exports.enforceall = function (test) {
   test.done();
 };
 
-exports.removeglobal = function (test) {
+exports.removeglobal = function(test) {
   var src = fs.readFileSync(__dirname + "/fixtures/removeglobals.js", "utf8");
 
   TestRun(test)
@@ -1827,7 +1828,7 @@ exports.removeglobal = function (test) {
   test.done();
 };
 
-exports.ignoreDelimiters = function (test) {
+exports.ignoreDelimiters = function(test) {
   var src = fs.readFileSync(__dirname + "/fixtures/ignoreDelimiters.js", "utf8");
 
   TestRun(test)
@@ -1847,7 +1848,7 @@ exports.ignoreDelimiters = function (test) {
   test.done();
 };
 
-exports.esnextPredefs = function (test) {
+exports.esnextPredefs = function(test) {
   var code = [
     '/* global alert: true */',
     'var mySym = Symbol("name");',
@@ -1864,12 +1865,12 @@ exports.esnextPredefs = function (test) {
 
 var singleGroups = exports.singleGroups = {};
 
-singleGroups.loneIdentifier = function (test) {
+singleGroups.loneIdentifier = function(test) {
   var code = [
     "if ((a)) {}",
     "if ((a) + b + c) {}",
     "if (a + (b) + c) {}",
-    "if (a + b + (c)) {}",
+    "if (a + b + (c)) {}"
   ];
 
   TestRun(test)
@@ -1882,7 +1883,7 @@ singleGroups.loneIdentifier = function (test) {
   test.done();
 };
 
-singleGroups.neighborless = function (test) {
+singleGroups.neighborless = function(test) {
   var code = [
     "if ((a instanceof b)) {}",
     "if ((a in b)) {}",
@@ -1900,7 +1901,7 @@ singleGroups.neighborless = function (test) {
 
 singleGroups.bindingPower = {};
 
-singleGroups.bindingPower.singleExpr = function (test) {
+singleGroups.bindingPower.singleExpr = function(test) {
   var code = [
     "var a = !(a instanceof b);",
     "var b = !(a in b);",
@@ -1936,7 +1937,7 @@ singleGroups.bindingPower.singleExpr = function (test) {
     "if ((a * b) * c) {}",
     "if (a + (b * c)) {}",
     "(a ? a : (a=[])).push(b);",
-    "if (a || (1 / 0 == 1 / 0)) {}",
+    "if (a || (1 / 0 == 1 / 0)) {}"
   ];
 
   TestRun(test)
@@ -1962,7 +1963,7 @@ singleGroups.bindingPower.singleExpr = function (test) {
   test.done();
 };
 
-singleGroups.bindingPower.multiExpr = function (test) {
+singleGroups.bindingPower.multiExpr = function(test) {
   var code = [
     "var j = (a, b);",
     "var k = -(a, b);",
@@ -1985,7 +1986,7 @@ singleGroups.bindingPower.multiExpr = function (test) {
   test.done();
 };
 
-singleGroups.multiExpr = function (test) {
+singleGroups.multiExpr = function(test) {
   var code = [
     "var a = (1, 2);",
     "var b = (true, false) ? 1 : 2;",
@@ -2005,7 +2006,7 @@ singleGroups.multiExpr = function (test) {
 // coercion semantics in JavaScript make it impossible to statically determine
 // whether the grouping operator is necessary. JSHint should err on the side of
 // caution and allow this form.
-singleGroups.concatenation = function (test) {
+singleGroups.concatenation = function(test) {
   var code = [
     "var a = b + (c + d);",
     "var e = (f + g) + h;"
@@ -2018,7 +2019,7 @@ singleGroups.concatenation = function (test) {
   test.done();
 };
 
-singleGroups.functionExpression = function (test) {
+singleGroups.functionExpression = function(test) {
   var code = [
     "(function() {})();",
     "(function() {}).call();",
@@ -2060,7 +2061,7 @@ singleGroups.functionExpression = function (test) {
   test.done();
 };
 
-singleGroups.generatorExpression = function (test) {
+singleGroups.generatorExpression = function(test) {
   var code = [
     "(function*() { yield; })();",
     "(function*() { yield; }).call();",
@@ -2102,7 +2103,7 @@ singleGroups.generatorExpression = function (test) {
   test.done();
 };
 
-singleGroups.arrowFunctions = function (test) {
+singleGroups.arrowFunctions = function(test) {
   var code = [
     "var a = () => ({});",
     "var b = (c) => {};",
@@ -2119,7 +2120,7 @@ singleGroups.arrowFunctions = function (test) {
   test.done();
 };
 
-singleGroups.objectLiterals = function (test) {
+singleGroups.objectLiterals = function(test) {
   var code = [
     "({}).method();",
     "if(true) {} ({}).method();",
@@ -2155,7 +2156,7 @@ singleGroups.newLine = function(test) {
   test.done();
 };
 
-singleGroups.lineNumber = function (test) {
+singleGroups.lineNumber = function(test) {
   var code = [
     "var x = (",
     "  1",
@@ -2170,13 +2171,13 @@ singleGroups.lineNumber = function (test) {
   test.done();
 };
 
-exports.elision = function (test) {
+exports.elision = function(test) {
   var code = [
     "var a = [1,,2];",
     "var b = [1,,,,2];",
     "var c = [1,2,];",
     "var d = [,1,2];",
-    "var e = [,,1,2];",
+    "var e = [,,1,2];"
   ];
 
   TestRun(test, "elision=false ES5")
@@ -2207,7 +2208,7 @@ exports.elision = function (test) {
   test.done();
 };
 
-exports.badInlineOptionValue = function (test) {
+exports.badInlineOptionValue = function(test) {
   var src = [ "/* jshint bitwise:batcrazy */" ];
 
   TestRun(test)
@@ -2217,7 +2218,7 @@ exports.badInlineOptionValue = function (test) {
   test.done();
 };
 
-exports.futureHostile = function (test) {
+exports.futureHostile = function(test) {
   var code = [
     "var JSON = {};",
     "var Map = function() {};",
@@ -2311,7 +2312,7 @@ exports.futureHostile = function (test) {
 };
 
 
-exports.varstmt = function (test) {
+exports.varstmt = function(test) {
   var code = [
     "var x;",
     "var y = 5;",

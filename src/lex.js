@@ -1073,8 +1073,8 @@ Lexer.prototype = {
         }
       }
 
-      if (ch === '$' && this.peek(1) === '{') {
-        value += '${';
+      if (ch === "$" && this.peek(1) === "{") {
+        value += "${";
         this.skip(2);
         return {
           type: tokenType,
@@ -1085,11 +1085,11 @@ Lexer.prototype = {
           depth: depth,
           context: this.currentContext()
         };
-      } else if (ch === '\\') {
+      } else if (ch === "\\") {
         var escape = this.scanEscapeSequence(checks);
         value += escape.char;
         this.skip(escape.jump);
-      } else if (ch !== '`') {
+      } else if (ch !== "`") {
         // Otherwise, append the value and continue.
         value += ch;
         this.skip(1);
@@ -1807,7 +1807,7 @@ Lexer.prototype = {
 
         if (token.isSpecial) {
           return {
-            id: '(comment)',
+            id: "(comment)",
             value: token.value,
             body: token.body,
             type: token.commentType,

@@ -1,5 +1,6 @@
 // Author: Boy Baukema
-// http://github.com/relaxnow
+// https://github.com/relaxnow
+
 module.exports =
 {
   reporter: function(results, data, opts) {
@@ -9,7 +10,7 @@ module.exports =
       out = [],
       pairs = {
         "&": "&amp;",
-        '"': "&quot;",
+        "\"": "&quot;",
         "'": "&apos;",
         "<": "&lt;",
         ">": "&gt;"
@@ -29,7 +30,7 @@ module.exports =
 
     results.forEach(function(result) {
       // Register the file
-      result.file = result.file.replace(/^\.\//, '');
+      result.file = result.file.replace(/^\.\//, "");
       if (!files[result.file]) {
         files[result.file] = [];
       }
@@ -37,20 +38,20 @@ module.exports =
       // Create the error message
       errorMessage = result.error.reason;
       if (opts.verbose) {
-        errorMessage += ' (' + result.error.code + ')';
+        errorMessage += " (" + result.error.code + ")";
       }
 
       var typeNo = result.error.code;
-      var severity = '';
+      var severity = "";
       switch (typeNo[0]) {
-        case 'I':
-          severity = 'info';
+        case "I":
+          severity = "info";
           break;
-        case 'W':
-          severity = 'warning';
+        case "W":
+          severity = "warning";
           break;
-        case 'E':
-          severity = 'error';
+        case "E":
+          severity = "error";
           break;
       }
 
@@ -60,7 +61,7 @@ module.exports =
         line: result.error.line,
         column: result.error.character,
         message: errorMessage,
-        source: 'jshint.' + result.error.code
+        source: "jshint." + result.error.code
       });
     });
 
