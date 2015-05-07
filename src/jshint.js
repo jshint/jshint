@@ -1545,6 +1545,11 @@ var JSHINT = (function() {
           break;
         }
 
+        if (t.value === "break" && controlToken.value === "return") {
+          if (state.option.brkret === true) {
+            return;
+          }
+        }
         warning("W027", t, t.value, controlToken.value);
         break;
       }

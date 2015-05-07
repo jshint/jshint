@@ -2397,3 +2397,21 @@ exports.errorI003 = function(test) {
 
   test.done();
 };
+
+exports.brkret = function (test) {
+  var src1  = fs.readFileSync(__dirname + '/fixtures/brkret1.js', 'utf8'),
+    src2 = fs.readFileSync(__dirname + '/fixtures/brkret2.js', 'utf8');
+
+  // By default, throw warning when there is break after return in switch statement
+  TestRun(test)
+    .addError(7, "Unreachable 'break' after 'return'.")
+    .addError(10, "Unreachable 'break' after 'return'.")
+    .test(src2);
+
+  TestRun(test).test(src1);
+
+  TestRun(test).test(src1, {brkret: true});
+  TestRun(test).test(src2, {brkret: true});
+
+  test.done();
+}

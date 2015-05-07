@@ -354,6 +354,12 @@ exports.bool = {
     boss        : true,
 
     /**
+     * This option suppresses warnings about the use of break after return
+     * in switch statements. Usefull especialy with automaticaly generated code
+     */
+    brkret      : true,
+
+    /**
      * This option suppresses warnings about the use of `eval`. The use of
      * `eval` is discouraged because it can make your code vulnerable to
      * various injection attacks and it makes it hard for JavaScript
