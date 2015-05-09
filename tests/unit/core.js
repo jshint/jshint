@@ -633,8 +633,40 @@ exports.testForIn = function (test) {
   ];
 
   TestRun(test)
-    .addError(2, "Expected an identifier and instead saw '(string)'.")
+    .addError(2, "Expected an identifier and instead saw 'i'.")
     .test(src);
+
+  src = [
+    "(function (o) {",
+    "for (i, j in o) { i(); }",
+    "for (var x, u in o) { x(); }",
+    "for (z = 0 in o) { z(); }",
+    "for (var q = 0 in o) { q(); }",
+    "})();"
+  ];
+
+  TestRun(test, "bad lhs errors")
+    .addError(2, "Invalid for-in loop left-hand-side: more than one ForBinding.")
+    .addError(3, "Invalid for-in loop left-hand-side: more than one ForBinding.")
+    .addError(4, "Invalid for-in loop left-hand-side: initializer is forbidden.")
+    .addError(5, "Invalid for-in loop left-hand-side: initializer is forbidden.")
+    .test(src);
+
+  src = [
+    "(function (o) {",
+    "for (let i, j in o) { i(); }",
+    "for (const x, u in o) { x(); }",
+    "for (let z = 0 in o) { z(); }",
+    "for (const q = 0 in o) { q(); }",
+    "})();"
+  ];
+
+  TestRun(test, "bad lhs errors (lexical)")
+    .addError(2, "Invalid for-in loop left-hand-side: more than one ForBinding.")
+    .addError(3, "Invalid for-in loop left-hand-side: more than one ForBinding.")
+    .addError(4, "Invalid for-in loop left-hand-side: initializer is forbidden.")
+    .addError(5, "Invalid for-in loop left-hand-side: initializer is forbidden.")
+    .test(src, { esnext: true });
 
   test.done();
 };

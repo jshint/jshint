@@ -207,7 +207,8 @@ var warnings = {
     "different variable name to avoid migration issues.",
   W130: "Invalid element after rest element.",
   W131: "Invalid parameter after rest parameter.",
-  W132: "`var` declarations are forbidden. Use `let` or `const` instead."
+  W132: "`var` declarations are forbidden. Use `let` or `const` instead.",
+  W133: "Invalid for-{a} loop left-hand-side: {b}."
 };
 
 var info = {
