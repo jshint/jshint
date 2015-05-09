@@ -3474,25 +3474,23 @@ var JSHINT = (function() {
           }
         }
       }
-      if (prefix) {
-        break;
-      }
 
       statement.first = statement.first.concat(names);
 
-      if (isConst && state.tokens.next.id !== "=") {
+      if (!prefix && isConst && state.tokens.next.id !== "=") {
         warning("E012", state.tokens.curr, state.tokens.curr.value);
       }
 
       if (state.tokens.next.id === "=") {
         advance("=");
-        if (state.tokens.next.id === "undefined") {
+        if (!prefix && state.tokens.next.id === "undefined") {
           warning("W080", state.tokens.prev, state.tokens.prev.value);
         }
-        if (peek(0).id === "=" && state.tokens.next.identifier) {
+        if (!prefix && peek(0).id === "=" && state.tokens.next.identifier) {
           warning("W120", state.tokens.next, state.tokens.next.value);
         }
-        value = expression(10);
+        // don't accept `in` in expression if prefix is used for ForIn/Of loop.
+        value = expression(prefix ? 120 : 10);
         if (lone) {
           tokens[0].first = value;
         } else {
@@ -3530,6 +3528,10 @@ var JSHINT = (function() {
     var inexport = context && context.inexport;
     var tokens, lone, value;
 
+    // If the `implied` option is set, bindings are set differently.
+    var implied = context && context.implied;
+    var report = !(context && context.ignore);
+
     this.first = [];
     for (;;) {
       var names = [];
@@ -3553,7 +3555,7 @@ var JSHINT = (function() {
               warning("E011", null, t.id);
             }
           }
-          if (funct["(global)"]) {
+          if (!implied && funct["(global)"]) {
             if (predefined[t.id] === false) {
               warning("W079", t.token, t.id);
             } else if (state.option.futurehostile === false) {
@@ -3564,17 +3566,29 @@ var JSHINT = (function() {
             }
           }
           if (t.id) {
-            addlabel(t.id, { type: "unused",
-              token: t.token });
+            if (implied === "for") {
+              var ident = t.token.value;
+              switch (funct[ident]) {
+              case "unused":
+                funct[ident] = "var";
+                break;
+              case "var":
+                break;
+              default:
+                if (!funct["(blockscope)"].getlabel(ident) &&
+                    !(scope[ident] || {})[ident]) {
+                  if (report) warning("W088", t.token, ident);
+                }
+              }
+            } else {
+              addlabel(t.id, { type: "unused", token: t.token });
+            }
             names.push(t.token);
           }
         }
       }
-      if (prefix) {
-        break;
-      }
 
-      if (state.option.varstmt) {
+      if (!prefix && report && state.option.varstmt) {
         warning("W132", this);
       }
 
@@ -3584,16 +3598,17 @@ var JSHINT = (function() {
         state.nameStack.set(state.tokens.curr);
 
         advance("=");
-        if (state.tokens.next.id === "undefined") {
+        if (!prefix && report && state.tokens.next.id === "undefined") {
           warning("W080", state.tokens.prev, state.tokens.prev.value);
         }
         if (peek(0).id === "=" && state.tokens.next.identifier) {
-          if (!funct["(params)"] ||
-              funct["(params)"].indexOf(state.tokens.next.value) === -1) {
+          if (!prefix && report &&
+              !funct["(params)"] || funct["(params)"].indexOf(state.tokens.next.value) === -1) {
             warning("W120", state.tokens.next, state.tokens.next.value);
           }
         }
-        value = expression(10);
+        // don't accept `in` in expression if prefix is used for ForIn/Of loop.
+        value = expression(prefix ? 120 : 10);
         if (lone) {
           tokens[0].first = value;
         } else {
@@ -4133,15 +4148,38 @@ var JSHINT = (function() {
     var nextop; // contains the token of the "in" or "of" operator
     var i = 0;
     var inof = ["in", "of"];
+    var level = 0; // BindingPattern "level" --- level 0 === no BindingPattern
+    var comma; // First comma punctuator at level 0
+    var initializer; // First initializer at level 0
+
+    // If initial token is a BindingPattern, count it as such.
+    if (checkPunctuators(state.tokens.next, ["{", "["])) ++level;
     do {
       nextop = peek(i);
       ++i;
-    } while (!_.contains(inof, nextop.value) && nextop.value !== ";" && nextop.type !== "(end)");
+      if (checkPunctuators(nextop, ["{", "["])) ++level;
+      else if (checkPunctuators(nextop, ["}", "]"])) --level;
+      if (level < 0) break;
+      if (level === 0) {
+        if (!comma && checkPunctuators(nextop, [","])) comma = nextop;
+        else if (!initializer && checkPunctuators(nextop, ["="])) initializer = nextop;
+      }
+    } while (level > 0 || !_.contains(inof, nextop.value) && nextop.value !== ";" &&
+    nextop.type !== "(end)"); // Is this a JSCS bug? This looks really weird.
 
     // if we're in a for (… in|of …) statement
     if (_.contains(inof, nextop.value)) {
       if (!state.option.inESNext() && nextop.value === "of") {
         error("W104", nextop, "for of");
+      }
+
+      var ok = !(initializer || comma);
+      if (initializer) {
+        error("W133", comma, nextop.value, "initializer is forbidden");
+      }
+
+      if (comma) {
+        error("W133", comma, nextop.value, "more than one ForBinding");
       }
 
       if (state.tokens.next.id === "var") {
@@ -4153,24 +4191,10 @@ var JSHINT = (function() {
         letscope = true;
         funct["(blockscope)"].stack();
         state.tokens.curr.fud({ prefix: true });
-      } else if (!state.tokens.next.identifier) {
-        error("E030", state.tokens.next, state.tokens.next.type);
-        advance();
       } else {
-        switch (funct[state.tokens.next.value]) {
-        case "unused":
-          funct[state.tokens.next.value] = "var";
-          break;
-        case "var":
-          break;
-        default:
-          var ident = state.tokens.next.value;
-          if (!funct["(blockscope)"].getlabel(ident) &&
-              !(scope[ident] || {})[ident]) {
-            warning("W088", state.tokens.next, state.tokens.next.value);
-          }
-        }
-        advance();
+        // Parse as a var statement, with implied bindings. Ignore errors if an error
+        // was already reported
+        Object.create(varstatement).fud({ prefix: true, implied: "for", ignore: !ok });
       }
       advance(nextop.value);
       expression(20);
