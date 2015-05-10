@@ -5406,6 +5406,30 @@ exports.classExpressionThis = function (test) {
   test.done();
 };
 
+exports.classElementEmpty = function (test) {
+  var code = [
+    "class A {",
+    "  ;",
+    "  method() {}",
+    "  ;",
+    "  *methodB() { yield; }",
+    "  ;;",
+    "  methodC() {}",
+    "  ;",
+    "}",
+  ];
+
+  TestRun(test)
+    .addError(2, "Unnecessary semicolon.")
+    .addError(4, "Unnecessary semicolon.")
+    .addError(6, "Unnecessary semicolon.")
+    .addError(6, "Unnecessary semicolon.")
+    .addError(8, "Unnecessary semicolon.")
+    .test(code, { esnext: true });
+
+  test.done();
+};
+
 exports["test for GH-1018"] = function (test) {
   var code = [
     "if (a = 42) {}",
