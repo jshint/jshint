@@ -5271,50 +5271,9 @@ exports.classes = function (test) {
 };
 
 exports["class and method naming"] = function (test) {
-  var code = [
-    "class eval {}",
-    "class arguments {}",
-    "class C {",
-    "  get constructor() {}",
-    "  set constructor(x) {}",
-    "  prototype() {}",
-    "  an extra identifier 'in' methodName() {}",
-    "  get foo extraIdent1() {}",
-    "  set foo extraIdent2() {}",
-    "  static some extraIdent3() {}",
-    "  static get an extraIdent4() {}",
-    "  static set an extraIdent5() {}",
-    "  get dupgetter() {}",
-    "  get dupgetter() {}",
-    "  set dupsetter() {}",
-    "  set dupsetter() {}",
-    "  static get dupgetter() {}",
-    "  static get dupgetter() {}",
-    "  static set dupsetter() {}",
-    "  static set dupsetter() {}",
-    "  dupmethod() {}",
-    "  dupmethod() {}",
-    "  static dupmethod() {}",
-    "  static dupmethod() {}",
-    "  ['computed method']() {}",
-    "  static ['computed static']() {}",
-    "  get ['computed getter']() {}",
-    "  set ['computed setter']() {}",
-    "  (typo() {}",
-    "  set lonely() {}",
-    "  set lonel2",
-    "            () {}",
-    "  *validGenerator() { yield; }",
-    "  static *validStaticGenerator() { yield; }",
-    "  *[1]() { yield; }",
-    "  static *[1]() { yield; }",
-    "  * ['*']() { yield; }",
-    "  static *['*']() { yield; }",
-    "  * [('*')]() { yield; }",
-    "  static *[('*')]() { yield; }",
-    "}"
-  ];
-  var run = TestRun(test)
+  var code = fs.readFileSync(path.join(__dirname, "./fixtures/es6-class-method-naming.js"), "utf8");
+
+  TestRun(test)
     .addError(1, "Expected an identifier and instead saw 'eval' (a reserved word).")
     .addError(2, "Expected an identifier and instead saw 'arguments' (a reserved word).")
     .addError(4, "A class getter method cannot be named 'constructor'.")
@@ -5335,9 +5294,8 @@ exports["class and method naming"] = function (test) {
     .addError(24, "Duplicate static class method 'dupmethod'.")
     .addError(29, "Unexpected '('.")
     .addError(30, "Setter is defined without getter.")
-    .addError(31, "Setter is defined without getter.");
-
-  run.test(code, {esnext: true});
+    .addError(31, "Setter is defined without getter.")
+    .test(code, { esnext: true });
 
   test.done();
 };

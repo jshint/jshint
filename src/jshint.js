@@ -3715,6 +3715,7 @@ var JSHINT = (function() {
       }
       if (name.id === "[") {
         name = computedPropertyName();
+        computed = true;
       } else if (isPropertyName(name)) {
         // Non-Computed PropertyName
         advance();
