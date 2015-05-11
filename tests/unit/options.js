@@ -295,7 +295,7 @@ exports.notypeof = function (test) {
     .test(src, { notypeof: true, esnext: true });
 
   test.done();
-}
+};
 
 exports['combination of latedef and undef'] = function (test) {
   var src = fixture('latedefundef.js');
@@ -391,13 +391,13 @@ exports.testProtoAndIterator = function (test) {
   // JSHint should not allow the `__proto__` and
   // `__iterator__` properties by default
   TestRun(test)
-    .addError(7, "The '__proto__' property is deprecated.")
-    .addError(8, "The '__proto__' property is deprecated.")
-    .addError(10, "The '__proto__' property is deprecated.")
+    .addError(7, "'__proto__' is only available in ES6 (use esnext option).")
+    .addError(8, "'__proto__' is only available in ES6 (use esnext option).")
+    .addError(10, "'__proto__' is only available in ES6 (use esnext option).")
     .addError(27, "The '__iterator__' property is deprecated.")
-    .addError(33, "The '__proto__' property is deprecated.")
-    .addError(37, "The '__proto__' property is deprecated.")
-    .test(source, {es3: true});
+    .addError(33, "'__proto__' is only available in ES6 (use esnext option).")
+    .addError(37, "'__proto__' is only available in ES6 (use esnext option).")
+    .test(source, { es3: true });
 
   TestRun(test)
     .addError(1, "The '__proto__' key may produce unexpected results.")
@@ -408,6 +408,19 @@ exports.testProtoAndIterator = function (test) {
   // options are on
   TestRun("source").test(source, { es3: true, proto: true, iterator: true });
   TestRun("json").test(json, { es3: true, proto: true, iterator: true });
+
+  // Should not allow the `__proto__` property if esnext is on but browser is off.
+  TestRun(test)
+    .addError(7, "The '__proto__' property may not be supported by non-browser environments.")
+    .addError(8, "The '__proto__' property may not be supported by non-browser environments.")
+    .addError(10, "The '__proto__' property may not be supported by non-browser environments.")
+    .addError(33, "The '__proto__' property may not be supported by non-browser environments.")
+    .addError(37, "The '__proto__' property may not be supported by non-browser environments.")
+    .test(source, { esnext: true, iterator: true });
+
+  // Should allow the `__proto__` property if both esnext and browser are on
+  TestRun(test)
+    .test(source, { esnext: true, browser: true, iterator: true });
 
   test.done();
 };
