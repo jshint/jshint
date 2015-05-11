@@ -3,6 +3,7 @@
 var path  = require("path");
 var shjs  = require("shelljs");
 var sinon = require("sinon");
+var expandHomeDir = require("expand-home-dir");
 
 var cliPath = path.resolve(__dirname, "../src/cli.js");
 var cli;
@@ -74,6 +75,9 @@ exports.group = {
               }
             }
           }
+        }))
+        .withArgs(sinon.match(/file10\.json$/)).returns(JSON.stringify({
+          extends: "~/.jshintrc"
         }));
 
       this.sinon.stub(shjs, "test")
@@ -87,6 +91,8 @@ exports.group = {
 
       var _cli = require("cli");
       this.out = this.sinon.stub(_cli, "error");
+
+      this.sinon.spy(cli, "loadConfig");
 
       done();
     },
@@ -129,6 +135,12 @@ exports.group = {
         "node", "jshint", "file.js", "--config", "file9.json"
       ]);
       test.deepEqual(cli.run.lastCall.args[0].config.overrides["file.js"].globals, { foo: true, bar: false, baz: true });
+
+      // Expands "~/" to user's home path
+      cli.interpret([
+        "node", "jshint", "file.js", "--config", "file10.json"
+      ]);
+      test.equal(cli.loadConfig.lastCall.args[0], path.join(expandHomeDir("~"), ".jshintrc"));
 
       test.done();
     },
