@@ -189,6 +189,13 @@ exports.es5 = function (test) {
   src = fs.readFileSync(__dirname + "/fixtures/es5.funcexpr.js", "utf8");
   TestRun(test).test(src, {  }); // es5
 
+  // JSHint should warn about duplicate key '__proto__'.
+  // (https://github.com/jshint/jshint/issues/2372)
+  src = "var a = { __proto__: null, __proto__: {} };";
+  TestRun(test)
+    .addError(1, "Duplicate key '__proto__'.")
+    .test(src, { proto: true });
+
   test.done();
 };
 
