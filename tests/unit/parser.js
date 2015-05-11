@@ -5342,6 +5342,28 @@ exports["class and method naming"] = function (test) {
   test.done();
 };
 
+exports["computed class methods aren't duplicate"] = function (test) {
+  var code = [
+    "const obj = {};",
+    "class A {",
+    "  [Symbol()]() {}",
+    "  [Symbol()]() {}",
+    "  [obj.property]() {}",
+    "  [obj.property]() {}",
+    "  [obj[0]]() {}",
+    "  [obj[0]]() {}",
+    "  [`template`]() {}",
+    "  [`template2`]() {}",
+    "}"
+  ];
+
+  // JSHint shouldn't throw a "Duplicate class method" warning with computed method names
+  // GH-2350
+  TestRun(test).test(code, { esnext: true });
+
+  test.done();
+};
+
 exports["class method this"] = function (test) {
   var code = [
   "class C {",
