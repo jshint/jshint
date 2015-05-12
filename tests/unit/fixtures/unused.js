@@ -62,3 +62,10 @@ if (letUsed) {
     let letUsed = "unused",
         anotherUnused;
 }
+
+// GH-2345 - Unused arrow-function parameters should be ignored if "unused" is set to "vars"
+let x = y => y;
+x = y => {};
+x = (y) => {};
+x = (y, z) => y;
+x = (y, z) => z;
