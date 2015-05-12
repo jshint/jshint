@@ -652,7 +652,10 @@ exports.unused = function (test) {
     [22, "'i' is defined but never used."],
     [28, "'a' is defined but never used."],
     [28, "'b' is defined but never used."],
-    [28, "'c' is defined but never used."]
+    [28, "'c' is defined but never used."],
+    [68, "'y' is defined but never used."],
+    [69, "'y' is defined but never used."],
+    [70, "'z' is defined but never used."]
   ];
 
   var all_param_errors = [
@@ -660,7 +663,8 @@ exports.unused = function (test) {
     [22, "'i' is defined but never used."],
     [28, "'a' is defined but never used."],
     [28, "'b' is defined but never used."],
-    [28, "'c' is defined but never used."]
+    [28, "'c' is defined but never used."],
+    [71, "'y' is defined but never used."]
   ];
 
   var true_run = TestRun(test, {esnext: true});
@@ -686,11 +690,12 @@ exports.unused = function (test) {
   vars_run.test(src, { esnext: true, unused: "vars"});
 
   var unused = JSHINT.data().unused;
-  test.equal(15, unused.length);
+  test.equal(19, unused.length);
   test.ok(unused.some(function (err) { return err.line === 1 && err.character == 5 && err.name === "a"; }));
   test.ok(unused.some(function (err) { return err.line === 6 && err.character == 18 && err.name === "f"; }));
   test.ok(unused.some(function (err) { return err.line === 7 && err.character == 9 && err.name === "c"; }));
   test.ok(unused.some(function (err) { return err.line === 15 && err.character == 10 && err.name === "foo"; }));
+  test.ok(unused.some(function (err) { return err.line === 68 && err.character == 5 && err.name === "y"; }));
 
   test.done();
 };

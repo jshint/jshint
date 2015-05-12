@@ -2879,7 +2879,7 @@ var JSHINT = (function() {
 
     if (loneArg && loneArg.identifier === true) {
       addlabel(loneArg.value, { type: "unused", token: loneArg });
-      return [loneArg];
+      return [loneArg.value];
     }
 
     next = state.tokens.next;
