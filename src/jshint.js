@@ -2496,7 +2496,7 @@ var JSHINT = (function() {
     if (left) {
       if (left.type === "(identifier)") {
         if (left.value.match(/^[A-Z]([A-Z0-9_$]*[a-z][A-Za-z0-9_$]*)?$/)) {
-          if ("Number String Boolean Date Object Error Symbol".indexOf(left.value) === -1) {
+          if ("Array Number String Boolean Date Object Error Symbol".indexOf(left.value) === -1) {
             if (left.value === "Math") {
               warning("W063", left);
             } else if (state.option.newcap) {

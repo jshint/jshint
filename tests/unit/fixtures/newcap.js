@@ -13,6 +13,7 @@ rat = iAnimal();
 bat = myAnimal();
 
 // Make sure we don't warn on Error, Number, etc.
+Array();
 Error();
 Number();
 String();
