@@ -213,6 +213,47 @@ exports.options = function (test) {
   test.done();
 };
 
+exports.emptyDirectives = function (test) {
+  TestRun(test)
+    .addError(1, "Bad option value.")
+    .test('/* global */');
+
+  TestRun(test)
+    .addError(1, "Bad option value.")
+    .test('/* global : */');
+
+  TestRun(test)
+    .addError(1, "Bad option value.")
+    .test('/* global -: */');
+
+  TestRun(test)
+    .test('/* global foo, bar, baz, */');
+
+  TestRun(test)
+    .addError(1, "Bad option value.")
+    .test('/* globals */');
+
+  TestRun(test)
+    .addError(1, "Bad option value.")
+    .test('/* globals : */');
+
+  TestRun(test)
+    .addError(1, "Bad option value.")
+    .test('/* globals -: */');
+
+  TestRun(test)
+    .test('/* globals foo, bar, baz, */');
+
+  TestRun(test)
+    .addError(1, "Bad option value.")
+    .test('/* exported */');
+
+  TestRun(test)
+    .test('/* exported foo, bar, baz, */');
+
+  test.done();
+};
+
 exports["jshint option comments single line"] = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/gh1768-1.js", "utf8");
 

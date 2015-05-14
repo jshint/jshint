@@ -488,10 +488,19 @@ var JSHINT = (function() {
     var body = nt.body.split(",").map(function(s) { return s.trim(); });
     var predef = {};
     if (nt.type === "globals") {
-      body.forEach(function(g) {
+      body.forEach(function(g, idx) {
         g = g.split(":");
         var key = (g[0] || "").trim();
         var val = (g[1] || "").trim();
+
+        if (key === "-" || !key.length) {
+          // Ignore trailing comma
+          if (idx > 0 && idx === body.length - 1) {
+            return;
+          }
+          error("E002", nt);
+          return;
+        }
 
         if (key.charAt(0) === "-") {
           key = key.slice(1);
@@ -514,7 +523,16 @@ var JSHINT = (function() {
     }
 
     if (nt.type === "exported") {
-      body.forEach(function(e) {
+      body.forEach(function(e, idx) {
+        if (!e.length) {
+          // Ignore trailing comma
+          if (idx > 0 && idx === body.length - 1) {
+            return;
+          }
+          error("E002", nt);
+          return;
+        }
+
         exported[e] = true;
       });
     }
