@@ -3215,7 +3215,7 @@ var JSHINT = (function() {
 
   (function(x) {
     x.nud = function() {
-      var b, f, i, p, t, g, nextVal;
+      var b, f, i, p, t, isGeneratorMethod = false, nextVal;
       var props = {}; // All properties, including accessors
 
       b = state.tokens.curr.line !== startLine(state.tokens.next);
@@ -3280,7 +3280,9 @@ var JSHINT = (function() {
               warning("W104", state.tokens.next, "generator functions");
             }
             advance("*");
-            g = true;
+            isGeneratorMethod = true;
+          } else {
+            isGeneratorMethod = false;
           }
 
           if (state.tokens.next.id === "[") {
@@ -3300,7 +3302,7 @@ var JSHINT = (function() {
             if (!state.inESNext()) {
               warning("W104", state.tokens.curr, "concise methods");
             }
-            doFunction({ type: g ? "generator" : null });
+            doFunction({ type: isGeneratorMethod ? "generator" : null });
           } else {
             advance(":");
             expression(10);
