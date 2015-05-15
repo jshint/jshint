@@ -143,15 +143,6 @@ exports.bool = {
     funcscope   : true,
 
     /**
-     * This option suppresses warnings about the use of global strict mode.
-     * Global strict mode can break third-party widgets so it is not
-     * recommended.
-     *
-     * For more info about strict mode see the `strict` option.
-     */
-    globalstrict: true,
-
-    /**
      * This option prohibits the use of immediate function invocations without
      * wrapping them in parentheses. Wrapping parentheses assists readers of
      * your code in understanding that the expression is the result of a
@@ -268,6 +259,21 @@ exports.bool = {
     singleGroups: false,
 
     /**
+     * This option requires all functions to run in ECMAScript 5's strict mode.
+     * [Strict mode](https://developer.mozilla.org/en/JavaScript/Strict_mode)
+     * is a way to opt in to a restricted variant of JavaScript. Strict mode
+     * eliminates some JavaScript pitfalls that didn't cause errors by changing
+     * them to produce errors.  It also fixes mistakes that made it difficult
+     * for the JavaScript engines to perform certain optimizations.
+     *
+     * *Note:* This option enables strict mode for function scope only. It
+     * *prohibits* the global scoped strict mode because it might break
+     * third-party widgets on your page. If you really want to use global
+     * strict mode, see the *globalstrict* option.
+     */
+    strict      : true,
+
+    /**
      * When set to true, the use of VariableStatements are forbidden.
      * For example:
      *
@@ -362,6 +368,15 @@ exports.bool = {
     evil        : true,
 
     /**
+     * This option suppresses warnings about the use of global strict mode.
+     * Global strict mode can break third-party widgets so it is not
+     * recommended.
+     *
+     * For more info about strict mode see the `strict` option.
+     */
+    globalstrict: true,
+
+    /**
      * This option prohibits the use of unary increment and decrement
      * operators.  Some people think that `++` and `--` reduces the quality of
      * their coding styles and there are programming languages—such as
@@ -379,21 +394,6 @@ exports.bool = {
      * URLs—such as `javascript:...`.
      */
     scripturl   : true,
-
-    /**
-     * This option requires all functions to run in ECMAScript 5's strict mode.
-     * [Strict mode](https://developer.mozilla.org/en/JavaScript/Strict_mode)
-     * is a way to opt in to a restricted variant of JavaScript. Strict mode
-     * eliminates some JavaScript pitfalls that didn't cause errors by changing
-     * them to produce errors.  It also fixes mistakes that made it difficult
-     * for the JavaScript engines to perform certain optimizations.
-     *
-     * *Note:* This option enables strict mode for function scope only. It
-     * *prohibits* the global scoped strict mode because it might break
-     * third-party widgets on your page. If you really want to use global
-     * strict mode, see the *globalstrict* option.
-     */
-    strict      : true,
 
     /**
      * This option suppresses warnings about using `[]` notation when it can be
