@@ -1739,6 +1739,38 @@ exports["destructuring assign of empty values as JS legacy"] = function (test) {
   test.done();
 };
 
+exports["destructuring assignment default values"] = function (test) {
+  var code = [
+    "var [ a = 3, b ] = [];",
+    "var [ c, d = 3 ] = [];",
+    "var [ [ e ] = [ 3 ] ] = [];",
+    "var [ f = , g ] = [];",
+    "var { g, h = 3 } = {};",
+    "var { i = 3, j } = {};",
+    "var { k, l: m = 3 } = {};",
+    "var { n: o = 3, p } = {};",
+    "var { q: { r } = { r: 3 } } = {};",
+    "var { s = , t } = {};",
+    "var [ u = undefined ] = [];",
+    "var { v = undefined } = {};",
+    "var { w: x = undefined } = {};",
+    "var [ ...y = 3 ] = [];"
+  ];
+
+  TestRun(test)
+    .addError(4, "Expected an identifier and instead saw ','.")
+    .addError(4, "Expected ',' and instead saw 'g'.")
+    .addError(10, "Expected an identifier and instead saw ','.")
+    .addError(10, "Expected ',' and instead saw 't'.")
+    .addError(11, "It's not necessary to initialize 'u' to 'undefined'.")
+    .addError(12, "It's not necessary to initialize 'v' to 'undefined'.")
+    .addError(13, "It's not necessary to initialize 'x' to 'undefined'.")
+    .addError(14, "Expected ']' and instead saw '='.")
+    .test(code, { esnext: true });
+
+  test.done();
+};
+
 exports["array element assignment inside array"] = function (test) {
   var code = [
     "var a1 = {};",
@@ -2766,6 +2798,22 @@ exports["test destructuring function as legacy JS"] = function (test) {
     .addError(4, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(4, "'destructuring expression' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .test(code, {es3: true, unused: true, undef: true, predef: ["print"]});
+
+  test.done();
+};
+
+exports["destructuring function default values"] = function (test) {
+  var code = [
+    "function a([ b = 2, c = 2 ] = []) {}",
+    "function d([ f = 2 ], g, [ e = 2 ] = []) {}",
+    "function h({ i = 2 }, { j = 2 } = {}) {}",
+    "function k({ l: m = 2, n = 2 }) {}",
+    "let o = (p, [ q = 2, r = 2 ]) => {};",
+    "let s = ({ t = 2 } = {}, [ u = 2 ] = []) => {};",
+    "let v = ({ w: x = 2, y = 2 }) => {};"
+  ];
+
+  TestRun(test).test(code, { esnext: true });
 
   test.done();
 };

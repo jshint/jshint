@@ -3203,21 +3203,33 @@ var JSHINT = (function() {
     if (checkPunctuators(state.tokens.next, ["["])) {
       advance("[");
       var element_after_rest = false;
-      if (nextInnerDE() && checkPunctuators(state.tokens.next, [","]) &&
-          !element_after_rest) {
+      if (nextInnerDE() && checkPunctuators(state.tokens.next, [","])) {
         warning("W130", state.tokens.next);
         element_after_rest = true;
       }
       while (!checkPunctuators(state.tokens.next, ["]"])) {
-        advance(",");
-        if (checkPunctuators(state.tokens.next, ["]"])) {
-          // Trailing comma
-          break;
+        if (checkPunctuators(state.tokens.next, ["="])) {
+          if (checkPunctuators(state.tokens.prev, ["..."])) {
+            advance("]");
+          } else {
+            advance("=");
+          }
+          if (state.tokens.next.id === "undefined") {
+            warning("W080", state.tokens.prev, state.tokens.prev.value);
+          }
+          expression(10);
         }
-        if (nextInnerDE() && checkPunctuators(state.tokens.next, [","]) &&
-            !element_after_rest) {
-          warning("W130", state.tokens.next);
-          element_after_rest = true;
+        if (!checkPunctuators(state.tokens.next, ["]"])) {
+          advance(",");
+          if (checkPunctuators(state.tokens.next, ["]"])) {
+            // Trailing comma
+            break;
+          }
+          if (nextInnerDE() && checkPunctuators(state.tokens.next, [","]) &&
+              !element_after_rest) {
+            warning("W130", state.tokens.next);
+            element_after_rest = true;
+          }
         }
       }
       advance("]");
@@ -3231,18 +3243,27 @@ var JSHINT = (function() {
         identifiers.push({ id: id, token: state.tokens.curr });
       }
       while (!checkPunctuators(state.tokens.next, ["}"])) {
-        advance(",");
-        if (checkPunctuators(state.tokens.next, ["}"])) {
-          // Trailing comma
-          // ObjectBindingPattern: { BindingPropertyList , }
-          break;
+        if (checkPunctuators(state.tokens.next, ["="])) {
+          advance("=");
+          if (state.tokens.next.id === "undefined") {
+            warning("W080", state.tokens.prev, state.tokens.prev.value);
+          }
+          expression(10);
         }
-        id = identifier();
-        if (checkPunctuators(state.tokens.next, [":"])) {
-          advance(":");
-          nextInnerDE();
-        } else {
-          identifiers.push({ id: id, token: state.tokens.curr });
+        if (!checkPunctuators(state.tokens.next, ["}"])) {
+          advance(",");
+          if (checkPunctuators(state.tokens.next, ["}"])) {
+            // Trailing comma
+            // ObjectBindingPattern: { BindingPropertyList , }
+            break;
+          }
+          id = identifier();
+          if (checkPunctuators(state.tokens.next, [":"])) {
+            advance(":");
+            nextInnerDE();
+          } else {
+            identifiers.push({ id: id, token: state.tokens.curr });
+          }
         }
       }
       advance("}");
