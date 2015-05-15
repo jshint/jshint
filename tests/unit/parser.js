@@ -6584,3 +6584,23 @@ exports.functionKeyword = function (test) {
 
   test.done();
 };
+
+exports.nonGeneratorAfterGenerator = function (test) {
+  var run;
+  var code = [
+    'var obj = {',
+    '  *gen() {',
+    '    yield 1;',
+    '  },',
+    // non_gen shouldn't be parsed as a generator method here, and parser
+    // shouldn't report an error about a generator without a yield expression.
+    '  non_gen() {',
+    '  }',
+    '};'
+  ];
+
+  run = TestRun(test);
+  run.test(code, { esnext: true });
+
+  test.done();
+};
