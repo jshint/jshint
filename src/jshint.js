@@ -2630,6 +2630,17 @@ var JSHINT = (function() {
           // Used to distinguish from an ExpressionStatement which may not
           // begin with the `{` and `function` tokens
           (opening.beginsStmt && (ret.id === "{" || triggerFnExpr || isFunctor(ret))) ||
+          // Used to signal that a function expression is being supplied to
+          // some other operator.
+          (triggerFnExpr &&
+            // For parenthesis wrapping a function expression to be considered
+            // necessary, the grouping operator should be the left-hand-side of
+            // some other operator--either within the parenthesis or directly
+            // following them.
+            (!isEndOfExpr() || state.tokens.prev.id !== "}")) ||
+          // Used to demarcate an arrow function as the left-hand side of some
+          // operator.
+          (isFunctor(ret) && !isEndOfExpr()) ||
           // Used as the return value of a single-statement arrow function
           (ret.id === "{" && preceeding.id === "=>");
       }

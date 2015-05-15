@@ -2028,10 +2028,11 @@ singleGroups.functionExpression = function (test) {
     "(function() {}());",
     "(function() {}.call());",
     "if (true) {} (function() {}());",
-    "var a",
     "(function() {}());",
+    // These usages are not technically necessary, but parenthesis are commonly
+    // used to signal that a function expression is going to be invoked
+    // immediately.
     "var a = (function() {})();",
-    // Invalid forms:
     "var b = (function() {}).call();",
     "var c = (function() {}());",
     "var d = (function() {}.call());",
@@ -2042,21 +2043,12 @@ singleGroups.functionExpression = function (test) {
     "if ((function() {})()) {}",
     "if ((function() {}).call()) {}",
     "if ((function() {}())) {}",
-    "if ((function() {}.call())) {}"
+    "if ((function() {}.call())) {}",
+    // Invalid forms:
+    "var i = (function() {});"
   ];
 
   TestRun(test)
-    .addError(8, "Unnecessary grouping operator.")
-    .addError(9, "Unnecessary grouping operator.")
-    .addError(10, "Unnecessary grouping operator.")
-    .addError(11, "Unnecessary grouping operator.")
-    .addError(12, "Unnecessary grouping operator.")
-    .addError(13, "Unnecessary grouping operator.")
-    .addError(14, "Unnecessary grouping operator.")
-    .addError(15, "Unnecessary grouping operator.")
-    .addError(16, "Unnecessary grouping operator.")
-    .addError(17, "Unnecessary grouping operator.")
-    .addError(18, "Unnecessary grouping operator.")
     .addError(19, "Unnecessary grouping operator.")
     .test(code, { singleGroups: true, asi: true });
 
@@ -2070,10 +2062,11 @@ singleGroups.generatorExpression = function (test) {
     "(function*() { yield; }());",
     "(function*() { yield; }.call());",
     "if (true) {} (function*() { yield; }());",
-    "var a",
     "(function*() { yield; }());",
+    // These usages are not technically necessary, but parenthesis are commonly
+    // used to signal that a function expression is going to be invoked
+    // immediately.
     "var a = (function*() { yield; })();",
-    // Invalid forms:
     "var b = (function*() { yield; }).call();",
     "var c = (function*() { yield; }());",
     "var d = (function*() { yield; }.call());",
@@ -2084,21 +2077,12 @@ singleGroups.generatorExpression = function (test) {
     "if ((function*() { yield; })()) {}",
     "if ((function*() { yield; }).call()) {}",
     "if ((function*() { yield; }())) {}",
-    "if ((function*() { yield; }.call())) {}"
+    "if ((function*() { yield; }.call())) {}",
+    // Invalid forms:
+    "var i = (function*() { yield; });"
   ];
 
   TestRun(test)
-    .addError(8, "Unnecessary grouping operator.")
-    .addError(9, "Unnecessary grouping operator.")
-    .addError(10, "Unnecessary grouping operator.")
-    .addError(11, "Unnecessary grouping operator.")
-    .addError(12, "Unnecessary grouping operator.")
-    .addError(13, "Unnecessary grouping operator.")
-    .addError(14, "Unnecessary grouping operator.")
-    .addError(15, "Unnecessary grouping operator.")
-    .addError(16, "Unnecessary grouping operator.")
-    .addError(17, "Unnecessary grouping operator.")
-    .addError(18, "Unnecessary grouping operator.")
     .addError(19, "Unnecessary grouping operator.")
     .test(code, { singleGroups: true, asi: true, esnext: true });
 
@@ -2109,14 +2093,30 @@ singleGroups.arrowFunctions = function (test) {
   var code = [
     "var a = () => ({});",
     "var b = (c) => {};",
+    "var g = (() => 3)();",
+    "var h = (() => ({}))();",
+    "var i = (() => 3).length;",
+    "var j = (() => ({})).length;",
+    "var k = (() => 3)[prop];",
+    "var l = (() => ({}))[prop];",
+    "var m = (() => 3) || 3;",
+    "var n = (() => ({})) || 3;",
+    "var o = (() => {})();",
+    "var p = (() => {})[prop];",
+    "var q = (() => {}) || 3;",
     "(() => {})();",
+    // Invalid forms:
     "var d = () => (e);",
-    "var f = () => (3);"
+    "var f = () => (3);",
+    "var r = (() => 3);",
+    "var s = (() => {});"
   ];
 
   TestRun(test)
-    .addError(4, "Unnecessary grouping operator.")
-    .addError(5, "Unnecessary grouping operator.")
+    .addError(15, "Unnecessary grouping operator.")
+    .addError(16, "Unnecessary grouping operator.")
+    .addError(17, "Unnecessary grouping operator.")
+    .addError(18, "Unnecessary grouping operator.")
     .test(code, { singleGroups: true, esnext: true });
 
   test.done();
