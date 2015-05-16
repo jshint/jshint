@@ -19,9 +19,18 @@
     "url": "https://github.com/jshint/jshint/issues"
   },
 
+  "license": {
+    "type": "MIT",
+    "url": "https://github.com/jshint/jshint/blob/master/LICENSE"
+  },
+
   "bin": {
     "jshint": "./bin/jshint"
   },
+
+  "main": "./src/jshint.js",
+
+  "preferGlobal": true,
 
   "scripts": {
     "build": "node bin/build",
@@ -30,8 +39,6 @@
     "pretest": "jshint src && jscs src",
     "test": "nodeunit tests tests/regression tests/unit"
   },
-
-  "main": "./src/jshint.js",
 
   "dependencies": {
     "cli":                 "0.6.x",
@@ -56,15 +63,6 @@
     "sinon":         "1.12.x",
     "unicode-6.3.0": "0.1.x"
   },
-
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://github.com/jshint/jshint/blob/master/LICENSE"
-    }
-  ],
-
-  "preferGlobal": true,
 
   "files": [
     "bin",
