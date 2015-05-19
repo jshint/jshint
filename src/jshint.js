@@ -1584,23 +1584,6 @@ var JSHINT = (function() {
       res = false;
     }
 
-    // detect a module import declaration
-    if (t.value === "module" && t.type === "(identifier)") {
-      if (peek().type === "(identifier)") {
-        if (!state.inESNext()) {
-          warning("W119", state.tokens.curr, "module");
-        }
-
-        advance("module");
-        var name = identifier();
-        addlabel(name, { type: "unused", token: state.tokens.curr });
-        advance("from");
-        advance("(string)");
-        parseFinalSemicolon();
-        return;
-      }
-    }
-
     if (t.identifier && !res && peek().id === ":") {
       advance();
       advance(":");
