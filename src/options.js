@@ -284,12 +284,14 @@ exports.bool = {
     varstmt: false,
 
     /**
-     * This option is a short hand for the most strict JSHint configuration. It
-     * enables all enforcing options and disables all relaxing options.
+     * This option is a short hand for the most strict JSHint configuration as
+     * available in JSHint version 2.6.3. It enables all enforcing options and
+     * disables all relaxing options that were defined in that release.
      *
-     * @deprecated The option automatically opts users in to new features which
-     *             can lead to unexpected warnings/errors in when upgrading
-     *             between minor versions of JSHint.
+     * @deprecated The option cannot be maintained without automatically opting
+     *             users in to new features. This can lead to unexpected
+     *             warnings/errors in when upgrading between minor versions of
+     *             JSHint.
      */
     enforceall : false
   },
@@ -965,5 +967,6 @@ exports.removed = {
 // Add options here which should not be automatically enforced by
 // `enforceall`.
 exports.noenforceall = {
-  varstmt: true
+  varstmt: true,
+  strict: true
 };
