@@ -1332,19 +1332,6 @@ exports.testArrayPrototypeExtensions = function (test) {
   test.done();
 };
 
-exports.testModuleKeyword = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/module-keyword.js", "utf8");
-
-  TestRun(test)
-    .addError(4, "Missing semicolon.")
-    .test(src, { esnext: true });
-
-  TestRun(test)
-    .test(src, { esnext: true, asi: true });
-
-  test.done();
-};
-
 // Issue #1446, PR #1688
 exports.testIncorrectJsonDetection = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/mappingstart.js", "utf8");
