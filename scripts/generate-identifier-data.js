@@ -12,36 +12,63 @@ var get = function(what) {
   return require('unicode-' + version + '/' + what + '/code-points');
 };
 
-// Unicode categories needed to construct the ES5 regex
-var Lu = get('categories/Lu');
-var Ll = get('categories/Ll');
-var Lt = get('categories/Lt');
-var Lm = get('categories/Lm');
-var Lo = get('categories/Lo');
-var Nl = get('categories/Nl');
-var Mn = get('categories/Mn');
-var Mc = get('categories/Mc');
-var Nd = get('categories/Nd');
-var Pc = get('categories/Pc');
+var zipArray = function(arr) {
+  var result = [];
+  var i;
+  for (i = 0; i < arr.length; i++) {
+    if (arr[i] + 1 === arr[i + 1]) {
+      var start = arr[i];
+      var n = 0;
+      while (arr[i] + 1 === arr[i + 1]) {
+        n++;
+        i++;
+      }
+      result.push(start.toString(36) + "-" + n.toString(36));
+    } else {
+      result.push(arr[i].toString(36));
+    }
+  }
+  return result;
+};
 
-var generateES5Data = function() { // ES 5.1
-  // http://mathiasbynens.be/notes/javascript-identifiers#valid-identifier-names
-  var identifierStart = regenerate('$', '_')
-    .add(Lu, Ll, Lt, Lm, Lo, Nl)
-    .removeRange(0x010000, 0x10FFFF) // remove astral symbols
-    .removeRange(0x0, 0x7F); // remove ASCII symbols (JSHint-specific)
-  var identifierStartCodePoints = identifierStart.toArray();
-  var identifierPart = regenerate()
-    .add(0x200C, 0x200D, Mn, Mc, Nd, Pc)
-    // remove astral symbols
-    .removeRange(0x010000, 0x10FFFF)
-    // remove ASCII symbols (JSHint-specific)
-    .removeRange(0x0, 0x7F)
-    // just to make sure no `IdentifierStart` code points are repeated here
-    .remove(identifierStartCodePoints);
+// Unicode properties needed to construct the valid code points list
+var ID_Start = get('properties/ID_Start');
+var Other_ID_Start = get('properties/Other_ID_Start');
+var ID_Continue = get('properties/ID_Continue');
+var Other_ID_Continue = get('properties/Other_ID_Continue');
+
+var generateData = function() {
+  var ascii = regenerate().addRange(0x0, 0x7F);
+  var astral = regenerate().addRange(0x10000, 0x10FFFF);
+
+  var identifierStart = regenerate(ID_Start, Other_ID_Start)
+    .remove(ascii);
+  var identifierPart = regenerate(0x200c, 0x200d, ID_Continue, Other_ID_Continue)
+    .remove(ascii);
+
+  // BMP: Basic Multilingual Plane -> Code points from 0x0000 to 0xFFFF
+  // Supported by ES5 and ES6 using the \uXXXX
+  var identifierStartBMP = identifierStart.clone()
+    .remove(astral);
+  var identifierPartBMP = identifierPart.clone()
+    .remove(astral).remove(identifierStartBMP);
+
+  // astral -> Code points from 0x10000 to 0x10FFFF
+  // Suppertd by ES6 using the \u{XXXXXX} notation.
+  var identifierStartAstral = identifierStart.clone()
+    .intersection(astral);
+  var identifierPartAstral = identifierPart.clone()
+    .intersection(astral).remove(identifierStartAstral);
+
   return {
-    'nonAsciiIdentifierStart': identifierStart.toArray(),
-    'nonAsciiIdentifierPart': identifierPart.toArray()
+    start: {
+      BMP: identifierStartBMP.toArray(),
+      astral: identifierStartAstral.toArray()
+    },
+    part: {
+      BMP: identifierPartBMP.toArray(),
+      astral: identifierPartAstral.toArray()
+    }
   };
 };
 
@@ -50,15 +77,33 @@ var writeFile = function(fileName, data) {
   fs.writeFileSync(
     fileName,
     [
-    'var str = \'' + data.join(',') + '\';',
-    'var arr = str.split(\',\').map(function(code) {',
-    '  return parseInt(code, 10);',
-    '});',
-    'module.exports = arr;'
+      'var data = {',
+      '  BMP: \'' + zipArray(data.BMP).join(',') + '\',',
+      '  astral: \'' + zipArray(data.astral).join(',') + '\'',
+      '};',
+      'function toArray(data) {',
+      '  var result = [];',
+      '  data.split(\',\').forEach(function (ch) {',
+      '    var range = ch.split(\'-\');',
+      '    if (range.length === 1) {',
+      '      result.push(parseInt(ch, 36));',
+      '    } else {',
+      '      var from = parseInt(range[0], 36);',
+      '      var to = from + parseInt(range[1], 36);',
+      '      while (from <= to) {',
+      '        result.push(from);',
+      '        from++;',
+      '      }',
+      '    }',
+      '  });',
+      '  return result;',
+      '}',
+      'exports.BMP = toArray(data.BMP);',
+      'exports.astral = toArray(data.astral);'
     ].join('\n')
   );
 };
 
-var result = generateES5Data();
-writeFile('./data/non-ascii-identifier-start.js', result.nonAsciiIdentifierStart);
-writeFile('./data/non-ascii-identifier-part-only.js', result.nonAsciiIdentifierPart);
+var data = generateData();
+writeFile('./data/non-ascii-identifier-start.js', data.start);
+writeFile('./data/non-ascii-identifier-part-only.js', data.part);

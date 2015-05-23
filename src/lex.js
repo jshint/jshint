@@ -9,11 +9,9 @@ var events = require("events");
 var reg    = require("./reg.js");
 var state  = require("./state.js").state;
 
-var unicodeData = require("../data/ascii-identifier-data.js");
-var asciiIdentifierStartTable = unicodeData.asciiIdentifierStartTable;
-var asciiIdentifierPartTable = unicodeData.asciiIdentifierPartTable;
-var nonAsciiIdentifierStartTable = require("../data/non-ascii-identifier-start.js");
-var nonAsciiIdentifierPartTable = require("../data/non-ascii-identifier-part-only.js");
+var asciiData = require("../data/ascii-identifier-data.js");
+var nonAsciiIdentifierStart = require("../data/non-ascii-identifier-start.js");
+var nonAsciiIdentifierPartOnly = require("../data/non-ascii-identifier-part-only.js");
 
 // Some of these token types are from JavaScript Parser API
 // while others are specific to JSHint parser.
@@ -59,6 +57,31 @@ function asyncTrigger() {
       _checks.splice(0, _checks.length);
     }
   };
+}
+
+function fromCodePoint(codepoint) {
+  if (String.fromCodePoint) {
+    return String.fromCodePoint(codepoint);
+  } else if (codepoint <= 0xffff) { // BMP
+    return String.fromCharCode(codepoint);
+  } else { // astral
+    var cp = codepoint - 0x10000;
+    var highSurrogate = (cp >> 10) + 0xd800;
+    var lowSurrogate = (cp % 1024) + 0xdc00;
+    return String.fromCharCode(highSurrogate, lowSurrogate);
+  }
+}
+
+function codePoint(char) {
+  if (char.codePointAt) {
+    return char.codePointAt(0);
+  } else if (char.length === 1) { // BMP
+    return char.charCodeAt(0);
+  } else { // astral
+    var highSurrogate = char.charCodeAt(0);
+    var lowSurrogate = char.charCodeAt(1);
+    return (highSurrogate - 0xd800) * 1024 + (lowSurrogate - 0xdc00) + 0x10000;
+  }
 }
 
 /*
@@ -596,92 +619,108 @@ Lexer.prototype = {
     var index = 0;
     var type, char;
 
-    function isNonAsciiIdentifierStart(code) {
-      return nonAsciiIdentifierStartTable.indexOf(code) > -1;
+    function isValidIdentifierCharacter(code, position) {
+      if (position === "start") {
+        return asciiData.start[code] || nonAsciiIdentifierStart.BMP.indexOf(code) > -1 ||
+          (code > 0xffff && nonAsciiIdentifierStart.astral.indexOf(code) > -1);
+      } else {
+        return isValidIdentifierCharacter(code, "start") || asciiData.part[code] ||
+          nonAsciiIdentifierPartOnly.BMP.indexOf(code) > -1 ||
+          (code > 0xffff && nonAsciiIdentifierPartOnly.astral.indexOf(code) > -1);
+      }
     }
 
-    function isNonAsciiIdentifierPart(code) {
-      return isNonAsciiIdentifierStart(code) || nonAsciiIdentifierPartTable.indexOf(code) > -1;
+    function isHexNumber(str) {
+      return (/^[0-9a-fA-F]+$/).test(str);
     }
 
-    function isHexDigit(str) {
-      return (/^[0-9a-fA-F]$/).test(str);
-    }
-
-    var readUnicodeEscapeSequence = function() {
+    var readUnicodeEscapeSequence = function(position) {
       /*jshint validthis:true */
-      index += 1;
-
-      if (this.peek(index) !== "u") {
+      if (this.peek(index + 1) !== "u") {
         return null;
       }
 
-      var ch1 = this.peek(index + 1);
-      var ch2 = this.peek(index + 2);
-      var ch3 = this.peek(index + 3);
-      var ch4 = this.peek(index + 4);
-      var code;
+      var hexCode = "";
+      var escapeSequence = "\\u";
 
-      if (isHexDigit(ch1) && isHexDigit(ch2) && isHexDigit(ch3) && isHexDigit(ch4)) {
-        code = parseInt(ch1 + ch2 + ch3 + ch4, 16);
-
-        if (asciiIdentifierPartTable[code] || isNonAsciiIdentifierPart(code)) {
-          index += 5;
-          return "\\u" + ch1 + ch2 + ch3 + ch4;
+      if (this.peek(index + 2) === "{") { // \u{...}
+        if (!state.inES6(true)) {
+          this.trigger("warning", {
+            code: "W119",
+            line: this.line,
+            character: this.char + index,
+            data: [ "\\u{...}", 6 ]
+          });
         }
-
-        return null;
+        escapeSequence += "{";
+        index += 3;
+        var i;
+        for (i = 0; i < 7; i++, index++) {
+          var ch = this.peek(index);
+          if (ch === "}") {
+            escapeSequence += "}";
+            break;
+          } else if (i < 6 && isHexNumber(ch)) {
+            hexCode += ch;
+            escapeSequence += ch;
+          } else {
+            this.trigger("error", {
+              code: "E020",
+              line: this.line,
+              character: this.char + index,
+              data: [ "}", "{", this.line, ch ]
+            });
+            return escapeSequence;
+          }
+        }
+        index += 1;
+      } else { // \uXXXX
+        hexCode = this.input.substr(index + 2, 4);
+        escapeSequence += hexCode;
+        index += 6;
       }
 
-      return null;
+      var code = parseInt(hexCode, 16);
+      if (!isHexNumber(hexCode) || !isValidIdentifierCharacter(code, position)) {
+        this.trigger("warning", {
+          code: "W052",
+          line: this.line,
+          character: this.char + index - escapeSequence.length,
+          data: [ escapeSequence ]
+        });
+      }
+
+      return escapeSequence;
     }.bind(this);
 
-    var getIdentifierStart = function() {
+    var getIdentifier = function(position) {
       /*jshint validthis:true */
       var chr = this.peek(index);
-      var code = chr.charCodeAt(0);
+      var code = codePoint(chr);
 
       if (code === 92) {
-        return readUnicodeEscapeSequence();
+        return readUnicodeEscapeSequence(position);
       }
 
-      if (code < 128) {
-        if (asciiIdentifierStartTable[code]) {
-          index += 1;
-          return chr;
+      if (0xd800 <= code && code <= 0xdbff) { // high surrogate
+        var ch2 = this.peek(index + 1);
+        var cp = codePoint(ch2);
+        if (0xdc00 <= cp && cp <= 0xdfff) { // low surrogate
+          chr += ch2;
+          code = codePoint(chr);
+          if (!state.inES6(true)) {
+            this.trigger("warning", {
+              code: "W119",
+              line: this.line,
+              character: this.char + index,
+              data: [ "Astral symbols in identifiers", 6 ]
+            });
+          }
         }
-
-        return null;
       }
 
-      if (isNonAsciiIdentifierStart(code)) {
-        index += 1;
-        return chr;
-      }
-
-      return null;
-    }.bind(this);
-
-    var getIdentifierPart = function() {
-      /*jshint validthis:true */
-      var chr = this.peek(index);
-      var code = chr.charCodeAt(0);
-
-      if (code === 92) {
-        return readUnicodeEscapeSequence();
-      }
-
-      if (code < 128) {
-        if (asciiIdentifierPartTable[code]) {
-          index += 1;
-          return chr;
-        }
-
-        return null;
-      }
-
-      if (isNonAsciiIdentifierPart(code)) {
-        index += 1;
+      index += chr.length;
+      if (isValidIdentifierCharacter(code, position)) {
         return chr;
       }
 
@@ -689,19 +728,21 @@ Lexer.prototype = {
     }.bind(this);
 
     function removeEscapeSequences(id) {
-      return id.replace(/\\u([0-9a-fA-F]{4})/g, function(m0, codepoint) {
-        return String.fromCharCode(parseInt(codepoint, 16));
+      return id.replace(/\\u(?:([0-9a-fA-F]{4})|\{([0-9a-fA-F]{1,6})\})/g, function(m0, cp1, cp2) {
+        var hex = cp1 || cp2;
+        var codepoint = parseInt(hex, 16);
+        return codepoint > 0x10ffff ? hex : fromCodePoint(codepoint);
       });
     }
 
-    char = getIdentifierStart();
+    char = getIdentifier("start");
     if (char === null) {
       return null;
     }
 
     id = char;
     for (;;) {
-      char = getIdentifierPart();
+      char = getIdentifier("part");
 
       if (char === null) {
         break;
@@ -994,18 +1035,55 @@ Lexer.prototype = {
       function() { return n >= 0 && n <= 7 && state.isStrict(); });
       break;
     case "u":
-      var hexCode = this.input.substr(1, 4);
+      var hexCode = "";
+      var escapeSequence = "\\u";
+      var maxCode;
+      if (this.peek(1) === "{") { // \u{...}
+        if (!state.inES6(true)) {
+          this.trigger("warning", {
+            code: "W119",
+            line: this.line,
+            character: this.char,
+            data: [ "\\u{...}", 6 ]
+          });
+        }
+        for (jump = 2; jump < 9; jump++) {
+          var ch = this.peek(jump);
+          if (ch === "}") {
+            break;
+          } else if (jump < 8 && /^[0-9a-f]$/i.test(ch)) {
+            hexCode += ch;
+          } else {
+            this.trigger("error", {
+              code: "E020",
+              line: this.line,
+              character: this.char + jump,
+              data: [ "}", "{", this.line, ch ]
+            });
+            jump--;
+            break;
+          }
+        }
+        escapeSequence += "{" + hexCode + "}";
+        maxCode = 0x10ffff;
+      } else { // \uXXXX
+        hexCode = this.input.substr(1, 4);
+        escapeSequence += hexCode;
+        maxCode = 0xffff;
+        jump = 5;
+      }
+
       var code = parseInt(hexCode, 16);
-      if (isNaN(code)) {
+      if (!/^[0-9a-f]+$/i.test(hexCode) || code < 0 || code > maxCode) {
         this.trigger("warning", {
           code: "W052",
           line: this.line,
-          character: this.char,
-          data: [ "u" + hexCode ]
+          character: this.char - 1,
+          data: [ escapeSequence ]
         });
+      } else {
+        char = fromCodePoint(code);
       }
-      char = String.fromCharCode(code);
-      jump = 5;
       break;
     case "v":
       this.triggerAsync("warning", {
@@ -1234,8 +1312,7 @@ Lexer.prototype = {
 
         allowNewLine = false;
         var char = this.peek();
-        var jump = 1; // A length of a jump, after we're done
-                      // parsing this character.
+        var jump = 1; // A length of a jump, after we're done parsing this character.
 
         if (char < " ") {
           // Warn about a control character in a string.

@@ -13,3 +13,5 @@ var let = 1;
 var obj = { class: 'foo' };
 obj.else = 1;
 obj.protected = 4;
+
+var v\u0061r; // U+61 is "a"
