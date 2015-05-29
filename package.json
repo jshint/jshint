@@ -57,7 +57,7 @@
     "unicode-6.3.0": "0.1.x"
   },
 
-  "license": "MIT",
+  "license": "(MIT AND JSON)",
 
   "preferGlobal": true,
 
