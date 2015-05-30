@@ -6053,7 +6053,9 @@ exports["allow expression with a comma in switch case condition"] = function (te
   test.done();
 };
 
-exports["/*jshint ignore */ should be a good option and only accept start, end or line as values"] = function (test) {
+exports.ignoreDirective = {};
+
+exports.ignoreDirective["should be a good option and only accept start, end or line as values"] = function (test) {
   var code = [
     "/*jshint ignore:start*/",
     "/*jshint ignore:end*/",
@@ -6068,7 +6070,7 @@ exports["/*jshint ignore */ should be a good option and only accept start, end o
   test.done();
 };
 
-exports["/*jshint ignore */ should allow the linter to skip blocked-out lines to continue finding errors in the rest of the code"] = function (test) {
+exports.ignoreDirective["should allow the linter to skip blocked-out lines to continue finding errors in the rest of the code"] = function (test) {
   var code = fs.readFileSync(__dirname + "/fixtures/gh826.js", "utf8");
 
   TestRun(test)
@@ -6078,7 +6080,7 @@ exports["/*jshint ignore */ should allow the linter to skip blocked-out lines to
   test.done();
 };
 
-exports["/*jshint ignore */ should ignore lines that appear to end with multiline comment endings (GH-1691)"] = function(test) {
+exports.ignoreDirective["should ignore lines that appear to end with multiline comment endings (GH-1691)"] = function(test) {
   var code = [
     "/*jshint ignore: start*/",
     "var a = {",
@@ -6095,7 +6097,7 @@ exports["/*jshint ignore */ should ignore lines that appear to end with multilin
   test.done();
 };
 
-exports["/*jshint ignore */ should ignore lines that end with a multi-line comment (GH-1396)"] = function(test) {
+exports.ignoreDirective["should ignore lines that end with a multi-line comment (GH-1396)"] = function(test) {
   var code = [
     "/*jshint ignore:start */",
     "var a; /* following comment */",
@@ -6108,7 +6110,7 @@ exports["/*jshint ignore */ should ignore lines that end with a multi-line comme
   test.done();
 };
 
-exports["/*jshint ignore */ should ignore multi-line comments"] = function(test) {
+exports.ignoreDirective["should ignore multi-line comments"] = function(test) {
   var code = [
     "/*jshint ignore:start */",
     "/*",
@@ -6124,7 +6126,7 @@ exports["/*jshint ignore */ should ignore multi-line comments"] = function(test)
   test.done();
 };
 
-exports["/*jshint ignore */ should be detected even with leading and/or trailing whitespace"] = function (test) {
+exports.ignoreDirective["should be detected even with leading and/or trailing whitespace"] = function (test) {
   var code = [
     "  /*jshint ignore:start */",     // leading whitespace
     "   if (true) { alert('sup') }", // should be ignored
@@ -6137,6 +6139,33 @@ exports["/*jshint ignore */ should be detected even with leading and/or trailing
 
   TestRun(test)
     .addError(4, "Missing semicolon.")
+    .test(code);
+
+  test.done();
+};
+
+// gh-2411 /* jshint ignore:start */ stopped working.
+exports.ignoreDirective["should apply to lines lexed during lookahead operations"] = function (test) {
+  var code = [
+    "void [function () {",
+    "  /* jshint ignore:start */",
+    "  ?",
+    "  /* jshint ignore:end */",
+    "}];"
+  ];
+
+  TestRun(test)
+    .test(code);
+
+  code = [
+    "(function () {",
+    "  /* jshint ignore:start */",
+    "  ?",
+    "  /* jshint ignore:end */",
+    "}());"
+  ];
+
+  TestRun(test)
     .test(code);
 
   test.done();

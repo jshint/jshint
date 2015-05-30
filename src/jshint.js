@@ -737,6 +737,14 @@ var JSHINT = (function() {
 
       if (state.tokens.next.isSpecial) {
         doOption();
+
+      // The `ignore` directive normally prevents tokens from being lexed, but
+      // the directive is only applied when the code is visited by the Pratt
+      // parser. `peek` operations may cause tokens to be lexed in advance of
+      // parsing (see the `lookahead` array); such tokens must be explicitly
+      // skipped here.
+      } else if (state.ignoreLinterErrors) {
+        continue;
       } else {
         if (state.tokens.next.id !== "(endline)") {
           break;
