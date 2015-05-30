@@ -39,6 +39,17 @@ exports.other = function (test) {
     .addError(1, "Unrecoverable syntax error. (100% scanned).")
     .test("if (product < ) {}", {es3: true});
 
+  TestRun(test)
+    .addError(1, "Missing name in function declaration.")
+    .addError(1, "Expected '(' and instead saw ''.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .test("function", {});
+
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw ''.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .test("function what (", {});
+
   test.done();
 };
 
