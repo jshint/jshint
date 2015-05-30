@@ -39,6 +39,17 @@ exports.other = function (test) {
     .addError(1, "Unrecoverable syntax error. (100% scanned).")
     .test("if (product < ) {}", {es3: true});
 
+  TestRun(test)
+    .addError(1, "Missing name in function declaration.")
+    .addError(1, "Expected '(' and instead saw ''.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .test("function", {});
+
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw ''.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .test("function what (", {});
+
   test.done();
 };
 
@@ -5462,6 +5473,7 @@ exports.invalidClasses = function (test) {
   TestRun(test)
     .addError(2, "Class properties must be methods. Expected '(' but instead saw ':'.")
     .addError(3, "Expected '(' and instead saw '}'.")
+    .addError(3, "Unmatched '}'.")
     .addError(4, "Expected an identifier and instead saw '}'.")
     .addError(4, "Unrecoverable syntax error. (100% scanned).")
     .test([
@@ -6568,6 +6580,7 @@ exports.getAsIdentifierProp = function (test) {
 exports.invalidParams = function (test) {
   TestRun(test)
     .addError(1, "Expected an identifier and instead saw '!'.")
+    .addError(1, "Unmatched '('.")
     .addError(1, "Unrecoverable syntax error. (100% scanned).")
     .test("(function(!", { esnext: true });
 
