@@ -216,7 +216,9 @@ var warnings = {
 var info = {
   I001: "Comma warnings can be turned off with 'laxcomma'.",
   I002: null,
-  I003: "ES5 option is now set per default"
+  I003: "ES5 option is now set per default",
+  I004: "The '{a}' option has been deprecated and will be removed" +
+        " in the next major release of JSHint."
 };
 
 exports.errors = {};

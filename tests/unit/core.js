@@ -596,6 +596,10 @@ exports.testCatchBlocks = function (test) {
 
 exports.testNumericParams = function (test) {
   TestRun(test)
+    .addError(1, "The 'indent' option has been deprecated and will be removed" +
+              " in the next major release of JSHint.")
+    .addError(1, "The 'maxlen' option has been deprecated and will be removed" +
+              " in the next major release of JSHint.")
     .test("/*jshint maxparams:4, indent:3, maxlen:false */");
 
   TestRun(test)

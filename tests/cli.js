@@ -885,9 +885,13 @@ exports.extract = {
     ]);
     test.equal(cli.exit.args[0][0], 2);
 
-    test.equal(errors.length, 1, "found single error");
-    var lintError = errors[0].error;
-    test.ok(lintError, "have error object");
+    test.equal(errors.length, 2, "found two error");
+    var deprecationWarning = errors[0].error;
+    test.ok(deprecationWarning, "have first error object");
+    test.equal(deprecationWarning.code, "I004", "found deprecation warning");
+    test.equal(deprecationWarning.line, 3, "misaligned line");
+    var lintError = errors[1].error;
+    test.ok(lintError, "have second error object");
     test.equal(lintError.code, "W033", "found missing semicolon warning");
     test.equal(lintError.line, 5, "misaligned line");
     test.equal(lintError.character, 14, "first misaligned character at column 5");
@@ -931,13 +935,15 @@ exports.extract = {
     ]);
     test.equal(cli.exit.args[0][0], 2);
 
-    test.equal(errors.length, 2, "found two errors");
+    test.equal(errors.length, 3, "found three errors");
 
-    test.equal(errors[0].error.line, 5, "first error line");
-    test.equal(errors[0].error.character, 14, "first error column");
+    test.equal(errors[0].error.line, 3, "first error line");
 
-    test.equal(errors[1].error.line, 10, "second error line");
-    test.equal(errors[1].error.character, 16, "second error column");
+    test.equal(errors[1].error.line, 5, "second error line");
+    test.equal(errors[1].error.character, 14, "second error column");
+
+    test.equal(errors[2].error.line, 10, "third error line");
+    test.equal(errors[2].error.character, 16, "third error column");
 
     test.done();
   },
