@@ -2912,7 +2912,8 @@ var JSHINT = (function() {
           addlabel(ident, { type: "unused", token: state.tokens.curr });
         } else {
           // Skip invalid parameter.
-          while (!checkPunctuators(state.tokens.next, [",", ")"])) advance();
+          while (state.tokens.next.id !== "(end)" &&
+                 !checkPunctuators(state.tokens.next, [",", ")"])) advance();
         }
       }
 
