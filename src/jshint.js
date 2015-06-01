@@ -4618,7 +4618,7 @@ var JSHINT = (function() {
         advance("(string)");
       } else if (ok) {
         exportedTokens.forEach(function(token) {
-          if (!funct[token.value]) {
+          if (!funct["(blockscope)"].getlabel(token.value)) {
             isundef(funct, "W117", token, token.value);
           }
           exported[token.value] = true;
