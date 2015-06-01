@@ -750,6 +750,9 @@ exports.testES6ModulesNamedExportsAffectUnused = function (test) {
     "};",
     "var x = 23;",
     "var z = 42;",
+    "let c = 2;",
+    "const d = 7;",
+    "export { c, d };",
     "export { a, x };",
     "export var b = { baz: 'baz' };",
     "export function boo() { return z; }",
@@ -763,8 +766,8 @@ exports.testES6ModulesNamedExportsAffectUnused = function (test) {
   ];
 
   TestRun(test)
-    .addError(16, "const 'c1u' is initialized to 'undefined'.")
-    .addError(16, "const 'c2u' is initialized to 'undefined'.")
+    .addError(19, "const 'c1u' is initialized to 'undefined'.")
+    .addError(19, "const 'c2u' is initialized to 'undefined'.")
     .test(src1, {
       esnext: true,
       unused: true
