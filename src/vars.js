@@ -670,6 +670,8 @@ exports.yui = {
 };
 
 exports.mocha = {
+  // Global (for config etc.)
+  mocha       : false,
   // BDD
   describe    : false,
   xdescribe   : false,
