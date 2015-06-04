@@ -97,6 +97,7 @@ exports.browser = {
   HTMLBRElement        : false,
   HTMLButtonElement    : false,
   HTMLCanvasElement    : false,
+  HTMLCollection       : false,
   HTMLDirectoryElement : false,
   HTMLDivElement       : false,
   HTMLDListElement     : false,
