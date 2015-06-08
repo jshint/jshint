@@ -171,6 +171,11 @@ var JSHINT = (function() {
   function combine(dest, src) {
     Object.keys(src).forEach(function(name) {
       if (_.has(JSHINT.blacklist, name)) return;
+      var match = name.match(/^\-(.*)/);
+      if (match) {
+        JSHINT.blacklist[match[1]] = src[name];
+        return;
+      }
       dest[name] = src[name];
     });
   }

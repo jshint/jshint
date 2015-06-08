@@ -50,6 +50,26 @@ exports.testUnusedDefinedGlobals = function (test) {
   test.done();
 };
 
+exports.testRemoveCustomGlobals = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/removeglobals.js", "utf8");
+
+  TestRun(test)
+    .addError(1, "'JSON' is not defined.")
+    .test(src, { undef: true }, { "-JSON": true, "myglobal": true });
+
+  test.done();
+};
+
+exports.testRemovePresetGlobals = function (test) {
+  var src = "event();";
+
+  TestRun(test)
+    .addError(1, "'event' is not defined.")
+    .test(src, { undef: true, browser: true }, { "-event": true });
+
+  test.done();
+};
+
 exports.globalDeclarations = function (test) {
   var src = "exports = module.exports = function (test) {};";
 
