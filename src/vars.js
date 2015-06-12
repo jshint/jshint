@@ -176,6 +176,7 @@ exports.browser = {
   opener               : false,
   Option               : false,
   parent               : false,
+  performance          : false,
   print                : false,
   Range                : false,
   requestAnimationFrame : false,
