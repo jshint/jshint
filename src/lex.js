@@ -59,10 +59,11 @@ function asyncTrigger() {
   };
 }
 
-function fromCodePoint(codepoint) {
-  if (String.fromCodePoint) {
-    return String.fromCodePoint(codepoint);
-  } else if (codepoint <= 0xffff) { // BMP
+/**
+ * Implementation of ES6 `String.fromCodePoint` for legacy environments
+ */
+var fromCodePoint = String.fromCodePoint || function(codepoint) {
+  if (codepoint <= 0xffff) { // BMP
     return String.fromCharCode(codepoint);
   } else { // astral
     var cp = codepoint - 0x10000;
@@ -70,9 +71,13 @@ function fromCodePoint(codepoint) {
     var lowSurrogate = (cp % 1024) + 0xdc00;
     return String.fromCharCode(highSurrogate, lowSurrogate);
   }
-}
+};
 
+/**
+ * Implementation of ES6 `String#codePointAt(0)` for legacy environments
+ */
 function codePoint(char) {
+  /* istanbul ignore if */
   if (char.codePointAt) {
     return char.codePointAt(0);
   } else if (char.length === 1) { // BMP
