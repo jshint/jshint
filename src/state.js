@@ -48,6 +48,7 @@ var state = {
     };
 
     this.option = {};
+    this.funct = null;
     this.ignored = {};
     this.directive = {};
     this.jsonMode = false;
