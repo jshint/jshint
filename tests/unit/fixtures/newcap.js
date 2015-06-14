@@ -9,6 +9,11 @@ cat = Animal();
 var rat = new iAnimal();
 var bat = new myAnimal();
 
+(function() {
+  var iAnimal = function() {};
+  rat = new iAnimal();
+}());
+
 rat = iAnimal();
 bat = myAnimal();
 

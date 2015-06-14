@@ -1142,7 +1142,6 @@ exports["destructuring var in function scope"] = function (test) {
     .addError(12, "Expected an identifier and instead saw ']'.")
     .addError(12, "Expected an assignment or function call and instead saw an expression.")
     .addError(4,  "'z' is not defined.")
-    .addError(12, "'a' is defined but never used.")
     .addError(12, "'b' is defined but never used.")
     .addError(12, "'c' is defined but never used.")
     .addError(5,  "'h' is defined but never used.")
@@ -1310,7 +1309,6 @@ exports["destructuring var errors"] = function (test) {
     .addError(11, "Expected an identifier and instead saw ']'.")
     .addError(11, "Expected an assignment or function call and instead saw an expression.")
     .addError(3,  "'z' is not defined.")
-    .addError(11, "'a' is defined but never used.")
     .addError(11, "'b' is defined but never used.")
     .addError(11, "'c' is defined but never used.")
     .addError(4,  "'h' is defined but never used.")
@@ -1371,6 +1369,7 @@ exports["destructuring const as esnext"] = function (test) {
     "const [ f, [ [ [ g ], h ], i ] ] = [ 1, [ [ [ 2 ], 3], 4 ] ];",
     "const { foo : bar } = { foo : 1 };",
     "const [ j, { foo : foobar } ] = [ 2, { foo : 1 } ];",
+    "[j] = [1];"
   ];
 
   TestRun(test)
@@ -1387,8 +1386,8 @@ exports["destructuring const as esnext"] = function (test) {
     .addError(6, "'h' is defined but never used.")
     .addError(6, "'i' is defined but never used.")
     .addError(7, "'bar' is defined but never used.")
-    .addError(8, "'j' is defined but never used.")
     .addError(8, "'foobar' is defined but never used.")
+    .addError(9, "Attempting to override 'j' which is a constant.")
     .addError(3, "'z' is not defined.")
     .test(code, {esnext: true, unused: true, undef: true});
 
@@ -1517,9 +1516,9 @@ exports["destructuring const errors"] = function (test) {
     .addError(5, "'n' is defined but never used.")
     .addError(5, "'o' is defined but never used.")
     .addError(5, "'p' is defined but never used.")
-    .addError(2, "const 'a' has already been declared.")
-    .addError(2, "const 'b' has already been declared.")
-    .addError(2, "const 'c' has already been declared.")
+    .addError(2, "'a' has already been declared.")
+    .addError(2, "'b' has already been declared.")
+    .addError(2, "'c' has already been declared.")
     .addError(3, "Expected an identifier and instead saw '1'.")
     .addError(4, "Expected ',' and instead saw ';'.")
     .addError(5, "Expected ']' to match '[' from line 5 and instead saw ';'.")
@@ -2169,7 +2168,7 @@ exports["let statement in for loop as moz"] = function (test) {
     "for (let i = 0; i<15; ++i) {",
     "  print(i);",
     "}",
-    "for (let i=i ; i < 10 ; i++ ) {",
+    "for (let i=0 ; i < 10 ; i++ ) {",
     "print(i);",
     "}"
   ];
@@ -2195,7 +2194,7 @@ exports["let statement in for loop as esnext"] = function (test) {
     "for (let i = 0; i<15; ++i) {",
     "  print(i);",
     "}",
-    "for (let i=i ; i < 10 ; i++ ) {",
+    "for (let i=0 ; i < 10 ; i++ ) {",
     "print(i);",
     "}"
   ];
@@ -2221,7 +2220,7 @@ exports["let statement in for loop as es5"] = function (test) {
     "for (let i = 0; i<15; ++i) {",
     "  print(i);",
     "}",
-    "for (let i=i ; i < 10 ; i++ ) {",
+    "for (let i=0 ; i < 10 ; i++ ) {",
     "print(i);",
     "}"
   ];
@@ -2253,7 +2252,7 @@ exports["let statement in for loop as legacy JS"] = function (test) {
     "for (let i = 0; i<15; ++i) {",
     "  print(i);",
     "}",
-    "for (let i=i ; i < 10 ; i++ ) {",
+    "for (let i=0 ; i < 10 ; i++ ) {",
     "print(i);",
     "}"
   ];
@@ -2641,7 +2640,8 @@ exports["make sure var variables can shadow let variables"] = function (test) {
     .addError(1, "'a' is defined but never used.")
     .addError(2, "'b' is defined but never used.")
     .addError(3, "'c' is defined but never used.")
-    .addError(7, "'d' is defined but never used.")
+    .addError(9, "'d' is defined but never used.")
+    .addError(9, "'d' has already been declared.")
     .test(code, { esnext: true, unused: true, undef: true, funcscope: true });
 
   test.done();
@@ -2672,6 +2672,19 @@ exports["make sure let variables in the closure of blocks shadow predefined glob
   ];
 
   TestRun(test).test(code, { esnext: true, predef: { foo: false } });
+  test.done();
+};
+
+exports["make sure variables may shadow globals in functions after they are referenced"] = function (test) {
+  var code = [
+    "var foo;",
+    "function x() {",
+    "  foo();",
+    "  var foo;",
+    "}"
+  ];
+
+  TestRun(test).test(code);
   test.done();
 };
 
@@ -3093,6 +3106,32 @@ exports["array comprehension"] = function (test) {
   ];
   TestRun(test)
     .test(code, {esnext: true, unused: true, undef: true, predef: ["print"]});
+
+  test.done();
+};
+
+exports["array comprehension unused and undefined"] = function (test) {
+  var code = [
+    "var range = [1, 2];",
+    "var a = [for (i of range) if (i % 2 === 0) i];",
+    "var b = [for (j of range) doesnotexist];"
+  ];
+  TestRun(test)
+    .addError(2, "'a' is defined but never used.")
+    .addError(3, "'j' is defined but never used.")
+    .addError(3, "'doesnotexist' is not defined.")
+    .addError(3, "'b' is defined but never used.")
+    .test(code, { esnext: true, unused: true, undef: true });
+
+  var unused = JSHINT.data().unused;
+  test.deepEqual([
+    { name: 'a', line: 2, character: 5 },
+    { name: 'b', line: 3, character: 5 }
+    //{ name: 'j', line: 3, character: 15 } // see gh-2440
+  ], unused);
+
+  var implieds = JSHINT.data().implieds;
+  test.deepEqual([{ name: 'doesnotexist', line: [ 3 ] }], implieds);
 
   test.done();
 };
@@ -3700,12 +3739,13 @@ exports["for of as esnext"] = function (test) {
     "}",
     "for (let x of [1,2,3,4]) print(x);",
     "for (const x of [1,2,3,4]) print(x);",
-    "for (x = 1 of [1,2,3,4]) print(x);",
-    "for (x, y of [1,2,3,4]) print(x + y);",
-    "for (x = 1, y = 2 of [1,2,3,4]) print(x + y);",
-    "for (var x = 1 of [1,2,3,4]) print(x);",
-    "for (var x, y of [1,2,3,4]) print(x + y);",
-    "for (var x = 1, y = 2 of [1,2,3,4]) print(x + y);",
+    "var xg, yg;",
+    "for (xg = 1 of [1,2,3,4]) print(xg);",
+    "for (xg, yg of [1,2,3,4]) print(xg + yg);",
+    "for (xg = 1, yg = 2 of [1,2,3,4]) print(xg + yg);",
+    "for (var xv = 1 of [1,2,3,4]) print(xv);",
+    "for (var xv, yv of [1,2,3,4]) print(xv + yv);",
+    "for (var xv = 1, yv = 2 of [1,2,3,4]) print(xv + yv);",
     "for (let x = 1 of [1,2,3,4]) print(x);",
     "for (let x, y of [1,2,3,4]) print(x + y);",
     "for (let x = 1, y = 2 of [1,2,3,4]) print(x + y);",
@@ -3714,22 +3754,22 @@ exports["for of as esnext"] = function (test) {
     "for (const x = 1, y = 2 of [1,2,3,4]) print(x + y);"
   ];
   TestRun(test)
-    .addError(6, "Invalid for-of loop left-hand-side: initializer is forbidden.")
-    .addError(7, "Invalid for-of loop left-hand-side: more than one ForBinding.")
-    .addError(8, "Invalid for-of loop left-hand-side: initializer is forbidden.")
+    .addError(7, "Invalid for-of loop left-hand-side: initializer is forbidden.")
     .addError(8, "Invalid for-of loop left-hand-side: more than one ForBinding.")
     .addError(9, "Invalid for-of loop left-hand-side: initializer is forbidden.")
-    .addError(10, "Invalid for-of loop left-hand-side: more than one ForBinding.")
-    .addError(11, "Invalid for-of loop left-hand-side: initializer is forbidden.")
+    .addError(9, "Invalid for-of loop left-hand-side: more than one ForBinding.")
+    .addError(10, "Invalid for-of loop left-hand-side: initializer is forbidden.")
     .addError(11, "Invalid for-of loop left-hand-side: more than one ForBinding.")
     .addError(12, "Invalid for-of loop left-hand-side: initializer is forbidden.")
-    .addError(13, "Invalid for-of loop left-hand-side: more than one ForBinding.")
-    .addError(14, "Invalid for-of loop left-hand-side: initializer is forbidden.")
+    .addError(12, "Invalid for-of loop left-hand-side: more than one ForBinding.")
+    .addError(13, "Invalid for-of loop left-hand-side: initializer is forbidden.")
     .addError(14, "Invalid for-of loop left-hand-side: more than one ForBinding.")
     .addError(15, "Invalid for-of loop left-hand-side: initializer is forbidden.")
-    .addError(16, "Invalid for-of loop left-hand-side: more than one ForBinding.")
-    .addError(17, "Invalid for-of loop left-hand-side: initializer is forbidden.")
+    .addError(15, "Invalid for-of loop left-hand-side: more than one ForBinding.")
+    .addError(16, "Invalid for-of loop left-hand-side: initializer is forbidden.")
     .addError(17, "Invalid for-of loop left-hand-side: more than one ForBinding.")
+    .addError(18, "Invalid for-of loop left-hand-side: initializer is forbidden.")
+    .addError(18, "Invalid for-of loop left-hand-side: more than one ForBinding.")
     .test(code, {esnext: true, undef: true, predef: ["print"]});
 
   test.done();
@@ -5451,6 +5491,20 @@ exports.classExpression = function (test) {
   test.done();
 };
 
+exports.functionNotOverwritten = function (test) {
+  var code = [
+    "function x() {",
+    "  x = 1;",
+    "  var x;",
+    "}"
+  ];
+
+  TestRun(test)
+    .test(code, { shadow: true });
+
+  test.done();
+};
+
 exports.classExpressionThis = function (test) {
   var code = [
     "void class MyClass {",
@@ -6292,6 +6346,8 @@ exports.testES6UnusedExports = function (test) {
   ];
 
   TestRun(test)
+    .addError(24, "'letDefinedLater' was used before it was declared, which is illegal for 'let' variables.")
+    .addError(25, "'constDefinedLater' was used before it was declared, which is illegal for 'const' variables.")
     .test(code, { esnext: true, unused: true });
 
   test.done();
