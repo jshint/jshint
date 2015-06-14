@@ -89,6 +89,10 @@ function codePoint(char) {
   }
 }
 
+function isHexNumber(str) {
+  return (/^[0-9a-f]+$/i).test(str);
+}
+
 /*
  * Lexer for JSHint.
  *
@@ -635,20 +639,17 @@ Lexer.prototype = {
       }
     }
 
-    function isHexNumber(str) {
-      return (/^[0-9a-fA-F]+$/).test(str);
-    }
-
     var readUnicodeEscapeSequence = function(position) {
       /*jshint validthis:true */
       if (this.peek(index + 1) !== "u") {
         return null;
       }
+      index += 2;
 
       var hexCode = "";
       var escapeSequence = "\\u";
 
-      if (this.peek(index + 2) === "{") { // \u{...}
+      if (this.peek(index) === "{") { // \u{...}
         if (!state.inES6(true)) {
           this.trigger("warning", {
             code: "W119",
@@ -658,14 +659,14 @@ Lexer.prototype = {
           });
         }
         escapeSequence += "{";
-        index += 3;
-        var i;
-        for (i = 0; i < 7; i++, index++) {
+        index++;
+        var i = 0;
+        for (;; i++, index++) {
           var ch = this.peek(index);
           if (ch === "}") {
             escapeSequence += "}";
             break;
-          } else if (i < 6 && isHexNumber(ch)) {
+          } else if (isHexNumber(ch)) {
             hexCode += ch;
             escapeSequence += ch;
           } else {
@@ -680,9 +681,9 @@ Lexer.prototype = {
         }
         index += 1;
       } else { // \uXXXX
-        hexCode = this.input.substr(index + 2, 4);
+        hexCode = this.input.substr(index, 4);
         escapeSequence += hexCode;
-        index += 6;
+        index += 4;
       }
 
       var code = parseInt(hexCode, 16);
@@ -1052,11 +1053,12 @@ Lexer.prototype = {
             data: [ "\\u{...}", 6 ]
           });
         }
-        for (jump = 2; jump < 9; jump++) {
+        jump = 2;
+        for (;; jump++) {
           var ch = this.peek(jump);
           if (ch === "}") {
             break;
-          } else if (jump < 8 && /^[0-9a-f]$/i.test(ch)) {
+          } else if (isHexNumber(ch)) {
             hexCode += ch;
           } else {
             this.trigger("error", {
@@ -1079,7 +1081,7 @@ Lexer.prototype = {
       }
 
       var code = parseInt(hexCode, 16);
-      if (!/^[0-9a-f]+$/i.test(hexCode) || code < 0 || code > maxCode) {
+      if (!isHexNumber(hexCode) || code > maxCode) {
         this.trigger("warning", {
           code: "W052",
           line: this.line,

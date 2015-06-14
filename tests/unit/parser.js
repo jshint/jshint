@@ -611,18 +611,20 @@ exports.strings = function (test) {
     "var f = '\\b\\f\\n\\/';",
     "var g = '\\u{61}';",
     "var h = '\\u{102c0}';",
-    "var i = 'ax"
+    "var i = '\\u{0000000041}';",
+    "var j = 'ax"
   ];
 
   var run = TestRun(test)
     .addError(1, "Control character in string: <non-printable>.", {character: 10})
     .addError(1, "This character may get silently deleted by one or more browsers.")
-    .addError(9, "Unclosed string.")
-    .addError(9, "Missing semicolon.");
+    .addError(10, "Unclosed string.")
+    .addError(10, "Missing semicolon.");
   run.test(code, { esnext: true });
   run
     .addError(7, "'\\u{...}' is only available in ES6 (use 'esversion: 6').")
-    .addError(8, "'\\u{...}' is only available in ES6 (use 'esversion: 6').");
+    .addError(8, "'\\u{...}' is only available in ES6 (use 'esversion: 6').")
+    .addError(9, "'\\u{...}' is only available in ES6 (use 'esversion: 6').");
   run.test(code, {es3: true});
   run.test(code, {}); // es5
   run.test(code, {moz: true});
@@ -631,30 +633,32 @@ exports.strings = function (test) {
 };
 
 exports.badStrings = function (test) {
-  var code = "var a = '\\uNOTHEX';";
+  var code = [
+    "var a = '\\uNOTHEX';",
+    "var c = '\\u{10abcde}';" // 10abcde > 10ffff
+  ];
 
   var run = TestRun(test)
-    .addError(1, "Unexpected '\\uNOTH'.");
+    .addError(1, "Unexpected '\\uNOTH'.")
+    .addError(2, "Unexpected '\\u{10abcde}'.");
+  run.test(code, {esnext: true});
+  run.addError(2, "'\\u{...}' is only available in ES6 (use 'esversion: 6').");
   run.test(code, {es3: true});
   run.test(code, {}); // es5
-  run.test(code, {esnext: true});
   run.test(code, {moz: true});
 
   var unclosedBrace = [
     "var a = '\\u{abc';",
-    "var b = '\\u{abcs}';", // "s" isn't an hex digit
-    "var c = '\\u{10abcde}';" // too long
+    "var b = '\\u{abcs}';" // "s" isn't an hex digit
   ];
 
   var run = TestRun(test)
     .addError(1, "Expected '}' to match '{' from line 1 and instead saw '''.")
-    .addError(2, "Expected '}' to match '{' from line 2 and instead saw 's'.")
-    .addError(3, "Expected '}' to match '{' from line 3 and instead saw 'e'.");
+    .addError(2, "Expected '}' to match '{' from line 2 and instead saw 's'.");
   run.test(unclosedBrace, { esnext: true });
   run
     .addError(1, "'\\u{...}' is only available in ES6 (use 'esversion: 6').")
-    .addError(2, "'\\u{...}' is only available in ES6 (use 'esversion: 6').")
-    .addError(3, "'\\u{...}' is only available in ES6 (use 'esversion: 6').");
+    .addError(2, "'\\u{...}' is only available in ES6 (use 'esversion: 6').");
   run.test(unclosedBrace, {es3: true});
   run.test(unclosedBrace, {}); // es5
   run.test(unclosedBrace, {moz: true});
@@ -1235,7 +1239,8 @@ exports.testIdentifiers = function (test) {
     "var a𐋀;", // U+102C0
     "var 𐋀a;", // U+102C0
     "var a\\u{10a0c};", // ID_Continue
-    "var b𐨌;" // U+10A0C
+    "var b𐨌;", // U+10A0C,
+    "var \\u{00000065};"
   ];
 
   var run = TestRun(test)
@@ -1249,7 +1254,8 @@ exports.testIdentifiers = function (test) {
     .addError(8, "'a𐋀' is defined but never used.")
     .addError(9, "'𐋀a' is defined but never used.")
     .addError(10, "'a\\u{10a0c}' is defined but never used.")
-    .addError(11, "'b𐨌' is defined but never used.");
+    .addError(11, "'b𐨌' is defined but never used.")
+    .addError(12, "'\\u{00000065}' is defined but never used.");
   run.test(src, { esnext: true, unused: true });
 
   run
@@ -1263,7 +1269,8 @@ exports.testIdentifiers = function (test) {
     .addError(8, "'Astral symbols in identifiers' is only available in ES6 (use 'esversion: 6').")
     .addError(9, "'Astral symbols in identifiers' is only available in ES6 (use 'esversion: 6').")
     .addError(10, "'\\u{...}' is only available in ES6 (use 'esversion: 6').")
-    .addError(11, "'Astral symbols in identifiers' is only available in ES6 (use 'esversion: 6').");
+    .addError(11, "'Astral symbols in identifiers' is only available in ES6 (use 'esversion: 6').")
+    .addError(12, "'\\u{...}' is only available in ES6 (use 'esversion: 6').");
   run.test(src, { es3: true, unused: true });
   run.test(src, { unused: true }); // es5
   run.test(src, { moz: true, unused: true });
