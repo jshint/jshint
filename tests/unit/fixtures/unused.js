@@ -69,3 +69,56 @@ x = y => {};
 x = (y) => {};
 x = (y, z) => y;
 x = (y, z) => z;
+
+function throwAwayFuncA() { if (testLateDef) {} }
+let testLateDef = true;
+function throwAwayFuncB() { if (testLateDefConst) {} }
+const testLateDefConst = true;
+throwAwayFuncA();
+try {
+    var inTry = true;
+} catch(e){
+    var inCatch = true;
+}
+if (inTry) {
+    throwAwayFuncA();
+}
+if (inCatch) {
+    throwAwayFuncB();
+}
+(function() {
+    var inTry5 = 1;
+    var inTry6 = 1;
+    let inTry7 = 1;
+    const inTry8 = 1;
+    let inTry9 = 1;
+    const inTry10 = 1;
+    try {
+        var inTry2 = 1;
+        var inTry3 = 1;
+        var inTry4 = 1;
+    } catch(e){}
+    inTry2++;
+    (function() {
+        inTry3++;
+        inTry5++;
+        if (inTry8) {
+            inTry7++;
+        }
+    })();
+    (function() {
+        inTry4++;
+        var inTry4 = 1;
+        inTry6++;
+        var inTry6 = 1;
+        if (inTry10) {
+            inTry9++;
+        }
+        let inTry9 = 1;
+        const inTry10 = 1;
+    })();
+}());
+
+function unusedRecurringFunc() {
+    unusedRecurringFunc();
+}

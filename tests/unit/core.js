@@ -22,7 +22,8 @@ exports.testCustomGlobals = function (test) {
   for (var i = 0, g; g = report.globals[i]; i += 1)
     dict[g] = true;
 
-  for (i = 0, g = null; g = custom[i]; i += 1)
+  var customKeys = Object.keys(custom);
+  for (i = 0, g = null; g = customKeys[i]; i += 1)
     test.ok(g in dict);
 
   // Regression test (GH-665)
@@ -50,6 +51,31 @@ exports.testUnusedDefinedGlobals = function (test) {
   test.done();
 };
 
+exports.testExportedDefinedGlobals = function (test) {
+  var src = ["/*global foo, bar */",
+    "export { bar, foo };"];
+
+  // Test should pass
+  TestRun(test).test(src, { esnext: true, unused: true }, {});
+
+  var report = JSHINT.data();
+  test.deepEqual(report.globals, ['bar', 'foo']);
+
+  test.done();
+};
+
+exports.testGlobalVarDeclarations = function (test) {
+  var src = "var a;";
+
+  // Test should pass
+  TestRun(test).test(src, { es3: true, node: true }, {});
+
+  var report = JSHINT.data();
+  test.deepEqual(report.globals, ['a']);
+
+  test.done();
+};
+
 exports.globalDeclarations = function (test) {
   var src = "exports = module.exports = function (test) {};";
 
@@ -71,7 +97,9 @@ exports.globalDeclarations = function (test) {
 exports.multilineGlobalDeclarations = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/multiline-global-declarations.js", "utf8");
 
-  TestRun(test).test(src);
+  TestRun(test)
+    .addError(12, "'pi' is defined but never used.")
+    .test(src, { unused: true });
 
   test.done();
 };
@@ -312,7 +340,7 @@ exports.argsInCatchReused = function (test) {
   TestRun(test)
     .addError(6, "'e' is already defined.")
     .addError(12, "Do not assign to the exception parameter.")
-    .addError(23, "'e' is not defined.")
+    .addError(23, "'e' used out of scope.")
     .test(src, { es3: true, undef: true });
 
   test.done();
@@ -579,13 +607,16 @@ exports.testCatchBlocks = function (test) {
   var src = fs.readFileSync(__dirname + '/fixtures/gh247.js', 'utf8');
 
   TestRun(test)
-    .addError(11, "'w' is not defined.")
+    .addError(19, "'w' is already defined.")
+    .addError(35, "'u2' used out of scope.")
+    .addError(36, "'w2' used out of scope.")
     .test(src, { es3: true, undef: true, devel: true });
 
   src = fs.readFileSync(__dirname + '/fixtures/gh618.js', 'utf8');
 
   TestRun(test)
     .addError(5, "Value of 'x' may be overwritten in IE 8 and earlier.")
+    .addError(15, "Value of 'y' may be overwritten in IE 8 and earlier.")
     .test(src, { es3: true, undef: true, devel: true });
 
   TestRun(test)
@@ -750,6 +781,9 @@ exports.testES6ModulesNamedExportsAffectUnused = function (test) {
     "};",
     "var x = 23;",
     "var z = 42;",
+    "let c = 2;",
+    "const d = 7;",
+    "export { c, d };",
     "export { a, x };",
     "export var b = { baz: 'baz' };",
     "export function boo() { return z; }",
@@ -763,8 +797,8 @@ exports.testES6ModulesNamedExportsAffectUnused = function (test) {
   ];
 
   TestRun(test)
-    .addError(16, "const 'c1u' is initialized to 'undefined'.")
-    .addError(16, "const 'c2u' is initialized to 'undefined'.")
+    .addError(19, "const 'c1u' is initialized to 'undefined'.")
+    .addError(19, "const 'c2u' is initialized to 'undefined'.")
     .test(src1, {
       esnext: true,
       unused: true
@@ -793,8 +827,9 @@ exports.testConstRedeclaration = function (test) {
   ];
 
   TestRun(test)
-      .addError(2, "const 'a' has already been declared.")
-      .addError(9, "const 'a' has already been declared.")
+      .addError(2, "'a' has already been declared.")
+      .addError(9, "'a' has already been declared.")
+      .addError(13, "'b' has already been declared.")
       .test(src, {
         esnext: true
       });
@@ -860,6 +895,11 @@ exports.testConstModification = function (test) {
     "delete a[0];",
     "new a();",
     "new a;",
+    "function e() {",
+    "  f++;",
+    "}",
+    "const f = 1;",
+    "e();"
   ];
 
   TestRun(test)
@@ -871,6 +911,7 @@ exports.testConstModification = function (test) {
       .addError(8, "Attempting to override 'a' which is a constant.")
       .addError(8, "You might be leaking a variable (a) here.")
       .addError(53, "Missing '()' invoking a constructor.")
+      .addError(55, "Attempting to override 'f' which is a constant.")
       .test(src, {
         esnext: true
       });
@@ -1429,4 +1470,111 @@ exports.beginningArraysAreNotJSON = function (test) {
 
   test.done();
 
+};
+
+exports.labelsOutOfScope = function (test) {
+  var src = [
+    "function a() {",
+    "  if (true) {",
+    "    bar: switch(2) {",
+    "    }",
+    "    foo: switch(1) {",
+    "      case 1:",
+    "        (function () {",
+    "          baz: switch(3) {",
+    "            case 3:",
+    "              break foo;",
+    "            case 2:",
+    "              break bar;",
+    "            case 3:",
+    "              break doesnotexist;",
+    "          }",
+    "        })();",
+    "        if (true) {",
+    "          break foo;",
+    "        }",
+    "        break foo;",
+    "      case 2:",
+    "        break bar;",
+    "      case 3:",
+    "        break baz;",
+    "    }",
+    "  }",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(10, "'foo' is not a statement label.")
+    .addError(12, "'bar' is not a statement label.")
+    .addError(14, "'doesnotexist' is not a statement label.")
+    .addError(22, "'bar' is not a statement label.")
+    .addError(24, "'baz' is not a statement label.")
+    .test(src);
+
+  test.done();
+}
+
+exports.labelDoesNotExistInGlobalScope = function (test) {
+  var src = [
+    "switch(1) {",
+    "  case 1:",
+    "    break nonExistent;",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(3, "'nonExistent' is not a statement label.")
+    .test(src);
+
+  test.done();
+};
+
+exports.labelsContinue = function (test) {
+  var src = [
+    "exists: while(true) {",
+    "  if (false) {",
+    "    continue exists;",
+    "  }",
+    "  continue nonExistent;",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(5, "'nonExistent' is not a statement label.")
+    .test(src);
+
+  test.done();
+};
+
+exports.catchWithNoParam = function (test) {
+  var src = [
+    "try{}catch(){}"
+  ];
+
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw ')'.")
+    .test(src);
+
+  test.done();
+};
+
+exports.catchWithNoParam = function (test) {
+  var src = [
+    "try{}",
+    "if (true) { console.log(); }"
+  ];
+
+  TestRun(test)
+    .addError(2, "Expected 'catch' and instead saw 'if'.")
+    .test(src);
+
+  var src = [
+    "try{}"
+  ];
+
+  TestRun(test)
+    .addError(1, "Expected 'catch' and instead saw ''.")
+    .test(src);
+
+  test.done();
 };

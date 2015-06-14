@@ -49,6 +49,8 @@ exports.jQuery_1_7 = function (test) {
     .addError(5691, "'i' is defined but never used.")
     .addError(7141, "'i' is defined but never used.")
     .addError(6061, "'cur' is defined but never used.")
+    .addError(7099, "'selector' used out of scope.")
+    .addError(7107, "'selector' used out of scope.")
     .test(src, { undef: true, unused: true }, globals);
 
   test.done();
@@ -88,6 +90,7 @@ exports.prototype_1_7 = function (test) {
     .addError(2989, "'tagName' used out of scope.")
     .addError(2989, "'tagName' used out of scope.")
     .addError(2990, "'tagName' used out of scope.")
+    .addError(3827, "'getOffsetParent' is a function.")
     .addError(3844, "'positionedOffset' is a function.")
     .addError(3860, "'cumulativeOffset' is a function.")
     .addError(4036, "'ret' is already defined.")
@@ -156,21 +159,22 @@ exports.lodash_0_6_1 = function (test) {
     .addError(632, "Missing semicolon.")
     .addError(920, "'isArguments' is a function.")
     .addError(963, "'isFunction' is a function.")
+    .addError(988, "'noNodeClass' used out of scope.")
     .addError(1122, "'isArr' used out of scope.")
     .addError(1127, "'className' used out of scope.")
     .addError(1129, "Use '===' to compare with 'true'.")
     .addError(1153, "'isArr' used out of scope.")
     .addError(1159, "'isArr' used out of scope.")
     .addError(1490, "Use '===' to compare with '0'.")
+    .addError(1504, "'noNodeClass' used out of scope.")
     .addError(1670, "Missing semicolon.")
-    .addError(2731, "'array' is already defined.")
-    .addError(2732, "'array' is a statement label.")
     .addError(3374, "Possible strict violation.")
     .addError(3377, "Missing '()' invoking a constructor.")
     .addError(3384, "Missing semicolon.")
     .addError(3677, "Missing '()' invoking a constructor.")
     .addError(3683, "Missing '()' invoking a constructor.")
     .addError(3825, "Possible strict violation.")
+    .addError(4063, "'useSourceURL' used out of scope.")
     .addError(4225, "Possible strict violation.")
     .addError(4226, "Possible strict violation.")
     .addError(4242, "Possible strict violation.")
@@ -212,18 +216,11 @@ exports.codemirror3 = function (test) {
   };
 
   TestRun(test)
-    .addError(1157, "'result' is defined but never used.")
     .addError(1342, "Value of 'e' may be overwritten in IE 8 and earlier.")
     .addError(1526, "Value of 'e' may be overwritten in IE 8 and earlier.")
-    .addError(1532, "'mX' is defined but never used.")
-    .addError(1532, "'mY' is defined but never used.")
     .addError(1533, "Value of 'e' may be overwritten in IE 8 and earlier.")
-    .addError(2218, "'state' is defined but never used.")
-    .addError(2427, "'style' is defined but never used.")
-    .addError(2696, "'target' is defined but never used.")
     .addError(3168, "'ok' is defined but never used.")
     .addError(4093, "Unnecessary semicolon.")
-    .addError(4277, "'range' is defined but never used.")
     .test(src, opt, { CodeMirror: true });
 
   test.done();

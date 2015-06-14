@@ -48,7 +48,7 @@ exports.shadow = function (test) {
 };
 
 /**
- * Option `scopeshadow` allows you to re-define variables later in inner scopes.
+ * Option `shadow:outer` allows you to re-define variables later in inner scopes.
  *
  *  E.g.:
  *    var a = 1;
@@ -56,7 +56,7 @@ exports.shadow = function (test) {
  *        var a = 2;
  *    }
  */
-exports.scopeshadow = function (test) {
+exports.shadowouter = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/scope-redef.js", "utf8");
 
   // Do not tolarate inner scope variable shadowing by default
@@ -86,6 +86,113 @@ exports.shadowInline = function (test) {
   test.done();
 };
 
+exports.shadowEs6 = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/redef-es6.js", "utf8");
+
+  var commonErrors = [
+    [2, "'ga' has already been declared."],
+    [5, "'gb' has already been declared."],
+    [14, "'gd' has already been declared."],
+    [24, "'gf' has already been declared."],
+    [110, "'gx' has already been declared."],
+    [113, "'gy' has already been declared."],
+    [116, "'gz' has already been declared."],
+    [119, "'gza' has already been declared."],
+    [122, "'gzb' has already been declared."],
+    [132, "'gzd' has already been declared."],
+    [147, "'gzf' has already been declared."],
+    [156, "'a' has already been declared."],
+    [159, "'b' has already been declared."],
+    [168, "'d' has already been declared."],
+    [178, "'f' has already been declared."],
+    [264, "'x' has already been declared."],
+    [267, "'y' has already been declared."],
+    [270, "'z' has already been declared."],
+    [273, "'za' has already been declared."],
+    [276, "'zb' has already been declared."],
+    [286, "'zd' has already been declared."],
+    [301, "'zf' has already been declared."],
+    [344, "'zzi' has already been declared."],
+    [345, "'zzj' has already been declared."],
+    [349, "'zzl' was used before it was declared, which is illegal for 'const' variables."],
+    [349, "'zzl' has already been declared."],
+    [350, "'zzm' was used before it was declared, which is illegal for 'let' variables."],
+    [350, "'zzm' has already been declared."]
+  ];
+
+  var innerErrors = [
+    [343, "'zzh' is already defined."],
+    [348, "'zzk' is already defined."]
+  ];
+
+  var outerErrors = [
+    /* block scope variables shadowing out of scope */
+    [9, "'gc' is already defined."],
+    [19, "'ge' is already defined."],
+    [28, "'gg' is already defined in outer scope."],
+    [32, "'gh' is already defined in outer scope."],
+    [36, "'gi' is already defined in outer scope."],
+    [40, "'gj' is already defined."],
+    [44, "'gk' is already defined."],
+    [48, "'gl' is already defined."],
+    [53, "'gm' is already defined."],
+    [59, "'gn' is already defined."],
+    [65, "'go' is already defined."],
+    [71, "'gp' is already defined."],
+    [76, "'gq' is already defined."],
+    [81, "'gr' is already defined."],
+    [86, "'gs' is already defined."],
+    [163, "'c' is already defined."],
+    [173, "'e' is already defined."],
+    [182, "'g' is already defined in outer scope."],
+    [186, "'h' is already defined in outer scope."],
+    [190, "'i' is already defined in outer scope."],
+    [194, "'j' is already defined."],
+    [198, "'k' is already defined."],
+    [202, "'l' is already defined."],
+    [207, "'m' is already defined."],
+    [213, "'n' is already defined."],
+    [219, "'o' is already defined."],
+    [225, "'p' is already defined."],
+    [230, "'q' is already defined."],
+    [235, "'r' is already defined."],
+    [240, "'s' is already defined."],
+    /* variables shadowing outside of function scope */
+    [91, "'gt' is already defined in outer scope."],
+    [96, "'gu' is already defined in outer scope."],
+    [101, "'gv' is already defined in outer scope."],
+    [106, "'gw' is already defined in outer scope."],
+    [245, "'t' is already defined in outer scope."],
+    [250, "'u' is already defined in outer scope."],
+    [255, "'v' is already defined in outer scope."],
+    [260, "'w' is already defined in outer scope."],
+    /* variables shadowing outside multiple function scopes */
+    [332, "'zza' is already defined in outer scope."],
+    [333, "'zzb' is already defined in outer scope."],
+    [334, "'zzc' is already defined in outer scope."],
+    [335, "'zzd' is already defined in outer scope."],
+    [336, "'zze' is already defined in outer scope."],
+    [337, "'zzf' is already defined in outer scope."],
+    [358, "'zzn' is already defined in outer scope."],
+    /* labels */
+    [317, "'zi' is already defined in outer scope."] // should always error
+  ];
+
+  var testRun = TestRun(test);
+  commonErrors.forEach(function(error) { testRun.addError.apply(testRun, error); });
+  testRun.test(src, {esnext: true, shadow: true});
+
+  var testRun = TestRun(test);
+  commonErrors.concat(innerErrors).forEach(function(error) { testRun.addError.apply(testRun, error); });
+  testRun.test(src, {esnext: true, shadow: "inner", maxerr: 100 });
+
+  var testRun = TestRun(test);
+  commonErrors.concat(innerErrors, outerErrors).forEach(function(error) { testRun.addError.apply(testRun, error); });
+  testRun.test(src, {esnext: true, shadow: "outer", maxerr: 100});
+
+  test.done();
+};
+
 /**
  * Option `latedef` allows you to prohibit the use of variable before their
  * definitions.
@@ -100,11 +207,16 @@ exports.shadowInline = function (test) {
  */
 exports.latedef = function (test) {
   var src  = fs.readFileSync(__dirname + '/fixtures/latedef.js', 'utf8'),
-    src1 = fs.readFileSync(__dirname + '/fixtures/redef.js', 'utf8');
+    src1 = fs.readFileSync(__dirname + '/fixtures/redef.js', 'utf8'),
+    esnextSrc = fs.readFileSync(__dirname + '/fixtures/latedef-esnext.js', 'utf8');
 
   // By default, tolerate the use of variable before its definition
   TestRun(test)
-    .test(src, {es3: true});
+    .test(src, {es3: true, funcscope: true});
+
+  TestRun(test)
+      .addError(10, "'i' was used before it was declared, which is illegal for 'let' variables.")
+      .test(esnextSrc, {esnext: true});
 
   // However, JSHint must complain if variable is actually missing
   TestRun(test)
@@ -127,8 +239,20 @@ exports.latedef = function (test) {
     .addError(2, "'fn' was used before it was defined.")
     .addError(6, "'fn1' was used before it was defined.")
     .addError(10, "'vr' was used before it was defined.")
+    .addError(18, "'bar' was used before it was defined.")
     .addError(18, "Inner functions should be listed at the top of the outer function.")
     .test(src, { es3: true, latedef: true });
+
+  TestRun(test)
+      .addError(4, "'c' was used before it was defined.")
+      .addError(6, "'e' was used before it was defined.")
+      .addError(8, "'h' was used before it was defined.")
+      .addError(10, "'i' was used before it was declared, which is illegal for 'let' variables.")
+      .addError(15, "'ai' was used before it was defined.")
+      .addError(20, "'ai' was used before it was defined.")
+      .addError(31, "'bi' was used before it was defined.")
+      .addError(48, "'ci' was used before it was defined.")
+      .test(esnextSrc, {esnext: true, latedef: true});
 
   test.done();
 };
@@ -580,6 +704,15 @@ exports.undef = function (test) {
     .addError(34, "'undef' is not defined.")
     .test(src, { es3: true, undef: true });
 
+  // block scope cannot use themselves in the declaration
+  TestRun(test)
+    .addError(1, "'a' was used before it was declared, which is illegal for 'let' variables.")
+    .addError(2, "'b' was used before it was declared, which is illegal for 'const' variables.")
+    .test([
+      'let a = a;',
+      'const b = b;'
+    ], { esnext: true, undef: true });
+
   // Regression test for GH-668.
   src = fs.readFileSync(__dirname + "/fixtures/gh668.js", "utf8");
   test.ok(JSHINT(src, { undef: true }));
@@ -589,7 +722,8 @@ exports.undef = function (test) {
   test.ok(!JSHINT.data().implieds);
 
   JSHINT("if (typeof foobar) {}", { undef: true });
-  test.ok(!JSHINT.data().implieds);
+  console.log(JSHINT.data().implieds);
+  test.strictEqual(JSHINT.data().implieds, undefined);
 
   test.done();
 };
@@ -632,24 +766,40 @@ exports.undefDeleteStrict = function (test) {
 exports.unused = function (test) {
   var src = fs.readFileSync(__dirname + '/fixtures/unused.js', 'utf8');
 
-  TestRun(test).test(src, { esnext: true });
+  var allErrors = [
+    [22, "'i' is defined but never used."],
+    [101, "'inTry2' used out of scope."],
+    [103, "'inTry3' used out of scope."],
+    [117, "'inTry9' was used before it was declared, which is illegal for 'let' variables."],
+    [118, "'inTry10' was used before it was declared, which is illegal for 'const' variables."]
+  ];
 
-  var var_errors = [
+  var testRun = TestRun(test);
+  allErrors.forEach(function (e) {
+    testRun.addError.apply(testRun, e);
+  });
+  testRun.test(src, { esnext: true });
+
+  var var_errors = allErrors.concat([
     [1, "'a' is defined but never used."],
     [7, "'c' is defined but never used."],
     [15, "'foo' is defined but never used."],
     [20, "'bar' is defined but never used."],
-    [22, "'i' is defined but never used."],
     [36, "'cc' is defined but never used."],
     [39, "'dd' is defined but never used."],
     [58, "'constUsed' is defined but never used."],
     [62, "'letUsed' is defined but never used."],
-    [63, "'anotherUnused' is defined but never used."]
-  ];
+    [63, "'anotherUnused' is defined but never used."],
+    [63, "'anotherUnused' is defined but never used."],
+    [91, "'inTry6' is defined but never used."],
+    [94, "'inTry9' is defined but never used."],
+    [95, "'inTry10' is defined but never used."],
+    [99, "'inTry4' is defined but never used."],
+    [122, "'unusedRecurringFunc' is defined but never used."]
+  ]);
 
   var last_param_errors = [
     [6, "'f' is defined but never used."],
-    [22, "'i' is defined but never used."],
     [28, "'a' is defined but never used."],
     [28, "'b' is defined but never used."],
     [28, "'c' is defined but never used."],
@@ -660,7 +810,6 @@ exports.unused = function (test) {
 
   var all_param_errors = [
     [15, "'err' is defined but never used."],
-    [22, "'i' is defined but never used."],
     [28, "'a' is defined but never used."],
     [28, "'b' is defined but never used."],
     [28, "'c' is defined but never used."],
@@ -690,12 +839,82 @@ exports.unused = function (test) {
   vars_run.test(src, { esnext: true, unused: "vars"});
 
   var unused = JSHINT.data().unused;
-  test.equal(19, unused.length);
+  test.equal(24, unused.length);
   test.ok(unused.some(function (err) { return err.line === 1 && err.character == 5 && err.name === "a"; }));
   test.ok(unused.some(function (err) { return err.line === 6 && err.character == 18 && err.name === "f"; }));
   test.ok(unused.some(function (err) { return err.line === 7 && err.character == 9 && err.name === "c"; }));
   test.ok(unused.some(function (err) { return err.line === 15 && err.character == 10 && err.name === "foo"; }));
   test.ok(unused.some(function (err) { return err.line === 68 && err.character == 5 && err.name === "y"; }));
+
+  test.done();
+};
+
+exports['unused data with options'] = function (test) {
+
+  // see gh-1894 for discussion on this test
+
+  var code = [
+    "function func(placeHolder1, placeHolder2, used, param) {",
+    "  used = 1;",
+    "}"
+  ];
+
+  var expectedVarUnused = [{ name: 'func', line: 1, character: 10 }];
+  var expectedParamUnused = [{ name: 'param', line: 1, character: 49 }];
+  var expectedPlaceholderUnused = [{ name: 'placeHolder2', line: 1, character: 29 },
+    { name: 'placeHolder1', line: 1, character: 15 }];
+
+  var expectedAllUnused = expectedParamUnused.concat(expectedPlaceholderUnused, expectedVarUnused);
+  var expectedVarAndParamUnused = expectedParamUnused.concat(expectedVarUnused);
+
+  // true
+  TestRun(test)
+    .addError(1, "'func' is defined but never used.")
+    .addError(1, "'param' is defined but never used.")
+    .test(code, { unused: true });
+
+  var unused = JSHINT.data().unused;
+  test.deepEqual(expectedVarAndParamUnused, unused);
+
+  // false
+  TestRun(test)
+    .test(code, { unused: false });
+
+  unused = JSHINT.data().unused;
+  test.deepEqual(expectedVarUnused, unused);
+
+  // strict
+  TestRun(test)
+    .addError(1, "'func' is defined but never used.")
+    .addError(1, "'placeHolder1' is defined but never used.")
+    .addError(1, "'placeHolder2' is defined but never used.")
+    .addError(1, "'param' is defined but never used.")
+    .test(code, { unused: "strict" });
+
+  unused = JSHINT.data().unused;
+  test.deepEqual(expectedAllUnused, unused);
+
+  // vars
+  TestRun(test)
+    .addError(1, "'func' is defined but never used.")
+    .test(code, { unused: "vars" });
+
+  unused = JSHINT.data().unused;
+  test.deepEqual(expectedAllUnused, unused);
+
+  test.done();
+};
+
+exports['unused with global override'] = function (test) {
+  var code;
+
+  code = [
+    "alert();",
+    "function alert() {}"
+  ];
+
+  TestRun(test)
+    .test(code, { unused: true, undef: true, devel: true, latedef: false });
 
   test.done();
 };
@@ -740,6 +959,73 @@ exports['unused overrides'] = function (test) {
     .addError(2, "'a' is defined but never used.")
     .addError(3, "'i' is defined but never used.")
     .test(code, {es3: true, unused: "strict"});
+
+  test.done();
+};
+
+exports['unused overrides esnext'] = function (test) {
+  var code;
+
+  code = ['function foo(a) {', '/*jshint unused:false */', '}', 'foo();'];
+  TestRun(test).test(code, {esnext: true, unused: true});
+
+  code = ['function foo(a, b, c) {', '/*jshint unused:vars */', 'let i = b;', '}', 'foo();'];
+  TestRun(test)
+    .addError(3, "'i' is defined but never used.")
+    .test(code, {esnext: true, unused: true});
+
+  code = ['function foo(a, b, c) {', '/*jshint unused:true */', 'let i = b;', '}', 'foo();'];
+  TestRun(test)
+    .addError(1, "'c' is defined but never used.")
+    .addError(3, "'i' is defined but never used.")
+    .test(code, {esnext: true, unused: "strict"});
+
+  code = ['function foo(a, b, c) {', '/*jshint unused:strict */', 'let i = b;', '}', 'foo();'];
+  TestRun(test)
+    .addError(1, "'a' is defined but never used.")
+    .addError(1, "'c' is defined but never used.")
+    .addError(3, "'i' is defined but never used.")
+    .test(code, {esnext: true, unused: true});
+
+  code = ['/*jshint unused:vars */', 'function foo(a, b) {', 'let i = 3;', '}', 'foo();'];
+  TestRun(test)
+    .addError(3, "'i' is defined but never used.")
+    .test(code, {esnext: true, unused: "strict"});
+
+  code = ['/*jshint unused:badoption */', 'function foo(a, b) {', 'let i = 3;', '}', 'foo();'];
+  TestRun(test)
+    .addError(1, "Bad option value.")
+    .addError(2, "'b' is defined but never used.")
+    .addError(2, "'a' is defined but never used.")
+    .addError(3, "'i' is defined but never used.")
+    .test(code, {esnext: true, unused: "strict"});
+
+  test.done();
+};
+
+exports['unused with latedef function'] = function (test) {
+  var code;
+
+  // Regression for gh-2363, gh-2282, gh-2191
+  code = ['exports.a = a;',
+    'function a() {}',
+    'exports.b = function() { b(); };',
+    'function b() {}',
+    '(function() {',
+    '  function c() { d(); }',
+    '  window.c = c;',
+    '  function d() {}',
+    '})();',
+    'var e;',
+    '(function() {',
+    '  e();',
+    '  function e(){}',
+    '})();',
+    ''];
+
+  TestRun(test)
+    .addError(10, "'e' is defined but never used.")
+    .test(code, {undef: false, unused: true, node: true});
 
   test.done();
 };
@@ -825,6 +1111,7 @@ exports.loopfunc = function (test) {
     .addError(8, "Don't make functions within a loop.")
     .addError(20, "Don't make functions within a loop.")
     .addError(25, "Don't make functions within a loop.")
+    .addError(30, "Don't make functions within a loop.")
     .addError(12, "Function declarations should not be placed in blocks. Use a function " +
             "expression or move the statement to the top of the outer function.")
     .test(src, {es3: true});
@@ -1125,6 +1412,7 @@ exports.newcap = function (test) {
     .addError(1, 'A constructor name should start with an uppercase letter.')
     .addError(5, "Missing 'new' prefix when invoking a constructor.")
     .addError(10, "A constructor name should start with an uppercase letter.")
+    .addError(14, "A constructor name should start with an uppercase letter.")
     .test(src, { es3: true, newcap: true });
 
   test.done();
@@ -1390,6 +1678,8 @@ exports.scope = function (test) {
     .addError(12, "'x' used out of scope.")
     .addError(20, "'aa' used out of scope.")
     .addError(27, "'bb' used out of scope.")
+    .addError(32, "'bb' used out of scope.")
+    .addError(36, "'bb' used out of scope.")
     .addError(37, "'cc' is not defined.")
     .addError(42, "'bb' is not defined.")
     .addError(53, "'xx' used out of scope.")
@@ -1431,12 +1721,12 @@ exports.esnext = function (test) {
     .test(src, { moz: true });
 
   TestRun(test)
-    .addError(3, "const 'myConst' has already been declared.")
+    .addError(3, "'myConst' has already been declared.")
     .addError(4, "Attempting to override 'foo' which is a constant.")
     .test(code, { esnext: true });
 
   TestRun(test)
-    .addError(3, "const 'myConst' has already been declared.")
+    .addError(3, "'myConst' has already been declared.")
     .addError(4, "Attempting to override 'foo' which is a constant.")
     .test(code, { moz: true });
 
@@ -2283,6 +2573,88 @@ exports.futureHostile = function (test) {
     .addError(8, "Redefinition of 'WeakMap'.")
     .addError(9, "Redefinition of 'WeakSet'.")
     .test(code, { esnext: true, futurehostile: false });
+
+  TestRun(test, "ESNext with option")
+    .addError(1, "Redefinition of 'JSON'.")
+    .addError(2, "Redefinition of 'Map'.")
+    .addError(3, "Redefinition of 'Promise'.")
+    .addError(4, "Redefinition of 'Proxy'.")
+    .addError(5, "Redefinition of 'Reflect'.")
+    .addError(6, "Redefinition of 'Set'.")
+    .addError(7, "Redefinition of 'Symbol'.")
+    .addError(8, "Redefinition of 'WeakMap'.")
+    .addError(9, "Redefinition of 'WeakSet'.")
+    .test(code, { esnext: true });
+
+  TestRun(test, "ESNext with opt-out")
+    .test(code, {
+      esnext: true,
+      futurehostile: false,
+      predef: [
+        "-JSON",
+        "-Map",
+        "-Promise",
+        "-Proxy",
+        "-Reflect",
+        "-Set",
+        "-Symbol",
+        "-WeakMap",
+        "-WeakSet"
+      ]
+    });
+
+  code = [
+    "let JSON = {};",
+    "let Map = function() {};",
+    "let Promise = function() {};",
+    "let Proxy = function() {};",
+    "let Reflect = function() {};",
+    "let Set = function() {};",
+    "let Symbol = function() {};",
+    "let WeakMap = function() {};",
+    "let WeakSet = function() {};"
+  ];
+
+  TestRun(test, "ESNext with option")
+    .addError(1, "Redefinition of 'JSON'.")
+    .addError(2, "Redefinition of 'Map'.")
+    .addError(3, "Redefinition of 'Promise'.")
+    .addError(4, "Redefinition of 'Proxy'.")
+    .addError(5, "Redefinition of 'Reflect'.")
+    .addError(6, "Redefinition of 'Set'.")
+    .addError(7, "Redefinition of 'Symbol'.")
+    .addError(8, "Redefinition of 'WeakMap'.")
+    .addError(9, "Redefinition of 'WeakSet'.")
+    .test(code, { esnext: true });
+
+  TestRun(test, "ESNext with opt-out")
+    .test(code, {
+      esnext: true,
+      futurehostile: false,
+      predef: [
+        "-JSON",
+        "-Map",
+        "-Promise",
+        "-Proxy",
+        "-Reflect",
+        "-Set",
+        "-Symbol",
+        "-WeakMap",
+        "-WeakSet"
+      ]
+    });
+
+  code = [
+    "const JSON = {};",
+    "const Map = function() {};",
+    "const Promise = function() {};",
+    "const Proxy = function() {};",
+    "const Reflect = function() {};",
+    "const Set = function() {};",
+    "const Symbol = function() {};",
+    "const WeakMap = function() {};",
+    "const WeakSet = function() {};"
+  ];
 
   TestRun(test, "ESNext with option")
     .addError(1, "Redefinition of 'JSON'.")

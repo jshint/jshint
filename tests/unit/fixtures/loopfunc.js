@@ -25,3 +25,7 @@ function boo(p) {
     var c = function () { return p; };
   }
 }
+
+while (true) {
+  var d = function z() { return z(); };
+}
