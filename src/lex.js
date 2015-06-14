@@ -733,7 +733,7 @@ Lexer.prototype = {
     }.bind(this);
 
     function removeEscapeSequences(id) {
-      return id.replace(/\\u(?:([0-9a-fA-F]{4})|\{([0-9a-fA-F]{1,6})\})/g, function(m0, cp1, cp2) {
+      return id.replace(reg.unicodeEscapeSequence, function(m0, cp1, cp2) {
         var hex = cp1 || cp2;
         var codepoint = parseInt(hex, 16);
         return codepoint > 0x10ffff ? hex : fromCodePoint(codepoint);
