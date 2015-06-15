@@ -6,8 +6,9 @@
 
 "use strict";
 
-var JSHINT = require('../../src/jshint.js').JSHINT;
-var fs = require('fs');
+var JSHINT  = require('../../src/jshint.js').JSHINT;
+var fs      = require('fs');
+var path    = require('path');
 var TestRun = require('../helpers/testhelper').setup.testRun;
 var fixture = require('../helpers/fixture').fixture;
 
@@ -22,7 +23,7 @@ var fixture = require('../helpers/fixture').fixture;
  * More often than not it is a typo, but sometimes people use it.
  */
 exports.shadow = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/redef.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/redef.js"), "utf8");
 
   // Do not tolerate variable shadowing by default
   TestRun(test)
@@ -57,7 +58,7 @@ exports.shadow = function (test) {
  *    }
  */
 exports.scopeshadow = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/scope-redef.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/scope-redef.js"), "utf8");
 
   // Do not tolarate inner scope variable shadowing by default
   TestRun(test)
@@ -71,7 +72,7 @@ exports.scopeshadow = function (test) {
 };
 
 exports.shadowInline = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/shadow-inline.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/shadow-inline.js"), "utf8");
 
   TestRun(test)
     .addError(6, "'a' is already defined in outer scope.")
@@ -99,8 +100,8 @@ exports.shadowInline = function (test) {
  * this option.
  */
 exports.latedef = function (test) {
-  var src  = fs.readFileSync(__dirname + '/fixtures/latedef.js', 'utf8'),
-    src1 = fs.readFileSync(__dirname + '/fixtures/redef.js', 'utf8');
+  var src  = fs.readFileSync(path.join(__dirname, '/fixtures/latedef.js'), 'utf8'),
+    src1 = fs.readFileSync(path.join(__dirname, '/fixtures/redef.js'), 'utf8');
 
   // By default, tolerate the use of variable before its definition
   TestRun(test)
@@ -134,7 +135,7 @@ exports.latedef = function (test) {
 };
 
 exports.latedefInline = function (test) {
-  var src  = fs.readFileSync(__dirname + '/fixtures/latedef-inline.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/latedef-inline.js'), 'utf8');
 
   TestRun(test)
     .addError(4, "'foo' was used before it was defined.")
@@ -147,7 +148,7 @@ exports.latedefInline = function (test) {
 };
 
 exports.notypeof = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/typeofcomp.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/typeofcomp.js'), 'utf8');
 
   TestRun(test)
     .addError(1, "Invalid typeof value 'funtion'")
@@ -230,7 +231,7 @@ exports['combination of latedef and undef'] = function (test) {
 };
 
 exports.undefwstrict = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/undefstrict.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/undefstrict.js'), 'utf8');
   TestRun(test).test(src, { es3: true, undef: false });
 
   test.done();
@@ -238,7 +239,7 @@ exports.undefwstrict = function (test) {
 
 // Regression test for GH-431
 exports["implied and unused should respect hoisting"] = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/gh431.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/gh431.js'), 'utf8');
   TestRun(test)
     .addError(14, "'fun4' is not defined.")
     .test(src, { undef: true }); // es5
@@ -261,7 +262,7 @@ exports["implied and unused should respect hoisting"] = function (test) {
  * special `__proto__` and `__iterator__` properties, respectively.
  */
 exports.testProtoAndIterator = function (test) {
-  var source = fs.readFileSync(__dirname + '/fixtures/protoiterator.js', 'utf8');
+  var source = fs.readFileSync(path.join(__dirname, '/fixtures/protoiterator.js'), 'utf8');
   var json = '{"__proto__": true, "__iterator__": false, "_identifier": null, "property": 123}';
 
   // JSHint should not allow the `__proto__` and
@@ -292,7 +293,7 @@ exports.testProtoAndIterator = function (test) {
  * The `camelcase` option allows you to enforce use of the camel case convention.
  */
 exports.testCamelcase = function (test) {
-  var source = fs.readFileSync(__dirname + '/fixtures/camelcase.js', 'utf8');
+  var source = fs.readFileSync(path.join(__dirname, '/fixtures/camelcase.js'), 'utf8');
 
   // By default, tolerate arbitrary identifiers
   TestRun(test)
@@ -323,8 +324,8 @@ exports.testCamelcase = function (test) {
  *   if (cond) { return; }
  */
 exports.curly = function (test) {
-  var src  = fs.readFileSync(__dirname + '/fixtures/curly.js', 'utf8'),
-    src1 = fs.readFileSync(__dirname + '/fixtures/curly2.js', 'utf8');
+  var src  = fs.readFileSync(path.join(__dirname, '/fixtures/curly.js'), 'utf8'),
+    src1 = fs.readFileSync(path.join(__dirname, '/fixtures/curly2.js'), 'utf8');
 
   // By default, tolerate one-line blocks since they are valid JavaScript
   TestRun(test).test(src, {es3: true});
@@ -372,7 +373,7 @@ exports.noempty = function (test) {
  *  - They are prohibited in the strict mode
  */
 exports.noarg = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/noarg.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/noarg.js'), 'utf8');
 
   // By default, tolerate both arguments.callee and arguments.caller
   TestRun(test).test(src, { es3: true });
@@ -404,7 +405,7 @@ exports.nonew = function (test) {
 };
 
 exports.shelljs = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/shelljs.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/shelljs.js'), 'utf8');
 
   TestRun(test, 1)
     .addError(1, "'target' is not defined.")
@@ -445,7 +446,7 @@ exports.shelljs = function (test) {
 
 // Option `asi` allows you to use automatic-semicolon insertion
 exports.asi = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/asi.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/asi.js'), 'utf8');
 
   TestRun(test, 1)
     .addError(2, "Missing semicolon.")
@@ -477,7 +478,7 @@ exports.asi = function (test) {
 
 // Option `asi` extended for safety -- warn in scenarios that would be unsafe when using asi.
 exports.safeasi = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/safeasi.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/safeasi.js'), 'utf8');
 
   TestRun(test, 1)
     // TOOD consider setting an option to suppress these errors so that
@@ -506,7 +507,7 @@ exports.safeasi = function (test) {
 /** Option `lastsemic` allows you to skip the semicolon after last statement in a block,
   * if that statement is followed by the closing brace on the same line. */
 exports.lastsemic = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/lastsemic.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/lastsemic.js'), 'utf8');
 
   // without lastsemic
   TestRun(test)
@@ -558,7 +559,7 @@ exports.expr = function (test) {
 
 // Option `undef` requires you to always define variables you use.
 exports.undef = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/undef.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/undef.js'), 'utf8');
 
   // Make sure there are no other errors
   TestRun(test).test(src, { es3: true });
@@ -581,7 +582,7 @@ exports.undef = function (test) {
     .test(src, { es3: true, undef: true });
 
   // Regression test for GH-668.
-  src = fs.readFileSync(__dirname + "/fixtures/gh668.js", "utf8");
+  src = fs.readFileSync(path.join(__dirname, "/fixtures/gh668.js"), "utf8");
   test.ok(JSHINT(src, { undef: true }));
   test.ok(!JSHINT.data().implieds);
 
@@ -630,7 +631,7 @@ exports.undefDeleteStrict = function (test) {
 };
 
 exports.unused = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/unused.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/unused.js'), 'utf8');
 
   TestRun(test).test(src, { esnext: true });
 
@@ -761,7 +762,7 @@ exports.scripturl = function (test) {
       "var foo = { 'count': 12, 'href': 'javascript:' };",
       "foo = 'javascript:' + 'xyz';"
     ],
-    src = fs.readFileSync(__dirname + '/fixtures/scripturl.js', 'utf8');
+    src = fs.readFileSync(path.join(__dirname, '/fixtures/scripturl.js'), 'utf8');
 
   // Make sure there is an error
   TestRun(test)
@@ -789,7 +790,7 @@ exports.scripturl = function (test) {
  * an object or was inherited through the prototype chain.
  */
 exports.forin = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/forin.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/forin.js'), 'utf8');
   var msg = 'The body of a for in should be wrapped in an if statement to filter unwanted ' +
         'properties from the prototype.';
 
@@ -817,7 +818,7 @@ exports.forin = function (test) {
  * closure-related mistake.
  */
 exports.loopfunc = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/loopfunc.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/loopfunc.js'), 'utf8');
 
   // By default, not functions are allowed inside loops
   TestRun(test)
@@ -841,7 +842,7 @@ exports.loopfunc = function (test) {
 
 /** Option `boss` unlocks some useful but unsafe features of JavaScript. */
 exports.boss = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/boss.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/boss.js'), 'utf8');
 
   // By default, warn about suspicious assignments
   TestRun(test)
@@ -905,7 +906,7 @@ exports.eqnull = function (test) {
  *   new Date;
  */
 exports.supernew = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/supernew.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/supernew.js'), 'utf8');
 
   TestRun(test)
     .addError(1, "Weird construction. Is 'new' necessary?")
@@ -997,7 +998,7 @@ exports.debug = function (test) {
 
 /** Option `eqeqeq` requires you to use === all the time. */
 exports.eqeqeq = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/eqeqeq.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/eqeqeq.js'), 'utf8');
 
   TestRun(test)
     .addError(8, "Use '===' to compare with 'null'.")
@@ -1055,7 +1056,7 @@ exports.evil = function (test) {
  *   console.log(a); // --> 'a'
  */
 exports.immed = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/immed.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/immed.js'), 'utf8');
 
   TestRun(test).test(src, {es3: true});
 
@@ -1116,7 +1117,7 @@ exports.plusplus = function (test) {
  * those mistakes. This option enforces that convention.
  */
 exports.newcap = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/newcap.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/newcap.js'), 'utf8');
 
   TestRun(test).test(src, {es3: true}); // By default, everything is fine
 
@@ -1147,9 +1148,9 @@ exports.sub = function (test) {
 exports.strict = function (test) {
   var code  = "(function (test) { return; }());";
   var code1 = '(function (test) { "use strict"; return; }());';
-  var src = fs.readFileSync(__dirname + '/fixtures/strict_violations.js', 'utf8');
-  var src2 = fs.readFileSync(__dirname + '/fixtures/strict_incorrect.js', 'utf8');
-  var src3 = fs.readFileSync(__dirname + '/fixtures/strict_newcap.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/strict_violations.js'), 'utf8');
+  var src2 = fs.readFileSync(path.join(__dirname, '/fixtures/strict_incorrect.js'), 'utf8');
+  var src3 = fs.readFileSync(path.join(__dirname, '/fixtures/strict_newcap.js'), 'utf8');
 
   TestRun(test).test(code, {es3: true});
   TestRun(test).test(code1, {es3: true});
@@ -1225,7 +1226,7 @@ exports.globalstrict = function (test) {
 
 /** Option `laxbreak` allows you to insert newlines before some operators. */
 exports.laxbreak = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/laxbreak.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/laxbreak.js'), 'utf8');
 
   TestRun(test)
     .addError(2, "Bad line breaking before ','.")
@@ -1256,7 +1257,7 @@ exports.laxbreak = function (test) {
 };
 
 exports.validthis = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/strict_this.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/strict_this.js'), 'utf8');
 
   TestRun(test)
     .addError(8, "Possible strict violation.")
@@ -1264,7 +1265,7 @@ exports.validthis = function (test) {
     .addError(11, "Possible strict violation.")
     .test(src, {es3: true});
 
-  src = fs.readFileSync(__dirname + '/fixtures/strict_this2.js', 'utf8');
+  src = fs.readFileSync(path.join(__dirname, '/fixtures/strict_this2.js'), 'utf8');
   TestRun(test).test(src, {es3: true});
 
   // Test for erroneus use of validthis
@@ -1287,7 +1288,7 @@ exports.validthis = function (test) {
  *   multistr   allows multiline strings
  */
 exports.strings = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/strings.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/strings.js'), 'utf8');
 
   TestRun(test)
     .addError(9, "Unclosed string.")
@@ -1315,8 +1316,8 @@ exports.strings = function (test) {
  *   quotmark   quotation mark or true (=ensure consistency)
  */
 exports.quotes = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/quotes.js', 'utf8');
-  var src2 = fs.readFileSync(__dirname + '/fixtures/quotes2.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/quotes.js'), 'utf8');
+  var src2 = fs.readFileSync(path.join(__dirname, '/fixtures/quotes2.js'), 'utf8');
 
   TestRun(test)
     .test(src, { es3: true });
@@ -1350,14 +1351,14 @@ exports.quotesInline = function (test) {
     .addError(14, "Strings must use singlequote.")
     .addError(21, "Mixed double and single quotes.")
     .addError(32, "Bad option value.")
-    .test(fs.readFileSync(__dirname + "/fixtures/quotes3.js", "utf8"));
+    .test(fs.readFileSync(path.join(__dirname, "/fixtures/quotes3.js"), "utf8"));
 
   test.done();
 };
 
 // Test the `quotmark` option along with TemplateLiterals.
 exports.quotesAndTemplateLiterals = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/quotes4.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/quotes4.js'), 'utf8');
 
   // Without esnext
   TestRun(test)
@@ -1383,7 +1384,7 @@ exports.quotesAndTemplateLiterals = function (test) {
 };
 
 exports.scope = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/scope.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/scope.js'), 'utf8');
 
   TestRun(test, 1)
     .addError(11, "'j' used out of scope.") // 3x
@@ -1412,7 +1413,7 @@ exports.scope = function (test) {
  *
  */
 exports.esnext = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/const.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/const.js'), 'utf8');
 
   var code = [
     'const myConst = true;',
@@ -1447,7 +1448,7 @@ exports.esnext = function (test) {
  * Tests the `maxlen` option
  */
 exports.maxlen = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/maxlen.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/maxlen.js'), 'utf8');
 
   TestRun(test)
     .addError(3, "Line is too long.")
@@ -1464,7 +1465,7 @@ exports.maxlen = function (test) {
  * Tests the `laxcomma` option
  */
 exports.laxcomma = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/laxcomma.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/laxcomma.js'), 'utf8');
 
   // All errors.
   TestRun(test)
@@ -1500,7 +1501,7 @@ exports.laxcomma = function (test) {
  * Tests the `browser` option
  */
 exports.browser = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/browser.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/browser.js'), 'utf8');
 
   TestRun(test)
     .addError(2, "'atob' is not defined.")
@@ -1540,7 +1541,7 @@ exports.unnecessarysemicolon = function (test) {
 };
 
 exports.blacklist = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/browser.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/browser.js'), 'utf8');
   var code = [
     '/*jshint browser: true */',
     '/*global -event, bar, -btoa */',
@@ -1584,7 +1585,7 @@ exports.blacklist = function (test) {
  * Tests the `maxstatements` option
  */
 exports.maxstatements = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/max-statements-per-function.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/max-statements-per-function.js'), 'utf8');
 
   TestRun(test)
     .addError(1, "This function has too many statements. (8)")
@@ -1604,7 +1605,7 @@ exports.maxstatements = function (test) {
  */
 exports.maxdepth = function (test) {
   var fixture = '/fixtures/max-nested-block-depth-per-function.js';
-  var src = fs.readFileSync(__dirname + fixture, 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, fixture), 'utf8');
 
   TestRun(test)
     .addError(5, "Blocks are nested too deeply. (2)")
@@ -1629,7 +1630,7 @@ exports.maxdepth = function (test) {
  */
 exports.maxparams = function (test) {
   var fixture = '/fixtures/max-parameters-per-function.js';
-  var src = fs.readFileSync(__dirname + fixture, 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, fixture), 'utf8');
 
   TestRun(test)
     .addError(4, "This function has too many parameters. (3)")
@@ -1653,7 +1654,7 @@ exports.maxparams = function (test) {
  */
 exports.maxcomplexity = function (test) {
   var fixture = '/fixtures/max-cyclomatic-complexity-per-function.js';
-  var src = fs.readFileSync(__dirname + fixture, 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, fixture), 'utf8');
 
   TestRun(test)
     .addError(8, "This function's cyclomatic complexity is too high. (2)")
@@ -1699,7 +1700,7 @@ exports.fnmetrics = function (test) {
  * Tests ignored warnings.
  */
 exports.ignored = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/ignored.js", "utf-8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/ignored.js"), "utf-8");
 
   TestRun(test)
     .addError(4, "A trailing decimal point can be confused with a dot: '12.'.")
@@ -1717,7 +1718,7 @@ exports.ignored = function (test) {
  * Tests ignored warnings being unignored.
  */
 exports.unignored = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/unignored.js", "utf-8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/unignored.js"), "utf8");
 
   TestRun(test)
     .addError(5, "A leading decimal point can be confused with a dot: '.12'.")
@@ -1730,7 +1731,7 @@ exports.unignored = function (test) {
  * Tests that the W117 and undef can be toggled per line.
  */
 exports['per-line undef / -W117'] = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/ignore-w117.js", "utf-8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/ignore-w117.js"), "utf-8");
 
   TestRun(test)
     .addError(5, "'c' is not defined.")
@@ -1745,7 +1746,7 @@ exports['per-line undef / -W117'] = function (test) {
 * Tests the `freeze` option -- Warn if native object prototype is assigned to.
 */
 exports.freeze = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/nativeobject.js", "utf-8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/nativeobject.js"), "utf8");
 
   TestRun(test)
     .addError(3, "Extending prototype of native object: 'Array'.")
@@ -1759,7 +1760,7 @@ exports.freeze = function (test) {
 };
 
 exports.nonbsp = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/nbsp.js', 'utf8');
+  var src = fs.readFileSync(path.join(__dirname, '/fixtures/nbsp.js'), 'utf8');
 
   TestRun(test)
     .test(src, { sub: true });
@@ -1807,7 +1808,7 @@ exports.nocomma = function (test) {
 };
 
 exports.enforceall = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/enforceall.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/enforceall.js"), "utf8");
 
   // Throws errors not normally on be default
   TestRun(test)
@@ -1824,7 +1825,7 @@ exports.enforceall = function (test) {
 };
 
 exports.removeglobal = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/removeglobals.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/removeglobals.js"), "utf8");
 
   TestRun(test)
     .addError(1, "'JSON' is not defined.")
@@ -1834,7 +1835,7 @@ exports.removeglobal = function (test) {
 };
 
 exports.ignoreDelimiters = function (test) {
-  var src = fs.readFileSync(__dirname + "/fixtures/ignoreDelimiters.js", "utf8");
+  var src = fs.readFileSync(path.join(__dirname, "/fixtures/ignoreDelimiters.js"), "utf8");
 
   TestRun(test)
     // make sure line/column are still reported properly
