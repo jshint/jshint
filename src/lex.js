@@ -76,18 +76,16 @@ var fromCodePoint = String.fromCodePoint || function(codepoint) {
 /**
  * Implementation of ES6 `String#codePointAt(0)` for legacy environments
  */
-function codePoint(char) {
-  /* istanbul ignore if */
-  if (char.codePointAt) {
-    return char.codePointAt(0);
-  } else if (char.length === 1) { // BMP
-    return char.charCodeAt(0);
-  } else { // astral
-    var highSurrogate = char.charCodeAt(0);
-    var lowSurrogate = char.charCodeAt(1);
-    return (highSurrogate - 0xd800) * 1024 + (lowSurrogate - 0xdc00) + 0x10000;
-  }
-}
+var codePoint = "".codePointAt ? "".codePointAt.call.bind("".codePointAt) :
+  function(char) {
+    if (char.length === 1) { // BMP
+      return char.charCodeAt(0);
+    } else { // astral
+      var highSurrogate = char.charCodeAt(0);
+      var lowSurrogate = char.charCodeAt(1);
+      return (highSurrogate - 0xd800) * 1024 + (lowSurrogate - 0xdc00) + 0x10000;
+    }
+  };
 
 function isHexNumber(str) {
   return (/^[0-9a-f]+$/i).test(str);
