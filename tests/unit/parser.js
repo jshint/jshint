@@ -2617,6 +2617,27 @@ exports["make sure let variables are not treated as globals"] = function (test) 
   test.done();
 };
 
+exports["make sure variables referenced in code above declaration are not marked as unused"] = function (test) {
+  // This is a regression test for GH-1462
+  var code = [
+    "const o = {",
+      "f: function () {",
+        "console.log(a);",
+        "console.log(b);",
+        "console.log(c);",
+      "}",
+    "};",
+
+    "const a = 'aaa';",
+    "let b = 'bbb';",
+    "var c = 'ccc';",
+    "o.f();",
+  ];
+
+  TestRun(test).test(code, { esnext: true, browser: true, unused: true });
+  test.done();
+};
+
 exports["make sure var variables can shadow let variables"] = function (test) {
   // This is a regression test for GH-1394
   var code = [
