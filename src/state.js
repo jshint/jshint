@@ -11,7 +11,7 @@ var state = {
    */
   isStrict: function() {
     return this.directive["use strict"] || this.inClassBody ||
-      this.option.module;
+      this.option.module || this.option.strict === "implied";
   },
 
   // Assumption: chronologically ES3 < ES5 < ES6/ESNext < Moz

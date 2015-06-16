@@ -259,21 +259,6 @@ exports.bool = {
     singleGroups: false,
 
     /**
-     * This option requires all functions to run in ECMAScript 5's strict mode.
-     * [Strict mode](https://developer.mozilla.org/en/JavaScript/Strict_mode)
-     * is a way to opt in to a restricted variant of JavaScript. Strict mode
-     * eliminates some JavaScript pitfalls that didn't cause errors by changing
-     * them to produce errors.  It also fixes mistakes that made it difficult
-     * for the JavaScript engines to perform certain optimizations.
-     *
-     * *Note:* This option enables strict mode for function scope only. It
-     * *prohibits* the global scoped strict mode because it might break
-     * third-party widgets on your page. If you really want to use global
-     * strict mode, see the *globalstrict* option.
-     */
-    strict      : true,
-
-    /**
      * When set to true, the use of VariableStatements are forbidden.
      * For example:
      *
@@ -375,6 +360,8 @@ exports.bool = {
      * recommended.
      *
      * For more info about strict mode see the `strict` option.
+     *
+     * @deprecated Use `strict: "global"`.
      */
     globalstrict: true,
 
@@ -870,6 +857,22 @@ exports.val = {
    * - true     - allow variable shadowing
    */
   shadow       : false,
+
+  /**
+   * This option requires the code to run in ECMAScript 5's strict mode.
+   * [Strict mode](https://developer.mozilla.org/en/JavaScript/Strict_mode)
+   * is a way to opt in to a restricted variant of JavaScript. Strict mode
+   * eliminates some JavaScript pitfalls that didn't cause errors by changing
+   * them to produce errors.  It also fixes mistakes that made it difficult
+   * for the JavaScript engines to perform certain optimizations.
+   *
+   * - "func"    - there must be a `"use strict";` directive at function level
+   * - "global"  - there must be a `"use strict";` directive at global level
+   * - "implied" - lint the code as if there is the `"use strict";` directive
+   * - false     - disable warnings about strict mode
+   * - true      - same as `"func"`
+   */
+  strict      : true,
 
   /**
    * This option warns when you define and never use your variables. It is very
