@@ -1512,7 +1512,33 @@ exports.labelsOutOfScope = function (test) {
     .test(src);
 
   test.done();
-}
+};
+
+exports.labelThroughCatch = function (test) {
+  var src = [
+    "function labelExample() {",
+    "  'use strict';",
+    "  var i;",
+    "  example:",
+    "    for (i = 0; i < 10; i += 1) {",
+    "      try {",
+    "        if (i === 5) {",
+    "          break example;",
+    "        } else {",
+    "          throw new Error();",
+    "        }",
+    "      } catch (e) {",
+    "        continue example;",
+    "      }",
+    "    }",
+    "}"
+  ];
+
+  TestRun(test)
+    .test(src);
+
+  test.done();
+};
 
 exports.labelDoesNotExistInGlobalScope = function (test) {
   var src = [
