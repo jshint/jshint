@@ -1204,6 +1204,17 @@ exports.strict = function (test) {
   run.addError(1, 'Unnecessary directive "use strict".')
     .test(code3, { strict: "implied" });
 
+  [ true, false, "global", "implied" ].forEach(function(val) {
+    JSHINT("/*jshint strict: " + val + " */");
+    test.strictEqual(JSHINT.data().options.strict, val);
+  });
+  JSHINT("/*jshint strict: func */");
+  test.strictEqual(JSHINT.data().options.strict, true);
+
+  TestRun(test)
+    .addError(1, "Bad option value.")
+    .test("/*jshint strict: foo */");
+
   test.done();
 };
 
