@@ -726,6 +726,9 @@ exports.testES6Modules = function (test) {
     .addError(48, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(47, "'export' is only available in ES6 (use esnext option).")
     .addError(46, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(50, "'export' is only available in ES6 (use esnext option).")
+    .addError(50, "'function*' is only available in ES6 (use esnext option).")
+    .addError(50, "'yield' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .test(src, {});
 
   var src2 = [
@@ -759,7 +762,8 @@ exports.testES6ModulesNamedExportsAffectUnused = function (test) {
     "export let letone = 1, lettwo = 2;",
     "export var v1u, v2u;",
     "export let l1u, l2u;",
-    "export const c1u, c2u;"
+    "export const c1u, c2u;",
+    "export function* gen() { yield 1; }"
   ];
 
   TestRun(test)

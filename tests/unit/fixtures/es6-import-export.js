@@ -46,3 +46,5 @@ export var c = "c";
 export class Foo {}
 export class List extends Array {}
 export default class Bar {}
+
+export function* gen() { yield 1; }
