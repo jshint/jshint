@@ -777,6 +777,9 @@ exports.testES6Modules = function (test) {
     .addError(59, "'import' is only available in ES6 (use esnext option).")
     .addError(60, "'import' is only available in ES6 (use esnext option).")
     .addError(65, "'import' is only available in ES6 (use esnext option).")
+    .addError(67, "'export' is only available in ES6 (use esnext option).")
+    .addError(67, "'function*' is only available in ES6 (use esnext option).")
+    .addError(67, "'yield' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).");
   importConstErrors.forEach(function(error) { testRun.addError.apply(testRun, error); });
   testRun.test(src, {});
 
@@ -814,7 +817,8 @@ exports.testES6ModulesNamedExportsAffectUnused = function (test) {
     "export let letone = 1, lettwo = 2;",
     "export var v1u, v2u;",
     "export let l1u, l2u;",
-    "export const c1u, c2u;"
+    "export const c1u, c2u;",
+    "export function* gen() { yield 1; }"
   ];
 
   TestRun(test)
