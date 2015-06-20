@@ -46,6 +46,9 @@ var scopeManager = function(state, predefined, exported, declared) {
   }
 
   function _addUsage(labelName, token) {
+    if (token) {
+      token["(function)"] = _currentFunct;
+    }
     if (!_.has(_current["(usages)"], labelName)) {
       _current["(usages)"][labelName] = {
         "(modified)": [],
@@ -265,7 +268,10 @@ var scopeManager = function(state, predefined, exported, declared) {
             var usedTokens = usage["(tokens)"];
             if (usedTokens) {
               for (j = 0; j < usedTokens.length; j++) {
-                error("W038", usedTokens[j], usedLabelName);
+                // Keep the consistency of https://github.com/jshint/jshint/issues/2409
+                if (usedLabel["(function)"] === usedTokens[j]["(function)"]) {
+                  error("W038", usedTokens[j], usedLabelName);
+                }
               }
             }
           }
@@ -630,6 +636,7 @@ var scopeManager = function(state, predefined, exported, declared) {
           "(type)" : type,
           "(token)": tok,
           "(blockscoped)": false,
+          "(function)": _currentFunct,
           "(unused)": unused };
       }
     },

@@ -340,7 +340,6 @@ exports.argsInCatchReused = function (test) {
   TestRun(test)
     .addError(6, "'e' is already defined.")
     .addError(12, "Do not assign to the exception parameter.")
-    .addError(23, "'e' used out of scope.")
     .test(src, { es3: true, undef: true });
 
   test.done();
