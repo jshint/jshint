@@ -376,6 +376,7 @@ var scopeManager = function(state, predefined, exported, declared) {
           // if its function scoped and
           // not already defined (caught with shadow, shouldn't also trigger out of scope)
           if (!currentLabels[defLabelName]["(blockscoped)"] &&
+            currentLabels[defLabelName]["(type)"] !== "exception" &&
             !this.funct.has(defLabelName, { excludeCurrent: true })) {
             subScope["(labels)"][defLabelName] = currentLabels[defLabelName];
             // we do not warn about out of scope usages in the global scope
