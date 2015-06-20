@@ -49,8 +49,6 @@ exports.jQuery_1_7 = function (test) {
     .addError(5691, "'i' is defined but never used.")
     .addError(7141, "'i' is defined but never used.")
     .addError(6061, "'cur' is defined but never used.")
-    .addError(7099, "'selector' used out of scope.")
-    .addError(7107, "'selector' used out of scope.")
     .test(src, { undef: true, unused: true }, globals);
 
   test.done();
@@ -159,14 +157,12 @@ exports.lodash_0_6_1 = function (test) {
     .addError(632, "Missing semicolon.")
     .addError(920, "'isArguments' is a function.")
     .addError(963, "'isFunction' is a function.")
-    .addError(988, "'noNodeClass' used out of scope.")
     .addError(1122, "'isArr' used out of scope.")
     .addError(1127, "'className' used out of scope.")
     .addError(1129, "Use '===' to compare with 'true'.")
     .addError(1153, "'isArr' used out of scope.")
     .addError(1159, "'isArr' used out of scope.")
     .addError(1490, "Use '===' to compare with '0'.")
-    .addError(1504, "'noNodeClass' used out of scope.")
     .addError(1670, "Missing semicolon.")
     .addError(3374, "Possible strict violation.")
     .addError(3377, "Missing '()' invoking a constructor.")
@@ -174,7 +170,6 @@ exports.lodash_0_6_1 = function (test) {
     .addError(3677, "Missing '()' invoking a constructor.")
     .addError(3683, "Missing '()' invoking a constructor.")
     .addError(3825, "Possible strict violation.")
-    .addError(4063, "'useSourceURL' used out of scope.")
     .addError(4225, "Possible strict violation.")
     .addError(4226, "Possible strict violation.")
     .addError(4242, "Possible strict violation.")
