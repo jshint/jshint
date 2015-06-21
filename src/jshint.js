@@ -4664,7 +4664,11 @@ var JSHINT = (function() {
       this.block = true;
       advance("function");
       exported[state.tokens.next.value] = ok;
-      state.tokens.next.exported = true;
+      if(state.tokens.next.value === "*") {
+        peek().exported = true;
+      } else {
+        state.tokens.next.exported = true;
+      }
       state.syntax["function"].fud();
     } else if (state.tokens.next.id === "class") {
       // ExportDeclaration :: export Declaration
