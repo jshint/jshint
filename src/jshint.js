@@ -3802,7 +3802,8 @@ var JSHINT = (function() {
     checkProperties(props);
   }
 
-  blockstmt("function", function() {
+  blockstmt("function", function(context) {
+    var inexport = context && context.inexport;
     var generator = false;
     if (state.tokens.next.value === "*") {
       advance("*");
@@ -3820,6 +3821,8 @@ var JSHINT = (function() {
 
     if (i === undefined) {
       warning("W025");
+    } else if (inexport) {
+      exported[i] = true;
     }
 
     // check if a identifier with the same name is already defined
@@ -4647,9 +4650,8 @@ var JSHINT = (function() {
       // ExportDeclaration :: export Declaration
       this.block = true;
       advance("function");
-      exported[state.tokens.next.value] = ok;
       state.tokens.next.exported = true;
-      state.syntax["function"].fud();
+      state.syntax["function"].fud({ inexport:true });
     } else if (state.tokens.next.id === "class") {
       // ExportDeclaration :: export Declaration
       this.block = true;
