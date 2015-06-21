@@ -5,15 +5,18 @@ exports.register = function(linter) {
   // deprecated and then re-introduced for ES6.
 
   linter.on("Identifier", function style_scanProto(data) {
-    if (linter.getOption("proto")) {
+    var esnext = linter.getOption("esnext");
+
+    if (linter.getOption("proto") || (esnext && (linter.getOption("browser") ||
+        linter.getOption("node") || linter.getOption("rhino")))) {
       return;
     }
 
     if (data.name === "__proto__") {
-      linter.warn("W103", {
+      linter.warn(esnext ? "W135" : "W119", {
         line: data.line,
         char: data.char,
-        data: [ data.name ]
+        data: [ esnext ? "The '__proto__' property" : "__proto__" ]
       });
     }
   });
