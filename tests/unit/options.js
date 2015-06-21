@@ -2338,6 +2338,16 @@ exports.varstmt = function (test) {
   test.done();
 };
 
+exports.nobom = function(test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/bom.js", "utf8");
+
+  TestRun(test)
+    //.addError(1, "Unexpected Unicode Byte Order Mark.")
+    .test(src, {});
+
+  test.done();
+};
+
 exports.errorI003 = function(test) {
   var code = [
     "// jshint browser: true",
