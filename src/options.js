@@ -757,7 +757,18 @@ exports.val = {
    */
   maxerr       : false,
 
-  predef       : false, // predef is deprecated and being replaced by globals
+  /**
+   * This option allows you to control which variables JSHint considers to be
+   * implicitly defined in the environment. Configure it with an array of
+   * string values. Prefixing a variable name with a hyphen (-) character will
+   * remove that name from the collection of predefined variables.
+   *
+   * JSHint will consider variables declared in this way to be read-only.
+   *
+   * This option cannot be specified in-line; it may only be used via the
+   * JavaScript API or from an external configuration file.
+   */
+  predef       : false,
 
   /**
    * This option can be used to specify a white list of global variables that
