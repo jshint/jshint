@@ -4119,20 +4119,19 @@ var JSHINT = (function() {
   stmt("break", function() {
     var v = state.tokens.next.value;
 
-    if (state.funct["(breakage)"] === 0)
-      warning("W052", state.tokens.next, this.value);
-
     if (!state.option.asi)
       nolinebreak(this);
 
-    if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
-      if (state.tokens.curr.line === startLine(state.tokens.next)) {
-        if (!state.funct["(scope)"].funct.hasBreakLabel(v)) {
-          warning("W090", state.tokens.next, v);
-        }
-        this.first = state.tokens.next;
-        advance();
+    if (state.tokens.next.id !== ";" && !state.tokens.next.reach &&
+        state.tokens.curr.line === startLine(state.tokens.next)) {
+      if (!state.funct["(scope)"].funct.hasBreakLabel(v)) {
+        warning("W090", state.tokens.next, v);
       }
+      this.first = state.tokens.next;
+      advance();
+    } else {
+      if (state.funct["(breakage)"] === 0)
+        warning("W052", state.tokens.next, this.value);
     }
 
     reachable(this);
@@ -4146,6 +4145,8 @@ var JSHINT = (function() {
 
     if (state.funct["(breakage)"] === 0)
       warning("W052", state.tokens.next, this.value);
+    if (!state.funct["(loopage)"])
+      warning("W052", state.tokens.next, this.value);
 
     if (!state.option.asi)
       nolinebreak(this);
@@ -4158,8 +4159,6 @@ var JSHINT = (function() {
         this.first = state.tokens.next;
         advance();
       }
-    } else if (!state.funct["(loopage)"]) {
-      warning("W052", state.tokens.next, this.value);
     }
 
     reachable(this);
