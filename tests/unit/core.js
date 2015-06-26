@@ -1555,6 +1555,68 @@ exports.labelDoesNotExistInGlobalScope = function (test) {
   test.done();
 };
 
+exports.labeledBreakWithoutLoop = function (test) {
+  var src = [
+    "foo: {",
+    "  break foo;",
+    "}"
+  ];
+
+  TestRun(test)
+    .test(src);
+
+  test.done();
+};
+
+// ECMAScript 5.1 § 12.7: labeled continue must refer to an enclosing
+// IterationStatement, as opposed to labeled break which is only required to
+// refer to an enclosing Statement.
+exports.labeledContinueWithoutLoop = function (test) {
+  var src = [
+    "foo: switch (i) {",
+    "  case 1:",
+    "    continue foo;",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(3, "Unexpected 'continue'.")
+    .test(src);
+
+  test.done();
+};
+
+exports.unlabeledBreakWithoutLoop = function(test) {
+  var src = [
+    "if (1 == 1) {",
+    "  break;",
+    "}",
+  ];
+
+  TestRun(test)
+    .addError(2, "Unexpected 'break'.")
+    .test(src);
+
+  test.done();
+}
+
+exports.unlabeledContinueWithoutLoop = function(test) {
+  var src = [
+    "switch (i) {",
+    "  case 1:",
+    "    continue;", // breakage but not loopage
+    "}",
+    "continue;"
+  ];
+
+  TestRun(test)
+    .addError(3, "Unexpected 'continue'.")
+    .addError(5, "Unexpected 'continue'.")
+    .test(src);
+
+  test.done();
+}
+
 exports.labelsContinue = function (test) {
   var src = [
     "exists: while(true) {",
