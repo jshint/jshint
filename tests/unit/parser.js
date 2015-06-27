@@ -877,6 +877,17 @@ exports.json.errors = function (test) {
   test.done();
 }
 
+// Regression test for gh-2488
+exports.json.semicolon = function (test) {
+  TestRun(test)
+    .test("{ \"attr\": \";\" }");
+
+  TestRun(test)
+    .test("[\";\"]");
+
+  test.done();
+};
+
 exports.comma = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/comma.js", "utf8");
 
