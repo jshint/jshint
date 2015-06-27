@@ -7,8 +7,7 @@ exports.register = function(linter) {
   linter.on("Identifier", function style_scanProto(data) {
     var esnext = linter.getOption("esnext");
 
-    if (linter.getOption("proto") || (esnext && (linter.getOption("browser") ||
-        linter.getOption("node") || linter.getOption("rhino")))) {
+    if (linter.getOption("proto") || (esnext && linter.getOption("browser"))) {
       return;
     }
 

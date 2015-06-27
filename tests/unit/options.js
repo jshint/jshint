@@ -292,15 +292,11 @@ exports.testProtoAndIterator = function (test) {
     .addError(10, "The '__proto__' property may not be supported by non-browser environments.")
     .addError(33, "The '__proto__' property may not be supported by non-browser environments.")
     .addError(37, "The '__proto__' property may not be supported by non-browser environments.")
-    .test(source, { es3: true, esnext: true, iterator: true });
+    .test(source, { esnext: true, iterator: true });
 
-  // Should allow the `__proto__` property if both esnext and one of browser, node or rhino are on
+  // Should allow the `__proto__` property if both esnext and browser are on
   TestRun(test)
-    .test(source, { es3: true, esnext: true, browser: true, iterator: true });
-  TestRun(test)
-    .test(source, { es3: true, esnext: true, node: true, iterator: true });
-  TestRun(test)
-    .test(source, { es3: true, esnext: true, rhino: true, iterator: true });
+    .test(source, { esnext: true, browser: true, iterator: true });
 
   test.done();
 };
