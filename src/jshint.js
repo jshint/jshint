@@ -290,7 +290,7 @@ var JSHINT = (function() {
     }
 
     if (state.option.globalstrict && state.option.strict !== false) {
-      state.option.strict = true;
+      state.option.strict = "global";
     }
 
     if (state.option.yui) {
@@ -610,6 +610,25 @@ var JSHINT = (function() {
           case "line":
             state.ignoredLines[nt.line] = true;
             removeIgnoredMessages();
+            break;
+          default:
+            error("E002", nt);
+          }
+          return;
+        }
+
+        if (key === "strict") {
+          switch (val) {
+          case "true":
+          case "func":
+            state.option.strict = true;
+            break;
+          case "false":
+            state.option.strict = false;
+            break;
+          case "global":
+          case "implied":
+            state.option.strict = val;
             break;
           default:
             error("E002", nt);
@@ -1557,8 +1576,7 @@ var JSHINT = (function() {
 
     if (r && (!r.identifier || r.value !== "function") && (r.type !== "(punctuator)")) {
       if (!state.isStrict() &&
-          state.option.globalstrict &&
-          state.option.strict) {
+          state.option.strict === "global") {
         warning("E007");
       }
     }
@@ -1636,15 +1654,10 @@ var JSHINT = (function() {
       }
 
       advance();
-      if (state.directive[state.tokens.curr.value]) {
+      var directive = state.tokens.curr.value;
+      if (state.directive[directive] ||
+          (directive === "use strict" && state.option.strict === "implied")) {
         warning("W034", state.tokens.curr, state.tokens.curr.value);
-      }
-
-      if (state.tokens.curr.value === "use strict") {
-        if (!state.option["(explicitNewcap)"]) {
-          state.option.newcap = true;
-        }
-        state.option.undef = true;
       }
 
       // there's no directive negation, so always set to true
@@ -1653,6 +1666,13 @@ var JSHINT = (function() {
       if (p.id === ";") {
         advance(";");
       }
+    }
+
+    if (state.isStrict()) {
+      if (!state.option["(explicitNewcap)"]) {
+        state.option.newcap = true;
+      }
+      state.option.undef = true;
     }
   }
 
@@ -5034,8 +5054,8 @@ var JSHINT = (function() {
       default:
         directives();
 
-        if (state.isStrict()) {
-          if (!state.option.globalstrict) {
+        if (state.directive["use strict"]) {
+          if (state.option.strict !== "global") {
             if (!(state.option.module || state.option.node || state.option.phantom ||
               state.option.browserify)) {
               warning("W097", state.tokens.prev);

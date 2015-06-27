@@ -1434,6 +1434,8 @@ exports.sub = function (test) {
 exports.strict = function (test) {
   var code  = "(function (test) { return; }());";
   var code1 = '(function (test) { "use strict"; return; }());';
+  var code2 = "var obj = Object({ foo: 'bar' });";
+  var code3 = "'use strict'; \n function hello() { return; }";
   var src = fs.readFileSync(__dirname + '/fixtures/strict_violations.js', 'utf8');
   var src2 = fs.readFileSync(__dirname + '/fixtures/strict_incorrect.js', 'utf8');
   var src3 = fs.readFileSync(__dirname + '/fixtures/strict_newcap.js', 'utf8');
@@ -1441,31 +1443,64 @@ exports.strict = function (test) {
   TestRun(test).test(code, {es3: true});
   TestRun(test).test(code1, {es3: true});
 
-  TestRun(test)
-    .addError(1, 'Missing "use strict" statement.')
-    .test(code, { es3: true, strict: true });
+  var run = TestRun(test)
+    .addError(1, 'Missing "use strict" statement.');
+  run.test(code, { es3: true, strict: true });
+  run.test(code, { es3: true, strict: "func" });
+  run.test(code, { es3: true, strict: "global" });
+  TestRun(test).test(code, { es3: true, strict: "implied" });
 
   TestRun(test).test(code1, { es3: true, strict: true });
+  TestRun(test).test(code1, { es3: true, strict: "func" });
+  TestRun(test).test(code1, { es3: true, strict: "global" });
+  TestRun(test)
+    .addError(1, 'Unnecessary directive "use strict".')
+    .test(code1, { es3: true, strict: "implied" });
 
   // Test for strict mode violations
-  TestRun(test)
+  run = TestRun(test)
     .addError(4, 'Possible strict violation.')
     .addError(7, 'Strict violation.')
-    .addError(8, 'Strict violation.')
-    .test(src, { es3: true, strict: true });
+    .addError(8, 'Strict violation.');
+  run.test(src, { es3: true, strict: true });
+  run.test(src, { es3: true, strict: "func" });
+  run.test(src, { es3: true, strict: "global" });
 
-  TestRun(test)
+  run = TestRun(test)
     .addError(4, 'Expected an assignment or function call and instead saw an expression.')
     .addError(9, 'Missing semicolon.')
     .addError(28, 'Expected an assignment or function call and instead saw an expression.')
-    .addError(53, 'Expected an assignment or function call and instead saw an expression.')
-    .test(src2, { es3: true, strict: false });
+    .addError(53, 'Expected an assignment or function call and instead saw an expression.');
+  run.test(src2, { es3: true, strict: false });
 
   TestRun(test)
     .addError(6, "Missing 'new' prefix when invoking a constructor.")
     .test(src3, {es3 : true});
 
-  TestRun(test).test("var obj = Object({ foo: 'bar' });", { es3: true, strict: true });
+  TestRun(test).test(code2, { es3: true, strict: true });
+  TestRun(test).test(code2, { es3: true, strict: "func" });
+  TestRun(test)
+    .addError(1, 'Missing "use strict" statement.')
+    .test(code2, { es3: true, strict: "global" });
+
+  TestRun(test).test(code3, { strict: "global"});
+  run = TestRun(test)
+    .addError(1, 'Use the function form of "use strict".');
+  run.test(code3, { strict: true });
+  run.test(code3, { strict: "func" });
+  run.addError(1, 'Unnecessary directive "use strict".')
+    .test(code3, { strict: "implied" });
+
+  [ true, false, "global", "implied" ].forEach(function(val) {
+    JSHINT("/*jshint strict: " + val + " */");
+    test.strictEqual(JSHINT.data().options.strict, val);
+  });
+  JSHINT("/*jshint strict: func */");
+  test.strictEqual(JSHINT.data().options.strict, true);
+
+  TestRun(test)
+    .addError(1, "Bad option value.")
+    .test("/*jshint strict: foo */");
 
   test.done();
 };
