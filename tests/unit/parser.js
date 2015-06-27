@@ -643,7 +643,8 @@ exports.ownProperty = function (test) {
   test.done();
 };
 
-exports.jsonMode = function (test) {
+exports.json = {};
+exports.json.dflt = function (test) {
   var code = [
     '{',
     '  a: 2,',
@@ -675,7 +676,7 @@ exports.jsonMode = function (test) {
   test.done();
 };
 
-exports.deepJSON = function (test) {
+exports.json.deep = function (test) {
   var code = [
     '{',
     '  "key" : {',
@@ -699,7 +700,7 @@ exports.deepJSON = function (test) {
   test.done();
 }
 
-exports.badJSON = function (test) {
+exports.json.errors = function (test) {
   var objTrailingComma = [
     '{ "key" : "value", }',
   ];
