@@ -4576,7 +4576,7 @@ var JSHINT = (function() {
           break;
         }
       }
-      if (pn.value === ";") {
+      if (checkPunctuators(pn, [";"])) {
         ret.isBlock = true;
         ret.notJson = true;
       }
