@@ -501,12 +501,21 @@ var scopeManager = function(state, predefined, exported, declared) {
       var token = opts.token;
       var isblockscoped = type === "let" || type === "const";
 
-      // late definition check
-      // this is for when a variable we thought was a closure turns out to not be a closure.
+      // outer shadow check (inner is only on non-block scoped)
+      _checkOuterShadow(labelName, token, type);
+
+      // if is block scoped (let or const)
       if (isblockscoped) {
 
-        // is used in TDZ
-        if (_.has(_current["(usages)"], labelName)) {
+        var declaredInCurrentScope = _.has(_current["(labels)"], labelName);
+        // for block scoped variables, params are seen in the current scope as the root function
+        // scope, so check these too.
+        if (!declaredInCurrentScope && _current === _currentFunct && !_current["(global)"]) {
+          declaredInCurrentScope = _.has(_currentFunct["(parent)"]["(labels)"], labelName);
+        }
+
+        // if its not already defined (which is an error, so ignore) and is used in TDZ
+        if (!declaredInCurrentScope && _.has(_current["(usages)"], labelName)) {
           var usage = _current["(usages)"][labelName];
           // if its in a sub function it is not necessarily an error, just latedef
           if (usage["(onlyUsedSubFunction)"]) {
@@ -516,26 +525,7 @@ var scopeManager = function(state, predefined, exported, declared) {
             warning("E056", token, labelName, type);
           }
         }
-      } else {
-        if (usedSoFarInCurrentFunction(labelName)) {
-          _latedefWarning(type, labelName, token);
-        }
-      }
 
-      // outer shadow check (inner is only on non-block scoped)
-      _checkOuterShadow(labelName, token, type);
-
-      // if the identifier is blockscoped (a let or a const),
-      // add it only to the current blockscope
-      if (isblockscoped) {
-
-        var declaredInCurrentScope = _.has(_current["(labels)"], labelName);
-        // for block scoped variables, params are seen in the current scope, so also
-        // throw an error. So if we are in the function scope (not an inner scope)
-        // then check params too
-        if (!declaredInCurrentScope && _current === _currentFunct && !_current["(global)"]) {
-          declaredInCurrentScope = _.has(_currentFunct["(parent)"]["(labels)"], labelName);
-        }
         // if this scope has the variable defined, its a re-definition error
         if (declaredInCurrentScope) {
           warning("E011", token, labelName);
@@ -549,7 +539,15 @@ var scopeManager = function(state, predefined, exported, declared) {
         }
 
         scopeManagerInst.block.add(labelName, type, token, true);
+
       } else {
+
+        var declaredInCurrentFunctionScope = scopeManagerInst.funct.has(labelName);
+
+        // check for late definition, ignore if already declared
+        if (!declaredInCurrentFunctionScope && usedSoFarInCurrentFunction(labelName)) {
+          _latedefWarning(type, labelName, token);
+        }
 
         // defining with a var or a function when a block scope variable of the same name
         // is in scope is an error
@@ -558,7 +556,7 @@ var scopeManager = function(state, predefined, exported, declared) {
         } else if (state.option.shadow !== true) {
           // now since we didn't get any block scope variables, test for var/function
           // shadowing
-          if (scopeManagerInst.funct.has(labelName)) {
+          if (declaredInCurrentFunctionScope) {
 
             // see https://github.com/jshint/jshint/issues/2400
             if (!_currentFunct["(global)"]) {

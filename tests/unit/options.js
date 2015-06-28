@@ -114,9 +114,7 @@ exports.shadowEs6 = function (test) {
     [301, "'zf' has already been declared."],
     [344, "'zzi' has already been declared."],
     [345, "'zzj' has already been declared."],
-    [349, "'zzl' was used before it was declared, which is illegal for 'const' variables."],
     [349, "'zzl' has already been declared."],
-    [350, "'zzm' was used before it was declared, which is illegal for 'let' variables."],
     [350, "'zzm' has already been declared."]
   ];
 
@@ -233,6 +231,13 @@ exports.latedef = function (test) {
   TestRun(test)
     .addError(10, "'vr' was used before it was defined.")
     .test(src, { es3: true, latedef: "nofunc" });
+
+  // when latedef is true, jshint must not warn if variable is defined.
+  TestRun(test)
+    .test([
+      "if(true) { var a; }",
+      "if (a) { a(); }",
+      "var a;"], { es3: true, latedef: true});
 
   // When latedef_func is true, JSHint must not tolerate the use before definition for functions
   TestRun(test)
