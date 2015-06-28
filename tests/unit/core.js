@@ -1473,6 +1473,67 @@ exports.testDefaultArguments = function (test) {
   test.done();
 };
 
+exports.testDuplicateParamNames = function (test) {
+  var src = [
+  "(function() {",
+  "  (function(a, a) { // warns only with shadow",
+  "  })();",
+  "})();",
+  "(function() {",
+  "  'use strict';",
+  "  (function(a, a) { // errors because of strict mode",
+  "  })();",
+  "})();",
+  "(function() {",
+  "  (function(a, a) { // errors because of strict mode",
+  "  'use strict';",
+  "  })();",
+  "})();",
+  "(function() {",
+  "  'use strict';",
+  "  (function(a, a) { // errors *once* because of strict mode",
+  "  'use strict';",
+  "  })();",
+  "})();"
+  ];
+
+  TestRun(test)
+    .addError(7, "'a' has already been declared.")
+    .addError(11, "'a' has already been declared.")
+    .addError(17, "'a' has already been declared.")
+    .addError(18, "Unnecessary directive \"use strict\".")
+    .test(src, { shadow: true });
+
+  TestRun(test)
+    .addError(2, "'a' is already defined.")
+    .addError(7, "'a' has already been declared.")
+    .addError(11, "'a' is already defined.")
+    .addError(11, "'a' has already been declared.")
+    .addError(17, "'a' has already been declared.")
+    .addError(18, "Unnecessary directive \"use strict\".")
+    .test(src, { shadow: "inner" });
+
+  TestRun(test)
+    .addError(2, "'a' is already defined.")
+    .addError(7, "'a' has already been declared.")
+    .addError(11, "'a' is already defined.")
+    .addError(11, "'a' has already been declared.")
+    .addError(17, "'a' has already been declared.")
+    .addError(18, "Unnecessary directive \"use strict\".")
+    .test(src, { shadow: "outer" });
+
+  TestRun(test)
+    .addError(2, "'a' is already defined.")
+    .addError(7, "'a' has already been declared.")
+    .addError(11, "'a' is already defined.")
+    .addError(11, "'a' has already been declared.")
+    .addError(17, "'a' has already been declared.")
+    .addError(18, "Unnecessary directive \"use strict\".")
+    .test(src, { shadow: false });
+
+  test.done();
+};
+
 // Issue #1324: Make sure that we're not mutating passed options object.
 exports.testClonePassedObjects = function (test) {
   var options = { predef: ["sup"] };

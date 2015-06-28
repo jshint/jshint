@@ -1668,6 +1668,8 @@ var JSHINT = (function() {
     }
 
     if (state.isStrict()) {
+      state.funct["(scope)"].inStrictMode();
+
       if (!state.option["(explicitNewcap)"]) {
         state.option.newcap = true;
       }
