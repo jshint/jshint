@@ -1771,6 +1771,28 @@ exports["destructuring assignment default values"] = function (test) {
   test.done();
 };
 
+exports["non-identifier PropertyNames in object destructuring"] = function (test) {
+  var code = [
+    "var { ['x' + 2]: a = 3, 0: b } = { x2: 1, 0: 2 };",
+    "var { c, '': d, 'x': e } = {};",
+    "function fn({ 0: f, 'x': g, ['y']: h}) {}"
+  ];
+
+  TestRun(test)
+    .addError(1, "'a' is defined but never used.")
+    .addError(1, "'b' is defined but never used.")
+    .addError(2, "'c' is defined but never used.")
+    .addError(2, "'d' is defined but never used.")
+    .addError(2, "'e' is defined but never used.")
+    .addError(3, "'fn' is defined but never used.")
+    .addError(0, "'f' is defined but never used.")
+    .addError(0, "'g' is defined but never used.")
+    .addError(0, "'h' is defined but never used.")
+    .test(code, { esnext: true, unused: true });
+
+  test.done();
+};
+
 exports["array element assignment inside array"] = function (test) {
   var code = [
     "var a1 = {};",
