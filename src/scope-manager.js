@@ -116,6 +116,7 @@ var scopeManager = function(state, predefined, exported, declared) {
    */
   function _checkForUnused() {
     // function params are handled specially
+    // assume that parameters are the only thing declared in the param scope
     if (_current["(isParams)"] === "function") {
       _checkParams();
       return;
@@ -413,41 +414,56 @@ var scopeManager = function(state, predefined, exported, declared) {
     },
 
     /**
+     * Add a param to the current scope
+     * @param {string} labelName
+     * @param {Token} token
+     * @param {string} [type="param"] param type
+     */
+    addParam: function(labelName, token, type) {
+      type = type || "param";
+
+      if (type === "exception") {
+        // if defined in the current function
+        var previouslyDefinedLabelType = this.funct.labeltype(labelName);
+        if (previouslyDefinedLabelType && previouslyDefinedLabelType !== "exception") {
+          // and has not been used yet in the current function scope
+          if (!state.option.node) {
+            warning("W002", state.tokens.next, labelName);
+          }
+        }
+      }
+
+      _checkOuterShadow(labelName, token, type);
+
+      if (_.has(_current["(usages)"], labelName)) {
+        var usage = _current["(usages)"][labelName];
+        // if its in a sub function it is not necessarily an error, just latedef
+        if (usage["(onlyUsedSubFunction)"]) {
+          _latedefWarning(type, labelName, token);
+        } else {
+          // this is a clear illegal usage for block scoped variables
+          warning("E056", token, labelName, type);
+        }
+      }
+
+      _current["(labels)"][labelName] = {
+        "(type)" : type,
+        "(token)": token,
+        "(unused)": true };
+      _current["(params)"].push(labelName);
+    },
+
+    /**
      * Tell the manager we are entering a new scope with parameters
      * Call stack after all parameters have been added
      * @param isFunction Whether the scope is a function or not
      */
-    stackParams: function(params, isFunction) {
+    stackParams: function(isFunction) {
       _current = _newScope();
       _current["(isParams)"] = isFunction ? "function" : true;
       _current["(params)"] = [];
 
       _scopeStack.push(_current);
-      var functionScope = this.funct;
-
-      _.each(params, function(param) {
-
-        var type = param.type || "param";
-
-        if (type === "exception") {
-          // if defined in the current function
-          var previouslyDefinedLabelType = functionScope.labeltype(param.id);
-          if (previouslyDefinedLabelType && previouslyDefinedLabelType !== "exception") {
-            // and has not been used yet in the current function scope
-            if (!state.option.node) {
-              warning("W002", state.tokens.next, param.id);
-            }
-          }
-        }
-
-        _checkOuterShadow(param.id, param.token, type);
-
-        _current["(labels)"][param.id] = {
-          "(type)" : type,
-          "(token)": param.token,
-          "(unused)": true };
-        _current["(params)"].push(param.id);
-      });
     },
 
     getUsedOrDefinedGlobals: function() {
