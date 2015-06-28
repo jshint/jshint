@@ -4300,7 +4300,7 @@ var JSHINT = (function() {
       // ImportClause :: ImportedDefaultBinding
       this.name = identifier();
       state.funct["(scope)"].addlabel(this.name, {
-        type: "var",
+        type: "const",
         token: state.tokens.curr });
 
       if (state.tokens.next.value === ",") {
@@ -4325,7 +4325,7 @@ var JSHINT = (function() {
       if (state.tokens.next.identifier) {
         this.name = identifier();
         state.funct["(scope)"].addlabel(this.name, {
-          type: "var",
+          type: "const",
           token: state.tokens.curr });
       }
     } else {
@@ -4349,7 +4349,7 @@ var JSHINT = (function() {
         }
 
         state.funct["(scope)"].addlabel(importName, {
-          type: "var",
+          type: "const",
           token: state.tokens.curr });
 
         if (state.tokens.next.value === ",") {
