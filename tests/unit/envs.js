@@ -30,7 +30,7 @@ function globalsImplied(test, globals, options) {
   JSHINT(wrap(globals), options || {});
   var report = JSHINT.data();
 
-  test.ok(report.implieds !== null);
+  test.ok(report.implieds != null);
   test.ok(report.globals === undefined);
 
   var implieds = [];

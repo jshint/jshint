@@ -88,6 +88,7 @@ exports.prototype_1_7 = function (test) {
     .addError(2989, "'tagName' used out of scope.")
     .addError(2989, "'tagName' used out of scope.")
     .addError(2990, "'tagName' used out of scope.")
+    .addError(3827, "'getOffsetParent' is a function.")
     .addError(3844, "'positionedOffset' is a function.")
     .addError(3860, "'cumulativeOffset' is a function.")
     .addError(4036, "'ret' is already defined.")
@@ -163,8 +164,6 @@ exports.lodash_0_6_1 = function (test) {
     .addError(1159, "'isArr' used out of scope.")
     .addError(1490, "Use '===' to compare with '0'.")
     .addError(1670, "Missing semicolon.")
-    .addError(2731, "'array' is already defined.")
-    .addError(2732, "'array' is a statement label.")
     .addError(3374, "Possible strict violation.")
     .addError(3377, "Missing '()' invoking a constructor.")
     .addError(3384, "Missing semicolon.")
@@ -212,18 +211,11 @@ exports.codemirror3 = function (test) {
   };
 
   TestRun(test)
-    .addError(1157, "'result' is defined but never used.")
     .addError(1342, "Value of 'e' may be overwritten in IE 8 and earlier.")
     .addError(1526, "Value of 'e' may be overwritten in IE 8 and earlier.")
-    .addError(1532, "'mX' is defined but never used.")
-    .addError(1532, "'mY' is defined but never used.")
     .addError(1533, "Value of 'e' may be overwritten in IE 8 and earlier.")
-    .addError(2218, "'state' is defined but never used.")
-    .addError(2427, "'style' is defined but never used.")
-    .addError(2696, "'target' is defined but never used.")
     .addError(3168, "'ok' is defined but never used.")
     .addError(4093, "Unnecessary semicolon.")
-    .addError(4277, "'range' is defined but never used.")
     .test(src, opt, { CodeMirror: true });
 
   test.done();

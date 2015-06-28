@@ -20,7 +20,7 @@ var errors = {
   E010: "'with' is not allowed in strict mode.",
 
   // Constants
-  E011: "const '{a}' has already been declared.",
+  E011: "'{a}' has already been declared.",
   E012: "const '{a}' is initialized to 'undefined'.",
   E013: "Attempting to override '{a}' which is a constant.",
 
@@ -70,7 +70,8 @@ var errors = {
   E052: "Unclosed template literal.",
   E053: "Export declaration must be in global scope.",
   E054: "Class properties must be methods. Expected '(' but instead saw '{a}'.",
-  E055: "The '{a}' option cannot be set after any executable code."
+  E055: "The '{a}' option cannot be set after any executable code.",
+  E056: "'{a}' was used before it was declared, which is illegal for '{b}' variables."
 };
 
 var warnings = {
@@ -168,7 +169,7 @@ var warnings = {
   W089: "The body of a for in should be wrapped in an if statement to filter " +
     "unwanted properties from the prototype.",
   W090: "'{a}' is not a statement label.",
-  W091: "'{a}' is out of scope.",
+  W091: null,
   W093: "Did you mean to return a conditional instead of an assignment?",
   W094: "Unexpected comma.",
   W095: "Expected a string and instead saw {a}.",
