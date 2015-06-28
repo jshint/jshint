@@ -3171,7 +3171,7 @@ var JSHINT = (function() {
   }(delim("{")));
 
   function destructuringExpression() {
-    var id, ids;
+    var ids;
     var identifiers = [];
     if (!state.inESNext()) {
       warning("W104", state.tokens.curr, "destructuring expression");
@@ -3198,6 +3198,29 @@ var JSHINT = (function() {
         return is_rest;
       }
       return false;
+    };
+    var assignmentProperty = function() {
+      var id;
+      if (checkPunctuators(state.tokens.next, ["["])) {
+        advance("[");
+        expression(10);
+        advance("]");
+        advance(":");
+        nextInnerDE();
+      } else if (state.tokens.next.id === "(string)" ||
+                 state.tokens.next.id === "(number)") {
+        advance();
+        advance(":");
+        nextInnerDE();
+      } else {
+        id = identifier();
+        if (checkPunctuators(state.tokens.next, [":"])) {
+          advance(":");
+          nextInnerDE();
+        } else {
+          identifiers.push({ id: id, token: state.tokens.curr });
+        }
+      }
     };
     if (checkPunctuators(state.tokens.next, ["["])) {
       advance("[");
@@ -3234,13 +3257,7 @@ var JSHINT = (function() {
       advance("]");
     } else if (checkPunctuators(state.tokens.next, ["{"])) {
       advance("{");
-      id = identifier();
-      if (checkPunctuators(state.tokens.next, [":"])) {
-        advance(":");
-        nextInnerDE();
-      } else {
-        identifiers.push({ id: id, token: state.tokens.curr });
-      }
+      assignmentProperty();
       while (!checkPunctuators(state.tokens.next, ["}"])) {
         if (checkPunctuators(state.tokens.next, ["="])) {
           advance("=");
@@ -3256,13 +3273,7 @@ var JSHINT = (function() {
             // ObjectBindingPattern: { BindingPropertyList , }
             break;
           }
-          id = identifier();
-          if (checkPunctuators(state.tokens.next, [":"])) {
-            advance(":");
-            nextInnerDE();
-          } else {
-            identifiers.push({ id: id, token: state.tokens.curr });
-          }
+          assignmentProperty();
         }
       }
       advance("}");
