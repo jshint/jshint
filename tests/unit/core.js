@@ -730,10 +730,30 @@ exports.testUndefinedAssignment = function (test) {
 exports.testES6Modules = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/es6-import-export.js", "utf8");
 
-  TestRun(test)
-    .test(src, {esnext: true});
+  var importConstErrors = [
+    [51, "Attempting to override '$' which is a constant."],
+    [52, "Attempting to override 'emGet' which is a constant."],
+    [53, "Attempting to override 'one' which is a constant."],
+    [54, "Attempting to override '_' which is a constant."],
+    [55, "Attempting to override 'ember2' which is a constant."],
+    [57, "'$' has already been declared."],
+    [58, "'emGet' has already been declared."],
+    [58, "'set' has already been declared."],
+    [59, "'_' has already been declared."],
+    [60, "'ember2' has already been declared."],
+    [65, "'newImport' was used before it was declared, which is illegal for 'const' variables."],
+    [57, "'$' was used before it was declared, which is illegal for 'const' variables."],
+    [58, "'emGet' was used before it was declared, which is illegal for 'const' variables."],
+    [58, "'set' was used before it was declared, which is illegal for 'const' variables."],
+    [59, "'_' was used before it was declared, which is illegal for 'const' variables."],
+    [60, "'ember2' was used before it was declared, which is illegal for 'const' variables."]
+  ];
 
-  TestRun(test)
+  var testRun = TestRun(test);
+  importConstErrors.forEach(function(error) { testRun.addError.apply(testRun, error); });
+  testRun.test(src, {esnext: true});
+
+  testRun = TestRun(test)
     .addError(3, "'import' is only available in ES6 (use esnext option).")
     .addError(4, "'import' is only available in ES6 (use esnext option).")
     .addError(5, "'import' is only available in ES6 (use esnext option).")
@@ -757,7 +777,13 @@ exports.testES6Modules = function (test) {
     .addError(48, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(47, "'export' is only available in ES6 (use esnext option).")
     .addError(46, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
-    .test(src, {});
+    .addError(57, "'import' is only available in ES6 (use esnext option).")
+    .addError(58, "'import' is only available in ES6 (use esnext option).")
+    .addError(59, "'import' is only available in ES6 (use esnext option).")
+    .addError(60, "'import' is only available in ES6 (use esnext option).")
+    .addError(65, "'import' is only available in ES6 (use esnext option).")
+  importConstErrors.forEach(function(error) { testRun.addError.apply(testRun, error); });
+  testRun.test(src, {});
 
   var src2 = [
     "var a = {",

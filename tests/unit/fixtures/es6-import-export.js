@@ -46,3 +46,20 @@ export var c = "c";
 export class Foo {}
 export class List extends Array {}
 export default class Bar {}
+
+// imports are const's and cannot be re-assigned
+$ = null;
+emGet = null;
+one = null;
+_ = null;
+ember2 = null;
+// they also cannot be imported twice
+import $ from "jquery";
+import { get as emGet, set } from "ember";
+import { default as _ } from "underscore";
+import * as ember2 from "ember";
+// or used before definition
+if (newImport) {
+  $();
+}
+import newImport from 'newImport';
