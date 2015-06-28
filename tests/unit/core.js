@@ -741,12 +741,7 @@ exports.testES6Modules = function (test) {
     [58, "'set' has already been declared."],
     [59, "'_' has already been declared."],
     [60, "'ember2' has already been declared."],
-    [65, "'newImport' was used before it was declared, which is illegal for 'const' variables."],
-    [57, "'$' was used before it was declared, which is illegal for 'const' variables."],
-    [58, "'emGet' was used before it was declared, which is illegal for 'const' variables."],
-    [58, "'set' was used before it was declared, which is illegal for 'const' variables."],
-    [59, "'_' was used before it was declared, which is illegal for 'const' variables."],
-    [60, "'ember2' was used before it was declared, which is illegal for 'const' variables."]
+    [65, "'newImport' was used before it was declared, which is illegal for 'const' variables."]
   ];
 
   var testRun = TestRun(test);
