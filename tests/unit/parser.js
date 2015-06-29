@@ -5522,7 +5522,13 @@ exports.classes = function (test) {
 
   var run = TestRun(test)
     .addError(cdecl + 4, "Expected an identifier and instead saw 'package' (a reserved word).")
-    .addError(cexpr + 4, "Expected an identifier and instead saw 'package' (a reserved word).");
+    .addError(cexpr + 4, "Expected an identifier and instead saw 'package' (a reserved word).")
+    .addError(cdeclAssn + 4, "'Foo15' is a class.")
+    .addError(cdeclAssn + 7, "'Foo18' is a class.")
+    .addError(cdeclAssn + 7, "'Foo17' is a class.")
+    .addError(cexprAssn + 4, "'Foo15' is a class.")
+    .addError(cexprAssn + 7, "'Foo18' is a class.")
+    .addError(cexprAssn + 7, "'Foo17' is a class.");
 
   run.test(code, {esnext: true});
   run.test(code, {moz: true});
@@ -5538,6 +5544,14 @@ exports.classes = function (test) {
     .addError(cexpr + 3, "'static' is defined but never used.")
     .addError(cexpr + 3, "Expected an identifier and instead saw 'protected' (a reserved word).")
     .addError(cexpr + 4, "'package' is defined but never used.");
+
+  run
+    .addError(cdeclAssn + 4, "'Foo15' is a class.")
+    .addError(cdeclAssn + 7, "'Foo18' is a class.")
+    .addError(cdeclAssn + 7, "'Foo17' is a class.")
+    .addError(cexprAssn + 4, "'Foo15' is a class.")
+    .addError(cexprAssn + 7, "'Foo18' is a class.")
+    .addError(cexprAssn + 7, "'Foo17' is a class.");
 
   code[0] = "'use strict';" + code[0];
   run.test(code, {unused: true, globalstrict: true, esnext: true});
@@ -5675,11 +5689,11 @@ exports.classExpression = function (test) {
   ];
 
   TestRun(test)
-    .addError(2, "'MyClass' is a function.")
-    .addError(3, "'MyClass' is a function.")
-    .addError(4, "'MyClass' is a function.")
-    .addError(5, "'MyClass' is a function.")
-    .addError(6, "'MyClass' is a function.")
+    .addError(2, "'MyClass' is a class.")
+    .addError(3, "'MyClass' is a class.")
+    .addError(4, "'MyClass' is a class.")
+    .addError(5, "'MyClass' is a class.")
+    .addError(6, "'MyClass' is a class.")
     .addError(8, "'MyClass' is not defined.")
     .test(code, { esnext: true, undef: true });
 

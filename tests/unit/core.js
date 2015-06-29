@@ -1005,7 +1005,7 @@ exports.testConstModification = function (test) {
   test.done();
 };
 
-exports["class declaration export (default)"] = function (test) {
+exports["class declaration export"] = function (test) {
   var source = fs.readFileSync(__dirname + "/fixtures/class-declaration.js", "utf8");
 
   TestRun(test).test(source, {
@@ -1016,13 +1016,42 @@ exports["class declaration export (default)"] = function (test) {
   test.done();
 };
 
-exports["function declaration export (default)"] = function (test) {
+exports["function declaration export"] = function (test) {
   var source = fs.readFileSync(__dirname + "/fixtures/function-declaration.js", "utf8");
 
   TestRun(test).test(source, {
     esnext: true,
     undef: true
   });
+
+  test.done();
+};
+
+exports.classIsBlockScoped = function (test) {
+  var code = [
+    "new A();", // use in TDZ
+    "class A {}",
+    "class B extends C {}", // use in TDZ
+    "class C {}",
+    "new D();", // not defined
+    "let E = class D {" +
+    "  constructor() { D.static(); }",
+    "  myfunc() { return D; }",
+    "};",
+    "new D();", // not defined
+    "if (true) {",
+    "  class F {}",
+    "}",
+    "new F();" // not defined
+  ];
+
+  TestRun(test)
+    .addError(2, "'A' was used before it was declared, which is illegal for 'class' variables.")
+    .addError(4, "'C' was used before it was declared, which is illegal for 'class' variables.")
+    .addError(5, "'D' is not defined.")
+    .addError(9, "'D' is not defined.")
+    .addError(13, "'F' is not defined.")
+    .test(code, { esnext: true, undef: true });
 
   test.done();
 };
