@@ -1708,3 +1708,20 @@ exports.catchWithNoParam = function (test) {
 
   test.done();
 };
+
+exports["gh-1920"] = function (test) {
+  var src = [
+    "for (var key in objects) {",
+    "  if (!objects.hasOwnProperty(key)) {",
+    "    switch (key) {",
+    "    }",
+    "  }",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(1, "The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.")
+    .test(src, { forin: true });
+
+  test.done();
+};
