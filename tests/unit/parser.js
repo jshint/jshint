@@ -2760,6 +2760,20 @@ exports["make sure variables may shadow globals in functions after they are refe
   test.done();
 };
 
+exports["test block scope redefines globals only outside of blocks"] = function (test) {
+  var code = [
+    "{",
+    "  let Map = true;",
+    "}",
+    "let Map = false;"
+  ];
+
+  TestRun(test)
+    .addError(4, "Redefinition of 'Map'.")
+    .test(code, { esnext: true, browser: true });
+  test.done();
+};
+
 exports["test destructuring function as moz"] = function (test) {
   // Example from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
