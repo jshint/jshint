@@ -2894,6 +2894,19 @@ var JSHINT = (function() {
 
     functions.push(state.funct);
 
+    // So that the function is available to itself and referencing itself is not
+    // seen as a closure, add the function name to a new scope, but do not
+    // test for unused (unused: false)
+    // it is a new block scope so that params can override it, it can be block scoped
+    // but declarations inside the function don't cause already declared error
+    var internallyAccessibleName = name || classExprBinding;
+    var internallyAccessibleNameType = name ? "function" : "class";
+    if (internallyAccessibleName) {
+      state.funct["(scope)"].stack();
+      state.funct["(scope)"].block.add(internallyAccessibleName,
+        internallyAccessibleNameType, state.tokens.curr, false);
+    }
+
     var params = functionparams(options);
     var paramsIds;
     if (params) {
@@ -2906,18 +2919,6 @@ var JSHINT = (function() {
     state.funct["(scope)"].stackParams(params, true);
     state.funct["(params)"] = paramsIds;
     state.funct["(metrics)"].verifyMaxParametersPerFunction(paramsIds);
-
-    if (name) {
-      // So that the function is available to itself and referencing itself is not
-      // seen as a closure, add the function name to the current scope, but do not
-      // test for unused (unused: false)
-      state.funct["(scope)"].funct.add(name, "function", state.tokens.curr, false);
-    }
-
-    if (classExprBinding) {
-      // if we are inside a class expression, make the class name available to sub functions
-      state.funct["(scope)"].funct.add(classExprBinding, "function", state.tokens.curr, false);
-    }
 
     if (isArrow) {
       if (!state.option.esnext) {
@@ -2945,6 +2946,11 @@ var JSHINT = (function() {
     state.funct["(lastcharacter)"] = state.tokens.curr.character;
 
     state.funct["(scope)"].unstack(); // also does usage and label checks
+
+    // if we have a name, unstack that scope (see above where it is stacked)
+    if (internallyAccessibleName) {
+      state.funct["(scope)"].unstack();
+    }
 
     state.funct = state.funct["(context)"];
 
@@ -4397,7 +4403,8 @@ var JSHINT = (function() {
       // ExportDeclaration :: export default ClassDeclaration
       state.nameStack.set(state.tokens.next);
       advance("default");
-      if (state.tokens.next.id === "function" || state.tokens.next.id === "class") {
+      var exportType = state.tokens.next.id;
+      if (exportType === "function" || exportType === "class") {
         this.block = true;
       }
 
@@ -4405,14 +4412,10 @@ var JSHINT = (function() {
 
       expression(10);
 
-      if (state.tokens.next.id === "class") {
-        identifier = token.name;
-      } else {
-        identifier = token.value;
-      }
+      identifier = token.value;
 
       state.funct["(scope)"].addlabel(identifier, {
-        type: "function",
+        type: exportType,
         token: token });
 
       state.funct["(scope)"].setExported(identifier, token);
@@ -4483,8 +4486,9 @@ var JSHINT = (function() {
       // ExportDeclaration :: export Declaration
       this.block = true;
       advance("class");
-      state.funct["(scope)"].setExported(state.tokens.next.value, state.tokens.next);
+      var classNameToken = state.tokens.next;
       state.syntax["class"].fud();
+      state.funct["(scope)"].setExported(classNameToken.value, classNameToken);
     } else {
       error("E024", state.tokens.next, state.tokens.next.value);
     }

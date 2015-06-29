@@ -263,6 +263,7 @@ var scopeManager = function(state, predefined, exported, declared) {
         var usage = currentUsages[usedLabelName];
         var usedLabel = _.has(currentLabels, usedLabelName) && currentLabels[usedLabelName];
         if (usedLabel) {
+          var usedLabelType = usedLabel["(type)"];
 
           if (usedLabel["(useOutsideOfScope)"] && !state.option.funcscope) {
             var usedTokens = usage["(tokens)"];
@@ -280,16 +281,17 @@ var scopeManager = function(state, predefined, exported, declared) {
           _current["(labels)"][usedLabelName]["(unused)"] = false;
 
           // check for modifying a const
-          if (usedLabel["(type)"] === "const" && usage["(modified)"]) {
+          if (usedLabelType === "const" && usage["(modified)"]) {
             for (j = 0; j < usage["(modified)"].length; j++) {
               error("E013", usage["(modified)"][j], usedLabelName);
             }
           }
 
           // check for re-assigning a function declaration
-          if (usedLabel["(type)"] === "function" && usage["(reassigned)"]) {
+          if ((usedLabelType === "function" || usedLabelType === "class") &&
+              usage["(reassigned)"]) {
             for (j = 0; j < usage["(reassigned)"].length; j++) {
-              error("W021", usage["(reassigned)"][j], usedLabelName);
+              error("W021", usage["(reassigned)"][j], usedLabelName, usedLabelType);
             }
           }
           continue;
@@ -495,7 +497,7 @@ var scopeManager = function(state, predefined, exported, declared) {
 
       var type  = opts.type;
       var token = opts.token;
-      var isblockscoped = type === "let" || type === "const";
+      var isblockscoped = type === "let" || type === "const" || type === "class";
 
       // outer shadow check (inner is only on non-block scoped)
       _checkOuterShadow(labelName, token, type);
@@ -624,7 +626,7 @@ var scopeManager = function(state, predefined, exported, declared) {
 
       /**
        * Adds a new function scoped variable
-       * see current.add for block scoped
+       * see block.add for block scoped
        */
       add: function(labelName, type, tok, unused) {
         _current["(labels)"][labelName] = {
