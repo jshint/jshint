@@ -472,10 +472,6 @@ var scopeManager = function(state, predefined, exported, declared) {
       return null;
     },
 
-    atTop: function() {
-      return _scopeStack.length === 1;
-    },
-
     /**
      * for the exported options, indicating a variable is used outside the file
      */
@@ -643,6 +639,15 @@ var scopeManager = function(state, predefined, exported, declared) {
     },
 
     block: {
+
+      /**
+       * is the current block global?
+       * @returns Boolean
+       */
+      isGlobal: function() {
+        return _currentFunct["(global)"] && _current === _currentFunct;
+      },
+
       use: function(labelName, token) {
 
         // if resolves to current function params, then do not store usage just resolve

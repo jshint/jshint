@@ -3360,7 +3360,7 @@ var JSHINT = (function() {
       for (var t in tokens) {
         if (tokens.hasOwnProperty(t)) {
           t = tokens[t];
-          if (state.funct["(global)"]) {
+          if (state.funct["(scope)"].block.isGlobal()) {
             if (predefined[t.id] === false) {
               warning("W079", t.token, t.id);
             }
@@ -4391,7 +4391,7 @@ var JSHINT = (function() {
       ok = false;
     }
 
-    if (!state.funct["(global)"] || !state.funct["(scope)"].atTop()) {
+    if (!state.funct["(scope)"].block.isGlobal()) {
       error("E053", state.tokens.curr);
       ok = false;
     }
