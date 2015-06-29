@@ -853,6 +853,33 @@ exports.unused = function (test) {
   test.done();
 };
 
+exports['param overrides function name expression'] = function (test) {
+  TestRun(test)
+    .test([
+      "var A = function B(B) {",
+      "  return B;",
+      "};",
+      "A();"
+    ], { undef: true, unused: "strict" });
+
+  test.done();
+};
+
+exports['let can re-use function and class name'] = function (test) {
+  TestRun(test)
+    .test([
+      "var A = function B(C) {",
+      "  let B = C;",
+      "  return B;",
+      "};",
+      "A();",
+      "var D = class E { constructor(F) { let E = F; return E; }};",
+      "D();"
+    ], { undef: true, unused: "strict", esnext: true });
+
+  test.done();
+};
+
 exports['unused data with options'] = function (test) {
 
   // see gh-1894 for discussion on this test

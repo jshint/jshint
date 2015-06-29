@@ -96,7 +96,7 @@ var warnings = {
   W018: "Confusing use of '{a}'.",
   W019: "Use the isNaN function to compare with NaN.",
   W020: "Read only.",
-  W021: "'{a}' is a function.",
+  W021: "'{a}' is a {b}.", // is a class or is a function
   W022: "Do not assign to the exception parameter.",
   W023: "Expected an identifier in an assignment and instead saw a function invocation.",
   W024: "Expected an identifier and instead saw '{a}' (a reserved word).",
