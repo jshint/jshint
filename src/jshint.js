@@ -2762,7 +2762,7 @@ var JSHINT = (function() {
           t = tokens[t];
           if (t.id) {
             paramsIds.push(t.id);
-            currentParams.push([t.id, t]);
+            currentParams.push([t.id, t.token]);
           }
         }
       } else {
