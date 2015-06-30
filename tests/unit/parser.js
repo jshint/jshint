@@ -1651,21 +1651,8 @@ exports["destructuring globals with syntax error"] = function (test) {
   ];
 
   TestRun(test)
-    .addError(4, "Expected ']' to match '[' from line 4 and instead saw ';'.")
-    .addError(4, "Expected an assignment or function call and instead saw an expression.")
-    .addError(4, "Missing semicolon.")
-    .addError(4, "Expected an assignment or function call and instead saw an expression.")
-    .addError(4, "Missing semicolon.")
-    .addError(4, "Expected an identifier and instead saw ']'.")
-    .addError(4, "Expected an operator and instead saw '='.")
-    .addError(4, "Expected an operator and instead saw '['.")
-    .addError(4, "Expected an assignment or function call and instead saw an expression.")
-    .addError(4, "Missing semicolon.")
-    .addError(4, "Expected an assignment or function call and instead saw an expression.")
-    .addError(4, "Expected an assignment or function call and instead saw an expression.")
-    .addError(4, "Missing semicolon.")
-    .addError(4, "Expected an identifier and instead saw ']'.")
-    .addError(4, "Expected an assignment or function call and instead saw an expression.")
+    .addError(3, "Expected an identifier and instead saw '1'.")
+    .addError(4, "Expected ',' and instead saw ';'.")
     .addError(5, "Expected ']' to match '[' from line 5 and instead saw ';'.")
     .addError(5, "Missing semicolon.")
     .addError(5, "Expected an assignment or function call and instead saw an expression.")
@@ -2890,6 +2877,56 @@ exports["destructuring function default values"] = function (test) {
   TestRun(test).test(code, { esnext: true });
 
   test.done();
+};
+
+exports["non var destructuring assignment statement"] = function (test) {
+  var codeValid = [
+    "let b;",
+    "[b] = b;",
+    "([b] = b);",
+    "({b} = b);",
+    "let c = {b} = b;",
+    "c = [b] = b;",
+    "c = ({b} = b);",
+    "c = ([b] = b);"
+  ];
+
+  var codeInvalid = [
+    "let b;",
+    "{b} = b;",
+    "({b}) = b;",
+    "([b]) = b;",
+    "[{constructor(){}}] = b;",
+    "([{constructor(){}}] = b);",
+    "let c = ({b}) = b;",
+    "c = ([b]) = b;"
+  ];
+
+  TestRun(test).test(codeValid, { esnext: true });
+
+  TestRun(test)
+    .addError(2, "Expected an assignment or function call and instead saw an expression.")
+    .addError(2, "Missing semicolon.")
+    .addError(2, "Expected an identifier and instead saw '='.")
+    .addError(2, "Expected an assignment or function call and instead saw an expression.")
+    .addError(2, "Missing semicolon.")
+    .addError(2, "Expected an assignment or function call and instead saw an expression.")
+    .addError(3, "Bad assignment.")
+    .addError(4, "Bad assignment.")
+    .addError(5, "Expected ',' and instead saw '('.")
+    .addError(5, "Expected an identifier and instead saw ')'.")
+    .addError(5, "Expected ',' and instead saw '{'.")
+    .addError(5, "Expected ',' and instead saw '}'.")
+    .addError(6, "Expected ',' and instead saw '('.")
+    .addError(6, "Expected an identifier and instead saw ')'.")
+    .addError(6, "Expected ',' and instead saw '{'.")
+    .addError(6, "Expected ',' and instead saw '}'.")
+    .addError(7, "Bad assignment.")
+    .addError(8, "Bad assignment.")
+    .test(codeInvalid, { esnext: true });
+
+  test.done();
+
 };
 
 exports["invalid for each"] = function (test) {
@@ -6525,6 +6562,7 @@ exports["regression crash from GH-1573"] = function (test) {
     .addError(1, "Expected an identifier and instead saw ']'.")
     .addError(1, "Expected an assignment or function call and instead saw an expression.")
     .addError(1, "Missing semicolon.")
+    .addError(1, "Bad assignment.")
     .test("[var foo = 1;]");
   test.done();
 };
