@@ -1285,20 +1285,22 @@ var JSHINT = (function() {
           state.nameStack.set(state.tokens.prev);
           that.right = expression(10);
           return that;
-        } else if (left.id === "[") {
-          if (state.tokens.curr.left.first) {
-            state.tokens.curr.left.first.forEach(function(t) {
-              if (t && t.identifier) {
-                state.funct["(scope)"].block.modify(t.value, t);
-              }
+        } else if (left.id === "{" || left.id === "[") {
+          if (state.tokens.curr.left.destructAssign) {
+            state.tokens.curr.left.destructAssign.forEach(function(t) {
+              state.funct["(scope)"].block.modify(t.id, t.token);
             });
-          } else if (!left.left) {
-            warning("E031", that);
-          } else if (left.left.value === "arguments" && !state.isStrict()) {
-            warning("E031", that);
+          } else {
+            if (left.id === "{" || !left.left) {
+              warning("E031", that);
+            } else if (left.left.value === "arguments" && !state.isStrict()) {
+              warning("E031", that);
+            }
           }
 
-          state.nameStack.set(left.right);
+          if (left.id === "[") {
+            state.nameStack.set(left.right);
+          }
 
           that.right = expression(10);
           return that;
@@ -2622,8 +2624,9 @@ var JSHINT = (function() {
         warning("W119", state.tokens.curr, "array comprehension");
       }
       return comprehensiveArrayExpression();
-    } else if (blocktype.isDestAssign && !state.inESNext()) {
-      warning("W104", state.tokens.curr, "destructuring assignment");
+    } else if (blocktype.isDestAssign) {
+      this.destructAssign = destructuringPattern({ openingParsed: true, assignment: true });
+      return this;
     }
     var b = state.tokens.curr.line !== startLine(state.tokens.next);
     this.first = [];
@@ -2764,7 +2767,7 @@ var JSHINT = (function() {
       var currentParams = [];
 
       if (_.contains(["{", "["], state.tokens.next.id)) {
-        tokens = destructuringExpression();
+        tokens = destructuringPattern();
         for (t in tokens) {
           t = tokens[t];
           if (t.id) {
@@ -3122,6 +3125,12 @@ var JSHINT = (function() {
         }
       }
 
+      var blocktype = lookupBlockType();
+      if (blocktype.isDestAssign) {
+        this.destructAssign = destructuringPattern({ openingParsed: true, assignment: true });
+        return this;
+      }
+
       for (;;) {
         if (state.tokens.next.id === "}") {
           break;
@@ -3232,16 +3241,27 @@ var JSHINT = (function() {
     };
   }(delim("{")));
 
-  function destructuringExpression() {
+  function destructuringPattern(options) {
+    var isAssignment = options && options.assignment;
+
+    if (!state.inESNext()) {
+      warning("W104", state.tokens.curr,
+        isAssignment ? "destructuring assignment" : "destructuring binding");
+    }
+
+    return destructuringPatternRecursive(options);
+  }
+
+  function destructuringPatternRecursive(options) {
     var ids;
     var identifiers = [];
-    if (!state.inESNext()) {
-      warning("W104", state.tokens.curr, "destructuring expression");
-    }
+    var openingParsed = options && options.openingParsed;
+    var firstToken = openingParsed ? state.tokens.curr : state.tokens.next;
+
     var nextInnerDE = function() {
       var ident;
       if (checkPunctuators(state.tokens.next, ["[", "{"])) {
-        ids = destructuringExpression();
+        ids = destructuringPatternRecursive();
         for (var id in ids) {
           id = ids[id];
           identifiers.push({ id: id.id, token: id.token });
@@ -3284,8 +3304,10 @@ var JSHINT = (function() {
         }
       }
     };
-    if (checkPunctuators(state.tokens.next, ["["])) {
-      advance("[");
+    if (checkPunctuators(firstToken, ["["])) {
+      if (!openingParsed) {
+        advance("[");
+      }
       if (checkPunctuators(state.tokens.next, ["]"])) {
         warning("W137", state.tokens.curr);
       }
@@ -3312,8 +3334,11 @@ var JSHINT = (function() {
         }
       }
       advance("]");
-    } else if (checkPunctuators(state.tokens.next, ["{"])) {
-      advance("{");
+    } else if (checkPunctuators(firstToken, ["{"])) {
+
+      if (!openingParsed) {
+        advance("{");
+      }
       if (checkPunctuators(state.tokens.next, ["}"])) {
         warning("W137", state.tokens.curr);
       }
@@ -3340,7 +3365,7 @@ var JSHINT = (function() {
     return identifiers;
   }
 
-  function destructuringExpressionMatch(tokens, value) {
+  function destructuringPatternMatch(tokens, value) {
     var first = value.first;
 
     if (!first)
@@ -3385,7 +3410,7 @@ var JSHINT = (function() {
     for (;;) {
       var names = [];
       if (_.contains(["{", "["], state.tokens.next.value)) {
-        tokens = destructuringExpression();
+        tokens = destructuringPattern();
         lone = false;
       } else {
         tokens = [ { id: identifier(), token: state.tokens.curr } ];
@@ -3411,7 +3436,7 @@ var JSHINT = (function() {
         if (lone) {
           tokens[0].first = value;
         } else {
-          destructuringExpressionMatch(names, value);
+          destructuringPatternMatch(names, value);
         }
       }
 
@@ -3476,7 +3501,7 @@ var JSHINT = (function() {
     for (;;) {
       var names = [];
       if (_.contains(["{", "["], state.tokens.next.value)) {
-        tokens = destructuringExpression();
+        tokens = destructuringPattern();
         lone = false;
       } else {
         tokens = [ { id: identifier(), token: state.tokens.curr } ];
@@ -3510,7 +3535,7 @@ var JSHINT = (function() {
         if (lone) {
           tokens[0].first = value;
         } else {
-          destructuringExpressionMatch(names, value);
+          destructuringPatternMatch(names, value);
         }
       }
 
@@ -3831,7 +3856,7 @@ var JSHINT = (function() {
       state.funct["(scope)"].stackParams();
 
       if (checkPunctuators(state.tokens.next, ["[", "{"])) {
-        var tokens = destructuringExpression();
+        var tokens = destructuringPattern();
         _.each(tokens, function(token) {
           if (token.id) {
             state.funct["(scope)"].addParam(token.id, token, "exception");
