@@ -39,6 +39,12 @@ exports.other = function (test) {
     .addError(1, "Unrecoverable syntax error. (100% scanned).")
     .test("if (product < ) {}", {es3: true});
 
+  // GH-2506
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw ';'.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .test("typeof;");
+
   test.done();
 };
 
