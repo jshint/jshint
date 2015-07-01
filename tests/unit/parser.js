@@ -1243,7 +1243,7 @@ exports.testIdentifiers = function (test) {
     "var \\u{00000065};"
   ];
 
-  var run = TestRun(test)
+  run = TestRun(test)
     .addError(1, "'\\u{64}' is defined but never used.")
     .addError(2, "'a\\u{64}' is defined but never used.")
     .addError(3, "'\\u{64}a' is defined but never used.")
@@ -1274,6 +1274,15 @@ exports.testIdentifiers = function (test) {
   run.test(src, { es3: true, unused: true });
   run.test(src, { unused: true }); // es5
   run.test(src, { moz: true, unused: true });
+
+  src = [
+    "var \\u{000000078};",
+    "var a = \\u{78};"
+  ];
+
+  TestRun(test)
+    .addError(2, "'a' is defined but never used.")
+    .test(src, { esnext: true, unused: true });
 
   test.done();
 };

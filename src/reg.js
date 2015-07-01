@@ -38,4 +38,4 @@ exports.fallsThrough = /^\s*falls?\sthrough\s*$/;
 exports.maxlenException = /^(?:(?:\/\/|\/\*|\*) ?)?[^ ]+$/;
 
 // Unicode escape sequences (\uXXXX and \u{XXXXXX})
-exports.unicodeEscapeSequence = /\\u(?:([0-9a-fA-F]{4})|\{([0-9a-fA-F]{1,6})\})/g;
+exports.unicodeEscapeSequence = /\\u(?:([0-9a-fA-F]{4})|\{([0-9a-fA-F]+)\})/g;
