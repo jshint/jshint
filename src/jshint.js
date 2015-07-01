@@ -4547,8 +4547,8 @@ var JSHINT = (function() {
     if (checkPunctuators(state.tokens.curr, ["[", "{"]))
       bracketStack += 1;
     do {
-      prev = pn || state.tokens.curr;
-      pn = (i === -1) ? state.tokens.next : peek(i);
+      prev = i === -1 ? state.tokens.curr : pn;
+      pn = i === -1 ? state.tokens.next : peek(i);
       pn1 = peek(i + 1);
       i = i + 1;
       if (checkPunctuators(pn, ["[", "{"])) {
