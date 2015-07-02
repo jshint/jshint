@@ -605,9 +605,6 @@ var JSHINT = (function() {
             state.ignoredLines[nt.line] = true;
             removeIgnoredMessages();
             break;
-          case "start":
-          case "end":
-            break;
           default:
             error("E002", nt);
           }

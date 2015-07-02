@@ -467,9 +467,11 @@ Lexer.prototype = {
               switch (options[1]) {
               case "start":
                 self.ignoringLinterErrors = true;
+                isSpecial = false;
                 break;
               case "end":
                 self.ignoringLinterErrors = false;
+                isSpecial = false;
                 break;
               }
             }
