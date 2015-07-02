@@ -91,6 +91,8 @@ exports.bool = {
      * specification. Use this option if you need your program to be executable
      * in older browsers—such as Internet Explorer 6/7/8/9—and other legacy
      * JavaScript environments.
+     *
+     * @deprecated Use `esversion: 3` instead.
      */
     es3         : true,
 
@@ -98,6 +100,8 @@ exports.bool = {
      * This option enables syntax first defined in [the ECMAScript 5.1
      * specification](http://es5.github.io/). This includes allowing reserved
      * keywords as object properties.
+     *
+     * @deprecated Use `esversion: 5` instead.
      */
     es5         : true,
 
@@ -542,8 +546,10 @@ exports.bool = {
      *
      * More info:
      *
-     * * [Draft Specification for ES.next (ECMA-262 Ed.
-     *   6)](http://wiki.ecmascript.org/doku.php?id=harmony:specification_drafts)
+     * * [Specification for ECMAScript
+     *   6](http://www.ecma-international.org/ecma-262/6.0/index.html)
+     *
+     * @deprecated Use `esversion: 6` instead.
      */
     esnext      : true,
 
@@ -937,8 +943,24 @@ exports.val = {
                         //   end      - stop ignoring lines, starting on the next line
                         //   line     - ignore warnings / errors for just a single line
                         //              (this option does not bypass the lexer)
-  ignoreDelimiters: false // array of start/end delimiters used to ignore
-                          // certain chunks from code
+
+  ignoreDelimiters: false, // array of start/end delimiters used to ignore
+                           // certain chunks from code
+
+  /**
+   * This option is used to specify the ECMAScript version to which the code
+   * must adhere. It can assume one of the following values:
+   *  - `3` - If you need your program to be executable
+   *    in older browsers—such as Internet Explorer 6/7/8/9—and other legacy
+   *    JavaScript environments
+   *  - `5` - To enable syntax first defined in [the ECMAScript 5.1
+   *    specification](http://www.ecma-international.org/ecma-262/5.1/index.html).
+   *    This includes allowing reserved keywords as object properties.
+   *  - `6` - To tell JSHint that your code uses [ECMAScript
+   *    6](http://www.ecma-international.org/ecma-262/6.0/index.html) specific
+   *    syntax. Note that not all browsers implement them.
+   */
+  esversion: 5
 };
 
 // These are JSHint boolean options which are shared with JSLint

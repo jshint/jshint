@@ -14,29 +14,32 @@ var state = {
       this.option.module || this.option.strict === "implied";
   },
 
-  // Assumption: chronologically ES3 < ES5 < ES6/ESNext < Moz
+  // Assumption: chronologically ES3 < ES5 < ES6 < Moz
+
   inMoz: function() {
-    return this.option.moz && !this.option.esnext;
+    return this.option.moz;
   },
 
   /**
-   * @param {object} options
-   * @param {boolean} options.strict - When `true`, only consider ESNext when
-   *                                   in "esnext" code and *not* in "moz".
+   * @param {boolean} strict - When `true`, only consider ES6 when in
+   *                           "esversion: 6" code and *not* in "moz".
    */
-  inESNext: function(strict) {
+  inES6: function(strict) {
     if (strict) {
-      return !this.option.moz && this.option.esnext;
+      return !this.option.moz && this.option.esversion === 6;
     }
-    return this.option.moz || this.option.esnext;
+    return this.option.moz || this.option.esversion >= 6;
   },
 
-  inES5: function() {
-    return !this.option.es3;
-  },
-
-  inES3: function() {
-    return this.option.es3;
+  /**
+   * @param {boolean} strict - When `true`, return `true` only when
+   *                           esversion is exactly 5
+   */
+  inES5: function(strict) {
+    if (strict) {
+      return (!this.option.esversion || this.option.esversion === 5) && !this.option.moz;
+    }
+    return !this.option.esversion || this.option.esversion >= 5 || this.option.moz;
   },
 
 
