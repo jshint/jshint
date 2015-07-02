@@ -4,44 +4,44 @@ for (var key in objects) {
   }
 }
 
-for (var key in objects) {
-  if (!objects.hasOwnProperty(key)) {
+for (var key2 in objects) {
+  if (!objects.hasOwnProperty(key2)) {
     continue;
   }
   hey();
 }
 
 // More statements in loop body than just the if
-for (var key in objects) {
-  if (objects.hasOwnProperty(key)) {
+for (var key3 in objects) {
+  if (objects.hasOwnProperty(key3)) {
     hey();
   }
   hey();
 }
 
 // No continue
-for (var key in objects) {
-  if (!objects.hasOwnProperty(key)) {
+for (var key4 in objects) {
+  if (!objects.hasOwnProperty(key4)) {
     hey();
   }
   hey();
 }
 
 // Nested loops
-for (var key in objects) {
-  if (!objects.hasOwnProperty(key)) {
+for (var key5 in objects) {
+  if (!objects.hasOwnProperty(key5)) {
     continue;
   }
 
   // No if statement
-  for (var key2 in objects) {
+  for (var key6 in objects) {
     hey();
 
-    for (var key3 in objects) {
-      if (objects.hasOwnProperty(key3)) {
+    for (var key7 in objects) {
+      if (objects.hasOwnProperty(key7)) {
         // No continue
-        for (var key4 in objects) {
-          if (!objects.hasOwnProperty(key4)) {
+        for (var key8 in objects) {
+          if (!objects.hasOwnProperty(key8)) {
             hey();
           }
         }
@@ -58,8 +58,8 @@ for (var p in o) {
   }
 }
 
-for (var p in o) {
-  if (Reflect.has(o, p)) {
+for (var p2 in o) {
+  if (Reflect.has(o, p2)) {
     hey();
   }
 }

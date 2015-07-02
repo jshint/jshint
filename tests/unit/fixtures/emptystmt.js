@@ -11,13 +11,13 @@ function foo() {
 
 if (true);
 
-for (var i = 0; i < 10; i += 1);
+for (var j = 0; j < 10; j += 1);
 
-for (var i = 0; i < 10; i += 1) {
+for (var k = 0; k < 10; k += 1) {
     foo();;
     break;
 }
 
-for (var i = 0; i < 10; i += 1) {
+for (var l = 0; l < 10; l += 1) {
     continue;
 }

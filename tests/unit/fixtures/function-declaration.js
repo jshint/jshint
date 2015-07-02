@@ -4,8 +4,8 @@ Object.defineProperty(Header, "CONST", {
   value: 1
 });
 
-export function Header() {}
+export function Header2() {}
 
-Object.defineProperty(Header, "CONST", {
+Object.defineProperty(Header2, "CONST", {
   value: 1
 });

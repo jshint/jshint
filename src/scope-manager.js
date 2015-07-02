@@ -653,9 +653,9 @@ var scopeManager = function(state, predefined, exported, declared) {
           if (declaredInCurrentFunctionScope && labelName !== "__proto__") {
 
             // see https://github.com/jshint/jshint/issues/2400
-            if (_currentFunctBody["(type)"] !== "global") {
-              warning("W004", token, labelName);
-            }
+            //if (_currentFunctBody["(type)"] !== "global") {
+            warning("W004", token, labelName);
+            //}
           }
         }
 

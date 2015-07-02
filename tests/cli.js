@@ -1029,7 +1029,7 @@ exports.extract = {
       "<p>nothing</p>",
       "<script type='text/javascript'>",
       "  /* jshint indent: 2*/",
-      "      var a = 1", // misindented on purpose
+      "      var c = 1", // misindented on purpose
       "</script>",
       "</html>"
     ].join("\n");

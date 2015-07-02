@@ -17,7 +17,7 @@ if (e /= 1)
 while (obj /= arr.next())
     doSomething();
 
-for (var b; b /= arr.next();)
+for (var f; f /= arr.next();)
     doSomething();
 
 do {
@@ -39,7 +39,7 @@ if ((e = 1))
 while ((obj = arr.next()))
     doSomething();
 
-for (var b; (b = arr.next());)
+for (var c; (c = arr.next());)
     doSomething();
 
 do {
@@ -52,17 +52,17 @@ if ((e /= 1))
 while ((obj /= arr.next()))
     doSomething();
 
-for (var b; (b /= arr.next());)
+for (var d; (d /= arr.next());)
     doSomething();
 
 do {
     doSomething();
 } while ((b /= arr.next()));
 
-function foo(a) {
+function foo2(a) {
   return (a = 1);
 }
 
-function bar(a) {
+function bar2(a) {
   return (b.a = 1);
 }

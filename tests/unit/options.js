@@ -24,21 +24,39 @@ var fixture = require('../helpers/fixture').fixture;
 exports.shadow = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/redef.js", "utf8");
 
+  var shadowInnerErrors = [
+    [5, "'a' is already defined."],
+    [10, "'foo' is already defined."],
+    [23, "'c' is already defined."],
+    [26, "'d' is already defined."],
+    [29, "'e' is already defined."],
+    [32, "'f' is already defined."],
+    [37, "'g' is already defined."],
+    [38, "'foo' is already defined."],
+    [42, "'h' is already defined."],
+    [47, "'i' is already defined."],
+    [52, "'c' is already defined."],
+    [55, "'d' is already defined."],
+    [58, "'e' is already defined."],
+    [61, "'f' is already defined."],
+    [66, "'g' is already defined."],
+    [67, "'foo' is already defined."],
+    [71, "'h' is already defined."],
+    [76, "'i' is already defined."]
+  ];
+
   // Do not tolerate variable shadowing by default
-  TestRun(test)
-    .addError(5, "'a' is already defined.")
-    .addError(10, "'foo' is already defined.")
-    .test(src, {es3: true});
+  var testRun = TestRun(test);
+  shadowInnerErrors.forEach(function(error) { testRun.addError.apply(testRun, error); });
+  testRun.test(src, {es3: true});
 
   TestRun(test)
-    .addError(5, "'a' is already defined.")
-    .addError(10, "'foo' is already defined.")
-    .test(src, {es3: true, shadow: false });
+  shadowInnerErrors.forEach(function(error) { testRun.addError.apply(testRun, error); });
+  testRun.test(src, {es3: true, shadow: false });
 
   TestRun(test)
-    .addError(5, "'a' is already defined.")
-    .addError(10, "'foo' is already defined.")
-    .test(src, {es3: true, shadow: "inner" });
+  shadowInnerErrors.forEach(function(error) { testRun.addError.apply(testRun, error); });
+  testRun.test(src, {es3: true, shadow: "inner" });
 
   // Allow variable shadowing when shadow is true
   TestRun(test)
@@ -66,6 +84,9 @@ exports.shadowouter = function (test) {
     .addError(20, "'bar' is already defined in outer scope.")
     .addError(26, "'foo' is already defined.")
     .test(src, { es3: true, shadow: "outer" });
+
+  TestRun(test)
+    .test(src, { es3: true, shadow: true });
 
   test.done();
 };
@@ -122,7 +143,10 @@ exports.shadowEs6 = function (test) {
 
   var innerErrors = [
     [343, "'zzh' is already defined."],
-    [348, "'zzk' is already defined."]
+    [348, "'zzk' is already defined."],
+    [370, "'zzq' is already defined."],
+    [373, "'zzr' is already defined."],
+    [376, "'zzs' is already defined."]
   ];
 
   var outerErrors = [
@@ -205,7 +229,6 @@ exports.shadowEs6 = function (test) {
  */
 exports.latedef = function (test) {
   var src  = fs.readFileSync(__dirname + '/fixtures/latedef.js', 'utf8'),
-    src1 = fs.readFileSync(__dirname + '/fixtures/redef.js', 'utf8'),
     esnextSrc = fs.readFileSync(__dirname + '/fixtures/latedef-esnext.js', 'utf8');
 
   // By default, tolerate the use of variable before its definition
@@ -221,12 +244,6 @@ exports.latedef = function (test) {
     .addError(1, "'fn' is not defined.")
     .test('fn();', { es3: true, undef: true });
 
-  // And it also must complain about the redefinition (see option `shadow`)
-  TestRun(test)
-    .addError(5, "'a' is already defined.")
-    .addError(10, "'foo' is already defined.")
-    .test(src1, { es3: true });
-
   // When latedef is true, JSHint must not tolerate the use before definition
   TestRun(test)
     .addError(10, "'vr' was used before it was defined.")
@@ -234,6 +251,7 @@ exports.latedef = function (test) {
 
   // when latedef is true, jshint must not warn if variable is defined.
   TestRun(test)
+    .addError(3, "'a' is already defined.")
     .test([
       "if(true) { var a; }",
       "if (a) { a(); }",
@@ -1837,10 +1855,12 @@ exports.scope = function (test) {
     .addError(42, "'bb' is not defined.")
     .addError(53, "'xx' used out of scope.")
     .addError(54, "'yy' used out of scope.")
+    .addError(41, "'repeatedloops' is already defined.")
     .test(src, {es3: true});
 
   TestRun(test, 2)
     .addError(37, "'cc' is not defined.")
+    .addError(41, "'repeatedloops' is already defined.")
     .addError(42, "'bb' is not defined.")
     .test(src, { es3: true, funcscope: true });
 
@@ -2391,7 +2411,7 @@ singleGroups.bindingPower.singleExpr = function (test) {
     "var h = void (a || b);",
     "var i = 2 * (3 - 4 - 5) * 6;",
     "var j = (a = 1) + 2;",
-    "var j = (a += 1) / 2;",
+    "var j2 = (a += 1) / 2;",
     "var k = 'foo' + ('bar' ? 'baz' : 'qux');",
     "var l = 1 + (0 || 3);",
     "var u = a / (b * c);",
@@ -2399,8 +2419,8 @@ singleGroups.bindingPower.singleExpr = function (test) {
     "var w = a * (b * c);",
     "var x = z === (b === c);",
     // Invalid forms:
-    "var j = 2 * ((3 - 4) - 5) * 6;",
-    "var l = 2 * ((3 - 4 - 5)) * 6;",
+    "var j3 = 2 * ((3 - 4) - 5) * 6;",
+    "var l2 = 2 * ((3 - 4 - 5)) * 6;",
     "var m = typeof(a.b);",
     "var n = 1 - (2 * 3);",
     "var o = (3 * 1) - 2;",
@@ -2445,9 +2465,9 @@ singleGroups.bindingPower.multiExpr = function (test) {
   var code = [
     "var j = (a, b);",
     "var k = -(a, b);",
-    "var i = (1, a = 1) + 2;",
-    "var k = a ? (b, c) : (d, e);",
-    "var j = (a, b + c) * d;",
+    "var l = (1, a = 1) + 2;",
+    "var m = a ? (b, c) : (d, e);",
+    "var n = (a, b + c) * d;",
     "if (a, (b * c)) {}",
     "if ((a * b), c) {}",
     "if ((a, b, c)) {}",

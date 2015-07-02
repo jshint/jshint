@@ -4518,21 +4518,21 @@ var JSHINT = (function() {
       state.nameStack.set(state.tokens.next);
       advance("default");
       var exportType = state.tokens.next.id;
-      if (exportType === "function" || exportType === "class") {
-        this.block = true;
-      }
 
       token = peek();
 
       expression(10);
 
-      identifier = token.value;
+      if (exportType === "function" || exportType === "class") {
+        this.block = true;
+        identifier = token.value;
 
-      state.funct["(scope)"].addlabel(identifier, {
-        type: exportType,
-        token: token });
+        state.funct["(scope)"].addlabel(identifier, {
+          type: exportType,
+          token: token });
 
-      state.funct["(scope)"].setExported(identifier, token);
+        state.funct["(scope)"].setExported(identifier, token);
+      }
 
       return this;
     }

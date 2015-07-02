@@ -147,7 +147,7 @@ exports.relations = function (test) {
     "var a = 2 === NaN;",
     "var b = NaN == 2;",
     "var c = !2 < 3;",
-    "var c = 2 < !3;",
+    "var c2 = 2 < !3;",
     "var d = (!'x' in obj);",
     "var e = (!a === b);",
     "var f = (a === !'hi');",
@@ -160,7 +160,7 @@ exports.relations = function (test) {
     .addError(1, "Use the isNaN function to compare with NaN.")
     .addError(2, "Use the isNaN function to compare with NaN.")
     .addError(3, "Confusing use of '!'.", {character : 9})
-    .addError(4, "Confusing use of '!'.", {character : 13})
+    .addError(4, "Confusing use of '!'.", {character : 14})
     .addError(5, "Confusing use of '!'.", {character : 10})
     .addError(6, "Confusing use of '!'.", {character : 10})
     .addError(7, "Confusing use of '!'.", {character : 16})
@@ -1254,25 +1254,32 @@ exports["destructuring var in function scope"] = function (test) {
 exports["destructuring var as moz"] = function (test) {
   var code = [
     "var [ a, b, c ] = [ 1, 2, 3 ];",
-    "var [ a ] = [ 1 ];",
-    "var [ a ] = [ z ];",
+    "var [ d ] = [ 1 ];",
+    "var [ e ] = [ z ];",
     "var [ h, w ] = [ 'hello', 'world' ]; ",
     "var [ o ] = [ { o : 1 } ];",
-    "var [ a, [ [ [ b ], c ], d ] ] = [ 1, [ [ [ 2 ], 3], 4 ] ];",
+    "var [ f, [ [ [ g ], i ], j ] ] = [ 1, [ [ [ 2 ], 3], 4 ] ];",
     "var { foo : bar } = { foo : 1 };",
-    "var [ a, { foo : bar } ] = [ 2, { foo : 1 } ];",
+    "var [ k, { foo : bar2 } ] = [ 2, { foo : 1 } ];",
   ];
 
   TestRun(test)
     .addError(3,  "'z' is not defined.")
-    .addError(8,  "'a' is defined but never used.")
-    .addError(6,  "'b' is defined but never used.")
-    .addError(6,  "'c' is defined but never used.")
+    .addError(1, "'a' is defined but never used.")
+    .addError(1, "'b' is defined but never used.")
+    .addError(1, "'c' is defined but never used.")
+    .addError(2, "'d' is defined but never used.")
+    .addError(3, "'e' is defined but never used.")
     .addError(4,  "'h' is defined but never used.")
     .addError(4,  "'w' is defined but never used.")
     .addError(5,  "'o' is defined but never used.")
-    .addError(6,  "'d' is defined but never used.")
-    .addError(8,  "'bar' is defined but never used.")
+    .addError(6,  "'f' is defined but never used.")
+    .addError(6,  "'g' is defined but never used.")
+    .addError(6,  "'i' is defined but never used.")
+    .addError(6,  "'j' is defined but never used.")
+    .addError(7,  "'bar' is defined but never used.")
+    .addError(8,  "'k' is defined but never used.")
+    .addError(8,  "'bar2' is defined but never used.")
     .test(code, {moz: true, unused: true, undef: true});
 
   test.done();
@@ -1281,25 +1288,32 @@ exports["destructuring var as moz"] = function (test) {
 exports["destructuring var as esnext"] = function (test) {
   var code = [
     "var [ a, b, c ] = [ 1, 2, 3 ];",
-    "var [ a ] = [ 1 ];",
-    "var [ a ] = [ z ];",
+    "var [ d ] = [ 1 ];",
+    "var [ e ] = [ z ];",
     "var [ h, w ] = [ 'hello', 'world' ]; ",
     "var [ o ] = [ { o : 1 } ];",
-    "var [ a, [ [ [ b ], c ], d ] ] = [ 1, [ [ [ 2 ], 3], 4 ] ];",
+    "var [ f, [ [ [ g ], i ], j ] ] = [ 1, [ [ [ 2 ], 3], 4 ] ];",
     "var { foo : bar } = { foo : 1 };",
-    "var [ a, { foo : bar } ] = [ 2, { foo : 1 } ];",
+    "var [ k, { foo : bar2 } ] = [ 2, { foo : 1 } ];",
   ];
 
   TestRun(test)
     .addError(3,  "'z' is not defined.")
-    .addError(8,  "'a' is defined but never used.")
-    .addError(6,  "'b' is defined but never used.")
-    .addError(6,  "'c' is defined but never used.")
+    .addError(1, "'a' is defined but never used.")
+    .addError(1, "'b' is defined but never used.")
+    .addError(1, "'c' is defined but never used.")
+    .addError(2, "'d' is defined but never used.")
+    .addError(3, "'e' is defined but never used.")
     .addError(4,  "'h' is defined but never used.")
     .addError(4,  "'w' is defined but never used.")
     .addError(5,  "'o' is defined but never used.")
-    .addError(6,  "'d' is defined but never used.")
-    .addError(8,  "'bar' is defined but never used.")
+    .addError(6,  "'f' is defined but never used.")
+    .addError(6,  "'g' is defined but never used.")
+    .addError(6,  "'i' is defined but never used.")
+    .addError(6,  "'j' is defined but never used.")
+    .addError(7,  "'bar' is defined but never used.")
+    .addError(8,  "'k' is defined but never used.")
+    .addError(8,  "'bar2' is defined but never used.")
     .test(code, {esnext: true, unused: true, undef: true});
 
   test.done();
@@ -1308,13 +1322,13 @@ exports["destructuring var as esnext"] = function (test) {
 exports["destructuring var as es5"] = function (test) {
   var code = [
     "var [ a, b, c ] = [ 1, 2, 3 ];",
-    "var [ a ] = [ 1 ];",
-    "var [ a ] = [ z ];",
+    "var [ d ] = [ 1 ];",
+    "var [ e ] = [ z ];",
     "var [ h, w ] = [ 'hello', 'world' ]; ",
     "var [ o ] = [ { o : 1 } ];",
-    "var [ a, [ [ [ b ], c ], d ] ] = [ 1, [ [ [ 2 ], 3], 4 ] ];",
+    "var [ f, [ [ [ g ], i ], j ] ] = [ 1, [ [ [ 2 ], 3], 4 ] ];",
     "var { foo : bar } = { foo : 1 };",
-    "var [ a, { foo : bar } ] = [ 2, { foo : 1 } ];",
+    "var [ k, { foo : bar2 } ] = [ 2, { foo : 1 } ];",
   ];
 
   TestRun(test)
@@ -1330,14 +1344,21 @@ exports["destructuring var as es5"] = function (test) {
     .addError(8, "'destructuring binding' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(8, "'destructuring binding' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(3,  "'z' is not defined.")
-    .addError(8,  "'a' is defined but never used.")
-    .addError(6,  "'b' is defined but never used.")
-    .addError(6,  "'c' is defined but never used.")
+    .addError(1, "'a' is defined but never used.")
+    .addError(1, "'b' is defined but never used.")
+    .addError(1, "'c' is defined but never used.")
+    .addError(2, "'d' is defined but never used.")
+    .addError(3, "'e' is defined but never used.")
     .addError(4,  "'h' is defined but never used.")
     .addError(4,  "'w' is defined but never used.")
     .addError(5,  "'o' is defined but never used.")
-    .addError(6,  "'d' is defined but never used.")
-    .addError(8,  "'bar' is defined but never used.")
+    .addError(6,  "'f' is defined but never used.")
+    .addError(6,  "'g' is defined but never used.")
+    .addError(6,  "'i' is defined but never used.")
+    .addError(6,  "'j' is defined but never used.")
+    .addError(7,  "'bar' is defined but never used.")
+    .addError(8,  "'k' is defined but never used.")
+    .addError(8,  "'bar2' is defined but never used.")
     .test(code, {unused: true, undef: true}); // es5
 
   test.done();
@@ -1346,13 +1367,13 @@ exports["destructuring var as es5"] = function (test) {
 exports["destructuring var as legacy JS"] = function (test) {
   var code = [
     "var [ a, b, c ] = [ 1, 2, 3 ];",
-    "var [ a ] = [ 1 ];",
-    "var [ a ] = [ z ];",
+    "var [ d ] = [ 1 ];",
+    "var [ e ] = [ z ];",
     "var [ h, w ] = [ 'hello', 'world' ]; ",
     "var [ o ] = [ { o : 1 } ];",
-    "var [ a, [ [ [ b ], c ], d ] ] = [ 1, [ [ [ 2 ], 3], 4 ] ];",
+    "var [ f, [ [ [ g ], i ], j ] ] = [ 1, [ [ [ 2 ], 3], 4 ] ];",
     "var { foo : bar } = { foo : 1 };",
-    "var [ a, { foo : bar } ] = [ 2, { foo : 1 } ];",
+    "var [ k, { foo : bar2 } ] = [ 2, { foo : 1 } ];",
   ];
 
   TestRun(test)
@@ -1368,14 +1389,21 @@ exports["destructuring var as legacy JS"] = function (test) {
     .addError(8, "'destructuring binding' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(8, "'destructuring binding' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(3,  "'z' is not defined.")
-    .addError(8,  "'a' is defined but never used.")
-    .addError(6,  "'b' is defined but never used.")
-    .addError(6,  "'c' is defined but never used.")
+    .addError(1, "'a' is defined but never used.")
+    .addError(1, "'b' is defined but never used.")
+    .addError(1, "'c' is defined but never used.")
+    .addError(2, "'d' is defined but never used.")
+    .addError(3, "'e' is defined but never used.")
     .addError(4,  "'h' is defined but never used.")
     .addError(4,  "'w' is defined but never used.")
     .addError(5,  "'o' is defined but never used.")
-    .addError(6,  "'d' is defined but never used.")
-    .addError(8,  "'bar' is defined but never used.")
+    .addError(6,  "'f' is defined but never used.")
+    .addError(6,  "'g' is defined but never used.")
+    .addError(6,  "'i' is defined but never used.")
+    .addError(6,  "'j' is defined but never used.")
+    .addError(7,  "'bar' is defined but never used.")
+    .addError(8,  "'k' is defined but never used.")
+    .addError(8,  "'bar2' is defined but never used.")
     .test(code, {es3: true, unused: true, undef: true});
 
   test.done();
@@ -1384,16 +1412,16 @@ exports["destructuring var as legacy JS"] = function (test) {
 exports["destructuring var errors"] = function (test) {
   var code = [
     "var [ a, b, c ] = [ 1, 2, 3 ];",
-    "var [ a ] = [ 1 ];",
-    "var [ a ] = [ z ];",
+    "var [ d ] = [ 1 ];",
+    "var [ e ] = [ z ];",
     "var [ h, w ] = [ 'hello', 'world' ]; ",
     "var [ o ] = [ { o : 1 } ];",
-    "var [ a, [ [ [ b ], c ], d ] ] = [ 1, [ [ [ 2 ], 3], 4 ] ];",
+    "var [ f, [ [ [ g ], i ], j ] ] = [ 1, [ [ [ 2 ], 3], 4 ] ];",
     "var { foo : bar } = { foo : 1 };",
-    "var [ a, { foo : bar } ] = [ 2, { foo : 1 } ];",
+    "var [ k, { foo : bar2 } ] = [ 2, { foo : 1 } ];",
     "var [ 1 ] = [ a ];",
-    "var [ a, b; c ] = [ 1, 2, 3 ];",
-    "var [ a, b, c ] = [ 1, 2; 3 ];"
+    "var [ l, m; n ] = [ 1, 2, 3 ];",
+    "var [ p, q, r ] = [ 1, 2; 3 ];"
   ];
 
   TestRun(test)
@@ -1406,13 +1434,26 @@ exports["destructuring var errors"] = function (test) {
     .addError(11, "Expected an identifier and instead saw ']'.")
     .addError(11, "Expected an assignment or function call and instead saw an expression.")
     .addError(3,  "'z' is not defined.")
-    .addError(11, "'b' is defined but never used.")
-    .addError(11, "'c' is defined but never used.")
+    .addError(1, "'b' is defined but never used.")
+    .addError(1, "'c' is defined but never used.")
+    .addError(2, "'d' is defined but never used.")
+    .addError(3, "'e' is defined but never used.")
     .addError(4,  "'h' is defined but never used.")
     .addError(4,  "'w' is defined but never used.")
     .addError(5,  "'o' is defined but never used.")
-    .addError(6,  "'d' is defined but never used.")
-    .addError(8,  "'bar' is defined but never used.")
+    .addError(6,  "'f' is defined but never used.")
+    .addError(6,  "'g' is defined but never used.")
+    .addError(6,  "'i' is defined but never used.")
+    .addError(6,  "'j' is defined but never used.")
+    .addError(7,  "'bar' is defined but never used.")
+    .addError(8,  "'k' is defined but never used.")
+    .addError(8,  "'bar2' is defined but never used.")
+    .addError(10,  "'l' is defined but never used.")
+    .addError(10,  "'m' is defined but never used.")
+    .addError(10,  "'n' is defined but never used.")
+    .addError(11,  "'p' is defined but never used.")
+    .addError(11,  "'q' is defined but never used.")
+    .addError(11,  "'r' is defined but never used.")
     .test(code, {esnext: true, unused: true, undef: true});
 
   test.done();
@@ -3994,8 +4035,8 @@ exports["for of as esnext"] = function (test) {
     "for (xg, yg of [1,2,3,4]) print(xg + yg);",
     "for (xg = 1, yg = 2 of [1,2,3,4]) print(xg + yg);",
     "for (var xv = 1 of [1,2,3,4]) print(xv);",
-    "for (var xv, yv of [1,2,3,4]) print(xv + yv);",
-    "for (var xv = 1, yv = 2 of [1,2,3,4]) print(xv + yv);",
+    "for (var xv2, yv2 of [1,2,3,4]) print(xv2 + yv2);",
+    "for (var xv3 = 1, yv3 = 2 of [1,2,3,4]) print(xv3 + yv3);",
     "for (let x = 1 of [1,2,3,4]) print(x);",
     "for (let x, y of [1,2,3,4]) print(x + y);",
     "for (let x = 1, y = 2 of [1,2,3,4]) print(x + y);",
@@ -4036,8 +4077,8 @@ exports["for of as es5"] = function (test) {
     "for (x, y of [1,2,3,4]) print(x + y);",
     "for (x = 1, y = 2 of [1,2,3,4]) print(x + y);",
     "for (var x = 1 of [1,2,3,4]) print(x);",
-    "for (var x, y of [1,2,3,4]) print(x + y);",
-    "for (var x = 1, y = 2 of [1,2,3,4]) print(x + y);",
+    "for (var x2, y of [1,2,3,4]) print(x2 + y);",
+    "for (var x3 = 1, y3 = 2 of [1,2,3,4]) print(x3 + y3);",
     "for (let x = 1 of [1,2,3,4]) print(x);",
     "for (let x, y of [1,2,3,4]) print(x + y);",
     "for (let x = 1, y = 2 of [1,2,3,4]) print(x + y);",
@@ -4102,8 +4143,8 @@ exports["for of as legacy JS"] = function (test) {
     "for (x, y of [1,2,3,4]) print(x + y);",
     "for (x = 1, y = 2 of [1,2,3,4]) print(x + y);",
     "for (var x = 1 of [1,2,3,4]) print(x);",
-    "for (var x, y of [1,2,3,4]) print(x + y);",
-    "for (var x = 1, y = 2 of [1,2,3,4]) print(x + y);",
+    "for (var x2, y of [1,2,3,4]) print(x2 + y);",
+    "for (var x3 = 1, y3 = 2 of [1,2,3,4]) print(x3 + y3);",
     "for (let x = 1 of [1,2,3,4]) print(x);",
     "for (let x, y of [1,2,3,4]) print(x + y);",
     "for (let x = 1, y = 2 of [1,2,3,4]) print(x + y);",
@@ -4175,8 +4216,8 @@ exports["array destructuring for of as esnext"] = function (test) {
     "for ([i, v], [a, b] of [[0, 1],[1, 2],[2, 3],[3, 4]]) print(i + '=' + v);",
     "for ([i, v], [a, b] = [1, 2] of [[0, 1],[1, 2],[2, 3],[3, 4]]) print(i + '=' + v);",
     "for (var [i, v] = [1, 2] of [[0, 1],[1, 2],[2, 3],[3, 4]]) print(i + '=' + v);",
-    "for (var [i, v], [a, b] of [[0, 1],[1, 2],[2, 3],[3, 4]]) print(i + '=' + v);",
-    "for (var [i, v], [a, b] = [1, 2] of [[0, 1],[1, 2],[2, 3],[3, 4]]) print(i + '=' + v);",
+    "for (var [i2, v2], [a, b] of [[0, 1],[1, 2],[2, 3],[3, 4]]) print(i2 + '=' + v2);",
+    "for (var [i3, v3], [a3, b3] = [1, 2] of [[0, 1],[1, 2],[2, 3],[3, 4]]) print(i3 + '=' + v3);",
   ];
 
   TestRun(test, "errors #1")
@@ -4240,8 +4281,8 @@ exports["array destructuring for of as es5"] = function (test) {
     "for ([i, v], [a, b] of [[0, 1],[1, 2],[2, 3],[3, 4]]) print(i + '=' + v);",
     "for ([i, v], [a, b] = [1, 2] of [[0, 1],[1, 2],[2, 3],[3, 4]]) print(i + '=' + v);",
     "for (var [i, v] = [1, 2] of [[0, 1],[1, 2],[2, 3],[3, 4]]) print(i + '=' + v);",
-    "for (var [i, v], [a, b] of [[0, 1],[1, 2],[2, 3],[3, 4]]) print(i + '=' + v);",
-    "for (var [i, v], [a, b] = [1, 2] of [[0, 1],[1, 2],[2, 3],[3, 4]]) print(i + '=' + v);",
+    "for (var [i2, v2], [a, b] of [[0, 1],[1, 2],[2, 3],[3, 4]]) print(i2 + '=' + v2);",
+    "for (var [i3, v3], [a3, b3] = [1, 2] of [[0, 1],[1, 2],[2, 3],[3, 4]]) print(i3 + '=' + v3);",
   ];
 
   TestRun(test, "errors #1")
@@ -4343,8 +4384,8 @@ exports["array destructuring for of as legacy JS"] = function (test) {
     "for ([i, v], [a, b] of [[0, 1],[1, 2],[2, 3],[3, 4]]) print(i + '=' + v);",
     "for ([i, v], [a, b] = [1, 2] of [[0, 1],[1, 2],[2, 3],[3, 4]]) print(i + '=' + v);",
     "for (var [i, v] = [1, 2] of [[0, 1],[1, 2],[2, 3],[3, 4]]) print(i + '=' + v);",
-    "for (var [i, v], [a, b] of [[0, 1],[1, 2],[2, 3],[3, 4]]) print(i + '=' + v);",
-    "for (var [i, v], [a, b] = [1, 2] of [[0, 1],[1, 2],[2, 3],[3, 4]]) print(i + '=' + v);",
+    "for (var [i2, v2], [a, b] of [[0, 1],[1, 2],[2, 3],[3, 4]]) print(i2 + '=' + v2);",
+    "for (var [i3, v3], [a3, b3] = [1, 2] of [[0, 1],[1, 2],[2, 3],[3, 4]]) print(i3 + '=' + v3);",
   ];
 
   TestRun(test, "errors #1")
@@ -4442,8 +4483,8 @@ exports["object destructuring for of as esnext"] = function (test) {
     "for ({key, data: {val}}, {a, b} of arr) print(key + '=' + val);",
     "for ({key, data: {val}}, {a, b} = obj1 of arr) print(key + '=' + val);",
     "for (var {key, data: {val}} = obj1 of arr) print(key + '=' + val);",
-    "for (var {key, data: {val}}, {a, b} of arr) print(key + '=' + val);",
-    "for (var {key, data: {val}}, {a, b} = obj1 of arr) print(key + '=' + val);"
+    "for (var {key2, data: {val2}}, {a, b} of arr) print(key2 + '=' + val2);",
+    "for (var {key3, data: {val3}}, {a3, b3} = obj1 of arr) print(key3 + '=' + val3);"
   ];
 
   TestRun(test, "errors #1")
@@ -4521,8 +4562,8 @@ exports["object destructuring for of as es5"] = function (test) {
     "for ({key, data: {val}}, {a, b} of arr) print(key + '=' + val);",
     "for ({key, data: {val}}, {a, b} = obj1 of arr) print(key + '=' + val);",
     "for (var {key, data: {val}} = obj1 of arr) print(key + '=' + val);",
-    "for (var {key, data: {val}}, {a, b} of arr) print(key + '=' + val);",
-    "for (var {key, data: {val}}, {a, b} = obj1 of arr) print(key + '=' + val);"
+    "for (var {key2, data: {val2}}, {a, b} of arr) print(key2 + '=' + val2);",
+    "for (var {key3, data: {val3}}, {a3, b3} = obj1 of arr) print(key3 + '=' + val3);"
   ];
 
   TestRun(test, "errors #1")
@@ -4650,8 +4691,8 @@ exports["object destructuring for of as legacy JS"] = function (test) {
     "for ({key, data: {val}}, {a, b} of arr) print(key + '=' + val);",
     "for ({key, data: {val}}, {a, b} = obj1 of arr) print(key + '=' + val);",
     "for (var {key, data: {val}} = obj1 of arr) print(key + '=' + val);",
-    "for (var {key, data: {val}}, {a, b} of arr) print(key + '=' + val);",
-    "for (var {key, data: {val}}, {a, b} = obj1 of arr) print(key + '=' + val);"
+    "for (var {key1, data: {val1}}, {a, b} of arr) print(key1 + '=' + val1);",
+    "for (var {key2, data: {val2}}, {a2, b2} = obj1 of arr) print(key2 + '=' + val2);"
   ];
 
   TestRun(test, "errors #1")
@@ -4951,8 +4992,8 @@ exports["automatic comma insertion GH-950"] = function (test) {
     "var a = b",
     "instanceof c;",
 
-    "var a = { b: 'X' }",
-    "delete a.b",
+    "var z = { b: 'X' }",
+    "delete z.b",
 
     "var y = true",
     "           && true && false;",
@@ -6969,7 +7010,7 @@ exports.extraRestOperator = function (test) {
     'function fn2([......c]) { }',
     'function fn3(a, b, ......) { }',
     'function fn4(......) { }',
-    'var [......a] = [1, 2, 3];',
+    'var [......z] = [1, 2, 3];',
     'var [a, b, ... ...c] = [1, 2, 3];',
     'var arrow = (......a) => a;',
     'var arrow2 = (a, b, ......c) => c;',
