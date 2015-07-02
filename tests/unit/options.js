@@ -3203,11 +3203,11 @@ exports.esversion = function(test) {
   ];
 
   TestRun(test, "ES6 syntax as ES3")
-    .addError(2, "'computed property names' is only available in ES6 (use esnext option).")
+    .addError(2, "'computed property names' is only available in ES6 (use 'esversion: 6').")
     .test(es6code, { esversion: 3 });
 
   TestRun(test, "ES6 syntax as ES5")
-    .addError(2, "'computed property names' is only available in ES6 (use esnext option).")
+    .addError(2, "'computed property names' is only available in ES6 (use 'esversion: 6').")
     .test(es6code); // esversion: 5 (default)
 
   TestRun(test, "ES6 syntax as ES6")
@@ -3222,7 +3222,7 @@ exports.esversion = function(test) {
     .test(es6code, { esversion: 6, es5: true });
 
   TestRun(test, "precedence over `esnext`") // TODO: Remove in JSHint 3
-    .addError(2, "'computed property names' is only available in ES6 (use esnext option).")
+    .addError(2, "'computed property names' is only available in ES6 (use 'esversion: 6').")
     .test(es6code, { esversion: 3, esnext: true });
 
   var code2 = [ // TODO: Remove in JSHint 3
