@@ -13,7 +13,7 @@ exports.register = function(linter) {
       linter.warn("W103", {
         line: data.line,
         char: data.char,
-        data: [ data.name ]
+        data: [ data.name, "6" ]
       });
     }
   });

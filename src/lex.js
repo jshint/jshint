@@ -796,7 +796,7 @@ Lexer.prototype = {
               code: "W119",
               line: this.line,
               character: this.char,
-              data: [ "Octal integer literal" ]
+              data: [ "Octal integer literal", "6" ]
             });
           }
 
@@ -814,7 +814,7 @@ Lexer.prototype = {
               code: "W119",
               line: this.line,
               character: this.char,
-              data: [ "Binary integer literal" ]
+              data: [ "Binary integer literal", "6" ]
             });
           }
 
