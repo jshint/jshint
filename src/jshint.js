@@ -5155,7 +5155,6 @@ var JSHINT = (function() {
       options: state.option
     };
 
-    var members = [];
     var fu, f, i, j, n, globals;
 
     if (itself.errors.length) {
@@ -5215,7 +5214,6 @@ var JSHINT = (function() {
       data.unused = unuseds;
     }
 
-    members = [];
     for (n in member) {
       if (typeof member[n] === "number") {
         data.member = member;
