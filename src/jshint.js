@@ -3767,14 +3767,6 @@ var JSHINT = (function() {
         advance();
       }
 
-      state.funct = functor("(catch)", state.tokens.next, {
-        "(context)"  : state.funct,
-        "(breakage)" : state.funct["(breakage)"],
-        "(loopage)"  : state.funct["(loopage)"],
-        "(statement)": false,
-        "(catch)"    : true
-      });
-
       state.funct["(scope)"].stackParams(e ? [ { id: e.value, token: e, type: "exception" }] : []);
 
       if (state.tokens.next.value === "if") {
@@ -3787,15 +3779,9 @@ var JSHINT = (function() {
 
       advance(")");
 
-      functions.push(state.funct);
-
       block(false);
 
       state.funct["(scope)"].unstack();
-
-      state.funct["(last)"] = state.tokens.curr.line;
-      state.funct["(lastcharacter)"] = state.tokens.curr.character;
-      state.funct = state.funct["(context)"];
     }
 
     block(true);
