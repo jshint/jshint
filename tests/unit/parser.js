@@ -1667,7 +1667,7 @@ exports["destructuring const errors"] = function (test) {
     .addError(5, "Expected an identifier and instead saw ']'.")
     .addError(5, "Expected an assignment or function call and instead saw an expression.")
     .addError(5, "Missing semicolon.")
-    .test(code, {es3: true, esnext: true, unused: true, undef: true});
+    .test(code, {esnext: true, unused: true, undef: true});
 
   test.done();
 };
@@ -5102,16 +5102,12 @@ exports["fat arrows support"] = function (test) {
     .addError(13, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
     .addError(16, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
     .addError(17, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
-    .addError(17, "Bad invocation.")
     .addError(18, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
     .addError(19, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
-    .addError(19, "Bad invocation.")
     .addError(21, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
     .addError(22, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
-    .addError(22, "Bad invocation.")
     .addError(23, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
     .addError(24, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
-    .addError(24, "Bad invocation.")
     .addError(26, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).");
 
   run.test(code, { undef: true, moz: true });

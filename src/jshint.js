@@ -189,11 +189,24 @@ var JSHINT = (function() {
   function assume() {
     processenforceall();
 
-    if (!state.option.es3) {
+    /**
+     * TODO: Remove in JSHint 3
+     */
+    if (!state.option.esversion) {
+      if (state.option.es3) {
+        state.option.esversion = 3;
+      } else if (state.option.esnext) {
+        state.option.esversion = 6;
+      } else {
+        state.option.esversion = 5;
+      }
+    }
+
+    if (state.inES5()) {
       combine(predefined, vars.ecmaIdentifiers[5]);
     }
 
-    if (state.option.esnext) {
+    if (state.inES6()) {
       combine(predefined, vars.ecmaIdentifiers[6]);
     }
 
@@ -204,7 +217,7 @@ var JSHINT = (function() {
       /**
        * TODO: Extend this restriction to *all* ES6-specific options.
        */
-      if (!state.inESNext()) {
+      if (!state.inES6()) {
         warning("W134", state.tokens.next, "module", 6);
       }
     }
@@ -516,6 +529,9 @@ var JSHINT = (function() {
           return;
         }
 
+        /**
+         * TODO: Remove in JSHint 3
+         */
         if (key === "es5") {
           if (val === "true" && state.option.es5) {
             warning("I003");
@@ -642,6 +658,48 @@ var JSHINT = (function() {
           if (!hasParsedCode(state.funct)) {
             error("E055", state.tokens.next, "module");
           }
+        }
+
+        /**
+         * TODO: Remove in JSHint 3
+         */
+        var esversions = {
+          es3   : 3,
+          es5   : 5,
+          esnext: 6
+        };
+        if (_.has(esversions, key)) {
+          switch (val) {
+          case "true":
+            state.option.esversion = esversions[key];
+            break;
+          case "false":
+            state.option.esversion = 5;
+            break;
+          default:
+            error("E002", nt);
+          }
+          return;
+        }
+
+        if (key === "esversion") {
+          switch (val) {
+          case "5":
+            if (state.inES5(true)) {
+              warning("I003");
+            }
+            /* falls through */
+          case "3":
+          case "6":
+            state.option.esversion = +val;
+            break;
+          case "2015":
+            state.option.esversion = 6;
+            break;
+          default:
+            error("E002", nt);
+          }
+          return;
         }
 
         var match = /^([+-])(W\d{3})$/g.exec(key);
@@ -1212,7 +1270,7 @@ var JSHINT = (function() {
     if (!left || !right)
       return false;
 
-    values = state.inESNext() ? typeofValues.es6 : typeofValues.es3;
+    values = state.inES6() ? typeofValues.es6 : typeofValues.es3;
 
     if (right.type === "(identifier)" && right.value === "typeof" && left.type === "(string)")
       return !_.contains(values, left.value);
@@ -1454,7 +1512,7 @@ var JSHINT = (function() {
 
     // parameter destructuring with rest operator
     if (state.tokens.next.value === "...") {
-      if (!state.option.esnext) {
+      if (!state.inES6(true)) {
         warning("W119", state.tokens.next, "spread/rest operator");
       }
       advance();
@@ -2180,7 +2238,7 @@ var JSHINT = (function() {
   });
 
   prefix("...", function() {
-    if (!state.option.esnext) {
+    if (!state.inES6(true)) {
       warning("W119", this, "spread/rest operator");
     }
 
@@ -2256,7 +2314,7 @@ var JSHINT = (function() {
   }));
   prefix("new", function() {
     var mp = metaProperty("target", function() {
-      if (!state.inESNext(true)) {
+      if (!state.inES6(true)) {
         warning("W119", state.tokens.prev, "new.target");
       }
       var inFunction, c = state.funct;
@@ -2284,7 +2342,7 @@ var JSHINT = (function() {
           warning("W053", state.tokens.prev, c.value);
           break;
         case "Symbol":
-          if (state.option.esnext) {
+          if (state.inES6()) {
             warning("W053", state.tokens.prev, c.value);
           }
           break;
@@ -2394,7 +2452,7 @@ var JSHINT = (function() {
     advance(")");
 
     if (typeof left === "object") {
-      if (state.inES3() && left.value === "parseInt" && n === 1) {
+      if (!state.inES5() && left.value === "parseInt" && n === 1) {
         warning("W065", state.tokens.curr);
       }
       if (!state.option.evil) {
@@ -2423,7 +2481,7 @@ var JSHINT = (function() {
       }
       if (!left.identifier && left.id !== "." && left.id !== "[" && left.id !== "=>" &&
           left.id !== "(" && left.id !== "&&" && left.id !== "||" && left.id !== "?" &&
-          !(state.option.esnext && left["(name)"])) {
+          !(state.inES6() && left["(name)"])) {
         warning("W067", that);
       }
     }
@@ -2636,7 +2694,7 @@ var JSHINT = (function() {
   prefix("[", function() {
     var blocktype = lookupBlockType();
     if (blocktype.isCompArray) {
-      if (!state.inESNext()) {
+      if (!state.inES6()) {
         warning("W119", state.tokens.curr, "array comprehension");
       }
       return comprehensiveArrayExpression();
@@ -2677,7 +2735,7 @@ var JSHINT = (function() {
       this.first.push(expression(10));
       if (state.tokens.next.id === ",") {
         comma({ allowTrailing: true });
-        if (state.tokens.next.id === "]" && !state.inES5(true)) {
+        if (state.tokens.next.id === "]" && !state.inES5()) {
           warning("W070", state.tokens.curr);
           break;
         }
@@ -2813,7 +2871,7 @@ var JSHINT = (function() {
         }
       }
       if (state.tokens.next.id === "=") {
-        if (!state.inESNext()) {
+        if (!state.inES6()) {
           warning("W119", state.tokens.next, "default parameters");
         }
         advance("=");
@@ -3000,7 +3058,7 @@ var JSHINT = (function() {
     }
 
     if (isArrow) {
-      if (!state.option.esnext) {
+      if (!state.inES6(true)) {
         warning("W119", state.tokens.curr, "arrow function syntax (=>)");
       }
 
@@ -3173,7 +3231,7 @@ var JSHINT = (function() {
         nextVal = state.tokens.next.value;
         if (state.tokens.next.identifier &&
             (peekIgnoreEOL().id === "," || peekIgnoreEOL().id === "}")) {
-          if (!state.inESNext()) {
+          if (!state.inES6()) {
             warning("W104", state.tokens.next, "object short notation");
           }
           i = propertyName(true);
@@ -3192,8 +3250,8 @@ var JSHINT = (function() {
 
           // ES6 allows for get() {...} and set() {...} method
           // definition shorthand syntax, so we don't produce an error
-          // if the esnext option is enabled.
-          if (!i && !state.inESNext()) {
+          // if linting ECMAScript 6 code.
+          if (!i && !state.inES6()) {
             error("E035");
           }
 
@@ -3215,7 +3273,7 @@ var JSHINT = (function() {
           }
         } else {
           if (state.tokens.next.value === "*" && state.tokens.next.type === "(punctuator)") {
-            if (!state.inESNext()) {
+            if (!state.inES6()) {
               warning("W104", state.tokens.next, "generator functions");
             }
             advance("*");
@@ -3238,7 +3296,7 @@ var JSHINT = (function() {
           }
 
           if (state.tokens.next.value === "(") {
-            if (!state.inESNext()) {
+            if (!state.inES6()) {
               warning("W104", state.tokens.curr, "concise methods");
             }
             doFunction({ type: isGeneratorMethod ? "generator" : null });
@@ -3254,7 +3312,7 @@ var JSHINT = (function() {
           comma({ allowTrailing: true, property: true });
           if (state.tokens.next.id === ",") {
             warning("W070", state.tokens.curr);
-          } else if (state.tokens.next.id === "}" && !state.inES5(true)) {
+          } else if (state.tokens.next.id === "}" && !state.inES5()) {
             warning("W070", state.tokens.curr);
           }
         } else {
@@ -3278,7 +3336,7 @@ var JSHINT = (function() {
   function destructuringPattern(options) {
     var isAssignment = options && options.assignment;
 
-    if (!state.inESNext()) {
+    if (!state.inES6()) {
       warning("W104", state.tokens.curr,
         isAssignment ? "destructuring assignment" : "destructuring binding");
     }
@@ -3425,7 +3483,7 @@ var JSHINT = (function() {
     var isConst = type === "const";
     var tokens, lone, value, letblock;
 
-    if (!state.inESNext()) {
+    if (!state.inES6()) {
       warning("W104", state.tokens.curr, type);
     }
 
@@ -3582,7 +3640,7 @@ var JSHINT = (function() {
               warning("W079", t.token, t.id);
             } else if (state.option.futurehostile === false) {
               if ((!state.inES5() && vars.ecmaIdentifiers[5][t.id] === false) ||
-                (!state.inESNext() && vars.ecmaIdentifiers[6][t.id] === false)) {
+                (!state.inES6() && vars.ecmaIdentifiers[6][t.id] === false)) {
                 warning("W129", t.token, t.id);
               }
             }
@@ -3625,7 +3683,7 @@ var JSHINT = (function() {
   function classdef(isStatement) {
 
     /*jshint validthis:true */
-    if (!state.inESNext()) {
+    if (!state.inES6()) {
       warning("W104", state.tokens.curr, "class");
     }
     if (isStatement) {
@@ -3779,7 +3837,7 @@ var JSHINT = (function() {
     var generator = false;
     if (state.tokens.next.value === "*") {
       advance("*");
-      if (state.inESNext({ strict: true })) {
+      if (state.inES6({ strict: true })) {
         generator = true;
       } else {
         warning("W119", state.tokens.curr, "function*");
@@ -3816,7 +3874,7 @@ var JSHINT = (function() {
     var generator = false;
 
     if (state.tokens.next.value === "*") {
-      if (!state.inESNext()) {
+      if (!state.inES6()) {
         warning("W119", state.tokens.curr, "function*");
       }
       advance("*");
@@ -4144,7 +4202,7 @@ var JSHINT = (function() {
 
     // if we're in a for (… in|of …) statement
     if (_.contains(inof, nextop.value)) {
-      if (!state.inESNext() && nextop.value === "of") {
+      if (!state.inES6() && nextop.value === "of") {
         error("W104", nextop, "for of");
       }
 
@@ -4355,12 +4413,12 @@ var JSHINT = (function() {
     x.lbp = 25;
   }(prefix("yield", function() {
     var prev = state.tokens.prev;
-    if (state.inESNext(true) && !state.funct["(generator)"]) {
+    if (state.inES6(true) && !state.funct["(generator)"]) {
       // If it's a yield within a catch clause inside a generator then that's ok
       if (!("(catch)" === state.funct["(name)"] && state.funct["(context)"]["(generator)"])) {
         error("E046", state.tokens.curr, "yield");
       }
-    } else if (!state.inESNext()) {
+    } else if (!state.inES6()) {
       warning("W104", state.tokens.curr, "yield");
     }
     state.funct["(generator)"] = "yielded";
@@ -4406,7 +4464,7 @@ var JSHINT = (function() {
   }).exps = true;
 
   stmt("import", function() {
-    if (!state.inESNext()) {
+    if (!state.inES6()) {
       warning("W119", state.tokens.curr, "import");
     }
 
@@ -4498,7 +4556,7 @@ var JSHINT = (function() {
     var token;
     var identifier;
 
-    if (!state.inESNext()) {
+    if (!state.inES6()) {
       warning("W119", state.tokens.curr, "export");
       ok = false;
     }
@@ -4746,7 +4804,7 @@ var JSHINT = (function() {
 
   function computedPropertyName() {
     advance("[");
-    if (!state.option.esnext) {
+    if (!state.inES6()) {
       warning("W119", state.tokens.curr, "computed property names");
     }
     var value = expression(10);
@@ -4779,13 +4837,13 @@ var JSHINT = (function() {
 
   // Check whether this function has been reached for a destructuring assign with undeclared values
   function destructuringAssignOrJsonValue() {
-    // lookup for the assignment (esnext only)
+    // lookup for the assignment (ECMAScript 6 only)
     // if it has semicolons, it is a block, so go parse it as a block
     // or it's not a block, but there are assignments, check for undeclared variables
 
     var block = lookupBlockType();
     if (block.notJson) {
-      if (!state.inESNext() && block.isDestAssign) {
+      if (!state.inES6() && block.isDestAssign) {
         warning("W104", state.tokens.curr, "destructuring assignment");
       }
       statements();
@@ -5058,10 +5116,9 @@ var JSHINT = (function() {
         } else {
           var optionKey = optionKeys[x];
           newOptionObj[optionKey] = o[optionKey];
-          if (optionKey === "es5") {
-            if (o[optionKey]) {
-              warning("I003");
-            }
+          if ((optionKey === "esversion" && o[optionKey] === 5) ||
+              (optionKey === "es5" && o[optionKey])) {
+            warning("I003");
           }
 
           if (optionKeys[x] === "newcap" && o[optionKey] === false)

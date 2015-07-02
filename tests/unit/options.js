@@ -3166,3 +3166,71 @@ exports.module.declarationRestrictions = function( test ) {
 
   test.done();
 };
+
+exports.esversion = function(test) {
+  var code = [
+    "// jshint esversion: 3",
+    "// jshint esversion: 4",
+    "// jshint esversion: 5",
+    "// jshint esversion: 6",
+    "// jshint esversion: 2015"
+  ];
+
+  TestRun(test, "Value")
+    .addError(2, "Bad option value.")
+    .test(code);
+
+  var es5code = [
+    "var a = {",
+    "  get b() {}",
+    "};"
+  ];
+
+  TestRun(test, "ES5 syntax as ES3")
+    .addError(2, "get/set are ES5 features.")
+    .test(es5code, { esversion: 3 });
+
+  TestRun(test, "ES5 syntax as ES5")
+    .test(es5code); // esversion: 5 (default)
+
+  TestRun(test, "ES5 syntax as ES6")
+    .test(es5code, { esversion: 6 });
+
+  var es6code = [
+    "var a = {",
+    "  ['b']: 1",
+    "};"
+  ];
+
+  TestRun(test, "ES6 syntax as ES3")
+    .addError(2, "'computed property names' is only available in ES6 (use esnext option).")
+    .test(es6code, { esversion: 3 });
+
+  TestRun(test, "ES6 syntax as ES5")
+    .addError(2, "'computed property names' is only available in ES6 (use esnext option).")
+    .test(es6code); // esversion: 5 (default)
+
+  TestRun(test, "ES6 syntax as ES6")
+    .test(es6code, { esversion: 6 });
+
+
+  TestRun(test, "precedence over `es3`") // TODO: Remove in JSHint 3
+    .test(es6code, { esversion: 6, es3: true });
+
+  TestRun(test, "precedence over `es5`") // TODO: Remove in JSHint 3
+    .addError(0, "ES5 option is now set per default")
+    .test(es6code, { esversion: 6, es5: true });
+
+  TestRun(test, "precedence over `esnext`") // TODO: Remove in JSHint 3
+    .addError(2, "'computed property names' is only available in ES6 (use esnext option).")
+    .test(es6code, { esversion: 3, esnext: true });
+
+  var code2 = [ // TODO: Remove in JSHint 3
+    "/* jshint esversion: 3, esnext: true */"
+  ].concat(es6code);
+
+  TestRun(test, "the last has the precedence (inline configuration)") // TODO: Remove in JSHint 3
+    .test(code2);
+
+  test.done();
+};
