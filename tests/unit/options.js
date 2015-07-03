@@ -3261,5 +3261,27 @@ exports.esversion = function(test) {
   TestRun(test, "the last has the precedence (inline configuration)") // TODO: Remove in JSHint 3
     .test(code2);
 
+  var code3 = [
+    "var someCode;",
+    "// jshint esversion: 3"
+  ];
+
+  TestRun(test, "cannot be set after any executable code")
+    .addError(2, "The 'esversion' option cannot be set after any executable code.")
+    .test(code3);
+
+  var code4 = [
+    "#!/usr/bin/env node",
+    "/**",
+    " * License",
+    " */",
+    "// jshint esversion: 3",
+    "// jshint esversion: 6"
+  ];
+
+  TestRun(test, "can follow shebang or comments")
+    .test(code4);
+
+
   test.done();
 };

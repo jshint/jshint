@@ -699,6 +699,9 @@ var JSHINT = (function() {
           default:
             error("E002", nt);
           }
+          if (!hasParsedCode(state.funct)) {
+            error("E055", state.tokens.next, "esversion");
+          }
           return;
         }
 
