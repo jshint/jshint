@@ -3221,22 +3221,19 @@ exports.esversion = function(test) {
 
   var es7code = [
     "var a = [ 1, 2, 3 ];",
-    "var b = [ for (i of a) i ]"
+    "var b = [ for (i of a) i ];"
   ];
 
   TestRun(test, "ES7 syntax as ES3")
-    .addError(2, "'array comprehension' is available in ES6 (use 'esversion: 6') or " +
-                 "Mozilla JS extensions (use moz).")
+    .addError(2, "'array comprehension' is only available in ES7 (use 'esversion: 7').")
     .test(es7code, { esversion: 3 });
 
   TestRun(test, "ES7 syntax as ES5")
-    .addError(2, "'array comprehension' is available in ES6 (use 'esversion: 6') or " +
-                 "Mozilla JS extensions (use moz).")
-    .test(es7code, { esversion: 5 });
+    .addError(2, "'array comprehension' is only available in ES7 (use 'esversion: 7').")
+    .test(es7code); // esversion: 5 (default)
 
   TestRun(test, "ES7 syntax as ES6")
-    .addError(2, "'array comprehension' is available in ES6 (use 'esversion: 6') or " +
-                 "Mozilla JS extensions (use moz).")
+    .addError(2, "'array comprehension' is only available in ES7 (use 'esversion: 7').")
     .test(es7code, { esversion: 6 });
 
   TestRun(test, "ES7 syntax as ES7")

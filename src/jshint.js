@@ -1513,7 +1513,7 @@ var JSHINT = (function() {
     // parameter destructuring with rest operator
     if (state.tokens.next.value === "...") {
       if (!state.inES6(true)) {
-        warning("W119", state.tokens.next, "spread/rest operator");
+        warning("W119", state.tokens.next, "spread/rest operator", "6");
       }
       advance();
 
@@ -2239,7 +2239,7 @@ var JSHINT = (function() {
 
   prefix("...", function() {
     if (!state.inES6(true)) {
-      warning("W119", this, "spread/rest operator");
+      warning("W119", this, "spread/rest operator", "6");
     }
 
     // TODO: Allow all AssignmentExpression
@@ -2315,7 +2315,7 @@ var JSHINT = (function() {
   prefix("new", function() {
     var mp = metaProperty("target", function() {
       if (!state.inES6(true)) {
-        warning("W119", state.tokens.prev, "new.target");
+        warning("W119", state.tokens.prev, "new.target", "6");
       }
       var inFunction, c = state.funct;
       while (c) {
@@ -2695,7 +2695,7 @@ var JSHINT = (function() {
     var blocktype = lookupBlockType();
     if (blocktype.isCompArray) {
       if (!state.inES7() && !state.inMoz()) {
-        warning("W119", state.tokens.curr, "array comprehension");
+        warning("W119", state.tokens.curr, "array comprehension", "7");
       }
       return comprehensiveArrayExpression();
     } else if (blocktype.isDestAssign) {
@@ -2872,7 +2872,7 @@ var JSHINT = (function() {
       }
       if (state.tokens.next.id === "=") {
         if (!state.inES6()) {
-          warning("W119", state.tokens.next, "default parameters");
+          warning("W119", state.tokens.next, "default parameters", "6");
         }
         advance("=");
         pastDefault = true;
@@ -3059,7 +3059,7 @@ var JSHINT = (function() {
 
     if (isArrow) {
       if (!state.inES6(true)) {
-        warning("W119", state.tokens.curr, "arrow function syntax (=>)");
+        warning("W119", state.tokens.curr, "arrow function syntax (=>)", "6");
       }
 
       if (!options.loneArg) {
@@ -3232,7 +3232,7 @@ var JSHINT = (function() {
         if (state.tokens.next.identifier &&
             (peekIgnoreEOL().id === "," || peekIgnoreEOL().id === "}")) {
           if (!state.inES6()) {
-            warning("W104", state.tokens.next, "object short notation");
+            warning("W104", state.tokens.next, "object short notation", "6");
           }
           i = propertyName(true);
           saveProperty(props, i, state.tokens.next);
@@ -3274,7 +3274,7 @@ var JSHINT = (function() {
         } else {
           if (state.tokens.next.value === "*" && state.tokens.next.type === "(punctuator)") {
             if (!state.inES6()) {
-              warning("W104", state.tokens.next, "generator functions");
+              warning("W104", state.tokens.next, "generator functions", "6");
             }
             advance("*");
             isGeneratorMethod = true;
@@ -3297,7 +3297,7 @@ var JSHINT = (function() {
 
           if (state.tokens.next.value === "(") {
             if (!state.inES6()) {
-              warning("W104", state.tokens.curr, "concise methods");
+              warning("W104", state.tokens.curr, "concise methods", "6");
             }
             doFunction({ type: isGeneratorMethod ? "generator" : null });
           } else {
@@ -3338,7 +3338,7 @@ var JSHINT = (function() {
 
     if (!state.inES6()) {
       warning("W104", state.tokens.curr,
-        isAssignment ? "destructuring assignment" : "destructuring binding");
+        isAssignment ? "destructuring assignment" : "destructuring binding", "6");
     }
 
     return destructuringPatternRecursive(options);
@@ -3484,7 +3484,7 @@ var JSHINT = (function() {
     var tokens, lone, value, letblock;
 
     if (!state.inES6()) {
-      warning("W104", state.tokens.curr, type);
+      warning("W104", state.tokens.curr, type, "6");
     }
 
     if (isLet && state.tokens.next.value === "(") {
@@ -3684,7 +3684,7 @@ var JSHINT = (function() {
 
     /*jshint validthis:true */
     if (!state.inES6()) {
-      warning("W104", state.tokens.curr, "class");
+      warning("W104", state.tokens.curr, "class", "6");
     }
     if (isStatement) {
       // BindingIdentifier
@@ -3840,7 +3840,7 @@ var JSHINT = (function() {
       if (state.inES6({ strict: true })) {
         generator = true;
       } else {
-        warning("W119", state.tokens.curr, "function*");
+        warning("W119", state.tokens.curr, "function*", "6");
       }
     }
     if (inblock) {
@@ -3875,7 +3875,7 @@ var JSHINT = (function() {
 
     if (state.tokens.next.value === "*") {
       if (!state.inES6()) {
-        warning("W119", state.tokens.curr, "function*");
+        warning("W119", state.tokens.curr, "function*", "6");
       }
       advance("*");
       generator = true;
@@ -4203,7 +4203,7 @@ var JSHINT = (function() {
     // if we're in a for (… in|of …) statement
     if (_.contains(inof, nextop.value)) {
       if (!state.inES6() && nextop.value === "of") {
-        error("W104", nextop, "for of");
+        warning("W104", nextop, "for of", "6");
       }
 
       var ok = !(initializer || comma);
@@ -4419,7 +4419,7 @@ var JSHINT = (function() {
         error("E046", state.tokens.curr, "yield");
       }
     } else if (!state.inES6()) {
-      warning("W104", state.tokens.curr, "yield");
+      warning("W104", state.tokens.curr, "yield", "6");
     }
     state.funct["(generator)"] = "yielded";
     var delegatingYield = false;
@@ -4465,7 +4465,7 @@ var JSHINT = (function() {
 
   stmt("import", function() {
     if (!state.inES6()) {
-      warning("W119", state.tokens.curr, "import");
+      warning("W119", state.tokens.curr, "import", "6");
     }
 
     if (state.tokens.next.type === "(string)") {
@@ -4557,7 +4557,7 @@ var JSHINT = (function() {
     var identifier;
 
     if (!state.inES6()) {
-      warning("W119", state.tokens.curr, "export");
+      warning("W119", state.tokens.curr, "export", "6");
       ok = false;
     }
 
@@ -4805,7 +4805,7 @@ var JSHINT = (function() {
   function computedPropertyName() {
     advance("[");
     if (!state.inES6()) {
-      warning("W119", state.tokens.curr, "computed property names");
+      warning("W119", state.tokens.curr, "computed property names", "6");
     }
     var value = expression(10);
     advance("]");
@@ -4844,7 +4844,7 @@ var JSHINT = (function() {
     var block = lookupBlockType();
     if (block.notJson) {
       if (!state.inES6() && block.isDestAssign) {
-        warning("W104", state.tokens.curr, "destructuring assignment");
+        warning("W104", state.tokens.curr, "destructuring assignment", "6");
       }
       statements();
     // otherwise parse json value
