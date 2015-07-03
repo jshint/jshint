@@ -3196,6 +3196,9 @@ exports.esversion = function(test) {
   TestRun(test, "ES5 syntax as ES6")
     .test(es5code, { esversion: 6 });
 
+  TestRun(test, "ES5 syntax as ES7")
+    .test(es5code, { esversion: 7 });
+
   var es6code = [
     "var a = {",
     "  ['b']: 1",
@@ -3212,6 +3215,35 @@ exports.esversion = function(test) {
 
   TestRun(test, "ES6 syntax as ES6")
     .test(es6code, { esversion: 6 });
+
+  TestRun(test, "ES6 syntax as ES7")
+    .test(es6code, { esversion: 7 });
+
+  var es7code = [
+    "var a = [ 1, 2, 3 ];",
+    "var b = [ for (i of a) i ]"
+  ];
+
+  TestRun(test, "ES7 syntax as ES3")
+    .addError(2, "'array comprehension' is available in ES6 (use 'esversion: 6') or " +
+                 "Mozilla JS extensions (use moz).")
+    .test(es7code, { esversion: 3 });
+
+  TestRun(test, "ES7 syntax as ES5")
+    .addError(2, "'array comprehension' is available in ES6 (use 'esversion: 6') or " +
+                 "Mozilla JS extensions (use moz).")
+    .test(es7code, { esversion: 5 });
+
+  TestRun(test, "ES7 syntax as ES6")
+    .addError(2, "'array comprehension' is available in ES6 (use 'esversion: 6') or " +
+                 "Mozilla JS extensions (use moz).")
+    .test(es7code, { esversion: 6 });
+
+  TestRun(test, "ES7 syntax as ES7")
+    .test(es7code, { esversion: 7 });
+
+  TestRun(test, "ES7 syntax as ES7 (using esnext)")
+    .test(es7code, { esnext: true });
 
 
   TestRun(test, "precedence over `es3`") // TODO: Remove in JSHint 3
