@@ -2740,7 +2740,7 @@ var JSHINT = (function() {
    *                                  single-argument shorthand.
    * @param {bool} [options.parsedOpening] Whether the opening parenthesis has
    *                                       already been parsed.
-   * @returns {Array.<string>} array of param identifiers
+   * @returns {{ arity: number, params: Array.<string>}}
    */
   function functionparams(options) {
     var next;
@@ -2750,11 +2750,12 @@ var JSHINT = (function() {
     var t;
     var pastDefault = false;
     var pastRest = false;
+    var arity = 0;
     var loneArg = options && options.loneArg;
 
     if (loneArg && loneArg.identifier === true) {
       state.funct["(scope)"].addParam(loneArg.value, loneArg);
-      return [ loneArg.value ];
+      return { arity: 1, params: [ loneArg.value ] };
     }
 
     next = state.tokens.next;
@@ -2773,7 +2774,7 @@ var JSHINT = (function() {
     }
 
     for (;;) {
-      // store the current param(s) of this loop so we can evaluate the default argument before parameters
+      arity++;
       // are added to the param scope
       var currentParams = [];
 
@@ -2823,7 +2824,7 @@ var JSHINT = (function() {
         comma();
       } else {
         advance(")", next);
-        return paramsIds;
+        return { arity: arity, params: paramsIds };
       }
     }
   }
@@ -2979,10 +2980,15 @@ var JSHINT = (function() {
     // create the param scope (params added in functionparams)
     state.funct["(scope)"].stackParams(true);
 
-    var paramsIds = functionparams(options);
+    var paramsInfo = functionparams(options);
 
-    state.funct["(params)"] = paramsIds;
-    state.funct["(metrics)"].verifyMaxParametersPerFunction(paramsIds);
+    if (paramsInfo) {
+      state.funct["(params)"] = paramsInfo.params;
+      state.funct["(metrics)"].arity = paramsInfo.arity;
+      state.funct["(metrics)"].verifyMaxParametersPerFunction();
+    } else {
+      state.funct["(metrics)"].arity = 0;
+    }
 
     if (isArrow) {
       if (!state.option.esnext) {
@@ -3026,6 +3032,7 @@ var JSHINT = (function() {
       statementCount: 0,
       nestedBlockDepth: -1,
       ComplexityCount: 1,
+      arity: 0,
 
       verifyMaxStatementsPerFunction: function() {
         if (state.option.maxstatements &&
@@ -3034,11 +3041,10 @@ var JSHINT = (function() {
         }
       },
 
-      verifyMaxParametersPerFunction: function(params) {
-        params = params || [];
-
-        if (_.isNumber(state.option.maxparams) && params.length > state.option.maxparams) {
-          warning("W072", functionStartToken, params.length);
+      verifyMaxParametersPerFunction: function() {
+        if (_.isNumber(state.option.maxparams) &&
+          this.arity > state.option.maxparams) {
+          warning("W072", functionStartToken, this.arity);
         }
       },
 
@@ -5284,7 +5290,7 @@ var JSHINT = (function() {
 
       fu.metrics = {
         complexity: f["(metrics)"].ComplexityCount,
-        parameters: (f["(params)"] || []).length,
+        parameters: f["(metrics)"].arity,
         statements: f["(metrics)"].statementCount
       };
 
