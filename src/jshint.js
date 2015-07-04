@@ -2974,6 +2974,9 @@ var JSHINT = (function() {
     if (paramsInfo) {
       state.funct["(params)"] = paramsInfo.params;
       state.funct["(metrics)"].verifyMaxParametersPerFunction(paramsInfo.count);
+      state.funct["(paramCount)"] = paramsInfo.count;
+    } else {
+      state.funct["(paramCount)"] = 0;
     }
 
     if (isArrow) {
@@ -5277,7 +5280,7 @@ var JSHINT = (function() {
 
       fu.metrics = {
         complexity: f["(metrics)"].ComplexityCount,
-        parameters: (f["(params)"] || []).length,
+        parameters: f["(paramCount)"],
         statements: f["(metrics)"].statementCount
       };
 
