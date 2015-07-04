@@ -218,24 +218,77 @@ exports.testNewNonNativeObject = function (test) {
   test.done();
 };
 
+exports["undefined as variable name"] = function (test) {
 
-/**
- * Test that JSHint allows `undefined` to be a function parameter.
- * It is a common pattern to protect against the case when somebody
- * overwrites undefined. It also helps with minification.
- *
- * More info: https://gist.github.com/315916
- */
-exports.testUndefinedAsParam = function (test) {
-  var code  = '(function (undefined) {}());';
-  var code1 = 'var undefined = 1;';
-
-  TestRun(test).test(code);
-
-  // But it must never tolerate reassigning of undefined
   TestRun(test)
-    .addError(1, "Expected an identifier and instead saw 'undefined' (a reserved word).")
-    .test(code1);
+    .test("var undefined;");
+
+  TestRun(test)
+    .test("let undefined;", { esnext: true });
+
+  TestRun(test)
+    .addError(1, "const 'undefined' is initialized to 'undefined'.")
+    .test("const undefined;", { esnext: true });
+
+  TestRun(test)
+    .test("var { undefined } = {};", { esnext: true });
+
+  TestRun(test)
+    .test("var [ undefined ] = [];", { esnext: true });
+
+  var functions = [
+    "function a(undefined) {}",
+    "function b({ undefined }) {}",
+    "function c([ undefined ]) {}"
+  ];
+
+  TestRun(test)
+    .test(functions, { esnext: true });
+
+  test.done();
+};
+
+exports["can't assign a value to undefined"] = function (test) {
+
+  TestRun(test)
+    .addError(1, "Assigning a value to 'undefined'.")
+    .test("var undefined = 2;");
+
+  TestRun(test)
+    .addError(1, "Assigning a value to 'undefined'.")
+    .test("let undefined = 2;", { esnext: true });
+
+  TestRun(test)
+    .addError(1, "Assigning a value to 'undefined'.")
+    .test("const undefined = 2;", { esnext: true });
+
+  TestRun(test)
+    .addError(1, "Assigning a value to 'undefined'.")
+    .test("var { undefined = 2 } = {};", { esnext: true });
+
+  TestRun(test)
+    .addError(1, "Assigning a value to 'undefined'.")
+    .test("var [ undefined = 2 ] = [];", { esnext: true });
+
+  TestRun(test) // An array is being assigned to undefined
+    .addError(1, "Assigning a value to 'undefined'.")
+    .test("var [ ...undefined ] = [];", { esnext: true });
+
+  var functions = [
+    "function a(undefined = 2) {}",
+    "function b(...undefined) {}",
+    "function c({ undefined = 2 }) {}",
+    "function d([ undefined = 2 ]) {}",
+    "function e([ ...undefined ]) {}"
+  ];
+
+  TestRun(test)
+    .addError(1, "Assigning a value to 'undefined'.")
+    .addError(2, "Assigning a value to 'undefined'.")
+    .addError(3, "Assigning a value to 'undefined'.")
+    .addError(4, "Assigning a value to 'undefined'.")
+    .addError(5, "Assigning a value to 'undefined'.")
+    .test(functions, { esnext: true });
 
   test.done();
 };
