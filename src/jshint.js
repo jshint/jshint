@@ -2729,7 +2729,7 @@ var JSHINT = (function() {
    *                                  single-argument shorthand.
    * @param {bool} [options.parsedOpening] Whether the opening parenthesis has
    *                                       already been parsed.
-   * @returns {Array.<string>} array of param identifiers
+   * @returns {{ count: number, params: Array.<string>}}
    */
   function functionparams(options) {
     var next;
@@ -2739,11 +2739,12 @@ var JSHINT = (function() {
     var t;
     var pastDefault = false;
     var pastRest = false;
+    var count = 0;
     var loneArg = options && options.loneArg;
 
     if (loneArg && loneArg.identifier === true) {
       state.funct["(scope)"].addParam(loneArg.value, loneArg);
-      return [ loneArg.value ];
+      return { count: 1, params: [ loneArg.value ] };
     }
 
     next = state.tokens.next;
@@ -2762,7 +2763,7 @@ var JSHINT = (function() {
     }
 
     for (;;) {
-      // store the current param(s) of this loop so we can evaluate the default argument before parameters
+      count++;
       // are added to the param scope
       var currentParams = [];
 
@@ -2812,7 +2813,7 @@ var JSHINT = (function() {
         comma();
       } else {
         advance(")", next);
-        return paramsIds;
+        return { count: count, params: paramsIds };
       }
     }
   }
@@ -2968,10 +2969,12 @@ var JSHINT = (function() {
     // create the param scope (params added in functionparams)
     state.funct["(scope)"].stackParams(true);
 
-    var paramsIds = functionparams(options);
+    var paramsInfo = functionparams(options);
 
-    state.funct["(params)"] = paramsIds;
-    state.funct["(metrics)"].verifyMaxParametersPerFunction(paramsIds);
+    if (paramsInfo) {
+      state.funct["(params)"] = paramsInfo.params;
+      state.funct["(metrics)"].verifyMaxParametersPerFunction(paramsInfo.count);
+    }
 
     if (isArrow) {
       if (!state.option.esnext) {
@@ -3023,11 +3026,9 @@ var JSHINT = (function() {
         }
       },
 
-      verifyMaxParametersPerFunction: function(params) {
-        params = params || [];
-
-        if (_.isNumber(state.option.maxparams) && params.length > state.option.maxparams) {
-          warning("W072", functionStartToken, params.length);
+      verifyMaxParametersPerFunction: function(count) {
+        if (_.isNumber(state.option.maxparams) && count > state.option.maxparams) {
+          warning("W072", functionStartToken, count);
         }
       },
 

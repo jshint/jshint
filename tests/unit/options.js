@@ -2043,17 +2043,25 @@ exports.maxparams = function (test) {
 
   TestRun(test)
     .addError(4, "This function has too many parameters. (3)")
-    .test(src, { es3: true, maxparams: 2 });
+    .addError(10, "This function has too many parameters. (3)")
+    .addError(16, "This function has too many parameters. (3)")
+    .test(src, { esnext: true, maxparams: 2 });
 
   TestRun(test)
-    .test(src, { es3: true, maxparams: 3 });
+    .test(src, { esnext: true, maxparams: 3 });
 
   TestRun(test)
     .addError(4, "This function has too many parameters. (3)")
-    .test(src, {es3: true, maxparams: 0 });
+    .addError(8, "This function has too many parameters. (1)")
+    .addError(9, "This function has too many parameters. (1)")
+    .addError(10, "This function has too many parameters. (3)")
+    .addError(11, "This function has too many parameters. (1)")
+    .addError(13, "This function has too many parameters. (2)")
+    .addError(16, "This function has too many parameters. (3)")
+    .test(src, {esnext: true, maxparams: 0 });
 
   TestRun(test)
-    .test(src, { es3: true });
+    .test(src, { esnext: true });
 
   test.done();
 };
