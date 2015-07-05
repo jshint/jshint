@@ -199,7 +199,7 @@ function loadIgnores(params) {
 
   var lines = (file ? shjs.cat(file) : "").split("\n");
   var exclude = params.exclude || "";
-  lines.unshift(exclude.split(","));
+  lines.unshift.apply(lines, exclude.split(","));
 
   return lines
     .filter(function(line) {
