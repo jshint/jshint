@@ -196,7 +196,7 @@ var JSHINT = (function() {
       if (state.option.es3) {
         state.option.esversion = 3;
       } else if (state.option.esnext) {
-        state.option.esversion = 7;
+        state.option.esversion = 6;
       } else {
         state.option.esversion = 5;
       }
@@ -666,7 +666,7 @@ var JSHINT = (function() {
         var esversions = {
           es3   : 3,
           es5   : 5,
-          esnext: 7
+          esnext: 6
         };
         if (_.has(esversions, key)) {
           switch (val) {
@@ -2697,8 +2697,8 @@ var JSHINT = (function() {
   prefix("[", function() {
     var blocktype = lookupBlockType();
     if (blocktype.isCompArray) {
-      if (!state.inES7() && !state.inMoz()) {
-        warning("W119", state.tokens.curr, "array comprehension", "7");
+      if (!state.option.esnext && !state.inMoz()) {
+        warning("W118", state.tokens.curr, "array comprehension");
       }
       return comprehensiveArrayExpression();
     } else if (blocktype.isDestAssign) {
