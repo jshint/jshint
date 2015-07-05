@@ -433,24 +433,20 @@ var scopeManager = function(state, predefined, exported, declared) {
         }
       }
 
-      var declaredInCurrentScope = _.has(_current["(labels)"], labelName);
+      // The variable was declared in the current scope
+      if (_.has(_current["(labels)"], labelName)) {
+        _current["(labels)"][labelName].duplicated = true;
 
-      // if this scope has the variable defined, its a re-definition error
-      var isStrict = state.isStrict();
-      if (declaredInCurrentScope) {
-        if (isStrict) {
-          warning("E011", token, labelName);
-        } else {
-          if (state.option.shadow !== true) {
-            warning("W004", token, labelName);
-          }
-          if (!_current["(unraisedStrictWarnings)"]) {
-            _current["(unraisedStrictWarnings)"] = [];
-          }
-          _current["(unraisedStrictWarnings)"].push(["E011", token, labelName]);
-        }
+      // The variable was declared in an outer scope
       } else {
+        // if this scope has the variable defined, it's a re-definition error
         _checkOuterShadow(labelName, token, type);
+
+        _current["(labels)"][labelName] = {
+          "(type)" : type,
+          "(token)": token,
+          "(unused)": true };
+        _current["(params)"].push(labelName);
       }
 
       if (_.has(_current["(usages)"], labelName)) {
@@ -463,28 +459,28 @@ var scopeManager = function(state, predefined, exported, declared) {
           warning("E056", token, labelName, type);
         }
       }
-
-      _current["(labels)"][labelName] = {
-        "(type)" : type,
-        "(token)": token,
-        "(unused)": true };
-      _current["(params)"].push(labelName);
     },
 
-    inStrictMode: function() {
-      // we only care about duplicate params, so return if we are not in a function
+    validateParams: function() {
+      // This method only concerns errors for function parameters
       if (_currentFunct["(global)"]) {
         return;
       }
 
+      var isStrict = state.isStrict();
       var currentFunctParamScope = _currentFunct["(parent)"];
-      var warnings = currentFunctParamScope["(unraisedStrictWarnings)"];
-      if (!warnings) {
-        return;
-      }
-      for (var i = 0; i < warnings.length; i++) {
-        warning.apply(null, warnings[i]);
-      }
+
+      currentFunctParamScope["(params)"].forEach(function(labelName) {
+        var label = currentFunctParamScope["(labels)"][labelName];
+
+        if (label && label.duplicated) {
+          if (isStrict) {
+            warning("E011", label["(token)"], labelName);
+          } else if (state.option.shadow !== true) {
+            warning("W004", label["(token)"], labelName);
+          }
+        }
+      });
     },
 
     /**

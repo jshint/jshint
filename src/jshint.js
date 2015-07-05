@@ -1641,13 +1641,13 @@ var JSHINT = (function() {
           p = pn;
         } else if (pn.value === "[" || pn.value === ".") {
           // string -> [ | . is a valid production
-          return;
+          break;
         } else if (!state.option.asi || pn.value === "(") {
           // string -> ( is not a valid production
           warning("W033", state.tokens.next);
         }
       } else if (p.id === "." || p.id === "[") {
-        return;
+        break;
       } else if (p.id !== ";") {
         warning("W033", p);
       }
@@ -1668,8 +1668,6 @@ var JSHINT = (function() {
     }
 
     if (state.isStrict()) {
-      state.funct["(scope)"].inStrictMode();
-
       if (!state.option["(explicitNewcap)"]) {
         state.option.newcap = true;
       }
@@ -1738,14 +1736,17 @@ var JSHINT = (function() {
 
         metrics.statementCount += a.length;
 
-        if (isfunc) {
-          state.directive = m;
-        }
-
         indent -= state.option.indent;
       }
 
       advance("}", t);
+
+      if (isfunc) {
+        state.funct["(scope)"].validateParams();
+        if (m) {
+          state.directive = m;
+        }
+      }
 
       state.funct["(scope)"].unstack();
 
