@@ -3268,6 +3268,17 @@ exports.esversion = function(test) {
   TestRun(test, "can follow shebang or comments")
     .test(code4);
 
+  var code5 = [
+    "// jshint esversion: 3",
+    "// jshint moz: true",
+    "var x = {",
+    "  get a() {}",
+    "};"
+  ];
+
+  TestRun(test, "correctly swap between moz and esversion")
+    .test(code5);
+
 
   test.done();
 };

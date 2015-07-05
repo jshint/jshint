@@ -37,9 +37,9 @@ var state = {
    */
   inES5: function(strict) {
     if (strict) {
-      return !this.option.esversion || this.option.esversion === 5;
+      return (!this.option.esversion || this.option.esversion === 5) && !this.option.moz;
     }
-    return !this.option.esversion || this.option.esversion >= 5;
+    return !this.option.esversion || this.option.esversion >= 5 || this.option.moz;
   },
 
 
