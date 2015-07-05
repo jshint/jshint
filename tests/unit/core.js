@@ -622,6 +622,11 @@ exports.testCatchBlocks = function (test) {
   TestRun(test)
     .test(src, { es3: true, undef: true, devel: true, node: true });
 
+  var code = "try {} catch ({ message }) {}";
+
+  TestRun(test, "destructuring in catch blocks' parameter")
+    .test(code, { esnext: true });
+
   test.done();
 };
 
