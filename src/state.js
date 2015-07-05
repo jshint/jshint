@@ -60,9 +60,6 @@ var state = {
     this.forinifcheckneeded = false;
     this.nameStack = new NameStack();
     this.inClassBody = false;
-
-    // Blank out non-multi-line-commented lines when ignoring linter errors
-    this.ignoreLinterErrors = false;
   }
 };
 
