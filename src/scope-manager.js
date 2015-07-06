@@ -645,7 +645,7 @@ var scopeManager = function(state, predefined, exported, declared) {
        * @returns Boolean
        */
       isGlobal: function() {
-        return _currentFunct["(global)"] && _current === _currentFunct;
+        return _current["(global)"];
       },
 
       use: function(labelName, token) {
