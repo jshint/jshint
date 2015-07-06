@@ -3972,6 +3972,7 @@ var JSHINT = (function() {
         indent -= state.option.indent;
       }
     }
+    return this;
   }).labelled = true;
 
   stmt("debugger", function() {
