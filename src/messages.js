@@ -71,7 +71,8 @@ var errors = {
   E053: "Export declaration must be in global scope.",
   E054: "Class properties must be methods. Expected '(' but instead saw '{a}'.",
   E055: "The '{a}' option cannot be set after any executable code.",
-  E056: "'{a}' was used before it was declared, which is illegal for '{b}' variables."
+  E056: "'{a}' was used before it was declared, which is illegal for '{b}' variables.",
+  E057: "Missing semicolon."
 };
 
 var warnings = {
