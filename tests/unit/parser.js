@@ -5928,13 +5928,15 @@ exports["test for crash with invalid condition"] = function (test) {
     .addError(4, "Expected an identifier and instead saw ','.")
     .addError(4, "Expected ')' to match '(' from line 4 and instead saw 'b'.")
     .addError(4, "Expected an identifier and instead saw ')'.")
+    .addError(4, "Missing semicolon.")
     .addError(6, "Expected an identifier and instead saw ','.")
     .addError(7, "Unexpected ')'.")
     .addError(7, "Expected an identifier and instead saw ')'.")
     .addError(7, "Expected ')' to match '(' from line 7 and instead saw ';'.")
     .addError(8, "Expected an identifier and instead saw ','.")
     .addError(8, "Expected ')' to match '(' from line 8 and instead saw 'b'.")
-    .addError(8, "Expected an identifier and instead saw ')'.");
+    .addError(8, "Expected an identifier and instead saw ')'.")
+    .addError(8, "Missing semicolon.");
 
   run.test(code, {asi: true, expr: true});
   test.done();
@@ -6041,6 +6043,7 @@ exports["test for line breaks with 'yield'"] = function (test) {
     .addError(8, "Comma warnings can be turned off with 'laxcomma'.")
     .addError(7, "Bad line breaking before ','.")
     .addError(10, "Expected an identifier and instead saw '?'.")
+    .addError(10, "Missing semicolon.")
     .addError(10, "Expected an assignment or function call and instead saw an expression.")
     .addError(10, "Label 'i' on j statement.")
     .addError(10, "Expected an assignment or function call and instead saw an expression.")
@@ -6056,7 +6059,6 @@ exports["test for line breaks with 'yield'"] = function (test) {
     .addError(7, "Line breaking error 'yield'.")
     .addError(9, "Line breaking error 'yield'.")
     .addError(9, "Missing semicolon.")
-    .addError(10, "Missing semicolon.")
     .addError(11, "Line breaking error 'yield'.")
     .addError(13, "Line breaking error 'yield'.")
     .addError(13, "Missing semicolon.");

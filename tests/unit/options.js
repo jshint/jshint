@@ -627,7 +627,32 @@ exports.safeasi = function (test) {
     .addError(10, "Bad line breaking before '/'.")
     .addError(10, "Expected an identifier and instead saw '.'.")
     .addError(10, "Expected an assignment or function call and instead saw an expression.")
+    .addError(10, "Missing semicolon.")
     .test(src, { asi: true });
+
+  test.done();
+};
+
+exports["missing semicolons not influenced by asi"] = function (test) {
+  // These tests are taken from
+  // http://www.ecma-international.org/ecma-262/6.0/index.html#sec-11.9.2
+
+  var code = [
+    "void 0;", // Not JSON
+    "{ 1 2 } 3"
+  ];
+
+  TestRun(test)
+    .addError(2, "Missing semicolon.", { character: 4, code: "E058" })
+    .test(code, { expr: true, asi: true });
+
+  code = [
+    "void 0;",
+    "{ 1",
+    "2 } 3"
+  ];
+
+  TestRun(test).test(code, { expr: true, asi: true });
 
   test.done();
 };

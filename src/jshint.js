@@ -1504,12 +1504,18 @@ var JSHINT = (function() {
     if (state.tokens.next.id !== ";") {
       // don't complain about unclosed templates / strings
       if (state.tokens.next.isUnclosed) return advance();
-      if (!state.option.asi) {
+
+      var sameLine = startLine(state.tokens.next) === state.tokens.curr.line &&
+                     state.tokens.next.id !== "(end)";
+      var blockEnd = checkPunctuators(state.tokens.next, "}");
+
+      if (sameLine && !blockEnd) {
+        errorAt("E058", state.tokens.curr.line, state.tokens.curr.character);
+      } else if (!state.option.asi) {
         // If this is the last statement in a block that ends on
         // the same line *and* option lastsemic is on, ignore the warning.
         // Otherwise, complain about missing semicolon.
-        if (!state.option.lastsemic || state.tokens.next.id !== "}" ||
-          startLine(state.tokens.next) !== state.tokens.curr.line) {
+        if ((blockEnd && !state.option.lastsemic) || !sameLine) {
           warningAt("W033", state.tokens.curr.line, state.tokens.curr.character);
         }
       }
