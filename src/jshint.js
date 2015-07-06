@@ -3754,18 +3754,23 @@ var JSHINT = (function() {
     var b;
 
     function doCatch() {
-      var e;
+      var params = [];
 
       advance("catch");
       advance("(");
 
-      e = state.tokens.next;
-      if (e.type !== "(identifier)") {
-        warning("E030", state.tokens.next, e.value);
-        e = null;
+      if (checkPunctuators(state.tokens.next, ["[", "{"])) {
+        var tokens = destructuringExpression();
+        _.each(tokens, function(token) {
+          if (token.id) {
+            params.push({ id: token.id, token: token });
+          }
+        });
+      } else if (state.tokens.next.type !== "(identifier)") {
+        warning("E030", state.tokens.next, state.tokens.next.value);
       } else {
         // only advance if we have an identifier so we can continue parsing in the most common error - that no param is given.
-        advance();
+        params.push({ id: identifier(), token: state.tokens.curr, type: "exception" });
       }
 
       state.funct = functor("(catch)", state.tokens.next, {
@@ -3776,7 +3781,7 @@ var JSHINT = (function() {
         "(catch)"    : true
       });
 
-      state.funct["(scope)"].stackParams(e ? [ { id: e.value, token: e, type: "exception" }] : []);
+      state.funct["(scope)"].stackParams(params);
 
       if (state.tokens.next.value === "if") {
         if (!state.inMoz()) {
