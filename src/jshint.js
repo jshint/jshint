@@ -3761,13 +3761,11 @@ var JSHINT = (function() {
 
       if (checkPunctuators(state.tokens.next, ["[", "{"])) {
         var tokens = destructuringExpression();
-        var t;
-        for (t in tokens) {
-          t = tokens[t];
-          if (t.id) {
-            params.push({ id: t.id, token: t });
+        _.each(tokens, function(token) {
+          if (token.id) {
+            params.push({ id: token.id, token: token });
           }
-        }
+        });
       } else if (state.tokens.next.type !== "(identifier)") {
         warning("E030", state.tokens.next, state.tokens.next.value);
       } else {
