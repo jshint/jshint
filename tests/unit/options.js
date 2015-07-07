@@ -650,13 +650,9 @@ exports["missing semicolons not influenced by asi"] = function (test) {
     "{ 1 2 } 3"
   ];
 
-  JSHINT(code, { expr: true, asi: true });
-
-  var error = JSHINT.errors[0]
-  test.equal(error.code, "E057");
-  test.equal(error.line, 2);
-  test.equal(error.character, 4);
-  test.equal(JSHINT.errors.length, 1);
+  TestRun(test)
+    .addError(2, "Missing semicolon.", { character: 4, code: "E057" })
+    .test(code, { expr: true, asi: true });
 
   code = [
     "void 0;",
