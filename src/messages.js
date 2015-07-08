@@ -71,7 +71,8 @@ var errors = {
   E053: "Export declaration must be in global scope.",
   E054: "Class properties must be methods. Expected '(' but instead saw '{a}'.",
   E055: "The '{a}' option cannot be set after any executable code.",
-  E056: "'{a}' was used before it was declared, which is illegal for '{b}' variables."
+  E056: "'{a}' was used before it was declared, which is illegal for '{b}' variables.",
+  E057: "Invalid meta property: '{a}.{b}'."
 };
 
 var warnings = {
@@ -211,7 +212,9 @@ var warnings = {
   W131: "Invalid parameter after rest parameter.",
   W132: "`var` declarations are forbidden. Use `let` or `const` instead.",
   W133: "Invalid for-{a} loop left-hand-side: {b}.",
-  W134: "The '{a}' option is only available when linting ECMAScript {b} code."
+  W134: "The '{a}' option is only available when linting ECMAScript {b} code.",
+  W135: "{a} may not be supported by non-browser environments.",
+  W136: "'{a}' must be in function scope."
 };
 
 var info = {
