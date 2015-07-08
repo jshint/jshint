@@ -3269,7 +3269,11 @@ exports.esversion = function(test) {
     .test(code4);
 
   var code5 = [
+    "// jshint moz: true",
     "// jshint esversion: 3",
+    "var x = {",
+    "  get a() {}",
+    "};",
     "// jshint moz: true",
     "var x = {",
     "  get a() {}",
@@ -3277,6 +3281,7 @@ exports.esversion = function(test) {
   ];
 
   TestRun(test, "correctly swap between moz and esversion")
+    .addError(4, "get/set are ES5 features.")
     .test(code5);
 
 

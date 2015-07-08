@@ -192,7 +192,7 @@ var JSHINT = (function() {
     /**
      * TODO: Remove in JSHint 3
      */
-    if (!state.option.esversion) {
+    if (!state.option.esversion && !state.option.moz) {
       if (state.option.es3) {
         state.option.esversion = 3;
       } else if (state.option.esnext) {
@@ -671,10 +671,13 @@ var JSHINT = (function() {
         if (_.has(esversions, key)) {
           switch (val) {
           case "true":
+            state.option.moz = false;
             state.option.esversion = esversions[key];
             break;
           case "false":
-            state.option.esversion = 5;
+            if (!state.option.moz) {
+              state.option.esversion = 5;
+            }
             break;
           default:
             error("E002", nt);
@@ -691,9 +694,11 @@ var JSHINT = (function() {
             /* falls through */
           case "3":
           case "6":
+            state.option.moz = false;
             state.option.esversion = +val;
             break;
           case "2015":
+            state.option.moz = false;
             state.option.esversion = 6;
             break;
           default:
