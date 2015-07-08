@@ -684,7 +684,11 @@ var JSHINT = (function() {
   //     for ( var i = ...
 
   function peek(p) {
-    var i = p || 0, j = 0, t;
+    var i = p || 0, j = lookahead.length, t;
+
+    if (i < j) {
+      return lookahead[i];
+    }
 
     while (j <= i) {
       t = lookahead[j];
@@ -4649,8 +4653,9 @@ var JSHINT = (function() {
     var i = -1;
     var bracketStack = 0;
     var ret = {};
-    if (checkPunctuators(state.tokens.curr, ["[", "{"]))
+    if (checkPunctuators(state.tokens.curr, ["[", "{"])) {
       bracketStack += 1;
+    }
     do {
       prev = i === -1 ? state.tokens.curr : pn;
       pn = i === -1 ? state.tokens.next : peek(i);
@@ -4661,13 +4666,13 @@ var JSHINT = (function() {
       } else if (checkPunctuators(pn, ["]", "}"])) {
         bracketStack -= 1;
       }
-      if (pn.identifier && pn.value === "for" &&
-          !checkPunctuator(prev, ".") && bracketStack === 1) {
+      if (bracketStack === 1 && pn.identifier && pn.value === "for" &&
+          !checkPunctuator(prev, ".")) {
         ret.isCompArray = true;
         ret.notJson = true;
         break;
       }
-      if (checkPunctuators(pn, ["}", "]"]) && bracketStack === 0) {
+      if (bracketStack === 0 && checkPunctuators(pn, ["}", "]"])) {
         if (pn1.value === "=") {
           ret.isDestAssign = true;
           ret.notJson = true;
