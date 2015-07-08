@@ -6914,3 +6914,80 @@ exports.nonGeneratorAfterGenerator = function (test) {
 
   test.done();
 };
+
+exports["new.target"] = function (test) {
+  var code = [
+    "class A {",
+    "  constructor() {",
+    "    return new.target;",
+    "  }",
+    "}"
+  ];
+
+  TestRun(test, "only in ES6")
+    .addError(1, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(3, "'new.target' is only available in ES6 (use esnext option).")
+    .test(code);
+
+  TestRun(test, "only in ES6").test(code, { esnext: true });
+
+  var code2 = [
+    "var a = new.target;",
+    "var b = () => {",
+    "  var c = () => {",
+    "    return new.target;",
+    "  };",
+    "  return new.target;",
+    "};",
+    "var d = function() {",
+    "  return new.target;",
+    "};",
+    "function e() {",
+    "  var f = () => {",
+    "    return new.target;",
+    "  };",
+    "  return new.target;",
+    "}",
+    "class g {",
+    "  constructor() {",
+    "    return new.target;",
+    "  }",
+    "}"
+  ];
+
+  TestRun(test, "must be in function scope")
+    .addError(1, "'new.target' must be in function scope.")
+    .addError(4, "'new.target' must be in function scope.")
+    .addError(6, "'new.target' must be in function scope.")
+    .test(code2, { esnext: true });
+
+  var code3 = [
+    "var x = new.meta;"
+  ];
+
+  TestRun(test, "invalid meta property")
+    .addError(1, "Invalid meta property: 'new.meta'.")
+    .test(code3);
+
+  var code4 = [
+    "class A {",
+    "  constructor() {",
+    "    new.target = 2;",
+    "    new.target += 2;",
+    "    new.target &= 2;",
+    "    new.target++;",
+    "    ++new.target;",
+    "  }",
+    "}"
+  ];
+
+  TestRun(test, "can't assign to new.target")
+    .addError(3, "Bad assignment.")
+    .addError(4, "Bad assignment.")
+    .addError(5, "Bad assignment.")
+    .addError(6, "Bad assignment.")
+    .addError(7, "Bad assignment.")
+    .test(code4, { esnext: true });
+
+  test.done();
+};

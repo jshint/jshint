@@ -1036,9 +1036,11 @@ var JSHINT = (function() {
           warning("W017", this);
         }
 
+        if (this.right && this.right.isMetaProperty) {
+          error("E031", this);
         // detect increment/decrement of a const
         // in the case of a.b, right will be the "." punctuator
-        if (this.right && this.right.identifier) {
+        } else if (this.right && this.right.identifier) {
           state.funct["(scope)"].block.modify(this.right.value, this);
         }
       }
@@ -1109,7 +1111,6 @@ var JSHINT = (function() {
     };
     return x;
   }
-
 
   function application(s) {
     var x = symbol(s, 42);
@@ -1264,7 +1265,7 @@ var JSHINT = (function() {
             warning("W121", left, nativeObject);
         }
 
-        if (left.identifier) {
+        if (left.identifier && !left.isMetaProperty) {
           // reassign also calls modify
           // but we are specific in order to catch function re-assignment
           // and globals re-assignment
@@ -1296,6 +1297,10 @@ var JSHINT = (function() {
 
           state.nameStack.set(left.right);
 
+          that.right = expression(10);
+          return that;
+        } else if (left.isMetaProperty) {
+          error("E031", that);
           that.right = expression(10);
           return that;
         } else if (left.identifier && !isReserved(left)) {
@@ -1343,6 +1348,11 @@ var JSHINT = (function() {
       }
 
       if (left) {
+        if (left.isMetaProperty) {
+          error("E031", that);
+          that.right = expression(10);
+          return that;
+        }
         if (left.id === "." || left.id === "[" ||
             (left.identifier && !isReserved(left))) {
           expression(10);
@@ -1369,9 +1379,11 @@ var JSHINT = (function() {
         warning("W017", this);
       }
 
+      if (left.isMetaProperty) {
+        error("E031", this);
       // detect increment/decrement of a const
       // in the case of a.b, left will be the "." punctuator
-      if (left && left.identifier) {
+      } else if (left && left.identifier) {
         state.funct["(scope)"].block.modify(left.value, left);
       }
 
@@ -2217,6 +2229,22 @@ var JSHINT = (function() {
     return this;
   }));
   prefix("new", function() {
+    var mp = metaProperty("target", function() {
+      if (!state.inESNext(true)) {
+        warning("W119", state.tokens.prev, "new.target");
+      }
+      var inFunction, c = state.funct;
+      while (c) {
+        inFunction = !c["(global)"];
+        if (!c["(arrow)"]) { break; }
+        c = c["(context)"];
+      }
+      if (!inFunction) {
+        warning("W136", state.tokens.prev, "new.target");
+      }
+    });
+    if (mp) { return mp; }
+
     var c = expression(155), i;
     if (c && c.id !== "function") {
       if (c.identifier) {
@@ -2778,6 +2806,7 @@ var JSHINT = (function() {
       "(scope)"     : null,
       "(comparray)" : null,
       "(generator)" : null,
+      "(arrow)"     : null,
       "(params)"    : null
     };
 
@@ -2885,6 +2914,7 @@ var JSHINT = (function() {
     state.funct = functor(name || state.nameStack.infer(), state.tokens.next, {
       "(statement)": statement,
       "(context)":   state.funct,
+      "(arrow)":     isArrow,
       "(generator)": isGenerator
     });
 
@@ -3034,6 +3064,21 @@ var JSHINT = (function() {
           warning("W078", props[name].setterToken);
         }
       }
+    }
+  }
+
+  function metaProperty(name, c) {
+    if (checkPunctuators(state.tokens.next, ".")) {
+      var left = state.tokens.curr.id;
+      advance(".");
+      var id = identifier();
+      state.tokens.curr.isMetaProperty = true;
+      if (name !== id) {
+        error("E057", state.tokens.prev, left, id);
+      } else {
+        c();
+      }
+      return state.tokens.curr;
     }
   }
 
