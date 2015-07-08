@@ -1039,7 +1039,7 @@ var JSHINT = (function() {
 
         // detect increment/decrement of a const
         // in the case of a.b, right will be the "." punctuator
-        if (this.right && this.right.identifier) {
+        if (this.right && this.right.identifier && !this.right.isMetaProperty) {
           state.funct["(scope)"].block.modify(this.right.value, this);
         }
       }
@@ -1110,7 +1110,6 @@ var JSHINT = (function() {
     };
     return x;
   }
-
 
   function application(s) {
     var x = symbol(s, 42);
@@ -1265,7 +1264,7 @@ var JSHINT = (function() {
             warning("W121", left, nativeObject);
         }
 
-        if (left.identifier) {
+        if (left.identifier && !left.isMetaProperty) {
           // reassign also calls modify
           // but we are specific in order to catch function re-assignment
           // and globals re-assignment
@@ -1372,7 +1371,7 @@ var JSHINT = (function() {
 
       // detect increment/decrement of a const
       // in the case of a.b, left will be the "." punctuator
-      if (left && left.identifier) {
+      if (left && left.identifier && !left.isMetaProperty) {
         state.funct["(scope)"].block.modify(left.value, left);
       }
 
@@ -2218,6 +2217,19 @@ var JSHINT = (function() {
     return this;
   }));
   prefix("new", function() {
+    var mp = metaProperty("target");
+    if (mp) {
+      if (mp.value === "target") {
+        if (!state.inESNext(true)) {
+          warning("W119", state.tokens.prev, "new.target");
+        }
+        if (!state.inClassBody) {
+          warning("W136", state.tokens.prev, "new.target", "class body");
+        }
+      }
+      return mp;
+    }
+
     var c = expression(155), i;
     if (c && c.id !== "function") {
       if (c.identifier) {
@@ -3035,6 +3047,19 @@ var JSHINT = (function() {
           warning("W078", props[name].setterToken);
         }
       }
+    }
+  }
+
+  function metaProperty(name) {
+    if (checkPunctuators(state.tokens.next, ".")) {
+      var left = state.tokens.curr.id;
+      advance(".");
+      var id = identifier();
+      if (name !== id) {
+        error("E057", state.tokens.prev, left, id);
+      }
+      state.tokens.curr.isMetaProperty = true;
+      return state.tokens.curr;
     }
   }
 

@@ -6900,3 +6900,38 @@ exports.nonGeneratorAfterGenerator = function (test) {
 
   test.done();
 };
+
+exports["new.target"] = function (test) {
+  var code = [
+    "class A {",
+    "  constructor() {",
+    "    return new.target;",
+    "  }",
+    "}"
+  ];
+
+  TestRun(test, "only in ES6")
+    .addError(1, "'class' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(3, "'new.target' is only available in ES6 (use esnext option).")
+    .test(code);
+
+  TestRun(test, "only in ES6").test(code, { esnext: true });
+
+  var code2 = [
+    "var x = new.target;"
+  ];
+
+  TestRun(test, "should be in class body")
+    .addError(1, "'new.target' should be in class body.")
+    .test(code2, { esnext: true });
+
+  var code3 = [
+    "var x = new.meta;"
+  ];
+
+  TestRun(test, "invalid meta property")
+    .addError(1, "Invalid meta property: 'new.meta'.")
+    .test(code3);
+
+  test.done();
+};
