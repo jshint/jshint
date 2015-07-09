@@ -2230,18 +2230,15 @@ var JSHINT = (function() {
     return this;
   }));
   prefix("new", function() {
-    var mp = metaProperty("target");
-    if (mp) {
-      if (mp.value === "target") {
-        if (!state.inESNext(true)) {
-          warning("W119", state.tokens.prev, "new.target");
-        }
-        if (!state.inClassBody) {
-          warning("W136", state.tokens.prev, "new.target", "class body");
-        }
+    var mp = metaProperty("target", function() {
+      if (!state.inESNext(true)) {
+        warning("W119", state.tokens.prev, "new.target");
       }
-      return mp;
-    }
+      if (!state.inClassBody) {
+        warning("W136", state.tokens.prev, "new.target", "class body");
+      }
+    });
+    if (mp) { return mp; }
 
     var c = expression(155), i;
     if (c && c.id !== "function") {
@@ -3063,15 +3060,17 @@ var JSHINT = (function() {
     }
   }
 
-  function metaProperty(name) {
+  function metaProperty(name, c) {
     if (checkPunctuators(state.tokens.next, ".")) {
       var left = state.tokens.curr.id;
       advance(".");
       var id = identifier();
+      state.tokens.curr.isMetaProperty = true;
       if (name !== id) {
         error("E057", state.tokens.prev, left, id);
+      } else {
+        c();
       }
-      state.tokens.curr.isMetaProperty = true;
       return state.tokens.curr;
     }
   }
