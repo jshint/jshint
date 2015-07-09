@@ -6933,5 +6933,25 @@ exports["new.target"] = function (test) {
     .addError(1, "Invalid meta property: 'new.meta'.")
     .test(code3);
 
+  var code4 = [
+    "class A {",
+    "  constructor() {",
+    "    new.target = 2;",
+    "    new.target += 2;",
+    "    new.target &= 2;",
+    "    new.target++;",
+    "    ++new.target;",
+    "  }",
+    "}"
+  ];
+
+  TestRun(test, "can't assign to new.target")
+    .addError(3, "Bad assignment.")
+    .addError(4, "Bad assignment.")
+    .addError(5, "Bad assignment.")
+    .addError(6, "Bad assignment.")
+    .addError(7, "Bad assignment.")
+    .test(code4, { esnext: true });
+
   test.done();
 };

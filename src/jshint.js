@@ -1037,9 +1037,11 @@ var JSHINT = (function() {
           warning("W017", this);
         }
 
+        if (this.right && this.right.isMetaProperty) {
+          error("E031", this);
         // detect increment/decrement of a const
         // in the case of a.b, right will be the "." punctuator
-        if (this.right && this.right.identifier && !this.right.isMetaProperty) {
+        } else if (this.right && this.right.identifier) {
           state.funct["(scope)"].block.modify(this.right.value, this);
         }
       }
@@ -1298,6 +1300,10 @@ var JSHINT = (function() {
 
           that.right = expression(10);
           return that;
+        } else if (left.isMetaProperty) {
+          error("E031", that);
+          that.right = expression(10);
+          return that;
         } else if (left.identifier && !isReserved(left)) {
           if (state.funct["(scope)"].labeltype(left.value) === "exception") {
             warning("W022", left);
@@ -1343,6 +1349,11 @@ var JSHINT = (function() {
       }
 
       if (left) {
+        if (left.isMetaProperty) {
+          error("E031", that);
+          that.right = expression(10);
+          return that;
+        }
         if (left.id === "." || left.id === "[" ||
             (left.identifier && !isReserved(left))) {
           expression(10);
@@ -1369,9 +1380,11 @@ var JSHINT = (function() {
         warning("W017", this);
       }
 
+      if (left.isMetaProperty) {
+        error("E031", this);
       // detect increment/decrement of a const
       // in the case of a.b, left will be the "." punctuator
-      if (left && left.identifier && !left.isMetaProperty) {
+      } else if (left && left.identifier) {
         state.funct["(scope)"].block.modify(left.value, left);
       }
 
