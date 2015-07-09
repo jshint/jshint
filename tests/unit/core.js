@@ -231,19 +231,7 @@ exports["undefined as variable name"] = function (test) {
     .test("const undefined;", { esnext: true });
 
   TestRun(test)
-    .test("var { undefined } = {};", { esnext: true });
-
-  TestRun(test)
-    .test("var [ undefined ] = [];", { esnext: true });
-
-  var functions = [
-    "function a(undefined) {}",
-    "function b({ undefined }) {}",
-    "function c([ undefined ]) {}"
-  ];
-
-  TestRun(test)
-    .test(functions, { esnext: true });
+    .test("function a(undefined) {}", { esnext: true });
 
   test.done();
 };
@@ -262,9 +250,21 @@ exports["can't assign a value to undefined"] = function (test) {
     .addError(1, "Assigning a value to 'undefined'.")
     .test("const undefined = 2;", { esnext: true });
 
+  // Always warn when undefined is assigned using a destructuring expression,
+  // as JSHint can't check the destructured object. Example:
+  //   let { undefined } = { undefined: 3 };
+
+  TestRun(test)
+    .addError(1, "Assigning a value to 'undefined'.")
+    .test("var { undefined } = {};", { esnext: true });
+
   TestRun(test)
     .addError(1, "Assigning a value to 'undefined'.")
     .test("var { undefined = 2 } = {};", { esnext: true });
+
+  TestRun(test)
+    .addError(1, "Assigning a value to 'undefined'.")
+    .test("var [ undefined ] = [];", { esnext: true });
 
   TestRun(test)
     .addError(1, "Assigning a value to 'undefined'.")
@@ -277,7 +277,9 @@ exports["can't assign a value to undefined"] = function (test) {
   var functions = [
     "function a(undefined = 2) {}",
     "function b(...undefined) {}",
+    "function b({ undefined }) {}",
     "function c({ undefined = 2 }) {}",
+    "function c([ undefined ]) {}",
     "function d([ undefined = 2 ]) {}",
     "function e([ ...undefined ]) {}"
   ];
@@ -288,6 +290,8 @@ exports["can't assign a value to undefined"] = function (test) {
     .addError(3, "Assigning a value to 'undefined'.")
     .addError(4, "Assigning a value to 'undefined'.")
     .addError(5, "Assigning a value to 'undefined'.")
+    .addError(6, "Assigning a value to 'undefined'.")
+    .addError(7, "Assigning a value to 'undefined'.")
     .test(functions, { esnext: true });
 
   test.done();

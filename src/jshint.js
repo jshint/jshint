@@ -3458,6 +3458,11 @@ var JSHINT = (function() {
     };
 
     var id, value;
+    var checkUndefined = function() {
+      if (state.tokens.curr.value === "undefined") {
+        warning("W139", state.tokens.curr);
+      }
+    };
     if (checkPunctuator(firstToken, "[")) {
       if (!openingParsed) {
         advance("[");
@@ -3472,10 +3477,8 @@ var JSHINT = (function() {
           warning("W130", state.tokens.next);
           element_after_rest = true;
         }
+        checkUndefined();
         if (checkPunctuator(state.tokens.next, "=")) {
-          if (state.tokens.curr.value === "undefined") {
-            warning("W139", state.tokens.curr);
-          }
           if (checkPunctuator(state.tokens.prev, "...")) {
             advance("]");
           } else {
@@ -3502,10 +3505,8 @@ var JSHINT = (function() {
       }
       while (!checkPunctuator(state.tokens.next, "}")) {
         assignmentProperty();
+        checkUndefined();
         if (checkPunctuator(state.tokens.next, "=")) {
-          if (state.tokens.curr.value === "undefined") {
-            warning("W139", state.tokens.curr);
-          }
           advance("=");
           id = state.tokens.prev;
           value = expression(10);
