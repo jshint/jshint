@@ -2234,8 +2234,14 @@ var JSHINT = (function() {
       if (!state.inESNext(true)) {
         warning("W119", state.tokens.prev, "new.target");
       }
-      if (!state.inClassBody) {
-        warning("W136", state.tokens.prev, "new.target", "class body");
+      var inFunction, c = state.funct;
+      while (c) {
+        inFunction = !c["(global)"];
+        if (!c["(arrow)"]) { break; }
+        c = c["(context)"];
+      }
+      if (!inFunction) {
+        warning("W136", state.tokens.prev, "new.target");
       }
     });
     if (mp) { return mp; }
@@ -2801,6 +2807,7 @@ var JSHINT = (function() {
       "(scope)"     : null,
       "(comparray)" : null,
       "(generator)" : null,
+      "(arrow)"     : null,
       "(params)"    : null
     };
 
@@ -2908,6 +2915,7 @@ var JSHINT = (function() {
     state.funct = functor(name || state.nameStack.infer(), state.tokens.next, {
       "(statement)": statement,
       "(context)":   state.funct,
+      "(arrow)":     isArrow,
       "(generator)": isGenerator
     });
 

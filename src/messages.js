@@ -214,7 +214,7 @@ var warnings = {
   W133: "Invalid for-{a} loop left-hand-side: {b}.",
   W134: "The '{a}' option is only available when linting ECMAScript {b} code.",
   W135: "{a} may not be supported by non-browser environments.",
-  W136: "'{a}' should be in {b}."
+  W136: "'{a}' must be in function scope."
 };
 
 var info = {

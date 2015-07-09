@@ -6918,11 +6918,33 @@ exports["new.target"] = function (test) {
   TestRun(test, "only in ES6").test(code, { esnext: true });
 
   var code2 = [
-    "var x = new.target;"
+    "var a = new.target;",
+    "var b = () => {",
+    "  var c = () => {",
+    "    return new.target;",
+    "  };",
+    "  return new.target;",
+    "};",
+    "var d = function() {",
+    "  return new.target;",
+    "};",
+    "function e() {",
+    "  var f = () => {",
+    "    return new.target;",
+    "  };",
+    "  return new.target;",
+    "}",
+    "class g {",
+    "  constructor() {",
+    "    return new.target;",
+    "  }",
+    "}"
   ];
 
-  TestRun(test, "should be in class body")
-    .addError(1, "'new.target' should be in class body.")
+  TestRun(test, "must be in function scope")
+    .addError(1, "'new.target' must be in function scope.")
+    .addError(4, "'new.target' must be in function scope.")
+    .addError(6, "'new.target' must be in function scope.")
     .test(code2, { esnext: true });
 
   var code3 = [
