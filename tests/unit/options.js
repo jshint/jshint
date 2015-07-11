@@ -799,6 +799,7 @@ exports.unused = function (test) {
   var allErrors = [
     [22, "'i' is defined but never used."],
     [101, "'inTry2' used out of scope."],
+    [103, "'inTry3' used out of scope."],
     [117, "'inTry9' was used before it was declared, which is illegal for 'let' variables."],
     [118, "'inTry10' was used before it was declared, which is illegal for 'const' variables."]
   ];
@@ -1833,6 +1834,8 @@ exports.scope = function (test) {
     .addError(12, "'x' used out of scope.")
     .addError(20, "'aa' used out of scope.")
     .addError(27, "'bb' used out of scope.")
+    .addError(32, "'bb' used out of scope.")
+    .addError(36, "'bb' used out of scope.")
     .addError(37, "'cc' is not defined.")
     .addError(42, "'bb' is not defined.")
     .addError(53, "'xx' used out of scope.")
