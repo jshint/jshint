@@ -1438,7 +1438,7 @@ exports.testDefaultArguments = function (test) {
     .addError(14, "'bar' is not defined.")
     .addError(14, "'num3' was used before it was declared, which is illegal for 'param' variables.")
     .addError(15, "'num4' was used before it was declared, which is illegal for 'param' variables.")
-    .addError(18, "Regular parameters cannot come after default parameters.")
+    .addError(18, "Regular parameters should not come after default parameters.")
     .addError(27, "'c' is not defined.")
     .addError(33, "'d' was used before it was defined.")
     .addError(36, "'e' was used before it was declared, which is illegal for 'param' variables.")
@@ -1447,7 +1447,7 @@ exports.testDefaultArguments = function (test) {
   TestRun(test)
     .addError(14, "'num3' was used before it was declared, which is illegal for 'param' variables.")
     .addError(15, "'num4' was used before it was declared, which is illegal for 'param' variables.")
-    .addError(18, "Regular parameters cannot come after default parameters.")
+    .addError(18, "Regular parameters should not come after default parameters.")
     .addError(36, "'e' was used before it was declared, which is illegal for 'param' variables.")
     .test(src, { moz: true });
 
@@ -1461,7 +1461,7 @@ exports.testDefaultArguments = function (test) {
     .addError(15, "'default parameters' is only available in ES6 (use esnext option).")
     .addError(15, "'num4' was used before it was declared, which is illegal for 'param' variables.")
     .addError(18, "'default parameters' is only available in ES6 (use esnext option).")
-    .addError(18, "Regular parameters cannot come after default parameters.")
+    .addError(18, "Regular parameters should not come after default parameters.")
     .addError(26, "'default parameters' is only available in ES6 (use esnext option).")
     .addError(31, "'default parameters' is only available in ES6 (use esnext option).")
     .addError(33, "'default parameters' is only available in ES6 (use esnext option).")
