@@ -1811,6 +1811,26 @@ exports["non-identifier PropertyNames in object destructuring"] = function (test
   test.done();
 };
 
+exports["empty destructuring"] = function (test) {
+  var code = [
+    "var {} = {};",
+    "var [] = [];",
+    "function a({}, []) {}",
+    "var b = ({}) => ([]) => ({});"
+  ];
+
+  TestRun(test)
+    .addError(1, "Empty destructuring.")
+    .addError(2, "Empty destructuring.")
+    .addError(3, "Empty destructuring.")
+    .addError(3, "Empty destructuring.")
+    .addError(4, "Empty destructuring.")
+    .addError(4, "Empty destructuring.")
+    .test(code, { esnext: true });
+
+  test.done();
+};
+
 exports["array element assignment inside array"] = function (test) {
   var code = [
     "var a1 = {};",
