@@ -4362,7 +4362,8 @@ var JSHINT = (function() {
 
     if (this.line === startLine(state.tokens.next) || !state.inMoz()) {
       if (delegatingYield ||
-          (state.tokens.next.id !== ";" && !state.tokens.next.reach && state.tokens.next.nud)) {
+          (state.tokens.next.id !== ";" && !state.option.asi &&
+           !state.tokens.next.reach && state.tokens.next.nud)) {
 
         nobreaknonadjacent(state.tokens.curr, state.tokens.next);
         this.first = expression(10);
