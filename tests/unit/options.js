@@ -1198,7 +1198,6 @@ exports.loopfunc = function (test) {
     .addError(8, "Don't make functions within a loop.")
     .addError(20, "Don't make functions within a loop.")
     .addError(25, "Don't make functions within a loop.")
-    .addError(30, "Don't make functions within a loop.")
     .addError(12, "Function declarations should not be placed in blocks. Use a function " +
             "expression or move the statement to the top of the outer function.")
     .test(src, {es3: true});

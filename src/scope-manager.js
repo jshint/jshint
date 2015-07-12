@@ -256,7 +256,8 @@ var scopeManager = function(state, predefined, exported, declared) {
     unstack: function() {
       // jshint proto: true
       var subScope = _scopeStack.length > 1 ? _scopeStack[_scopeStack.length - 2] : null;
-      var isUnstackingFunction = _current === _currentFunct;
+      var isUnstackingFunction = _current === _currentFunct,
+        isUnstackingFunctionParams = _current["(isParams)"] === "function";
 
       var i, j;
       var currentUsages = _current["(usages)"];
@@ -307,7 +308,7 @@ var scopeManager = function(state, predefined, exported, declared) {
           continue;
         }
 
-        if (isUnstackingFunction) {
+        if (isUnstackingFunctionParams) {
           state.funct["(isCapturing)"] = true;
         }
 
@@ -379,7 +380,7 @@ var scopeManager = function(state, predefined, exported, declared) {
       }
 
       // if we have a sub scope we can copy too and we are still within the function boundary
-      if (subScope && !isUnstackingFunction && _current["(isParams)"] !== "function") {
+      if (subScope && !isUnstackingFunction && !isUnstackingFunctionParams) {
         var labelNames = Object.keys(currentLabels);
         for (i = 0; i < labelNames.length; i++) {
 
