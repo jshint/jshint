@@ -2799,10 +2799,12 @@ var JSHINT = (function() {
         }
       }
 
-      // it is a syntax error to have a regular argument after a default argument
+      // It is valid to have a regular argument after a default argument
+      // since undefined can be used for missing parameters. Still warn as it is
+      // a possible code smell.
       if (pastDefault) {
         if (state.tokens.next.id !== "=") {
-          error("E051", state.tokens.current);
+          error("W138", state.tokens.current);
         }
       }
       if (state.tokens.next.id === "=") {
