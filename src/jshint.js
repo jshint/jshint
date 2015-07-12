@@ -2970,15 +2970,15 @@ var JSHINT = (function() {
     // test for unused (unused: false)
     // it is a new block scope so that params can override it, it can be block scoped
     // but declarations inside the function don't cause already declared error
+    state.funct["(scope)"].stack("functionouter");
     var internallyAccessibleName = name || classExprBinding;
     if (internallyAccessibleName) {
-      state.funct["(scope)"].stack();
       state.funct["(scope)"].block.add(internallyAccessibleName,
         classExprBinding ? "class" : "function", state.tokens.curr, false);
     }
 
     // create the param scope (params added in functionparams)
-    state.funct["(scope)"].stackParams(true);
+    state.funct["(scope)"].stack("functionparams");
 
     var paramsInfo = functionparams(options);
 
@@ -3015,12 +3015,11 @@ var JSHINT = (function() {
     state.funct["(last)"] = state.tokens.curr.line;
     state.funct["(lastcharacter)"] = state.tokens.curr.character;
 
+    // unstack the params scope
     state.funct["(scope)"].unstack(); // also does usage and label checks
 
-    // if we have a name, unstack that scope (see above where it is stacked)
-    if (internallyAccessibleName) {
-      state.funct["(scope)"].unstack();
-    }
+    // unstack the function outer stack
+    state.funct["(scope)"].unstack();
 
     state.funct = state.funct["(context)"];
 
@@ -3870,7 +3869,7 @@ var JSHINT = (function() {
       advance("catch");
       advance("(");
 
-      state.funct["(scope)"].stackParams();
+      state.funct["(scope)"].stack("catchparams");
 
       if (checkPunctuators(state.tokens.next, ["[", "{"])) {
         var tokens = destructuringPattern();

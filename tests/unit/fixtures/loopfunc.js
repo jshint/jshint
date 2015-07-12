@@ -29,3 +29,7 @@ function boo(p) {
 while (true) {
   var d = function z() { return z(); };
 }
+
+for (i = 0; i < 5; i++) {
+  c = function(a,b,i) { return i; };
+}
