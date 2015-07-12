@@ -120,7 +120,7 @@ var scopeManager = function(state, predefined, exported, declared) {
     for (var labelName in curentLabels) {
       if (curentLabels[labelName]) {
         if (curentLabels[labelName]["(type)"] !== "exception" &&
-          curentLabels[labelName]["(unused)"]) {
+          curentLabels[labelName]["(unused)"] && labelName !== "undefined") {
           _warnUnused(labelName, curentLabels[labelName]["(token)"], "var");
         }
       }

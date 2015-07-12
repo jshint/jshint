@@ -299,32 +299,18 @@ exports["can't assign a value to undefined"] = function (test) {
 exports["unused `undefined`"] = function (test) {
 
   var code = [
-    "var undefined;",
-    "function fn() {",
-    "  return undefined;",
-    "}",
-    "fn();"
+    "var undefined;"
   ];
 
 
   TestRun(test).test(code, { unused: true });
 
   var code2 = [
-    "function fn(undefined) {",
-    "  return undefined;",
-    "}",
+    "function fn(undefined) {}",
     "fn();"
   ];
 
   TestRun(test).test(code2, { unused: true });
-
-  var code3 = [
-    "var undefined;"
-  ];
-
-  TestRun(test)
-    .addError(1, "'undefined' is defined but never used.")
-    .test(code3, { unused: true });
 
   test.done();
 };
