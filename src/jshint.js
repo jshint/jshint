@@ -3215,12 +3215,16 @@ var JSHINT = (function() {
     };
     if (checkPunctuators(state.tokens.next, ["["])) {
       advance("[");
-      var element_after_rest = false;
-      if (nextInnerDE() && checkPunctuators(state.tokens.next, [","])) {
-        warning("W130", state.tokens.next);
-        element_after_rest = true;
+      if (checkPunctuators(state.tokens.next, ["]"])) {
+        warning("W135", state.tokens.curr);
       }
+      var element_after_rest = false;
       while (!checkPunctuators(state.tokens.next, ["]"])) {
+        if (nextInnerDE() && !element_after_rest &&
+            checkPunctuators(state.tokens.next, [","])) {
+          warning("W130", state.tokens.next);
+          element_after_rest = true;
+        }
         if (checkPunctuators(state.tokens.next, ["="])) {
           if (checkPunctuators(state.tokens.prev, ["..."])) {
             advance("]");
@@ -3234,22 +3238,16 @@ var JSHINT = (function() {
         }
         if (!checkPunctuators(state.tokens.next, ["]"])) {
           advance(",");
-          if (checkPunctuators(state.tokens.next, ["]"])) {
-            // Trailing comma
-            break;
-          }
-          if (nextInnerDE() && checkPunctuators(state.tokens.next, [","]) &&
-              !element_after_rest) {
-            warning("W130", state.tokens.next);
-            element_after_rest = true;
-          }
         }
       }
       advance("]");
     } else if (checkPunctuators(state.tokens.next, ["{"])) {
       advance("{");
-      assignmentProperty();
+      if (checkPunctuators(state.tokens.next, ["}"])) {
+        warning("W135", state.tokens.curr);
+      }
       while (!checkPunctuators(state.tokens.next, ["}"])) {
+        assignmentProperty();
         if (checkPunctuators(state.tokens.next, ["="])) {
           advance("=");
           if (state.tokens.next.id === "undefined") {
@@ -3264,7 +3262,6 @@ var JSHINT = (function() {
             // ObjectBindingPattern: { BindingPropertyList , }
             break;
           }
-          assignmentProperty();
         }
       }
       advance("}");
