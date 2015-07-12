@@ -2548,7 +2548,7 @@ var JSHINT = (function() {
           addInternalSrc(left, p[0].value);
         }
       }
-      if (!left.identifier && left.id !== "." && left.id !== "[" && left.value !== "=>" &&
+      if (!left.identifier && left.id !== "." && left.id !== "[" && left.id !== "=>" &&
           left.id !== "(" && left.id !== "&&" && left.id !== "||" && left.id !== "?" &&
           !(state.option.esnext && left["(name)"])) {
         warning("W067", that);
