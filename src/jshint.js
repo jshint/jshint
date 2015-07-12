@@ -2923,7 +2923,7 @@ var JSHINT = (function() {
    *                                           the body of member functions.
    */
   function doFunction(options) {
-    var f, name, statement, classExprBinding, isGenerator, isArrow;
+    var f, token, name, statement, classExprBinding, isGenerator, isArrow, ignoreLoopFunc;
     var oldOption = state.option;
     var oldIgnored = state.ignored;
 
@@ -2933,6 +2933,7 @@ var JSHINT = (function() {
       classExprBinding = options.classExprBinding;
       isGenerator = options.type === "generator";
       isArrow = options.type === "arrow";
+      ignoreLoopFunc = options.ignoreLoopFunc;
     }
 
     state.option = Object.create(state.option);
@@ -2946,7 +2947,8 @@ var JSHINT = (function() {
     });
 
     f = state.funct;
-    state.tokens.curr.funct = state.funct;
+    token = state.tokens.curr;
+    token.funct = state.funct;
 
     functions.push(state.funct);
 
@@ -3002,6 +3004,15 @@ var JSHINT = (function() {
     state.funct["(scope)"].unstack();
 
     state.funct = state.funct["(context)"];
+
+    if (!ignoreLoopFunc && !state.option.loopfunc && state.funct["(loopage)"]) {
+      // If the function we just parsed accesses any non-local variables
+      // trigger a warning. Otherwise, the function is safe even within
+      // a loop.
+      if (f["(isCapturing)"]) {
+        warning("W083", token);
+      }
+    }
 
     return f;
   }
@@ -3726,7 +3737,6 @@ var JSHINT = (function() {
     }
     if (inblock) {
       warning("W082", state.tokens.curr);
-
     }
     var i = optionalidentifier();
 
@@ -3743,7 +3753,8 @@ var JSHINT = (function() {
     doFunction({
       name: i,
       statement: this,
-      type: generator ? "generator" : null
+      type: generator ? "generator" : null,
+      ignoreLoopFunc: inblock // a declaration may already have warned
     });
     if (state.tokens.next.id === "(" && state.tokens.next.line === state.tokens.curr.line) {
       error("E039");
@@ -3763,16 +3774,7 @@ var JSHINT = (function() {
     }
 
     var i = optionalidentifier();
-    var fn = doFunction({ name: i, type: generator ? "generator" : null });
-
-    if (!state.option.loopfunc && state.funct["(loopage)"]) {
-      // If the function we just parsed accesses any non-local variables
-      // trigger a warning. Otherwise, the function is safe even within
-      // a loop.
-      if (fn["(isCapturing)"]) {
-        warning("W083");
-      }
-    }
+    doFunction({ name: i, type: generator ? "generator" : null });
     return this;
   });
 

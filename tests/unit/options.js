@@ -1200,6 +1200,7 @@ exports.loopfunc = function (test) {
     .addError(25, "Don't make functions within a loop.")
     .addError(12, "Function declarations should not be placed in blocks. Use a function " +
             "expression or move the statement to the top of the outer function.")
+    .addError(42, "Don't make functions within a loop.")
     .test(src, {es3: true});
 
   // When loopfunc is true, only function declaration should fail.
@@ -1208,6 +1209,34 @@ exports.loopfunc = function (test) {
     .addError(12, "Function declarations should not be placed in blocks. Use a function " +
             "expression or move the statement to the top of the outer function.")
     .test(src, { es3: true, loopfunc: true });
+
+  var es6LoopFuncSrc = [
+    "for (var i = 0; i < 5; i++) {",
+    "  var y = w => i;",
+    "}",
+    "for (i = 0; i < 5; i++) {",
+    "  var z = () => i;",
+    "}",
+    "for (i = 0; i < 5; i++) {",
+    "  y = i => i;", // not capturing
+    "}",
+    "for (i = 0; i < 5; i++) {",
+    "  y = { a() { return i; } };",
+    "}",
+    "for (i = 0; i < 5; i++) {",
+    "  y = class { constructor() { this.i = i; }};",
+    "}",
+    "for (i = 0; i < 5; i++) {",
+    "  y = { a() { return () => i; } };",
+    "}"
+  ];
+  TestRun(test)
+    .addError(2, "Don't make functions within a loop.")
+    .addError(5, "Don't make functions within a loop.")
+    .addError(11, "Don't make functions within a loop.")
+    .addError(14, "Don't make functions within a loop.")
+    .addError(17, "Don't make functions within a loop.")
+    .test(es6LoopFuncSrc, {esnext: true});
 
   test.done();
 };
