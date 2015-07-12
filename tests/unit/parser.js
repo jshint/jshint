@@ -6001,6 +6001,20 @@ exports["test for line breaks with 'yield'"] = function (test) {
     .addError(13, "Missing semicolon.");
 
   run.test(code, {moz: true});
+
+  var code2 = [
+    "function* gen() {",
+    "  yield",
+    "  fn();",
+    "}"
+  ];
+
+  TestRun(test, "gh-2530").test(code2, { esnext: true, undef: false, asi: true });
+
+  TestRun(test, "gh-2530")
+    .addError(3, "Bad line breaking before 'fn'.")
+    .test(code2, { esnext: true, undef: false });
+
   test.done();
 };
 
