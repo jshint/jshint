@@ -62,11 +62,11 @@ var errors = {
   E044: null,
   E045: "Invalid for each loop.",
   E046: "A yield statement shall be within a generator function (with syntax: `function*`)",
-  E047: null, // Vacant
+  E047: null,
   E048: "{a} declaration not directly within block.",
   E049: "A {a} cannot be named '{b}'.",
   E050: "Mozilla requires the yield expression to be parenthesized here.",
-  E051: "Regular parameters cannot come after default parameters.",
+  E051: null,
   E052: "Unclosed template literal.",
   E053: "Export declaration must be in global scope.",
   E054: "Class properties must be methods. Expected '(' but instead saw '{a}'.",
@@ -217,7 +217,8 @@ var warnings = {
   W134: "The '{a}' option is only available when linting ECMAScript {b} code.",
   W135: "{a} may not be supported by non-browser environments.",
   W136: "'{a}' must be in function scope.",
-  W137: "Empty destructuring."
+  W137: "Empty destructuring.",
+  W138: "Regular parameters should not come after default parameters."
 };
 
 var info = {
