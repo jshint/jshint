@@ -13,21 +13,26 @@ var marker = {};
  * and resolving when variables are used and undefined
  */
 var scopeManager = function(state, predefined, exported, declared) {
-  function _newScope() {
-    return {
+
+  var _current;
+  var _scopeStack = [];
+
+  function _newScope(type) {
+    _current = {
       "(labels)": Object.create(null),
       "(usages)": Object.create(null),
       "(breakLabels)": Object.create(null),
-      "(parent)": _current
+      "(parent)": _current,
+      "(type)": type,
+      "(params)": (type === "functionparams" || type === "catchparams") ? [] : null
     };
+    _scopeStack.push(_current);
   }
 
-  var _current = _newScope();
+  _newScope("global");
   _current["(predefined)"] = predefined;
-  _current["(global)"] = true;
 
-  var _currentFunct = _current; // this is the block after the params = function
-  var _scopeStack = [_current];
+  var _currentFunctBody = _current; // this is the block after the params = function
 
   var usedPredefinedAndGlobals = Object.create(null);
   var impliedGlobals = Object.create(null);
@@ -65,7 +70,7 @@ var scopeManager = function(state, predefined, exported, declared) {
     _setupUsages(labelName);
 
     if (token) {
-      token["(function)"] = _currentFunct;
+      token["(function)"] = _currentFunctBody;
       _current["(usages)"][labelName]["(tokens)"].push(token);
     }
   }
@@ -122,7 +127,7 @@ var scopeManager = function(state, predefined, exported, declared) {
   function _checkForUnused() {
     // function params are handled specially
     // assume that parameters are the only thing declared in the param scope
-    if (_current["(isParams)"] === "function") {
+    if (_current["(type)"] === "functionparams") {
       _checkParams();
       return;
     }
@@ -143,6 +148,11 @@ var scopeManager = function(state, predefined, exported, declared) {
    */
   function _checkParams() {
     var params = _current["(params)"];
+
+    if (!params) {
+      return;
+    }
+
     var param = params.pop();
     var unused_opt;
 
@@ -186,7 +196,7 @@ var scopeManager = function(state, predefined, exported, declared) {
       if (current["(usages)"][labelName]) {
         return current["(usages)"][labelName];
       }
-      if (current === _currentFunct) {
+      if (current === _currentFunctBody) {
         break;
       }
     }
@@ -200,14 +210,14 @@ var scopeManager = function(state, predefined, exported, declared) {
       return;
     }
 
-    var isGlobal = _currentFunct["(global)"],
-      isNewFunction = _current["(isParams)"] === "function";
+    var isGlobal = _currentFunctBody["(type)"] === "global",
+      isNewFunction = _current["(type)"] === "functionparams";
 
     var outsideCurrentFunction = !isGlobal;
     for (var i = 0; i < _scopeStack.length; i++) {
       var stackItem = _scopeStack[i];
 
-      if (!isNewFunction && _scopeStack[i + 1] === _currentFunct) {
+      if (!isNewFunction && _scopeStack[i + 1] === _currentFunctBody) {
         outsideCurrentFunction = false;
       }
       if (outsideCurrentFunction && stackItem["(labels)"][labelName]) {
@@ -244,24 +254,28 @@ var scopeManager = function(state, predefined, exported, declared) {
 
     /**
      * Tell the manager we are entering a new block of code
+     * @param {string} [type] - The type of the block. Valid values are
+     *                          "functionparams", "catchparams" and
+     *                          "functionouter"
      */
-    stack: function() {
+    stack: function(type) {
       var previousScope = _current;
-      _current = _newScope();
+      _newScope(type);
 
-      if (previousScope["(isParams)"] === "function") {
+      if (!type && previousScope["(type)"] === "functionparams") {
 
-        _current["(isFunc)"] = true;
-        _current["(context)"] = _currentFunct;
-        _currentFunct = _current;
+        _current["(isFuncBody)"] = true;
+        _current["(context)"] = _currentFunctBody;
+        _currentFunctBody = _current;
       }
-      _scopeStack.push(_current);
     },
 
     unstack: function() {
       // jshint proto: true
       var subScope = _scopeStack.length > 1 ? _scopeStack[_scopeStack.length - 2] : null;
-      var isUnstackingFunction = _current === _currentFunct;
+      var isUnstackingFunctionBody = _current === _currentFunctBody,
+        isUnstackingFunctionParams = _current["(type)"] === "functionparams",
+        isUnstackingFunctionOuter = _current["(type)"] === "functionouter";
 
       var i, j;
       var currentUsages = _current["(usages)"];
@@ -312,7 +326,7 @@ var scopeManager = function(state, predefined, exported, declared) {
           continue;
         }
 
-        if (isUnstackingFunction) {
+        if (isUnstackingFunctionOuter) {
           state.funct["(isCapturing)"] = true;
         }
 
@@ -320,7 +334,7 @@ var scopeManager = function(state, predefined, exported, declared) {
           // not exiting the global scope, so copy the usage down in case its an out of scope usage
           if (!subScope["(usages)"][usedLabelName]) {
             subScope["(usages)"][usedLabelName] = usage;
-            if (isUnstackingFunction) {
+            if (isUnstackingFunctionBody) {
               subScope["(usages)"][usedLabelName]["(onlyUsedSubFunction)"] = true;
             }
           } else {
@@ -384,7 +398,8 @@ var scopeManager = function(state, predefined, exported, declared) {
       }
 
       // if we have a sub scope we can copy too and we are still within the function boundary
-      if (subScope && !isUnstackingFunction && _current["(isParams)"] !== "function") {
+      if (subScope && !isUnstackingFunctionBody &&
+        !isUnstackingFunctionParams && !isUnstackingFunctionOuter) {
         var labelNames = Object.keys(currentLabels);
         for (i = 0; i < labelNames.length; i++) {
 
@@ -397,7 +412,7 @@ var scopeManager = function(state, predefined, exported, declared) {
             !this.funct.has(defLabelName, { excludeCurrent: true })) {
             subScope["(labels)"][defLabelName] = currentLabels[defLabelName];
             // we do not warn about out of scope usages in the global scope
-            if (!_currentFunct["(global)"]) {
+            if (_currentFunctBody["(type)"] !== "global") {
               subScope["(labels)"][defLabelName]["(useOutsideOfScope)"] = true;
             }
             delete currentLabels[defLabelName];
@@ -408,10 +423,10 @@ var scopeManager = function(state, predefined, exported, declared) {
       _checkForUnused();
 
       _scopeStack.pop();
-      if (isUnstackingFunction) {
-        _currentFunct = _scopeStack[_.findLastIndex(_scopeStack, function(scope) {
+      if (isUnstackingFunctionBody) {
+        _currentFunctBody = _scopeStack[_.findLastIndex(_scopeStack, function(scope) {
           // if function or if global (which is at the bottom so it will only return true if we call back)
-          return scope["(isFunc)"] || scope["(global)"];
+          return scope["(isFuncBody)"] || scope["(type)"] === "global";
         })];
       }
 
@@ -451,6 +466,7 @@ var scopeManager = function(state, predefined, exported, declared) {
           "(type)" : type,
           "(token)": token,
           "(unused)": true };
+
         _current["(params)"].push(labelName);
       }
 
@@ -468,12 +484,16 @@ var scopeManager = function(state, predefined, exported, declared) {
 
     validateParams: function() {
       // This method only concerns errors for function parameters
-      if (_currentFunct["(global)"]) {
+      if (_currentFunctBody["(type)"] === "global") {
         return;
       }
 
       var isStrict = state.isStrict();
-      var currentFunctParamScope = _currentFunct["(parent)"];
+      var currentFunctParamScope = _currentFunctBody["(parent)"];
+
+      if (!currentFunctParamScope["(params)"]) {
+        return;
+      }
 
       currentFunctParamScope["(params)"].forEach(function(labelName) {
         var label = currentFunctParamScope["(labels)"][labelName];
@@ -486,19 +506,6 @@ var scopeManager = function(state, predefined, exported, declared) {
           }
         }
       });
-    },
-
-    /**
-     * Tell the manager we are entering a new scope with parameters
-     * Call stack after all parameters have been added
-     * @param isFunction Whether the scope is a function or not
-     */
-    stackParams: function(isFunction) {
-      _current = _newScope();
-      _current["(isParams)"] = isFunction ? "function" : true;
-      _current["(params)"] = [];
-
-      _scopeStack.push(_current);
     },
 
     getUsedOrDefinedGlobals: function() {
@@ -596,8 +603,9 @@ var scopeManager = function(state, predefined, exported, declared) {
         var declaredInCurrentScope = _current["(labels)"][labelName];
         // for block scoped variables, params are seen in the current scope as the root function
         // scope, so check these too.
-        if (!declaredInCurrentScope && _current === _currentFunct && !_current["(global)"]) {
-          declaredInCurrentScope = !!_currentFunct["(parent)"]["(labels)"][labelName];
+        if (!declaredInCurrentScope && _current === _currentFunctBody &&
+          _current["(type)"] !== "global") {
+          declaredInCurrentScope = !!_currentFunctBody["(parent)"]["(labels)"][labelName];
         }
 
         // if its not already defined (which is an error, so ignore) and is used in TDZ
@@ -645,7 +653,7 @@ var scopeManager = function(state, predefined, exported, declared) {
           if (declaredInCurrentFunctionScope && labelName !== "__proto__") {
 
             // see https://github.com/jshint/jshint/issues/2400
-            if (!_currentFunct["(global)"]) {
+            if (_currentFunctBody["(type)"] !== "global") {
               warning("W004", token, labelName);
             }
           }
@@ -653,7 +661,7 @@ var scopeManager = function(state, predefined, exported, declared) {
 
         scopeManagerInst.funct.add(labelName, type, token, true);
 
-        if (state.funct["(global)"]) {
+        if (_currentFunctBody["(type)"] === "global") {
           usedPredefinedAndGlobals[labelName] = marker;
         }
       }
@@ -680,7 +688,7 @@ var scopeManager = function(state, predefined, exported, declared) {
             return current["(labels)"][labelName]["(type)"];
           }
           var scopeCheck = excludeParams ? _scopeStack[ i - 1 ] : current;
-          if (scopeCheck && scopeCheck["(isParams)"] === "function") {
+          if (scopeCheck && scopeCheck["(type)"] === "functionparams") {
             return null;
           }
         }
@@ -698,7 +706,7 @@ var scopeManager = function(state, predefined, exported, declared) {
           if (current["(breakLabels)"][labelName]) {
             return true;
           }
-          if (current["(isParams)"] === "function") {
+          if (current["(type)"] === "functionparams") {
             return false;
           }
         }
@@ -706,7 +714,7 @@ var scopeManager = function(state, predefined, exported, declared) {
       },
       /**
        * Returns if the label is in the current function scope
-       * See state.funct.labelType for options
+       * See scopeManager.funct.labelType for options
        */
       has: function(labelName, options) {
         return Boolean(this.labeltype(labelName, options));
@@ -721,7 +729,7 @@ var scopeManager = function(state, predefined, exported, declared) {
           "(type)" : type,
           "(token)": tok,
           "(blockscoped)": false,
-          "(function)": _currentFunct,
+          "(function)": _currentFunctBody,
           "(unused)": unused };
       }
     },
@@ -733,7 +741,7 @@ var scopeManager = function(state, predefined, exported, declared) {
        * @returns Boolean
        */
       isGlobal: function() {
-        return _current["(global)"];
+        return _current["(type)"] === "global";
       },
 
       use: function(labelName, token) {
@@ -742,7 +750,7 @@ var scopeManager = function(state, predefined, exported, declared) {
         // this is because function(a) { var a = a; } will resolve to the param, not
         // to the unset var
         // first check the param is used
-        var paramScope = _currentFunct["(parent)"];
+        var paramScope = _currentFunctBody["(parent)"];
         if (paramScope && paramScope["(labels)"][labelName] &&
           paramScope["(labels)"][labelName]["(type)"] === "param") {
 
