@@ -1551,7 +1551,8 @@ Lexer.prototype = {
     // If there is a limit on line length, warn when lines get too
     // long.
 
-    if (state.option.maxlen && state.option.maxlen < this.input.length) {
+    if (!this.ignoringLinterErrors && state.option.maxlen &&
+      state.option.maxlen < this.input.length) {
       var inComment = this.inComment ||
         startsWith.call(inputTrimmed, "//") ||
         startsWith.call(inputTrimmed, "/*");
