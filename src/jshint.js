@@ -2879,8 +2879,8 @@ var JSHINT = (function() {
       } else {
         if (checkPunctuator(state.tokens.next, "...")) pastRest = true;
         ident = identifier(true);
-        if (pastRest && state.tokens.curr.value === "undefined") {
-          warning("W139", state.tokens.curr);
+        if (pastRest) {
+          checkUndefined();
         }
         if (ident) {
           paramsIds.push(ident);
@@ -2903,9 +2903,7 @@ var JSHINT = (function() {
         if (!state.inES6()) {
           warning("W119", state.tokens.next, "default parameters", "6");
         }
-        if (state.tokens.curr.value === "undefined") {
-          warning("W139", state.tokens.curr);
-        }
+        checkUndefined();
         advance("=");
         pastDefault = true;
         expression(10);
@@ -3376,6 +3374,12 @@ var JSHINT = (function() {
     return destructuringPatternRecursive(options);
   }
 
+  function checkUndefined() {
+    if (state.tokens.curr.value === "undefined") {
+      warning("W139", state.tokens.curr);
+    }
+  }
+
   function destructuringPatternRecursive(options) {
     var ids;
     var identifiers = [];
@@ -3421,8 +3425,8 @@ var JSHINT = (function() {
         if (ident) {
           identifiers.push({ id: ident, token: state.tokens.curr });
         }
-        if (is_rest && state.tokens.curr.value === "undefined") {
-          warning("W139", state.tokens.curr);
+        if (is_rest) {
+          checkUndefined();
         }
         return is_rest;
       }
@@ -3458,11 +3462,6 @@ var JSHINT = (function() {
     };
 
     var id, value;
-    var checkUndefined = function() {
-      if (state.tokens.curr.value === "undefined") {
-        warning("W139", state.tokens.curr);
-      }
-    };
     if (checkPunctuator(firstToken, "[")) {
       if (!openingParsed) {
         advance("[");
@@ -3606,10 +3605,7 @@ var JSHINT = (function() {
       }
 
       if (state.tokens.next.id === "=") {
-        if (state.tokens.curr.value === "undefined") {
-          warning("W139", state.tokens.curr);
-        }
-
+        checkUndefined();
         advance("=");
         if (!prefix && peek(0).id === "=" && state.tokens.next.identifier) {
           warning("W120", state.tokens.next, state.tokens.next.value);
@@ -3716,10 +3712,7 @@ var JSHINT = (function() {
 
       if (state.tokens.next.id === "=") {
         state.nameStack.set(state.tokens.curr);
-
-        if (state.tokens.curr.value === "undefined") {
-          warning("W139", state.tokens.curr);
-        }
+        checkUndefined();
 
         advance("=");
         if (peek(0).id === "=" && state.tokens.next.identifier) {
