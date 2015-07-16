@@ -694,7 +694,10 @@ var scopeManager = function(state, predefined, exported, declared) {
 
       addBreakLabel: function(labelName, opts) {
         var token = opts.token;
-        if (state.option.shadow === "outer") {
+        if (scopeManagerInst.funct.hasBreakLabel(labelName)) {
+          warning("E011", token, labelName);
+        }
+        else if (state.option.shadow === "outer") {
           if (scopeManagerInst.funct.has(labelName)) {
             warning("W004", token, labelName);
           } else {

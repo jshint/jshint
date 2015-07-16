@@ -359,3 +359,9 @@ function zzg(zzh, zzi, zzj) {
     const zzo = null;
     let zzp = null;
 }());
+
+zj: while(true) {
+    zj: while(true) {
+        break zj;
+    }
+}
