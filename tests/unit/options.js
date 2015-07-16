@@ -112,10 +112,12 @@ exports.shadowEs6 = function (test) {
     [276, "'zb' has already been declared."],
     [286, "'zd' has already been declared."],
     [301, "'zf' has already been declared."],
+    [317, "'zi' has already been declared."],
     [344, "'zzi' has already been declared."],
     [345, "'zzj' has already been declared."],
     [349, "'zzl' has already been declared."],
-    [350, "'zzm' has already been declared."]
+    [350, "'zzm' has already been declared."],
+    [364, "'zj' has already been declared."]
   ];
 
   var innerErrors = [
@@ -171,9 +173,7 @@ exports.shadowEs6 = function (test) {
     [335, "'zzd' is already defined in outer scope."],
     [336, "'zze' is already defined in outer scope."],
     [337, "'zzf' is already defined in outer scope."],
-    [358, "'zzn' is already defined in outer scope."],
-    /* labels */
-    [317, "'zi' is already defined in outer scope."] // should always error
+    [358, "'zzn' is already defined in outer scope."]
   ];
 
   var testRun = TestRun(test);
