@@ -2930,5 +2930,13 @@ exports.module.declarationRestrictions = function( test ) {
       "/* jshint module: true */"
     ], { esnext: true });
 
+  TestRun(test, "Not re-applied with every directive (gh-2560)")
+    .test([
+      "/* jshint module:true */",
+      "function bar() {",
+      "  /* jshint validthis:true */",
+      "}"
+    ], { esnext: true });
+
   test.done();
 };
