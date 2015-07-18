@@ -198,13 +198,6 @@ var JSHINT = (function() {
 
     if (state.option.module) {
       /**
-       * TODO: Extend this restriction to *all* "environmental" options.
-       */
-      if (!hasParsedCode(state.funct)) {
-        error("E055", state.tokens.next, "module");
-      }
-
-      /**
        * TODO: Extend this restriction to *all* ES6-specific options.
        */
       if (!state.inESNext()) {
@@ -627,6 +620,15 @@ var JSHINT = (function() {
             error("E002", nt);
           }
           return;
+        }
+
+        if (key === "module") {
+          /**
+           * TODO: Extend this restriction to *all* "environmental" options.
+           */
+          if (!hasParsedCode(state.funct)) {
+            error("E055", state.tokens.next, "module");
+          }
         }
 
         var match = /^([+-])(W\d{3})$/g.exec(key);
