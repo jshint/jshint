@@ -201,7 +201,6 @@ var scopeManager = function(state, predefined, exported, declared) {
       }
       if (outsideCurrentFunction && _.has(stackItem["(labels)"], labelName)) {
         warning("W123", token, labelName);
-        //break;
       }
       if (_.has(stackItem["(breakLabels)"], labelName)) {
         warning("W123", token, labelName);
