@@ -3,6 +3,11 @@
 var _      = require("lodash");
 var events = require("events");
 
+// Used to denote membership in lookup tables (a primitive value such as `true`
+// would be silently rejected for the property name "__proto__" in some
+// environments)
+var marker = {};
+
 /**
  * Creates a scope manager that handles variables and labels, storing usages
  * and resolving when variables are used and undefined
@@ -322,7 +327,7 @@ var scopeManager = function(state, predefined, exported, declared) {
             delete declared[usedLabelName];
 
             // note it as used so it can be reported
-            usedPredefinedAndGlobals[usedLabelName] = true;
+            usedPredefinedAndGlobals[usedLabelName] = marker;
 
             // check for re-assigning a read-only (set to false) predefined
             if (_current["(predefined)"][usedLabelName] === false && usage["(reassigned)"]) {
@@ -440,7 +445,18 @@ var scopeManager = function(state, predefined, exported, declared) {
     },
 
     getUsedOrDefinedGlobals: function() {
-      return Object.keys(usedPredefinedAndGlobals);
+      // jshint proto: true
+      var list = Object.keys(usedPredefinedAndGlobals);
+
+      // If `__proto__` is used as a global variable name, its entry in the
+      // lookup table may not be enumerated by `Object.keys` (depending on the
+      // environment).
+      if (usedPredefinedAndGlobals.__proto__ === marker &&
+        list.indexOf("__proto__") === -1) {
+        list.push("__proto__");
+      }
+
+      return list;
     },
 
     /**
@@ -564,7 +580,7 @@ var scopeManager = function(state, predefined, exported, declared) {
         scopeManagerInst.funct.add(labelName, type, token, true);
 
         if (state.funct["(global)"]) {
-          usedPredefinedAndGlobals[labelName] = true;
+          usedPredefinedAndGlobals[labelName] = marker;
         }
       }
     },

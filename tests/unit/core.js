@@ -73,6 +73,10 @@ exports.testGlobalVarDeclarations = function (test) {
   var report = JSHINT.data();
   test.deepEqual(report.globals, ['a']);
 
+  TestRun(test).test("var __proto__;", { proto: true });
+  report = JSHINT.data();
+  test.deepEqual(report.globals, ["__proto__"]);
+
   test.done();
 };
 
