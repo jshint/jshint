@@ -3062,7 +3062,7 @@ var JSHINT = (function() {
     // Check for lonely setters if in the ES5 mode.
     if (state.inES5()) {
       for (var name in props) {
-        if (_.has(props, name) && props[name].setterToken && !props[name].getterToken) {
+        if (props[name] && props[name].setterToken && !props[name].getterToken) {
           warning("W078", props[name].setterToken);
         }
       }
@@ -3087,7 +3087,7 @@ var JSHINT = (function() {
   (function(x) {
     x.nud = function() {
       var b, f, i, p, t, isGeneratorMethod = false, nextVal;
-      var props = {}; // All properties, including accessors
+      var props = Object.create(null); // All properties, including accessors
 
       b = state.tokens.curr.line !== startLine(state.tokens.next);
       if (b) {
@@ -3582,8 +3582,8 @@ var JSHINT = (function() {
     var isStatic;
     var isGenerator;
     var getset;
-    var props = {};
-    var staticProps = {};
+    var props = Object.create(null);
+    var staticProps = Object.create(null);
     var computed;
     for (var i = 0; state.tokens.next.id !== "}"; ++i) {
       name = state.tokens.next;
@@ -4617,10 +4617,10 @@ var JSHINT = (function() {
       name = tkn.value;
     }
 
-    if (props[name] && _.has(props, name)) {
+    if (props[name]) {
       warning("W075", state.tokens.next, msg, name);
     } else {
-      props[name] = {};
+      props[name] = Object.create(null);
     }
 
     props[name].basic = true;
@@ -4652,12 +4652,12 @@ var JSHINT = (function() {
     state.tokens.curr.accessorType = accessorType;
     state.nameStack.set(tkn);
 
-    if (props[name] && _.has(props, name)) {
+    if (props[name]) {
       if (props[name].basic || props[name][flagName]) {
         warning("W075", state.tokens.next, msg, name);
       }
     } else {
-      props[name] = {};
+      props[name] = Object.create(null);
     }
 
     props[name][flagName] = tkn;

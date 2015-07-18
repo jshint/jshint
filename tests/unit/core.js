@@ -51,6 +51,37 @@ exports.testUnusedDefinedGlobals = function (test) {
   test.done();
 };
 
+exports.testImplieds = function (test) {
+  var src = [
+    "f = 0;",
+    "(function() {",
+    "  g = 0;",
+    "}());",
+    "h = 0;"
+  ];
+  var report;
+
+  TestRun(test).test(src);
+  report = JSHINT.data();
+
+  test.deepEqual(
+    report.implieds,
+    [
+      { name: "f", line: [1] },
+      { name: "g", line: [3] },
+      { name: "h", line: [5] }
+    ]
+  );
+
+  TestRun(test)
+    .test("__proto__ = 0;", { proto: true });
+  report = JSHINT.data();
+
+  test.deepEqual(report.implieds, [ { name: "__proto__", line: [1] } ]);
+
+  test.done();
+};
+
 exports.testExportedDefinedGlobals = function (test) {
   var src = ["/*global foo, bar */",
     "export { bar, foo };"];
@@ -72,6 +103,10 @@ exports.testGlobalVarDeclarations = function (test) {
 
   var report = JSHINT.data();
   test.deepEqual(report.globals, ['a']);
+
+  TestRun(test).test("var __proto__;", { proto: true });
+  report = JSHINT.data();
+  test.deepEqual(report.globals, ["__proto__"]);
 
   test.done();
 };
@@ -1731,6 +1766,77 @@ exports["gh-1920"] = function (test) {
   TestRun(test)
     .addError(1, "The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.")
     .test(src, { forin: true });
+
+  test.done();
+};
+
+exports.duplicateProto = function (test) {
+  var src = [
+    "(function() {",
+    "  var __proto__;",
+    "  var __proto__;",
+    "}());"
+  ];
+
+  TestRun(test, "Duplicate `var`s")
+    .addError(3, "'__proto__' is already defined.")
+    .test(src, { proto: true });
+
+  src = [
+    "(function() {",
+    "  let __proto__;",
+    "  let __proto__;",
+    "}());"
+  ];
+
+  TestRun(test, "Duplicate `let`s")
+    .addError(3, "'__proto__' has already been declared.")
+    .test(src, { proto: true, esnext: true });
+
+  src = [
+    "(function() {",
+    "  const __proto__ = null;",
+    "  const __proto__ = null;",
+    "}());"
+  ];
+
+  TestRun(test, "Duplicate `const`s")
+    .addError(3, "'__proto__' has already been declared.")
+    .test(src, { proto: true, esnext: true });
+
+  src = [
+    "void {",
+    "  __proto__: null,",
+    "  __proto__: null",
+    "};"
+  ];
+
+  TestRun(test, "Duplicate keys (data)")
+    .addError(3, "Duplicate key '__proto__'.")
+    .test(src, { proto: true });
+
+  src = [
+    "void {",
+    "  __proto__: null,",
+    "  get __proto__() {}",
+    "};"
+  ];
+
+  TestRun(test, "Duplicate keys (data and accessor)")
+    .addError(3, "Duplicate key '__proto__'.")
+    .test(src, { proto: true });
+
+  src = [
+    "__proto__: while (true) {",
+    "  __proto__: while (true) {",
+    "    break;",
+    "  }",
+    "}"
+  ];
+
+  TestRun(test, "Duplicate labels")
+    .addError(2, "'__proto__' has already been declared.")
+    .test(src, { proto: true });
 
   test.done();
 };
