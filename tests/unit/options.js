@@ -3154,3 +3154,28 @@ exports.module.declarationRestrictions = function( test ) {
 
   test.done();
 };
+
+exports["gh-2436"] = function( test ) {
+  // see gh-2436. Previously jshint directives after a function declaration were ignored.
+  TestRun(test)
+    .addError(12, "This function has too many parameters. (2)")
+    .addError(14, "eval can be harmful.")
+    .test([
+      "function x() {}",
+      "/*jshint evil: true */", // <-- previously ignored
+      "eval();",
+      "// jshint maxparams: 2",
+      "function Foo () {}",
+      "// jshint maxparams: 9", // <-- previously ignored
+      "Foo.prototype.bar = function (a, b, c, d, e) {",
+      "  return a + b + c + d + e;",
+      "};",
+      "var z = () => foo;",
+      "// jshint maxparams: 1",
+      "function y(a, b) {}",
+      "// jshint evil: false",
+      "eval()/*jshint evil: true */;"
+    ], { esnext: true });
+
+  test.done();
+};
