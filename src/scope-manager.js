@@ -30,7 +30,7 @@ var scopeManager = function(state, predefined, exported, declared) {
   var _scopeStack = [_current];
 
   var usedPredefinedAndGlobals = Object.create(null);
-  var impliedGlobals = {};
+  var impliedGlobals = Object.create(null);
   var unuseds = [];
   var emitter = new events.EventEmitter();
 
@@ -254,7 +254,7 @@ var scopeManager = function(state, predefined, exported, declared) {
     },
 
     unstack: function() {
-
+      // jshint proto: true
       var subScope = _scopeStack.length > 1 ? _scopeStack[_scopeStack.length - 2] : null;
       var isUnstackingFunction = _current === _currentFunct;
 
@@ -262,6 +262,11 @@ var scopeManager = function(state, predefined, exported, declared) {
       var currentUsages = _current["(usages)"];
       var currentLabels = _current["(labels)"];
       var usedLabelNameList = Object.keys(currentUsages);
+
+      if (currentUsages.__proto__ && usedLabelNameList.indexOf("__proto__") === -1) {
+        usedLabelNameList.push("__proto__");
+      }
+
       for (i = 0; i < usedLabelNameList.length; i++) {
         var usedLabelName = usedLabelNameList[i];
 
@@ -321,7 +326,7 @@ var scopeManager = function(state, predefined, exported, declared) {
           }
         } else {
           // this is exiting global scope, so we finalise everything here - we are at the end of the file
-          if (_.has(_current["(predefined)"], usedLabelName)) {
+          if (typeof _current["(predefined)"][usedLabelName] === "boolean") {
 
             // remove the declared token, so we know it is used
             delete declared[usedLabelName];
@@ -348,7 +353,7 @@ var scopeManager = function(state, predefined, exported, declared) {
                   if (state.option.undef && !undefinedToken.ignoreUndef) {
                     warning("W117", undefinedToken, usedLabelName);
                   }
-                  if (_.has(impliedGlobals, usedLabelName)) {
+                  if (impliedGlobals[usedLabelName]) {
                     impliedGlobals[usedLabelName].line.push(undefinedToken.line);
                   } else {
                     impliedGlobals[usedLabelName] = {
@@ -464,7 +469,24 @@ var scopeManager = function(state, predefined, exported, declared) {
      * @returns {Array.<{ name: string, line: Array.<number>}>}
      */
     getImpliedGlobals: function() {
-      return _.values(impliedGlobals);
+      // jshint proto: true
+      var values = _.values(impliedGlobals);
+      var hasProto = false;
+
+      // If `__proto__` is an implied global variable, its entry in the lookup
+      // table may not be enumerated by `_.values` (depending on the
+      // environment).
+      if (impliedGlobals.__proto__) {
+        hasProto = values.some(function(value) {
+          return value.name === "__proto__";
+        });
+
+        if (!hasProto) {
+          values.push(impliedGlobals.__proto__);
+        }
+      }
+
+      return values;
     },
 
     /**

@@ -51,6 +51,37 @@ exports.testUnusedDefinedGlobals = function (test) {
   test.done();
 };
 
+exports.testImplieds = function (test) {
+  var src = [
+    "f = 0;",
+    "(function() {",
+    "  g = 0;",
+    "}());",
+    "h = 0;"
+  ];
+  var report;
+
+  TestRun(test).test(src);
+  report = JSHINT.data();
+
+  test.deepEqual(
+    report.implieds,
+    [
+      { name: "f", line: [1] },
+      { name: "g", line: [3] },
+      { name: "h", line: [5] }
+    ]
+  );
+
+  TestRun(test)
+    .test("__proto__ = 0;", { proto: true });
+  report = JSHINT.data();
+
+  test.deepEqual(report.implieds, [ { name: "__proto__", line: [1] } ]);
+
+  test.done();
+};
+
 exports.testExportedDefinedGlobals = function (test) {
   var src = ["/*global foo, bar */",
     "export { bar, foo };"];
