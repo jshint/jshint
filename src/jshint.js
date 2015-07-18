@@ -4616,14 +4616,15 @@ var JSHINT = (function() {
       name = tkn.value;
     }
 
-    if (props[name] && _.has(props, name)) {
+    if ((props[name] && _.has(props, name)) || (name === "__proto__" &&
+        Object.getPrototypeOf(props) !== Object.prototype)) { // __proto__ has been modified
       warning("W075", state.tokens.next, msg, name);
-    } else {
-      props[name] = {};
     }
 
-    props[name].basic = true;
-    props[name].basictkn = tkn;
+    props[name] = {
+      basic: true,
+      basictkn: tkn
+    };
   }
 
   /**
