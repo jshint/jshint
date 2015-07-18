@@ -49,7 +49,7 @@ var scopeManager = function(state, predefined, exported, declared) {
     if (token) {
       token["(function)"] = _currentFunct;
     }
-    if (!_.has(_current["(usages)"], labelName)) {
+    if (!_current["(usages)"][labelName]) {
       _current["(usages)"][labelName] = {
         "(modified)": [],
         "(reassigned)": [],
@@ -117,7 +117,7 @@ var scopeManager = function(state, predefined, exported, declared) {
     }
     var curentLabels = _current["(labels)"];
     for (var labelName in curentLabels) {
-      if (_.has(curentLabels, labelName)) {
+      if (curentLabels[labelName]) {
         if (curentLabels[labelName]["(type)"] !== "exception" &&
           curentLabels[labelName]["(unused)"]) {
           _warnUnused(labelName, curentLabels[labelName]["(token)"], "var");
@@ -162,7 +162,7 @@ var scopeManager = function(state, predefined, exported, declared) {
   function _getLabel(labelName) {
     for (var i = _scopeStack.length - 1 ; i >= 0; --i) {
       var scopeLabels = _scopeStack[i]["(labels)"];
-      if (_.has(scopeLabels, labelName)) {
+      if (scopeLabels[labelName]) {
         return scopeLabels;
       }
     }
@@ -172,7 +172,7 @@ var scopeManager = function(state, predefined, exported, declared) {
     // used so far in this whole function and any sub functions
     for (var i = _scopeStack.length - 1; i >= 0; i--) {
       var current = _scopeStack[i];
-      if (_.has(current["(usages)"], labelName)) {
+      if (current["(usages)"][labelName]) {
         return current["(usages)"][labelName];
       }
       if (current === _currentFunct) {
@@ -199,11 +199,11 @@ var scopeManager = function(state, predefined, exported, declared) {
       if (!isNewFunction && _scopeStack[i + 1] === _currentFunct) {
         outsideCurrentFunction = false;
       }
-      if (outsideCurrentFunction && _.has(stackItem["(labels)"], labelName)) {
+      if (outsideCurrentFunction && stackItem["(labels)"][labelName]) {
         warning("W123", token, labelName);
         //break;
       }
-      if (_.has(stackItem["(breakLabels)"], labelName)) {
+      if (stackItem["(breakLabels)"][labelName]) {
         warning("W123", token, labelName);
       }
     }
@@ -261,7 +261,7 @@ var scopeManager = function(state, predefined, exported, declared) {
         var usedLabelName = usedLabelNameList[i];
 
         var usage = currentUsages[usedLabelName];
-        var usedLabel = _.has(currentLabels, usedLabelName) && currentLabels[usedLabelName];
+        var usedLabel = currentLabels[usedLabelName];
         if (usedLabel) {
 
           if (usedLabel["(useOutsideOfScope)"] && !state.option.funcscope) {
@@ -301,7 +301,7 @@ var scopeManager = function(state, predefined, exported, declared) {
 
         if (subScope) {
           // not exiting the global scope, so copy the usage down in case its an out of scope usage
-          if (!_.has(subScope["(usages)"], usedLabelName)) {
+          if (!subScope["(usages)"][usedLabelName]) {
             subScope["(usages)"][usedLabelName] = usage;
             if (isUnstackingFunction) {
               subScope["(usages)"][usedLabelName]["(onlyUsedSubFunction)"] = true;
@@ -503,15 +503,15 @@ var scopeManager = function(state, predefined, exported, declared) {
       // if is block scoped (let or const)
       if (isblockscoped) {
 
-        var declaredInCurrentScope = _.has(_current["(labels)"], labelName);
+        var declaredInCurrentScope = _current["(labels)"][labelName];
         // for block scoped variables, params are seen in the current scope as the root function
         // scope, so check these too.
         if (!declaredInCurrentScope && _current === _currentFunct && !_current["(global)"]) {
-          declaredInCurrentScope = _.has(_currentFunct["(parent)"]["(labels)"], labelName);
+          declaredInCurrentScope = !!_currentFunct["(parent)"]["(labels)"][labelName];
         }
 
         // if its not already defined (which is an error, so ignore) and is used in TDZ
-        if (!declaredInCurrentScope && _.has(_current["(usages)"], labelName)) {
+        if (!declaredInCurrentScope && _current["(usages)"][labelName]) {
           var usage = _current["(usages)"][labelName];
           // if its in a sub function it is not necessarily an error, just latedef
           if (usage["(onlyUsedSubFunction)"]) {
@@ -585,7 +585,7 @@ var scopeManager = function(state, predefined, exported, declared) {
         var currentScopeIndex = _scopeStack.length - (options && options.excludeCurrent ? 2 : 1);
         for (var i = currentScopeIndex; i >= 0; i--) {
           var current = _scopeStack[i];
-          if (_.has(current["(labels)"], labelName) &&
+          if (current["(labels)"][labelName] &&
             (!onlyBlockscoped || current["(labels)"][labelName]["(blockscoped)"])) {
             return current["(labels)"][labelName]["(type)"];
           }
@@ -605,7 +605,7 @@ var scopeManager = function(state, predefined, exported, declared) {
         for (var i = _scopeStack.length - 1; i >= 0; i--) {
           var current = _scopeStack[i];
 
-          if (_.has(current["(breakLabels)"], labelName)) {
+          if (current["(breakLabels)"][labelName]) {
             return true;
           }
           if (current["(isParams)"] === "function") {
@@ -653,7 +653,7 @@ var scopeManager = function(state, predefined, exported, declared) {
         // to the unset var
         // first check the param is used
         var paramScope = _currentFunct["(parent)"];
-        if (paramScope && _.has(paramScope["(labels)"], labelName) &&
+        if (paramScope && paramScope["(labels)"][labelName] &&
           paramScope["(labels)"][labelName]["(type)"] === "param") {
 
           // then check its not used

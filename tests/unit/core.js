@@ -1734,3 +1734,74 @@ exports["gh-1920"] = function (test) {
 
   test.done();
 };
+
+exports.duplicateProto = function (test) {
+  var src = [
+    "(function() {",
+    "  var __proto__;",
+    "  var __proto__;",
+    "}());"
+  ];
+
+  TestRun(test, "Duplicate `var`s")
+    .addError(3, "'__proto__' is already defined.")
+    .test(src, { proto: true });
+
+  src = [
+    "(function() {",
+    "  let __proto__;",
+    "  let __proto__;",
+    "}());"
+  ];
+
+  TestRun(test, "Duplicate `let`s")
+    .addError(3, "'__proto__' has already been declared.")
+    .test(src, { proto: true, esnext: true });
+
+  src = [
+    "(function() {",
+    "  const __proto__ = null;",
+    "  const __proto__ = null;",
+    "}());"
+  ];
+
+  TestRun(test, "Duplicate `const`s")
+    .addError(3, "'__proto__' has already been declared.")
+    .test(src, { proto: true, esnext: true });
+
+  src = [
+    "void {",
+    "  __proto__: null,",
+    "  __proto__: null",
+    "};"
+  ];
+
+  TestRun(test, "Duplicate keys (data)")
+    .addError(3, "Duplicate key '__proto__'.")
+    .test(src, { proto: true });
+
+  src = [
+    "void {",
+    "  __proto__: null,",
+    "  get __proto__() {}",
+    "};"
+  ];
+
+  TestRun(test, "Duplicate keys (data and accessor)")
+    .addError(3, "Duplicate key '__proto__'.")
+    .test(src, { proto: true });
+
+  src = [
+    "__proto__: while (true) {",
+    "  __proto__: while (true) {",
+    "    break;",
+    "  }",
+    "}"
+  ];
+
+  TestRun(test, "Duplicate labels")
+    .addError(2, "'__proto__' has already been declared.")
+    .test(src, { proto: true });
+
+  test.done();
+};
