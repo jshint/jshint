@@ -805,11 +805,12 @@ exports.testES6Modules = function (test) {
     [65, "'newImport' was used before it was declared, which is illegal for 'const' variables."]
   ];
 
-  var testRun = TestRun(test);
+  var testRun = TestRun(test)
+    .addError(74, "Empty export.");
   importConstErrors.forEach(function(error) { testRun.addError.apply(testRun, error); });
   testRun.test(src, {esnext: true});
 
-  testRun = TestRun(test)
+  testRun
     .addError(3, "'import' is only available in ES6 (use 'esversion: 6').")
     .addError(4, "'import' is only available in ES6 (use 'esversion: 6').")
     .addError(5, "'import' is only available in ES6 (use 'esversion: 6').")
@@ -840,9 +841,12 @@ exports.testES6Modules = function (test) {
     .addError(65, "'import' is only available in ES6 (use 'esversion: 6').")
     .addError(67, "'export' is only available in ES6 (use 'esversion: 6').")
     .addError(67, "'function*' is only available in ES6 (use 'esversion: 6').")
-    .addError(67, "'yield' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).");
-  importConstErrors.forEach(function(error) { testRun.addError.apply(testRun, error); });
-  testRun.test(src, {});
+    .addError(67, "'yield' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .addError(70, "'export' is only available in ES6 (use 'esversion: 6').")
+    .addError(71, "'import' is only available in ES6 (use 'esversion: 6').")
+    .addError(74, "'export' is only available in ES6 (use 'esversion: 6').")
+    .addError(75, "'import' is only available in ES6 (use 'esversion: 6').")
+    .test(src);
 
   var src2 = [
     "var a = {",
