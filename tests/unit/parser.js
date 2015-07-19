@@ -1803,9 +1803,9 @@ exports["non-identifier PropertyNames in object destructuring"] = function (test
     .addError(2, "'d' is defined but never used.")
     .addError(2, "'e' is defined but never used.")
     .addError(3, "'fn' is defined but never used.")
-    .addError(0, "'f' is defined but never used.")
-    .addError(0, "'g' is defined but never used.")
-    .addError(0, "'h' is defined but never used.")
+    .addError(3, "'f' is defined but never used.")
+    .addError(3, "'g' is defined but never used.")
+    .addError(3, "'h' is defined but never used.")
     .test(code, { esnext: true, unused: true });
 
   test.done();

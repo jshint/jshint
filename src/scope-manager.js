@@ -116,6 +116,7 @@ var scopeManager = function(state, predefined, exported, declared) {
    */
   function _checkForUnused() {
     // function params are handled specially
+    // assume that parameters are the only thing declared in the param scope
     if (_current["(isParams)"] === "function") {
       _checkParams();
       return;
@@ -413,41 +414,86 @@ var scopeManager = function(state, predefined, exported, declared) {
     },
 
     /**
+     * Add a param to the current scope
+     * @param {string} labelName
+     * @param {Token} token
+     * @param {string} [type="param"] param type
+     */
+    addParam: function(labelName, token, type) {
+      type = type || "param";
+
+      if (type === "exception") {
+        // if defined in the current function
+        var previouslyDefinedLabelType = this.funct.labeltype(labelName);
+        if (previouslyDefinedLabelType && previouslyDefinedLabelType !== "exception") {
+          // and has not been used yet in the current function scope
+          if (!state.option.node) {
+            warning("W002", state.tokens.next, labelName);
+          }
+        }
+      }
+
+      // The variable was declared in the current scope
+      if (_.has(_current["(labels)"], labelName)) {
+        _current["(labels)"][labelName].duplicated = true;
+
+      // The variable was declared in an outer scope
+      } else {
+        // if this scope has the variable defined, it's a re-definition error
+        _checkOuterShadow(labelName, token, type);
+
+        _current["(labels)"][labelName] = {
+          "(type)" : type,
+          "(token)": token,
+          "(unused)": true };
+        _current["(params)"].push(labelName);
+      }
+
+      if (_.has(_current["(usages)"], labelName)) {
+        var usage = _current["(usages)"][labelName];
+        // if its in a sub function it is not necessarily an error, just latedef
+        if (usage["(onlyUsedSubFunction)"]) {
+          _latedefWarning(type, labelName, token);
+        } else {
+          // this is a clear illegal usage for block scoped variables
+          warning("E056", token, labelName, type);
+        }
+      }
+    },
+
+    validateParams: function() {
+      // This method only concerns errors for function parameters
+      if (_currentFunct["(global)"]) {
+        return;
+      }
+
+      var isStrict = state.isStrict();
+      var currentFunctParamScope = _currentFunct["(parent)"];
+
+      currentFunctParamScope["(params)"].forEach(function(labelName) {
+        var label = currentFunctParamScope["(labels)"][labelName];
+
+        if (label && label.duplicated) {
+          if (isStrict) {
+            warning("E011", label["(token)"], labelName);
+          } else if (state.option.shadow !== true) {
+            warning("W004", label["(token)"], labelName);
+          }
+        }
+      });
+    },
+
+    /**
      * Tell the manager we are entering a new scope with parameters
      * Call stack after all parameters have been added
      * @param isFunction Whether the scope is a function or not
      */
-    stackParams: function(params, isFunction) {
+    stackParams: function(isFunction) {
       _current = _newScope();
       _current["(isParams)"] = isFunction ? "function" : true;
       _current["(params)"] = [];
 
       _scopeStack.push(_current);
-      var functionScope = this.funct;
-
-      _.each(params, function(param) {
-
-        var type = param.type || "param";
-
-        if (type === "exception") {
-          // if defined in the current function
-          var previouslyDefinedLabelType = functionScope.labeltype(param.id);
-          if (previouslyDefinedLabelType && previouslyDefinedLabelType !== "exception") {
-            // and has not been used yet in the current function scope
-            if (!state.option.node) {
-              warning("W002", state.tokens.next, param.id);
-            }
-          }
-        }
-
-        _checkOuterShadow(param.id, param.token, type);
-
-        _current["(labels)"][param.id] = {
-          "(type)" : type,
-          "(token)": param.token,
-          "(unused)": true };
-        _current["(params)"].push(param.id);
-      });
     },
 
     getUsedOrDefinedGlobals: function() {
