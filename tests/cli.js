@@ -3,6 +3,7 @@
 var path  = require("path");
 var shjs  = require("shelljs");
 var sinon = require("sinon");
+var fs    = require("fs");
 
 var cliPath = path.resolve(__dirname, "../src/cli.js");
 var cli;
@@ -679,6 +680,10 @@ exports.group = {
 
     gather.returns([]);
 
+    var dirname = fs.realpathSync(__dirname);
+    this.sinon.stub(fs, "realpathSync", function(p) {
+      return path.resolve(p).replace(__dirname, dirname);
+    });
     this.sinon.stub(shjs, "test")
       .withArgs("-e", sinon.match(/.*/)).returns(true);
 
@@ -767,6 +772,10 @@ exports.group = {
     var dir = __dirname + "/../examples/";
     var files = [];
     this.sinon.stub(process, "cwd").returns(dir);
+    var dirname = fs.realpathSync(__dirname);
+    this.sinon.stub(fs, "realpathSync", function(p) {
+      return path.resolve(p).replace(__dirname, dirname);
+    });
 
     var demoFiles = [
       [ /file2?\.js$/, "console.log('Hello');" ],

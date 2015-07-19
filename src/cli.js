@@ -171,7 +171,7 @@ var findFileResults = {};
 function findFile(name, cwd) {
   cwd = cwd || process.cwd();
 
-  var filename = path.normalize(path.join(cwd, name));
+  var filename = path.resolve(cwd, name);
   if (findFileResults[filename] !== undefined) {
     return findFileResults[filename];
   }
@@ -203,9 +203,19 @@ function loadIgnores(params) {
   if (!file && !params.exclude) {
     return [];
   }
+  if (file)
+    file = fs.realpathSync(file);
 
   var lines = (file ? shjs.cat(file) : "").split("\n");
-  lines.unshift(params.exclude || "");
+  if (params.exclude && path.resolve(params.exclude) ===
+      path.normalize(params.exclude).replace(RegExp(path.sep + "$"), "")) {
+      // params.exclude is an absolute path
+    var exclude = fs.realpathSync(params.exclude);
+    exclude = exclude.slice(path.dirname(file).length + 1);
+    lines.unshift(exclude);
+  } else {
+    lines.unshift(params.exclude || "");
+  }
 
   return lines
     .filter(function(line) {
@@ -229,7 +239,7 @@ function loadIgnores(params) {
  */
 function isIgnored(fp, patterns) {
   return patterns.some(function(ip) {
-    if (minimatch(path.resolve(fp), ip, { nocase: true })) {
+    if (minimatch(fs.realpathSync(fp), ip, { nocase: true })) {
       return true;
     }
 
