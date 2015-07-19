@@ -5523,12 +5523,12 @@ exports.classes = function (test) {
   var run = TestRun(test)
     .addError(cdecl + 4, "Expected an identifier and instead saw 'package' (a reserved word).")
     .addError(cexpr + 4, "Expected an identifier and instead saw 'package' (a reserved word).")
-    .addError(cdeclAssn + 4, "'Foo15' is a class.")
-    .addError(cdeclAssn + 7, "'Foo18' is a class.")
-    .addError(cdeclAssn + 7, "'Foo17' is a class.")
-    .addError(cexprAssn + 4, "'Foo15' is a class.")
-    .addError(cexprAssn + 7, "'Foo18' is a class.")
-    .addError(cexprAssn + 7, "'Foo17' is a class.");
+    .addError(cdeclAssn + 4, "Reassignment of 'Foo15', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(cdeclAssn + 7, "Reassignment of 'Foo18', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(cdeclAssn + 7, "Reassignment of 'Foo17', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(cexprAssn + 4, "Reassignment of 'Foo15', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(cexprAssn + 7, "Reassignment of 'Foo18', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(cexprAssn + 7, "Reassignment of 'Foo17', which is is a class. Use 'var' or 'let' to declare bindings that may change.");
 
   run.test(code, {esnext: true});
   run.test(code, {moz: true});
@@ -5546,12 +5546,12 @@ exports.classes = function (test) {
     .addError(cexpr + 4, "'package' is defined but never used.");
 
   run
-    .addError(cdeclAssn + 4, "'Foo15' is a class.")
-    .addError(cdeclAssn + 7, "'Foo18' is a class.")
-    .addError(cdeclAssn + 7, "'Foo17' is a class.")
-    .addError(cexprAssn + 4, "'Foo15' is a class.")
-    .addError(cexprAssn + 7, "'Foo18' is a class.")
-    .addError(cexprAssn + 7, "'Foo17' is a class.");
+    .addError(cdeclAssn + 4, "Reassignment of 'Foo15', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(cdeclAssn + 7, "Reassignment of 'Foo18', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(cdeclAssn + 7, "Reassignment of 'Foo17', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(cexprAssn + 4, "Reassignment of 'Foo15', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(cexprAssn + 7, "Reassignment of 'Foo18', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(cexprAssn + 7, "Reassignment of 'Foo17', which is is a class. Use 'var' or 'let' to declare bindings that may change.");
 
   code[0] = "'use strict';" + code[0];
   run.test(code, {unused: true, globalstrict: true, esnext: true});
@@ -5689,11 +5689,11 @@ exports.classExpression = function (test) {
   ];
 
   TestRun(test)
-    .addError(2, "'MyClass' is a class.")
-    .addError(3, "'MyClass' is a class.")
-    .addError(4, "'MyClass' is a class.")
-    .addError(5, "'MyClass' is a class.")
-    .addError(6, "'MyClass' is a class.")
+    .addError(2, "Reassignment of 'MyClass', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(3, "Reassignment of 'MyClass', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(4, "Reassignment of 'MyClass', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(5, "Reassignment of 'MyClass', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(6, "Reassignment of 'MyClass', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
     .addError(8, "'MyClass' is not defined.")
     .test(code, { esnext: true, undef: true });
 
