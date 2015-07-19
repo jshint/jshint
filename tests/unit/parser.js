@@ -5700,6 +5700,27 @@ exports.classExpression = function (test) {
   test.done();
 };
 
+exports.functionReassignment = function (test) {
+  var src = [
+    "function f() {}",
+    "f = null;",
+    "function g() {",
+    "  g = null;",
+    "}",
+    "(function h() {",
+    "  h = null;",
+    "}());"
+  ];
+
+  TestRun(test)
+    .addError(2, "'f' is a function.")
+    .addError(4, "'g' is a function.")
+    .addError(7, "'h' is a function.")
+    .test(src);
+
+  test.done();
+};
+
 exports.functionNotOverwritten = function (test) {
   var code = [
     "function x() {",
