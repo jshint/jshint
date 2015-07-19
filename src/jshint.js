@@ -2523,7 +2523,11 @@ var JSHINT = (function() {
           // operator.
           (isFunctor(ret) && !isEndOfExpr()) ||
           // Used as the return value of a single-statement arrow function
-          (ret.id === "{" && preceeding.id === "=>");
+          (ret.id === "{" && preceeding.id === "=>") ||
+          // Used to delineate an integer number literal from a dereferencing
+          // punctuator (otherwise interpreted as a decimal point)
+          (ret.type === "(number)" &&
+            checkPunctuator(pn, ".") && /^\d+$/.test(ret.value));
       }
     }
 
