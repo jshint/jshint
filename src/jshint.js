@@ -2900,11 +2900,10 @@ var JSHINT = (function() {
     // it is a new block scope so that params can override it, it can be block scoped
     // but declarations inside the function don't cause already declared error
     var internallyAccessibleName = name || classExprBinding;
-    var internallyAccessibleNameType = name ? "function" : "class";
     if (internallyAccessibleName) {
       state.funct["(scope)"].stack();
       state.funct["(scope)"].block.add(internallyAccessibleName,
-        internallyAccessibleNameType, state.tokens.curr, false);
+        classExprBinding ? "class" : "function", state.tokens.curr, false);
     }
 
     var params = functionparams(options);
