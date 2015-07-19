@@ -2175,7 +2175,7 @@ var JSHINT = (function() {
       warning("W016", this, "~");
     }
     this.arity = "unary";
-    expression(150);
+    this.right = expression(150);
     return this;
   });
 
@@ -2241,7 +2241,7 @@ var JSHINT = (function() {
 
   prefix("typeof", (function() {
     var p = expression(150);
-    this.first = p;
+    this.first = this.right = p;
 
     if (!p) { // 'typeof' followed by nothing? Give up.
       quit("E041", this.line || 0, this.character || 0);
@@ -2318,7 +2318,7 @@ var JSHINT = (function() {
     if (state.tokens.next.id !== "(" && !state.option.supernew) {
       warning("W058", state.tokens.curr, state.tokens.curr.value);
     }
-    this.first = c;
+    this.first = this.right = c;
     return this;
   });
   state.syntax["new"].exps = true;
@@ -2530,7 +2530,7 @@ var JSHINT = (function() {
       // The operator may be necessary to override the default binding power of
       // neighboring operators (whenever there is an operator in use within the
       // first expression *or* the current group contains multiple expressions)
-      if (!isNecessary && (first.left || ret.exprs)) {
+      if (!isNecessary && (first.left || first.right || ret.exprs)) {
         isNecessary =
           (!isBeginOfExpr(preceeding) && first.lbp <= preceeding.lbp) ||
           (!isEndOfExpr() && last.lbp < state.tokens.next.lbp);

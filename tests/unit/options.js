@@ -2649,6 +2649,38 @@ singleGroups.lineNumber = function (test) {
   test.done();
 };
 
+singleGroups.unary = function (test) {
+  var code = [
+    "(-3).toString();",
+    "(+3)[methodName]();",
+    "(!3).toString();",
+    "(~3).toString();",
+    "(typeof x).toString();",
+    "(new x).method();",
+
+    // Unnecessary:
+    "x = (-3) + 5;",
+    "x = (+3) - 5;",
+    "x = (!3) / 5;",
+    "x = (~3) << 5;",
+    "x = (typeof x) === 'undefined';",
+    "x = (new x) + 4;",
+  ];
+
+  TestRun(test)
+    .addError(6, "Missing '()' invoking a constructor.")
+    .addError(7, "Unnecessary grouping operator.")
+    .addError(8, "Unnecessary grouping operator.")
+    .addError(9, "Unnecessary grouping operator.")
+    .addError(10, "Unnecessary grouping operator.")
+    .addError(11, "Unnecessary grouping operator.")
+    .addError(12, "Unnecessary grouping operator.")
+    .addError(12, "Missing '()' invoking a constructor.")
+    .test(code, { singleGroups: true });
+
+  test.done();
+};
+
 exports.elision = function (test) {
   var code = [
     "var a = [1,,2];",
