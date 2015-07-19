@@ -6006,13 +6006,18 @@ exports["test for line breaks with 'yield'"] = function (test) {
     "function* gen() {",
     "  yield",
     "  fn();",
+    "  yield*",
+    "  fn();",
     "}"
   ];
 
-  TestRun(test, "gh-2530").test(code2, { esnext: true, undef: false, asi: true });
+  TestRun(test, "gh-2530")
+    .addError(5, "Bad line breaking before 'fn'.")
+    .test(code2, { esnext: true, undef: false, asi: true });
 
   TestRun(test, "gh-2530")
     .addError(3, "Bad line breaking before 'fn'.")
+    .addError(5, "Bad line breaking before 'fn'.")
     .test(code2, { esnext: true, undef: false });
 
   test.done();
