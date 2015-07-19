@@ -2681,6 +2681,39 @@ singleGroups.unary = function (test) {
   test.done();
 };
 
+singleGroups.numberLiterals = function (test) {
+  var code = [
+    "(3).toString();",
+    "(3.1).toString();",
+    "(.3).toString();",
+    "(3.).toString();",
+    "(1e3).toString();",
+    "(1e-3).toString();",
+    "(1.1e3).toString();",
+    "(1.1e-3).toString();",
+    "(3)[methodName]();",
+    "var x = (3) + 3;",
+    "('3').toString();"
+  ];
+
+  TestRun(test)
+    .addError(2, "Unnecessary grouping operator.")
+    .addError(3, "Unnecessary grouping operator.")
+    .addError(3, "A leading decimal point can be confused with a dot: '.3'.")
+    .addError(4, "Unnecessary grouping operator.")
+    .addError(4, "A trailing decimal point can be confused with a dot: '3.'.")
+    .addError(5, "Unnecessary grouping operator.")
+    .addError(6, "Unnecessary grouping operator.")
+    .addError(7, "Unnecessary grouping operator.")
+    .addError(8, "Unnecessary grouping operator.")
+    .addError(9, "Unnecessary grouping operator.")
+    .addError(10, "Unnecessary grouping operator.")
+    .addError(11, "Unnecessary grouping operator.")
+    .test(code, { singleGroups: true });
+
+  test.done();
+};
+
 exports.elision = function (test) {
   var code = [
     "var a = [1,,2];",
