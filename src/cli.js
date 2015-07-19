@@ -623,7 +623,7 @@ var exports = {
         }
 
         if (filename && !config) {
-          config = exports.getConfig(filename)
+          config = exports.getConfig(filename);
         }
 
         config = config || {};
