@@ -5700,6 +5700,27 @@ exports.classExpression = function (test) {
   test.done();
 };
 
+exports.functionReassignment = function (test) {
+  var src = [
+    "function f() {}",
+    "f = null;",
+    "function g() {",
+    "  g = null;",
+    "}",
+    "(function h() {",
+    "  h = null;",
+    "}());"
+  ];
+
+  TestRun(test)
+    .addError(2, "Reassignment of 'f', which is is a function. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(4, "Reassignment of 'g', which is is a function. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(7, "Reassignment of 'h', which is is a function. Use 'var' or 'let' to declare bindings that may change.")
+    .test(src);
+
+  test.done();
+};
+
 exports.functionNotOverwritten = function (test) {
   var code = [
     "function x() {",
