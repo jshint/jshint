@@ -410,12 +410,7 @@ language/module-code/early-dup-export-id.js
 language/module-code/early-export-global.js
 language/module-code/early-export-unresolvable.js
 language/module-code/early-super.js
-language/module-code/eval-rqstd-once.js
-language/module-code/eval-rqstd-order.js
-language/module-code/eval-self-once.js
-language/module-code/instn-iee-trlng-comma.js
 language/module-code/instn-named-id-name.js
-language/module-code/instn-once.js
 language/module-code/instn-resolve-empty-import.js
 language/module-code/instn-resolve-err-reference.js
 language/module-code/instn-resolve-err-syntax.js
@@ -433,7 +428,6 @@ language/module-code/parse-err-invoke-anon-fun-decl.js
 language/module-code/parse-err-invoke-anon-gen-decl.js
 language/module-code/parse-err-reference.js
 language/module-code/parse-err-return.js
-language/module-code/parse-export-empty.js
 language/expressions/async-arrow-function/arrow-returns-promise.js
 language/expressions/async-function/expression-returns-promise.js
 language/expressions/async-function/syntax-expression-is-PrimaryExpression.js
@@ -4619,3 +4613,7 @@ language/statements/class/meth-static-dflt-params-ref-self.js
 language/statements/class/meth-static-dflt-params-trailing-comma.js
 language/statements/class/meth-static-params-trailing-comma-multiple.js
 language/statements/class/meth-static-params-trailing-comma-single.js
+
+# JSHint currently makes no attempt to resolve module references, so it is
+# incapable of detecting early errors across modules.
+language/module-code/instn-resolve-empty-export.js

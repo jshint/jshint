@@ -3411,7 +3411,7 @@ var JSHINT = (function() {
         advance("[");
       }
       if (checkPunctuator(state.tokens.next, "]")) {
-        warning("W137", state.tokens.curr);
+        warning("W137", state.tokens.curr, "destructuring");
       }
       var element_after_rest = false;
       while (!checkPunctuator(state.tokens.next, "]")) {
@@ -3443,7 +3443,7 @@ var JSHINT = (function() {
         advance("{");
       }
       if (checkPunctuator(state.tokens.next, "}")) {
-        warning("W137", state.tokens.curr);
+        warning("W137", state.tokens.curr, "destructuring");
       }
       while (!checkPunctuator(state.tokens.next, "}")) {
         assignmentProperty();
@@ -4633,6 +4633,10 @@ var JSHINT = (function() {
     } else {
       // ImportClause :: NamedImports
       advance("{");
+      // Breaking change
+      // if (checkPunctuator(state.tokens.next, "}")) {
+      //   warning("W137", state.tokens.next, "import");
+      // }
       for (;;) {
         if (state.tokens.next.value === "}") {
           advance("}");
@@ -4730,8 +4734,11 @@ var JSHINT = (function() {
     if (state.tokens.next.value === "{") {
       // ExportDeclaration :: export ExportClause
       advance("{");
+      if (checkPunctuator(state.tokens.next, "}")) {
+        warning("W137", state.tokens.next, "export");
+      }
       var exportedTokens = [];
-      for (;;) {
+      while (!checkPunctuator(state.tokens.next, "}")) {
         if (!state.tokens.next.identifier) {
           error("E030", state.tokens.next, state.tokens.next.value);
         }
@@ -4747,16 +4754,11 @@ var JSHINT = (function() {
           advance();
         }
 
-        if (state.tokens.next.value === ",") {
+        if (!checkPunctuator(state.tokens.next, "}")) {
           advance(",");
-        } else if (state.tokens.next.value === "}") {
-          advance("}");
-          break;
-        } else {
-          error("E024", state.tokens.next, state.tokens.next.value);
-          break;
         }
       }
+      advance("}");
       if (state.tokens.next.value === "from") {
         // ExportDeclaration :: export ExportClause FromClause
         advance("from");
