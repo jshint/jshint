@@ -623,8 +623,7 @@ var exports = {
         }
 
         if (filename && !config) {
-          config = loadNpmConfig(filename) ||
-            exports.loadConfig(findConfig(filename));
+          config = exports.getConfig(filename)
         }
 
         config = config || {};
