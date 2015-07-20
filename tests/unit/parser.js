@@ -5826,7 +5826,9 @@ exports.classes = function (test) {
 
   var run = TestRun(test)
     .addError(cdecl + 4, "Expected an identifier and instead saw 'package' (a reserved word).")
+    .addError(cdecl + 7, "You must call 'super' in derived constructors.")
     .addError(cexpr + 4, "Expected an identifier and instead saw 'package' (a reserved word).")
+    .addError(cexpr + 7, "You must call 'super' in derived constructors.")
     .addError(cdeclAssn + 4, "Reassignment of 'Foo15', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
     .addError(cdeclAssn + 7, "Reassignment of 'Foo18', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
     .addError(cdeclAssn + 7, "Reassignment of 'Foo17', which is is a class. Use 'var' or 'let' to declare bindings that may change.")

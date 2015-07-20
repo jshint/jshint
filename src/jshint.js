@@ -2016,6 +2016,9 @@ var JSHINT = (function() {
         state.funct["(name)"].charAt(0) > "Z") || state.funct["(global)"])) {
       warning("W040", x);
     }
+    if (state.funct["(super)"] === "required") {
+      error("E060", x);
+    }
   });
   reservevar("true");
   reservevar("undefined");
@@ -2994,11 +2997,15 @@ var JSHINT = (function() {
    *                                           scope, mimicking the bahavior of
    *                                           class expression names within
    *                                           the body of member functions.
+   * @param {bool} [options.super] If true, `super` must be called in the function
+   *                                and `this` can't be used until `super` is called
    */
   function doFunction(options) {
-    var f, token, name, statement, classExprBinding, isGenerator, isArrow, ignoreLoopFunc;
+    var f, token, name, statement, classExprBinding;
+    var isGenerator, isArrow, ignoreLoopFunc, superCall;
     var oldOption = state.option;
     var oldIgnored = state.ignored;
+    var tk = state.tokens.curr;
 
     if (options) {
       name = options.name;
@@ -3007,6 +3014,7 @@ var JSHINT = (function() {
       isGenerator = options.type === "generator";
       isArrow = options.type === "arrow";
       ignoreLoopFunc = options.ignoreLoopFunc;
+      superCall = options.super && "required";
     }
 
     state.option = Object.create(state.option);
@@ -3016,7 +3024,8 @@ var JSHINT = (function() {
       "(statement)": statement,
       "(context)":   state.funct,
       "(arrow)":     isArrow,
-      "(generator)": isGenerator
+      "(generator)": isGenerator,
+      "(super)":     superCall
     });
 
     f = state.funct;
@@ -3065,6 +3074,10 @@ var JSHINT = (function() {
     if (!state.option.noyield && isGenerator &&
         state.funct["(generator)"] !== "yielded") {
       warning("W124", state.tokens.curr);
+    }
+
+    if (superCall === "required" && state.funct["(super)"] !== "called") {
+      error("E061", tk);
     }
 
     state.funct["(metrics)"].verifyMaxStatementsPerFunction();
@@ -3725,6 +3738,8 @@ var JSHINT = (function() {
     if (state.tokens.next.value === "extends") {
       advance("extends");
       c.heritage = expression(10);
+    } else {
+      c.heritage = null;
     }
 
     state.inClassBody = true;
@@ -3801,6 +3816,9 @@ var JSHINT = (function() {
         continue;
       }
 
+      var superCall = c.heritage && c.heritage.type !== "null" &&
+                      name.value === "constructor" && !isStatic;
+
       if (!checkPunctuator(state.tokens.next, "(")) {
         // error --- class properties must be methods
         error("E054", state.tokens.next, state.tokens.next.value);
@@ -3809,7 +3827,10 @@ var JSHINT = (function() {
           advance();
         }
         if (state.tokens.next.value !== "(") {
-          doFunction({ statement: c });
+          doFunction({
+            statement: c,
+            super: superCall
+          });
         }
       }
 
@@ -3840,7 +3861,8 @@ var JSHINT = (function() {
       doFunction({
         statement: c,
         type: isGenerator ? "generator" : null,
-        classExprBinding: c.namedExpr ? c.name : null
+        classExprBinding: c.namedExpr ? c.name : null,
+        super: superCall
       });
     }
 
@@ -4717,7 +4739,25 @@ var JSHINT = (function() {
   FutureReservedWord("public", { es5: true, strictOnly: true });
   FutureReservedWord("short");
   FutureReservedWord("static", { es5: true, strictOnly: true });
-  FutureReservedWord("super", { es5: true });
+  FutureReservedWord("super", {
+    es5: true,
+    nud: function() {
+      if (state.inES6() && checkPunctuator(state.tokens.next, "(")) {
+        var f = state.funct;
+        while (f) {
+          // If `super` is called in an arrow function, check the outer scope
+          if (!f["(arrow)"]) { break; }
+          f = f["(context)"];
+        }
+        if (!f["(super)"]) {
+          error("E062", state.tokens.curr);
+        } else {
+          f["(super)"] = "called";
+        }
+      }
+      return this;
+    }
+  });
   FutureReservedWord("synchronized");
   FutureReservedWord("transient");
   FutureReservedWord("volatile");

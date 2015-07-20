@@ -74,7 +74,10 @@ var errors = {
   E056: "'{a}' was used before it was declared, which is illegal for '{b}' variables.",
   E057: "Invalid meta property: '{a}.{b}'.",
   E058: "Missing semicolon.",
-  E059: "Incompatible values for the '{a}' and '{b}' linting options."
+  E059: "Incompatible values for the '{a}' and '{b}' linting options.",
+  E060: "You must call 'super' before using 'this'.",
+  E061: "You must call 'super' in derived constructors.",
+  E062: "'super' can only be called in derived constructors."
 };
 
 var warnings = {
