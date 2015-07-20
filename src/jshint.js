@@ -2955,7 +2955,7 @@ var JSHINT = (function() {
     // test for unused (unused: false)
     // it is a new block scope so that params can override it, it can be block scoped
     // but declarations inside the function don't cause already declared error
-    state.funct["(scope)"].stackFunctionOuter();
+    state.funct["(scope)"].stack("functionouter");
     var internallyAccessibleName = name || classExprBinding;
     if (internallyAccessibleName) {
       state.funct["(scope)"].block.add(internallyAccessibleName,
@@ -2963,7 +2963,7 @@ var JSHINT = (function() {
     }
 
     // create the param scope (params added in functionparams)
-    state.funct["(scope)"].stackParams(true);
+    state.funct["(scope)"].stack("functionparams");
 
     var paramsIds = functionparams(options);
 
@@ -3827,7 +3827,7 @@ var JSHINT = (function() {
       advance("catch");
       advance("(");
 
-      state.funct["(scope)"].stackParams();
+      state.funct["(scope)"].stack();
 
       if (checkPunctuators(state.tokens.next, ["[", "{"])) {
         var tokens = destructuringExpression();
