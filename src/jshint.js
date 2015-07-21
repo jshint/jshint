@@ -198,6 +198,9 @@ var JSHINT = (function() {
     }
 
     if (state.option.module) {
+      if (state.option.strict === true) {
+        state.option.strict = "global";
+      }
       /**
        * TODO: Extend this restriction to *all* ES6-specific options.
        */
@@ -228,6 +231,9 @@ var JSHINT = (function() {
 
     if (state.option.phantom) {
       combine(predefined, vars.phantom);
+      if (state.option.strict === true) {
+        state.option.strict = "global";
+      }
     }
 
     if (state.option.prototypejs) {
@@ -237,6 +243,9 @@ var JSHINT = (function() {
     if (state.option.node) {
       combine(predefined, vars.node);
       combine(predefined, vars.typed);
+      if (state.option.strict === true) {
+        state.option.strict = "global";
+      }
     }
 
     if (state.option.devel) {
@@ -256,6 +265,9 @@ var JSHINT = (function() {
       combine(predefined, vars.browser);
       combine(predefined, vars.typed);
       combine(predefined, vars.browserify);
+      if (state.option.strict === true) {
+        state.option.strict = "global";
+      }
     }
 
     if (state.option.nonstandard) {
@@ -607,12 +619,12 @@ var JSHINT = (function() {
         if (key === "strict") {
           switch (val) {
           case "true":
-          case "func":
             state.option.strict = true;
             break;
           case "false":
             state.option.strict = false;
             break;
+          case "func":
           case "global":
           case "implied":
             state.option.strict = val;
@@ -5168,10 +5180,7 @@ var JSHINT = (function() {
 
         if (state.directive["use strict"]) {
           if (state.option.strict !== "global") {
-            if (!(state.option.module || state.option.node || state.option.phantom ||
-              state.option.browserify)) {
-              warning("W097", state.tokens.prev);
-            }
+            warning("W097", state.tokens.prev);
           }
         }
 
