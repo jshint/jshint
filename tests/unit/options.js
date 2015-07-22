@@ -7,6 +7,7 @@
 "use strict";
 
 var JSHINT = require('../../src/jshint.js').JSHINT;
+var options = require('../../src/options.js');
 var fs = require('fs');
 var TestRun = require('../helpers/testhelper').setup.testRun;
 var fixture = require('../helpers/fixture').fixture;
@@ -1562,6 +1563,8 @@ exports.strict = function (test) {
   run.test(src2, { es3: true, strict: false });
 
   TestRun(test)
+    .addError(15, "The 'newcap' option has been deprecated and will be removed" +
+              " in the next major release of JSHint.")
     .addError(6, "Missing 'new' prefix when invoking a constructor.")
     .test(src3, {es3 : true});
 
@@ -1756,6 +1759,8 @@ exports.quotes = function (test) {
 // Test the `quotmark` option when defined as a JSHint comment.
 exports.quotesInline = function (test) {
   TestRun(test)
+    .addError(2, "The 'quotmark' option has been deprecated and will be removed" +
+                 " in the next major release of JSHint.")
     .addError(6, "Strings must use doublequote.")
     .addError(14, "Strings must use singlequote.")
     .addError(21, "Mixed double and single quotes.")
@@ -2899,6 +2904,23 @@ exports.errorI003 = function(test) {
 
   TestRun(test, "toggling es5 option through nested scopes")
     .test(code4, {});
+
+  test.done();
+};
+
+exports.deprecatedOptions = function(test) {
+  var deprecated = Object.keys(options.deprecated);
+
+  var src = "/*jshint " + deprecated.map(function(key) {
+    return key + ":false";
+  }).join(", ") + " */";
+
+  var run = TestRun(test);
+  deprecated.forEach(function(key) {
+    run.addError(1, "The '" + key + "' option has been deprecated and will be removed" +
+                 " in the next major release of JSHint.");
+  });
+  run.test(src);
 
   test.done();
 };

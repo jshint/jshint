@@ -984,3 +984,20 @@ exports.noenforceall = {
   varstmt: true,
   strict: true
 };
+
+// Theese options will be removed in the next major release of JSHint.
+exports.deprecated = {
+  camelcase : true,
+  enforceall: true,
+  immed     : true,
+  indent    : true,
+  maxlen    : true,
+  newcap    : true,
+  noempty   : true,
+  quotmark  : true,
+  laxbreak  : true,
+  laxcomma  : true,
+  multistr  : true,
+  sub       : true,
+  predef    : true
+};

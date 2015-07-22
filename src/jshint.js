@@ -486,6 +486,15 @@ var JSHINT = (function() {
           return;
         }
 
+        if (options.deprecated[key]) {
+          var displayed = api.getCache("displayed:I004") || {};
+          if (!displayed[key]) { // Warn only once
+            warning("I004", null, key);
+            displayed[key] = true;
+            api.setCache("displayed:I004", displayed);
+          }
+        }
+
         if (numvals.indexOf(key) >= 0) {
           // GH988 - numeric options can be disabled by setting them to `false`
           if (val !== "false") {

@@ -200,9 +200,13 @@ exports.options = function (test) {
     .addError(3, "Unexpected /*member 'c'.")
     .addError(4, "Bad option: '++'.")
     .addError(5, "Expected a small integer or 'false' and instead saw '0'.")
+    .addError(5, "The 'indent' option has been deprecated and will be removed" +
+                 " in the next major release of JSHint.")
     .addError(6, "Expected a small integer or 'false' and instead saw '-2'.")
     .addError(7, "Expected a small integer or 'false' and instead saw '100.4'.")
     .addError(8, "Expected a small integer or 'false' and instead saw '200.4'.")
+    .addError(8, "The 'maxlen' option has been deprecated and will be removed" +
+                 " in the next major release of JSHint.")
     .addError(9, "Expected a small integer or 'false' and instead saw '300.4'.")
     .addError(10, "Expected a small integer or 'false' and instead saw '0'.")
     .addError(13, "Bad option: 'd'.")
@@ -214,7 +218,12 @@ exports.options = function (test) {
   run.test(code, {esnext: true});
   run.test(code, {moz: true});
 
-  TestRun(test).test(fs.readFileSync(__dirname + "/fixtures/gh988.js", "utf8"));
+  TestRun(test)
+    .addError(45, "The 'maxlen' option has been deprecated and will be removed" +
+                 " in the next major release of JSHint.")
+    .addError(53, "The 'indent' option has been deprecated and will be removed" +
+                 " in the next major release of JSHint.")
+    .test(fs.readFileSync(__dirname + "/fixtures/gh988.js", "utf8"));
 
   test.done();
 };

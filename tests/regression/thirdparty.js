@@ -23,6 +23,12 @@ exports.jQuery_1_7 = function (test) {
   var globals = { DOMParser: false, ActiveXObject: false, define: false };
 
   TestRun(test)
+    .addError(3, "The 'newcap' option has been deprecated and will be removed" +
+              " in the next major release of JSHint.")
+    .addError(3, "The 'immed' option has been deprecated and will be removed" +
+              " in the next major release of JSHint.")
+    .addError(3, "The 'maxlen' option has been deprecated and will be removed" +
+              " in the next major release of JSHint.")
     .addError(551, "'name' is defined but never used.")
     .addError(1044, "'actual' is defined but never used.")
     .addError(1312, "'pCount' is defined but never used.")
