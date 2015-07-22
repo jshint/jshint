@@ -2287,8 +2287,7 @@ var JSHINT = (function() {
     //
     if (!state.tokens.curr.allowSpread) {
       error("E059", state.tokens.curr);
-    }
-    else if (!state.tokens.next.identifier &&
+    } else if (!state.tokens.next.identifier &&
         state.tokens.next.type !== "(string)" &&
           !checkPunctuators(state.tokens.next, ["[", "("])) {
 
