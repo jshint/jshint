@@ -1238,6 +1238,18 @@ exports.loopfunc = function (test) {
     .addError(17, "Don't make functions within a loop.")
     .test(es6LoopFuncSrc, {esnext: true});
 
+  // functions declared in the expressions that loop should warn
+  var src2 = [
+    "for(var i = 0; function a(){return i;}; i++) { break; }",
+    "var j;",
+    "while(function b(){return j;}){}",
+    "for(var c = function(){return j;};;){c();}"];
+
+  TestRun(test)
+    .addError(1, "Don't make functions within a loop.")
+    .addError(3, "Don't make functions within a loop.")
+    .test(src2, { es3: true, loopfunc: false, boss: true });
+
   test.done();
 };
 
