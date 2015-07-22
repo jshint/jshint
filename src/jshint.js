@@ -3555,7 +3555,8 @@ var JSHINT = (function() {
         state.nameStack.set(state.tokens.curr);
 
         advance("=");
-        if (!prefix && report && state.tokens.next.id === "undefined") {
+        if (!prefix && report && !state.funct["(loopage)"] &&
+          state.tokens.next.id === "undefined") {
           warning("W080", state.tokens.prev, state.tokens.prev.value);
         }
         if (peek(0).id === "=" && state.tokens.next.identifier) {
@@ -4116,8 +4117,6 @@ var JSHINT = (function() {
       }
     }
 
-    state.funct["(breakage)"] += 1;
-    state.funct["(loopage)"] += 1;
     increaseComplexityCount();
     advance("(");
 
@@ -4191,6 +4190,9 @@ var JSHINT = (function() {
         });
       }
 
+      state.funct["(breakage)"] += 1;
+      state.funct["(loopage)"] += 1;
+
       s = block(true, true);
 
       if (nextop.value === "in" && state.option.forin) {
@@ -4239,6 +4241,10 @@ var JSHINT = (function() {
       }
       nolinebreak(state.tokens.curr);
       advance(";");
+
+      // start loopage after the first ; as the next two expressions are executed
+      // on every loop
+      state.funct["(loopage)"] += 1;
       if (state.tokens.next.id !== ";") {
         checkCondAssignment(expression(0));
       }
@@ -4257,6 +4263,7 @@ var JSHINT = (function() {
         }
       }
       advance(")", t);
+      state.funct["(breakage)"] += 1;
       block(true, true);
       state.funct["(breakage)"] -= 1;
       state.funct["(loopage)"] -= 1;

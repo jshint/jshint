@@ -755,13 +755,33 @@ exports.testUndefinedAssignment = function (test) {
   var src = [
     "var x = undefined;",
     "const y = undefined;",
-    "let z = undefined;"
+    "let z = undefined;",
+    "for(var a = undefined; a < 9; a++) {",
+    "  var b = undefined;", // necessary - see gh-1191
+    "  const c = undefined;",
+    "  let d = undefined;",
+    "  var e = function() {",
+    "    var f = undefined;",
+    "    const g = undefined;",
+    "    let h = undefined;",
+    "  };",
+    "}",
+    "// jshint -W080",
+    "var i = undefined;",
+    "const j = undefined;",
+    "let k = undefined;",
   ];
 
   TestRun(test)
     .addError(1, "It's not necessary to initialize 'x' to 'undefined'.")
     .addError(2, "It's not necessary to initialize 'y' to 'undefined'.")
     .addError(3, "It's not necessary to initialize 'z' to 'undefined'.")
+    .addError(4, "It's not necessary to initialize 'a' to 'undefined'.")
+    .addError(6, "It's not necessary to initialize 'c' to 'undefined'.")
+    .addError(7, "It's not necessary to initialize 'd' to 'undefined'.")
+    .addError(9, "It's not necessary to initialize 'f' to 'undefined'.")
+    .addError(10, "It's not necessary to initialize 'g' to 'undefined'.")
+    .addError(11, "It's not necessary to initialize 'h' to 'undefined'.")
     .test(src, {esnext: true});
 
   test.done();
