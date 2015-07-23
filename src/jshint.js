@@ -4742,7 +4742,9 @@ var JSHINT = (function() {
   FutureReservedWord("super", {
     es5: true,
     nud: function() {
-      if (state.inES6() && checkPunctuator(state.tokens.next, "(")) {
+      if (!state.inES6()) {
+        warning("W119", state.tokens.curr, "super", "6");
+      } else if (checkPunctuators(state.tokens.next, "(")) {
         var f = state.funct;
         while (f) {
           // If `super` is called in an arrow function, check the outer scope

@@ -2221,3 +2221,20 @@ exports["this must be used after super()"] = function (test) {
 
   test.done();
 };
+
+exports["super in es5"] = function (test) {
+  var code = [
+    "function a() {",
+    "  super();",
+    "}",
+    "var super;"
+  ];
+
+  TestRun(test)
+    .addError(2, "'super' is only available in ES6 (use 'esversion: 6').")
+    .addError(4, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .test(code);
+
+  test.done();
+};
+
