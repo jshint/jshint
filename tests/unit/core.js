@@ -806,7 +806,7 @@ exports.testES6Modules = function (test) {
   ];
 
   var testRun = TestRun(test)
-    .addError(74, "Empty export.");
+    .addError(74, "Empty export: this is unnecessary and can be removed.");
   importConstErrors.forEach(function(error) { testRun.addError.apply(testRun, error); });
   testRun.test(src, {esnext: true});
 

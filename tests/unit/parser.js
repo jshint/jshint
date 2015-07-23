@@ -1930,12 +1930,12 @@ exports["empty destructuring"] = function (test) {
   ];
 
   TestRun(test)
-    .addError(1, "Empty destructuring.")
-    .addError(2, "Empty destructuring.")
-    .addError(3, "Empty destructuring.")
-    .addError(3, "Empty destructuring.")
-    .addError(4, "Empty destructuring.")
-    .addError(4, "Empty destructuring.")
+    .addError(1, "Empty destructuring: this is unnecessary and can be removed.")
+    .addError(2, "Empty destructuring: this is unnecessary and can be removed.")
+    .addError(3, "Empty destructuring: this is unnecessary and can be removed.")
+    .addError(3, "Empty destructuring: this is unnecessary and can be removed.")
+    .addError(4, "Empty destructuring: this is unnecessary and can be removed.")
+    .addError(4, "Empty destructuring: this is unnecessary and can be removed.")
     .test(code, { esnext: true });
 
   test.done();
