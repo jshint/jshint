@@ -222,7 +222,7 @@ var warnings = {
   W134: "The '{a}' option is only available when linting ECMAScript {b} code.",
   W135: "{a} may not be supported by non-browser environments.",
   W136: "'{a}' must be in function scope.",
-  W137: "Empty {a}.",
+  W137: "Empty {a}: this is unnecessary and can be removed.",
   W138: "Regular parameters should not come after default parameters.",
   W139: "Function expressions should not be used as the second operand to instanceof.",
   W140: "Missing comma."
