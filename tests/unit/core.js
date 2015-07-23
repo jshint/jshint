@@ -2210,6 +2210,7 @@ exports["this must be used after super()"] = function (test) {
     "class B extends A {",
     "  constructor() {",
     "    this.x = 1;",
+    "    (() => this.x = 2)();",
     "    super();",
     "  }",
     "}"
@@ -2217,7 +2218,21 @@ exports["this must be used after super()"] = function (test) {
 
   TestRun(test, "'this' can't be before 'super()'")
     .addError(4, "You must call 'super' before using 'this'.")
+    .addError(5, "You must call 'super' before using 'this'.")
     .test(code2, { esversion: 6 });
+
+  var code3 = [
+    "class A {}",
+    "class B extends A {",
+    "  constructor() {",
+    "    (() => super())();",
+    "    this.x = 1;",
+    "  }",
+    "}"
+  ];
+
+  TestRun(test, "'super' is in an arrow function")
+    .test(code3, { esversion: 6 });
 
   test.done();
 };
