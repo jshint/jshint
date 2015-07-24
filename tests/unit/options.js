@@ -822,6 +822,12 @@ exports.undef = function (test) {
       "void x;"
     ], { esversion: 6, undef: true });
 
+  TestRun(test)
+    .addError(1, 1, "'foo' is not defined.")
+    .test(['foo.call();',
+      '/* exported foo, bar */'],
+    {undef: true});
+
   test.done();
 };
 
