@@ -74,8 +74,17 @@ exports.setup.testRun = function (test, name) {
     },
 
     test: function (source, options, globals) {
+
+      Object.prototype.pollution1 = {};
+      Object.prototype.pollution2 = true;
+      Object.prototype.pollution3 = false;
+
       var ret = !!JSHINT(source, options, globals);
       var errors = JSHINT.errors;
+
+      delete Object.prototype.pollution1;
+      delete Object.prototype.pollution2;
+      delete Object.prototype.pollution3;
 
       if (errors.length === 0 && definedErrors.length === 0) {
         return;
