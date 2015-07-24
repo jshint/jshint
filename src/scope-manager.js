@@ -280,6 +280,7 @@ var scopeManager = function(state, predefined, exported, declared) {
       var currentLabels = _current["(labels)"];
       var usedLabelNameList = Object.keys(currentUsages);
 
+      /* istanbul ignore if */
       if (currentUsages.__proto__ && usedLabelNameList.indexOf("__proto__") === -1) {
         usedLabelNameList.push("__proto__");
       }
@@ -513,6 +514,7 @@ var scopeManager = function(state, predefined, exported, declared) {
       // If `__proto__` is used as a global variable name, its entry in the
       // lookup table may not be enumerated by `Object.keys` (depending on the
       // environment).
+      /* istanbul ignore if */
       if (usedPredefinedAndGlobals.__proto__ === marker &&
         list.indexOf("__proto__") === -1) {
         list.push("__proto__");
@@ -538,6 +540,7 @@ var scopeManager = function(state, predefined, exported, declared) {
           return value.name === "__proto__";
         });
 
+        /* istanbul ignore if */
         if (!hasProto) {
           values.push(impliedGlobals.__proto__);
         }
