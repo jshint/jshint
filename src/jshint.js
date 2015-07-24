@@ -1780,9 +1780,7 @@ var JSHINT = (function() {
         if (isfunc) {
           m = {};
           for (d in state.directive) {
-            if (_.has(state.directive, d)) {
-              m[d] = state.directive[d];
-            }
+            m[d] = state.directive[d];
           }
           directives();
 
@@ -3370,7 +3368,7 @@ var JSHINT = (function() {
   }
 
   function destructuringPatternRecursive(options) {
-    var ids;
+    var ids, idx;
     var identifiers = [];
     var openingParsed = options && options.openingParsed;
     var isAssignment = options && options.assignment;
@@ -3381,9 +3379,8 @@ var JSHINT = (function() {
       var ident;
       if (checkPunctuators(state.tokens.next, ["[", "{"])) {
         ids = destructuringPatternRecursive(recursiveOptions);
-        for (var id in ids) {
-          id = ids[id];
-          identifiers.push({ id: id.id, token: id.token });
+        for (idx = 0; idx < ids.length; idx++) {
+          identifiers.push({ id: ids[idx].id, token: ids[idx].token });
         }
       } else if (checkPunctuator(state.tokens.next, ",")) {
         identifiers.push({ id: null, token: state.tokens.curr });
