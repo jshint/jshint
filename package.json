@@ -26,7 +26,8 @@
   "scripts": {
     "browser-test-server": "node tests/helpers/browser/server",
     "build": "node bin/build",
-    "coverage": "istanbul -- cover ./node_modules/.bin/nodeunit tests/unit",
+    "coverage": "istanbul -- cover ./node_modules/nodeunit/bin/nodeunit tests/unit",
+    "coverage-report": "npm run coverage && istanbul report html",
     "data": "node scripts/generate-identifier-data",
     "fetch-test262": "git submodule init && git submodule update",
     "pretest": "node ./bin/jshint src && jscs src",
