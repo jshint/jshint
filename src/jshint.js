@@ -888,15 +888,13 @@ var JSHINT = (function() {
   }
 
   function nobreaknonadjacent(left, right) {
-    left = left || state.tokens.curr;
-    right = right || state.tokens.next;
     if (!state.option.laxbreak && left.line !== startLine(right)) {
       warning("W014", right, right.value);
     }
   }
 
   function nolinebreak(t) {
-    t = t || state.tokens.curr;
+    t = t;
     if (t.line !== startLine(state.tokens.next)) {
       warning("E022", t, t.value);
     }
