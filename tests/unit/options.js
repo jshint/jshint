@@ -545,46 +545,6 @@ exports.nonew = function (test) {
   test.done();
 };
 
-exports.shelljs = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/shelljs.js', 'utf8');
-
-  TestRun(test, 1)
-    .addError(1, 1, "'target' is not defined.")
-    .addError(3, 1, "'echo' is not defined.")
-    .addError(4, 1, "'exit' is not defined.")
-    .addError(5, 1, "'cd' is not defined.")
-    .addError(6, 1, "'pwd' is not defined.")
-    .addError(7, 1, "'ls' is not defined.")
-    .addError(8, 1, "'find' is not defined.")
-    .addError(9, 1, "'cp' is not defined.")
-    .addError(10, 1, "'rm' is not defined.")
-    .addError(11, 1, "'mv' is not defined.")
-    .addError(12, 1, "'mkdir' is not defined.")
-    .addError(13, 1, "'test' is not defined.")
-    .addError(14, 1, "'cat' is not defined.")
-    .addError(15, 1, "'sed' is not defined.")
-    .addError(16, 1, "'grep' is not defined.")
-    .addError(17, 1, "'which' is not defined.")
-    .addError(18, 1, "'dirs' is not defined.")
-    .addError(19, 1, "'pushd' is not defined.")
-    .addError(20, 1, "'popd' is not defined.")
-    .addError(21, 1, "'env' is not defined.")
-    .addError(22, 1, "'exec' is not defined.")
-    .addError(23, 1, "'chmod' is not defined.")
-    .addError(24, 1, "'config' is not defined.")
-    .addError(25, 1, "'error' is not defined.")
-    .addError(26, 1, "'tempdir' is not defined.")
-    .addError(29, 1, "'require' is not defined.")
-    .addError(30, 1, "'module' is not defined.")
-    .addError(31, 1, "'process' is not defined.")
-    .test(src, { undef: true });
-
-  TestRun(test, 2)
-    .test(src, { undef: true, shelljs: true });
-
-  test.done();
-};
-
 // Option `asi` allows you to use automatic-semicolon insertion
 exports.asi = function (test) {
   var src = fs.readFileSync(__dirname + '/fixtures/asi.js', 'utf8');
@@ -2375,35 +2335,6 @@ exports.laxcomma = function (test) {
 
   // No errors if both laxbreak and laxcomma are turned on
   TestRun(test).test(src, {es3: true, laxbreak: true, laxcomma: true });
-
-  test.done();
-};
-
-/*
- * Tests the `browser` option
- */
-exports.browser = function (test) {
-  var src = fs.readFileSync(__dirname + '/fixtures/browser.js', 'utf8');
-
-  TestRun(test)
-    .addError(2, 9, "'atob' is not defined.")
-    .addError(3, 9, "'btoa' is not defined.")
-    .addError(6, 14, "'DOMParser' is not defined.")
-    .addError(10, 14, "'XMLSerializer' is not defined.")
-    .addError(14, 20, "'NodeFilter' is not defined.")
-    .addError(15, 19, "'Node' is not defined.")
-    .addError(18, 28, "'MutationObserver' is not defined.")
-    .addError(21, 16, "'SVGElement' is not defined.")
-    .addError(24, 19, "'Comment' is not defined.")
-    .addError(25, 14, "'DocumentFragment' is not defined.")
-    .addError(26, 17, "'Range' is not defined.")
-    .addError(27, 16, "'Text' is not defined.")
-    .addError(31, 15, "'document' is not defined.")
-    .addError(32, 1, "'fetch' is not defined.")
-    .addError(35, 19, "'URL' is not defined.")
-    .test(src, {es3: true, undef: true });
-
-  TestRun(test).test(src, {es3: true, browser: true, undef: true });
 
   test.done();
 };
