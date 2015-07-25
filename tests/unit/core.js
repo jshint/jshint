@@ -2246,7 +2246,7 @@ exports["super in es5"] = function (test) {
   ];
 
   TestRun(test)
-    .addError(2, "'super' is only available in ES6 (use 'esversion: 6').")
+    .addError(2, "Expected an identifier and instead saw 'super' (a reserved word).")
     .addError(4, "Expected an identifier and instead saw 'super' (a reserved word).")
     .test(code);
 

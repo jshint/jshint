@@ -4743,7 +4743,7 @@ var JSHINT = (function() {
     es5: true,
     nud: function() {
       if (!state.inES6()) {
-        warning("W119", state.tokens.curr, "super", "6");
+        warning("W024", state.tokens.curr, "super", "6");
       } else if (checkPunctuators(state.tokens.next, "(")) {
         var f = state.funct;
         while (f) {
