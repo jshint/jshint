@@ -437,7 +437,7 @@ var JSHINT = (function() {
     if (directiveToken.type === "globals") {
       body.forEach(function(g, idx) {
         g = g.split(":");
-        var key = (g[0] || "").trim();
+        var key = g[0].trim();
         var val = (g[1] || "").trim();
 
         if (key === "-" || !key.length) {
@@ -514,7 +514,7 @@ var JSHINT = (function() {
     if (directiveToken.type === "jshint" || directiveToken.type === "jslint") {
       body.forEach(function(g) {
         g = g.split(":");
-        var key = (g[0] || "").trim();
+        var key = g[0].trim();
         var val = (g[1] || "").trim();
 
         if (!checkOption(key, directiveToken)) {
