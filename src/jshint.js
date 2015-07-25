@@ -2973,10 +2973,10 @@ var JSHINT = (function() {
 
     if (paramsInfo) {
       state.funct["(params)"] = paramsInfo.params;
-      state.funct["(metrics)"].verifyMaxParametersPerFunction(paramsInfo.arity);
-      state.funct["(arity)"] = paramsInfo.arity;
+      state.funct["(metrics)"].arity = paramsInfo.arity;
+      state.funct["(metrics)"].verifyMaxParametersPerFunction();
     } else {
-      state.funct["(arity)"] = 0;
+      state.funct["(metrics)"].arity = 0;
     }
 
     if (isArrow) {
@@ -3021,6 +3021,7 @@ var JSHINT = (function() {
       statementCount: 0,
       nestedBlockDepth: -1,
       ComplexityCount: 1,
+      arity: 0,
 
       verifyMaxStatementsPerFunction: function() {
         if (state.option.maxstatements &&
@@ -3029,9 +3030,10 @@ var JSHINT = (function() {
         }
       },
 
-      verifyMaxParametersPerFunction: function(count) {
-        if (_.isNumber(state.option.maxparams) && count > state.option.maxparams) {
-          warning("W072", functionStartToken, count);
+      verifyMaxParametersPerFunction: function() {
+        if (_.isNumber(state.option.maxparams) &&
+          this.arity > state.option.maxparams) {
+          warning("W072", functionStartToken, this.arity);
         }
       },
 
@@ -5280,7 +5282,7 @@ var JSHINT = (function() {
 
       fu.metrics = {
         complexity: f["(metrics)"].ComplexityCount,
-        parameters: f["(arity)"],
+        parameters: f["(metrics)"].arity,
         statements: f["(metrics)"].statementCount
       };
 
