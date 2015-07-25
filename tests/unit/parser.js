@@ -924,6 +924,42 @@ exports.comma = function (test) {
   test.done();
 };
 
+exports["gh-2587"] = function (test) {
+
+  var ops = ["==", "!="];
+  var options = [{}, {eqeqeq: true}, {eqnull: true}, {eqeqeq: true, eqnull: true}];
+
+  ops.forEach(function(op) {
+    options.forEach(function(option) {
+      var testRun = TestRun(test)
+        .addError(1, "Expected an identifier and instead saw 'if'.")
+        .addError(1, "Unrecoverable syntax error. (100% scanned).");
+
+      if (option.eqeqeq) {
+        testRun.addError(1, "Expected '" + op + "=' and instead saw '" + op + "'.");
+      } else {
+        testRun.addError(1, "Use '" + op + "=' to compare with 'true'.");
+      }
+      testRun.test([
+          "true " + op + " if"
+        ], option);
+    });
+  });
+
+  var otherOps = ["===", "!==", ">", "<", ">=", "<="];
+
+  otherOps.forEach(function(op) {
+    TestRun(test)
+      .addError(1, "Expected an identifier and instead saw 'if'.")
+      .addError(1, "Unrecoverable syntax error. (100% scanned).")
+      .test([
+        "true " + op + " if"
+      ], {});
+  });
+
+  test.done();
+};
+
 exports.withStatement = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/with.js", "utf8");
   var run;
