@@ -924,6 +924,85 @@ exports.comma = function (test) {
   test.done();
 };
 
+exports["gh-2587"] = function (test) {
+
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw 'if'.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .addError(1, "Expected '===' and instead saw '=='.")
+    .test([
+    "true == if"
+  ], {eqeqeq: true, eqnull: true});
+
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw 'if'.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .addError(1, "Expected '!==' and instead saw '!='.")
+    .test([
+    "true != if"
+  ], {eqeqeq: true, eqnull: true});
+
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw 'if'.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .addError(1, "Use '===' to compare with 'true'.")
+    .test([
+    "true == if"
+  ], {});
+
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw 'if'.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .addError(1, "Use '!==' to compare with 'true'.")
+    .test([
+    "true != if"
+  ], {});
+
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw 'if'.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .test([
+    "true === if"
+  ], {});
+
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw 'if'.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .test([
+    "true !== if"
+  ], {});
+
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw 'if'.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .test([
+    "true > if"
+  ], {});
+
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw 'if'.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .test([
+    "true < if"
+  ], {});
+
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw 'if'.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .test([
+    "true >= if"
+  ], {});
+
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw 'if'.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .test([
+    "true <= if"
+  ], {});
+
+  test.done();
+};
+
 exports.withStatement = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/with.js", "utf8");
   var run;
