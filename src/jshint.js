@@ -1263,9 +1263,7 @@ var JSHINT = (function() {
         }
 
         if (left.id === ".") {
-          if (!left.left) {
-            warning("E031", that);
-          } else if (left.left.value === "arguments" && !state.isStrict()) {
+          if (!left.left || left.left.value === "arguments" && !state.isStrict()) {
             warning("E031", that);
           }
 
