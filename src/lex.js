@@ -143,10 +143,6 @@ Lexer.prototype = {
     return this.context.pop();
   },
 
-  isContext: function(context) {
-    return this.context.length > 0 && this.context[this.context.length - 1] === context;
-  },
-
   currentContext: function() {
     return this.context.length > 0 && this.context[this.context.length - 1];
   },
@@ -1586,6 +1582,9 @@ Lexer.prototype = {
 
 
     function isReserved(token, isProperty) {
+      // At present all current identifiers have reserved set.
+      // Preserving check anyway, for future-proofing.
+      /* istanbul ignore if */
       if (!token.reserved) {
         return false;
       }
@@ -1646,8 +1645,7 @@ Lexer.prototype = {
         }
 
         if (_.has(state.syntax, value)) {
-          obj = Object.create(state.syntax[value] || state.syntax["(error)"]);
-
+          obj = Object.create(state.syntax[value]);
           // If this can't be a reserved keyword, reset the object.
           if (!isReserved(obj, isProperty && type === "(identifier)")) {
             obj = null;
@@ -1852,9 +1850,6 @@ Lexer.prototype = {
           };
         }
 
-        break;
-
-      case "":
         break;
 
       default:
