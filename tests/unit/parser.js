@@ -921,6 +921,17 @@ exports.comma = function (test) {
     .addError(1, "Extra comma. (it breaks older versions of IE)")
     .test("var f = [1,];", {es3: true});
 
+  TestRun(test)
+    .addError(3, "Unexpected 'break'.")
+    .addError(3, "Expected an assignment or function call and instead saw an expression.")
+    .addError(3, "Missing semicolon.")
+    .test([
+      "var a;",
+      "while(true) {",
+      "  a=1, break;",
+      "}"
+    ], { });
+
   test.done();
 };
 
