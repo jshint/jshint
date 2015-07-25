@@ -2625,7 +2625,7 @@ var JSHINT = (function() {
       }
       return comprehensiveArrayExpression();
     } else if (blocktype.isDestAssign) {
-      this.destructAssign = destructuringExpression({ openingParsed: true, assignment: true });
+      this.destructAssign = destructuringPattern({ openingParsed: true, assignment: true });
       return this;
     }
     var b = state.tokens.curr.line !== startLine(state.tokens.next);
@@ -2767,7 +2767,7 @@ var JSHINT = (function() {
       var currentParams = [];
 
       if (_.contains(["{", "["], state.tokens.next.id)) {
-        tokens = destructuringExpression();
+        tokens = destructuringPattern();
         for (t in tokens) {
           t = tokens[t];
           if (t.id) {
@@ -3127,7 +3127,7 @@ var JSHINT = (function() {
 
       var blocktype = lookupBlockType();
       if (blocktype.isDestAssign) {
-        this.destructAssign = destructuringExpression({ openingParsed: true, assignment: true });
+        this.destructAssign = destructuringPattern({ openingParsed: true, assignment: true });
         return this;
       }
 
@@ -3241,7 +3241,7 @@ var JSHINT = (function() {
     };
   }(delim("{")));
 
-  function destructuringExpression(options) {
+  function destructuringPattern(options) {
     var isAssignment = options && options.assignment;
 
     if (!state.inESNext()) {
@@ -3249,10 +3249,10 @@ var JSHINT = (function() {
         isAssignment ? "destructuring assignment" : "destructuring expression");
     }
 
-    return destructuringExpressionRecursive(options);
+    return destructuringPatternRecursive(options);
   }
 
-  function destructuringExpressionRecursive(options) {
+  function destructuringPatternRecursive(options) {
     var ids;
     var identifiers = [];
     var openingParsed = options && options.openingParsed;
@@ -3261,7 +3261,7 @@ var JSHINT = (function() {
     var nextInnerDE = function() {
       var ident;
       if (checkPunctuators(state.tokens.next, ["[", "{"])) {
-        ids = destructuringExpressionRecursive();
+        ids = destructuringPatternRecursive();
         for (var id in ids) {
           id = ids[id];
           identifiers.push({ id: id.id, token: id.token });
@@ -3365,7 +3365,7 @@ var JSHINT = (function() {
     return identifiers;
   }
 
-  function destructuringExpressionMatch(tokens, value) {
+  function destructuringPatternMatch(tokens, value) {
     var first = value.first;
 
     if (!first)
@@ -3410,7 +3410,7 @@ var JSHINT = (function() {
     for (;;) {
       var names = [];
       if (_.contains(["{", "["], state.tokens.next.value)) {
-        tokens = destructuringExpression();
+        tokens = destructuringPattern();
         lone = false;
       } else {
         tokens = [ { id: identifier(), token: state.tokens.curr } ];
@@ -3436,7 +3436,7 @@ var JSHINT = (function() {
         if (lone) {
           tokens[0].first = value;
         } else {
-          destructuringExpressionMatch(names, value);
+          destructuringPatternMatch(names, value);
         }
       }
 
@@ -3501,7 +3501,7 @@ var JSHINT = (function() {
     for (;;) {
       var names = [];
       if (_.contains(["{", "["], state.tokens.next.value)) {
-        tokens = destructuringExpression();
+        tokens = destructuringPattern();
         lone = false;
       } else {
         tokens = [ { id: identifier(), token: state.tokens.curr } ];
@@ -3535,7 +3535,7 @@ var JSHINT = (function() {
         if (lone) {
           tokens[0].first = value;
         } else {
-          destructuringExpressionMatch(names, value);
+          destructuringPatternMatch(names, value);
         }
       }
 
@@ -3856,7 +3856,7 @@ var JSHINT = (function() {
       state.funct["(scope)"].stackParams();
 
       if (checkPunctuators(state.tokens.next, ["[", "{"])) {
-        var tokens = destructuringExpression();
+        var tokens = destructuringPattern();
         _.each(tokens, function(token) {
           if (token.id) {
             state.funct["(scope)"].addParam(token.id, token, "exception");
