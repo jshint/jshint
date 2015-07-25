@@ -129,31 +129,8 @@ var JSHINT = (function() {
   }
 
   function isReserved(token) {
-    if (!token.reserved) {
-      return false;
-    }
-    var meta = token.meta;
-
-    if (meta && meta.isFutureReservedWord && state.inES5()) {
-      // ES3 FutureReservedWord in an ES5 environment.
-      if (!meta.es5) {
-        return false;
-      }
-
-      // Some ES5 FutureReservedWord identifiers are active only
-      // within a strict mode environment.
-      if (meta.strictOnly) {
-        if (!state.option.strict && !state.isStrict()) {
-          return false;
-        }
-      }
-
-      if (token.isProperty) {
-        return false;
-      }
-    }
-
-    return true;
+    // the lexer handles having different identifiers in different environments
+    return token.reserved;
   }
 
   function supplant(str, data) {
