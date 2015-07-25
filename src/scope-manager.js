@@ -478,11 +478,6 @@ var scopeManager = function(state, predefined, exported, declared) {
     },
 
     validateParams: function() {
-      // This method only concerns errors for function parameters
-      if (_currentFunctBody["(type)"] === "global") {
-        return;
-      }
-
       var isStrict = state.isStrict();
       var currentFunctParamScope = _currentFunctBody["(parent)"];
 
