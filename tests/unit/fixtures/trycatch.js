@@ -10,6 +10,7 @@ function foo() {
         // do something
     } catch (e) {
         e = 12;
+        e <<= 1;
     }
 }
 

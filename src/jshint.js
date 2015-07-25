@@ -1269,69 +1269,81 @@ var JSHINT = (function() {
     if (prototype) return walkNative(prototype);
   }
 
+  /**
+   * Checks the left hand side of an assignment for issues, returns if ok
+   * @param {token} left - the left hand side of the assignment
+   * @param {token} assignToken - the token for the assignment
+   * @param {object=} options - optional object
+   * @param {boolean} options.allowDestructuring - whether to allow destructuting binding
+   * @returns {boolean} Whether the left hand side is OK
+   */
+  function checkLeftSideAssign(left, assignToken, options) {
+
+    var allowDestructuring = options && options.allowDestructuring;
+
+    if (state.option.freeze) {
+      var nativeObject = findNativePrototype(left);
+      if (nativeObject)
+        warning("W121", left, nativeObject);
+    }
+
+    if (left.identifier && !left.isMetaProperty) {
+      // reassign also calls modify
+      // but we are specific in order to catch function re-assignment
+      // and globals re-assignment
+      state.funct["(scope)"].block.reassign(left.value, left);
+    }
+
+    if (left.id === ".") {
+      if (!left.left || left.left.value === "arguments" && !state.isStrict()) {
+        warning("E031", assignToken);
+      }
+
+      state.nameStack.set(state.tokens.prev);
+      return true;
+    } else if (left.id === "{" || left.id === "[") {
+      if (allowDestructuring && state.tokens.curr.left.destructAssign) {
+        state.tokens.curr.left.destructAssign.forEach(function(t) {
+          state.funct["(scope)"].block.modify(t.id, t.token);
+        });
+      } else {
+        if (left.id === "{" || !left.left) {
+          warning("E031", assignToken);
+        } else if (left.left.value === "arguments" && !state.isStrict()) {
+          warning("E031", assignToken);
+        }
+      }
+
+      if (left.id === "[") {
+        state.nameStack.set(left.right);
+      }
+
+      return true;
+    } else if (left.isMetaProperty) {
+      error("E031", assignToken);
+      return true;
+    } else if (left.identifier && !isReserved(left)) {
+      if (state.funct["(scope)"].labeltype(left.value) === "exception") {
+        warning("W022", left);
+      }
+      state.nameStack.set(left);
+      return true;
+    }
+
+    if (left === state.syntax["function"]) {
+      warning("W023", state.tokens.curr);
+    }
+
+    return false;
+  }
+
   function assignop(s, f, p) {
     var x = infix(s, typeof f === "function" ? f : function(left, that) {
       that.left = left;
 
-      if (left) {
-        if (state.option.freeze) {
-          var nativeObject = findNativePrototype(left);
-          if (nativeObject)
-            warning("W121", left, nativeObject);
-        }
-
-        if (left.identifier && !left.isMetaProperty) {
-          // reassign also calls modify
-          // but we are specific in order to catch function re-assignment
-          // and globals re-assignment
-          state.funct["(scope)"].block.reassign(left.value, left);
-        }
-
-        if (left.id === ".") {
-          if (!left.left) {
-            warning("E031", that);
-          } else if (left.left.value === "arguments" && !state.isStrict()) {
-            warning("E031", that);
-          }
-
-          state.nameStack.set(state.tokens.prev);
-          that.right = expression(10);
-          return that;
-        } else if (left.id === "{" || left.id === "[") {
-          if (state.tokens.curr.left.destructAssign) {
-            state.tokens.curr.left.destructAssign.forEach(function(t) {
-              state.funct["(scope)"].block.modify(t.id, t.token);
-            });
-          } else {
-            if (left.id === "{" || !left.left) {
-              warning("E031", that);
-            } else if (left.left.value === "arguments" && !state.isStrict()) {
-              warning("E031", that);
-            }
-          }
-
-          if (left.id === "[") {
-            state.nameStack.set(left.right);
-          }
-
-          that.right = expression(10);
-          return that;
-        } else if (left.isMetaProperty) {
-          error("E031", that);
-          that.right = expression(10);
-          return that;
-        } else if (left.identifier && !isReserved(left)) {
-          if (state.funct["(scope)"].labeltype(left.value) === "exception") {
-            warning("W022", left);
-          }
-          state.nameStack.set(left);
-          that.right = expression(10);
-          return that;
-        }
-
-        if (left === state.syntax["function"]) {
-          warning("W023", state.tokens.curr);
-        }
+      if (left && checkLeftSideAssign(left, that, { allowDestructuring: true })) {
+        that.right = expression(10);
+        return that;
       }
 
       error("E031", that);
@@ -1357,27 +1369,14 @@ var JSHINT = (function() {
     return x;
   }
 
-
   function bitwiseassignop(s) {
     return assignop(s, function(left, that) {
       if (state.option.bitwise) {
         warning("W016", that, that.id);
       }
 
-      if (left) {
-        if (left.isMetaProperty) {
-          error("E031", that);
-          that.right = expression(10);
-          return that;
-        }
-        if (left.id === "." || left.id === "[" ||
-            (left.identifier && !isReserved(left))) {
-          expression(10);
-          return that;
-        }
-        if (left === state.syntax["function"]) {
-          warning("W023", state.tokens.curr);
-        }
+      if (left && checkLeftSideAssign(left, that)) {
+        that.right = expression(10);
         return that;
       }
       error("E031", that);
