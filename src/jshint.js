@@ -2016,13 +2016,7 @@ var JSHINT = (function() {
         state.funct["(name)"].charAt(0) > "Z") || state.funct["(global)"])) {
       warning("W040", x);
     }
-    var f = state.funct;
-    while (f) {
-      // If `this` is used in an arrow function, check the outer scope
-      if (!f["(arrow)"]) { break; }
-      f = f["(context)"];
-    }
-    if (f["(super)"] === "required") {
+    if (state.funct["(super)"] === "required") {
       error("E060", x);
     }
   });
