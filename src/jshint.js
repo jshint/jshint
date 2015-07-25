@@ -3246,7 +3246,7 @@ var JSHINT = (function() {
 
     if (!state.inESNext()) {
       warning("W104", state.tokens.curr,
-        isAssignment ? "destructuring assignment" : "destructuring expression");
+        isAssignment ? "destructuring assignment" : "destructuring binding");
     }
 
     return destructuringPatternRecursive(options);
