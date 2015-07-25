@@ -295,12 +295,10 @@ var scopeManager = function(state, predefined, exported, declared) {
 
           if (usedLabel["(useOutsideOfScope)"] && !state.option.funcscope) {
             var usedTokens = usage["(tokens)"];
-            if (usedTokens) {
-              for (j = 0; j < usedTokens.length; j++) {
-                // Keep the consistency of https://github.com/jshint/jshint/issues/2409
-                if (usedLabel["(function)"] === usedTokens[j]["(function)"]) {
-                  error("W038", usedTokens[j], usedLabelName);
-                }
+            for (j = 0; j < usedTokens.length; j++) {
+              // Keep the consistency of https://github.com/jshint/jshint/issues/2409
+              if (usedLabel["(function)"] === usedTokens[j]["(function)"]) {
+                error("W038", usedTokens[j], usedLabelName);
               }
             }
           }
@@ -364,23 +362,21 @@ var scopeManager = function(state, predefined, exported, declared) {
           else {
             // label usage is not predefined and we have not found a declaration
             // so report as undeclared
-            if (usage["(tokens)"]) {
-              for (j = 0; j < usage["(tokens)"].length; j++) {
-                var undefinedToken = usage["(tokens)"][j];
-                // if its not a forgiven undefined (e.g. typof x)
-                if (!undefinedToken.forgiveUndef) {
-                  // if undef is on and undef was on when the token was defined
-                  if (state.option.undef && !undefinedToken.ignoreUndef) {
-                    warning("W117", undefinedToken, usedLabelName);
-                  }
-                  if (impliedGlobals[usedLabelName]) {
-                    impliedGlobals[usedLabelName].line.push(undefinedToken.line);
-                  } else {
-                    impliedGlobals[usedLabelName] = {
-                      name: usedLabelName,
-                      line: [undefinedToken.line]
-                    };
-                  }
+            for (j = 0; j < usage["(tokens)"].length; j++) {
+              var undefinedToken = usage["(tokens)"][j];
+              // if its not a forgiven undefined (e.g. typof x)
+              if (!undefinedToken.forgiveUndef) {
+                // if undef is on and undef was on when the token was defined
+                if (state.option.undef && !undefinedToken.ignoreUndef) {
+                  warning("W117", undefinedToken, usedLabelName);
+                }
+                if (impliedGlobals[usedLabelName]) {
+                  impliedGlobals[usedLabelName].line.push(undefinedToken.line);
+                } else {
+                  impliedGlobals[usedLabelName] = {
+                    name: usedLabelName,
+                    line: [undefinedToken.line]
+                  };
                 }
               }
             }
