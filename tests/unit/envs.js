@@ -278,3 +278,329 @@ exports.browser = function (test) {
 
   test.done();
 };
+
+exports.couch = function (test) {
+
+  var globals = [
+    "require",
+    "respond",
+    "getRow",
+    "emit",
+    "send",
+    "start",
+    "sum",
+    "log",
+    "exports",
+    "module",
+    "provides"
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { couch: true });
+
+  test.done();
+};
+
+exports.qunit = function (test) {
+
+  var globals = [
+    "asyncTest",
+    "deepEqual",
+    "equal",
+    "expect",
+    "module",
+    "notDeepEqual",
+    "notEqual",
+    "notPropEqual",
+    "notStrictEqual",
+    "ok",
+    "propEqual",
+    "QUnit",
+    "raises",
+    "start",
+    "stop",
+    "strictEqual",
+    "test",
+    "throws"
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { qunit: true });
+
+  test.done();
+};
+
+exports.rhino = function (test) {
+
+  var globals = [
+    "defineClass",
+    "deserialize",
+    "gc",
+    "help",
+    "importClass",
+    "importPackage",
+    "java",
+    "load",
+    "loadClass",
+    "Packages",
+    "print",
+    "quit",
+    "readFile",
+    "readUrl",
+    "runCommand",
+    "seal",
+    "serialize",
+    "spawn",
+    "sync",
+    "toint32",
+    "version"
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { rhino: true });
+
+  test.done();
+};
+
+exports.prototypejs = function (test) {
+
+  var globals = [
+    "$",
+    "$$",
+    "$A",
+    "$F",
+    "$H",
+    "$R",
+    "$break",
+    "$continue",
+    "$w",
+    "Abstract",
+    "Ajax",
+    "Class",
+    "Enumerable",
+    "Element",
+    "Event",
+    "Field",
+    "Form",
+    "Hash",
+    "Insertion",
+    "ObjectRange",
+    "PeriodicalExecuter",
+    "Position",
+    "Prototype",
+    "Selector",
+    "Template",
+    "Toggle",
+    "Try",
+    "Autocompleter",
+    "Builder",
+    "Control",
+    "Draggable",
+    "Draggables",
+    "Droppables",
+    "Effect",
+    "Sortable",
+    "SortableObserver",
+    "Sound",
+    "Scriptaculous"
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { prototypejs: true });
+
+  test.done();
+};
+
+exports.dojo = function (test) {
+
+  var globals = [
+    "dojo",
+    "dijit",
+    "dojox",
+    "define",
+    "require"
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { dojo: true });
+
+  test.done();
+};
+
+exports.nonstandard = function (test) {
+
+  var globals = [
+    "escape",
+    "unescape"
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { nonstandard: true });
+
+  test.done();
+};
+
+exports.jasmine = function (test) {
+
+  var globals = [
+    "jasmine",
+    "describe",
+    "xdescribe",
+    "it",
+    "xit",
+    "beforeEach",
+    "afterEach",
+    "setFixtures",
+    "loadFixtures",
+    "spyOn",
+    "expect",
+    "runs",
+    "waitsFor",
+    "waits",
+    "beforeAll",
+    "afterAll",
+    "fail",
+    "fdescribe",
+    "fit"
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { jasmine: true });
+
+  test.done();
+};
+
+exports.mootools = function (test) {
+
+  var globals = [
+    "$",
+    "$$",
+    "Asset",
+    "Browser",
+    "Chain",
+    "Class",
+    "Color",
+    "Cookie",
+    "Core",
+    "Document",
+    "DomReady",
+    "DOMEvent",
+    "DOMReady",
+    "Drag",
+    "Element",
+    "Elements",
+    "Event",
+    "Events",
+    "Fx",
+    "Group",
+    "Hash",
+    "HtmlTable",
+    "IFrame",
+    "IframeShim",
+    "InputValidator",
+    "instanceOf",
+    "Keyboard",
+    "Locale",
+    "Mask",
+    "MooTools",
+    "Native",
+    "Options",
+    "OverText",
+    "Request",
+    "Scroller",
+    "Slick",
+    "Slider",
+    "Sortables",
+    "Spinner",
+    "Swiff",
+    "Tips",
+    "Type",
+    "typeOf",
+    "URI",
+    "Window"
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { mootools: true });
+
+  test.done();
+};
+
+exports.worker = function (test) {
+
+  var globals = [
+    "importScripts",
+    "postMessage",
+    "self",
+    "FileReaderSync"
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { worker: true });
+
+  test.done();
+};
+
+exports.wsh = function (test) {
+
+  var globals = [
+    "ActiveXObject",
+    "Enumerator",
+    "GetObject",
+    "ScriptEngine",
+    "ScriptEngineBuildVersion",
+    "ScriptEngineMajorVersion",
+    "ScriptEngineMinorVersion",
+    "VBArray",
+    "WSH",
+    "WScript",
+    "XDomainRequest"
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { wsh: true });
+
+  test.done();
+};
+
+exports.yui = function (test) {
+
+  var globals = [
+    "YUI",
+    "Y",
+    "YUI_config"
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { yui: true });
+
+  test.done();
+};
+
+exports.mocha = function (test) {
+
+  var globals = [
+    "mocha",
+    "describe",
+    "xdescribe",
+    "it",
+    "xit",
+    "context",
+    "xcontext",
+    "before",
+    "after",
+    "beforeEach",
+    "afterEach",
+    "suite",
+    "test",
+    "setup",
+    "teardown",
+    "suiteSetup",
+    "suiteTeardown"
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { mocha: true });
+
+  test.done();
+};
