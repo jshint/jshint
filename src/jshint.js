@@ -1808,22 +1808,14 @@ var JSHINT = (function() {
       if (isfunc) {
         state.funct["(scope)"].stack();
 
-        m = {};
         if (stmt && !isfatarrow && !state.inMoz()) {
           error("W118", state.tokens.curr, "function closure expressions");
         }
 
-        if (!stmt) {
-          for (d in state.directive) {
-            if (_.has(state.directive, d)) {
-              m[d] = state.directive[d];
-            }
-          }
-        }
         expression(10);
 
         if (state.option.strict && state.funct["(context)"]["(global)"]) {
-          if (!m["use strict"] && !state.isStrict()) {
+          if (!state.isStrict()) {
             warning("E007");
           }
         }
