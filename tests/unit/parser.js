@@ -54,15 +54,17 @@ exports.confusingOps = function (test) {
     "var b = 3 + +3;",
     "a = a - --a;",
     "a = b + ++b;",
-    "a = a-- - 3;", // this is not confusing?!
-    "a = a++ + 3;", // this is not confusing?!
+    "a = a-- - 3;",
+    "a = a++ + 3;",
   ];
 
   var run = TestRun(test)
     .addError(1, "Confusing minuses.")
     .addError(2, "Confusing plusses.")
     .addError(3, "Confusing minuses.")
-    .addError(4, "Confusing plusses.");
+    .addError(4, "Confusing plusses.")
+    .addError(5, "Confusing minuses.")
+    .addError(6, "Confusing plusses.")
   run.test(code, {es3: true});
   run.test(code, {}); // es5
   run.test(code, {esnext: true});
@@ -5318,11 +5320,14 @@ exports["object ComputedPropertyName"] = function (test) {
     "var e = { ['s']: 1 };",
   ];
 
-  TestRun(test).test(code, { esnext: true });
+  TestRun(test)
+    .addError(7, "Confusing plusses.")
+    .test(code, { esnext: true });
 
   TestRun(test)
     .addError(6, "'computed property names' is only available in ES6 (use esnext option).")
     .addError(7, "'computed property names' is only available in ES6 (use esnext option).")
+    .addError(7, "Confusing plusses.")
     .addError(8, "'concise methods' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(8, "'computed property names' is only available in ES6 (use esnext option).")
     .addError(9, "'computed property names' is only available in ES6 (use esnext option).")

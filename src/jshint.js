@@ -721,11 +721,13 @@ var JSHINT = (function() {
         warning("W005", state.tokens.curr);
       }
       break;
+    case "--":
     case "-":
       if (state.tokens.next.id === "-" || state.tokens.next.id === "--") {
         warning("W006");
       }
       break;
+    case "++":
     case "+":
       if (state.tokens.next.id === "+" || state.tokens.next.id === "++") {
         warning("W007");
