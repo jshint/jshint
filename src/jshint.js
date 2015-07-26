@@ -1301,10 +1301,6 @@ var JSHINT = (function() {
           that.right = expression(10);
           return that;
         }
-
-        if (left === state.syntax["function"]) {
-          warning("W023", state.tokens.curr);
-        }
       }
 
       error("E031", that);
@@ -1348,9 +1344,7 @@ var JSHINT = (function() {
           expression(10);
           return that;
         }
-        if (left === state.syntax["function"]) {
-          warning("W023", state.tokens.curr);
-        }
+
         return that;
       }
       error("E031", that);
