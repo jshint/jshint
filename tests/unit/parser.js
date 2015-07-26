@@ -3295,6 +3295,17 @@ exports["yield statement within try-catch"] = function (test) {
   test.done();
 };
 
+exports["catch block no curlies"] = function (test) {
+  var code = [
+    "try {} catch(e) e.toString();"
+  ];
+  TestRun(test)
+    .addError(1, "Expected '{' and instead saw 'e'.")
+    .test(code, {});
+
+  test.done();
+};
+
 exports["mozilla generator as es5"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
