@@ -3605,6 +3605,18 @@ exports["catch block no curlies"] = function (test) {
   test.done();
 };
 
+exports["strict violation - use of arguments"] = function (test) {
+  var code = [
+    "'use strict';",
+    "arguments[0]();"
+  ];
+  TestRun(test)
+    .addError(2, 1, "Strict violation.")
+    .test(code, { strict: "global"});
+
+  test.done();
+};
+
 exports["mozilla generator as es5"] = function (test) {
   // example taken from https://developer.mozilla.org/en-US/docs/JavaScript/New_in_JavaScript/1.7
   var code = [
