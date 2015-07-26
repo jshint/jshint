@@ -2162,32 +2162,8 @@ var JSHINT = (function() {
     return that;
   }, 130);
   prefix("+", "num");
-  prefix("+++", function() {
-    warning("W007");
-    this.arity = "unary";
-    this.right = expression(150);
-    return this;
-  });
-  infix("+++", function(left) {
-    warning("W007");
-    this.left = left;
-    this.right = expression(130);
-    return this;
-  }, 130);
   infix("-", "sub", 130);
   prefix("-", "neg");
-  prefix("---", function() {
-    warning("W006");
-    this.arity = "unary";
-    this.right = expression(150);
-    return this;
-  });
-  infix("---", function(left) {
-    warning("W006");
-    this.left = left;
-    this.right = expression(130);
-    return this;
-  }, 130);
   infix("*", "mult", 140);
   infix("/", "div", 140);
   infix("%", "mod", 140);
