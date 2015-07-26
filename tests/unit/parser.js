@@ -93,18 +93,23 @@ exports.plusplus = function (test) {
   var code = [
     "var a = ++[2];",
     "var b = --(2);",
+    "var c = [2]++;",
+    "var d = (2)--;",
   ];
 
   run = TestRun(test)
     .addError(1, "Unexpected use of '++'.")
-    .addError(2, "Unexpected use of '--'.");
+    .addError(2, "Unexpected use of '--'.")
+    .addError(3, "Unexpected use of '++'.")
+    .addError(4, "Unexpected use of '--'.");
   run.test(code, { plusplus: true, es3: true });
   run.test(code, { plusplus: true }); // es5
   run.test(code, { plusplus: true, esnext: true });
   run.test(code, { plusplus: true, moz: true });
 
   run = TestRun(test)
-    .addError(2, "Bad operand.");
+    .addError(2, "Bad operand.")
+    .addError(4, "Bad operand.");
   run.test(code, { plusplus: false, es3: true });
   run.test(code, { plusplus: false }); // es5
   run.test(code, { plusplus: false, esnext: true });
