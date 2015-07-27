@@ -881,7 +881,9 @@ exports.val = {
    * - "global"  - there must be a `"use strict";` directive at global level
    * - "implied" - lint the code as if there is the `"use strict";` directive
    * - false     - disable warnings about strict mode
-   * - true      - same as `"func"`
+   * - true      - same as `"func"`, but environment options have precedence over
+   *               this (e.g. `node`, `module`, `browserify` and `phantomjs` can
+   *               set `strict: global`)
    */
   strict      : true,
 

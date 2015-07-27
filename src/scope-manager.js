@@ -55,17 +55,22 @@ var scopeManager = function(state, predefined, exported, declared) {
     });
   }
 
-  function _addUsage(labelName, token) {
-    if (token) {
-      token["(function)"] = _currentFunctBody;
-    }
+  function _setupUsages(labelName) {
     if (!_current["(usages)"][labelName]) {
       _current["(usages)"][labelName] = {
         "(modified)": [],
         "(reassigned)": [],
-        "(tokens)": token ? [token] : []
+        "(tokens)": []
       };
-    } else if (token) {
+    }
+  }
+
+  function _addUsage(labelName, token) {
+
+    _setupUsages(labelName);
+
+    if (token) {
+      token["(function)"] = _currentFunctBody;
       _current["(usages)"][labelName]["(tokens)"].push(token);
     }
   }
@@ -771,6 +776,8 @@ var scopeManager = function(state, predefined, exported, declared) {
       },
 
       modify: function(labelName, token) {
+
+        _setupUsages(labelName);
 
         _current["(usages)"][labelName]["(modified)"].push(token);
       },

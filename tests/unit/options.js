@@ -6,7 +6,7 @@
 
 "use strict";
 
-var JSHINT = require('../../src/jshint.js').JSHINT;
+var JSHINT = require("../..").JSHINT;
 var fs = require('fs');
 var TestRun = require('../helpers/testhelper').setup.testRun;
 var fixture = require('../helpers/fixture').fixture;
@@ -1607,16 +1607,21 @@ exports.strict = function (test) {
   run.addError(1, 'Unnecessary directive "use strict".')
     .test(code3, { strict: "implied" });
 
-  [ true, false, "global", "implied" ].forEach(function(val) {
+  [ true, false, "global", "func", "implied" ].forEach(function(val) {
     JSHINT("/*jshint strict: " + val + " */");
     test.strictEqual(JSHINT.data().options.strict, val);
   });
-  JSHINT("/*jshint strict: func */");
-  test.strictEqual(JSHINT.data().options.strict, true);
 
   TestRun(test)
     .addError(1, "Bad option value.")
     .test("/*jshint strict: foo */");
+
+  TestRun(test, "environments have precedence over 'strict: true'")
+    .test(code3, { strict: true, node: true });
+
+  TestRun(test, "environments don't have precedence over 'strict: func'")
+    .addError(1, 'Use the function form of "use strict".')
+    .test(code3, { strict: "func", node: true });
 
   test.done();
 };
@@ -2071,17 +2076,37 @@ exports.maxparams = function (test) {
 
   TestRun(test)
     .addError(4, "This function has too many parameters. (3)")
-    .test(src, { es3: true, maxparams: 2 });
+    .addError(10, "This function has too many parameters. (3)")
+    .addError(16, "This function has too many parameters. (3)")
+    .test(src, { esnext: true, maxparams: 2 });
 
   TestRun(test)
-    .test(src, { es3: true, maxparams: 3 });
+    .test(src, { esnext: true, maxparams: 3 });
 
   TestRun(test)
     .addError(4, "This function has too many parameters. (3)")
-    .test(src, {es3: true, maxparams: 0 });
+    .addError(8, "This function has too many parameters. (1)")
+    .addError(9, "This function has too many parameters. (1)")
+    .addError(10, "This function has too many parameters. (3)")
+    .addError(11, "This function has too many parameters. (1)")
+    .addError(13, "This function has too many parameters. (2)")
+    .addError(16, "This function has too many parameters. (3)")
+    .test(src, {esnext: true, maxparams: 0 });
 
   TestRun(test)
-    .test(src, { es3: true });
+    .test(src, { esnext: true });
+
+  var functions = JSHINT.data().functions;
+  test.equal(functions.length, 9);
+  test.equal(functions[0].metrics.parameters, 0);
+  test.equal(functions[1].metrics.parameters, 3);
+  test.equal(functions[2].metrics.parameters, 0);
+  test.equal(functions[3].metrics.parameters, 1);
+  test.equal(functions[4].metrics.parameters, 1);
+  test.equal(functions[5].metrics.parameters, 3);
+  test.equal(functions[6].metrics.parameters, 1);
+  test.equal(functions[7].metrics.parameters, 2);
+  test.equal(functions[8].metrics.parameters, 3);
 
   test.done();
 };
