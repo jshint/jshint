@@ -24,7 +24,7 @@ var scopeManager = function(state, predefined, exported, declared) {
       "(breakLabels)": Object.create(null),
       "(parent)": _current,
       "(type)": type,
-      "(params)": null
+      "(params)": (type === "functionparams" || type === "catchparams") ? [] : null
     };
     _scopeStack.push(_current);
   }
@@ -254,7 +254,9 @@ var scopeManager = function(state, predefined, exported, declared) {
 
     /**
      * Tell the manager we are entering a new block of code
-     * @param {string} [type] - the type of the block. Valid values are "functionparams", "functionouter"
+     * @param {string} [type] - The type of the block. Valid values are
+     *                          "functionparams", "catchparams" and
+     *                          "functionouter"
      */
     stack: function(type) {
       var previousScope = _current;
@@ -465,9 +467,6 @@ var scopeManager = function(state, predefined, exported, declared) {
           "(token)": token,
           "(unused)": true };
 
-        if (!_current["(params)"]) {
-          _current["(params)"] = [];
-        }
         _current["(params)"].push(labelName);
       }
 

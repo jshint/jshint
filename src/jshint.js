@@ -3872,7 +3872,7 @@ var JSHINT = (function() {
       advance("catch");
       advance("(");
 
-      state.funct["(scope)"].stack();
+      state.funct["(scope)"].stack("catchparams");
 
       if (checkPunctuators(state.tokens.next, ["[", "{"])) {
         var tokens = destructuringPattern();
