@@ -88,27 +88,72 @@ exports.division = function (test) {
   test.done();
 };
 
-exports.plusplus = function (test) {
+exports.plusplusparse = function (test) {
   var run;
-  var code = [
+  var invalidcode = [
     "var a = ++[2];",
     "var b = --(2);",
+    "var c = [2]++;",
+    "var f = ++a[0]++;",
+    "var k = ++(c)++;"
+  ];
+
+  var validcode = [
+    "var d = a[0]++;",
+    "var e = ++a[0];",
+    "var g = [0][0]++;",
+    "var h = ++[0][0];",
+    "var g = a.b++;",
+    "var h = ++a.b;",
+    "var i = (a)++;",
+    "var j = ++(b);"
   ];
 
   run = TestRun(test)
     .addError(1, "Unexpected use of '++'.")
-    .addError(2, "Unexpected use of '--'.");
-  run.test(code, { plusplus: true, es3: true });
-  run.test(code, { plusplus: true }); // es5
-  run.test(code, { plusplus: true, esnext: true });
-  run.test(code, { plusplus: true, moz: true });
+    .addError(2, "Unexpected use of '++'.")
+    .addError(3, "Unexpected use of '++'.")
+    .addError(4, "Unexpected use of '++'.")
+    .addError(5, "Unexpected use of '++'.")
+    .addError(6, "Unexpected use of '++'.")
+    .addError(7, "Unexpected use of '++'.")
+    .addError(8, "Unexpected use of '++'.")
+  run.test(validcode, { plusplus: true, es3: true });
+  run.test(validcode, { plusplus: true }); // es5
+  run.test(validcode, { plusplus: true, esnext: true });
+  run.test(validcode, { plusplus: true, moz: true });
+
+  run = TestRun(test);
+  run.test(validcode, { plusplus: false, es3: true });
+  run.test(validcode, { plusplus: false }); // es5
+  run.test(validcode, { plusplus: false, esnext: true });
+  run.test(validcode, { plusplus: false, moz: true });
 
   run = TestRun(test)
-    .addError(2, "Bad operand.");
-  run.test(code, { plusplus: false, es3: true });
-  run.test(code, { plusplus: false }); // es5
-  run.test(code, { plusplus: false, esnext: true });
-  run.test(code, { plusplus: false, moz: true });
+    .addError(1, "Bad assignment.")
+    .addError(2, "Bad operand.")
+    .addError(3, "Bad assignment.")
+    .addError(4, "Bad assignment.")
+    .addError(5, "Bad assignment.");
+  run.test(invalidcode, { plusplus: false, es3: true });
+  run.test(invalidcode, { plusplus: false }); // es5
+  run.test(invalidcode, { plusplus: false, esnext: true });
+  run.test(invalidcode, { plusplus: false, moz: true });
+
+  run = TestRun(test)
+    .addError(1, "Bad assignment.")
+    .addError(1, "Unexpected use of '++'.")
+    .addError(2, "Unexpected use of '--'.")
+    .addError(3, "Bad assignment.")
+    .addError(3, "Unexpected use of '++'.")
+    .addError(4, "Bad assignment.")
+    .addError(4, "Unexpected use of '++'.")
+    .addError(5, "Bad assignment.")
+    .addError(5, "Unexpected use of '++'.");
+  run.test(invalidcode, { plusplus: true, es3: true });
+  run.test(invalidcode, { plusplus: true }); // es5
+  run.test(invalidcode, { plusplus: true, esnext: true });
+  run.test(invalidcode, { plusplus: true, moz: true });
 
   test.done();
 };
