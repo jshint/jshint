@@ -1104,6 +1104,12 @@ var JSHINT = (function() {
     });
   }
 
+  function infixDefaultLed(left, token, precedence) {
+    token.left = left;
+    token.right = expression(precedence);
+    return token;
+  }
+
   function infix(s, f, p, w) {
     var x = symbol(s, p);
     reserveName(x);
@@ -1115,13 +1121,8 @@ var JSHINT = (function() {
       if ((s === "in" || s === "instanceof") && left.id === "!") {
         warning("W018", left, "!");
       }
-      if (typeof f === "function") {
-        return f(left, this);
-      } else {
-        this.left = left;
-        this.right = expression(p);
-        return this;
-      }
+      f = typeof f === "function" ? f : infixDefaultLed;
+      return f(left, this, p);
     };
     return x;
   }
@@ -2018,14 +2019,15 @@ var JSHINT = (function() {
     return that;
   }, 30);
 
-  var orPrecendence = 40;
-  infix("||", function(left, that) {
+  infix("||", function(left, that, precedence) {
     increaseComplexityCount();
-    that.left = left;
-    that.right = expression(orPrecendence);
-    return that;
-  }, orPrecendence);
-  infix("&&", "and", 50);
+    return infixDefaultLed(left, that, precedence);
+  }, 40);
+
+  infix("&&", function(left, that, precedence) {
+    increaseComplexityCount();
+    return infixDefaultLed(left, that, precedence);
+  }, 50);
   bitwise("|", "bitor", 70);
   bitwise("^", "bitxor", 80);
   bitwise("&", "bitand", 90);
@@ -2096,10 +2098,9 @@ var JSHINT = (function() {
   bitwise(">>>", "shiftrightunsigned", 120);
   infix("in", "in", 120);
   infix("instanceof", "instanceof", 120);
-  infix("+", function(left, that) {
-    var right;
-    that.left = left;
-    that.right = right = expression(130);
+  infix("+", function(left, that, precedence) {
+    that = infixDefaultLed(left, that, precedence);
+    var right = that.right;
 
     if (left && right && left.id === "(string)" && right.id === "(string)") {
       left.value += right.value;
@@ -2119,11 +2120,9 @@ var JSHINT = (function() {
     this.right = expression(150);
     return this;
   });
-  infix("+++", function(left) {
+  infix("+++", function(left, that, precedence) {
     warning("W007");
-    this.left = left;
-    this.right = expression(130);
-    return this;
+    return infixDefaultLed(left, that, precedence);
   }, 130);
   infix("-", "sub", 130);
   prefix("-", "neg");
@@ -2133,11 +2132,9 @@ var JSHINT = (function() {
     this.right = expression(150);
     return this;
   });
-  infix("---", function(left) {
+  infix("---", function(left, that, precedence) {
     warning("W006");
-    this.left = left;
-    this.right = expression(130);
-    return this;
+    return infixDefaultLed(left, that, precedence);
   }, 130);
   infix("*", "mult", 140);
   infix("/", "div", 140);
