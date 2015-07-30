@@ -6483,6 +6483,20 @@ exports.ignoreDirective["should apply to lines lexed during lookahead operations
   test.done();
 };
 
+// gh-2598 /* jshint ignore:start */ stopped working.
+exports.ignoreDirective["should allow a comment after the ignore"] = function (test) {
+  var code = [
+    "// jshint ignore:start",
+    "/* comment */ var foo = bar()",
+    "// jshint ignore:end",
+  ];
+
+  TestRun(test)
+    .test(code);
+
+  test.done();
+};
+
 exports["should be able to ignore a single line with a trailing comment: // jshint:ignore"] = function (test) {
   var code = fs.readFileSync(__dirname + "/fixtures/gh870.js", "utf8");
   TestRun(test).test(code, { unused: true });
