@@ -2168,6 +2168,42 @@ exports.fnmetrics = function (test) {
   test.done();
 };
 
+//switch statements with fall through cases should not increase complexity
+exports.switchcomplexity = function (test) {
+  JSHINT([
+    "function foo(a) { switch(a){ case '1': case '2': case '3': break;}  }",
+    "function bar(b) { switch(b){ case '1': case '2': break; case '3': break; }  }",
+    "function hasdefault(b) { switch(b){ case '1': case '2': break; case '3': default:break;}  }",
+    "function allbreaks(b) { switch(b){ case '1':break; case '2': break; case '3':break; default:break;}  }"
+  ]);
+
+  test.equal(JSHINT.data().functions.length, 4);
+
+  test.deepEqual(JSHINT.data().functions[0].metrics, {
+        complexity: 2,
+        parameters: 1,
+        statements: 1
+  });
+  test.deepEqual(JSHINT.data().functions[1].metrics, {
+        complexity: 3,
+        parameters: 1,
+        statements: 1
+  });
+  test.deepEqual(JSHINT.data().functions[2].metrics, {
+        complexity: 3,
+        parameters: 1,
+        statements: 1
+  });
+  test.deepEqual(JSHINT.data().functions[3].metrics, {
+        complexity: 4,
+        parameters: 1,
+        statements: 1
+  });
+
+  test.done();
+};
+
+
 /*
  * Tests ignored warnings.
  */

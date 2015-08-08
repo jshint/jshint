@@ -4002,9 +4002,11 @@ var JSHINT = (function() {
 
         advance("case");
         this.cases.push(expression(0));
-        increaseComplexityCount();
         g = true;
         advance(":");
+        //if next token is case then we are falling through decrease complexity
+        if (state.tokens.next.type !== "case")
+          increaseComplexityCount();
         state.funct["(verb)"] = "case";
         break;
       case "default":
