@@ -116,13 +116,17 @@ exports.plusplus = function (test) {
 exports.assignment = function (test) {
   var code = [
     "function test() {",
-    "arguments.length = 2;",
-    "arguments[0] = 3;",
+    "  arguments.length = 2;",
+    "  arguments[0] = 3;",
+    "  arguments.length &= 2;",
+    "  arguments[0] >>= 3;",
     "}",
     "function test2() {",
-    "\"use strict\";",
-    "arguments.length = 2;",
-    "arguments[0] = 3;",
+    "  \"use strict\";",
+    "  arguments.length = 2;",
+    "  arguments[0] = 3;",
+    "  arguments.length &= 2;",
+    "  arguments[0] >>= 3;",
     "}",
     "a() = 2;",
   ];
@@ -130,9 +134,11 @@ exports.assignment = function (test) {
   var run = TestRun(test)
     .addError(2, "Bad assignment.")
     .addError(3, "Bad assignment.")
-    .addError(10, "Bad assignment.")
-    .addError(10, "Expected an assignment or function call and instead saw an expression.")
-    .addError(10, "Missing semicolon.");
+    .addError(4, "Bad assignment.")
+    .addError(5, "Bad assignment.")
+    .addError(14, "Bad assignment.")
+    .addError(14, "Expected an assignment or function call and instead saw an expression.")
+    .addError(14, "Missing semicolon.");
 
   run.test(code, { plusplus: true, es3: true });
   run.test(code, { plusplus: true }); // es5
@@ -1003,6 +1009,42 @@ exports["gh-2587"] = function (test) {
   test.done();
 };
 
+exports.badAssignments = function (test) {
+  TestRun(test)
+    .addError(1, "Missing semicolon.")
+    .addError(1, "Bad assignment.")
+    .addError(1, "Expected an assignment or function call and instead saw an expression.")
+    .test([
+      "a() = 1;"
+    ], { });
+
+  TestRun(test)
+    .addError(1, "Missing semicolon.")
+    .addError(1, "Bad assignment.")
+    .addError(1, "Expected an assignment or function call and instead saw an expression.")
+    .test([
+      "a.a() = 1;"
+    ], { });
+
+  TestRun(test)
+    .addError(1, "Missing semicolon.")
+    .addError(1, "Bad assignment.")
+    .addError(1, "Expected an assignment or function call and instead saw an expression.")
+    .test([
+      "(function(){}) = 1;"
+    ], { });
+
+  TestRun(test)
+    .addError(1, "Missing semicolon.")
+    .addError(1, "Bad assignment.")
+    .addError(1, "Expected an assignment or function call and instead saw an expression.")
+    .test([
+      "a.a() &= 1;"
+    ], { });
+
+  test.done();
+};
+
 exports.withStatement = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/with.js", "utf8");
   var run;
@@ -1726,7 +1768,8 @@ exports["destructuring globals with syntax error"] = function (test) {
     "[ a ] = [ z ];",
     "[ 1 ] = [ a ];",
     "[ a, b; c ] = [ 1, 2, 3 ];",
-    "[ a, b, c ] = [ 1, 2; 3 ];"
+    "[ a, b, c ] = [ 1, 2; 3 ];",
+    "[ a ] += [ 1 ];",
   ];
 
   TestRun(test)
@@ -1738,6 +1781,7 @@ exports["destructuring globals with syntax error"] = function (test) {
     .addError(5, "Missing semicolon.")
     .addError(5, "Expected an identifier and instead saw ']'.")
     .addError(5, "Expected an assignment or function call and instead saw an expression.")
+    .addError(6, "Bad assignment.")
     .addError(2,  "'z' is not defined.")
     .test(code, {esnext: true, unused: true, undef: true});
 
@@ -5800,6 +5844,7 @@ exports.classExpression = function (test) {
     "  static method() { MyClass = null; }",
     "  get accessor() { MyClass = null; }",
     "  set accessor() { MyClass = null; }",
+    "  method2() { MyClass &= null; }",
     "};",
     "void MyClass;"
   ];
@@ -5810,7 +5855,8 @@ exports.classExpression = function (test) {
     .addError(4, "Reassignment of 'MyClass', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
     .addError(5, "Reassignment of 'MyClass', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
     .addError(6, "Reassignment of 'MyClass', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
-    .addError(8, "'MyClass' is not defined.")
+    .addError(7, "Reassignment of 'MyClass', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(9, "'MyClass' is not defined.")
     .test(code, { esnext: true, undef: true });
 
   test.done();
@@ -5820,18 +5866,24 @@ exports.functionReassignment = function (test) {
   var src = [
     "function f() {}",
     "f = null;",
+    "f ^= null;",
     "function g() {",
     "  g = null;",
+    "  g &= null;",
     "}",
     "(function h() {",
     "  h = null;",
+    "  h |= null;",
     "}());"
   ];
 
   TestRun(test)
     .addError(2, "Reassignment of 'f', which is is a function. Use 'var' or 'let' to declare bindings that may change.")
-    .addError(4, "Reassignment of 'g', which is is a function. Use 'var' or 'let' to declare bindings that may change.")
-    .addError(7, "Reassignment of 'h', which is is a function. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(3, "Reassignment of 'f', which is is a function. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(5, "Reassignment of 'g', which is is a function. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(6, "Reassignment of 'g', which is is a function. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(9, "Reassignment of 'h', which is is a function. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(10, "Reassignment of 'h', which is is a function. Use 'var' or 'let' to declare bindings that may change.")
     .test(src);
 
   test.done();
