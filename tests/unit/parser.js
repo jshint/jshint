@@ -926,36 +926,79 @@ exports.comma = function (test) {
 
 exports["gh-2587"] = function (test) {
 
-  var ops = ["==", "!="];
-  var options = [{}, {eqeqeq: true}, {eqnull: true}, {eqeqeq: true, eqnull: true}];
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw 'if'.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .addError(1, "Expected '===' and instead saw '=='.")
+    .test([
+    "true == if"
+  ], {eqeqeq: true, eqnull: true});
 
-  ops.forEach(function(op) {
-    options.forEach(function(option) {
-      var testRun = TestRun(test)
-        .addError(1, "Expected an identifier and instead saw 'if'.")
-        .addError(1, "Unrecoverable syntax error. (100% scanned).");
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw 'if'.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .addError(1, "Expected '!==' and instead saw '!='.")
+    .test([
+    "true != if"
+  ], {eqeqeq: true, eqnull: true});
 
-      if (option.eqeqeq) {
-        testRun.addError(1, "Expected '" + op + "=' and instead saw '" + op + "'.");
-      } else {
-        testRun.addError(1, "Use '" + op + "=' to compare with 'true'.");
-      }
-      testRun.test([
-          "true " + op + " if"
-        ], option);
-    });
-  });
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw 'if'.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .addError(1, "Use '===' to compare with 'true'.")
+    .test([
+    "true == if"
+  ], {});
 
-  var otherOps = ["===", "!==", ">", "<", ">=", "<="];
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw 'if'.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .addError(1, "Use '!==' to compare with 'true'.")
+    .test([
+    "true != if"
+  ], {});
 
-  otherOps.forEach(function(op) {
-    TestRun(test)
-      .addError(1, "Expected an identifier and instead saw 'if'.")
-      .addError(1, "Unrecoverable syntax error. (100% scanned).")
-      .test([
-        "true " + op + " if"
-      ], {});
-  });
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw 'if'.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .test([
+    "true === if"
+  ], {});
+
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw 'if'.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .test([
+    "true !== if"
+  ], {});
+
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw 'if'.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .test([
+    "true > if"
+  ], {});
+
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw 'if'.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .test([
+    "true < if"
+  ], {});
+
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw 'if'.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .test([
+    "true >= if"
+  ], {});
+
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw 'if'.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .test([
+    "true <= if"
+  ], {});
 
   test.done();
 };
