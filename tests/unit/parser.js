@@ -5399,25 +5399,29 @@ exports["spread & rest operator support"] = function (test) {
     // Spread Group
     "foo(...([]));",
 
-    // 6, 7, 8
+    // 6, 7, 8, 9
     // Spread Operator
     "let initial = [ 1, 2, 3, 4, 5 ];",
     "let extended = [ ...initial, 6, 7, 8, 9 ];",
     "let nest = [ ...[], 6, 7, 8, 9 ];",
+    "let multiple = [...[], ...[], 3, ...[]];",
 
-    // 9
+    // 10
     // Rest Operator
     "function foo(...args) {}",
 
-    // 10
+    // 11
     // Rest Operator (Fat Arrow Params)
     "let bar = (...args) => args;",
 
-    // 11
+    // 12
     "foo(...[].entries());",
 
-    // 12
-    "foo(...(new Map()).set('a', 1).values());"
+    // 13
+    "foo(...(new Map()).set('a', 1).values());",
+
+    // 14
+    "foo(...[], ...[], ...[]);"
   ];
 
   TestRun(test)
@@ -5433,9 +5437,11 @@ exports["spread & rest operator support"] = function (test) {
     .addError(8, "'spread/rest operator' is only available in ES6 (use esnext option).")
     .addError(9, "'spread/rest operator' is only available in ES6 (use esnext option).")
     .addError(10, "'spread/rest operator' is only available in ES6 (use esnext option).")
-    .addError(10, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(11, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
     .addError(11, "'spread/rest operator' is only available in ES6 (use esnext option).")
     .addError(12, "'spread/rest operator' is only available in ES6 (use esnext option).")
+    .addError(13, "'spread/rest operator' is only available in ES6 (use esnext option).")
+    .addError(14, "'spread/rest operator' is only available in ES6 (use esnext option).")
     .test(code, {moz: true});
 
   TestRun(test)
@@ -5450,12 +5456,47 @@ exports["spread & rest operator support"] = function (test) {
     .addError(7, "'spread/rest operator' is only available in ES6 (use esnext option).")
     .addError(8, "'let' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(8, "'spread/rest operator' is only available in ES6 (use esnext option).")
+    .addError(9, "'let' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(9, "'spread/rest operator' is only available in ES6 (use esnext option).")
-    .addError(10, "'let' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
     .addError(10, "'spread/rest operator' is only available in ES6 (use esnext option).")
-    .addError(10, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(11, "'let' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(11, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
     .addError(11, "'spread/rest operator' is only available in ES6 (use esnext option).")
     .addError(12, "'spread/rest operator' is only available in ES6 (use esnext option).")
+    .addError(13, "'spread/rest operator' is only available in ES6 (use esnext option).")
+    .addError(14, "'spread/rest operator' is only available in ES6 (use esnext option).")
+    .test(code);
+
+  test.done();
+};
+
+exports["invalid spread & rest"] = function (test) {
+  var code = [
+    "var a = (...(b) => ());",
+    "var b = ...a;",
+    "[{a:...a}] = a;",
+    "var a = b((...a));"
+  ];
+
+  TestRun(test)
+    .addError(1, "Invalid location for spread/rest operator.")
+    .addError(2, "Invalid location for spread/rest operator.")
+    .addError(3, "Invalid location for spread/rest operator.")
+    .addError(4, "Invalid location for spread/rest operator.")
+    .test(code, {esnext: true});
+
+  TestRun(test)
+    .addError(1, "Invalid location for spread/rest operator.")
+    .addError(2, "Invalid location for spread/rest operator.")
+    .addError(3, "Invalid location for spread/rest operator.")
+    .addError(4, "Invalid location for spread/rest operator.")
+
+    .addError(1, "'spread/rest operator' is only available in ES6 (use esnext option).")
+    .addError(1, "'arrow function syntax (=>)' is only available in ES6 (use esnext option).")
+    .addError(2, "'spread/rest operator' is only available in ES6 (use esnext option).")
+    .addError(3, "'destructuring assignment' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).")
+    .addError(3, "'spread/rest operator' is only available in ES6 (use esnext option).")
+    .addError(4, "'spread/rest operator' is only available in ES6 (use esnext option).")
     .test(code);
 
   test.done();

@@ -73,7 +73,8 @@ var errors = {
   E055: "The '{a}' option cannot be set after any executable code.",
   E056: "'{a}' was used before it was declared, which is illegal for '{b}' variables.",
   E057: "Invalid meta property: '{a}.{b}'.",
-  E058: "Missing semicolon."
+  E058: "Missing semicolon.",
+  E059: "Invalid location for spread/rest operator."
 };
 
 var warnings = {
