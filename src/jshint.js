@@ -2527,7 +2527,7 @@ var JSHINT = (function() {
           // Used to delineate an integer number literal from a dereferencing
           // punctuator (otherwise interpreted as a decimal point)
           (ret.type === "(number)" &&
-            checkPunctuators(pn, ".") && /^\d+$/.test(ret.value));
+            checkPunctuator(pn, ".") && /^\d+$/.test(ret.value));
       }
     }
 
