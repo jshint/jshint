@@ -60,6 +60,7 @@ var state = {
     this.forinifcheckneeded = false;
     this.nameStack = new NameStack();
     this.inClassBody = false;
+    this.nextCommentOptions = []; // comment option tokens appearing before token.next
   }
 };
 

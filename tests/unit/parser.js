@@ -261,6 +261,11 @@ exports.emptyDirectives = function (test) {
     .test('/* exported */');
 
   TestRun(test)
+    .addError(2, "Bad option value.")
+    .test(['var x = 1;',
+    '/* exported */']); // option in last position and not in first position
+
+  TestRun(test)
     .test('/* exported foo, bar, baz, */');
 
   test.done();

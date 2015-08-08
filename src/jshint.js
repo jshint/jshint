@@ -186,7 +186,7 @@ var JSHINT = (function() {
     }
   }
 
-  function assume() {
+  function assume(token) {
     processenforceall();
 
     if (!state.option.es3) {
@@ -205,7 +205,7 @@ var JSHINT = (function() {
        * TODO: Extend this restriction to *all* ES6-specific options.
        */
       if (!state.inESNext()) {
-        warning("W134", state.tokens.next, "module", 6);
+        warning("W134", token, "module", 6);
       }
     }
 
@@ -406,8 +406,35 @@ var JSHINT = (function() {
     return i;
   }
 
-  function doOption() {
-    var nt = state.tokens.next;
+  function doLexOption(nt) {
+    if (nt.type === "jshint" || nt.type === "jslint") {
+      var body = nt.body.split(",").map(function(s) { return s.trim(); });
+      body.forEach(function(g) {
+        g = g.split(":");
+        var key = (g[0] || "").trim();
+        var val = (g[1] || "").trim();
+
+        if (key === "maxlen") {
+          if (val !== "false") {
+            val = +val;
+
+            if (typeof val !== "number" || !isFinite(val) || val <= 0 || Math.floor(val) !== val) {
+              error("E032", nt, g[1].trim());
+              return;
+            }
+
+            state.option[key] = val;
+          } else {
+            state.option[key] = false;
+          }
+
+          return;
+        }
+      });
+    }
+  }
+
+  function doOption(nt) {
     var body = nt.body.split(",").map(function(s) { return s.trim(); });
 
     var predef = {};
@@ -484,7 +511,6 @@ var JSHINT = (function() {
       "maxdepth",
       "maxcomplexity",
       "maxerr",
-      "maxlen",
       "indent"
     ];
 
@@ -494,7 +520,7 @@ var JSHINT = (function() {
         var key = (g[0] || "").trim();
         var val = (g[1] || "").trim();
 
-        if (!checkOption(key, nt)) {
+        if (key === "maxlen" || !checkOption(key, nt)) {
           return;
         }
 
@@ -518,7 +544,7 @@ var JSHINT = (function() {
 
         if (key === "es5") {
           if (val === "true" && state.option.es5) {
-            warning("I003");
+            warning("I003", nt);
           }
         }
 
@@ -526,7 +552,7 @@ var JSHINT = (function() {
           // `validthis` is valid only within a function scope.
 
           if (state.funct["(global)"])
-            return void error("E009");
+            return void error("E009", nt);
 
           if (val !== "true" && val !== "false")
             return void error("E002", nt);
@@ -640,7 +666,7 @@ var JSHINT = (function() {
            * TODO: Extend this restriction to *all* "environmental" options.
            */
           if (!hasParsedCode(state.funct)) {
-            error("E055", state.tokens.next, "module");
+            error("E055", nt, "module");
           }
         }
 
@@ -673,7 +699,7 @@ var JSHINT = (function() {
         error("E002", nt);
       });
 
-      assume();
+      assume(nt);
     }
   }
 
@@ -711,9 +737,28 @@ var JSHINT = (function() {
     return t;
   }
 
-  // Produce the next token. It looks for programming errors.
+  /**
+   * Processing any comment options that are waiting to be processed
+   * (that appeared between tokens.curr and tokens.next)
+   */
+  function processCommentOptions() {
+    if (state.nextCommentOptions.length) {
+      _.each(state.nextCommentOptions, function(commentOptionToken) {
+        doOption(commentOptionToken);
+      });
+      state.nextCommentOptions.length = 0;
+    }
+  }
 
+  /**
+   * Produce the next token. It looks for programming errors.
+   * @param {string=} id - The optional id of the next token, advance will error
+   *                       if this doesn't match
+   * @param {token=} t - The token to use the details for if id doesn't match
+   */
   function advance(id, t) {
+
+    processCommentOptions();
 
     switch (state.tokens.curr.id) {
     case "(number)":
@@ -755,6 +800,7 @@ var JSHINT = (function() {
       }
 
       if (state.tokens.next.id === "(end)" || state.tokens.next.id === "(error)") {
+        processCommentOptions();
         return;
       }
 
@@ -763,7 +809,8 @@ var JSHINT = (function() {
       }
 
       if (state.tokens.next.isSpecial) {
-        doOption();
+        doLexOption(state.tokens.next);
+        state.nextCommentOptions.push(state.tokens.next);
       } else {
         if (state.tokens.next.id !== "(endline)") {
           break;
@@ -5199,7 +5246,7 @@ var JSHINT = (function() {
       }
     }
 
-    assume();
+    assume(state.tokens.next);
 
     // combine the passed globals after we've assumed all our options
     combine(predefined, g || {});
@@ -5209,6 +5256,8 @@ var JSHINT = (function() {
 
     try {
       advance();
+      // the first token is not real, so process any comments in advance of it
+      processCommentOptions();
       switch (state.tokens.next.id) {
       case "{":
       case "[":
