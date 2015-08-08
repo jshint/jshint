@@ -93,18 +93,23 @@ exports.plusplus = function (test) {
   var code = [
     "var a = ++[2];",
     "var b = --(2);",
+    "var c = [2]++;",
+    "var d = (2)--;",
   ];
 
   run = TestRun(test)
     .addError(1, "Unexpected use of '++'.")
-    .addError(2, "Unexpected use of '--'.");
+    .addError(2, "Unexpected use of '--'.")
+    .addError(3, "Unexpected use of '++'.")
+    .addError(4, "Unexpected use of '--'.");
   run.test(code, { plusplus: true, es3: true });
   run.test(code, { plusplus: true }); // es5
   run.test(code, { plusplus: true, esnext: true });
   run.test(code, { plusplus: true, moz: true });
 
   run = TestRun(test)
-    .addError(2, "Bad operand.");
+    .addError(2, "Bad operand.")
+    .addError(4, "Bad operand.");
   run.test(code, { plusplus: false, es3: true });
   run.test(code, { plusplus: false }); // es5
   run.test(code, { plusplus: false, esnext: true });
@@ -920,6 +925,17 @@ exports.comma = function (test) {
   TestRun(test)
     .addError(1, "Extra comma. (it breaks older versions of IE)")
     .test("var f = [1,];", {es3: true});
+
+  TestRun(test)
+    .addError(3, "Unexpected 'break'.")
+    .addError(3, "Expected an assignment or function call and instead saw an expression.")
+    .addError(3, "Missing semicolon.")
+    .test([
+      "var a;",
+      "while(true) {",
+      "  a=1, break;",
+      "}"
+    ], { });
 
   test.done();
 };
@@ -3275,6 +3291,29 @@ exports["yield statement within try-catch"] = function (test) {
   ];
   TestRun(test)
     .test(code, {esnext: true, unused: true, undef: true, predef: ["print", "Iterator"]});
+
+  test.done();
+};
+
+exports["catch block no curlies"] = function (test) {
+  var code = [
+    "try {} catch(e) e.toString();"
+  ];
+  TestRun(test)
+    .addError(1, "Expected '{' and instead saw 'e'.")
+    .test(code, {});
+
+  test.done();
+};
+
+exports["strict violation - use of arguments"] = function (test) {
+  var code = [
+    "'use strict';",
+    "arguments[0]();"
+  ];
+  TestRun(test)
+    .addError(2, "Strict violation.")
+    .test(code, { strict: "global"});
 
   test.done();
 };
@@ -6827,6 +6866,27 @@ exports.testStrictDirectiveASI = function (test) {
   TestRun(test, 8)
     .addError(1, "Missing \"use strict\" statement.")
     .test("(function() { var x; \"use strict\"; return x; }());", { strict: true, expr: true });
+
+  TestRun(test, 9)
+    .addError(1, "Missing \"use strict\" statement.")
+    .test("(() => 1)();", { strict: true, esnext: true });
+
+  TestRun(test, 10)
+    .test("(() => { \"use strict\"; })();", { strict: true, esnext: true });
+
+  TestRun(test, 11)
+    .test("(() => {})();", { strict: true, esnext: true });
+
+  TestRun(test, 12)
+    .addError(1, "Missing \"use strict\" statement.")
+    .test("(() => { return 1; })();", { strict: true, esnext: true });
+
+  TestRun(test, 13)
+    .addError(1, "Use the function form of \"use strict\".")
+    .test([
+      "'use strict';",
+      "(() => { return 1; })();"],
+    { strict: true, esnext: true });
 
   test.done();
 };

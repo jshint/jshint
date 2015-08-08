@@ -133,11 +133,9 @@ var scopeManager = function(state, predefined, exported, declared) {
     }
     var curentLabels = _current["(labels)"];
     for (var labelName in curentLabels) {
-      if (curentLabels[labelName]) {
-        if (curentLabels[labelName]["(type)"] !== "exception" &&
-          curentLabels[labelName]["(unused)"]) {
-          _warnUnused(labelName, curentLabels[labelName]["(token)"], "var");
-        }
+      if (curentLabels[labelName]["(type)"] !== "exception" &&
+        curentLabels[labelName]["(unused)"]) {
+        _warnUnused(labelName, curentLabels[labelName]["(token)"], "var");
       }
     }
   }
@@ -282,6 +280,7 @@ var scopeManager = function(state, predefined, exported, declared) {
       var currentLabels = _current["(labels)"];
       var usedLabelNameList = Object.keys(currentUsages);
 
+      /* istanbul ignore if */
       if (currentUsages.__proto__ && usedLabelNameList.indexOf("__proto__") === -1) {
         usedLabelNameList.push("__proto__");
       }
@@ -296,12 +295,10 @@ var scopeManager = function(state, predefined, exported, declared) {
 
           if (usedLabel["(useOutsideOfScope)"] && !state.option.funcscope) {
             var usedTokens = usage["(tokens)"];
-            if (usedTokens) {
-              for (j = 0; j < usedTokens.length; j++) {
-                // Keep the consistency of https://github.com/jshint/jshint/issues/2409
-                if (usedLabel["(function)"] === usedTokens[j]["(function)"]) {
-                  error("W038", usedTokens[j], usedLabelName);
-                }
+            for (j = 0; j < usedTokens.length; j++) {
+              // Keep the consistency of https://github.com/jshint/jshint/issues/2409
+              if (usedLabel["(function)"] === usedTokens[j]["(function)"]) {
+                error("W038", usedTokens[j], usedLabelName);
               }
             }
           }
@@ -365,23 +362,21 @@ var scopeManager = function(state, predefined, exported, declared) {
           else {
             // label usage is not predefined and we have not found a declaration
             // so report as undeclared
-            if (usage["(tokens)"]) {
-              for (j = 0; j < usage["(tokens)"].length; j++) {
-                var undefinedToken = usage["(tokens)"][j];
-                // if its not a forgiven undefined (e.g. typof x)
-                if (!undefinedToken.forgiveUndef) {
-                  // if undef is on and undef was on when the token was defined
-                  if (state.option.undef && !undefinedToken.ignoreUndef) {
-                    warning("W117", undefinedToken, usedLabelName);
-                  }
-                  if (impliedGlobals[usedLabelName]) {
-                    impliedGlobals[usedLabelName].line.push(undefinedToken.line);
-                  } else {
-                    impliedGlobals[usedLabelName] = {
-                      name: usedLabelName,
-                      line: [undefinedToken.line]
-                    };
-                  }
+            for (j = 0; j < usage["(tokens)"].length; j++) {
+              var undefinedToken = usage["(tokens)"][j];
+              // if its not a forgiven undefined (e.g. typof x)
+              if (!undefinedToken.forgiveUndef) {
+                // if undef is on and undef was on when the token was defined
+                if (state.option.undef && !undefinedToken.ignoreUndef) {
+                  warning("W117", undefinedToken, usedLabelName);
+                }
+                if (impliedGlobals[usedLabelName]) {
+                  impliedGlobals[usedLabelName].line.push(undefinedToken.line);
+                } else {
+                  impliedGlobals[usedLabelName] = {
+                    name: usedLabelName,
+                    line: [undefinedToken.line]
+                  };
                 }
               }
             }
@@ -483,11 +478,6 @@ var scopeManager = function(state, predefined, exported, declared) {
     },
 
     validateParams: function() {
-      // This method only concerns errors for function parameters
-      if (_currentFunctBody["(type)"] === "global") {
-        return;
-      }
-
       var isStrict = state.isStrict();
       var currentFunctParamScope = _currentFunctBody["(parent)"];
 
@@ -515,6 +505,7 @@ var scopeManager = function(state, predefined, exported, declared) {
       // If `__proto__` is used as a global variable name, its entry in the
       // lookup table may not be enumerated by `Object.keys` (depending on the
       // environment).
+      /* istanbul ignore if */
       if (usedPredefinedAndGlobals.__proto__ === marker &&
         list.indexOf("__proto__") === -1) {
         list.push("__proto__");
@@ -540,6 +531,7 @@ var scopeManager = function(state, predefined, exported, declared) {
           return value.name === "__proto__";
         });
 
+        /* istanbul ignore if */
         if (!hasProto) {
           values.push(impliedGlobals.__proto__);
         }

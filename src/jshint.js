@@ -129,31 +129,8 @@ var JSHINT = (function() {
   }
 
   function isReserved(token) {
-    if (!token.reserved) {
-      return false;
-    }
-    var meta = token.meta;
-
-    if (meta && meta.isFutureReservedWord && state.inES5()) {
-      // ES3 FutureReservedWord in an ES5 environment.
-      if (!meta.es5) {
-        return false;
-      }
-
-      // Some ES5 FutureReservedWord identifiers are active only
-      // within a strict mode environment.
-      if (meta.strictOnly) {
-        if (!state.option.strict && !state.isStrict()) {
-          return false;
-        }
-      }
-
-      if (token.isProperty) {
-        return false;
-      }
-    }
-
-    return true;
+    // the lexer handles having different identifiers in different environments
+    return token.reserved;
   }
 
   function supplant(str, data) {
@@ -414,7 +391,7 @@ var JSHINT = (function() {
     if (nt.type === "globals") {
       body.forEach(function(g, idx) {
         g = g.split(":");
-        var key = (g[0] || "").trim();
+        var key = g[0].trim();
         var val = (g[1] || "").trim();
 
         if (key === "-" || !key.length) {
@@ -491,7 +468,7 @@ var JSHINT = (function() {
     if (nt.type === "jshint" || nt.type === "jslint") {
       body.forEach(function(g) {
         g = g.split(":");
-        var key = (g[0] || "").trim();
+        var key = g[0].trim();
         var val = (g[1] || "").trim();
 
         if (!checkOption(key, nt)) {
@@ -911,15 +888,13 @@ var JSHINT = (function() {
   }
 
   function nobreaknonadjacent(left, right) {
-    left = left || state.tokens.curr;
-    right = right || state.tokens.next;
     if (!state.option.laxbreak && left.line !== startLine(right)) {
       warning("W014", right, right.value);
     }
   }
 
   function nolinebreak(t) {
-    t = t || state.tokens.curr;
+    t = t;
     if (t.line !== startLine(state.tokens.next)) {
       warning("E022", t, t.value);
     }
@@ -1288,9 +1263,7 @@ var JSHINT = (function() {
         }
 
         if (left.id === ".") {
-          if (!left.left) {
-            warning("E031", that);
-          } else if (left.left.value === "arguments" && !state.isStrict()) {
+          if (!left.left || left.left.value === "arguments" && !state.isStrict()) {
             warning("E031", that);
           }
 
@@ -1327,10 +1300,6 @@ var JSHINT = (function() {
           state.nameStack.set(left);
           that.right = expression(10);
           return that;
-        }
-
-        if (left === state.syntax["function"]) {
-          warning("W023", state.tokens.curr);
         }
       }
 
@@ -1375,9 +1344,7 @@ var JSHINT = (function() {
           expression(10);
           return that;
         }
-        if (left === state.syntax["function"]) {
-          warning("W023", state.tokens.curr);
-        }
+
         return that;
       }
       error("E031", that);
@@ -1740,9 +1707,7 @@ var JSHINT = (function() {
         if (isfunc) {
           m = {};
           for (d in state.directive) {
-            if (_.has(state.directive, d)) {
-              m[d] = state.directive[d];
-            }
+            m[d] = state.directive[d];
           }
           directives();
 
@@ -1776,22 +1741,14 @@ var JSHINT = (function() {
       if (isfunc) {
         state.funct["(scope)"].stack();
 
-        m = {};
         if (stmt && !isfatarrow && !state.inMoz()) {
           error("W118", state.tokens.curr, "function closure expressions");
         }
 
-        if (!stmt) {
-          for (d in state.directive) {
-            if (_.has(state.directive, d)) {
-              m[d] = state.directive[d];
-            }
-          }
-        }
         expression(10);
 
         if (state.option.strict && state.funct["(context)"]["(global)"]) {
-          if (!m["use strict"] && !state.isStrict()) {
+          if (!state.isStrict()) {
             warning("E007");
           }
         }
@@ -2115,32 +2072,8 @@ var JSHINT = (function() {
     return that;
   }, 130);
   prefix("+", "num");
-  prefix("+++", function() {
-    warning("W007");
-    this.arity = "unary";
-    this.right = expression(150);
-    return this;
-  });
-  infix("+++", function(left) {
-    warning("W007");
-    this.left = left;
-    this.right = expression(130);
-    return this;
-  }, 130);
   infix("-", "sub", 130);
   prefix("-", "neg");
-  prefix("---", function() {
-    warning("W006");
-    this.arity = "unary";
-    this.right = expression(150);
-    return this;
-  });
-  infix("---", function(left) {
-    warning("W006");
-    this.left = left;
-    this.right = expression(130);
-    return this;
-  }, 130);
   infix("*", "mult", 140);
   infix("/", "div", 140);
   infix("%", "mod", 140);

@@ -209,3 +209,398 @@ exports.phantom = function (test) {
 
   test.done();
 };
+
+exports.shelljs = function (test) {
+  var src = fs.readFileSync(__dirname + '/fixtures/shelljs.js', 'utf8');
+
+  TestRun(test, 1)
+    .addError(1, "'target' is not defined.")
+    .addError(3, "'echo' is not defined.")
+    .addError(4, "'exit' is not defined.")
+    .addError(5, "'cd' is not defined.")
+    .addError(6, "'pwd' is not defined.")
+    .addError(7, "'ls' is not defined.")
+    .addError(8, "'find' is not defined.")
+    .addError(9, "'cp' is not defined.")
+    .addError(10, "'rm' is not defined.")
+    .addError(11, "'mv' is not defined.")
+    .addError(12, "'mkdir' is not defined.")
+    .addError(13, "'test' is not defined.")
+    .addError(14, "'cat' is not defined.")
+    .addError(15, "'sed' is not defined.")
+    .addError(16, "'grep' is not defined.")
+    .addError(17, "'which' is not defined.")
+    .addError(18, "'dirs' is not defined.")
+    .addError(19, "'pushd' is not defined.")
+    .addError(20, "'popd' is not defined.")
+    .addError(21, "'env' is not defined.")
+    .addError(22, "'exec' is not defined.")
+    .addError(23, "'chmod' is not defined.")
+    .addError(24, "'config' is not defined.")
+    .addError(25, "'error' is not defined.")
+    .addError(26, "'tempdir' is not defined.")
+    .addError(29, "'require' is not defined.")
+    .addError(30, "'module' is not defined.")
+    .addError(31, "'process' is not defined.")
+    .test(src, { undef: true });
+
+  TestRun(test, 2)
+    .test(src, { undef: true, shelljs: true });
+
+  test.done();
+};
+
+/*
+ * Tests the `browser` option
+ */
+exports.browser = function (test) {
+  var src = fs.readFileSync(__dirname + '/fixtures/browser.js', 'utf8');
+
+  TestRun(test)
+    .addError(2, "'atob' is not defined.")
+    .addError(3, "'btoa' is not defined.")
+    .addError(6, "'DOMParser' is not defined.")
+    .addError(10, "'XMLSerializer' is not defined.")
+    .addError(14, "'NodeFilter' is not defined.")
+    .addError(15, "'Node' is not defined.")
+    .addError(18, "'MutationObserver' is not defined.")
+    .addError(21, "'SVGElement' is not defined.")
+    .addError(24, "'Comment' is not defined.")
+    .addError(25, "'DocumentFragment' is not defined.")
+    .addError(26, "'Range' is not defined.")
+    .addError(27, "'Text' is not defined.")
+    .addError(31, "'document' is not defined.")
+    .addError(32, "'fetch' is not defined.")
+    .addError(35, "'URL' is not defined.")
+    .test(src, {es3: true, undef: true });
+
+  TestRun(test).test(src, {es3: true, browser: true, undef: true });
+
+  test.done();
+};
+
+exports.couch = function (test) {
+
+  var globals = [
+    "require",
+    "respond",
+    "getRow",
+    "emit",
+    "send",
+    "start",
+    "sum",
+    "log",
+    "exports",
+    "module",
+    "provides"
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { couch: true });
+
+  test.done();
+};
+
+exports.qunit = function (test) {
+
+  var globals = [
+    "asyncTest",
+    "deepEqual",
+    "equal",
+    "expect",
+    "module",
+    "notDeepEqual",
+    "notEqual",
+    "notPropEqual",
+    "notStrictEqual",
+    "ok",
+    "propEqual",
+    "QUnit",
+    "raises",
+    "start",
+    "stop",
+    "strictEqual",
+    "test",
+    "throws"
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { qunit: true });
+
+  test.done();
+};
+
+exports.rhino = function (test) {
+
+  var globals = [
+    "defineClass",
+    "deserialize",
+    "gc",
+    "help",
+    "importClass",
+    "importPackage",
+    "java",
+    "load",
+    "loadClass",
+    "Packages",
+    "print",
+    "quit",
+    "readFile",
+    "readUrl",
+    "runCommand",
+    "seal",
+    "serialize",
+    "spawn",
+    "sync",
+    "toint32",
+    "version"
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { rhino: true });
+
+  test.done();
+};
+
+exports.prototypejs = function (test) {
+
+  var globals = [
+    "$",
+    "$$",
+    "$A",
+    "$F",
+    "$H",
+    "$R",
+    "$break",
+    "$continue",
+    "$w",
+    "Abstract",
+    "Ajax",
+    "Class",
+    "Enumerable",
+    "Element",
+    "Event",
+    "Field",
+    "Form",
+    "Hash",
+    "Insertion",
+    "ObjectRange",
+    "PeriodicalExecuter",
+    "Position",
+    "Prototype",
+    "Selector",
+    "Template",
+    "Toggle",
+    "Try",
+    "Autocompleter",
+    "Builder",
+    "Control",
+    "Draggable",
+    "Draggables",
+    "Droppables",
+    "Effect",
+    "Sortable",
+    "SortableObserver",
+    "Sound",
+    "Scriptaculous"
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { prototypejs: true });
+
+  test.done();
+};
+
+exports.dojo = function (test) {
+
+  var globals = [
+    "dojo",
+    "dijit",
+    "dojox",
+    "define",
+    "require"
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { dojo: true });
+
+  test.done();
+};
+
+exports.nonstandard = function (test) {
+
+  var globals = [
+    "escape",
+    "unescape"
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { nonstandard: true });
+
+  test.done();
+};
+
+exports.jasmine = function (test) {
+
+  var globals = [
+    "jasmine",
+    "describe",
+    "xdescribe",
+    "it",
+    "xit",
+    "beforeEach",
+    "afterEach",
+    "setFixtures",
+    "loadFixtures",
+    "spyOn",
+    "expect",
+    "runs",
+    "waitsFor",
+    "waits",
+    "beforeAll",
+    "afterAll",
+    "fail",
+    "fdescribe",
+    "fit"
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { jasmine: true });
+
+  test.done();
+};
+
+exports.mootools = function (test) {
+
+  var globals = [
+    "$",
+    "$$",
+    "Asset",
+    "Browser",
+    "Chain",
+    "Class",
+    "Color",
+    "Cookie",
+    "Core",
+    "Document",
+    "DomReady",
+    "DOMEvent",
+    "DOMReady",
+    "Drag",
+    "Element",
+    "Elements",
+    "Event",
+    "Events",
+    "Fx",
+    "Group",
+    "Hash",
+    "HtmlTable",
+    "IFrame",
+    "IframeShim",
+    "InputValidator",
+    "instanceOf",
+    "Keyboard",
+    "Locale",
+    "Mask",
+    "MooTools",
+    "Native",
+    "Options",
+    "OverText",
+    "Request",
+    "Scroller",
+    "Slick",
+    "Slider",
+    "Sortables",
+    "Spinner",
+    "Swiff",
+    "Tips",
+    "Type",
+    "typeOf",
+    "URI",
+    "Window"
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { mootools: true });
+
+  test.done();
+};
+
+exports.worker = function (test) {
+
+  var globals = [
+    "importScripts",
+    "postMessage",
+    "self",
+    "FileReaderSync"
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { worker: true });
+
+  test.done();
+};
+
+exports.wsh = function (test) {
+
+  var globals = [
+    "ActiveXObject",
+    "Enumerator",
+    "GetObject",
+    "ScriptEngine",
+    "ScriptEngineBuildVersion",
+    "ScriptEngineMajorVersion",
+    "ScriptEngineMinorVersion",
+    "VBArray",
+    "WSH",
+    "WScript",
+    "XDomainRequest"
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { wsh: true });
+
+  test.done();
+};
+
+exports.yui = function (test) {
+
+  var globals = [
+    "YUI",
+    "Y",
+    "YUI_config"
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { yui: true });
+
+  test.done();
+};
+
+exports.mocha = function (test) {
+
+  var globals = [
+    "mocha",
+    "describe",
+    "xdescribe",
+    "it",
+    "xit",
+    "context",
+    "xcontext",
+    "before",
+    "after",
+    "beforeEach",
+    "afterEach",
+    "suite",
+    "test",
+    "setup",
+    "teardown",
+    "suiteSetup",
+    "suiteTeardown"
+  ];
+
+  globalsImplied(test, globals);
+  globalsKnown(test, globals, { mocha: true });
+
+  test.done();
+};

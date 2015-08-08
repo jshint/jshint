@@ -100,7 +100,7 @@ var warnings = {
   W021: "Reassignment of '{a}', which is is a {b}. " +
     "Use 'var' or 'let' to declare bindings that may change.",
   W022: "Do not assign to the exception parameter.",
-  W023: "Expected an identifier in an assignment and instead saw a function invocation.",
+  W023: null,
   W024: "Expected an identifier and instead saw '{a}' (a reserved word).",
   W025: "Missing name in function declaration.",
   W026: "Inner functions should be listed at the top of the outer function.",
