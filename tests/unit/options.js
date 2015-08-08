@@ -2714,6 +2714,19 @@ singleGroups.numberLiterals = function (test) {
   test.done();
 };
 
+singleGroups.postfix = function (test) {
+  var code = [
+    "var x;",
+    "(x++).toString();",
+    "(x--).toString();"
+  ];
+
+  TestRun(test)
+    .test(code, { singleGroups: true });
+
+  test.done();
+};
+
 exports.elision = function (test) {
   var code = [
     "var a = [1,,2];",
