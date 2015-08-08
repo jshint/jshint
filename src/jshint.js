@@ -3390,25 +3390,33 @@ var JSHINT = (function() {
       return false;
     };
     var assignmentProperty = function() {
-      var id;
+      var singleNameBinding = null;
+      var usesRest;
+
       if (checkPunctuator(state.tokens.next, "[")) {
         advance("[");
         expression(10);
         advance("]");
         advance(":");
-        nextInnerDE();
       } else if (state.tokens.next.id === "(string)" ||
                  state.tokens.next.id === "(number)") {
         advance();
         advance(":");
-        nextInnerDE();
       } else {
-        id = identifier();
+        singleNameBinding = identifier();
         if (checkPunctuator(state.tokens.next, ":")) {
+          singleNameBinding = null;
           advance(":");
-          nextInnerDE();
         } else {
-          identifiers.push({ id: id, token: state.tokens.curr });
+          identifiers.push({ id: singleNameBinding, token: state.tokens.curr });
+        }
+      }
+
+      if (singleNameBinding === null) {
+        usesRest = nextInnerDE();
+
+        if (usesRest) {
+          error("E059", state.tokens.curr);
         }
       }
     };
