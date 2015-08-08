@@ -15,3 +15,7 @@ a = 23;
 /*
    http://jshint.com/docs/
  */
+/*jshint ignore:start*/
+// third-party code
+// this very very very very very very very very very very very very very long comment line will produce warning "Line is too long." unless W101 is explicitly disabled
+/*jshint ignore:end*/

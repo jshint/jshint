@@ -24,11 +24,17 @@
   },
 
   "scripts": {
+    "browser-test-server": "node tests/helpers/browser/server",
     "build": "node bin/build",
     "coverage": "istanbul -- cover ./node_modules/.bin/nodeunit tests/unit",
     "data": "node scripts/generate-identifier-data",
     "pretest": "jshint src && jscs src",
-    "test": "nodeunit tests tests/regression tests/unit"
+    "test-browser": "node tests/browser",
+    "test-cli": "nodeunit tests/cli.js",
+    "test-node": "npm run test-unit && npm run test-cli && npm run test-regression",
+    "test-regression": "nodeunit tests/regression",
+    "test-unit": "nodeunit tests/unit",
+    "test": "npm run test-node && npm run test-browser"
   },
 
   "main": "./src/jshint.js",
@@ -52,6 +58,8 @@
     "jshint":        "2.6.x",
     "mock-stdin":    "0.3.x",
     "nodeunit":      "0.9.x",
+    "phantom":       "~0.7.2",
+    "phantomjs":     "1.9.13",
     "regenerate":    "1.2.x",
     "sinon":         "1.12.x",
     "unicode-6.3.0": "0.1.x"
