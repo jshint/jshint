@@ -25,6 +25,16 @@ following command from within your repo directory:
 After that, you will be able to run the edge version of JSHint using
 `bin/jshint` or build the release bundles using `bin/build`.
 
+## Issue Priority
+
+When verifying bug reports and feature requests, the JSHint team will assign
+one of the following labels to document the report's severity:
+
+- *P1:* Something is throwing exceptions; broken JSHint backward compatibility.
+- *P2:* Something is not being parsed correctly.
+- *P3:* Features that the core team will work on once P2s and P1s are done.
+- *P4:* Patches welcome; The request is good, but low priority.
+
 ## Coding Style
 
 This section describes our coding style guide. You might not agree with it and
@@ -107,10 +117,7 @@ that's fine but if you're going to send us patches treat this guide as a law.
       report.addWarning("W001");
     ```
 
-Commit Message Guidelines
--------------------------
-
-### Overview
+## Commit Message Guidelines
 
 Commit messages are written in a simple format which clearly describes the purpose of a change.
 
@@ -181,12 +188,3 @@ Fixes #1000009
 Closes #888888
 Closes #77777
 ```
-
-## License
-
-Most files are published using [the standard MIT Expat
-license](https://www.gnu.org/licenses/license-list.html#Expat). One file,
-however, is provided under a slightly modified version of that license. The
-so-called [JSON license](https://www.gnu.org/licenses/license-list.html#JSON)
-is a non-free license, and unfortunately, we can't change it due to historical
-reasons. This license is included as an in-line within the file it concerns.
