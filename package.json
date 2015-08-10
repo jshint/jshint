@@ -29,6 +29,7 @@
     "coverage": "istanbul -- cover ./node_modules/.bin/nodeunit tests/unit",
     "data": "node scripts/generate-identifier-data",
     "pretest": "jshint src && jscs src",
+    "changelog": "conventional-changelog -p jshint -i CHANGELOG.md -w",
     "github-release": "conventional-github-releaser -p jshint",
     "test-browser": "node tests/browser",
     "test-cli": "nodeunit tests/cli.js",
@@ -53,6 +54,7 @@
 
   "devDependencies": {
     "browserify":                     "9.x",
+    "conventional-changelog":         "0.3.x",
     "conventional-github-releaser":   "0.3.x",
     "coveralls":                      "2.11.x",
     "istanbul":                       "0.3.x",
