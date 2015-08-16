@@ -300,7 +300,7 @@ exports.bool = {
      *                 // No warning when funcscope:true
      *     }
      */
-    funcscope   : true,    
+    funcscope   : true,
 
     /**
      * This option suppresses warnings about multi-line strings. Multi-line
