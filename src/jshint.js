@@ -4520,7 +4520,7 @@ var JSHINT = (function() {
       // ImportClause :: NamedImports
       advance("{");
       // Breaking change
-      // if (checkPunctuators(state.tokens.next, ["}"])) {
+      // if (checkPunctuator(state.tokens.next, "}")) {
       //   warning("W137", state.tokens.next, "import");
       // }
       for (;;) {
@@ -4616,11 +4616,11 @@ var JSHINT = (function() {
     if (state.tokens.next.value === "{") {
       // ExportDeclaration :: export ExportClause
       advance("{");
-      if (checkPunctuators(state.tokens.next, ["}"])) {
+      if (checkPunctuator(state.tokens.next, "}")) {
         warning("W137", state.tokens.next, "export");
       }
       var exportedTokens = [];
-      while (!checkPunctuators(state.tokens.next, ["}"])) {
+      while (!checkPunctuator(state.tokens.next, "}")) {
         if (!state.tokens.next.identifier) {
           error("E030", state.tokens.next, state.tokens.next.value);
         }
@@ -4636,7 +4636,7 @@ var JSHINT = (function() {
           advance();
         }
 
-        if (!checkPunctuators(state.tokens.next, ["}"])) {
+        if (!checkPunctuator(state.tokens.next, "}")) {
           advance(",");
         }
       }
