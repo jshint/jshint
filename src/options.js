@@ -160,12 +160,6 @@ exports.bool = {
     immed       : true,
 
     /**
-     * This option suppresses warnings about the `__iterator__` property. This
-     * property is not supported by all browsers so use it carefully.
-     */
-    iterator    : true,
-
-    /**
      * This option requires you to capitalize names of constructor functions.
      * Capitalizing functions that are intended to be used with `new` operator
      * is just a convention that helps programmers to visually distinguish
@@ -301,6 +295,12 @@ exports.bool = {
      * Insertion](http://inimino.org/~inimino/blog/javascript_semicolons).
      */
     asi         : true,
+
+    /**
+     * This option suppresses warnings about the `__iterator__` property. This
+     * property is not supported by all browsers so use it carefully.
+     */
+    iterator    : true,
 
     /**
      * This option suppresses warnings about multi-line strings. Multi-line
