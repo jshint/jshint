@@ -127,26 +127,6 @@ exports.bool = {
     forin       : true,
 
     /**
-     * This option suppresses warnings about declaring variables inside of
-     * control
-     * structures while accessing them later from the outside. Even though
-     * JavaScript has only two real scopes—global and function—such practice
-     * leads to confusion among people new to the language and hard-to-debug
-     * bugs. This is why, by default, JSHint warns about variables that are
-     * used outside of their intended scope.
-     *
-     *     function test() {
-     *       if (true) {
-     *         var x = 0;
-     *       }
-     *
-     *       x += 1; // Default: 'x' used out of scope.
-     *                 // No warning when funcscope:true
-     *     }
-     */
-    funcscope   : true,
-
-    /**
      * This option prohibits the use of immediate function invocations without
      * wrapping them in parentheses. Wrapping parentheses assists readers of
      * your code in understanding that the expression is the result of a
@@ -301,6 +281,26 @@ exports.bool = {
      * Insertion](http://inimino.org/~inimino/blog/javascript_semicolons).
      */
     asi         : true,
+    
+    /**
+     * This option suppresses warnings about declaring variables inside of
+     * control
+     * structures while accessing them later from the outside. Even though
+     * JavaScript has only two real scopes—global and function—such practice
+     * leads to confusion among people new to the language and hard-to-debug
+     * bugs. This is why, by default, JSHint warns about variables that are
+     * used outside of their intended scope.
+     *
+     *     function test() {
+     *       if (true) {
+     *         var x = 0;
+     *       }
+     *
+     *       x += 1; // Default: 'x' used out of scope.
+     *                 // No warning when funcscope:true
+     *     }
+     */
+    funcscope   : true,    
 
     /**
      * This option suppresses warnings about multi-line strings. Multi-line
