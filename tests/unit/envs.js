@@ -182,7 +182,7 @@ exports.es5 = function (test) {
     .addError(62, "Expected a single parameter in set x function.")
     .addError(64, "Expected a single parameter in set z function.")
     .addError(80, "Setter is defined without getter.")
-    .test(src, { esnext: true });
+    .test(src, { esversion: 6 });
 
   // Make sure that JSHint parses getters/setters as function expressions
   // (https://github.com/jshint/jshint/issues/96)
