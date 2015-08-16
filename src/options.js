@@ -281,7 +281,7 @@ exports.bool = {
      * Insertion](http://inimino.org/~inimino/blog/javascript_semicolons).
      */
     asi         : true,
-    
+
     /**
      * This option suppresses warnings about declaring variables inside of
      * control
