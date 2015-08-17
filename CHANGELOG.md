@@ -125,6 +125,12 @@
 * Support generators in class body ([ee348c3](https://github.com/jshint/jshint/commit/ee348c3))
 
 
+### BREAKING CHANGES
+
+* In projects which do not enable ES3 mode, it is now an error by default to use elision array elements,
+also known as empty array elements (such as `[1, , 3, , 5]`)
+
+
 
 <a name="2.5.11"></a>
 ## [2.5.11](https://github.com/jshint/jshint/compare/2.5.10...2.5.11) (2014-12-18)
