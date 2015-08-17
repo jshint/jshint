@@ -2433,8 +2433,12 @@ var JSHINT = (function() {
     var p = [];
 
     if (left) {
-      if (left.type === "(identifier)") {
-        if (left.value.match(/^[A-Z]([A-Z0-9_$]*[a-z][A-Za-z0-9_$]*)?$/)) {
+      if (left.type === "class") {
+        warning("W064", left);
+      } else if (left.type === "(identifier)") {
+        if (state.funct["(scope)"].labeltype(left.value) === "class") {
+          warning("W064", left);
+        } else if (left.value.match(/^[A-Z]([A-Z0-9_$]*[a-z][A-Za-z0-9_$]*)?$/)) {
           if ("Array Number String Boolean Date Object Error Symbol".indexOf(left.value) === -1) {
             if (left.value === "Math") {
               warning("W063", left);
