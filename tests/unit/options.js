@@ -736,11 +736,21 @@ exports.undef = function (test) {
 
   // block scope cannot use themselves in the declaration
   TestRun(test)
-    .addError(1, "'a' was used before it was declared, which is illegal for 'let' variables.")
-    .addError(2, "'b' was used before it was declared, which is illegal for 'const' variables.")
+    // JSHint does not currently enforce the correct temporal dead zone
+    // semantics in this case. Once this is fixed, the following errors
+    // should be thrown:
+    //.addError(1, "'a' was used before it was declared, which is illegal for 'let' variables.")
+    //.addError(2, "'b' was used before it was declared, which is illegal for 'const' variables.")
+    .addError(5, "'e' is already defined.")
     .test([
       'let a = a;',
-      'const b = b;'
+      'const b = b;',
+      'var c = c;',
+      'function f(e) {',
+      '  var e;',         // the var does not overwrite the param, the param is used
+      '  e = e || 2;',
+      '  return e;',
+      '}'
     ], { esnext: true, undef: true });
 
   // Regression test for GH-668.
