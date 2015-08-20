@@ -2969,7 +2969,8 @@ exports.varstmt = function (test) {
     "var fn = function() {",
     "  var x;",
     "  var y = 5;",
-    "};"
+    "};",
+    "for (var a in x);"
   ];
 
   TestRun(test)
@@ -2978,6 +2979,7 @@ exports.varstmt = function (test) {
     .addError(3, "`var` declarations are forbidden. Use `let` or `const` instead.")
     .addError(4, "`var` declarations are forbidden. Use `let` or `const` instead.")
     .addError(5, "`var` declarations are forbidden. Use `let` or `const` instead.")
+    .addError(7, "`var` declarations are forbidden. Use `let` or `const` instead.")
     .test(code, { varstmt: true });
 
   test.done();
