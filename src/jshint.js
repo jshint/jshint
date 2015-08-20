@@ -3521,25 +3521,6 @@ var JSHINT = (function() {
         warning("E012", state.tokens.curr, state.tokens.curr.value);
       }
 
-      // absorb the assignment before processing the label so that use of the label
-      // can be detected as before declaration
-      if (state.tokens.next.id === "=") {
-        advance("=");
-        if (!prefix && state.tokens.next.id === "undefined") {
-          warning("W080", state.tokens.prev, state.tokens.prev.value);
-        }
-        if (!prefix && peek(0).id === "=" && state.tokens.next.identifier) {
-          warning("W120", state.tokens.next, state.tokens.next.value);
-        }
-        // don't accept `in` in expression if prefix is used for ForIn/Of loop.
-        value = expression(prefix ? 120 : 10);
-        if (lone) {
-          tokens[0].first = value;
-        } else {
-          destructuringPatternMatch(names, value);
-        }
-      }
-
       for (var t in tokens) {
         if (tokens.hasOwnProperty(t)) {
           t = tokens[t];
@@ -3558,6 +3539,23 @@ var JSHINT = (function() {
               state.funct["(scope)"].setExported(t.token.value, t.token);
             }
           }
+        }
+      }
+
+      if (state.tokens.next.id === "=") {
+        advance("=");
+        if (!prefix && state.tokens.next.id === "undefined") {
+          warning("W080", state.tokens.prev, state.tokens.prev.value);
+        }
+        if (!prefix && peek(0).id === "=" && state.tokens.next.identifier) {
+          warning("W120", state.tokens.next, state.tokens.next.value);
+        }
+        // don't accept `in` in expression if prefix is used for ForIn/Of loop.
+        value = expression(prefix ? 120 : 10);
+        if (lone) {
+          tokens[0].first = value;
+        } else {
+          destructuringPatternMatch(names, value);
         }
       }
 
@@ -3614,32 +3612,6 @@ var JSHINT = (function() {
 
       this.first = this.first.concat(names);
 
-      // absorb the assignment before processing the label so that use of the label
-      // can be detected as before declaration
-      if (state.tokens.next.id === "=") {
-        state.nameStack.set(state.tokens.curr);
-
-        advance("=");
-        if (!prefix && report && !state.funct["(loopage)"] &&
-          state.tokens.next.id === "undefined") {
-          warning("W080", state.tokens.prev, state.tokens.prev.value);
-        }
-        if (peek(0).id === "=" && state.tokens.next.identifier) {
-          if (!prefix && report &&
-              !state.funct["(params)"] ||
-              state.funct["(params)"].indexOf(state.tokens.next.value) === -1) {
-            warning("W120", state.tokens.next, state.tokens.next.value);
-          }
-        }
-        // don't accept `in` in expression if prefix is used for ForIn/Of loop.
-        value = expression(prefix ? 120 : 10);
-        if (lone) {
-          tokens[0].first = value;
-        } else {
-          destructuringPatternMatch(names, value);
-        }
-      }
-
       for (var t in tokens) {
         if (tokens.hasOwnProperty(t)) {
           t = tokens[t];
@@ -3671,6 +3643,30 @@ var JSHINT = (function() {
             }
             names.push(t.token);
           }
+        }
+      }
+
+      if (state.tokens.next.id === "=") {
+        state.nameStack.set(state.tokens.curr);
+
+        advance("=");
+        if (!prefix && report && !state.funct["(loopage)"] &&
+          state.tokens.next.id === "undefined") {
+          warning("W080", state.tokens.prev, state.tokens.prev.value);
+        }
+        if (peek(0).id === "=" && state.tokens.next.identifier) {
+          if (!prefix && report &&
+              !state.funct["(params)"] ||
+              state.funct["(params)"].indexOf(state.tokens.next.value) === -1) {
+            warning("W120", state.tokens.next, state.tokens.next.value);
+          }
+        }
+        // don't accept `in` in expression if prefix is used for ForIn/Of loop.
+        value = expression(prefix ? 120 : 10);
+        if (lone) {
+          tokens[0].first = value;
+        } else {
+          destructuringPatternMatch(names, value);
         }
       }
 
