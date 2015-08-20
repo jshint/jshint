@@ -53,3 +53,10 @@ function cg() {
     cj();
 }
 cg();
+let da = () => da;
+const db = () => db;
+let dc = {
+    dd() {
+        return dc;
+    }
+};

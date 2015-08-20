@@ -747,15 +747,16 @@ var scopeManager = function(state, predefined, exported, declared) {
       use: function(labelName, token) {
 
         // if resolves to current function params, then do not store usage just resolve
-        // this is because function(a) { var a = a; } will resolve to the param, not
+        // this is because function(a) { var a; a = a; } will resolve to the param, not
         // to the unset var
         // first check the param is used
         var paramScope = _currentFunctBody["(parent)"];
         if (paramScope && paramScope["(labels)"][labelName] &&
           paramScope["(labels)"][labelName]["(type)"] === "param") {
 
-          // then check its not used
-          if (!scopeManagerInst.funct.has(labelName, { excludeParams: true })) {
+          // then check its not declared by a block scope variable
+          if (!scopeManagerInst.funct.has(labelName,
+                { excludeParams: true, onlyBlockscoped: true })) {
             paramScope["(labels)"][labelName]["(unused)"] = false;
           }
         }
