@@ -3610,7 +3610,7 @@ var JSHINT = (function() {
         lone = true;
       }
 
-      if (!prefix && report && state.option.varstmt) {
+      if (!(prefix && implied) && report && state.option.varstmt) {
         warning("W132", this);
       }
 
