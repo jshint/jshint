@@ -1826,9 +1826,7 @@ exports.quotesAndTemplateLiterals = function (test) {
 
   // Without esnext
   TestRun(test)
-    .addError(2, "Unexpected '`'.")
-    .addError(2, "Unexpected early end of program.")
-    .addError(2, "Unrecoverable syntax error. (100% scanned).")
+    .addError(2, "'template literal syntax' is only available in ES6 (use 'esversion: 6').")
     .test(src);
 
   // With esnext
