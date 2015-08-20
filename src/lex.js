@@ -1061,10 +1061,15 @@ Lexer.prototype = {
     var startChar = this.char;
     var depth = this.templateStarts.length;
 
-    if (!state.inES6(true)) {
-      // Only lex template strings in ESNext mode.
-      return null;
-    } else if (this.peek() === "`") {
+    if (this.peek() === "`") {
+      if (!state.inES6(true)) {
+        this.trigger("warning", {
+          code: "W119",
+          line: this.line,
+          character: this.char,
+          data: ["template literal syntax", "6"]
+        });
+      }
       // Template must start with a backtick.
       tokenType = Token.TemplateHead;
       this.templateStarts.push({ line: this.line, char: this.char });
