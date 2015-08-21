@@ -230,6 +230,10 @@ var JSHINT = (function() {
       }
     }
 
+    if (state.option.preferconst && !state.inES6()) {
+      warning("W134", state.tokens.next, "preferconst", 6);
+    }
+
     if (state.option.couch) {
       combine(predefined, vars.couch);
     }

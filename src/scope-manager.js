@@ -265,10 +265,23 @@ var scopeManager = function(state, predefined, exported, declared) {
       var i, j;
       var currentUsages = _current["(usages)"];
       var currentLabels = _current["(labels)"];
+      var labelNameList = Object.keys(currentLabels);
       var usedLabelNameList = Object.keys(currentUsages);
 
       if (currentUsages.__proto__ && usedLabelNameList.indexOf("__proto__") === -1) {
         usedLabelNameList.push("__proto__");
+      }
+
+      if (state.option.preferconst) {
+        // check for not modified let-variables
+        for (i = 0; i < labelNameList.length; i++) {
+          var labelName = labelNameList[i];
+
+          if (currentLabels[labelName]["(type)"] === "let" &&
+              (!currentUsages[labelName] || currentUsages[labelName]["(modified)"].length === 0)) {
+            warning("W139", currentLabels[labelName]["(token)"], labelName);
+          }
+        }
       }
 
       for (i = 0; i < usedLabelNameList.length; i++) {

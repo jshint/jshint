@@ -3331,3 +3331,26 @@ exports.esversion = function(test) {
 
   test.done();
 };
+
+exports.preferconst = function(test) {
+  TestRun(test, "needs esversion: 6")
+    .addError(0, "The 'preferconst' option is only available when linting ECMAScript 6 code.")
+    .test("", { preferconst: true });
+
+  TestRun(test, "not enforced by enforceall")
+    .test("let a = 0;", { enforceall: true, esversion: 6 });
+
+  var src = [
+    "let a = 0;",
+    "let b = a;", // a is used but not modified
+    "let c;",
+    "c = 0;",
+    "b++;",
+    "var x;" // don't warn about vars
+  ];
+  TestRun(test)
+    .addError(1, "Use 'const' if the value of the variable ('a') doesn't change.")
+    .test(src, { esversion: 6, preferconst: true });
+
+  test.done();
+};

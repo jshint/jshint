@@ -236,6 +236,21 @@ exports.bool = {
     nonew       : true,
 
     /**
+     * This option prohibits the use of `let` for variables which don't mutate.
+     * Using `const` would make the code easier to review.
+     *
+     *     // jshint preferconst: true
+     *
+     *     let a = 2; // a is never modified, so JSHint warns.
+     *     let b = a;
+     *     b++;
+     *
+     * This option doesn't warn when using `var` but not mutating because `var`
+     * has a different scope from `const`.
+     */
+    preferconst : false,
+
+    /**
      * This option prohibits the use of explicitly undeclared variables. This
      * option is very useful for spotting leaking and mistyped variables.
      *
@@ -1008,5 +1023,6 @@ exports.removed = {
 // `enforceall`.
 exports.noenforceall = {
   varstmt: true,
-  strict: true
+  strict: true,
+  preferconst: true
 };
