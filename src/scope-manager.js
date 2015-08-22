@@ -265,7 +265,6 @@ var scopeManager = function(state, predefined, exported, declared) {
       var i, j;
       var currentUsages = _current["(usages)"];
       var currentLabels = _current["(labels)"];
-      var labelNameList = Object.keys(currentLabels);
       var usedLabelNameList = Object.keys(currentUsages);
 
       if (currentUsages.__proto__ && usedLabelNameList.indexOf("__proto__") === -1) {
@@ -273,6 +272,7 @@ var scopeManager = function(state, predefined, exported, declared) {
       }
 
       if (state.option.preferconst) {
+        var labelNameList = Object.keys(currentLabels);
         // check for not modified let-variables
         for (i = 0; i < labelNameList.length; i++) {
           var labelName = labelNameList[i];
