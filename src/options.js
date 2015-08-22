@@ -246,7 +246,8 @@ exports.bool = {
      *     b++;
      *
      * This option doesn't warn when using `var` but not mutating because `var`
-     * has a different scope from `const`.
+     * has a different scope from `const`. To prohibit the use of `var`, you can
+     * use the `varstmt` option.
      */
     preferconst : false,
 
