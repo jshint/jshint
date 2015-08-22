@@ -3352,5 +3352,20 @@ exports.preferconst = function(test) {
     .addError(1, "Use 'const' if the value of the variable ('a') doesn't change.")
     .test(src, { esversion: 6, preferconst: true });
 
+  src = [
+    "let a = 0, b = 1;",
+    "a = 2;"
+  ];
+  TestRun(test, "warns about variables in multiple declarations")
+    .addError(1, "Use 'const' if the value of the variable ('b') doesn't change.")
+    .test(src, { esversion: 6, preferconst: true });
+
+  src = [
+    "let [ a, b ] = [];",
+    "a = 2;"
+  ];
+  TestRun(test, "doesn't warn about variables defined using destructuring")
+    .test(src, { esversion: 6, preferconst: true });
+
   test.done();
 };

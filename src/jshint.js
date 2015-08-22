@@ -3588,7 +3588,8 @@ var JSHINT = (function() {
           if (t.id && !state.funct["(noblockscopedvar)"]) {
             state.funct["(scope)"].addlabel(t.id, {
               type: type,
-              token: t.token });
+              token: t.token,
+              lone: lone });
             names.push(t.token);
 
             if (lone && inexport) {
@@ -3692,7 +3693,8 @@ var JSHINT = (function() {
             } else {
               state.funct["(scope)"].addlabel(t.id, {
                 type: "var",
-                token: t.token });
+                token: t.token,
+                lone: lone });
 
               if (lone && inexport) {
                 state.funct["(scope)"].setExported(t.id, t.token);
