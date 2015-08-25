@@ -776,6 +776,9 @@ exports.val = {
    * See also the "environment" options: a set of options to be used as short
    * hand for enabling global variables defined in common JavaScript
    * environments.
+   *
+   * To configure `globals` within an individual file, see [Inline
+   * Configuration](http://jshint.com/docs/#inline-configuration).
    */
   globals      : false,
 
