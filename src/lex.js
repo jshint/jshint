@@ -791,7 +791,7 @@ Lexer.prototype = {
           isAllowedDigit = isOctalDigit;
           base = 8;
 
-          if (!state.option.esnext) {
+          if (!state.inES6(true)) {
             this.trigger("warning", {
               code: "W119",
               line: this.line,
@@ -809,7 +809,7 @@ Lexer.prototype = {
           isAllowedDigit = isBinaryDigit;
           base = 2;
 
-          if (!state.option.esnext) {
+          if (!state.inES6(true)) {
             this.trigger("warning", {
               code: "W119",
               line: this.line,
@@ -1056,7 +1056,7 @@ Lexer.prototype = {
     var startChar = this.char;
     var depth = this.templateStarts.length;
 
-    if (!state.option.esnext) {
+    if (!state.inES6(true)) {
       // Only lex template strings in ESNext mode.
       return null;
     } else if (this.peek() === "`") {

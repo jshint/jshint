@@ -1187,10 +1187,12 @@ exports.testES6ModulesNameSpaceImportsAffectUnused = function (test) {
 
 exports.testES6TemplateLiterals = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/es6-template-literal.js", "utf8");
-  TestRun(test)
+  var run = TestRun(test)
     .addError(14, "Octal literals are not allowed in strict mode.")
-    .addError(21, "Unclosed template literal.")
-    .test(src, { esnext: true });
+    .addError(21, "Unclosed template literal.");
+  run.test(src, { esnext: true });
+  run.test("/* jshint esnext: true */" + src);
+
   test.done();
 };
 
