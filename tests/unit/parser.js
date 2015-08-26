@@ -427,6 +427,12 @@ exports.numbers = function (test) {
       "var f = 0b1012;",
     ], {esnext: true});
 
+  TestRun(test)
+    .test([
+      "// jshint esnext: true",
+      "var a = 0b0 + 0o0;"
+    ]);
+
   test.done();
 };
 
