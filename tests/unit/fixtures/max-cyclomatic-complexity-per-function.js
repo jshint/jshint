@@ -12,7 +12,7 @@ function functionWithCyclomaticComplexity_2() {
     }
 }
 
-function functionWithCyclomaticComplexity_2() {
+function anotherFunctionWithCyclomaticComplexity_2() {
     var dummy = 10;
     if (dummy < 20) {
         dummy = 2;

@@ -365,3 +365,12 @@ zj: while(true) {
         break zj;
     }
 }
+
+var {zzq} = {};
+var [zzq] = [];
+
+var {zzr} = {};
+var {zzr} = {};
+
+var [zzs] = [];
+var [zzs] = [];

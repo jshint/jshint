@@ -32,7 +32,7 @@ function test2(a = function() {
   return d; // cannot tell if it is declared yet at point of evaluation
 }, d = true) {
 }
-function test2(a = e, // next param and outside scope - this acts like a reference in TDZ and throws
+function test3(a = e, // next param and outside scope - this acts like a reference in TDZ and throws
                e = true) {
 }
 var e;

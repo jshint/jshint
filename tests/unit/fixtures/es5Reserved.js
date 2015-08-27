@@ -1,4 +1,4 @@
-var x = {
+var y = {
   default: 10,
   in: 1
 };
