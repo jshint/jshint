@@ -4600,11 +4600,13 @@ var JSHINT = (function() {
 
       identifier = token.value;
 
-      state.funct["(scope)"].addlabel(identifier, {
-        type: exportType,
-        token: token });
+      if (this.block) {
+        state.funct["(scope)"].addlabel(identifier, {
+          type: exportType,
+          token: token });
 
-      state.funct["(scope)"].setExported(identifier, token);
+        state.funct["(scope)"].setExported(identifier, token);
+      }
 
       return this;
     }

@@ -1170,6 +1170,20 @@ exports.testES6ModulesDefaultExportsAffectUnused = function (test) {
   test.done();
 };
 
+exports.testES6ModulesDefaultExportAssignmentExpr = function (test) {
+  // The identifier in the exported AssignmentExpression should not be
+  // interpreted as a declaration.
+  var src = [
+    "let x = 1;",
+    "export default -x;"
+  ];
+
+  TestRun(test)
+    .test(src, { unused: true, esnext: true });
+
+  test.done();
+};
+
 exports.testES6ModulesNameSpaceImportsAffectUnused = function (test) {
   var src = [
     "import * as angular from 'angular';"
