@@ -7216,3 +7216,39 @@ exports["new.target"] = function (test) {
 
   test.done();
 };
+
+// gh2656: "[Regression] 2.9.0 warns about proto deprecated even if proto:true"
+exports.lazyIdentifierChecks = function (test) {
+  var src = [
+    "var o = [",
+    "  function() {",
+    "    // jshint proto: true",
+    "    o.__proto__ = null;",
+    "  }",
+    "];",
+    "o.__proto__ = null;"
+  ];
+
+  TestRun(test)
+    .addError(7, "The '__proto__' property is deprecated.")
+    .test(src);
+
+  src = [
+    "var o = {",
+    "  p: function() {",
+    "    // jshint proto: true, iterator: true",
+    "    o.__proto__ = null;",
+    "    o.__iterator__ = null;",
+    "  }",
+    "};",
+    "o.__proto__ = null;",
+    "o.__iterator__ = null;"
+  ];
+
+  TestRun(test)
+    .addError(8, "The '__proto__' property is deprecated.")
+    .addError(9, "The '__iterator__' property is deprecated.")
+    .test(src);
+
+  test.done();
+};
