@@ -42,12 +42,12 @@
   "main": "./src/jshint.js",
 
   "dependencies": {
-    "cli":                 "0.6.x",
+    "cli":                 "0.9.x",
     "console-browserify":  "1.1.x",
     "exit":                "0.1.x",
     "htmlparser2":         "3.8.x",
     "minimatch":           "2.0.x",
-    "shelljs":             "0.3.x",
+    "shelljs":             "0.5.x",
     "strip-json-comments": "1.0.x",
     "lodash":              "3.7.x"
   },
