@@ -1782,14 +1782,14 @@ Lexer.prototype = {
         return create("(no subst template)", token.value, null, token);
 
       case Token.Identifier:
-        this.trigger("Identifier", {
+        this.triggerAsync("Identifier", {
           line: this.line,
           char: this.char,
           from: this.form,
           name: token.value,
           raw_name: token.text,
           isProperty: state.tokens.curr.id === "."
-        });
+        }, checks, function() { return true; });
 
         /* falls through */
       case Token.Keyword:
