@@ -1,3 +1,92 @@
+<a name="2.9.0"></a>
+# [2.9.0](https://github.com/jshint/jshint/compare/2.8.0...v2.9.0) (2015-09-03)
+
+This release was a long time in the making, but it may not be the most exciting
+version we've published. Most of the changes are internal refactorings that
+were necessary to properly fix bugs. And fix bugs we did! Special thanks go to
+Luke Page, the newest addition to the JSHint team. Luke is a maintainer of [the
+Less CSS project](http://lesscss.org/), and he introduced himself to use by
+overhauling JSHint's variable tracking logic.
+
+JSHint 3.0 is closer than ever. We're excited for the opportunity to break a
+few things in order to make real strides forward. In fact, the hardest part
+will be *limiting* ourselves (we don't want to make migrating to the new
+version onerous). If you have any ideas along these lines, please submit them
+on [the project's issue tracker](https://github.com/jshint/jshint/issues).
+We'll mark them with [the label "Breaking
+Change"](https://github.com/jshint/jshint/labels/Breaking%20Change), and as we
+decide what's definitely "in" for 3.0, we'll add them to [the "v3.0.0"
+milestone](https://github.com/jshint/jshint/milestones/v3.0.0).
+
+### Bug Fixes
+
+* Add `HTMLCollection` to browser environment. ([e92d375](https://github.com/jshint/jshint/commit/e92d375)), closes [#2443](https://github.com/jshint/jshint/issues/2443)
+* Add `window.performance` to browser vars ([3ff1b05](https://github.com/jshint/jshint/commit/3ff1b05)), closes [#2461](https://github.com/jshint/jshint/issues/2461)
+* Allow `__proto__` when using ES6 ([06b5764](https://github.com/jshint/jshint/commit/06b5764)), closes [#2371](https://github.com/jshint/jshint/issues/2371)
+* Allow binary and octal numbers, and templates when using inline `esnext` ([b5ba7d6](https://github.com/jshint/jshint/commit/b5ba7d6)), closes [#2519](https://github.com/jshint/jshint/issues/2519)
+* Allow default values in destructuring. ([04ace9a](https://github.com/jshint/jshint/commit/04ace9a)), closes [#1941](https://github.com/jshint/jshint/issues/1941)
+* Allow destructuring in catch blocks parameter ([759644c](https://github.com/jshint/jshint/commit/759644c)), closes [#2526](https://github.com/jshint/jshint/issues/2526)
+* Allow latedef in the initialiser of variable ([18f8775](https://github.com/jshint/jshint/commit/18f8775)), closes [#2628](https://github.com/jshint/jshint/issues/2628)
+* Allow line breaking after yield if `asi: true` ([728c84b](https://github.com/jshint/jshint/commit/728c84b)), closes [#2530](https://github.com/jshint/jshint/issues/2530)
+* Allow non-identifier PropertyNames in object destructuring. ([aa8a023](https://github.com/jshint/jshint/commit/aa8a023)), closes [#2467](https://github.com/jshint/jshint/issues/2467)
+* Allow object destructuring assignment ([ae48966](https://github.com/jshint/jshint/commit/ae48966)), closes [#2269](https://github.com/jshint/jshint/issues/2269)
+* Allow semicolon as string value in JSON ([ab73e01](https://github.com/jshint/jshint/commit/ab73e01))
+* block scope vars dont redefine in blocks ([9e74025](https://github.com/jshint/jshint/commit/9e74025)), closes [#2438](https://github.com/jshint/jshint/issues/2438)
+* Catch blocks are no longer functions ([8a864f3](https://github.com/jshint/jshint/commit/8a864f3)), closes [#2510](https://github.com/jshint/jshint/issues/2510)
+* Change imported variables to be constants ([94a6779](https://github.com/jshint/jshint/commit/94a6779)), closes [#2428](https://github.com/jshint/jshint/issues/2428)
+* Classes are not hoisted ([87378cc](https://github.com/jshint/jshint/commit/87378cc)), closes [#1934](https://github.com/jshint/jshint/issues/1934)
+* Correct exported AssignmentExpressions ([282b40e](https://github.com/jshint/jshint/commit/282b40e))
+* Correctly parse empty destructuring ([97c188b](https://github.com/jshint/jshint/commit/97c188b)), closes [#2513](https://github.com/jshint/jshint/issues/2513)
+* Correctly parse exported generators ([0604816](https://github.com/jshint/jshint/commit/0604816)), closes [#2472](https://github.com/jshint/jshint/issues/2472)
+* Declare `func` as a property of `state` ([3be8d36](https://github.com/jshint/jshint/commit/3be8d36))
+* default params can't reference future arg ([bc2741c](https://github.com/jshint/jshint/commit/bc2741c)), closes [#2422](https://github.com/jshint/jshint/issues/2422)
+* Define "build" module ([2f98f91](https://github.com/jshint/jshint/commit/2f98f91))
+* Define npm scripts for each test suite ([5c33ded](https://github.com/jshint/jshint/commit/5c33ded))
+* Do not accept empty values for directives ([a5bfefb](https://github.com/jshint/jshint/commit/a5bfefb))
+* Do not crash if the forin check is block ([d1cbe84](https://github.com/jshint/jshint/commit/d1cbe84)), closes [#1920](https://github.com/jshint/jshint/issues/1920)
+* Do not mark `ignore` directives as special ([f14c262](https://github.com/jshint/jshint/commit/f14c262))
+* Do not parse arrays which contain `for` as array comprehensions. ([d70876c](https://github.com/jshint/jshint/commit/d70876c)), closes [#1413](https://github.com/jshint/jshint/issues/1413)
+* Don't crash on uncomplete typeof expression ([a32cf50](https://github.com/jshint/jshint/commit/a32cf50)), closes [#2506](https://github.com/jshint/jshint/issues/2506)
+* Don't warn when Array() is used without 'new'. ([5f88aa7](https://github.com/jshint/jshint/commit/5f88aa7)), closes [#1987](https://github.com/jshint/jshint/issues/1987)
+* Dont crash when testing x == keyword if eqnull is on ([6afd373](https://github.com/jshint/jshint/commit/6afd373)), closes [#2587](https://github.com/jshint/jshint/issues/2587)
+* Dont warn twice in var redeclaration ([e32e17b](https://github.com/jshint/jshint/commit/e32e17b))
+* handle no 'home' environment variables ([946af3e](https://github.com/jshint/jshint/commit/946af3e))
+* Honor `ignore` directive more consistently ([0971608](https://github.com/jshint/jshint/commit/0971608))
+* Ignore directive should ignore max line length for comments ([f2f871a](https://github.com/jshint/jshint/commit/f2f871a)), closes [#1575](https://github.com/jshint/jshint/issues/1575)
+* Immediately-invoked arrow funcs' param doesn't need parentheses ([d261071](https://github.com/jshint/jshint/commit/d261071)), closes [#2351](https://github.com/jshint/jshint/issues/2351)
+* Improve support for `__proto__` identifier ([925a983](https://github.com/jshint/jshint/commit/925a983))
+* It is not un-necessary to assign undefined in a loop ([e8ce9bf](https://github.com/jshint/jshint/commit/e8ce9bf)), closes [#1191](https://github.com/jshint/jshint/issues/1191)
+* labeled break and continue semantics ([da66f70](https://github.com/jshint/jshint/commit/da66f70))
+* Labels shadowing within a function is a syntax error ([124e00f](https://github.com/jshint/jshint/commit/124e00f)), closes [#2419](https://github.com/jshint/jshint/issues/2419)
+* Load JSHint from package root ([92acdd1](https://github.com/jshint/jshint/commit/92acdd1))
+* Make `strict: func` have precedence over env options. ([d138db8](https://github.com/jshint/jshint/commit/d138db8))
+* Param destructuring should not effect max params ([9d021ee](https://github.com/jshint/jshint/commit/9d021ee)), closes [#2183](https://github.com/jshint/jshint/issues/2183)
+* Params cannot always have the same name ([9f2b64c](https://github.com/jshint/jshint/commit/9f2b64c)), closes [#2492](https://github.com/jshint/jshint/issues/2492)
+* Prevent regressions in bug fix ([477d3ad](https://github.com/jshint/jshint/commit/477d3ad))
+* Regular args can come after args with default ([f2a59f1](https://github.com/jshint/jshint/commit/f2a59f1)), closes [#1779](https://github.com/jshint/jshint/issues/1779)
+* Relax restriction on `module` option ([56c19a5](https://github.com/jshint/jshint/commit/56c19a5))
+* Remove bad error E048 in for loop init ([a8fc16b](https://github.com/jshint/jshint/commit/a8fc16b)), closes [#1862](https://github.com/jshint/jshint/issues/1862)
+* Remove module import declaration ([1749ac0](https://github.com/jshint/jshint/commit/1749ac0))
+* Report an error when a necessary semicolon is missing ([45d8e3e](https://github.com/jshint/jshint/commit/45d8e3e)), closes [#1327](https://github.com/jshint/jshint/issues/1327)
+* report line numbers of destructured params ([7d25451](https://github.com/jshint/jshint/commit/7d25451)), closes [#2494](https://github.com/jshint/jshint/issues/2494)
+* Report loopfunc for all function types ([4d4cfcd](https://github.com/jshint/jshint/commit/4d4cfcd)), closes [#2153](https://github.com/jshint/jshint/issues/2153)
+* singleGroups: Allow grouping for integers ([8c265ca](https://github.com/jshint/jshint/commit/8c265ca))
+* Support `new.target` ([2fbf621](https://github.com/jshint/jshint/commit/2fbf621))
+* The `__iterator__` property is deprecated. ([7780613](https://github.com/jshint/jshint/commit/7780613))
+* Unify assign operation checks. ([06eb1d2](https://github.com/jshint/jshint/commit/06eb1d2)), closes [#2589](https://github.com/jshint/jshint/issues/2589)
+* use of params is not capturing loopfunc ([827e335](https://github.com/jshint/jshint/commit/827e335))
+* Warn about using `var` inside `for (...)` when `varstmt: true` ([f1ab638](https://github.com/jshint/jshint/commit/f1ab638)), closes [#2627](https://github.com/jshint/jshint/issues/2627)
+
+### Features
+
+* Add `esversion` option ([cf5a699](https://github.com/jshint/jshint/commit/cf5a699)), closes [#2124](https://github.com/jshint/jshint/issues/2124)
+* Add pending to Jasmine's globals ([02790b9](https://github.com/jshint/jshint/commit/02790b9)), closes [#2154](https://github.com/jshint/jshint/issues/2154)
+* Add Window constructor to browser vars ([7f5806f](https://github.com/jshint/jshint/commit/7f5806f)), closes [#2132](https://github.com/jshint/jshint/issues/2132)
+* Option to assume strict mode ([8de8247](https://github.com/jshint/jshint/commit/8de8247)), closes [#924](https://github.com/jshint/jshint/issues/924)
+* Support multiple files in the exclude option ([bd4ec25](https://github.com/jshint/jshint/commit/bd4ec25))
+
+
+
 <a name="2.8.0"></a>
 # [2.8.0](https://github.com/jshint/jshint/compare/2.7.0...2.8.0) (2015-05-31)
 
