@@ -259,6 +259,9 @@ exports.latedef = function (test) {
       .addError(48, "'ci' was used before it was defined.")
       .test(esnextSrc, {esnext: true, latedef: true});
 
+  TestRun(test, "shouldn't warn when marking a var as exported")
+    .test("var a;", { exported: ["a"], latedef: true });
+
   test.done();
 };
 
@@ -271,6 +274,9 @@ exports.latedefInline = function (test) {
     .addError(22, "'a' was used before it was defined.")
     .addError(26, "Bad option value.")
     .test(src);
+
+  TestRun(test, "shouldn't warn when marking a var as exported")
+    .test("/*exported a*/var a;", { latedef: true });
 
   test.done();
 };
