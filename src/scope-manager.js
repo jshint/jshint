@@ -75,11 +75,6 @@ var scopeManager = function(state, predefined, exported, declared) {
     }
   }
 
-  var exportedLabels = Object.keys(exported);
-  for (var i = 0; i < exportedLabels.length; i++) {
-    _addUsage(exportedLabels[i]);
-  }
-
   var _getUnusedOption = function(unused_opt) {
     if (unused_opt === undefined) {
       unused_opt = state.option.unused;
@@ -572,7 +567,16 @@ var scopeManager = function(state, predefined, exported, declared) {
     /**
      * for the exported options, indicating a variable is used outside the file
      */
-    addExported: _addUsage,
+    addExported: function(labelName) {
+      if (_.has(declared, labelName)) {
+        // remove the declared token, so we know it is used
+        delete declared[labelName];
+      } else if (_current["(type)"] === "global" && _.has(_current["(labels)"], labelName)) {
+        _current["(labels)"][labelName]["(unused)"] = false;
+      } else {
+        exported[labelName] = true;
+      }
+    },
 
     /**
      * Mark an indentifier as es6 module exported
@@ -593,6 +597,8 @@ var scopeManager = function(state, predefined, exported, declared) {
       var type  = opts.type;
       var token = opts.token;
       var isblockscoped = type === "let" || type === "const" || type === "class";
+      var isexported    = (isblockscoped ? _current : _currentFunctBody)["(type)"] === "global" &&
+                          _.has(exported, labelName);
 
       // outer shadow check (inner is only on non-block scoped)
       _checkOuterShadow(labelName, token, type);
@@ -632,7 +638,7 @@ var scopeManager = function(state, predefined, exported, declared) {
           }
         }
 
-        scopeManagerInst.block.add(labelName, type, token, true);
+        scopeManagerInst.block.add(labelName, type, token, !isexported);
 
       } else {
 
@@ -659,7 +665,7 @@ var scopeManager = function(state, predefined, exported, declared) {
           }
         }
 
-        scopeManagerInst.funct.add(labelName, type, token, true);
+        scopeManagerInst.funct.add(labelName, type, token, !isexported);
 
         if (_currentFunctBody["(type)"] === "global") {
           usedPredefinedAndGlobals[labelName] = marker;
