@@ -1124,10 +1124,35 @@ exports.exported = function (test) {
   run.test(src, {unused: true }); // es5
   run.test(src, {esnext: true, unused: true });
   run.test(src, {moz: true, unused: true });
+  run.test(src, {unused: true, latedef: true});
 
-  run = TestRun(test)
+  TestRun(test)
     .addError(1, "'unused' is defined but never used.")
     .test("var unused = 1; var used = 2;", {exported: ["used"], unused: true});
+
+  TestRun(test, "exported vars aren't used before definition")
+    .test("var a;", {exported:["a"], latedef: true});
+
+  var code = [
+    "/* exported a, b */",
+    "if (true) {",
+    "  /* exported c, d */",
+    "  let a, c, e, g;",
+    "  const [b, d, f, h] = [];",
+    "  /* exported e, f */",
+    "}",
+    "/* exported g, h */"
+  ];
+  TestRun(test, "blockscoped variables")
+    .addError(4, "'a' is defined but never used.")
+    .addError(4, "'c' is defined but never used.")
+    .addError(4, "'e' is defined but never used.")
+    .addError(4, "'g' is defined but never used.")
+    .addError(5, "'b' is defined but never used.")
+    .addError(5, "'d' is defined but never used.")
+    .addError(5, "'f' is defined but never used.")
+    .addError(5, "'h' is defined but never used.")
+    .test(code, {esversion: 6, unused: true});
 
   test.done();
 };

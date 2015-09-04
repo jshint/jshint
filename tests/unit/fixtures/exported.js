@@ -16,3 +16,19 @@ var unusedExpression = function () {};
 (function () {
   function cannotBeExported() {}
 }());
+
+var a, b;
+if (true) {
+  /* exported a */
+}
+if (true) {
+  for(var i = 0; i < 1; i++) {
+    // dont peek
+  }
+  /* exported b */
+}
+
+if (true) {
+  var c;
+}
+/* exported c */

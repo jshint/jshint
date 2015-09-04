@@ -65,21 +65,6 @@ var scopeManager = function(state, predefined, exported, declared) {
     }
   }
 
-  function _addUsage(labelName, token) {
-
-    _setupUsages(labelName);
-
-    if (token) {
-      token["(function)"] = _currentFunctBody;
-      _current["(usages)"][labelName]["(tokens)"].push(token);
-    }
-  }
-
-  var exportedLabels = Object.keys(exported);
-  for (var i = 0; i < exportedLabels.length; i++) {
-    _addUsage(exportedLabels[i]);
-  }
-
   var _getUnusedOption = function(unused_opt) {
     if (unused_opt === undefined) {
       unused_opt = state.option.unused;
@@ -572,7 +557,30 @@ var scopeManager = function(state, predefined, exported, declared) {
     /**
      * for the exported options, indicating a variable is used outside the file
      */
-    addExported: _addUsage,
+    addExported: function(labelName) {
+      var globalLabels = _scopeStack[0]["(labels)"];
+      if (_.has(declared, labelName)) {
+        // remove the declared token, so we know it is used
+        delete declared[labelName];
+      } else if (_.has(globalLabels, labelName)) {
+        globalLabels[labelName]["(unused)"] = false;
+      } else {
+        for (var i = 1; i < _scopeStack.length; i++) {
+          var scope = _scopeStack[i];
+          // if `scope.(type)` is not defined, it is a block scope
+          if (!scope["(type)"]) {
+            if (_.has(scope["(labels)"], labelName) &&
+                !scope["(labels)"][labelName]["(blockscoped)"]) {
+              scope["(labels)"][labelName]["(unused)"] = false;
+              return;
+            }
+          } else {
+            break;
+          }
+        }
+        exported[labelName] = true;
+      }
+    },
 
     /**
      * Mark an indentifier as es6 module exported
@@ -593,6 +601,8 @@ var scopeManager = function(state, predefined, exported, declared) {
       var type  = opts.type;
       var token = opts.token;
       var isblockscoped = type === "let" || type === "const" || type === "class";
+      var isexported    = (isblockscoped ? _current : _currentFunctBody)["(type)"] === "global" &&
+                          _.has(exported, labelName);
 
       // outer shadow check (inner is only on non-block scoped)
       _checkOuterShadow(labelName, token, type);
@@ -632,7 +642,7 @@ var scopeManager = function(state, predefined, exported, declared) {
           }
         }
 
-        scopeManagerInst.block.add(labelName, type, token, true);
+        scopeManagerInst.block.add(labelName, type, token, !isexported);
 
       } else {
 
@@ -659,7 +669,7 @@ var scopeManager = function(state, predefined, exported, declared) {
           }
         }
 
-        scopeManagerInst.funct.add(labelName, type, token, true);
+        scopeManagerInst.funct.add(labelName, type, token, !isexported);
 
         if (_currentFunctBody["(type)"] === "global") {
           usedPredefinedAndGlobals[labelName] = marker;
@@ -765,7 +775,12 @@ var scopeManager = function(state, predefined, exported, declared) {
           token.ignoreUndef = true;
         }
 
-        _addUsage(labelName, token);
+        _setupUsages(labelName);
+
+        if (token) {
+          token["(function)"] = _currentFunctBody;
+          _current["(usages)"][labelName]["(tokens)"].push(token);
+        }
       },
 
       reassign: function(labelName, token) {
