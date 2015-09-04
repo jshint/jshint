@@ -1129,6 +1129,9 @@ exports.exported = function (test) {
     .addError(1, "'unused' is defined but never used.")
     .test("var unused = 1; var used = 2;", {exported: ["used"], unused: true});
 
+  TestRun(test, "exported vars aren't used before definition")
+    .test("var a;", {exported:["a"], latedef: true});
+
   test.done();
 };
 
