@@ -1514,7 +1514,9 @@ exports["destructuring const as esnext"] = function (test) {
     "const [ f, [ [ [ g ], h ], i ] ] = [ 1, [ [ [ 2 ], 3], 4 ] ];",
     "const { foo : bar } = { foo : 1 };",
     "const [ j, { foo : foobar } ] = [ 2, { foo : 1 } ];",
-    "[j] = [1];"
+    "[j] = [1];",
+    "[j.a] = [1];",
+    "[j['a']] = [1];",
   ];
 
   TestRun(test)
@@ -1533,6 +1535,7 @@ exports["destructuring const as esnext"] = function (test) {
     .addError(7, "'bar' is defined but never used.")
     .addError(8, "'foobar' is defined but never used.")
     .addError(9, "Attempting to override 'j' which is a constant.")
+    .addError(11, "['a'] is better written in dot notation.")
     .addError(3, "'z' is not defined.")
     .test(code, {esnext: true, unused: true, undef: true});
 
@@ -1649,7 +1652,10 @@ exports["destructuring const errors"] = function (test) {
     "const [ a, b, c ] = [ 1, 2, 3 ];",
     "const [ 1 ] = [ a ];",
     "const [ k, l; m ] = [ 1, 2, 3 ];",
-    "const [ n, o, p ] = [ 1, 2; 3 ];"
+    "const [ n, o, p ] = [ 1, 2; 3 ];",
+    "const q = {};",
+    "[q.a] = [1];",
+    "({a:q.a} = {a:1});"
   ];
 
   TestRun(test)
@@ -1688,10 +1694,18 @@ exports["destructuring globals as moz"] = function (test) {
     "[ o ] = [ { o : 1 } ];",
     "[ a, [ [ [ b ], c ], d ] ] = [ 1, [ [ [ 2 ], 3], 4 ] ];",
     "[ a, { foo : b } ] = [ 2, { foo : 1 } ];",
+    "[ a.b ] = [1];",
+    "[ { a: a.b } ] = [{a:1}];",
+    "[ { a: a['b'] } ] = [{a:1}];",
+    "[a['b']] = [1];",
+    "[,...a.b] = [1];"
   ];
 
   TestRun(test)
     .addError(4,  "'z' is not defined.")
+    .addError(11, "['b'] is better written in dot notation.")
+    .addError(12, "['b'] is better written in dot notation.")
+    .addError(13, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
     .test(code, {moz: true, unused: true, undef: true});
 
   test.done();
@@ -1699,7 +1713,7 @@ exports["destructuring globals as moz"] = function (test) {
 
 exports["destructuring globals as esnext"] = function (test) {
   var code = [
-    "var a, b, c, d, h, w, o;",
+    "var a, b, c, d, h, i, w, o;",
     "[ a, b, c ] = [ 1, 2, 3 ];",
     "[ a ] = [ 1 ];",
     "[ a ] = [ z ];",
@@ -1707,10 +1721,22 @@ exports["destructuring globals as esnext"] = function (test) {
     "[ o ] = [ { o : 1 } ];",
     "[ a, [ [ [ b ], c ], d ] ] = [ 1, [ [ [ 2 ], 3], 4 ] ];",
     "[ a, { foo : b } ] = [ 2, { foo : 1 } ];",
+    "[ a.b ] = [1];",
+    "[ { a: a.b } ] = [{a:1}];",
+    "[ { a: a['b'] } ] = [{a:1}];",
+    "[a['b']] = [1];",
+    "[,...a.b] = [1];",
+    "[...i] = [1];",
+    "[notDefined1] = [];",
+    "[...notDefined2] = [];",
   ];
 
   TestRun(test)
     .addError(4,  "'z' is not defined.")
+    .addError(11, "['b'] is better written in dot notation.")
+    .addError(12, "['b'] is better written in dot notation.")
+    .addError(15, "'notDefined1' is not defined.")
+    .addError(16, "'notDefined2' is not defined.")
     .test(code, {esnext: true, unused: true, undef: true});
 
   test.done();
@@ -1726,6 +1752,11 @@ exports["destructuring globals as es5"] = function (test) {
     "[ o ] = [ { o : 1 } ];",
     "[ a, [ [ [ b ], c ], d ] ] = [ 1, [ [ [ 2 ], 3], 4 ] ];",
     "[ a, { foo : b } ] = [ 2, { foo : 1 } ];",
+    "[ a.b ] = [1];",
+    "[ { a: a.b } ] = [{a:1}];",
+    "[ { a: a['b'] } ] = [{a:1}];",
+    "[a['b']] = [1];",
+    "[,...a.b] = [1];"
   ];
 
   TestRun(test)
@@ -1737,6 +1768,14 @@ exports["destructuring globals as es5"] = function (test) {
     .addError(6, "'destructuring assignment' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(7, "'destructuring assignment' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(8, "'destructuring assignment' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .addError(9, "'destructuring assignment' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .addError(10, "'destructuring assignment' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .addError(11, "['b'] is better written in dot notation.")
+    .addError(11, "'destructuring assignment' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .addError(12, "['b'] is better written in dot notation.")
+    .addError(12, "'destructuring assignment' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .addError(13, "'destructuring assignment' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .addError(13, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
     .test(code, {unused: true, undef: true}); // es5
 
   test.done();
@@ -1752,6 +1791,11 @@ exports["destructuring globals as legacy JS"] = function (test) {
     "[ o ] = [ { o : 1 } ];",
     "[ a, [ [ [ b ], c ], d ] ] = [ 1, [ [ [ 2 ], 3], 4 ] ];",
     "[ a, { foo : b } ] = [ 2, { foo : 1 } ];",
+    "[ a.b ] = [1];",
+    "[ { a: a.b } ] = [{a:1}];",
+    "[ { a: a['b'] } ] = [{a:1}];",
+    "[a['b']] = [1];",
+    "[,...a.b] = [1];"
   ];
 
   TestRun(test)
@@ -1763,6 +1807,14 @@ exports["destructuring globals as legacy JS"] = function (test) {
     .addError(6, "'destructuring assignment' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(7, "'destructuring assignment' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(8, "'destructuring assignment' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .addError(9, "'destructuring assignment' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .addError(10, "'destructuring assignment' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .addError(11, "['b'] is better written in dot notation.")
+    .addError(11, "'destructuring assignment' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .addError(12, "['b'] is better written in dot notation.")
+    .addError(12, "'destructuring assignment' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .addError(13, "'destructuring assignment' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .addError(13, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
     .test(code, {es3: true, unused: true, undef: true});
 
   test.done();
@@ -1776,6 +1828,9 @@ exports["destructuring globals with syntax error"] = function (test) {
     "[ a, b; c ] = [ 1, 2, 3 ];",
     "[ a, b, c ] = [ 1, 2; 3 ];",
     "[ a ] += [ 1 ];",
+    "[ { a.b } ] = [{a:1}];",
+    "[ a() ] = [];",
+    "[ { a: a() } ] = [];"
   ];
 
   TestRun(test)
@@ -1788,8 +1843,49 @@ exports["destructuring globals with syntax error"] = function (test) {
     .addError(5, "Expected an identifier and instead saw ']'.")
     .addError(5, "Expected an assignment or function call and instead saw an expression.")
     .addError(6, "Bad assignment.")
+    .addError(7, "Expected ',' and instead saw '.'.")
+    .addError(8, "Expected ',' and instead saw '('.")
+    .addError(8, "Expected an identifier and instead saw ')'.")
+    .addError(8, "Expected an identifier and instead saw ')'.")
+    .addError(9, "Expected ',' and instead saw '('.")
+    .addError(9, "Expected an identifier and instead saw ')'.")
     .addError(2,  "'z' is not defined.")
     .test(code, {esnext: true, unused: true, undef: true});
+
+  TestRun(test)
+    .addError(1, "Expected ',' and instead saw '['.")
+    .addError(1, "Expected ':' and instead saw ']'.")
+    .addError(1, "Expected an identifier and instead saw '}'.")
+    .addError(1, "Expected ',' and instead saw ']'.")
+    .addError(1, "Expected an identifier and instead saw '{'.")
+    .addError(1, "Expected ',' and instead saw 'a'.")
+    .addError(1, "Expected an identifier and instead saw ':'.")
+    .addError(1, "Expected ',' and instead saw '1'.")
+    .addError(1, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, "Expected an identifier and instead saw '='.")
+    .test("[ { a['b'] } ] = [{a:1}];", {esnext: true, unused: true, undef: true});
+
+  TestRun(test)
+    .addError(1, "Expected ',' and instead saw '('.")
+    .addError(1, "Expected an identifier and instead saw ')'.")
+    .test("[ { a() } ] = [];", {esnext: true, unused: true, undef: true});
+
+  TestRun(test)
+    .addError(1, "Extending prototype of native object: 'Number'.")
+    .addError(3, "Bad assignment.")
+    .addError(4, "Bad assignment.")
+    .addError(6, "Do not assign to the exception parameter.")
+    .addError(7, "Do not assign to the exception parameter.")
+    .test([
+      "[ Number.prototype.toString ] = [function(){}];",
+      "function a() {",
+      "  [ new.target ] = [];",
+      "  [ arguments.anything ] = [];",
+      "  try{} catch(e) {",
+      "    ({e} = {e});",
+      "    [e] = [];",
+      "  }",
+      "}"], {esnext: true, freeze: true});
 
   test.done();
 };
