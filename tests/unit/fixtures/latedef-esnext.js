@@ -60,3 +60,8 @@ let dc = {
         return dc;
     }
 };
+
+export function de() {}
+export class df {}
+export var dg;
+export let dh;
