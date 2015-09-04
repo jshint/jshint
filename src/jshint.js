@@ -1370,7 +1370,9 @@ var JSHINT = (function() {
     } else if (left.id === "{" || left.id === "[") {
       if (allowDestructuring && state.tokens.curr.left.destructAssign) {
         state.tokens.curr.left.destructAssign.forEach(function(t) {
-          state.funct["(scope)"].block.modify(t.id, t.token);
+          if (t.id) {
+            state.funct["(scope)"].block.modify(t.id, t.token);
+          }
         });
       } else {
         if (left.id === "{" || !left.left) {
@@ -3356,12 +3358,14 @@ var JSHINT = (function() {
     var ids;
     var identifiers = [];
     var openingParsed = options && options.openingParsed;
+    var isAssignment = options && options.assignment;
+    var recursiveOptions = isAssignment ? { assignment: isAssignment } : null;
     var firstToken = openingParsed ? state.tokens.curr : state.tokens.next;
 
     var nextInnerDE = function() {
       var ident;
       if (checkPunctuators(state.tokens.next, ["[", "{"])) {
-        ids = destructuringPatternRecursive();
+        ids = destructuringPatternRecursive(recursiveOptions);
         for (var id in ids) {
           id = ids[id];
           identifiers.push({ id: id.id, token: id.token });
@@ -3374,9 +3378,22 @@ var JSHINT = (function() {
         advance(")");
       } else {
         var is_rest = checkPunctuator(state.tokens.next, "...");
-        ident = identifier();
-        if (ident)
+
+        if (isAssignment) {
+          var identifierToken = is_rest ? peek(0) : state.tokens.next;
+          if (!identifierToken.identifier) {
+            warning("E030", identifierToken, identifierToken.value);
+          }
+          var assignTarget = expression(150);
+          if (assignTarget && assignTarget.identifier) {
+            ident = assignTarget.value;
+          }
+        } else {
+          ident = identifier();
+        }
+        if (ident) {
           identifiers.push({ id: ident, token: state.tokens.curr });
+        }
         return is_rest;
       }
       return false;
