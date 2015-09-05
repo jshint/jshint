@@ -3384,7 +3384,7 @@ var JSHINT = (function() {
           if (!identifierToken.identifier) {
             warning("E030", identifierToken, identifierToken.value);
           }
-          var assignTarget = expression(150);
+          var assignTarget = expression(155);
           if (assignTarget && assignTarget.identifier) {
             ident = assignTarget.value;
           }
