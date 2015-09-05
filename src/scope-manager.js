@@ -568,11 +568,12 @@ var scopeManager = function(state, predefined, exported, declared) {
      * for the exported options, indicating a variable is used outside the file
      */
     addExported: function(labelName) {
+      var globalLabels = _scopeStack[0]["(labels)"];
       if (_.has(declared, labelName)) {
         // remove the declared token, so we know it is used
         delete declared[labelName];
-      } else if (_current["(type)"] === "global" && _.has(_current["(labels)"], labelName)) {
-        _current["(labels)"][labelName]["(unused)"] = false;
+      } else if (_.has(globalLabels, labelName)) {
+        globalLabels[labelName]["(unused)"] = false;
       } else {
         exported[labelName] = true;
       }
