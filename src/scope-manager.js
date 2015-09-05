@@ -65,16 +65,6 @@ var scopeManager = function(state, predefined, exported, declared) {
     }
   }
 
-  function _addUsage(labelName, token) {
-
-    _setupUsages(labelName);
-
-    if (token) {
-      token["(function)"] = _currentFunctBody;
-      _current["(usages)"][labelName]["(tokens)"].push(token);
-    }
-  }
-
   var _getUnusedOption = function(unused_opt) {
     if (unused_opt === undefined) {
       unused_opt = state.option.unused;
@@ -772,7 +762,12 @@ var scopeManager = function(state, predefined, exported, declared) {
           token.ignoreUndef = true;
         }
 
-        _addUsage(labelName, token);
+        _setupUsages(labelName);
+
+        if (token) {
+          token["(function)"] = _currentFunctBody;
+          _current["(usages)"][labelName]["(tokens)"].push(token);
+        }
       },
 
       reassign: function(labelName, token) {
