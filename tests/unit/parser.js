@@ -1124,8 +1124,9 @@ exports.exported = function (test) {
   run.test(src, {unused: true }); // es5
   run.test(src, {esnext: true, unused: true });
   run.test(src, {moz: true, unused: true });
+  run.test(src, {unused: true, latedef: true});
 
-  run = TestRun(test)
+  TestRun(test)
     .addError(1, "'unused' is defined but never used.")
     .test("var unused = 1; var used = 2;", {exported: ["used"], unused: true});
 
