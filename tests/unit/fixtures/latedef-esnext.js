@@ -65,3 +65,4 @@ export function de() {}
 export class df {}
 export var dg;
 export let dh;
+export const di = {};
