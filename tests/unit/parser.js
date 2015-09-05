@@ -1897,6 +1897,23 @@ exports["destructuring globals with syntax error"] = function (test) {
     .addError(1, "Expected an identifier and instead saw ')'.")
     .test("[ { a() } ] = [];", {esnext: true, unused: true, undef: true});
 
+  TestRun(test)
+    .addError(1, "Extending prototype of native object: 'Number'.")
+    .addError(3, "Bad assignment.")
+    .addError(4, "Bad assignment.")
+    .addError(6, "Do not assign to the exception parameter.")
+    .addError(7, "Do not assign to the exception parameter.")
+    .test([
+      "[ Number.prototype.toString ] = [function(){}];",
+      "function a() {",
+      "  [ new.target ] = [];",
+      "  [ arguments.anything ] = [];",
+      "  try{} catch(e) {",
+      "    ({e} = {e});",
+      "    [e] = [];",
+      "  }",
+      "}"], {esnext: true, freeze: true});
+
   test.done();
 };
 

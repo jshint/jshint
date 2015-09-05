@@ -1338,7 +1338,7 @@ var JSHINT = (function() {
   /**
    * Checks the left hand side of an assignment for issues, returns if ok
    * @param {token} left - the left hand side of the assignment
-   * @param {token} assignToken - the token for the assignment
+   * @param {token=} assignToken - the token for the assignment, used for reporting
    * @param {object=} options - optional object
    * @param {boolean} options.allowDestructuring - whether to allow destructuting binding
    * @returns {boolean} Whether the left hand side is OK
@@ -1346,6 +1346,8 @@ var JSHINT = (function() {
   function checkLeftSideAssign(left, assignToken, options) {
 
     var allowDestructuring = options && options.allowDestructuring;
+
+    assignToken = assignToken || left;
 
     if (state.option.freeze) {
       var nativeObject = findNativePrototype(left);
@@ -3385,8 +3387,13 @@ var JSHINT = (function() {
             warning("E030", identifierToken, identifierToken.value);
           }
           var assignTarget = expression(155);
-          if (assignTarget && assignTarget.identifier) {
-            ident = assignTarget.value;
+          if (assignTarget) {
+            checkLeftSideAssign(assignTarget);
+
+            // if the target was a simple identifier, add it to the list to return
+            if (assignTarget.identifier) {
+              ident = assignTarget.value;
+            }
           }
         } else {
           ident = identifier();
@@ -3412,11 +3419,16 @@ var JSHINT = (function() {
         advance(":");
         nextInnerDE();
       } else {
+        // this id will either be the property name or the property name and the assigning identifier
         id = identifier();
         if (checkPunctuator(state.tokens.next, ":")) {
           advance(":");
           nextInnerDE();
-        } else {
+        } else if (id) {
+          // in this case we are assigning (not declaring), so check assignment
+          if (isAssignment) {
+            checkLeftSideAssign(state.tokens.curr);
+          }
           identifiers.push({ id: id, token: state.tokens.curr });
         }
       }
