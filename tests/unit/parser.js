@@ -1678,44 +1678,6 @@ exports["destructuring const errors"] = function (test) {
   test.done();
 };
 
-exports["destructuring const errors"] = function (test) {
-  var code = [
-    "const [ a, b, c ] = [ 1, 2, 3 ];",
-    "const [ a, b, c ] = [ 1, 2, 3 ];",
-    "const [ 1 ] = [ a ];",
-    "const [ k, l; m ] = [ 1, 2, 3 ];",
-    "const [ n, o, p ] = [ 1, 2; 3 ];",
-    "const q = {};",
-    "[q.a] = [1];",
-    "({a:q.a} = {a:1});"
-  ];
-
-  TestRun(test)
-    .addError(2, "'b' is defined but never used.")
-    .addError(2, "'c' is defined but never used.")
-    .addError(4, "'k' is defined but never used.")
-    .addError(4, "'l' is defined but never used.")
-    .addError(4, "'m' is defined but never used.")
-    .addError(5, "'n' is defined but never used.")
-    .addError(5, "'o' is defined but never used.")
-    .addError(5, "'p' is defined but never used.")
-    .addError(2, "'a' has already been declared.")
-    .addError(2, "'b' has already been declared.")
-    .addError(2, "'c' has already been declared.")
-    .addError(3, "Expected an identifier and instead saw '1'.")
-    .addError(4, "Expected ',' and instead saw ';'.")
-    .addError(5, "Expected ']' to match '[' from line 5 and instead saw ';'.")
-    .addError(5, "Missing semicolon.")
-    .addError(5, "Expected an assignment or function call and instead saw an expression.")
-    .addError(5, "Missing semicolon.")
-    .addError(5, "Expected an identifier and instead saw ']'.")
-    .addError(5, "Expected an assignment or function call and instead saw an expression.")
-    .addError(5, "Missing semicolon.")
-    .test(code, {esnext: true, unused: true, undef: true});
-
-  test.done();
-};
-
 exports["destructuring globals as moz"] = function (test) {
   var code = [
     "var a, b, c, d, h, w, o;",
