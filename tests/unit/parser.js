@@ -1707,7 +1707,7 @@ exports["destructuring globals as moz"] = function (test) {
 
 exports["destructuring globals as esnext"] = function (test) {
   var code = [
-    "var a, b, c, d, h, w, o;",
+    "var a, b, c, d, h, i, w, o;",
     "[ a, b, c ] = [ 1, 2, 3 ];",
     "[ a ] = [ 1 ];",
     "[ a ] = [ z ];",
@@ -1719,13 +1719,18 @@ exports["destructuring globals as esnext"] = function (test) {
     "[ { a: a.b } ] = [{a:1}];",
     "[ { a: a['b'] } ] = [{a:1}];",
     "[a['b']] = [1];",
-    "[,...a.b] = [1];"
+    "[,...a.b] = [1];",
+    "[...i] = [1];",
+    "[notDefined1] = [];",
+    "[...notDefined2] = [];",
   ];
 
   TestRun(test)
     .addError(4,  "'z' is not defined.")
     .addError(11, "['b'] is better written in dot notation.")
     .addError(12, "['b'] is better written in dot notation.")
+    .addError(15, "'notDefined1' is not defined.")
+    .addError(16, "'notDefined2' is not defined.")
     .test(code, {esnext: true, unused: true, undef: true});
 
   test.done();
