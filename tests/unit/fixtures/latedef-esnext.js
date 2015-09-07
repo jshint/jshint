@@ -61,6 +61,7 @@ let dc = {
     }
 };
 
+// Regression test for gh-2658
 export function de() {}
 export class df {}
 export var dg;
