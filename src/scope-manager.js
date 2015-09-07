@@ -565,6 +565,19 @@ var scopeManager = function(state, predefined, exported, declared) {
       } else if (_.has(globalLabels, labelName)) {
         globalLabels[labelName]["(unused)"] = false;
       } else {
+        for (var i = 1; i < _scopeStack.length; i++) {
+          var scope = _scopeStack[i];
+          // if `scope.(type)` is not defined, it is a block scope
+          if (!scope["(type)"]) {
+            if (_.has(scope["(labels)"], labelName) &&
+                !scope["(labels)"][labelName]["(blockscoped)"]) {
+              scope["(labels)"][labelName]["(unused)"] = false;
+              return;
+            }
+          } else {
+            break;
+          }
+        }
         exported[labelName] = true;
       }
     },

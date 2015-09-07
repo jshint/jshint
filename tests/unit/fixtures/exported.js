@@ -27,3 +27,8 @@ if (true) {
   }
   /* exported b */
 }
+
+if (true) {
+  var c;
+}
+/* exported c */
