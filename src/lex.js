@@ -421,6 +421,11 @@ Lexer.prototype = {
 
       body = body.replace(/\n/g, " ");
 
+      if (label === "/*" && reg.fallsThrough.test(body)) {
+        isSpecial = true;
+        commentType = "falls through";
+      }
+
       special.forEach(function(str) {
         if (isSpecial) {
           return;
