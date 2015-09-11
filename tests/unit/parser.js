@@ -6935,6 +6935,7 @@ exports.testStrictDirectiveASI = function (test) {
     .test("'use strict'\n(function fn() {})();", options);
 
   TestRun(test, 5)
+    .addError(2, "Missing \"use strict\" statement.")
     .test("'use strict'\n[0] = '6';", options);
 
   TestRun(test, 6)
@@ -6944,6 +6945,7 @@ exports.testStrictDirectiveASI = function (test) {
     .test("'use strict',function fn() {}\nfn();", options);
 
   TestRun(test, 7)
+    .addError(1, "Missing \"use strict\" statement.")
     .test("'use strict'.split(' ');", options);
 
   TestRun(test, 8)
