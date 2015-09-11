@@ -832,7 +832,11 @@ var JSHINT = (function() {
       }
 
       if (state.tokens.next.isSpecial) {
-        doOption();
+        if (state.tokens.next.type === "falls through") {
+          state.tokens.curr.caseFallsThrough = true;
+        } else {
+          doOption();
+        }
       } else {
         if (state.tokens.next.id !== "(endline)") {
           break;
@@ -4094,7 +4098,7 @@ var JSHINT = (function() {
           // You can tell JSHint that you don't use break intentionally by
           // adding a comment /* falls through */ on a line just before
           // the next `case`.
-          if (!reg.fallsThrough.test(state.lines[state.tokens.next.line - 2])) {
+          if (!state.tokens.curr.caseFallsThrough) {
             warning("W086", state.tokens.curr, "case");
           }
         }
@@ -4118,7 +4122,7 @@ var JSHINT = (function() {
           // Do not display a warning if 'default' is the first statement or if
           // there is a special /* falls through */ comment.
           if (this.cases.length) {
-            if (!reg.fallsThrough.test(state.lines[state.tokens.next.line - 2])) {
+            if (!state.tokens.curr.caseFallsThrough) {
               warning("W086", state.tokens.curr, "default");
             }
           }
