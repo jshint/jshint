@@ -1651,6 +1651,10 @@ exports.strict = function (test) {
     .addError(1, 'Use the function form of "use strict".')
     .test(code3, { strict: "func", node: true });
 
+  TestRun(test, "gh-2668")
+    .addError(1, "Missing \"use strict\" statement.")
+    .test("a = 2;", { strict: "global" });
+
   test.done();
 };
 
@@ -1684,6 +1688,7 @@ exports.globalstrict = function (test) {
   ];
   TestRun(test)
     .addError(1, 'Missing "use strict" statement.')
+    .addError(2, 'Missing "use strict" statement.')
     .test(code, { globalstrict: true, strict: true });
 
   // globalscript does not prevent you from using only the function-mode
