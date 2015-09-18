@@ -710,7 +710,14 @@ exports.bool = {
      * native support for various web standards: DOM handling, CSS selector,
      * JSON, Canvas, and SVG.
      */
-    phantom     : true
+    phantom     : true,
+
+
+    /**
+     * This option adds the core globals exposed by the platform Meteor.js
+     * [Meteor Platform](https://github.com/meteor/meteor)
+     */
+    meteor      : true    
   },
 
   // Obsolete options

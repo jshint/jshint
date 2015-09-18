@@ -318,6 +318,10 @@ var JSHINT = (function() {
     if (state.option.mocha) {
       combine(predefined, vars.mocha);
     }
+
+    if (state.option.meteor) {
+      combine(predefined, vars.meteor);
+    }
   }
 
   // Produce an error warning.
