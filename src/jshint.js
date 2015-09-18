@@ -1815,6 +1815,7 @@ var JSHINT = (function() {
 
       // create a new block scope
       state.funct["(scope)"].stack();
+      state.funct["(noblockscopedvar)"] = false;
 
       line = state.tokens.curr.line;
       if (state.tokens.next.id !== "}") {
