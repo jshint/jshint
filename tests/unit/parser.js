@@ -4945,25 +4945,32 @@ exports["no let not directly within a block"] = function (test) {
     "   if (true)",
     "       let x = 1;",
     "}",
-    "if (true) let (x = 1) print(x);",
     "for (let x = 0; x < 42; ++x) let a = 1;",
     "for (let x in [1, 2, 3, 4] ) let a = 1;",
     "for (let x of [1, 2, 3, 4] ) let a = 1;",
     "while (true) let a = 1;",
-    "if (false) let a = 1; else if (true) let a = 1; else let a = 2;"
+    "if (false) let a = 1; else if (true) let a = 1; else let a = 2;",
+    "if (true) if (false) let x = 1;",
+    "if (true) if (false) { let x = 1; }",
+    "if (true) try { let x = 1; } catch (e) { let x = 1; }"
   ];
 
-  TestRun(test)
+  var run = TestRun(test)
     .addError(1, "Let declaration not directly within block.")
     .addError(4, "Let declaration not directly within block.")
+    .addError(6, "Let declaration not directly within block.")
     .addError(7, "Let declaration not directly within block.")
     .addError(8, "Let declaration not directly within block.")
     .addError(9, "Let declaration not directly within block.")
     .addError(10, "Let declaration not directly within block.")
-    .addError(11, "Let declaration not directly within block.")
-    .addError(11, "Let declaration not directly within block.")
-    .addError(11, "Let declaration not directly within block.")
-    .test(code, {moz: true, predef: ["print"]});
+    .addError(10, "Let declaration not directly within block.")
+    .addError(10, "Let declaration not directly within block.")
+    .addError(11, "Let declaration not directly within block.");
+  run.test(code, {esversion: 6});
+  run.test(code, {moz: true});
+
+  // Don't warn about let expressions
+  TestRun(test).test("if (true) let (x = 1) print(x);", {moz: true, predef: ["print"]});
 
   test.done();
 };
@@ -4977,7 +4984,8 @@ exports["no const not directly within a block"] = function (test) {
     "}",
     "for (let x = 0; x < 42; ++x) const a = 1;",
     "while (true) const a = 1;",
-    "if (false) const a = 1; else if (true) const a = 1; else const a = 2;"
+    "if (false) const a = 1; else if (true) const a = 1; else const a = 2;",
+    "if (true) if (false) { const a = 1; }"
   ];
 
   TestRun(test)
