@@ -1647,13 +1647,13 @@ var JSHINT = (function() {
           p = pn;
         } else if (pn.value === "[" || pn.value === ".") {
           // string -> [ | . is a valid production
-          return;
+          break;
         } else if (!state.option.asi || pn.value === "(") {
           // string -> ( is not a valid production
           warning("W033", state.tokens.next);
         }
       } else if (p.id === "." || p.id === "[") {
-        return;
+        break;
       } else if (p.id !== ";") {
         warning("W033", p);
       }
@@ -1742,14 +1742,17 @@ var JSHINT = (function() {
 
         metrics.statementCount += a.length;
 
-        if (isfunc) {
-          state.directive = m;
-        }
-
         indent -= state.option.indent;
       }
 
       advance("}", t);
+
+      if (isfunc) {
+        state.funct["(scope)"].validateParams();
+        if (m) {
+          state.directive = m;
+        }
+      }
 
       state.funct["(scope)"].unstack();
 
@@ -2722,11 +2725,11 @@ var JSHINT = (function() {
    *                                  single-argument shorthand.
    * @param {bool} [options.parsedOpening] Whether the opening parenthesis has
    *                                       already been parsed.
-   * @returns {Array.<{ id: string, token: Token}>}
+   * @returns {Array.<string>} array of param identifiers
    */
   function functionparams(options) {
     var next;
-    var params = [];
+    var paramsIds = [];
     var ident;
     var tokens = [];
     var t;
@@ -2735,7 +2738,8 @@ var JSHINT = (function() {
     var loneArg = options && options.loneArg;
 
     if (loneArg && loneArg.identifier === true) {
-      return [ { id: loneArg.value, token: loneArg }];
+      state.funct["(scope)"].addParam(loneArg.value, loneArg);
+      return [ loneArg.value ];
     }
 
     next = state.tokens.next;
@@ -2749,20 +2753,30 @@ var JSHINT = (function() {
       return;
     }
 
+    function addParam(addParamArgs) {
+      state.funct["(scope)"].addParam.apply(state.funct["(scope)"], addParamArgs);
+    }
+
     for (;;) {
+      // store the current param(s) of this loop so we can evaluate the default argument before parameters
+      // are added to the param scope
+      var currentParams = [];
+
       if (_.contains(["{", "["], state.tokens.next.id)) {
         tokens = destructuringExpression();
         for (t in tokens) {
           t = tokens[t];
           if (t.id) {
-            params.push({ id: t.id, token: t });
+            paramsIds.push(t.id);
+            currentParams.push([t.id, t.token]);
           }
         }
       } else {
         if (checkPunctuators(state.tokens.next, ["..."])) pastRest = true;
         ident = identifier(true);
         if (ident) {
-          params.push({ id: ident, token: state.tokens.curr });
+          paramsIds.push(ident);
+          currentParams.push([ident, state.tokens.curr]);
         } else {
           // Skip invalid parameter.
           while (!checkPunctuators(state.tokens.next, [",", ")"])) advance();
@@ -2783,6 +2797,10 @@ var JSHINT = (function() {
         pastDefault = true;
         expression(10);
       }
+
+      // now we have evaluated the default expression, add the variable to the param scope
+      currentParams.forEach(addParam);
+
       if (state.tokens.next.id === ",") {
         if (pastRest) {
           warning("W131", state.tokens.next);
@@ -2790,7 +2808,7 @@ var JSHINT = (function() {
         comma();
       } else {
         advance(")", next);
-        return params;
+        return paramsIds;
       }
     }
   }
@@ -2943,16 +2961,11 @@ var JSHINT = (function() {
         classExprBinding ? "class" : "function", state.tokens.curr, false);
     }
 
-    var params = functionparams(options);
-    var paramsIds;
-    if (params) {
-      paramsIds = _.map(params, function(token) {
-        return token.id;
-      });
-    }
+    // create the param scope (params added in functionparams)
+    state.funct["(scope)"].stackParams(true);
 
-    // create the param scope and adds the labels to it
-    state.funct["(scope)"].stackParams(params, true);
+    var paramsIds = functionparams(options);
+
     state.funct["(params)"] = paramsIds;
     state.funct["(metrics)"].verifyMaxParametersPerFunction(paramsIds);
 
@@ -3811,26 +3824,24 @@ var JSHINT = (function() {
     var b;
 
     function doCatch() {
-      var params = [];
-
       advance("catch");
       advance("(");
+
+      state.funct["(scope)"].stackParams();
 
       if (checkPunctuators(state.tokens.next, ["[", "{"])) {
         var tokens = destructuringExpression();
         _.each(tokens, function(token) {
           if (token.id) {
-            params.push({ id: token.id, token: token });
+            state.funct["(scope)"].addParam(token.id, token, "exception");
           }
         });
       } else if (state.tokens.next.type !== "(identifier)") {
         warning("E030", state.tokens.next, state.tokens.next.value);
       } else {
         // only advance if we have an identifier so we can continue parsing in the most common error - that no param is given.
-        params.push({ id: identifier(), token: state.tokens.curr, type: "exception" });
+        state.funct["(scope)"].addParam(identifier(), state.tokens.curr, "exception");
       }
-
-      state.funct["(scope)"].stackParams(params);
 
       if (state.tokens.next.value === "if") {
         if (!state.inMoz()) {

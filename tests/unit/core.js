@@ -1435,18 +1435,98 @@ exports.testPotentialVariableLeak = function (test) {
 exports.testDefaultArguments = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/default-arguments.js", "utf8");
   TestRun(test)
-    .addError(11, "Regular parameters cannot come after default parameters.")
-    .test(src, { esnext: true });
+    .addError(14, "'bar' is not defined.")
+    .addError(14, "'num3' was used before it was declared, which is illegal for 'param' variables.")
+    .addError(15, "'num4' was used before it was declared, which is illegal for 'param' variables.")
+    .addError(18, "Regular parameters cannot come after default parameters.")
+    .addError(27, "'c' is not defined.")
+    .addError(33, "'d' was used before it was defined.")
+    .addError(36, "'e' was used before it was declared, which is illegal for 'param' variables.")
+    .test(src, { esnext: true, undef: true, latedef: true });
 
   TestRun(test)
-    .addError(11, "Regular parameters cannot come after default parameters.")
+    .addError(14, "'num3' was used before it was declared, which is illegal for 'param' variables.")
+    .addError(15, "'num4' was used before it was declared, which is illegal for 'param' variables.")
+    .addError(18, "Regular parameters cannot come after default parameters.")
+    .addError(36, "'e' was used before it was declared, which is illegal for 'param' variables.")
     .test(src, { moz: true });
 
   TestRun(test)
     .addError(7, "'default parameters' is only available in ES6 (use esnext option).")
     .addError(11, "'default parameters' is only available in ES6 (use esnext option).")
-    .addError(11, "Regular parameters cannot come after default parameters.")
+    .addError(12, "'default parameters' is only available in ES6 (use esnext option).")
+    .addError(13, "'default parameters' is only available in ES6 (use esnext option).")
+    .addError(14, "'default parameters' is only available in ES6 (use esnext option).")
+    .addError(14, "'num3' was used before it was declared, which is illegal for 'param' variables.")
+    .addError(15, "'default parameters' is only available in ES6 (use esnext option).")
+    .addError(15, "'num4' was used before it was declared, which is illegal for 'param' variables.")
+    .addError(18, "'default parameters' is only available in ES6 (use esnext option).")
+    .addError(18, "Regular parameters cannot come after default parameters.")
+    .addError(26, "'default parameters' is only available in ES6 (use esnext option).")
+    .addError(31, "'default parameters' is only available in ES6 (use esnext option).")
+    .addError(33, "'default parameters' is only available in ES6 (use esnext option).")
+    .addError(35, "'default parameters' is only available in ES6 (use esnext option).")
+    .addError(36, "'default parameters' is only available in ES6 (use esnext option).")
+    .addError(36, "'e' was used before it was declared, which is illegal for 'param' variables.")
     .test(src, {  });
+
+  test.done();
+};
+
+exports.testDuplicateParamNames = function (test) {
+  var src = [
+  "(function() {",
+  "  (function(a, a) { // warns only with shadow",
+  "  })();",
+  "})();",
+  "(function() {",
+  "  'use strict';",
+  "  (function(a, a) { // errors because of strict mode",
+  "  })();",
+  "})();",
+  "(function() {",
+  "  (function(a, a) { // errors because of strict mode",
+  "  'use strict';",
+  "  })();",
+  "})();",
+  "(function() {",
+  "  'use strict';",
+  "  (function(a, a) { // errors *once* because of strict mode",
+  "  'use strict';",
+  "  })();",
+  "})();"
+  ];
+
+  TestRun(test)
+    .addError(7, "'a' has already been declared.")
+    .addError(11, "'a' has already been declared.")
+    .addError(17, "'a' has already been declared.")
+    .addError(18, "Unnecessary directive \"use strict\".")
+    .test(src, { shadow: true });
+
+  TestRun(test)
+    .addError(2, "'a' is already defined.")
+    .addError(7, "'a' has already been declared.")
+    .addError(11, "'a' has already been declared.")
+    .addError(17, "'a' has already been declared.")
+    .addError(18, "Unnecessary directive \"use strict\".")
+    .test(src, { shadow: "inner" });
+
+  TestRun(test)
+    .addError(2, "'a' is already defined.")
+    .addError(7, "'a' has already been declared.")
+    .addError(11, "'a' has already been declared.")
+    .addError(17, "'a' has already been declared.")
+    .addError(18, "Unnecessary directive \"use strict\".")
+    .test(src, { shadow: "outer" });
+
+  TestRun(test)
+    .addError(2, "'a' is already defined.")
+    .addError(7, "'a' has already been declared.")
+    .addError(11, "'a' has already been declared.")
+    .addError(17, "'a' has already been declared.")
+    .addError(18, "Unnecessary directive \"use strict\".")
+    .test(src, { shadow: false });
 
   test.done();
 };
