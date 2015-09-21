@@ -24,7 +24,8 @@ var scopeManager = function(state, predefined, exported, declared) {
       "(breakLabels)": Object.create(null),
       "(parent)": _current,
       "(type)": type,
-      "(params)": (type === "functionparams" || type === "catchparams") ? [] : null
+      "(params)": (type === "functionparams" || type === "catchparams") ? [] : null,
+      "(currentDefinition)": Object.create(null)
     };
     _scopeStack.push(_current);
   }
@@ -699,6 +700,15 @@ var scopeManager = function(state, predefined, exported, declared) {
       }
     },
 
+    definition: {
+      add: function(labelName, type) {
+        _current["(currentDefinition)"][labelName] = { type: type };
+      },
+      reset: function() {
+        _current["(currentDefinition)"] = Object.create(null);
+      }
+    },
+
     funct: {
       /**
        * Returns the label type given certain options
@@ -804,6 +814,13 @@ var scopeManager = function(state, predefined, exported, declared) {
         if (token) {
           token["(function)"] = _currentFunctBody;
           _current["(usages)"][labelName]["(tokens)"].push(token);
+        }
+
+        // blockscoped vars can't be used within their initializer (TDZ)
+        // (currentDefinitions) only contains blockscoped vars
+        var currentDefinition = _current["(currentDefinition)"][labelName];
+        if (currentDefinition) {
+          error("E056", token, labelName, currentDefinition.type);
         }
       },
 

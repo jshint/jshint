@@ -3553,6 +3553,7 @@ var JSHINT = (function() {
             if (lone && inexport) {
               state.funct["(scope)"].setExported(t.token.value, t.token);
             }
+            state.funct["(scope)"].definition.add(t.id, type);
           }
         }
       }
@@ -3574,6 +3575,8 @@ var JSHINT = (function() {
           destructuringPatternMatch(names, value);
         }
       }
+
+      state.funct["(scope)"].definition.reset();
 
       statement.first = statement.first.concat(names);
 
