@@ -1989,3 +1989,42 @@ exports.duplicateProto = function (test) {
 
   test.done();
 };
+
+exports["TDZ within initializer of lexical declarations"] = function(test) {
+  var code = [
+    "let a = a;",
+    "const b = b;",
+    "let c = () => c;",
+    "const d = () => d;",
+    // line 5
+    "let e = {",
+    "  x: e,",
+    "  y: () => e",
+    "};",
+    "const f = {",
+    "  x: f,",
+    "  y: () => f",
+    "};",
+    // line 13
+    "let g, h = g;",
+    "const i = 0, j = i;",
+    "let [ k, l ] = l;",
+    "const [ m, n ] = n;",
+    // line 17
+    "let o = (() => o) + o;",
+    "const p = (() => p) + p;"
+  ];
+
+  TestRun(test)
+    .addError(1, "'a' was used before it was declared, which is illegal for 'let' variables.")
+    .addError(2, "'b' was used before it was declared, which is illegal for 'const' variables.")
+    .addError(6, "'e' was used before it was declared, which is illegal for 'let' variables.")
+    .addError(10, "'f' was used before it was declared, which is illegal for 'const' variables.")
+    .addError(15, "'l' was used before it was declared, which is illegal for 'let' variables.")
+    .addError(16, "'n' was used before it was declared, which is illegal for 'const' variables.")
+    .addError(17, "'o' was used before it was declared, which is illegal for 'let' variables.")
+    .addError(18, "'p' was used before it was declared, which is illegal for 'const' variables.")
+    .test(code, { esversion: 6 });
+
+  test.done();
+};
