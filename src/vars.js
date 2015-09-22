@@ -84,6 +84,8 @@ exports.browser = {
   Event                : false,
   event                : false,
   fetch                : false,
+  File                 : false,
+  FileList             : false,
   FileReader           : false,
   FormData             : false,
   focus                : false,
