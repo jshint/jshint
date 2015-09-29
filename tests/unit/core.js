@@ -771,6 +771,10 @@ exports.testUndefinedAssignment = function (test) {
     "var i = undefined;",
     "const j = undefined;",
     "let k = undefined;",
+    "// jshint +W080",
+    "var l = undefined === 0;",
+    "const m = undefined === 0;",
+    "let n = undefined === 0;",
   ];
 
   TestRun(test)
