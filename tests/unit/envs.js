@@ -86,6 +86,13 @@ exports.node = function (test) {
     .addError(1, "Read only.")
     .test(overwrites, { es3: true, browserify: true });
 
+  TestRun(test, "gh-2657")
+    .test("'use strict';var a;", { node: true });
+
+  // Implied `strict: global` if `strict` is `true`
+  JSHINT("", { node: true, strict: true });
+  test.strictEqual(JSHINT.data().options.strict, "global");
+
   test.done();
 };
 

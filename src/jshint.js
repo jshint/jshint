@@ -5286,7 +5286,10 @@ var JSHINT = (function() {
         directives();
 
         if (state.directive["use strict"]) {
-          if (state.option.strict !== "global") {
+          if (state.option.strict !== "global" &&
+              !((state.option.strict === true || !state.option.strict) &&
+                (state.option.globalstrict || state.option.module || state.option.node ||
+                 state.option.phantom || state.option.browserify))) {
             warning("W097", state.tokens.prev);
           }
         }
