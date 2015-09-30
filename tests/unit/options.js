@@ -1696,6 +1696,9 @@ exports.globalstrict = function (test) {
   code = '(function (test) { "use strict"; return; }());';
   TestRun(test).test(code, { globalstrict: true, strict: true });
 
+  TestRun(test, "gh-2661")
+    .test("'use strict';", { strict: false, globalstrict: true });
+
   test.done();
 };
 
