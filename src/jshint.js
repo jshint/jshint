@@ -3737,6 +3737,8 @@ var JSHINT = (function() {
       state.funct["(scope)"].addlabel(this.name, {
         type: "class",
         token: state.tokens.curr });
+
+      state.funct["(scope)"].definition.add(this.name, "class");
     } else if (state.tokens.next.identifier && state.tokens.next.value !== "extends") {
       // BindingIdentifier(opt)
       this.name = identifier();
@@ -3744,7 +3746,13 @@ var JSHINT = (function() {
     } else {
       this.name = state.nameStack.infer();
     }
+
     classtail(this);
+
+    if (isStatement) {
+      state.funct["(scope)"].definition.reset();
+    }
+
     return this;
   }
 
