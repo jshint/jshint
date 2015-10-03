@@ -2128,3 +2128,30 @@ exports["TDZ within initializer of lexical declarations"] = function(test) {
 
   test.done();
 };
+
+exports["TDZ within class heritage definition"] = function(test) {
+  var code = [
+    "let A = class extends A {};",
+    "let B = class extends { B } {};",
+    "let C = class extends { method() { return C; } } {};",
+    // line 4
+    "const D = class extends D {};",
+    "const E = class extends { E } {};",
+    "const F = class extends { method() { return F; } } {};",
+    // line 7
+    "class G extends G {}",
+    "class H extends { H } {}",
+    "class I extends { method() { return I; }} {}"
+  ];
+
+  TestRun(test)
+    .addError(1, "'A' was used before it was declared, which is illegal for 'let' variables.")
+    .addError(2, "'B' was used before it was declared, which is illegal for 'let' variables.")
+    .addError(4, "'D' was used before it was declared, which is illegal for 'const' variables.")
+    .addError(5, "'E' was used before it was declared, which is illegal for 'const' variables.")
+    .addError(7, "'G' was used before it was declared, which is illegal for 'class' variables.")
+    .addError(8, "'H' was used before it was declared, which is illegal for 'class' variables.")
+    .test(code, { esversion: 6 });
+
+  test.done();
+}
