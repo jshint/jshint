@@ -210,6 +210,10 @@ var JSHINT = (function() {
       combine(predefined, vars.ecmaIdentifiers[6]);
     }
 
+    if (state.option.strict === "global" && "globalstrict" in state.option) {
+      error("E059", state.tokens.next, "strict", "globalstrict");
+    }
+
     if (state.option.module) {
       if (state.option.strict === true) {
         state.option.strict = "global";
