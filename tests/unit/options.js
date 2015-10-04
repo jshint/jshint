@@ -1679,6 +1679,26 @@ exports.globalstrict = function (test) {
   // Don't enforce "use strict"; if strict has been explicitly set to false
   TestRun(test).test(code[1], { es3: true, globalstrict: true, strict: false });
 
+  TestRun(test, "co-occurence with 'strict: global'")
+    .addError(0, "Incompatible values for the 'strict' and 'globalstrict' linting options.")
+    .test(code, { strict: "global", globalstrict: false });
+
+  TestRun(test, "co-occurence with 'strict: global'")
+    .addError(0, "Incompatible values for the 'strict' and 'globalstrict' linting options.")
+    .test(code, { strict: "global", globalstrict: true });
+
+  TestRun(test, "co-occurence with internally-set 'strict: gobal' (module code)")
+    .test(code, { strict: true, globalstrict: false, esnext: true, module: true });
+
+  TestRun(test, "co-occurence with internally-set 'strict: gobal' (Node.js code)")
+    .test(code, { strict: true, globalstrict: false, node: true });
+
+  TestRun(test, "co-occurence with internally-set 'strict: gobal' (Phantom.js code)")
+    .test(code, { strict: true, globalstrict: false, phantom: true });
+
+  TestRun(test, "co-occurence with internally-set 'strict: gobal' (Browserify code)")
+    .test(code, { strict: true, globalstrict: false, browserify: true });
+
   // Check that we can detect missing "use strict"; statement for code that is
   // not inside a function
   code = [
