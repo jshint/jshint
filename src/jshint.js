@@ -895,7 +895,7 @@ var JSHINT = (function() {
       state.funct["(scope)"].stack();
       advance("let");
       advance("(");
-      state.tokens.prev.fud();
+      state.tokens.prev.fud({ letExpr: true });
       advance(")");
     }
 
@@ -3528,19 +3528,20 @@ var JSHINT = (function() {
     var inexport = context && context.inexport;
     var isLet = type === "let";
     var isConst = type === "const";
-    var tokens, lone, value, letblock;
+    var isLetExpr = context && context.letExpr;
+    var isLetBlock = isLet && checkPunctuator(state.tokens.next, "(");
+    var tokens, lone, value;
 
-    if (!state.inES6()) {
+    if (!isLetExpr && !isLetBlock && !state.inES6()) {
       warning("W104", state.tokens.curr, type, "6");
     }
 
-    if (isLet && state.tokens.next.value === "(") {
+    if (isLetBlock) {
       if (!state.inMoz()) {
         warning("W118", state.tokens.next, "let block");
       }
       advance("(");
       state.funct["(scope)"].stack();
-      letblock = true;
     } else if (state.funct["(noblockscopedvar)"]) {
       error("E048", state.tokens.curr, isConst ? "Const" : "Let");
     }
@@ -3605,7 +3606,7 @@ var JSHINT = (function() {
       }
       comma();
     }
-    if (letblock) {
+    if (isLetBlock) {
       advance(")");
       block(true, true);
       statement.block = true;
