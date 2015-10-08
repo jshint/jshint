@@ -2602,6 +2602,8 @@ singleGroups.generatorExpression = function (test) {
 };
 
 singleGroups.arrowFunctions = function (test) {
+  var options = { singleGroups: true, esversion: 6 };
+
   var code = [
     "var a = () => ({});",
     "var b = (c) => {};",
@@ -2611,25 +2613,44 @@ singleGroups.arrowFunctions = function (test) {
     "var j = (() => ({})).length;",
     "var k = (() => 3)[prop];",
     "var l = (() => ({}))[prop];",
-    "var m = (() => 3) || 3;",
-    "var n = (() => ({})) || 3;",
     "var o = (() => {})();",
     "var p = (() => {})[prop];",
-    "var q = (() => {}) || 3;",
     "(() => {})();",
+    "var t = +(() => 3);",
+    "var u = +(() => {});",
+
     // Invalid forms:
     "var d = () => (e);",
     "var f = () => (3);",
     "var r = (() => 3);",
     "var s = (() => {});"
   ];
+  var loneArgs = code.join("\n").replace(/\([^\(\)]*?\)\s*=>/g, "x =>");
 
-  TestRun(test)
+  var run = TestRun(test)
+    .addError(14, "Unnecessary grouping operator.")
     .addError(15, "Unnecessary grouping operator.")
     .addError(16, "Unnecessary grouping operator.")
-    .addError(17, "Unnecessary grouping operator.")
-    .addError(18, "Unnecessary grouping operator.")
-    .test(code, { singleGroups: true, esnext: true });
+    .addError(17, "Unnecessary grouping operator.");
+  run.test(code, options);
+  run.test(loneArgs, options);
+
+  code = [
+    // unnecessary
+    "var a = (x) => (3 || {});",
+
+    // necessary
+    "var b = ((x) => {}) || 3;",
+    "var c = 3 || ((x) => 3);",
+    "var d = (x) => ({} || 3);",
+    "var e = ((x) => 3) || {};"
+  ];
+  loneArgs = code.join("\n").replace(/\([^\(\)]*?\)\s*=>/g, "x =>");
+
+  run = TestRun(test, "binary operator")
+    .addError(1, "Unnecessary grouping operator.");
+  run.test(code, options);
+  run.test(loneArgs, options);
 
   test.done();
 };

@@ -1207,8 +1207,18 @@ var JSHINT = (function() {
     x.led = function(left) {
       nobreaknonadjacent(state.tokens.prev, state.tokens.curr);
 
+      if (!left.identifier) {
+        error("E059", this);
+        // We can safely assume that the previous token is the argument because
+        // multi-params arrow functions are handled by the '(' prefix
+        left = state.tokens.prev;
+      }
       this.left = left;
       this.right = doFunction({ type: "arrow", loneArg: left });
+      if (state.tokens.next.lbp > 42) {
+        error("E059", this);
+      }
+
       return this;
     };
     return x;
@@ -2098,7 +2108,7 @@ var JSHINT = (function() {
     return that;
   }, 30);
 
-  var orPrecendence = 40;
+  var orPrecendence = 45;
   infix("||", function(left, that) {
     increaseComplexityCount();
     that.left = left;
@@ -2518,6 +2528,7 @@ var JSHINT = (function() {
     var parens = 1;
     var opening = state.tokens.curr;
     var preceeding = state.tokens.prev;
+    var firstTok = state.tokens.next;
     var isNecessary = !state.option.singleGroups;
 
     do {
@@ -2540,7 +2551,15 @@ var JSHINT = (function() {
     // current token marks the beginning of a "fat arrow" function and parsing
     // should proceed accordingly.
     if (pn.value === "=>") {
-      return doFunction({ type: "arrow", parsedOpening: true });
+      pn.left = opening;
+      if (state.tokens.prev.lbp > pn.lbp && state.tokens.prev.lbp <= 150) {
+        error("E059", pn);
+      }
+      pn.right = doFunction({ type: "arrow", parsedOpening: true });
+      if (state.tokens.next.lbp > pn.lbp && state.tokens.next.lbp <= 150) {
+        error("E059", pn);
+      }
+      return pn;
     }
 
     var exprs = [];
@@ -2602,7 +2621,9 @@ var JSHINT = (function() {
           // operator.
           (isFunctor(ret) && !isEndOfExpr()) ||
           // Used as the return value of a single-statement arrow function
-          (ret.id === "{" && preceeding.id === "=>") ||
+          (firstTok.id === "{" && preceeding.id === "=>") ||
+          // Used to wrap multi-statement arrow functions followed by a binary operator
+          (ret.id === "=>" && !ret.singleStmt && state.tokens.next.lbp > ret.lbp) ||
           // Used to delineate an integer number literal from a dereferencing
           // punctuator (otherwise interpreted as a decimal point)
           (ret.type === "(number)" &&
@@ -3086,6 +3107,10 @@ var JSHINT = (function() {
 
       if (!options.loneArg) {
         advance("=>");
+      }
+
+      if (!checkPunctuator(state.tokens.next, "{")) {
+        state.tokens.curr.singleStmt = true;
       }
     }
 
