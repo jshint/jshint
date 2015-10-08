@@ -5233,19 +5233,15 @@ exports["fat arrows support"] = function (test) {
     .addError(16, "'arrow function syntax (=>)' is only available in ES6 (use 'esversion: 6').")
     .addError(17, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(17, "'arrow function syntax (=>)' is only available in ES6 (use 'esversion: 6').")
-    .addError(17, "Bad invocation.")
     .addError(18, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(18, "'arrow function syntax (=>)' is only available in ES6 (use 'esversion: 6').")
     .addError(19, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(19, "'arrow function syntax (=>)' is only available in ES6 (use 'esversion: 6').")
-    .addError(19, "Bad invocation.")
     .addError(20, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(21, "'arrow function syntax (=>)' is only available in ES6 (use 'esversion: 6').")
     .addError(22, "'arrow function syntax (=>)' is only available in ES6 (use 'esversion: 6').")
-    .addError(22, "Bad invocation.")
     .addError(23, "'arrow function syntax (=>)' is only available in ES6 (use 'esversion: 6').")
     .addError(24, "'arrow function syntax (=>)' is only available in ES6 (use 'esversion: 6').")
-    .addError(24, "Bad invocation.")
     .addError(26, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(26, "'arrow function syntax (=>)' is only available in ES6 (use 'esversion: 6').");
 
@@ -5298,6 +5294,28 @@ exports["expressions in place of arrow function parameters"] = function (test) {
   TestRun(test)
     .addError(1, "Expected an identifier and instead saw '1'.")
     .test("(1) => {};", { expr: true, esnext: true });
+
+  test.done();
+};
+
+exports["arrow functions preceded/succeeded by a binary/unary operator must be in parens"] = function(test) {
+  var code = [
+    "var a = 1 || (x) => {};",
+    "var b = 1 || (x) => 1;",
+    "var c = (x) => {} || 1;",
+    "var e = +(x) => {};",
+    "var f = +(x) => 1;"
+  ];
+  var loneArgs = code.join("\n").replace(/\([^\(\)]*?\)\s*=>/g, "x =>");
+
+  var run = TestRun(test)
+    .addError(1, "Wrap the arrow function in parens.")
+    .addError(2, "Wrap the arrow function in parens.")
+    .addError(3, "Wrap the arrow function in parens.")
+    .addError(4, "Wrap the arrow function in parens.")
+    .addError(5, "Wrap the arrow function in parens.");
+  run.test(code, { esversion: 6 });
+  run.test(loneArgs, { esversion: 6 });
 
   test.done();
 };
