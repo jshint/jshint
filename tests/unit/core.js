@@ -775,6 +775,10 @@ exports.testUndefinedAssignment = function (test) {
     "var l = undefined === 0;",
     "const m = undefined === 0;",
     "let n = undefined === 0;",
+    "let [ o = undefined === 0 ] = [];",
+    "[ o = undefined === 0] = [];",
+    "let { p = undefined === 0, x: q = undefined === 0 } = {};",
+    "({ p = undefined === 0, x: q = undefined === 0 } = {});"
   ];
 
   TestRun(test)
