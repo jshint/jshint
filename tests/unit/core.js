@@ -1886,7 +1886,7 @@ exports.catchWithNoParam = function (test) {
   test.done();
 };
 
-exports.catchWithNoParam = function (test) {
+exports.tryWithoutCatch = function (test) {
   var src = [
     "try{}",
     "if (true) { console.log(); }"
