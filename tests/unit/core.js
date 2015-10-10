@@ -925,12 +925,13 @@ exports.testConstRedeclaration = function (test) {
   ];
 
   TestRun(test)
-      .addError(2, "'a' has already been declared.")
-      .addError(9, "'a' has already been declared.")
-      .addError(13, "'b' has already been declared.")
-      .test(src, {
-        esnext: true
-      });
+    .addError(2, "'a' has already been declared.")
+    .addError(6, "'a' was used before it was declared, which is illegal for 'const' variables.")
+    .addError(9, "'a' has already been declared.")
+    .addError(13, "'b' has already been declared.")
+    .test(src, {
+      esnext: true
+    });
 
   test.done();
 };
@@ -2154,4 +2155,38 @@ exports["TDZ within class heritage definition"] = function(test) {
     .test(code, { esversion: 6 });
 
   test.done();
-}
+};
+
+exports["TDZ within for in/of head"] = function(test) {
+  var code = [
+    "for (let a   in a);",
+    "for (const b in b);",
+    "for (let c   of c);",
+    "for (const d of d);",
+
+    // line 5
+    "for (let e   in { e });",
+    "for (const f in { f });",
+    "for (let g   of { g });",
+    "for (const h of { h });",
+
+    // line 9
+    "for (let i   in { method() { return i; } });",
+    "for (const j in { method() { return j; } });",
+    "for (let k   of { method() { return k; } });",
+    "for (const l of { method() { return l; } });"
+  ];
+
+  TestRun(test)
+    .addError(1, "'a' was used before it was declared, which is illegal for 'let' variables.")
+    .addError(2, "'b' was used before it was declared, which is illegal for 'const' variables.")
+    .addError(3, "'c' was used before it was declared, which is illegal for 'let' variables.")
+    .addError(4, "'d' was used before it was declared, which is illegal for 'const' variables.")
+    .addError(5, "'e' was used before it was declared, which is illegal for 'let' variables.")
+    .addError(6, "'f' was used before it was declared, which is illegal for 'const' variables.")
+    .addError(7, "'g' was used before it was declared, which is illegal for 'let' variables.")
+    .addError(8, "'h' was used before it was declared, which is illegal for 'const' variables.")
+    .test(code, { esversion: 6 });
+
+  test.done();
+};

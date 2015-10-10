@@ -3576,7 +3576,9 @@ var JSHINT = (function() {
         }
       }
 
-      state.funct["(scope)"].definition.reset();
+      if (!prefix) {
+        state.funct["(scope)"].definition.reset();
+      }
 
       statement.first = statement.first.concat(names);
 
@@ -4275,6 +4277,10 @@ var JSHINT = (function() {
       //     for ( LeftHandSideExpression of AssignmentExpression ) Statement
       expression(bindingPower);
       advance(")", t);
+
+      if (letscope) {
+        state.funct["(scope)"].definition.reset();
+      }
 
       if (nextop.value === "in" && state.option.forin) {
         state.forinifcheckneeded = true;
