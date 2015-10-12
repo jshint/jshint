@@ -607,6 +607,22 @@ exports.asi = function (test) {
   TestRun(test, 2)
     .test(src, { es3: true, asi: true });
 
+  var code = [
+    "function a() { 'code' }",
+    "function b() { 'code'; 'code' }",
+    "function c() { 'code', 'code' }",
+    "function d() {",
+    "  'code' }",
+    "function e() { 'code' 'code' }"
+  ];
+
+  TestRun(test, "gh-2714")
+    .addError(2, "Unnecessary directive \"code\".")
+    .addError(3, "Expected an assignment or function call and instead saw an expression.")
+    .addError(6, "Unnecessary directive \"code\".")
+    .addError(6, "Missing semicolon.", { code: "E058" })
+    .test(code, { asi: true });
+
   test.done();
 };
 
