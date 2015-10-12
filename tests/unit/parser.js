@@ -6944,7 +6944,7 @@ exports.testES6BlockExports = function (test) {
 };
 
 exports.testStrictDirectiveASI = function (test) {
-  var options = { strict: true, asi: true, globalstrict: true };
+  var options = { strict: true, asi: true, globalstrict: true, predef: ["x"] };
 
   TestRun(test, 1)
     .test("'use strict'\nfunction fn() {}\nfn();", options);
@@ -6956,7 +6956,8 @@ exports.testStrictDirectiveASI = function (test) {
     .test("'use strict';function fn() {} fn();", options);
 
   TestRun(test, 4)
-    .addError(1, "Missing semicolon.")
+    .addError(2, "Bad invocation.")
+    .addError(2, "Missing \"use strict\" statement.")
     .test("'use strict'\n(function fn() {})();", options);
 
   TestRun(test, 5)
@@ -6964,9 +6965,8 @@ exports.testStrictDirectiveASI = function (test) {
     .test("'use strict'\n[0] = '6';", options);
 
   TestRun(test, 6)
-    .addError(1, "Missing semicolon.")
-    .addError(1, "Expected an identifier and instead saw ','.")
     .addError(1, "Expected an assignment or function call and instead saw an expression.")
+    .addError(2, "Missing \"use strict\" statement.")
     .test("'use strict',function fn() {}\nfn();", options);
 
   TestRun(test, 7)
@@ -6976,6 +6976,36 @@ exports.testStrictDirectiveASI = function (test) {
   TestRun(test, 8)
     .addError(1, "Missing \"use strict\" statement.")
     .test("(function() { var x; \"use strict\"; return x; }());", { strict: true, expr: true });
+
+  TestRun(test, 9)
+    .addError(1, "Missing \"use strict\" statement.")
+    .addError(1, "Expected an assignment or function call and instead saw an expression.")
+    .test("'use strict', 'use strict';", options);
+
+  TestRun(test, 10)
+    .addError(1, "Missing \"use strict\" statement.")
+    .addError(1, "Expected an assignment or function call and instead saw an expression.")
+    .test("'use strict' * 'use strict';", options);
+
+  TestRun(test, 11)
+    .addError(2, "Expected an assignment or function call and instead saw an expression.")
+    .test("'use strict'\n!x;", options);
+
+  TestRun(test, 12)
+    .addError(2, "Bad line breaking before '+'.")
+    .addError(2, "Missing \"use strict\" statement.")
+    .addError(2, "Expected an assignment or function call and instead saw an expression.")
+    .test("'use strict'\n+x;", options);
+
+  TestRun(test, 13)
+    .test("'use strict'\n++x;", options);
+
+  TestRun(test, 14)
+    .addError(1, "Bad operand.")
+    .addError(2, "Missing \"use strict\" statement.")
+    .addError(2, "Missing \"use strict\" statement.")
+    .addError(2, "Expected an assignment or function call and instead saw an expression.")
+    .test("'use strict'++\nx;", options);
 
   test.done();
 };

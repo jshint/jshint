@@ -1732,32 +1732,19 @@ var JSHINT = (function() {
 
   /*
    * read all directives
-   * recognizes a simple form of asi, but always
-   * warns, if it is used
    */
   function directives() {
     var i, p, pn;
 
     while (state.tokens.next.id === "(string)") {
-      p = peek(0);
-      if (p.id === "(endline)") {
-        i = 1;
-        do {
-          pn = peek(i++);
-        } while (pn.id === "(endline)");
-        if (pn.id === ";") {
-          p = pn;
-        } else if (pn.value === "[" || pn.value === ".") {
-          // string -> [ | . is a valid production
-          break;
-        } else if (!state.option.asi || pn.value === "(") {
-          // string -> ( is not a valid production
-          warning("W033", state.tokens.next);
-        }
-      } else if (p.id === "." || p.id === "[") {
+      pn = peek();
+      i = 0;
+      do {
+        p = pn;
+        pn = peek(++i);
+      } while (p.id === "(endline)");
+      if (p.lbp > 0 && (startLine(pn) !== p.line || p.lbp !== 150)) {
         break;
-      } else if (p.id !== ";") {
-        warning("W033", p);
       }
 
       advance();
@@ -1770,9 +1757,7 @@ var JSHINT = (function() {
       // there's no directive negation, so always set to true
       state.directive[directive] = true;
 
-      if (p.id === ";") {
-        advance(";");
-      }
+      parseFinalSemicolon();
     }
 
     if (state.isStrict()) {
