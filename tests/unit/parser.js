@@ -7007,6 +7007,11 @@ exports.testStrictDirectiveASI = function (test) {
     .addError(2, "Expected an assignment or function call and instead saw an expression.")
     .test("'use strict'++\nx;", options);
 
+  TestRun(test, 15)
+    .addError(1, "Bad operand.")
+    .addError(1, "Missing \"use strict\" statement.")
+    .test("'use strict'++;", options);
+
   test.done();
 };
 
