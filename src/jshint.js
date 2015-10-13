@@ -4233,7 +4233,7 @@ var JSHINT = (function() {
     var i = 0;
     var inof = ["in", "of"];
     var level = 0; // BindingPattern "level" --- level 0 === no BindingPattern
-    var comma; // First comma punctuator at level 0
+    var parseComma; // First comma punctuator at level 0
     var initializer; // First initializer at level 0
 
     // If initial token is a BindingPattern, count it as such.
@@ -4245,7 +4245,7 @@ var JSHINT = (function() {
       else if (checkPunctuators(nextop, ["}", "]"])) --level;
       if (level < 0) break;
       if (level === 0) {
-        if (!comma && checkPunctuator(nextop, ",")) comma = nextop;
+        if (!parseComma && checkPunctuator(nextop, ",")) parseComma = nextop;
         else if (!initializer && checkPunctuator(nextop, "=")) initializer = nextop;
       }
     } while (level > 0 || !_.contains(inof, nextop.value) && nextop.value !== ";" &&
@@ -4257,13 +4257,13 @@ var JSHINT = (function() {
         warning("W104", nextop, "for of", "6");
       }
 
-      var ok = !(initializer || comma);
+      var ok = !(initializer || parseComma);
       if (initializer) {
-        error("W133", comma, nextop.value, "initializer is forbidden");
+        error("W133", parseComma, nextop.value, "initializer is forbidden");
       }
 
-      if (comma) {
-        error("W133", comma, nextop.value, "more than one ForBinding");
+      if (parseComma) {
+        error("W133", parseComma, nextop.value, "more than one ForBinding");
       }
 
       if (state.tokens.next.id === "var") {
