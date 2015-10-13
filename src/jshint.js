@@ -1010,16 +1010,16 @@ var JSHINT = (function() {
   function nobreakcomma(left, right) {
     if (left.line !== startLine(right)) {
       if (!state.option.laxcomma) {
-        if (comma.first) {
+        if (parseComma.first) {
           warning("I001");
-          comma.first = false;
+          parseComma.first = false;
         }
         warning("W014", left, right.value);
       }
     }
   }
 
-  function comma(opts) {
+  function parseComma(opts) {
     opts = opts || {};
 
     if (!opts.peek) {
@@ -2082,7 +2082,7 @@ var JSHINT = (function() {
       warning("W127");
     }
 
-    if (!comma({ peek: true })) {
+    if (!parseComma({ peek: true })) {
       return that;
     }
     while (true) {
@@ -2090,7 +2090,7 @@ var JSHINT = (function() {
         break;
       }
       that.exprs.push(expr);
-      if (state.tokens.next.value !== "," || !comma()) {
+      if (state.tokens.next.value !== "," || !parseComma()) {
         break;
       }
     }
@@ -2475,7 +2475,7 @@ var JSHINT = (function() {
         if (state.tokens.next.id !== ",") {
           break;
         }
-        comma();
+        parseComma();
       }
     }
 
@@ -2565,7 +2565,7 @@ var JSHINT = (function() {
           warning("W127");
         }
 
-        comma();
+        parseComma();
       }
     }
 
@@ -2764,7 +2764,7 @@ var JSHINT = (function() {
 
       this.first.push(expression(10));
       if (state.tokens.next.id === ",") {
-        comma({ allowTrailing: true });
+        parseComma({ allowTrailing: true });
         if (state.tokens.next.id === "]" && !state.inES5()) {
           warning("W070", state.tokens.curr);
           break;
@@ -2916,7 +2916,7 @@ var JSHINT = (function() {
         if (pastRest) {
           warning("W131", state.tokens.next);
         }
-        comma();
+        parseComma();
       } else {
         advance(")", next);
         return { arity: arity, params: paramsIds };
@@ -3339,7 +3339,7 @@ var JSHINT = (function() {
         countMember(i);
 
         if (state.tokens.next.id === ",") {
-          comma({ allowTrailing: true, property: true });
+          parseComma({ allowTrailing: true, property: true });
           if (state.tokens.next.id === ",") {
             warning("W070", state.tokens.curr);
           } else if (state.tokens.next.id === "}" && !state.inES5()) {
@@ -3611,7 +3611,7 @@ var JSHINT = (function() {
       if (state.tokens.next.id !== ",") {
         break;
       }
-      comma();
+      parseComma();
     }
     if (letblock) {
       advance(")");
@@ -3720,7 +3720,7 @@ var JSHINT = (function() {
       if (state.tokens.next.id !== ",") {
         break;
       }
-      comma();
+      parseComma();
     }
 
     return this;
@@ -4233,7 +4233,7 @@ var JSHINT = (function() {
     var i = 0;
     var inof = ["in", "of"];
     var level = 0; // BindingPattern "level" --- level 0 === no BindingPattern
-    var parseComma; // First comma punctuator at level 0
+    var comma; // First comma punctuator at level 0
     var initializer; // First initializer at level 0
 
     // If initial token is a BindingPattern, count it as such.
@@ -4245,7 +4245,7 @@ var JSHINT = (function() {
       else if (checkPunctuators(nextop, ["}", "]"])) --level;
       if (level < 0) break;
       if (level === 0) {
-        if (!parseComma && checkPunctuator(nextop, ",")) parseComma = nextop;
+        if (!comma && checkPunctuator(nextop, ",")) comma = nextop;
         else if (!initializer && checkPunctuator(nextop, "=")) initializer = nextop;
       }
     } while (level > 0 || !_.contains(inof, nextop.value) && nextop.value !== ";" &&
@@ -4257,13 +4257,13 @@ var JSHINT = (function() {
         warning("W104", nextop, "for of", "6");
       }
 
-      var ok = !(initializer || parseComma);
+      var ok = !(initializer || comma);
       if (initializer) {
-        error("W133", parseComma, nextop.value, "initializer is forbidden");
+        error("W133", comma, nextop.value, "initializer is forbidden");
       }
 
-      if (parseComma) {
-        error("W133", parseComma, nextop.value, "more than one ForBinding");
+      if (comma) {
+        error("W133", comma, nextop.value, "more than one ForBinding");
       }
 
       if (state.tokens.next.id === "var") {
@@ -4343,7 +4343,7 @@ var JSHINT = (function() {
             if (state.tokens.next.id !== ",") {
               break;
             }
-            comma();
+            parseComma();
           }
         }
       }
@@ -4367,7 +4367,7 @@ var JSHINT = (function() {
           if (state.tokens.next.id !== ",") {
             break;
           }
-          comma();
+          parseComma();
         }
       }
       advance(")", t);
@@ -5316,7 +5316,7 @@ var JSHINT = (function() {
     combine(predefined, g || {});
 
     //reset values
-    comma.first = true;
+    parseComma.first = true;
 
     try {
       advance();
