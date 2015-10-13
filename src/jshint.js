@@ -974,16 +974,16 @@ var JSHINT = (function() {
   function nobreakcomma(left, right) {
     if (left.line !== startLine(right)) {
       if (!state.option.laxcomma) {
-        if (comma.first) {
+        if (parseComma.first) {
           warning("I001");
-          comma.first = false;
+          parseComma.first = false;
         }
         warning("W014", left, right.value);
       }
     }
   }
 
-  function comma(opts) {
+  function parseComma(opts) {
     opts = opts || {};
 
     if (!opts.peek) {
@@ -2046,7 +2046,7 @@ var JSHINT = (function() {
       warning("W127");
     }
 
-    if (!comma({ peek: true })) {
+    if (!parseComma({ peek: true })) {
       return that;
     }
     while (true) {
@@ -2054,7 +2054,7 @@ var JSHINT = (function() {
         break;
       }
       that.exprs.push(expr);
-      if (state.tokens.next.value !== "," || !comma()) {
+      if (state.tokens.next.value !== "," || !parseComma()) {
         break;
       }
     }
@@ -2439,7 +2439,7 @@ var JSHINT = (function() {
         if (state.tokens.next.id !== ",") {
           break;
         }
-        comma();
+        parseComma();
       }
     }
 
@@ -2529,7 +2529,7 @@ var JSHINT = (function() {
           warning("W127");
         }
 
-        comma();
+        parseComma();
       }
     }
 
@@ -2728,7 +2728,7 @@ var JSHINT = (function() {
 
       this.first.push(expression(10));
       if (state.tokens.next.id === ",") {
-        comma({ allowTrailing: true });
+        parseComma({ allowTrailing: true });
         if (state.tokens.next.id === "]" && !state.inES5()) {
           warning("W070", state.tokens.curr);
           break;
@@ -2880,7 +2880,7 @@ var JSHINT = (function() {
         if (pastRest) {
           warning("W131", state.tokens.next);
         }
-        comma();
+        parseComma();
       } else {
         advance(")", next);
         return { arity: arity, params: paramsIds };
@@ -3303,7 +3303,7 @@ var JSHINT = (function() {
         countMember(i);
 
         if (state.tokens.next.id === ",") {
-          comma({ allowTrailing: true, property: true });
+          parseComma({ allowTrailing: true, property: true });
           if (state.tokens.next.id === ",") {
             warning("W070", state.tokens.curr);
           } else if (state.tokens.next.id === "}" && !state.inES5()) {
@@ -3580,7 +3580,7 @@ var JSHINT = (function() {
       if (state.tokens.next.id !== ",") {
         break;
       }
-      comma();
+      parseComma();
     }
     if (letblock) {
       advance(")");
@@ -3689,7 +3689,7 @@ var JSHINT = (function() {
       if (state.tokens.next.id !== ",") {
         break;
       }
-      comma();
+      parseComma();
     }
 
     return this;
@@ -4312,7 +4312,7 @@ var JSHINT = (function() {
             if (state.tokens.next.id !== ",") {
               break;
             }
-            comma();
+            parseComma();
           }
         }
       }
@@ -4336,7 +4336,7 @@ var JSHINT = (function() {
           if (state.tokens.next.id !== ",") {
             break;
           }
-          comma();
+          parseComma();
         }
       }
       advance(")", t);
@@ -5283,7 +5283,7 @@ var JSHINT = (function() {
       combine(predefined, g || {});
 
       //reset values
-      comma.first = true;
+      parseComma.first = true;
 
       advance();
       switch (state.tokens.next.id) {
