@@ -1734,13 +1734,8 @@ var JSHINT = (function() {
    * read all directives
    */
   function directives() {
-    var i, p;
-
     while (state.tokens.next.id === "(string)") {
-      i = 0;
-      do {
-        p = peek(i++);
-      } while (p.id === "(endline)");
+      var p = peekIgnoreEOL();
       if (p.lbp > 0 && p.lbp !== 150 ||
           (startLine(p) === state.tokens.next.line && checkPunctuators(p, ["++", "--"]))) {
         break;
