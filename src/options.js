@@ -541,8 +541,7 @@ exports.bool = {
 
     /**
      * This option tells JSHint that your code uses ECMAScript 6 specific
-     * syntax. Note that these features are not finalized yet and not all
-     * browsers implement them.
+     * syntax. Note that not all browsers implement these features.
      *
      * More info:
      *
