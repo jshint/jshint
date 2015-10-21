@@ -204,7 +204,13 @@ function loadIgnores(params) {
     return [];
   }
 
-  var lines = (file ? shjs.cat(file) : "").split("\n");
+  var name = (file ? shjs.cat(file) : "");
+
+  if (!name) {
+    return [];
+  }
+
+  var lines = name.split("\n");
   var exclude = params.exclude || "";
   lines.unshift.apply(lines, exclude.split(","));
 
@@ -632,7 +638,12 @@ var exports = {
         mergeCLIPrereq(config);
 
         lint(extract(code, opts.extract), results, config, data, filename);
-        (opts.reporter || defReporter)(results, data, { verbose: opts.verbose });
+
+        // invoke each reporter
+        for (var index in opts.reporters) {
+          (exports.getReporter(opts.reporters[index]))(results, data, { verbose: opts.verbose });
+        }
+
         cb(results.length === 0);
       });
 
@@ -668,7 +679,17 @@ var exports = {
       }
     });
 
-    (opts.reporter || defReporter)(results, data, { verbose: opts.verbose });
+    if (opts.hasOwnProperty('reporter')) {
+      // passed in manually 'old' way without going through entry point of script (interpret)
+      (opts.reporter)(results, data, { verbose: opts.verbose });
+    }
+    else {
+      // invoke each reporter as set up on
+      for (var index in opts.reporters) {
+        (exports.getReporter(opts.reporters[index]))(results, data, { verbose: opts.verbose });
+      }
+    }
+
     return results.length === 0;
   },
 
@@ -680,6 +701,54 @@ var exports = {
     return process.stdout.bufferSize;
   },
 
+  /**
+   * Helper to get proper reporter.
+   *
+   * @param {string} name of reporter to fetch, pre-defined or custom.
+   */
+  getReporter: function(reporterName) {
+    var reporter = defReporter; // default
+
+    if (!reporterName) {
+      return reporter; // return default
+    }
+    switch (true) {
+      // JSLint reporter
+      case reporterName === "jslint":
+        reporter = "./reporters/jslint_xml.js";
+        break;
+
+      // CheckStyle (XML) reporter
+      case reporterName === "checkstyle":
+        reporter = "./reporters/checkstyle.js";
+        break;
+
+      // Unix reporter
+      case reporterName === "unix":
+        reporter = "./reporters/unix.js";
+        break;
+
+      // Reporter that displays additional JSHint data
+      case reporterName === "non_error":
+        reporter = "./reporters/non_error.js";
+        break;
+
+      // Custom reporter
+      case reporterName !== undefined:
+        reporter = path.resolve(process.cwd(), reporterName);
+        break;
+    }
+
+    if (reporter) {
+      reporter = loadReporter(reporter); // copy over path with require obj
+      if (reporter === null) {
+        cli.error("Can't load reporter file: " + reporterName);
+        exports.exit(1);
+      }
+    }
+
+    return reporter;
+  },
   /**
    * Main entrance function. Parses arguments and calls 'run' when
    * its done. This function is called from bin/jshint file.
@@ -700,42 +769,36 @@ var exports = {
       config = exports.loadConfig(options.config);
     }
 
-    switch (true) {
-    // JSLint reporter
-    case options.reporter === "jslint":
-    case options["jslint-reporter"]:
-      options.reporter = "./reporters/jslint_xml.js";
-      break;
-
-    // CheckStyle (XML) reporter
-    case options.reporter === "checkstyle":
-    case options["checkstyle-reporter"]:
-      options.reporter = "./reporters/checkstyle.js";
-      break;
-
-    // Unix reporter
-    case options.reporter === "unix":
-      options.reporter = "./reporters/unix.js";
-      break;
-
-    // Reporter that displays additional JSHint data
-    case options["show-non-errors"]:
-      options.reporter = "./reporters/non_error.js";
-      break;
-
-    // Custom reporter
-    case options.reporter !== undefined:
-      options.reporter = path.resolve(process.cwd(), options.reporter);
+    var reporters = [];
+    if (options.reporter) {
+      reporters = options.reporter.split(',');
+    }
+    // push command lines options onto reporter stack
+    if (options["jslint-reporter"]) {
+      //console.log("Deprecated command line arg: 'jslint-reporter'. " +
+      //"Use a jslint compatible reporter --reporter=jslint");
+      if (reporters.indexOf('jslint') === -1) {
+        reporters.push('jslint');
+      }
+    }
+    if (options["checkstyle-reporter"]) {
+      //console.log("Deprecated command line arg: 'checkstyle-reporter'. " +
+      //"Use a CheckStyle compatible XML reporter --reporter=checkstyle");
+      if (reporters.indexOf('checkstyle') === -1) {
+        reporters.push('checkstyle');
+      }
+    }
+    if (options["show-non-errors"]) {
+      //console.log("Pushing show-non errors onto reporters. --reporter=non_error");
+      if (reporters.indexOf('non_error') === -1) {
+        reporters.push('non_error');
+      }
     }
 
-    var reporter;
-    if (options.reporter) {
-      reporter = loadReporter(options.reporter);
-
-      if (reporter === null) {
-        cli.error("Can't load reporter file: " + options.reporter);
-        exports.exit(1);
-      }
+    // comes LAST
+    // if nothing is asked of me, push undefined (default) reporter
+    if (reporters.length === 0) {
+      reporters.push(undefined);
     }
 
     // This is a hack. exports.run is both sync and async function
@@ -754,9 +817,9 @@ var exports = {
     done(exports.run({
       args:       cli.args,
       config:     config,
-      reporter:   reporter,
       ignores:    loadIgnores({ exclude: options.exclude, excludePath: options["exclude-path"] }),
       extensions: options["extra-ext"],
+      reporters:  reporters,
       verbose:    options.verbose,
       extract:    options.extract,
       filename:   options.filename,
