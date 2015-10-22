@@ -641,7 +641,7 @@ var exports = {
 
         // invoke each reporter
         for (var index in opts.reporters) {
-          (exports.getReporter(opts.reporters[index]))(results, data, { verbose: opts.verbose });
+          exports.getReporter(opts.reporters[index])(results, data, { verbose: opts.verbose });
         }
 
         cb(results.length === 0);
@@ -686,7 +686,7 @@ var exports = {
     else {
       // invoke each reporter as set up on
       for (var index in opts.reporters) {
-        (exports.getReporter(opts.reporters[index]))(results, data, { verbose: opts.verbose });
+        exports.getReporter(opts.reporters[index])(results, data, { verbose: opts.verbose });
       }
     }
 
@@ -712,29 +712,30 @@ var exports = {
     if (!reporterName) {
       return reporter; // return default
     }
-    switch (true) {
+
+    switch (reporterName) {
       // JSLint reporter
-      case reporterName === "jslint":
+      case "jslint":
         reporter = "./reporters/jslint_xml.js";
         break;
 
       // CheckStyle (XML) reporter
-      case reporterName === "checkstyle":
+      case "checkstyle":
         reporter = "./reporters/checkstyle.js";
         break;
 
       // Unix reporter
-      case reporterName === "unix":
+      case "unix":
         reporter = "./reporters/unix.js";
         break;
 
       // Reporter that displays additional JSHint data
-      case reporterName === "non_error":
+      case "non_error":
         reporter = "./reporters/non_error.js";
         break;
 
-      // Custom reporter
-      case reporterName !== undefined:
+      // Custom reporter. not to be confused with 'default' if undefined above
+      default:
         reporter = path.resolve(process.cwd(), reporterName);
         break;
     }
