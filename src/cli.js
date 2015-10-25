@@ -188,7 +188,9 @@ function findFile(name, cwd) {
     return null;
   }
 
-  return findFile(name, parent);
+  var result = findFile(name, parent);
+  findFileResults[filename] = result;
+  return result;
 }
 
 /**
