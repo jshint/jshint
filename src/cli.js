@@ -631,11 +631,15 @@ var exports = {
           config = exports.getConfig(filename);
         }
 
+        var ignores = !filename ? [] : loadIgnores({ cwd: filename });
+
         config = config || {};
 
         mergeCLIPrereq(config);
 
-        lint(extract(code, opts.extract), results, config, data, filename);
+        if (!isIgnored(filename, ignores)) {
+          lint(extract(code, opts.extract), results, config, data, filename);
+        }
         (opts.reporter || defReporter)(results, data, { verbose: opts.verbose });
         cb(results.length === 0);
       });
