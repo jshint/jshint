@@ -3549,11 +3549,6 @@ var JSHINT = (function() {
               type: type,
               token: t.token });
             names.push(t.token);
-
-            if (lone && inexport) {
-              state.funct["(scope)"].setExported(t.token.value, t.token);
-            }
-            state.funct["(scope)"].definition.add(t.id, type);
           }
         }
       }
@@ -3577,7 +3572,16 @@ var JSHINT = (function() {
       }
 
       if (!prefix) {
-        state.funct["(scope)"].definition.reset();
+        for (t in tokens) {
+          if (tokens.hasOwnProperty(t)) {
+            t = tokens[t];
+            state.funct["(scope)"].initialize(t.id);
+
+            if (lone && inexport) {
+              state.funct["(scope)"].setExported(t.token.value, t.token);
+            }
+          }
+        }
       }
 
       statement.first = statement.first.concat(names);
@@ -3719,7 +3723,6 @@ var JSHINT = (function() {
         type: "class",
         token: state.tokens.curr });
 
-      state.funct["(scope)"].definition.add(this.name, "class");
     } else if (state.tokens.next.identifier && state.tokens.next.value !== "extends") {
       // BindingIdentifier(opt)
       this.name = identifier();
@@ -3731,7 +3734,7 @@ var JSHINT = (function() {
     classtail(this);
 
     if (isStatement) {
-      state.funct["(scope)"].definition.reset();
+      state.funct["(scope)"].initialize(this.name);
     }
 
     return this;
@@ -4278,10 +4281,6 @@ var JSHINT = (function() {
       expression(bindingPower);
       advance(")", t);
 
-      if (letscope) {
-        state.funct["(scope)"].definition.reset();
-      }
-
       if (nextop.value === "in" && state.option.forin) {
         state.forinifcheckneeded = true;
 
@@ -4582,6 +4581,7 @@ var JSHINT = (function() {
       // Import bindings are immutable (see ES6 8.1.1.5.5)
       state.funct["(scope)"].addlabel(this.name, {
         type: "const",
+        initialized: true,
         token: state.tokens.curr });
 
       if (state.tokens.next.value === ",") {
@@ -4608,6 +4608,7 @@ var JSHINT = (function() {
         // Import bindings are immutable (see ES6 8.1.1.5.5)
         state.funct["(scope)"].addlabel(this.name, {
           type: "const",
+          initialized: true,
           token: state.tokens.curr });
       }
     } else {
@@ -4633,6 +4634,7 @@ var JSHINT = (function() {
         // Import bindings are immutable (see ES6 8.1.1.5.5)
         state.funct["(scope)"].addlabel(importName, {
           type: "const",
+          initialized: true,
           token: state.tokens.curr });
 
         if (state.tokens.next.value === ",") {
@@ -4697,6 +4699,7 @@ var JSHINT = (function() {
       if (this.block) {
         state.funct["(scope)"].addlabel(identifier, {
           type: exportType,
+          initialized: true,
           token: token });
 
         state.funct["(scope)"].setExported(identifier, token);
