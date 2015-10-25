@@ -563,7 +563,8 @@ var exports = {
    *
    * @param {object} post-processed options from 'interpret':
    *                   args     - CLI arguments
-   *                   ignores  - A list of files/dirs to ignore (defaults to .jshintignores)
+   *                   ignores  - A list of files/dirs to ignore (defaults to
+   *                     the contents of .jshintignore)
    *                   extensions - A list of non-dot-js extensions to check
    */
   gather: function(opts) {
