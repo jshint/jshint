@@ -431,7 +431,8 @@ function collect(fp, files, ignores, ext) {
     shjs.ls(fp).forEach(function(item) {
       var itempath = path.join(fp, item);
       if (shjs.test("-d", itempath) || item.match(ext)) {
-        collect(itempath, files, ignores, ext);
+        var dirIgnores = loadIgnores({ cwd: path.resolve(itempath) });
+        collect(itempath, files, ignores.concat(dirIgnores), ext);
       }
     });
 
@@ -574,13 +575,13 @@ var exports = {
       (!opts.extensions ? "" : "|" +
         opts.extensions.replace(/,/g, "|").replace(/[\. ]/g, "")) + ")$");
 
-    var ignores = !opts.ignores ? loadIgnores({ cwd: opts.cwd }) :
-                                  opts.ignores.map(function(target) {
-                                    return path.resolve(target);
-                                  });
+    var ignores = (opts.ignores || []).map(function(target) {
+      return path.resolve(target);
+    });
 
     opts.args.forEach(function(target) {
-      collect(target, files, ignores, reg);
+      var dirIgnores = loadIgnores({ cwd: path.resolve(target) });
+      collect(target, files, ignores.concat(dirIgnores), reg);
     });
 
     return files;
