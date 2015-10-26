@@ -3590,6 +3590,7 @@ var JSHINT = (function() {
             if (lone && inexport) {
               state.funct["(scope)"].setExported(t.token.value, t.token);
             }
+            state.funct["(scope)"].definition.add(t.id, type);
           }
         }
       }
@@ -3610,6 +3611,10 @@ var JSHINT = (function() {
         } else {
           destructuringPatternMatch(names, value);
         }
+      }
+
+      if (!prefix) {
+        state.funct["(scope)"].definition.reset();
       }
 
       statement.first = statement.first.concat(names);
@@ -3750,6 +3755,8 @@ var JSHINT = (function() {
       state.funct["(scope)"].addlabel(this.name, {
         type: "class",
         token: state.tokens.curr });
+
+      state.funct["(scope)"].definition.add(this.name, "class");
     } else if (state.tokens.next.identifier && state.tokens.next.value !== "extends") {
       // BindingIdentifier(opt)
       this.name = identifier();
@@ -3757,7 +3764,13 @@ var JSHINT = (function() {
     } else {
       this.name = state.nameStack.infer();
     }
+
     classtail(this);
+
+    if (isStatement) {
+      state.funct["(scope)"].definition.reset();
+    }
+
     return this;
   }
 
@@ -4289,6 +4302,10 @@ var JSHINT = (function() {
       advance(nextop.value);
       expression(20);
       advance(")", t);
+
+      if (letscope) {
+        state.funct["(scope)"].definition.reset();
+      }
 
       if (nextop.value === "in" && state.option.forin) {
         state.forinifcheckneeded = true;
