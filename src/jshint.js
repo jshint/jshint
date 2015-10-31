@@ -738,9 +738,6 @@ var JSHINT = (function() {
             state.option[key] = (val === "true");
           }
 
-          if (key === "newcap") {
-            state.option["(explicitNewcap)"] = true;
-          }
           return;
         }
 
@@ -1776,9 +1773,6 @@ var JSHINT = (function() {
     }
 
     if (state.isStrict()) {
-      if (!state.option["(explicitNewcap)"]) {
-        state.option.newcap = true;
-      }
       state.option.undef = true;
     }
   }
@@ -5180,9 +5174,6 @@ var JSHINT = (function() {
               (optionKey === "es5" && o[optionKey])) {
             warning("I003");
           }
-
-          if (optionKeys[x] === "newcap" && o[optionKey] === false)
-            newOptionObj["(explicitNewcap)"] = true;
         }
       }
     }

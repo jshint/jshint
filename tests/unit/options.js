@@ -1618,7 +1618,6 @@ exports.strict = function (test) {
   run.test(src2, { es3: true, strict: false });
 
   TestRun(test)
-    .addError(6, "Missing 'new' prefix when invoking a constructor.")
     .test(src3, {es3 : true});
 
   TestRun(test).test(code2, { es3: true, strict: true });
@@ -3207,6 +3206,20 @@ exports.module.declarationRestrictions = function( test ) {
       "  /* jshint validthis:true */",
       "}"
     ], { esnext: true });
+
+  test.done();
+};
+
+exports.module.newcap = function(test) {
+  var code = [
+    "var ctor = function() {};",
+    "var Ctor = function() {};",
+    "var c1 = new ctor();",
+    "var c2 = Ctor();"
+  ];
+
+  TestRun(test, "The `newcap` option is not automatically enabled for module code.")
+    .test(code, { esversion: 6, module: true });
 
   test.done();
 };
