@@ -14,9 +14,8 @@
 [![Coverage Status](https://img.shields.io/coveralls/jshint/jshint.svg?style=flat)](https://coveralls.io/r/jshint/jshint?branch=master)
 
 JSHint is a community-driven tool that detects errors and potential problems in
-JavaScript code and that enforces your team's coding conventions. Since JSHint 
-is so flexible, you can easily adjust it to your particular coding style and
-to the environment in which you expect your code to run. JSHint is open source and
+JavaScript code. Since JSHint is so flexible, you can easily adjust it in 
+the environment you expect your code to execute. JSHint is open source and
 will always stay this way.
 
 ## Our goal
