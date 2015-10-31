@@ -5939,6 +5939,24 @@ exports["class method this"] = function (test) {
   test.done();
 };
 
+exports.classNewcap = function (test) {
+  var code = [
+    "class C {",
+    "  m() {",
+    "    var ctor = function() {};",
+    "    var Ctor = function() {};",
+    "    var c1 = new ctor();",
+    "    var c2 = Ctor();",
+    "  }",
+    "}"
+  ];
+
+  TestRun(test, "The `newcap` option is not automatically enabled within class bodies.")
+    .test(code, { esversion: 6 });
+
+  test.done();
+};
+
 exports.classExpression = function (test) {
   var code = [
     "void class MyClass {",
