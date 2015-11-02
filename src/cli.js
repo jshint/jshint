@@ -204,7 +204,7 @@ function loadIgnores(params) {
     return [];
   }
 
-  var name = (file ? shjs.cat(file) : "");
+  var name = file ? shjs.cat(file) : "";
 
   if (!name) {
     return [];
@@ -640,8 +640,8 @@ var exports = {
         lint(extract(code, opts.extract), results, config, data, filename);
 
         // invoke each reporter
-        for (var index in opts.reporters) {
-          exports.getReporter(opts.reporters[index])(results, data, { verbose: opts.verbose });
+        for (var i = 0; i < opts.reporters.length; i++) {
+          exports.getReporter(opts.reporters[i])(results, data, { verbose: opts.verbose });
         }
 
         cb(results.length === 0);
@@ -681,12 +681,11 @@ var exports = {
 
     if (opts.hasOwnProperty('reporter')) {
       // passed in manually 'old' way without going through entry point of script (interpret)
-      (opts.reporter)(results, data, { verbose: opts.verbose });
-    }
-    else {
+      opts.reporter(results, data, { verbose: opts.verbose });
+    } else {
       // invoke each reporter as set up on
-      for (var index in opts.reporters) {
-        exports.getReporter(opts.reporters[index])(results, data, { verbose: opts.verbose });
+      for (var i = 0; i < opts.reporters.length; i++) {
+        exports.getReporter(opts.reporters[i])(results, data, { verbose: opts.verbose });
       }
     }
 
