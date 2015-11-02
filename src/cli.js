@@ -706,10 +706,10 @@ var exports = {
    * @param {string} name of reporter to fetch, pre-defined or custom.
    */
   getReporter: function(reporterName) {
-    var reporter = defReporter; // default
+    var reporter = defReporter; // assume no cli --reporter defined
 
-    if (!reporterName) {
-      return reporter; // return default
+    if (!reporterName || reporterName === 'default') {
+      return reporter; // return defReporter defined in head
     }
 
     switch (reporterName) {
