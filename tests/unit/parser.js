@@ -7474,3 +7474,42 @@ exports.parsingCommas = function (test) {
 
   test.done();
 };
+
+exports.invalidSuper = function (test) {
+
+  var code = [
+    "function super(super = super) {",
+    "  return super;",
+    "}",
+    "let fn = super => (super) => {};",
+    "fn(super);",
+    "super: while(super) {}",
+    "{ let [ super = super ] = [ super ]; }",
+    "{ let { super = super } = { super }; }",
+    "{ let super = 1;",
+    "  super = 3; }"
+  ];
+
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(1, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(1, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(2, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(4, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(4, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(5, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(5, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(6, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(7, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(8, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(8, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(8, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(9, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(9, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(9, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(10, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(10, "Bad assignment.")
+    .test(code, { esversion: 6 });
+
+  test.done();
+};
