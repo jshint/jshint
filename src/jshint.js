@@ -330,7 +330,7 @@ var JSHINT = (function() {
 
   // Produce an error warning.
   function quit(code, line, chr) {
-    var percentage = Math.floor((line / state.lines.length) * 100);
+    var percentage = Math.floor((line / state.lines.length) * 100) || 0;
     var message = messages.errors[code].desc;
 
     throw {
