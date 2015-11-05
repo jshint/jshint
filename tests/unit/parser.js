@@ -45,6 +45,10 @@ exports.other = function (test) {
     .addError(1, "Unrecoverable syntax error. (100% scanned).")
     .test("typeof;");
 
+  TestRun(test)
+    .addError(1, "Unrecoverable syntax error. (0% scanned).")
+    .test("}");
+
   test.done();
 };
 
