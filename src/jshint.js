@@ -2017,7 +2017,7 @@ var JSHINT = (function() {
       warning("W040", x);
     }
     if (state.funct["(super)"] === "required") {
-      error("E060", x);
+      error("E060", x, "this");
     }
   });
   reservevar("true");
@@ -4744,7 +4744,7 @@ var JSHINT = (function() {
     nud: function() {
       if (!state.inES6()) {
         warning("W024", state.tokens.curr, "super", "6");
-      } else if (checkPunctuators(state.tokens.next, "(")) {
+      } else if (checkPunctuator(state.tokens.next, "(")) {
         var f = state.funct;
         while (f) {
           // If `super` is called in an arrow function, check the outer scope
@@ -4755,6 +4755,10 @@ var JSHINT = (function() {
           error("E062", state.tokens.curr);
         } else {
           f["(super)"] = "called";
+        }
+      } else if (checkPunctuators(state.tokens.next, [".", "["])) {
+        if (state.funct["(super)"] === "required") {
+          error("E060", this, "super.*");
         }
       }
       return this;
