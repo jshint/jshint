@@ -468,6 +468,7 @@ exports.qunit = {
   module         : false,
   notDeepEqual   : false,
   notEqual       : false,
+  notOk          : false,
   notPropEqual   : false,
   notStrictEqual : false,
   ok             : false,
