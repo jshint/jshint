@@ -123,9 +123,6 @@ function Lexer(source) {
   for (var i = 0; i < state.option.indent; i += 1) {
     state.tab += " ";
   }
-
-  // Blank out non-multi-line-commented lines when ignoring linter errors
-  this.ignoreLinterErrors = false;
 }
 
 Lexer.prototype = {
