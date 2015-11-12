@@ -1,4 +1,4 @@
-/*! 2.9.0 */
+/*! 2.9.1-rc1 */
 var JSHINT;
 if (typeof window === 'undefined') window = {};
 (function () {
@@ -13778,9 +13778,6 @@ function Lexer(source) {
   for (var i = 0; i < state.option.indent; i += 1) {
     state.tab += " ";
   }
-
-  // Blank out non-multi-line-commented lines when ignoring linter errors
-  this.ignoreLinterErrors = false;
 }
 
 Lexer.prototype = {
@@ -14000,7 +13997,7 @@ Lexer.prototype = {
     }
 
     // 2-character punctuators: <= >= == != ++ -- << >> && ||
-    // += -= *= %= &= |= ^= (but not /=, see below)
+    // += -= *= %= &= |= ^= /=
     if (ch1 === ch2 && ("+-<>&|".indexOf(ch1) >= 0)) {
       return {
         type: Token.Punctuator,
@@ -14008,7 +14005,7 @@ Lexer.prototype = {
       };
     }
 
-    if ("<>=!+-*%&|^".indexOf(ch1) >= 0) {
+    if ("<>=!+-*%&|^/".indexOf(ch1) >= 0) {
       if (ch2 === "=") {
         return {
           type: Token.Punctuator,
@@ -14019,22 +14016,6 @@ Lexer.prototype = {
       return {
         type: Token.Punctuator,
         value: ch1
-      };
-    }
-
-    // Special case: /=.
-
-    if (ch1 === "/") {
-      if (ch2 === "=") {
-        return {
-          type: Token.Punctuator,
-          value: "/="
-        };
-      }
-
-      return {
-        type: Token.Punctuator,
-        value: "/"
       };
     }
 
@@ -14075,6 +14056,11 @@ Lexer.prototype = {
       }
 
       body = body.replace(/\n/g, " ");
+
+      if (label === "/*" && reg.fallsThrough.test(body)) {
+        isSpecial = true;
+        commentType = "falls through";
+      }
 
       special.forEach(function(str) {
         if (isSpecial) {
@@ -14711,10 +14697,15 @@ Lexer.prototype = {
     var startChar = this.char;
     var depth = this.templateStarts.length;
 
-    if (!state.inES6(true)) {
-      // Only lex template strings in ESNext mode.
-      return null;
-    } else if (this.peek() === "`") {
+    if (this.peek() === "`") {
+      if (!state.inES6(true)) {
+        this.trigger("warning", {
+          code: "W119",
+          line: this.line,
+          character: this.char,
+          data: ["template literal syntax", "6"]
+        });
+      }
       // Template must start with a backtick.
       tokenType = Token.TemplateHead;
       this.templateStarts.push({ line: this.line, char: this.char });
@@ -15113,14 +15104,9 @@ Lexer.prototype = {
     this.from = this.char;
 
     // Move to the next non-space character.
-    var start;
-    if (/\s/.test(this.peek())) {
-      start = this.char;
-
-      while (/\s/.test(this.peek())) {
-        this.from += 1;
-        this.skip();
-      }
+    while (/\s/.test(this.peek())) {
+      this.from += 1;
+      this.skip();
     }
 
     // Methods that work with multi-line structures and move the
@@ -15437,14 +15423,14 @@ Lexer.prototype = {
         return create("(no subst template)", token.value, null, token);
 
       case Token.Identifier:
-        this.trigger("Identifier", {
+        this.triggerAsync("Identifier", {
           line: this.line,
           char: this.char,
           from: this.form,
           name: token.value,
           raw_name: token.text,
           isProperty: state.tokens.curr.id === "."
-        });
+        }, checks, function() { return true; });
 
         /* falls through */
       case Token.Keyword:
@@ -15598,7 +15584,8 @@ var errors = {
   E055: "The '{a}' option cannot be set after any executable code.",
   E056: "'{a}' was used before it was declared, which is illegal for '{b}' variables.",
   E057: "Invalid meta property: '{a}.{b}'.",
-  E058: "Missing semicolon."
+  E058: "Missing semicolon.",
+  E059: "Incompatible values for the '{a}' and '{b}' linting options."
 };
 
 var warnings = {
@@ -16388,8 +16375,7 @@ exports.bool = {
 
     /**
      * This option tells JSHint that your code uses ECMAScript 6 specific
-     * syntax. Note that these features are not finalized yet and not all
-     * browsers implement them.
+     * syntax. Note that not all browsers implement these features.
      *
      * More info:
      *
@@ -16893,7 +16879,7 @@ exports.identifier = /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/;
 exports.javascriptURL = /^(?:javascript|jscript|ecmascript|vbscript|livescript)\s*:/i;
 
 // Catches /* falls through */ comments (ft)
-exports.fallsThrough = /^\s*\/\*\s*falls?\sthrough\s*\*\/\s*$/;
+exports.fallsThrough = /^\s*falls?\sthrough\s*$/;
 
 // very conservative rule (eg: only one space between the start of the comment and the first character)
 // to relax the maxlen option
@@ -16965,21 +16951,6 @@ var scopeManager = function(state, predefined, exported, declared) {
         "(tokens)": []
       };
     }
-  }
-
-  function _addUsage(labelName, token) {
-
-    _setupUsages(labelName);
-
-    if (token) {
-      token["(function)"] = _currentFunctBody;
-      _current["(usages)"][labelName]["(tokens)"].push(token);
-    }
-  }
-
-  var exportedLabels = Object.keys(exported);
-  for (var i = 0; i < exportedLabels.length; i++) {
-    _addUsage(exportedLabels[i]);
   }
 
   var _getUnusedOption = function(unused_opt) {
@@ -17474,7 +17445,30 @@ var scopeManager = function(state, predefined, exported, declared) {
     /**
      * for the exported options, indicating a variable is used outside the file
      */
-    addExported: _addUsage,
+    addExported: function(labelName) {
+      var globalLabels = _scopeStack[0]["(labels)"];
+      if (_.has(declared, labelName)) {
+        // remove the declared token, so we know it is used
+        delete declared[labelName];
+      } else if (_.has(globalLabels, labelName)) {
+        globalLabels[labelName]["(unused)"] = false;
+      } else {
+        for (var i = 1; i < _scopeStack.length; i++) {
+          var scope = _scopeStack[i];
+          // if `scope.(type)` is not defined, it is a block scope
+          if (!scope["(type)"]) {
+            if (_.has(scope["(labels)"], labelName) &&
+                !scope["(labels)"][labelName]["(blockscoped)"]) {
+              scope["(labels)"][labelName]["(unused)"] = false;
+              return;
+            }
+          } else {
+            break;
+          }
+        }
+        exported[labelName] = true;
+      }
+    },
 
     /**
      * Mark an indentifier as es6 module exported
@@ -17495,6 +17489,8 @@ var scopeManager = function(state, predefined, exported, declared) {
       var type  = opts.type;
       var token = opts.token;
       var isblockscoped = type === "let" || type === "const" || type === "class";
+      var isexported    = (isblockscoped ? _current : _currentFunctBody)["(type)"] === "global" &&
+                          _.has(exported, labelName);
 
       // outer shadow check (inner is only on non-block scoped)
       _checkOuterShadow(labelName, token, type);
@@ -17534,7 +17530,7 @@ var scopeManager = function(state, predefined, exported, declared) {
           }
         }
 
-        scopeManagerInst.block.add(labelName, type, token, true);
+        scopeManagerInst.block.add(labelName, type, token, !isexported);
 
       } else {
 
@@ -17561,7 +17557,7 @@ var scopeManager = function(state, predefined, exported, declared) {
           }
         }
 
-        scopeManagerInst.funct.add(labelName, type, token, true);
+        scopeManagerInst.funct.add(labelName, type, token, !isexported);
 
         if (_currentFunctBody["(type)"] === "global") {
           usedPredefinedAndGlobals[labelName] = marker;
@@ -17667,7 +17663,12 @@ var scopeManager = function(state, predefined, exported, declared) {
           token.ignoreUndef = true;
         }
 
-        _addUsage(labelName, token);
+        _setupUsages(labelName);
+
+        if (token) {
+          token["(function)"] = _currentFunctBody;
+          _current["(usages)"][labelName]["(tokens)"].push(token);
+        }
       },
 
       reassign: function(labelName, token) {
@@ -18020,6 +18021,8 @@ exports.browser = {
   Event                : false,
   event                : false,
   fetch                : false,
+  File                 : false,
+  FileList             : false,
   FileReader           : false,
   FormData             : false,
   focus                : false,
@@ -18404,6 +18407,7 @@ exports.qunit = {
   module         : false,
   notDeepEqual   : false,
   notEqual       : false,
+  notOk          : false,
   notPropEqual   : false,
   notStrictEqual : false,
   ok             : false,
@@ -18867,6 +18871,14 @@ var JSHINT = (function() {
 
     if (state.inES6()) {
       combine(predefined, vars.ecmaIdentifiers[6]);
+    }
+
+    /**
+     * Use `in` to check for the presence of any explicitly-specified value for
+     * `globalstrict` because both `true` and `false` should trigger an error.
+     */
+    if (state.option.strict === "global" && "globalstrict" in state.option) {
+      error("E059", state.tokens.next, "strict", "globalstrict");
     }
 
     if (state.option.module) {
@@ -19389,9 +19401,6 @@ var JSHINT = (function() {
             state.option[key] = (val === "true");
           }
 
-          if (key === "newcap") {
-            state.option["(explicitNewcap)"] = true;
-          }
           return;
         }
 
@@ -19492,7 +19501,11 @@ var JSHINT = (function() {
       }
 
       if (state.tokens.next.isSpecial) {
-        doOption();
+        if (state.tokens.next.type === "falls through") {
+          state.tokens.curr.caseFallsThrough = true;
+        } else {
+          doOption();
+        }
       } else {
         if (state.tokens.next.id !== "(endline)") {
           break;
@@ -20001,7 +20014,7 @@ var JSHINT = (function() {
   /**
    * Checks the left hand side of an assignment for issues, returns if ok
    * @param {token} left - the left hand side of the assignment
-   * @param {token} assignToken - the token for the assignment
+   * @param {token=} assignToken - the token for the assignment, used for reporting
    * @param {object=} options - optional object
    * @param {boolean} options.allowDestructuring - whether to allow destructuting binding
    * @returns {boolean} Whether the left hand side is OK
@@ -20009,6 +20022,8 @@ var JSHINT = (function() {
   function checkLeftSideAssign(left, assignToken, options) {
 
     var allowDestructuring = options && options.allowDestructuring;
+
+    assignToken = assignToken || left;
 
     if (state.option.freeze) {
       var nativeObject = findNativePrototype(left);
@@ -20033,7 +20048,9 @@ var JSHINT = (function() {
     } else if (left.id === "{" || left.id === "[") {
       if (allowDestructuring && state.tokens.curr.left.destructAssign) {
         state.tokens.curr.left.destructAssign.forEach(function(t) {
-          state.funct["(scope)"].block.modify(t.id, t.token);
+          if (t.id) {
+            state.funct["(scope)"].block.modify(t.id, t.token);
+          }
         });
       } else {
         if (left.id === "{" || !left.left) {
@@ -20322,7 +20339,9 @@ var JSHINT = (function() {
 
     r = expression(0, true);
 
-    if (r && (!r.identifier || r.value !== "function") && (r.type !== "(punctuator)")) {
+    if (r && !(r.identifier && r.value === "function") &&
+        !(r.type === "(punctuator)" && r.left &&
+          r.left.identifier && r.left.value === "function")) {
       if (!state.isStrict() &&
           state.option.strict === "global") {
         warning("E007");
@@ -20417,9 +20436,6 @@ var JSHINT = (function() {
     }
 
     if (state.isStrict()) {
-      if (!state.option["(explicitNewcap)"]) {
-        state.option.newcap = true;
-      }
       state.option.undef = true;
     }
   }
@@ -20457,6 +20473,7 @@ var JSHINT = (function() {
 
       // create a new block scope
       state.funct["(scope)"].stack();
+      state.funct["(noblockscopedvar)"] = false;
 
       line = state.tokens.curr.line;
       if (state.tokens.next.id !== "}") {
@@ -22019,12 +22036,14 @@ var JSHINT = (function() {
     var ids;
     var identifiers = [];
     var openingParsed = options && options.openingParsed;
+    var isAssignment = options && options.assignment;
+    var recursiveOptions = isAssignment ? { assignment: isAssignment } : null;
     var firstToken = openingParsed ? state.tokens.curr : state.tokens.next;
 
     var nextInnerDE = function() {
       var ident;
       if (checkPunctuators(state.tokens.next, ["[", "{"])) {
-        ids = destructuringPatternRecursive();
+        ids = destructuringPatternRecursive(recursiveOptions);
         for (var id in ids) {
           id = ids[id];
           identifiers.push({ id: id.id, token: id.token });
@@ -22037,9 +22056,27 @@ var JSHINT = (function() {
         advance(")");
       } else {
         var is_rest = checkPunctuator(state.tokens.next, "...");
-        ident = identifier();
-        if (ident)
+
+        if (isAssignment) {
+          var identifierToken = is_rest ? peek(0) : state.tokens.next;
+          if (!identifierToken.identifier) {
+            warning("E030", identifierToken, identifierToken.value);
+          }
+          var assignTarget = expression(155);
+          if (assignTarget) {
+            checkLeftSideAssign(assignTarget);
+
+            // if the target was a simple identifier, add it to the list to return
+            if (assignTarget.identifier) {
+              ident = assignTarget.value;
+            }
+          }
+        } else {
+          ident = identifier();
+        }
+        if (ident) {
           identifiers.push({ id: ident, token: state.tokens.curr });
+        }
         return is_rest;
       }
       return false;
@@ -22058,15 +22095,22 @@ var JSHINT = (function() {
         advance(":");
         nextInnerDE();
       } else {
+        // this id will either be the property name or the property name and the assigning identifier
         id = identifier();
         if (checkPunctuator(state.tokens.next, ":")) {
           advance(":");
           nextInnerDE();
-        } else {
+        } else if (id) {
+          // in this case we are assigning (not declaring), so check assignment
+          if (isAssignment) {
+            checkLeftSideAssign(state.tokens.curr);
+          }
           identifiers.push({ id: id, token: state.tokens.curr });
         }
       }
     };
+
+    var id, value;
     if (checkPunctuator(firstToken, "[")) {
       if (!openingParsed) {
         advance("[");
@@ -22087,10 +22131,11 @@ var JSHINT = (function() {
           } else {
             advance("=");
           }
-          if (state.tokens.next.id === "undefined") {
-            warning("W080", state.tokens.prev, state.tokens.prev.value);
+          id = state.tokens.prev;
+          value = expression(10);
+          if (value && value.type === "undefined") {
+            warning("W080", id, id.value);
           }
-          expression(10);
         }
         if (!checkPunctuator(state.tokens.next, "]")) {
           advance(",");
@@ -22109,10 +22154,11 @@ var JSHINT = (function() {
         assignmentProperty();
         if (checkPunctuator(state.tokens.next, "=")) {
           advance("=");
-          if (state.tokens.next.id === "undefined") {
-            warning("W080", state.tokens.prev, state.tokens.prev.value);
+          id = state.tokens.prev;
+          value = expression(10);
+          if (value && value.type === "undefined") {
+            warning("W080", id, id.value);
           }
-          expression(10);
         }
         if (!checkPunctuator(state.tokens.next, "}")) {
           advance(",");
@@ -22207,14 +22253,15 @@ var JSHINT = (function() {
 
       if (state.tokens.next.id === "=") {
         advance("=");
-        if (!prefix && state.tokens.next.id === "undefined") {
-          warning("W080", state.tokens.prev, state.tokens.prev.value);
-        }
         if (!prefix && peek(0).id === "=" && state.tokens.next.identifier) {
           warning("W120", state.tokens.next, state.tokens.next.value);
         }
+        var id = state.tokens.prev;
         // don't accept `in` in expression if prefix is used for ForIn/Of loop.
         value = expression(prefix ? 120 : 10);
+        if (!prefix && value && value.type === "undefined") {
+          warning("W080", id, id.value);
+        }
         if (lone) {
           tokens[0].first = value;
         } else {
@@ -22313,10 +22360,6 @@ var JSHINT = (function() {
         state.nameStack.set(state.tokens.curr);
 
         advance("=");
-        if (!prefix && report && !state.funct["(loopage)"] &&
-          state.tokens.next.id === "undefined") {
-          warning("W080", state.tokens.prev, state.tokens.prev.value);
-        }
         if (peek(0).id === "=" && state.tokens.next.identifier) {
           if (!prefix && report &&
               !state.funct["(params)"] ||
@@ -22324,8 +22367,12 @@ var JSHINT = (function() {
             warning("W120", state.tokens.next, state.tokens.next.value);
           }
         }
+        var id = state.tokens.prev;
         // don't accept `in` in expression if prefix is used for ForIn/Of loop.
         value = expression(prefix ? 120 : 10);
+        if (value && !prefix && report && !state.funct["(loopage)"] && value.type === "undefined") {
+          warning("W080", id, id.value);
+        }
         if (lone) {
           tokens[0].first = value;
         } else {
@@ -22515,15 +22562,15 @@ var JSHINT = (function() {
     }
     var i = optionalidentifier();
 
+    state.funct["(scope)"].addlabel(i, {
+      type: "function",
+      token: state.tokens.curr });
+
     if (i === undefined) {
       warning("W025");
     } else if (inexport) {
       state.funct["(scope)"].setExported(i, state.tokens.prev);
     }
-
-    state.funct["(scope)"].addlabel(i, {
-      type: "function",
-      token: state.tokens.curr });
 
     doFunction({
       name: i,
@@ -22725,7 +22772,7 @@ var JSHINT = (function() {
           // You can tell JSHint that you don't use break intentionally by
           // adding a comment /* falls through */ on a line just before
           // the next `case`.
-          if (!reg.fallsThrough.test(state.lines[state.tokens.next.line - 2])) {
+          if (!state.tokens.curr.caseFallsThrough) {
             warning("W086", state.tokens.curr, "case");
           }
         }
@@ -22749,7 +22796,7 @@ var JSHINT = (function() {
           // Do not display a warning if 'default' is the first statement or if
           // there is a special /* falls through */ comment.
           if (this.cases.length) {
-            if (!reg.fallsThrough.test(state.lines[state.tokens.next.line - 2])) {
+            if (!state.tokens.curr.caseFallsThrough) {
               warning("W086", state.tokens.curr, "default");
             }
           }
@@ -23790,9 +23837,6 @@ var JSHINT = (function() {
               (optionKey === "es5" && o[optionKey])) {
             warning("I003");
           }
-
-          if (optionKeys[x] === "newcap" && o[optionKey] === false)
-            newOptionObj["(explicitNewcap)"] = true;
         }
       }
     }
@@ -23945,7 +23989,10 @@ var JSHINT = (function() {
         directives();
 
         if (state.directive["use strict"]) {
-          if (state.option.strict !== "global") {
+          if (state.option.strict !== "global" &&
+              !((state.option.strict === true || !state.option.strict) &&
+                (state.option.globalstrict || state.option.module || state.option.node ||
+                 state.option.phantom || state.option.browserify))) {
             warning("W097", state.tokens.prev);
           }
         }
