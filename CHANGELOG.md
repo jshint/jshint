@@ -1,3 +1,38 @@
+<a name="2.9.1-rc1"></a>
+## [2.9.1-rc1](https://github.com/jshint/jshint/compare/2.9.0...v2.9.1-rc1) (2015-11-12)
+
+Version 2.9.0 was revoked shortly after its release due to a number of
+regressions. Although the underlying issues have been resolved, we are
+sensitive to the possibility that there may be still more; as mentioned in
+2.9.0's release notes, the variable tracking system saw a significant
+refactoring.
+
+In an effort to minimize friction with a new version, we're publishing a
+release candidate and requesting feedback from early adopters. Please give it a
+try in your projects and let us know about any surprising behavior!
+
+### Bug Fixes
+
+* `latedef` shouldn't warn when marking a var as exported ([c630994](https://github.com/jshint/jshint/commit/c630994)), closes [#2662](https://github.com/jshint/jshint/issues/2662)
+* Add `File` and `FileList` to browser global variables ([7f2a729](https://github.com/jshint/jshint/commit/7f2a729)), closes [#2690](https://github.com/jshint/jshint/issues/2690)
+* Allow comments and new lines after /* falls through */ ([3b1c925](https://github.com/jshint/jshint/commit/3b1c925)), closes [#2652](https://github.com/jshint/jshint/issues/2652) [#1660](https://github.com/jshint/jshint/issues/1660)
+* Allow let and const to be in a block outside of a block ([84a9145](https://github.com/jshint/jshint/commit/84a9145)), closes [#2685](https://github.com/jshint/jshint/issues/2685)
+* Always warn about missing "use strict" directive ([e85c2a1](https://github.com/jshint/jshint/commit/e85c2a1)), closes [#2668](https://github.com/jshint/jshint/issues/2668)
+* Disallow incompatible option values ([72ba5ad](https://github.com/jshint/jshint/commit/72ba5ad))
+* Do not enable `newcap` within strict mode ([acaf3f7](https://github.com/jshint/jshint/commit/acaf3f7))
+* Don't throw W080 when the initializer starts with `undefined` ([0d87919](https://github.com/jshint/jshint/commit/0d87919)), closes [#2699](https://github.com/jshint/jshint/issues/2699)
+* Don't warn that an exported function is used before it is defined. ([d0433d2](https://github.com/jshint/jshint/commit/d0433d2)), closes [#2658](https://github.com/jshint/jshint/issues/2658)
+* Enforce Identifier restrictions lazily ([ceca549](https://github.com/jshint/jshint/commit/ceca549))
+* Global "use strict" regressions ([04b43d2](https://github.com/jshint/jshint/commit/04b43d2)), closes [#2657](https://github.com/jshint/jshint/issues/2657) [#2661](https://github.com/jshint/jshint/issues/2661)
+* Support property assignment when destructure assigning ([b6df1f2](https://github.com/jshint/jshint/commit/b6df1f2)), closes [#2659](https://github.com/jshint/jshint/issues/2659) [#2660](https://github.com/jshint/jshint/issues/2660)
+* Throw W119 instead of "Unexpected '`'" when using templates in ES5 mode. ([87064e8](https://github.com/jshint/jshint/commit/87064e8))
+
+### Features
+
+* Support QUnit's global notOk ([73ac9b8](https://github.com/jshint/jshint/commit/73ac9b8))
+
+
+
 <a name="2.9.0"></a>
 # [2.9.0](https://github.com/jshint/jshint/compare/2.8.0...v2.9.0) (2015-09-03)
 
