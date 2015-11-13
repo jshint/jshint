@@ -305,7 +305,9 @@ var scopeManager = function(state, predefined, exported, declared) {
           if ((usedLabelType === "function" || usedLabelType === "class") &&
               usage["(reassigned)"]) {
             for (j = 0; j < usage["(reassigned)"].length; j++) {
-              error("W021", usage["(reassigned)"][j], usedLabelName, usedLabelType);
+              if (!usage["(reassigned)"][j].ignoreW021) {
+                warning("W021", usage["(reassigned)"][j], usedLabelName, usedLabelType);
+              }
             }
           }
           continue;
@@ -343,7 +345,9 @@ var scopeManager = function(state, predefined, exported, declared) {
             // check for re-assigning a read-only (set to false) predefined
             if (_current["(predefined)"][usedLabelName] === false && usage["(reassigned)"]) {
               for (j = 0; j < usage["(reassigned)"].length; j++) {
-                warning("W020", usage["(reassigned)"][j]);
+                if (!usage["(reassigned)"][j].ignoreW020) {
+                  warning("W020", usage["(reassigned)"][j]);
+                }
               }
             }
           }
@@ -784,6 +788,8 @@ var scopeManager = function(state, predefined, exported, declared) {
       },
 
       reassign: function(labelName, token) {
+        token.ignoreW020 = state.ignored.W020;
+        token.ignoreW021 = state.ignored.W021;
 
         this.modify(labelName, token);
 
