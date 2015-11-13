@@ -1997,3 +1997,37 @@ exports.duplicateProto = function (test) {
 
   test.done();
 };
+
+exports["gh-2761"] = function (test) {
+  var code = [
+    "/* global foo: false */",
+    "foo = 2;",
+    "// jshint -W020",
+    "foo = 3;",
+    "// jshint +W020",
+    "foo = 4;"
+  ];
+
+  TestRun(test, "W020")
+    .addError(2, "Read only.")
+    .addError(6, "Read only.")
+    .test(code);
+
+  code = [
+    "function a() {}",
+    "a = 2;",
+    "// jshint -W021",
+    "a = 3;",
+    "// jshint +W021",
+    "a = 4;"
+  ];
+
+  TestRun(test, "W021")
+    .addError(2, "Reassignment of 'a', which is is a function. " +
+              "Use 'var' or 'let' to declare bindings that may change.")
+    .addError(6, "Reassignment of 'a', which is is a function. " +
+              "Use 'var' or 'let' to declare bindings that may change.")
+    .test(code);
+
+  test.done();
+};
