@@ -633,7 +633,17 @@ exports.group = {
 
     test.done();
   },
-  
+
+  testIgnoresWithSpecialChars: function (test) {
+    this.sinon.stub(process, "cwd").returns(path.resolve(__dirname, "special++chars"));
+    this.sinon.stub(shjs, "test").withArgs(sinon.match(/-[ed]/), ".").returns(true);
+    this.sinon.stub(shjs, "ls").withArgs(".").returns([]);
+    test.doesNotThrow(function() {
+      cli.interpret(["node", "jshint", ".", "--exclude=exclude1.js"]);
+    });
+    test.done();
+  },
+
   testMultipleIgnores: function (test) {
     var run = this.sinon.stub(cli, "run");
     var dir = __dirname + "/../examples/";
