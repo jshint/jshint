@@ -23,10 +23,10 @@ will always stay this way.
 The project aims to help JavaScript developers write complex programs
 without worrying about typos and language gotchas.
 
-Any code base eventually becomes huge at some point, and simple mistakes—that
-would not show themselves when written—can become show stoppers and waste your
-hours debugging. So this is when static code analysis tools come into play
-and help developers to spot such problems. JSHint scans a program written in
+Any code base eventually becomes huge at some point, so simple mistakes — that
+would not show themselves when written — can become show stoppers and add 
+extra hours of debugging. So, static code analysis tools come into play
+and help developers spot such problems. JSHint scans a program written in
 JavaScript and reports about commonly made mistakes and potential bugs. The
 potential problem could be a syntax error, a bug due to an implicit type
 conversion, a leaking variable, or something else entirely.
