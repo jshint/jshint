@@ -40,7 +40,8 @@ module.exports = function(target, done) {
     ];
 
     if (target === "rhino") {
-      wrapped.splice(0, 0, "#!/usr/bin/env rhino", "var window = {};");
+      wrapped.splice(0, 0, "#!/usr/bin/env rhino", "var window = this;");
+	  wrapped.push( require("fs").readFileSync(srcDir + "/platforms/rhino.js") );
     }
 
     done(null, version, wrapped.join("\n"));
