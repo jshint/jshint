@@ -1997,3 +1997,26 @@ exports.duplicateProto = function (test) {
 
   test.done();
 };
+
+exports["classes are not invocable"] = function (test) {
+  var src = [
+    "class A {}",
+    "function B () {}",
+    "A();",
+    "B();", // B isn't a class
+    "(class {}());",
+    "(class {})();",
+    "(((class {})))();",
+    "let C = class {};",
+    "C();" // JSHint doesn't know if C is a class
+  ];
+
+  TestRun(test)
+    .addError(3, "Missing 'new' prefix when invoking a constructor.")
+    .addError(5, "Missing 'new' prefix when invoking a constructor.")
+    .addError(6, "Missing 'new' prefix when invoking a constructor.")
+    .addError(7, "Missing 'new' prefix when invoking a constructor.")
+    .test(src, { esversion: 6 });
+
+  test.done();
+};
