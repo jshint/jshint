@@ -7375,3 +7375,33 @@ exports.lazyIdentifierChecks = function (test) {
 
   test.done();
 };
+
+exports.parsingCommas = function (test) {
+  var src = fs.readFileSync(__dirname + '/fixtures/parsingCommas.js', 'utf8');
+
+  TestRun(test)
+    .addError(2, "Unexpected ','.")
+    .addError(2, "Comma warnings can be turned off with 'laxcomma'.")
+    .addError(1, "Bad line breaking before ','.")
+    .addError(2, "Expected an identifier and instead saw ';'.")
+    .addError(2, "Expected an identifier and instead saw ')'.")
+    .addError(2, "Expected ';' and instead saw '{'.")
+    .addError(2, "Expected an identifier and instead saw '}'.")
+    .addError(5, "Expected ')' to match '(' from line 1 and instead saw 'for'.")
+    .addError(5, "Expected an identifier and instead saw ';'.")
+    .addError(5, "Expected ')' to match '(' from line 5 and instead saw ';'.")
+    .addError(5, "Expected an assignment or function call and instead saw an expression.")
+    .addError(5, "Missing semicolon.")
+    .addError(6, "Unexpected ','.")
+    .addError(5, "Expected an assignment or function call and instead saw an expression.")
+    .addError(5, "Missing semicolon.")
+    .addError(6, "Expected an identifier and instead saw ','.")
+    .addError(6, "Expected an assignment or function call and instead saw an expression.")
+    .addError(6, "Missing semicolon.")
+    .addError(6, "Expected an identifier and instead saw ')'.")
+    .addError(6, "Expected an assignment or function call and instead saw an expression.")
+    .addError(6, "Missing semicolon.")
+    .test(src);
+
+  test.done();
+};
