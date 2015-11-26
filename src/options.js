@@ -941,13 +941,13 @@ exports.val = {
   latedef      : false,
 
   ignore       : false, // start/end ignoring lines of code, bypassing the lexer
-                //   start    - start ignoring lines, including the current line
-                //   end      - stop ignoring lines, starting on the next line
-                //   line     - ignore warnings / errors for just a single line
-                //              (this option does not bypass the lexer)
+    //   start    - start ignoring lines, including the current line
+    //   end      - stop ignoring lines, starting on the next line
+    //   line     - ignore warnings / errors for just a single line
+    //              (this option does not bypass the lexer)
 
   ignoreDelimiters: false, // array of start/end delimiters used to ignore
-                // certain chunks from code
+    // certain chunks from code
 
   /**
    * This option is used to specify the ECMAScript version to which the code
