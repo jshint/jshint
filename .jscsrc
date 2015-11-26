@@ -5,7 +5,6 @@
       "allowComments": true,
       "allowRegex": true
     },
-    "validateIndentation": 2,
 
     "disallowMultipleLineStrings": true,
     "disallowMixedSpacesAndTabs": true,
