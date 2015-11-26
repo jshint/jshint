@@ -1,5 +1,6 @@
 // Author: Boy Baukema
 // http://github.com/relaxnow
+"use strict";
 module.exports =
 {
   reporter: function(results, data, opts) {
