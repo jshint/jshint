@@ -29,9 +29,9 @@
  */
 
 /*jshint quotmark:double */
+/*jshint strict:false */
 /*global console:true */
 /*exported console */
-
 var _            = require("lodash");
 var events       = require("events");
 var vars         = require("./vars.js");
