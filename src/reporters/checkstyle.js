@@ -1,6 +1,6 @@
 // Author: Boy Baukema
 // http://github.com/relaxnow
-"use strict";
+/*jshint strict:false */
 module.exports =
 {
   reporter: function(results, data, opts) {
