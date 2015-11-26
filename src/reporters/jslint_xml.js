@@ -1,4 +1,4 @@
-"use strict";
+/*jshint strict:false */
 module.exports =
 {
   reporter: function(results) {
