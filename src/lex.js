@@ -1224,25 +1224,25 @@ Lexer.prototype = {
         // parsing this character.
 
         if (char < " ") {
-            // Warn about a control character in a string.
-            this.trigger("warning", {
-                code: "W113",
-                line: this.line,
-                character: this.char,
-                data: [ "<non-printable>" ]
-            } );
+          // Warn about a control character in a string.
+          this.trigger("warning", {
+            code: "W113",
+            line: this.line,
+              character: this.char,
+              data: [ "<non-printable>" ]
+          } );
         }
 
         // Special treatment for some escaped characters.
-        if ( char === "\\" ) {
-            var parsed = this.scanEscapeSequence(checks);
-            char = parsed.char;
-            jump = parsed.jump;
-            allowNewLine = parsed.allowNewLine;
+        if (char === "\\") {
+          var parsed = this.scanEscapeSequence(checks);
+          char = parsed.char;
+          jump = parsed.jump;
+          allowNewLine = parsed.allowNewLine;
         }
 
         value += char;
-        this.skip( jump );
+        this.skip(jump);
       }
     }
 
