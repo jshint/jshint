@@ -1220,16 +1220,20 @@ Lexer.prototype = {
 
         allowNewLine = false;
         var char = this.peek();
+        // jscs:disable
         var jump = 1; // A length of a jump, after we're done
-        // parsing this character.
+                      // parsing this character.
+        // jscs:enable
 
         if (char < " ") {
           // Warn about a control character in a string.
           this.trigger("warning", {
             code: "W113",
+            // jscs:disable
             line: this.line,
-                      character: this.char,
-                      data: [ "<non-printable>" ]
+            character: this.char,
+            data: [ "<non-printable>" ]
+            // jscs:enable
           });
         }
 
