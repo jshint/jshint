@@ -950,7 +950,7 @@ exports.val = {
   ignoreDelimiters: false, // array of start/end delimiters used to ignore
                           // certain chunks from code
   // jscs:enable
-  
+
   /**
    * This option is used to specify the ECMAScript version to which the code
    * must adhere. It can assume one of the following values:
