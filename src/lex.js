@@ -1228,8 +1228,8 @@ Lexer.prototype = {
           this.trigger("warning", {
             code: "W113",
             line: this.line,
-                        character: this.char,
-                        data: [ "<non-printable>" ]
+                      character: this.char,
+                      data: [ "<non-printable>" ]
           });
         }
 
