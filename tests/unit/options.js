@@ -1900,6 +1900,31 @@ exports.scope = function (test) {
   test.done();
 };
 
+exports.scopeUnused = function (test) {
+  var src = [
+    '(function() {',
+    '  var x;',
+    '  {',
+    '    var x;',
+    '    void x;',
+    '  }',
+    '  {',
+    '    var x;',
+    '  }',
+    '}());'
+  ];
+
+  TestRun(test)
+    .addError(2, "'x' is defined but never used.")
+    .addError(8, "'x' is defined but never used.")
+    .test(src, { shadow: true, unused: true });
+
+  TestRun(test)
+    .test(src, { funcscope: true, shadow: true, unused: true });
+
+  test.done();
+};
+
 /*
  * Tests `esnext` and `moz` options.
  *

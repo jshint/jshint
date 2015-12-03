@@ -2969,7 +2969,6 @@ exports["make sure var variables can shadow let variables"] = function (test) {
     .addError(1, "'a' is defined but never used.")
     .addError(2, "'b' is defined but never used.")
     .addError(3, "'c' is defined but never used.")
-    .addError(9, "'d' is defined but never used.")
     .addError(9, "'d' has already been declared.")
     .test(code, { esnext: true, unused: true, undef: true, funcscope: true });
 
