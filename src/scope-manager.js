@@ -739,7 +739,9 @@ var scopeManager = function(state, predefined, exported, declared) {
        * see block.add for block scoped
        */
       add: function(labelName, type, tok, unused) {
-        _current["(labels)"][labelName] = {
+        var targetScope = state.option.funcscope ? _currentFunctBody : _current;
+
+        targetScope["(labels)"][labelName] = {
           "(type)" : type,
           "(token)": tok,
           "(blockscoped)": false,
