@@ -809,7 +809,8 @@ exports.undefDeleteStrict = function (test) {
   test.done();
 };
 
-exports.unused = function (test) {
+exports.unused = {};
+exports.unused.basic = function (test) {
   var src = fs.readFileSync(__dirname + '/fixtures/unused.js', 'utf8');
 
   var allErrors = [
@@ -890,6 +891,93 @@ exports.unused = function (test) {
   test.ok(unused.some(function (err) { return err.line === 7 && err.character == 9 && err.name === "c"; }));
   test.ok(unused.some(function (err) { return err.line === 15 && err.character == 10 && err.name === "foo"; }));
   test.ok(unused.some(function (err) { return err.line === 68 && err.character == 5 && err.name === "y"; }));
+
+  test.done();
+};
+
+// Regression test for gh-2784
+exports.unused.usedThroughShadowedDeclaration = function (test) {
+  var code = [
+    "(function() {",
+    "  var x;",
+    "  {",
+    "    var x;",
+    "    void x;",
+    "  }",
+    "}());"
+  ];
+
+  TestRun(test)
+    .addError(4, "'x' is already defined.")
+    .test(code, { unused: true });
+
+  test.done();
+};
+
+exports.unused.unusedThroughShadowedDeclaration = function (test) {
+  var code = [
+    "(function() {",
+    "  {",
+    "      var x;",
+    "      void x;",
+    "  }",
+    "  {",
+    "      var x;",
+    "  }",
+    "})();"
+  ];
+
+  TestRun(test)
+    .addError(7, "'x' is already defined.")
+    .test(code, { unused: true });
+
+  test.done();
+};
+
+exports.unused.hoisted = function (test) {
+  var code = [
+    "(function() {",
+    "  {",
+    "    var x;",
+    "  }",
+    "  {",
+    "    var x;",
+    "  }",
+    "  void x;",
+    "}());"
+  ];
+
+  TestRun(test)
+    .addError(6, "'x' is already defined.")
+    .addError(8, "'x' used out of scope.")
+    .test(code, { unused: true });
+
+  test.done();
+};
+
+exports.unused.crossBlocks = function (test) {
+  var code = fs.readFileSync(__dirname + '/fixtures/unused-cross-blocks.js', 'utf8');
+
+  TestRun(test)
+    .addError(15, "'func4' is already defined.")
+    .addError(18, "'func5' is already defined.")
+    .addError(41, "'topBlock6' is already defined.")
+    .addError(44, "'topBlock7' is already defined.")
+    .addError(56, "'topBlock3' is already defined.")
+    .addError(59, "'topBlock4' is already defined.")
+    .addError(9, "'unusedFunc' is defined but never used.")
+    .addError(27, "'unusedTopBlock' is defined but never used.")
+    .addError(52, "'unusedNestedBlock' is defined but never used.")
+    .test(code, { unused: true });
+
+  TestRun(test)
+    .addError(15, "'func4' is already defined.")
+    .addError(18, "'func5' is already defined.")
+    .addError(41, "'topBlock6' is already defined.")
+    .addError(44, "'topBlock7' is already defined.")
+    .addError(56, "'topBlock3' is already defined.")
+    .addError(59, "'topBlock4' is already defined.")
+    .test(code);
 
   test.done();
 };
@@ -1878,7 +1966,8 @@ exports.quotesAndTemplateLiterals = function (test) {
   test.done();
 };
 
-exports.scope = function (test) {
+exports.scope = {};
+exports.scope.basic = function (test) {
   var src = fs.readFileSync(__dirname + '/fixtures/scope.js', 'utf8');
 
   TestRun(test, 1)
@@ -1896,6 +1985,25 @@ exports.scope = function (test) {
     .addError(37, "'cc' is not defined.")
     .addError(42, "'bb' is not defined.")
     .test(src, { es3: true, funcscope: true });
+
+  test.done();
+};
+
+exports.scope.crossBlocks = function (test) {
+  var code = fs.readFileSync(__dirname + '/fixtures/scope-cross-blocks.js', 'utf8');
+
+  TestRun(test)
+    .addError(3, "'topBlockBefore' used out of scope.")
+    .addError(4, "'nestedBlockBefore' used out of scope.")
+    .addError(11, "'nestedBlockBefore' used out of scope.")
+    .addError(27, "'nestedBlockAfter' used out of scope.")
+    .addError(32, "'nestedBlockAfter' used out of scope.")
+    .addError(33, "'topBlockAfter' used out of scope.")
+    .test(code);
+
+  TestRun(test)
+    .test(code, { funcscope: true });
+
 
   test.done();
 };
