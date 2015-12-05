@@ -519,6 +519,8 @@ exports.regexp = function (test) {
   run.test(code, {esnext: true});
   run.test(code, {moz: true});
 
+  TestRun(test).test("var a = `${/./}${/./}`;", { esversion: 6 });
+
 
   // Pre Regular Expression Punctuation
   //  (See: token method, create function in lex.js)

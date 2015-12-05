@@ -1642,6 +1642,10 @@ Lexer.prototype = {
         }
       }
 
+      if (type === "(template)" || type === "(template middle)") {
+        this.prereg = true;
+      }
+
       if (!obj) {
         obj = Object.create(state.syntax[type]);
       }
