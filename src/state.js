@@ -22,11 +22,11 @@ var state = {
 
   /**
    * @param {boolean} strict - When `true`, only consider ES6 when in
-   *                           "esversion: 6" code and *not* in "moz".
+   *                           "esversion: 6" code.
    */
   inES6: function(strict) {
     if (strict) {
-      return !this.option.moz && this.option.esversion === 6;
+      return this.option.esversion === 6;
     }
     return this.option.moz || this.option.esversion >= 6;
   },
