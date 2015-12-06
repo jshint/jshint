@@ -342,11 +342,11 @@ var scopeManager = function(state, predefined, exported, declared) {
             // note it as used so it can be reported
             usedPredefinedAndGlobals[usedLabelName] = marker;
 
-            // check for re-assigning a read-only (set to false) predefined
-            if (_current["(predefined)"][usedLabelName] === false && usage["(reassigned)"]) {
-              for (j = 0; j < usage["(reassigned)"].length; j++) {
-                if (!usage["(reassigned)"][j].ignoreW020) {
-                  warning("W020", usage["(reassigned)"][j]);
+            // check for modifying a read-only (set to false) predefined
+            if (_current["(predefined)"][usedLabelName] === false && usage["(modified)"]) {
+              for (j = 0; j < usage["(modified)"].length; j++) {
+                if (!usage["(modified)"][j].ignoreW020) {
+                  warning("W020", usage["(modified)"][j]);
                 }
               }
             }
@@ -788,7 +788,6 @@ var scopeManager = function(state, predefined, exported, declared) {
       },
 
       reassign: function(labelName, token) {
-        token.ignoreW020 = state.ignored.W020;
         token.ignoreW021 = state.ignored.W021;
 
         this.modify(labelName, token);
@@ -797,6 +796,7 @@ var scopeManager = function(state, predefined, exported, declared) {
       },
 
       modify: function(labelName, token) {
+        token.ignoreW020 = state.ignored.W020;
 
         _setupUsages(labelName);
 
