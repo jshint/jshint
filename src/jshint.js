@@ -328,18 +328,25 @@ var JSHINT = (function() {
   }
 
   // Produce an error warning.
-  function quit(code, token) {
+  function quit(code, token, a, b) {
     var percentage = Math.floor((token.line / state.lines.length) * 100);
     var message = messages.errors[code].desc;
 
-    throw {
+    var descriptor = {
       name: "JSHintError",
       line: token.line,
       character: token.from,
       message: message + " (" + percentage + "% scanned).",
       raw: message,
-      code: code
+      code: code,
+      a: a,
+      b: b
     };
+
+    descriptor.reason = supplant(message, descriptor) + " (" + percentage +
+      "% scanned).";
+
+    throw descriptor;
   }
 
   function removeIgnoredMessages() {
@@ -5360,7 +5367,7 @@ var JSHINT = (function() {
           scope     : "(main)",
           raw       : err.raw,
           code      : err.code,
-          reason    : err.message,
+          reason    : err.reason,
           line      : err.line || nt.line,
           character : err.character || nt.from
         }, null);
