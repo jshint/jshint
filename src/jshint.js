@@ -932,9 +932,7 @@ var JSHINT = (function() {
         error("E030", state.tokens.curr, state.tokens.curr.id);
       }
 
-      // TODO: use pratt mechanics rather than special casing template tokens
-      while ((rbp < state.tokens.next.lbp || state.tokens.next.type === "(template)") &&
-              !isEndOfExpr()) {
+      while (rbp < state.tokens.next.lbp && !isEndOfExpr()) {
         isArray = state.tokens.curr.value === "Array";
         isObject = state.tokens.curr.value === "Object";
 
@@ -1980,11 +1978,11 @@ var JSHINT = (function() {
   };
 
   var baseTemplateSyntax = {
-    lbp: 0,
     identifier: false,
     template: true,
   };
   state.syntax["(template)"] = _.extend({
+    lbp: 15,
     type: "(template)",
     nud: doTemplateLiteral,
     led: doTemplateLiteral,
@@ -1992,18 +1990,21 @@ var JSHINT = (function() {
   }, baseTemplateSyntax);
 
   state.syntax["(template middle)"] = _.extend({
+    lbp: 0,
     type: "(template middle)",
     middle: true,
     noSubst: false
   }, baseTemplateSyntax);
 
   state.syntax["(template tail)"] = _.extend({
+    lbp: 0,
     type: "(template tail)",
     tail: true,
     noSubst: false
   }, baseTemplateSyntax);
 
   state.syntax["(no subst template)"] = _.extend({
+    lbp: 15,
     type: "(template)",
     nud: doTemplateLiteral,
     led: doTemplateLiteral,
