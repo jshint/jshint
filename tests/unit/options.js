@@ -1679,13 +1679,45 @@ exports.globalstrict = function (test) {
   // Don't enforce "use strict"; if strict has been explicitly set to false
   TestRun(test).test(code[1], { es3: true, globalstrict: true, strict: false });
 
-  TestRun(test, "co-occurence with 'strict: global'")
-    .addError(0, "Incompatible values for the 'strict' and 'globalstrict' linting options.")
-    .test(code, { strict: "global", globalstrict: false });
+  TestRun(test, "co-occurence with 'strict: global' (via configuration)")
+    .addError(0, "Incompatible values for the 'strict' and 'globalstrict' linting options. (0% scanned).")
+    .test("this is not JavaScript", { strict: "global", globalstrict: false });
 
-  TestRun(test, "co-occurence with 'strict: global'")
-    .addError(0, "Incompatible values for the 'strict' and 'globalstrict' linting options.")
-    .test(code, { strict: "global", globalstrict: true });
+  TestRun(test, "co-occurence with 'strict: global' (via configuration)")
+    .addError(0, "Incompatible values for the 'strict' and 'globalstrict' linting options. (0% scanned).")
+    .test("this is not JavaScript", { strict: "global", globalstrict: true });
+
+  TestRun(test, "co-occurence with 'strict: global' (via in-line directive")
+    .addError(2, "Incompatible values for the 'strict' and 'globalstrict' linting options. (66% scanned).")
+    .test([
+      "",
+      "// jshint globalstrict: true",
+      "this is not JavaScript"
+    ], { strict: "global" });
+
+  TestRun(test, "co-occurence with 'strict: global' (via in-line directive")
+    .addError(2, "Incompatible values for the 'strict' and 'globalstrict' linting options. (66% scanned).")
+    .test([
+      "",
+      "// jshint globalstrict: false",
+      "this is not JavaScript"
+    ], { strict: "global" });
+
+  TestRun(test, "co-occurence with 'strict: global' (via in-line directive")
+    .addError(2, "Incompatible values for the 'strict' and 'globalstrict' linting options. (66% scanned).")
+    .test([
+      "",
+      "// jshint strict: global",
+      "this is not JavaScript"
+    ], { globalstrict: true });
+
+  TestRun(test, "co-occurence with 'strict: global' (via in-line directive")
+    .addError(2, "Incompatible values for the 'strict' and 'globalstrict' linting options. (66% scanned).")
+    .test([
+      "",
+      "// jshint strict: global",
+      "this is not JavaScript"
+    ], { globalstrict: false });
 
   TestRun(test, "co-occurence with internally-set 'strict: gobal' (module code)")
     .test(code, { strict: true, globalstrict: false, esnext: true, module: true });

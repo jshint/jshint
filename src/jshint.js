@@ -214,7 +214,7 @@ var JSHINT = (function() {
      * `globalstrict` because both `true` and `false` should trigger an error.
      */
     if (state.option.strict === "global" && "globalstrict" in state.option) {
-      error("E059", state.tokens.next, "strict", "globalstrict");
+      quit("E059", state.tokens.next, "strict", "globalstrict");
     }
 
     if (state.option.module) {
@@ -5324,15 +5324,15 @@ var JSHINT = (function() {
       }
     }
 
-    assume();
-
-    // combine the passed globals after we've assumed all our options
-    combine(predefined, g || {});
-
-    //reset values
-    comma.first = true;
-
     try {
+      assume();
+
+      // combine the passed globals after we've assumed all our options
+      combine(predefined, g || {});
+
+      //reset values
+      comma.first = true;
+
       advance();
       switch (state.tokens.next.id) {
       case "{":
