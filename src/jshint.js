@@ -1552,7 +1552,7 @@ var JSHINT = (function() {
     }
   }
 
-  function parseFinalSemicolon() {
+  function parseFinalSemicolon(stmt) {
     if (state.tokens.next.id !== ";") {
       // don't complain about unclosed templates / strings
       if (state.tokens.next.isUnclosed) return advance();
@@ -1561,13 +1561,13 @@ var JSHINT = (function() {
                      state.tokens.next.id !== "(end)";
       var blockEnd = checkPunctuator(state.tokens.next, "}");
 
-      if (sameLine && !blockEnd) {
+      if (sameLine && !blockEnd && !(stmt.value === "do" && state.inES6(true))) {
         errorAt("E058", state.tokens.curr.line, state.tokens.curr.character);
       } else if (!state.option.asi) {
         // If this is the last statement in a block that ends on
         // the same line *and* option lastsemic is on, ignore the warning.
         // Otherwise, complain about missing semicolon.
-        if ((blockEnd && !state.option.lastsemic) || !sameLine) {
+        if (!(blockEnd && sameLine && state.option.lastsemic)) {
           warningAt("W033", state.tokens.curr.line, state.tokens.curr.character);
         }
       }
@@ -1647,7 +1647,7 @@ var JSHINT = (function() {
       } else if (state.option.nonew && r && r.left && r.id === "(" && r.left.id === "new") {
         warning("W031", t);
       }
-      parseFinalSemicolon();
+      parseFinalSemicolon(t);
     }
 
 
