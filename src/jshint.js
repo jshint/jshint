@@ -1301,8 +1301,10 @@ var JSHINT = (function() {
       while (!obj.identifier && typeof obj.left === "object")
         obj = obj.left;
 
-      if (obj.identifier && natives.indexOf(obj.value) >= 0)
+      if (obj.identifier && natives.indexOf(obj.value) >= 0 &&
+          state.funct["(scope)"].isPredefined(obj.value)) {
         return obj.value;
+      }
     }
 
     var prototype = walkPrototype(left);
