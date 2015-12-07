@@ -2276,10 +2276,10 @@ exports.freeze = function (test) {
   TestRun(test)
     .addError(3, "Extending prototype of native object: 'Array'.")
     .addError(13, "Extending prototype of native object: 'Boolean'.")
-    .test(src, { freeze: true });
+    .test(src, { freeze: true, esversion: 6 });
 
   TestRun(test)
-    .test(src);
+    .test(src, { esversion: 6 });
 
   test.done();
 };
