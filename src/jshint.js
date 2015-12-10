@@ -332,7 +332,7 @@ var JSHINT = (function() {
     var percentage = Math.floor((token.line / state.lines.length) * 100);
     var message = messages.errors[code].desc;
 
-    var descriptor = {
+    var exception = {
       name: "JSHintError",
       line: token.line,
       character: token.from,
@@ -343,10 +343,10 @@ var JSHINT = (function() {
       b: b
     };
 
-    descriptor.reason = supplant(message, descriptor) + " (" + percentage +
+    exception.reason = supplant(message, exception) + " (" + percentage +
       "% scanned).";
 
-    throw descriptor;
+    throw exception;
   }
 
   function removeIgnoredMessages() {
