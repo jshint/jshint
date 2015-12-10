@@ -215,7 +215,7 @@ var JSHINT = (function() {
      * `globalstrict` because both `true` and `false` should trigger an error.
      */
     if (state.option.strict === "global" && "globalstrict" in state.option) {
-      error("E059", state.tokens.next, "strict", "globalstrict");
+      quit("E059", state.tokens.next, "strict", "globalstrict");
     }
 
     if (state.option.module) {
@@ -329,18 +329,25 @@ var JSHINT = (function() {
   }
 
   // Produce an error warning.
-  function quit(code, line, chr) {
-    var percentage = Math.floor((line / state.lines.length) * 100);
+  function quit(code, token, a, b) {
+    var percentage = Math.floor((token.line / state.lines.length) * 100);
     var message = messages.errors[code].desc;
 
-    throw {
+    var exception = {
       name: "JSHintError",
-      line: line,
-      character: chr,
+      line: token.line,
+      character: token.from,
       message: message + " (" + percentage + "% scanned).",
       raw: message,
-      code: code
+      code: code,
+      a: a,
+      b: b
     };
+
+    exception.reason = supplant(message, exception) + " (" + percentage +
+      "% scanned).";
+
+    throw exception;
   }
 
   function removeIgnoredMessages() {
@@ -369,8 +376,8 @@ var JSHINT = (function() {
       t = state.tokens.curr;
     }
 
-    l = t.line || 0;
-    ch = t.from || 0;
+    l = t.line;
+    ch = t.from;
 
     w = {
       id: "(error)",
@@ -392,7 +399,7 @@ var JSHINT = (function() {
     removeIgnoredMessages();
 
     if (JSHINT.errors.length >= state.option.maxerr)
-      quit("E043", l, ch);
+      quit("E043", t);
 
     return w;
   }
@@ -826,7 +833,7 @@ var JSHINT = (function() {
       state.tokens.next = lookahead.shift() || lex.token();
 
       if (!state.tokens.next) { // No more tokens left, give up
-        quit("E041", state.tokens.curr.line);
+        quit("E041", state.tokens.curr);
       }
 
       if (state.tokens.next.id === "(end)" || state.tokens.next.id === "(error)") {
@@ -1234,7 +1241,7 @@ var JSHINT = (function() {
       }
 
       if (!left || !right) {
-        quit("E041", state.tokens.curr.line);
+        quit("E041", state.tokens.curr);
       }
 
       if (left.id === "!") {
@@ -2018,7 +2025,9 @@ var JSHINT = (function() {
   // ECMAScript parser
 
   delim("(endline)");
-  delim("(begin)");
+  (function(x) {
+    x.line = x.from = 0;
+  })(delim("(begin)"));
   delim("(end)").reach = true;
   delim("(error)").reach = true;
   delim("}").reach = true;
@@ -2313,7 +2322,7 @@ var JSHINT = (function() {
     this.right = expression(150);
 
     if (!this.right) { // '!' followed by nothing? Give up.
-      quit("E041", this.line || 0);
+      quit("E041", this);
     }
 
     if (bang[this.right.id] === true) {
@@ -2327,7 +2336,7 @@ var JSHINT = (function() {
     this.first = this.right = p;
 
     if (!p) { // 'typeof' followed by nothing? Give up.
-      quit("E041", this.line || 0, this.character || 0);
+      quit("E041", this);
     }
 
     // The `typeof` operator accepts unresolvable references, so the operand
@@ -5172,7 +5181,7 @@ var JSHINT = (function() {
           newOptionObj[optionKey] = o[optionKey];
           if ((optionKey === "esversion" && o[optionKey] === 5) ||
               (optionKey === "es5" && o[optionKey])) {
-            warning("I003");
+            warningAt("I003", 0, 0);
           }
         }
       }
@@ -5283,7 +5292,7 @@ var JSHINT = (function() {
     });
 
     lex.on("fatal", function(ev) {
-      quit("E041", ev.line, ev.from);
+      quit("E041", ev);
     });
 
     lex.on("Identifier", function(ev) {
@@ -5307,15 +5316,15 @@ var JSHINT = (function() {
       }
     }
 
-    assume();
-
-    // combine the passed globals after we've assumed all our options
-    combine(predefined, g || {});
-
-    //reset values
-    comma.first = true;
-
     try {
+      assume();
+
+      // combine the passed globals after we've assumed all our options
+      combine(predefined, g || {});
+
+      //reset values
+      comma.first = true;
+
       advance();
       switch (state.tokens.next.id) {
       case "{":
@@ -5338,7 +5347,7 @@ var JSHINT = (function() {
       }
 
       if (state.tokens.next.id !== "(end)") {
-        quit("E041", state.tokens.curr.line);
+        quit("E041", state.tokens.curr);
       }
 
       state.funct["(scope)"].unstack();
@@ -5350,7 +5359,7 @@ var JSHINT = (function() {
           scope     : "(main)",
           raw       : err.raw,
           code      : err.code,
-          reason    : err.message,
+          reason    : err.reason,
           line      : err.line || nt.line,
           character : err.character || nt.from
         }, null);
