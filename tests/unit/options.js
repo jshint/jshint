@@ -1939,6 +1939,26 @@ exports.esnext = function (test) {
   test.done();
 };
 
+// The `moz` option should not preclude ES6
+exports.mozAndEs6 = function (test) {
+  var src = [
+   "var x = () => {};",
+   "function* toArray(...rest) {",
+   "  void new.target;",
+   "  yield rest;",
+   "}",
+   "var y = [...x];"
+  ];
+
+  TestRun(test)
+    .test(src, { esversion: 6 });
+
+  TestRun(test)
+    .test(src, { esversion: 6, moz: true });
+
+  test.done();
+};
+
 /*
  * Tests the `maxlen` option
  */
