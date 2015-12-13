@@ -193,24 +193,9 @@ var JSHINT = (function() {
     /**
      * TODO: Remove in JSHint 3
      */
-    if (state.option.esversion) {
-      if (state.option.es3) {
-        badESOpt = "es3";
-      } else if (state.option.es5) {
-        badESOpt = "es5";
-      } else if (state.option.esnext) {
-        badESOpt = "esnext";
-      }
-
-      if (badESOpt) {
-        quit("E059", state.tokens.next, "esversion", badESOpt);
-      }
-
-      state.esVersion = state.option.esversion;
-    } else if (state.option.es3) {
-      state.esVersion = 3;
-    } else if (state.option.esnext) {
-      state.esVersion = 6;
+    badESOpt = state.inferEsVersion();
+    if (badESOpt) {
+      quit("E059", state.tokens.next, "esversion", badESOpt);
     }
 
     if (state.inES5()) {
