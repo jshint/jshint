@@ -187,19 +187,30 @@ var JSHINT = (function() {
   }
 
   function assume() {
+    var badESOpt = null;
     processenforceall();
 
     /**
      * TODO: Remove in JSHint 3
      */
-    if (!state.option.esversion && !state.option.moz) {
+    if (state.option.esversion) {
       if (state.option.es3) {
-        state.option.esversion = 3;
+        badESOpt = "es3";
+      } else if (state.option.es5) {
+        badESOpt = "es5";
       } else if (state.option.esnext) {
-        state.option.esversion = 6;
-      } else {
-        state.option.esversion = 5;
+        badESOpt = "esnext";
       }
+
+      if (badESOpt) {
+        quit("E059", state.tokens.next, "esversion", badESOpt);
+      }
+
+      state.esVersion = state.option.esversion;
+    } else if (state.option.es3) {
+      state.esVersion = 3;
+    } else if (state.option.esnext) {
+      state.esVersion = 6;
     }
 
     if (state.inES5()) {
@@ -673,31 +684,6 @@ var JSHINT = (function() {
           if (!hasParsedCode(state.funct)) {
             error("E055", state.tokens.next, "module");
           }
-        }
-
-        /**
-         * TODO: Remove in JSHint 3
-         */
-        var esversions = {
-          es3   : 3,
-          es5   : 5,
-          esnext: 6
-        };
-        if (_.has(esversions, key)) {
-          switch (val) {
-          case "true":
-            state.option.moz = false;
-            state.option.esversion = esversions[key];
-            break;
-          case "false":
-            if (!state.option.moz) {
-              state.option.esversion = 5;
-            }
-            break;
-          default:
-            error("E002", nt);
-          }
-          return;
         }
 
         if (key === "esversion") {
