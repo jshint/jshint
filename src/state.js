@@ -26,20 +26,20 @@ var state = {
    */
   inES6: function(strict) {
     if (strict) {
-      return this.option.esversion === 6;
+      return this.esVersion === 6;
     }
-    return this.option.moz || this.option.esversion >= 6;
+    return this.option.moz || this.esVersion >= 6;
   },
 
   /**
    * @param {boolean} strict - When `true`, return `true` only when
-   *                           esversion is exactly 5
+   *                           esVersion is exactly 5
    */
   inES5: function(strict) {
     if (strict) {
-      return (!this.option.esversion || this.option.esversion === 5) && !this.option.moz;
+      return (!this.esVersion || this.esVersion === 5) && !this.option.moz;
     }
-    return !this.option.esversion || this.option.esversion >= 5 || this.option.moz;
+    return !this.esVersion || this.esVersion >= 5 || this.option.moz;
   },
 
 
@@ -51,6 +51,7 @@ var state = {
     };
 
     this.option = {};
+    this.esVersion = 5;
     this.funct = null;
     this.ignored = {};
     this.directive = {};
