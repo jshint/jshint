@@ -4094,3 +4094,41 @@ exports.trailingcomma = function (test) {
 
   test.done();
 };
+
+exports.unstable = function (test) {
+  TestRun(test, "Accepts programmatic configuration.")
+    .test("", { unstable: {} });
+
+  TestRun(test, "Accepts empty in-line directive (single-line comment).")
+    .test("// jshint.unstable");
+
+  TestRun(test, "Rejects empty in-line directive (multi-line comment).")
+    .addError(1, "Bad unstable option: ''.")
+    .test("/* jshint.unstable */");
+
+  TestRun(test, "Rejects non-existent names specified via programmatic configuration.")
+    .addError(0, "Bad unstable option: 'nonExistentOptionName'.")
+    .test("", { unstable: { nonExistentOptionName: true } });
+
+  TestRun(test, "Rejects non-existent names specified via in-line directive (single-line comment).")
+    .addError(1, "Bad unstable option: 'nonExistentOptionName'.")
+    .test("// jshint.unstable nonExistentOptionName: true");
+
+  TestRun(test, "Rejects non-existent names specified via in-line directive (multi-line comment).")
+    .addError(1, "Bad unstable option: 'nonExistentOptionName'.")
+    .test("/* jshint.unstable nonExistentOptionName: true */");
+
+  TestRun(test, "Rejects stable names specified via programmatic configuration.")
+    .addError(0, "Bad unstable option: 'undef'.")
+    .test("", { unstable: { undef: true } });
+
+  TestRun(test, "Rejects stable names specified via in-line directive (single-line comment).")
+    .addError(1, "Bad unstable option: 'undef'.")
+    .test("// jshint.unstable undef: true");
+
+  TestRun(test, "Rejects stable names specified via in-line directive (multi-line comment).")
+    .addError(1, "Bad unstable option: 'undef'.")
+    .test("/* jshint.unstable undef: true */");
+
+  test.done();
+};
