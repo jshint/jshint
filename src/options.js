@@ -1005,6 +1005,14 @@ exports.val = {
   esversion: 5
 };
 
+/**
+ * Unstable options allow control for parsing and linting of proposed additions
+ * to the JavaScript language. Just like the language features they describe,
+ * the presence and behavior of these options is volatile; JSHint reserves the
+ * right to remove or modify them between major version releases.
+ */
+exports.unstable = {};
+
 // These are JSHint boolean options which are shared with JSLint
 // where the definition in JSHint is opposite JSLint
 exports.inverted = {
@@ -1024,7 +1032,10 @@ exports.validNames = Object.keys(exports.val)
   .concat(Object.keys(exports.bool.relaxing))
   .concat(Object.keys(exports.bool.enforcing))
   .concat(Object.keys(exports.bool.obsolete))
-  .concat(Object.keys(exports.bool.environments));
+  .concat(Object.keys(exports.bool.environments))
+  .concat(["unstable"]);
+
+exports.unstableNames = Object.keys(exports.unstable);
 
 // These are JSHint boolean options which are shared with JSLint
 // where the name has been changed but the effect is unchanged

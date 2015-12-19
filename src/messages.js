@@ -4,7 +4,7 @@ var _ = require("lodash");
 
 var errors = {
   // JSHint options
-  E001: "Bad option: '{a}'.",
+  E001: "Bad {a}option: '{b}'.",
   E002: "Bad option value.",
 
   // JSHint input
