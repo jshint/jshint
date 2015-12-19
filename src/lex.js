@@ -399,7 +399,10 @@ Lexer.prototype = {
     // comments.
 
     function commentToken(label, body, opt) {
-      var special = ["jshint", "jslint", "members", "member", "globals", "global", "exported"];
+      var special = [
+        "jshint", "jshint.unstable", "jslint", "members", "member", "globals",
+        "global", "exported"
+      ];
       var isSpecial = false;
       var value = label + body;
       var commentType = "plain";
@@ -423,7 +426,7 @@ Lexer.prototype = {
 
         // Don't recognize any special comments other than jshint for single-line
         // comments. This introduced many problems with legit comments.
-        if (label === "//" && str !== "jshint") {
+        if (label === "//" && str !== "jshint" && str !== "jshint.unstable") {
           return;
         }
 
