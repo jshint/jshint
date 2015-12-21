@@ -3446,22 +3446,44 @@ exports.esversion = function(test) {
     .test(arrayComprehension, { esnext: true });
 
 
-  TestRun(test, "precedence over `es3`") // TODO: Remove in JSHint 3
+  TestRun(test, "incompatibility with `es3`") // TODO: Remove in JSHint 3
+    .addError(0, "Incompatible values for the 'esversion' and 'es3' linting options. (0% scanned).")
     .test(es6code, { esversion: 6, es3: true });
 
-  TestRun(test, "precedence over `es5`") // TODO: Remove in JSHint 3
+  TestRun(test, "incompatibility with `es5`") // TODO: Remove in JSHint 3
     .addError(0, "ES5 option is now set per default")
+    .addError(0, "Incompatible values for the 'esversion' and 'es5' linting options. (0% scanned).")
     .test(es6code, { esversion: 6, es5: true });
 
-  TestRun(test, "precedence over `esnext`") // TODO: Remove in JSHint 3
-    .addError(2, "'computed property names' is only available in ES6 (use 'esversion: 6').")
+  TestRun(test, "incompatibility with `esnext`") // TODO: Remove in JSHint 3
+    .addError(0, "Incompatible values for the 'esversion' and 'esnext' linting options. (0% scanned).")
     .test(es6code, { esversion: 3, esnext: true });
+
+  TestRun(test, "imcompatible option specified in-line")
+    .addError(2, "Incompatible values for the 'esversion' and 'es3' linting options. (66% scanned).")
+    .test(["", "// jshint esversion: 3", ""], { es3: true });
+
+  TestRun(test, "incompatible option specified in-line")
+    .addError(2, "Incompatible values for the 'esversion' and 'es3' linting options. (66% scanned).")
+    .test(["", "// jshint es3: true", ""], { esversion: 3 });
+
+  TestRun(test, "compatible option specified in-line")
+    .addError(3, "'class' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .test(["", "// jshint esversion: 3", "class A {}"], { esversion: 3 });
+
+  TestRun(test, "compatible option specified in-line")
+    .addError(3, "'class' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .test(["", "// jshint esversion: 3", "class A {}"], { esversion: 6 });
+
+  TestRun(test, "compatible option specified in-line")
+    .test(["", "// jshint esversion: 6", "class A {}"], { esversion: 3 });
 
   var code2 = [ // TODO: Remove in JSHint 3
     "/* jshint esversion: 3, esnext: true */"
   ].concat(es6code);
 
-  TestRun(test, "the last has the precedence (inline configuration)") // TODO: Remove in JSHint 3
+  TestRun(test, "incompatible options specified in-line") // TODO: Remove in JSHint 3
+    .addError(1, "Incompatible values for the 'esversion' and 'esnext' linting options. (25% scanned).")
     .test(code2);
 
   var code3 = [
