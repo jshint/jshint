@@ -1,6 +1,6 @@
 #!/usr/bin/env rhino
 var window = {};
-/*! 2.9.1-rc1 */
+/*! 2.9.1-rc2 */
 var JSHINT;
 if (typeof window === 'undefined') window = {};
 (function () {
@@ -17195,7 +17195,9 @@ var scopeManager = function(state, predefined, exported, declared) {
           if ((usedLabelType === "function" || usedLabelType === "class") &&
               usage["(reassigned)"]) {
             for (j = 0; j < usage["(reassigned)"].length; j++) {
-              error("W021", usage["(reassigned)"][j], usedLabelName, usedLabelType);
+              if (!usage["(reassigned)"][j].ignoreW021) {
+                warning("W021", usage["(reassigned)"][j], usedLabelName, usedLabelType);
+              }
             }
           }
           continue;
@@ -17233,7 +17235,9 @@ var scopeManager = function(state, predefined, exported, declared) {
             // check for re-assigning a read-only (set to false) predefined
             if (_current["(predefined)"][usedLabelName] === false && usage["(reassigned)"]) {
               for (j = 0; j < usage["(reassigned)"].length; j++) {
-                warning("W020", usage["(reassigned)"][j]);
+                if (!usage["(reassigned)"][j].ignoreW020) {
+                  warning("W020", usage["(reassigned)"][j]);
+                }
               }
             }
           }
@@ -17272,24 +17276,43 @@ var scopeManager = function(state, predefined, exported, declared) {
           });
       }
 
-      // if we have a sub scope we can copy too and we are still within the function boundary
+      // If this is not a function boundary, transfer function-scoped labels to
+      // the parent block (a rough simulation of variable hoisting). Previously
+      // existing labels in the parent block should take precedence so that things and stuff.
       if (subScope && !isUnstackingFunctionBody &&
         !isUnstackingFunctionParams && !isUnstackingFunctionOuter) {
         var labelNames = Object.keys(currentLabels);
         for (i = 0; i < labelNames.length; i++) {
 
           var defLabelName = labelNames[i];
+          var defLabel = currentLabels[defLabelName];
 
-          // if its function scoped and
-          // not already defined (caught with shadow, shouldn't also trigger out of scope)
-          if (!currentLabels[defLabelName]["(blockscoped)"] &&
-            currentLabels[defLabelName]["(type)"] !== "exception" &&
-            !this.funct.has(defLabelName, { excludeCurrent: true })) {
-            subScope["(labels)"][defLabelName] = currentLabels[defLabelName];
-            // we do not warn about out of scope usages in the global scope
-            if (_currentFunctBody["(type)"] !== "global") {
-              subScope["(labels)"][defLabelName]["(useOutsideOfScope)"] = true;
+          if (!defLabel["(blockscoped)"] && defLabel["(type)"] !== "exception") {
+            var shadowed = subScope["(labels)"][defLabelName];
+
+            // Do not overwrite a label if it exists in the parent scope
+            // because it is shared by adjacent blocks. Copy the `unused`
+            // property so that any references found within the current block
+            // are counted toward that higher-level declaration.
+            if (shadowed) {
+              shadowed["(unused)"] &= defLabel["(unused)"];
+
+            // "Hoist" the variable to the parent block, decorating the label
+            // so that future references, though technically valid, can be
+            // reported as "out-of-scope" in the absence of the `funcscope`
+            // option.
+            } else {
+              defLabel["(useOutsideOfScope)"] =
+                // Do not warn about out-of-scope usages in the global scope
+                _currentFunctBody["(type)"] !== "global" &&
+                // When a higher scope contains a binding for the label, the
+                // label is a re-declaration and should not prompt "used
+                // out-of-scope" warnings.
+                !this.funct.has(defLabelName, { excludeCurrent: true });
+
+              subScope["(labels)"][defLabelName] = defLabel;
             }
+
             delete currentLabels[defLabelName];
           }
         }
@@ -17674,6 +17697,8 @@ var scopeManager = function(state, predefined, exported, declared) {
       },
 
       reassign: function(labelName, token) {
+        token.ignoreW020 = state.ignored.W020;
+        token.ignoreW021 = state.ignored.W021;
 
         this.modify(labelName, token);
 
@@ -17744,26 +17769,61 @@ var state = {
 
   /**
    * @param {boolean} strict - When `true`, only consider ES6 when in
-   *                           "esversion: 6" code and *not* in "moz".
+   *                           "esversion: 6" code.
    */
   inES6: function(strict) {
     if (strict) {
-      return !this.option.moz && this.option.esversion === 6;
+      return this.esVersion === 6;
     }
-    return this.option.moz || this.option.esversion >= 6;
+    return this.option.moz || this.esVersion >= 6;
   },
 
   /**
    * @param {boolean} strict - When `true`, return `true` only when
-   *                           esversion is exactly 5
+   *                           esVersion is exactly 5
    */
   inES5: function(strict) {
     if (strict) {
-      return (!this.option.esversion || this.option.esversion === 5) && !this.option.moz;
+      return (!this.esVersion || this.esVersion === 5) && !this.option.moz;
     }
-    return !this.option.esversion || this.option.esversion >= 5 || this.option.moz;
+    return !this.esVersion || this.esVersion >= 5 || this.option.moz;
   },
 
+  /**
+   * Determine the current version of the input language by inspecting the
+   * value of all ECMAScript-version-related options. This logic is necessary
+   * to ensure compatibility with deprecated options `es3`, `es5`, and
+   * `esnext`, and it may be drastically simplified when those options are
+   * removed.
+   *
+   * @returns {string|null} - the name of any incompatible option detected,
+   *                          `null` otherwise
+   */
+  inferEsVersion: function() {
+    var badOpt = null;
+
+    if (this.option.esversion) {
+      if (this.option.es3) {
+        badOpt = "es3";
+      } else if (this.option.es5) {
+        badOpt = "es5";
+      } else if (this.option.esnext) {
+        badOpt = "esnext";
+      }
+
+      if (badOpt) {
+        return badOpt;
+      }
+
+      this.esVersion = this.option.esversion;
+    } else if (this.option.es3) {
+      this.esVersion = 3;
+    } else if (this.option.esnext) {
+      this.esVersion = 6;
+    }
+
+    return null;
+  },
 
   reset: function() {
     this.tokens = {
@@ -17773,6 +17833,7 @@ var state = {
     };
 
     this.option = {};
+    this.esVersion = 5;
     this.funct = null;
     this.ignored = {};
     this.directive = {};
@@ -18852,19 +18913,15 @@ var JSHINT = (function() {
   }
 
   function assume() {
+    var badESOpt = null;
     processenforceall();
 
     /**
      * TODO: Remove in JSHint 3
      */
-    if (!state.option.esversion && !state.option.moz) {
-      if (state.option.es3) {
-        state.option.esversion = 3;
-      } else if (state.option.esnext) {
-        state.option.esversion = 6;
-      } else {
-        state.option.esversion = 5;
-      }
+    badESOpt = state.inferEsVersion();
+    if (badESOpt) {
+      quit("E059", state.tokens.next, "esversion", badESOpt);
     }
 
     if (state.inES5()) {
@@ -18880,7 +18937,7 @@ var JSHINT = (function() {
      * `globalstrict` because both `true` and `false` should trigger an error.
      */
     if (state.option.strict === "global" && "globalstrict" in state.option) {
-      error("E059", state.tokens.next, "strict", "globalstrict");
+      quit("E059", state.tokens.next, "strict", "globalstrict");
     }
 
     if (state.option.module) {
@@ -18994,18 +19051,25 @@ var JSHINT = (function() {
   }
 
   // Produce an error warning.
-  function quit(code, line, chr) {
-    var percentage = Math.floor((line / state.lines.length) * 100);
+  function quit(code, token, a, b) {
+    var percentage = Math.floor((token.line / state.lines.length) * 100);
     var message = messages.errors[code].desc;
 
-    throw {
+    var exception = {
       name: "JSHintError",
-      line: line,
-      character: chr,
+      line: token.line,
+      character: token.from,
       message: message + " (" + percentage + "% scanned).",
       raw: message,
-      code: code
+      code: code,
+      a: a,
+      b: b
     };
+
+    exception.reason = supplant(message, exception) + " (" + percentage +
+      "% scanned).";
+
+    throw exception;
   }
 
   function removeIgnoredMessages() {
@@ -19034,8 +19098,8 @@ var JSHINT = (function() {
       t = state.tokens.curr;
     }
 
-    l = t.line || 0;
-    ch = t.from || 0;
+    l = t.line;
+    ch = t.from;
 
     w = {
       id: "(error)",
@@ -19057,7 +19121,7 @@ var JSHINT = (function() {
     removeIgnoredMessages();
 
     if (JSHINT.errors.length >= state.option.maxerr)
-      quit("E043", l, ch);
+      quit("E043", t);
 
     return w;
   }
@@ -19333,31 +19397,6 @@ var JSHINT = (function() {
           }
         }
 
-        /**
-         * TODO: Remove in JSHint 3
-         */
-        var esversions = {
-          es3   : 3,
-          es5   : 5,
-          esnext: 6
-        };
-        if (_.has(esversions, key)) {
-          switch (val) {
-          case "true":
-            state.option.moz = false;
-            state.option.esversion = esversions[key];
-            break;
-          case "false":
-            if (!state.option.moz) {
-              state.option.esversion = 5;
-            }
-            break;
-          default:
-            error("E002", nt);
-          }
-          return;
-        }
-
         if (key === "esversion") {
           switch (val) {
           case "5":
@@ -19491,7 +19530,7 @@ var JSHINT = (function() {
       state.tokens.next = lookahead.shift() || lex.token();
 
       if (!state.tokens.next) { // No more tokens left, give up
-        quit("E041", state.tokens.curr.line);
+        quit("E041", state.tokens.curr);
       }
 
       if (state.tokens.next.id === "(end)" || state.tokens.next.id === "(error)") {
@@ -19899,7 +19938,7 @@ var JSHINT = (function() {
       }
 
       if (!left || !right) {
-        quit("E041", state.tokens.curr.line);
+        quit("E041", state.tokens.curr);
       }
 
       if (left.id === "!") {
@@ -20683,7 +20722,9 @@ var JSHINT = (function() {
   // ECMAScript parser
 
   delim("(endline)");
-  delim("(begin)");
+  (function(x) {
+    x.line = x.from = 0;
+  })(delim("(begin)"));
   delim("(end)").reach = true;
   delim("(error)").reach = true;
   delim("}").reach = true;
@@ -20978,7 +21019,7 @@ var JSHINT = (function() {
     this.right = expression(150);
 
     if (!this.right) { // '!' followed by nothing? Give up.
-      quit("E041", this.line || 0);
+      quit("E041", this);
     }
 
     if (bang[this.right.id] === true) {
@@ -20992,7 +21033,7 @@ var JSHINT = (function() {
     this.first = this.right = p;
 
     if (!p) { // 'typeof' followed by nothing? Give up.
-      quit("E041", this.line || 0, this.character || 0);
+      quit("E041", this);
     }
 
     // The `typeof` operator accepts unresolvable references, so the operand
@@ -23837,7 +23878,7 @@ var JSHINT = (function() {
           newOptionObj[optionKey] = o[optionKey];
           if ((optionKey === "esversion" && o[optionKey] === 5) ||
               (optionKey === "es5" && o[optionKey])) {
-            warning("I003");
+            warningAt("I003", 0, 0);
           }
         }
       }
@@ -23948,7 +23989,7 @@ var JSHINT = (function() {
     });
 
     lex.on("fatal", function(ev) {
-      quit("E041", ev.line, ev.from);
+      quit("E041", ev);
     });
 
     lex.on("Identifier", function(ev) {
@@ -23972,15 +24013,15 @@ var JSHINT = (function() {
       }
     }
 
-    assume();
-
-    // combine the passed globals after we've assumed all our options
-    combine(predefined, g || {});
-
-    //reset values
-    comma.first = true;
-
     try {
+      assume();
+
+      // combine the passed globals after we've assumed all our options
+      combine(predefined, g || {});
+
+      //reset values
+      comma.first = true;
+
       advance();
       switch (state.tokens.next.id) {
       case "{":
@@ -24003,7 +24044,7 @@ var JSHINT = (function() {
       }
 
       if (state.tokens.next.id !== "(end)") {
-        quit("E041", state.tokens.curr.line);
+        quit("E041", state.tokens.curr);
       }
 
       state.funct["(scope)"].unstack();
@@ -24015,7 +24056,7 @@ var JSHINT = (function() {
           scope     : "(main)",
           raw       : err.raw,
           code      : err.code,
-          reason    : err.message,
+          reason    : err.reason,
           line      : err.line || nt.line,
           character : err.character || nt.from
         }, null);

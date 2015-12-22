@@ -1,3 +1,18 @@
+<a name="2.9.1-rc2"></a>
+## [2.9.1-rc2](https://github.com/jshint/jshint/compare/2.9.1-rc1...v2.9.1-rc2) (2015-12-22)
+
+
+### Bug Fixes
+
+* Abort in the presence of invalid config ([767c47d](https://github.com/jshint/jshint/commit/767c47d))
+* Allow ignoring W020 and W021 ([46db923](https://github.com/jshint/jshint/commit/46db923)), closes [#2761](https://github.com/jshint/jshint/issues/2761)
+* Correct `unused` for function-scoped vars ([91fa9fc](https://github.com/jshint/jshint/commit/91fa9fc))
+* Disallow ambiguous configuration values ([eb54a4c](https://github.com/jshint/jshint/commit/eb54a4c))
+* Do not disable ES6 when `moz` is set ([97dfd90](https://github.com/jshint/jshint/commit/97dfd90))
+* Don't throw '(NaN% scanned)' ([903b698](https://github.com/jshint/jshint/commit/903b698))
+
+
+
 <a name="2.9.1-rc1"></a>
 ## [2.9.1-rc1](https://github.com/jshint/jshint/compare/2.9.0...v2.9.1-rc1) (2015-11-12)
 
