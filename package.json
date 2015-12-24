@@ -42,30 +42,30 @@
   "main": "./src/jshint.js",
 
   "dependencies": {
-    "cli":                 "0.6.x",
+    "cli":                 "0.10.x",
     "console-browserify":  "1.1.x",
     "exit":                "0.1.x",
     "htmlparser2":         "3.8.x",
     "minimatch":           "2.0.x",
-    "shelljs":             "0.3.x",
+    "shelljs":             "0.5.x",
     "strip-json-comments": "1.0.x",
-    "lodash":              "3.7.x"
+    "lodash":              "3.10.x"
   },
 
   "devDependencies": {
-    "browserify":                     "9.x",
+    "browserify":                     "11.x",
     "conventional-changelog":         "0.4.x",
     "conventional-github-releaser":   "0.4.x",
     "coveralls":                      "2.11.x",
     "istanbul":                       "0.3.x",
-    "jscs":                           "1.11.x",
-    "jshint":                         "2.6.x",
+    "jscs":                           "2.x",
+    "jshint":                         "2.x",
     "mock-stdin":                     "0.3.x",
     "nodeunit":                       "0.9.x",
     "phantom":                        "~0.7.2",
-    "phantomjs":                      "1.9.13",
+    "phantomjs":                      "1.9.x",
     "regenerate":                     "1.2.x",
-    "sinon":                          "1.12.x",
+    "sinon":                          "1.17.x",
     "unicode-6.3.0":                  "0.1.x"
   },
 

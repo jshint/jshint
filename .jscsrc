@@ -5,7 +5,10 @@
       "allowComments": true,
       "allowRegex": true
     },
-    "validateIndentation": 2,
+    "validateIndentation": {
+      "allExcept": ["comments"],
+      "value": 2
+    },
 
     "disallowMultipleLineStrings": true,
     "disallowMixedSpacesAndTabs": true,
