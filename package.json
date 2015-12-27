@@ -59,7 +59,7 @@
     "coveralls":                      "2.11.x",
     "istanbul":                       "0.3.x",
     "jscs":                           "1.11.x",
-    "jshint":                         "2.6.x",
+    "jshint":                         "2.9.1-rc2",
     "mock-stdin":                     "0.3.x",
     "nodeunit":                       "0.9.x",
     "phantom":                        "~0.7.2",
