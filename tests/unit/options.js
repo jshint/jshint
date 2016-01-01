@@ -1678,12 +1678,10 @@ exports.strict = function (test) {
   var run = TestRun(test)
     .addError(1, 'Missing "use strict" statement.');
   run.test(code, { es3: true, strict: true });
-  run.test(code, { es3: true, strict: "func" });
   run.test(code, { es3: true, strict: "global" });
   TestRun(test).test(code, { es3: true, strict: "implied" });
 
   TestRun(test).test(code1, { es3: true, strict: true });
-  TestRun(test).test(code1, { es3: true, strict: "func" });
   TestRun(test).test(code1, { es3: true, strict: "global" });
   TestRun(test)
     .addError(1, 'Unnecessary directive "use strict".')
@@ -1695,7 +1693,6 @@ exports.strict = function (test) {
     .addError(7, 'Strict violation.')
     .addError(8, 'Strict violation.');
   run.test(src, { es3: true, strict: true });
-  run.test(src, { es3: true, strict: "func" });
   run.test(src, { es3: true, strict: "global" });
 
   run = TestRun(test)
@@ -1709,7 +1706,6 @@ exports.strict = function (test) {
     .test(src3, {es3 : true});
 
   TestRun(test).test(code2, { es3: true, strict: true });
-  TestRun(test).test(code2, { es3: true, strict: "func" });
   TestRun(test)
     .addError(1, 'Missing "use strict" statement.')
     .test(code2, { es3: true, strict: "global" });
@@ -1718,11 +1714,10 @@ exports.strict = function (test) {
   run = TestRun(test)
     .addError(1, 'Use the function form of "use strict".');
   run.test(code3, { strict: true });
-  run.test(code3, { strict: "func" });
   run.addError(1, 'Unnecessary directive "use strict".')
     .test(code3, { strict: "implied" });
 
-  [ true, false, "global", "func", "implied" ].forEach(function(val) {
+  [ true, false, "global", "implied" ].forEach(function(val) {
     JSHINT("/*jshint strict: " + val + " */");
     test.strictEqual(JSHINT.data().options.strict, val);
   });
@@ -1734,13 +1729,45 @@ exports.strict = function (test) {
   TestRun(test, "environments have precedence over 'strict: true'")
     .test(code3, { strict: true, node: true });
 
-  TestRun(test, "environments don't have precedence over 'strict: func'")
-    .addError(1, 'Use the function form of "use strict".')
-    .test(code3, { strict: "func", node: true });
-
   TestRun(test, "gh-2668")
     .addError(1, "Missing \"use strict\" statement.")
     .test("a = 2;", { strict: "global" });
+
+  test.done();
+};
+
+/**
+ * This test asserts sub-optimal behavior.
+ *
+ * In the "browserify", "node" and "phantomjs" environments, user code is not
+ * executed in the global scope directly. This means that top-level `use
+ * strict` directives, although seemingly global, do *not* enable ES5 strict
+ * mode for other scripts executed in the same environment. Because of this,
+ * the `strict` option should enforce a top-level `use strict` directive in
+ * those environments.
+ *
+ * The `strict` option was implemented without consideration for these
+ * environments, so the sub-optimal behavior must be preserved for backwards
+ * compatability.
+ *
+ * TODO: Interpret `strict: true` as `strict: global` in the Browserify,
+ * Node.js, and PhantomJS environments, and remove this test in JSHint 3
+ */
+exports.strictEnvs = function (test) {
+  var partialStrict = [
+    "void 0;",
+    "(function() { void 0; }());",
+    "(function() { 'use strict'; void 0; }());"
+  ];
+  TestRun(test, "")
+    .addError(2, "Missing \"use strict\" statement.")
+    .test(partialStrict, { strict: true, browserify: true });
+  TestRun(test, "")
+    .addError(2, "Missing \"use strict\" statement.")
+    .test(partialStrict, { strict: true, node: true });
+  TestRun(test, "")
+    .addError(2, "Missing \"use strict\" statement.")
+    .test(partialStrict, { strict: true, phantom: true });
 
   test.done();
 };
