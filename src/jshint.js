@@ -247,9 +247,6 @@ var JSHINT = (function() {
 
     if (state.option.phantom) {
       combine(predefined, vars.phantom);
-      if (state.option.strict === true) {
-        state.option.strict = "global";
-      }
     }
 
     if (state.option.prototypejs) {
@@ -259,9 +256,6 @@ var JSHINT = (function() {
     if (state.option.node) {
       combine(predefined, vars.node);
       combine(predefined, vars.typed);
-      if (state.option.strict === true) {
-        state.option.strict = "global";
-      }
     }
 
     if (state.option.devel) {
@@ -281,9 +275,6 @@ var JSHINT = (function() {
       combine(predefined, vars.browser);
       combine(predefined, vars.typed);
       combine(predefined, vars.browserify);
-      if (state.option.strict === true) {
-        state.option.strict = "global";
-      }
     }
 
     if (state.option.nonstandard) {
@@ -650,7 +641,6 @@ var JSHINT = (function() {
           case "false":
             state.option.strict = false;
             break;
-          case "func":
           case "global":
           case "implied":
             state.option.strict = val;
