@@ -214,7 +214,6 @@ exports.codemirror3 = function (test) {
     .addError(1342, "Value of 'e' may be overwritten in IE 8 and earlier.")
     .addError(1526, "Value of 'e' may be overwritten in IE 8 and earlier.")
     .addError(1533, "Value of 'e' may be overwritten in IE 8 and earlier.")
-    .addError(3168, "'ok' is defined but never used.")
     .addError(4093, "Unnecessary semicolon.")
     .test(src, opt, { CodeMirror: true });
 
