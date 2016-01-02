@@ -1465,9 +1465,16 @@ exports.testPotentialVariableLeak = function (test) {
 
   // Real Error
   TestRun(test)
-    .addError(2, "You might be leaking a variable (b) here.")
-    .addError(3, "You might be leaking a variable (d) here.")
-    .addError(4, "You might be leaking a variable (f) here.")
+    .addError(4, "You might be leaking a variable (b) here.")
+    .addError(5, "You might be leaking a variable (d) here.")
+    .addError(6, "You might be leaking a variable (f) here.")
+    .addError(8, "You might be leaking a variable (h) here.")
+    .addError(9, "You might be leaking a variable (j) here.")
+    .addError(12, "You might be leaking a variable (g) here.")
+    .addError(13, "You might be leaking a variable (k) here.")
+    .addError(14, "You might be leaking a variable (l) here.")
+    .addError(18, "You might be leaking a variable (p) here.")
+    .addError(20, "You might be leaking a variable (r) here.")
     .test(a, { esnext: true });
 
   // False Positive
