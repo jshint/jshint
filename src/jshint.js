@@ -3570,7 +3570,10 @@ var JSHINT = (function() {
 
       if (state.tokens.next.id === "=") {
         advance("=");
-        if (!prefix && peek(0).id === "=" && state.tokens.next.identifier) {
+        if (!prefix && peek(0).id === "=" && state.tokens.next.identifier &&
+          state.funct["(scope)"].has(state.tokens.next.value) &&
+          !state.funct["(scope)"].block.has(state.tokens.next.value)
+          ) {
           warning("W120", state.tokens.next, state.tokens.next.value);
         }
         var id = state.tokens.prev;
@@ -3677,12 +3680,12 @@ var JSHINT = (function() {
         state.nameStack.set(state.tokens.curr);
 
         advance("=");
-        if (peek(0).id === "=" && state.tokens.next.identifier) {
-          if (!prefix && report &&
-              !state.funct["(params)"] ||
-              state.funct["(params)"].indexOf(state.tokens.next.value) === -1) {
-            warning("W120", state.tokens.next, state.tokens.next.value);
-          }
+        if (peek(0).id === "=" && state.tokens.next.identifier &&
+          !prefix && report &&
+          state.funct["(scope)"].has(state.tokens.next.value) &&
+          !state.funct["(scope)"].funct.has(state.tokens.next.value)
+          ) {
+          warning("W120", state.tokens.next, state.tokens.next.value);
         }
         var id = state.tokens.prev;
         // don't accept `in` in expression if prefix is used for ForIn/Of loop.

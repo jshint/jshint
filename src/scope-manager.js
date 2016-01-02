@@ -822,6 +822,10 @@ var scopeManager = function(state, predefined, exported, declared) {
         _current["(usages)"][labelName]["(modified)"].push(token);
       },
 
+      has: function(labelName) {
+        return !!_current["(labels)"][labelName];
+      },
+
       /**
        * Adds a new variable
        */

@@ -14,6 +14,9 @@ function test() {
     let o = l = 7;
   }
 
+  // Although developers who use this form may expect that the assignment
+  // expressions create new bindings, the misunderstanding has no effect on
+  // program execution, so no warning is necessary.
   var p;
   var q = p = 8;
   let r;

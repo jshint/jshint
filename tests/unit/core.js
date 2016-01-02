@@ -1024,7 +1024,6 @@ exports.testConstModification = function (test) {
       .addError(6, "Attempting to override 'a' which is a constant.")
       .addError(7, "Attempting to override 'a' which is a constant.")
       .addError(8, "Attempting to override 'a' which is a constant.")
-      .addError(8, "You might be leaking a variable (a) here.")
       .addError(53, "Missing '()' invoking a constructor.")
       .addError(55, "Attempting to override 'f' which is a constant.")
       .test(src, {
@@ -1465,16 +1464,10 @@ exports.testPotentialVariableLeak = function (test) {
 
   // Real Error
   TestRun(test)
-    .addError(4, "You might be leaking a variable (b) here.")
-    .addError(5, "You might be leaking a variable (d) here.")
-    .addError(6, "You might be leaking a variable (f) here.")
-    .addError(8, "You might be leaking a variable (h) here.")
-    .addError(9, "You might be leaking a variable (j) here.")
-    .addError(12, "You might be leaking a variable (g) here.")
-    .addError(13, "You might be leaking a variable (k) here.")
-    .addError(14, "You might be leaking a variable (l) here.")
-    .addError(18, "You might be leaking a variable (p) here.")
-    .addError(20, "You might be leaking a variable (r) here.")
+    .addError(8, "'h' has been declared in a higher scope. Did you intend to create a new binding?")
+    .addError(9, "'j' has been declared in a higher scope. Did you intend to create a new binding?")
+    .addError(13, "'k' has been declared in a higher scope. Did you intend to create a new binding?")
+    .addError(14, "'l' has been declared in a higher scope. Did you intend to create a new binding?")
     .test(a, { esnext: true });
 
   // False Positive
