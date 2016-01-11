@@ -89,10 +89,6 @@ exports.node = function (test) {
   TestRun(test, "gh-2657")
     .test("'use strict';var a;", { node: true });
 
-  // Implied `strict: global` if `strict` is `true`
-  JSHINT("", { node: true, strict: true });
-  test.strictEqual(JSHINT.data().options.strict, "global");
-
   test.done();
 };
 
