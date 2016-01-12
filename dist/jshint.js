@@ -1,4 +1,4 @@
-/*! 2.9.1-rc2 */
+/*! 2.9.1-rc3 */
 var JSHINT;
 if (typeof window === 'undefined') window = {};
 (function () {
@@ -16719,13 +16719,14 @@ exports.val = {
    * them to produce errors.  It also fixes mistakes that made it difficult
    * for the JavaScript engines to perform certain optimizations.
    *
-   * - "func"    - there must be a `"use strict";` directive at function level
    * - "global"  - there must be a `"use strict";` directive at global level
    * - "implied" - lint the code as if there is the `"use strict";` directive
    * - false     - disable warnings about strict mode
-   * - true      - same as `"func"`, but environment options have precedence over
-   *               this (e.g. `node`, `module`, `browserify` and `phantomjs` can
-   *               set `strict: global`)
+   * - true      - there must be a `"use strict";` directive at function level;
+   *               this is preferable for scripts intended to be loaded in web
+   *               browsers directly because enabling strict mode globally
+   *               could adversely effect other scripts running on the same
+   *               page
    */
   strict      : true,
 
@@ -18972,9 +18973,6 @@ var JSHINT = (function() {
 
     if (state.option.phantom) {
       combine(predefined, vars.phantom);
-      if (state.option.strict === true) {
-        state.option.strict = "global";
-      }
     }
 
     if (state.option.prototypejs) {
@@ -18984,9 +18982,6 @@ var JSHINT = (function() {
     if (state.option.node) {
       combine(predefined, vars.node);
       combine(predefined, vars.typed);
-      if (state.option.strict === true) {
-        state.option.strict = "global";
-      }
     }
 
     if (state.option.devel) {
@@ -19006,9 +19001,6 @@ var JSHINT = (function() {
       combine(predefined, vars.browser);
       combine(predefined, vars.typed);
       combine(predefined, vars.browserify);
-      if (state.option.strict === true) {
-        state.option.strict = "global";
-      }
     }
 
     if (state.option.nonstandard) {
@@ -19375,7 +19367,6 @@ var JSHINT = (function() {
           case "false":
             state.option.strict = false;
             break;
-          case "func":
           case "global":
           case "implied":
             state.option.strict = val;

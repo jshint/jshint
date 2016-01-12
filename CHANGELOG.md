@@ -1,3 +1,13 @@
+<a name="2.9.1-rc3"></a>
+## [2.9.1-rc3](https://github.com/jshint/jshint/compare/2.9.1-rc2...v2.9.1-rc3) (2016-01-12)
+
+
+### Bug Fixes
+
+* Do not require global USD for any envs ([3fa9ece](https://github.com/jshint/jshint/commit/3fa9ece))
+
+
+
 <a name="2.9.1-rc2"></a>
 ## [2.9.1-rc2](https://github.com/jshint/jshint/compare/2.9.1-rc1...v2.9.1-rc2) (2015-12-22)
 
