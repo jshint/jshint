@@ -1150,6 +1150,20 @@ exports.extract = {
     test.equal(cli.extract(html, "auto"), js);
 
     test.done();
+  },
+
+  "\\r\\n as line terminator (gh-2825)": function (test) {
+    var html = [
+      "<script>",
+      "  var a = 3;",
+      "</script>"
+    ].join("\r\n");
+
+    var js = "\nvar a = 3;\n";
+
+    test.equal(cli.extract(html, "auto"), js);
+
+    test.done();
   }
 };
 
