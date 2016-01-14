@@ -1,3 +1,16 @@
+<a name="2.9.1"></a>
+## [2.9.1](https://github.com/jshint/jshint/compare/2.9.1-rc3...v2.9.1) (2016-01-14)
+
+Following the revocation of version 2.9.0, we observed an extended "release
+candidate" phase where we encouraged users to vet JSHint for undesirable
+changes in behavior. During that time, we identified and resolved a number of
+such regressions. This release comprises all changes from the release candidate
+phase along with the improvements initially released as version 2.9.0. This
+release does not itself contain any changes to the codebase. If you are
+upgrading from version 2.8.0 or earlier, please refer to the
+previously-published release notes for details on bug fixes and features.
+
+
 <a name="2.9.1-rc3"></a>
 ## [2.9.1-rc3](https://github.com/jshint/jshint/compare/2.9.1-rc2...v2.9.1-rc3) (2016-01-12)
 

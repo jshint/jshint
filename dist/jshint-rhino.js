@@ -1,6 +1,6 @@
 #!/usr/bin/env rhino
 var window = {};
-/*! 2.9.1-rc3 */
+/*! 2.9.1 */
 var JSHINT;
 if (typeof window === 'undefined') window = {};
 (function () {
