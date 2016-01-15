@@ -3858,7 +3858,7 @@ var JSHINT = (function() {
     var generator = false;
     if (state.tokens.next.value === "*") {
       advance("*");
-      if (state.inES6({ strict: true })) {
+      if (state.inES6(true)) {
         generator = true;
       } else {
         warning("W119", state.tokens.curr, "function*", "6");
