@@ -1350,8 +1350,8 @@ var JSHINT = (function() {
       state.nameStack.set(state.tokens.prev);
       return true;
     } else if (left.id === "{" || left.id === "[") {
-      if (allowDestructuring && state.tokens.curr.left.destructAssign) {
-        state.tokens.curr.left.destructAssign.forEach(function(t) {
+      if (allowDestructuring && left.destructAssign) {
+        left.destructAssign.forEach(function(t) {
           if (t.id) {
             state.funct["(scope)"].block.modify(t.id, t.token);
           }
@@ -1391,12 +1391,13 @@ var JSHINT = (function() {
     var x = infix(s, typeof f === "function" ? f : function(left, that) {
       that.left = left;
 
-      if (left && checkLeftSideAssign(left, that, { allowDestructuring: true })) {
-        that.right = expression(10);
-        return that;
+      if (!checkLeftSideAssign(left, that, { allowDestructuring: true })) {
+        error("E031", that);
       }
 
-      error("E031", that);
+      that.right = expression(10);
+
+      return that;
     }, p);
 
     x.exps = true;
@@ -1425,11 +1426,13 @@ var JSHINT = (function() {
         warning("W016", that, that.id);
       }
 
-      if (left && checkLeftSideAssign(left, that)) {
-        that.right = expression(10);
-        return that;
+      if (!checkLeftSideAssign(left, that)) {
+        error("E031", that);
       }
-      error("E031", that);
+
+      that.right = expression(10);
+
+      return that;
     }, 20);
   }
 
