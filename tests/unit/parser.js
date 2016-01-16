@@ -140,9 +140,7 @@ exports.assignment = function (test) {
     .addError(3, "Bad assignment.")
     .addError(4, "Bad assignment.")
     .addError(5, "Bad assignment.")
-    .addError(14, "Bad assignment.")
-    .addError(14, "Expected an assignment or function call and instead saw an expression.")
-    .addError(14, "Missing semicolon.");
+    .addError(14, "Bad assignment.");
 
   run.test(code, { plusplus: true, es3: true });
   run.test(code, { plusplus: true }); // es5
@@ -1021,33 +1019,25 @@ exports["gh-2587"] = function (test) {
 
 exports.badAssignments = function (test) {
   TestRun(test)
-    .addError(1, "Missing semicolon.")
     .addError(1, "Bad assignment.")
-    .addError(1, "Expected an assignment or function call and instead saw an expression.")
     .test([
       "a() = 1;"
     ], { });
 
   TestRun(test)
-    .addError(1, "Missing semicolon.")
     .addError(1, "Bad assignment.")
-    .addError(1, "Expected an assignment or function call and instead saw an expression.")
     .test([
       "a.a() = 1;"
     ], { });
 
   TestRun(test)
-    .addError(1, "Missing semicolon.")
     .addError(1, "Bad assignment.")
-    .addError(1, "Expected an assignment or function call and instead saw an expression.")
     .test([
       "(function(){}) = 1;"
     ], { });
 
   TestRun(test)
-    .addError(1, "Missing semicolon.")
     .addError(1, "Bad assignment.")
-    .addError(1, "Expected an assignment or function call and instead saw an expression.")
     .test([
       "a.a() &= 1;"
     ], { });
@@ -5093,8 +5083,7 @@ exports["regression test for crash from GH-964"] = function (test) {
 
   TestRun(test)
     .addError(2, "Bad assignment.")
-    .addError(2, "Expected an operator and instead saw 'new'.")
-    .addError(2, "Missing semicolon.")
+    .addError(2, "Did you mean to return a conditional instead of an assignment?")
     .test(code);
 
   test.done();
