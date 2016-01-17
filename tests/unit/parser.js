@@ -1854,6 +1854,7 @@ exports["destructuring globals with syntax error"] = function (test) {
 
   TestRun(test)
     .addError(3, "Expected an identifier and instead saw '1'.")
+    .addError(3, "Bad assignment.")
     .addError(4, "Expected ',' and instead saw ';'.")
     .addError(5, "Expected ']' to match '[' from line 5 and instead saw ';'.")
     .addError(5, "Missing semicolon.")
@@ -1895,6 +1896,8 @@ exports["destructuring globals with syntax error"] = function (test) {
     .addError(4, "Bad assignment.")
     .addError(6, "Do not assign to the exception parameter.")
     .addError(7, "Do not assign to the exception parameter.")
+    .addError(9, "Bad assignment.")
+    .addError(10, "Bad assignment.")
     .test([
       "[ Number.prototype.toString ] = [function(){}];",
       "function a() {",
@@ -1904,6 +1907,9 @@ exports["destructuring globals with syntax error"] = function (test) {
       "    ({e} = {e});",
       "    [e] = [];",
       "  }",
+      "  ({ x: null } = {});",
+      "  ({ y: [...this] } = {});",
+      "  ({ y: [...z] } = {});",
       "}"], {esnext: true, freeze: true});
 
   test.done();
