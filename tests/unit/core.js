@@ -2031,3 +2031,21 @@ exports["gh-2761"] = function (test) {
 
   test.done();
 };
+
+exports["gh-2838"] = function (test) {
+
+  var code = [
+    "function foo() {",
+    "  return a + b;",
+    "}",
+    "function bar() {",
+    "  return a + b;",
+    "}",
+    "let a = 1;",
+    "const b = 2;"
+  ];
+
+  TestRun(test).test(code, { esversion: 6 });
+
+  test.done();
+};
