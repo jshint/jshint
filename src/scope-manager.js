@@ -330,7 +330,6 @@ var scopeManager = function(state, predefined, exported, declared) {
             subScopeUsage["(tokens)"] = subScopeUsage["(tokens)"].concat(usage["(tokens)"]);
             subScopeUsage["(reassigned)"] =
               subScopeUsage["(reassigned)"].concat(usage["(reassigned)"]);
-            subScopeUsage["(onlyUsedSubFunction)"] = false;
           }
         } else {
           // this is exiting global scope, so we finalise everything here - we are at the end of the file
@@ -800,6 +799,8 @@ var scopeManager = function(state, predefined, exported, declared) {
 
         _setupUsages(labelName);
 
+        _current["(usages)"][labelName]["(onlyUsedSubFunction)"] = false;
+
         if (token) {
           token["(function)"] = _currentFunctBody;
           _current["(usages)"][labelName]["(tokens)"].push(token);
@@ -819,6 +820,7 @@ var scopeManager = function(state, predefined, exported, declared) {
 
         _setupUsages(labelName);
 
+        _current["(usages)"][labelName]["(onlyUsedSubFunction)"] = false;
         _current["(usages)"][labelName]["(modified)"].push(token);
       },
 
