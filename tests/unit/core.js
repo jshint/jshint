@@ -2047,5 +2047,29 @@ exports["gh-2838"] = function (test) {
 
   TestRun(test).test(code, { esversion: 6 });
 
+  code = [
+    "function x() {",
+    "  return c;",
+    "}",
+    "void c;",
+    "let c;"
+  ];
+
+  TestRun(test, "Same-scope reference following sub-scope reference")
+    .addError(5, "'c' was used before it was declared, which is illegal for 'let' variables.")
+    .test(code, { esversion: 6 });
+
+  code = [
+    "function x() {",
+    "  return d;",
+    "}",
+    "({ d } = {});",
+    "let d;"
+  ];
+
+  TestRun(test, "Same-scope assignment following sub-scope reference")
+    .addError(5, "'d' was used before it was declared, which is illegal for 'let' variables.")
+    .test(code, { esversion: 6 });
+
   test.done();
 };
