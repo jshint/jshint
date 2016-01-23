@@ -14,6 +14,42 @@ var state = {
       this.option.module || this.option.strict === "implied";
   },
 
+  /**
+   * Determine if the current state warrants a warning for statements outside
+   * of strict mode code.
+   *
+   * While emitting warnings based on function scope would be more intuitive
+   * (and less noisy), JSHint observes statement-based semantics in order to
+   * preserve legacy behavior.
+   *
+   * This method does not take the state of the parser into account, making no
+   * distinction between global code and function code. Because the "missing
+   * 'use strict'" warning is *also* reported at function boundaries, this
+   * function interprets `strict` option values `true` and `undefined` as
+   * equivalent.
+   */
+  stmtMissingStrict: function() {
+    if (this.option.strict === "global") {
+      return true;
+    }
+
+    if (this.option.strict === false) {
+      return false;
+    }
+
+    if (this.option.globalstrict) {
+      return true;
+    }
+
+    return false;
+  },
+
+  allowsGlobalUsd: function() {
+    return this.option.strict === "global" || this.option.globalstrict ||
+      this.option.module || this.option.node || this.option.phantom ||
+      this.option.browserify;
+  },
+
   // Assumption: chronologically ES3 < ES5 < ES6 < Moz
 
   inMoz: function() {
