@@ -47,7 +47,7 @@ exports.register = function(linter) {
     if (data.name.replace(/^_+|_+$/g, "").indexOf("_") > -1 && !data.name.match(/^[A-Z0-9_]*$/)) {
       linter.warn("W106", {
         line: data.line,
-        char: data.from,
+        char: data.char,
         data: [ data.name ]
       });
     }

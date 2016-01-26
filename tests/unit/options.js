@@ -435,11 +435,11 @@ exports.testCamelcase = function (test) {
 
   // Require identifiers in camel case if camelcase is true
   TestRun(test)
-    .addError(5, "Identifier 'Foo_bar' is not in camel case.")
-    .addError(5, "Identifier 'test_me' is not in camel case.")
-    .addError(6, "Identifier 'test_me' is not in camel case.")
-    .addError(6, "Identifier 'test_me' is not in camel case.")
-    .addError(13, "Identifier 'test_1' is not in camel case.")
+    .addError(5, "Identifier 'Foo_bar' is not in camel case.", {character: 17})
+    .addError(5, "Identifier 'test_me' is not in camel case.", {character: 25})
+    .addError(6, "Identifier 'test_me' is not in camel case.", {character: 15})
+    .addError(6, "Identifier 'test_me' is not in camel case.", {character: 25})
+    .addError(13, "Identifier 'test_1' is not in camel case.", {character: 26})
     .test(source, { es3: true, camelcase: true });
 
 
