@@ -215,9 +215,6 @@ var JSHINT = (function() {
     }
 
     if (state.option.module) {
-      if (state.option.strict === true) {
-        state.option.strict = "global";
-      }
       /**
        * TODO: Extend this restriction to *all* ES6-specific options.
        */
@@ -300,10 +297,6 @@ var JSHINT = (function() {
 
     if (state.option.wsh) {
       combine(predefined, vars.wsh);
-    }
-
-    if (state.option.globalstrict && state.option.strict !== false) {
-      state.option.strict = "global";
     }
 
     if (state.option.yui) {
@@ -1647,8 +1640,7 @@ var JSHINT = (function() {
     if (r && !(r.identifier && r.value === "function") &&
         !(r.type === "(punctuator)" && r.left &&
           r.left.identifier && r.left.value === "function")) {
-      if (!state.isStrict() &&
-          state.option.strict === "global") {
+      if (!state.isStrict() && state.stmtMissingStrict()) {
         warning("E007");
       }
     }
@@ -5296,10 +5288,7 @@ var JSHINT = (function() {
         directives();
 
         if (state.directive["use strict"]) {
-          if (state.option.strict !== "global" &&
-              !((state.option.strict === true || !state.option.strict) &&
-                (state.option.globalstrict || state.option.module || state.option.node ||
-                 state.option.phantom || state.option.browserify))) {
+          if (!state.allowsGlobalUsd()) {
             warning("W097", state.tokens.prev);
           }
         }
