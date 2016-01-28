@@ -10,6 +10,7 @@ var targets = ["web", "rhino"];
 
 module.exports = function(target, done) {
   var bundle = browserify();
+  bundle.transform('browserify-versionify');
 
   done = done || function() {};
 
@@ -19,6 +20,17 @@ module.exports = function(target, done) {
   }
 
   bundle.require(srcDir + "/jshint.js", { expose: "jshint" });
+  if (target === 'rhino') {
+    // Replace the `exit` package with our own rhino-specific version.
+    bundle.exclude('exit');
+    bundle.require(srcDir + "/rhino-exit.js", { expose: "exit" });
+    // Exclude the optional `daemon` package, an optional dep of `cli`.
+    bundle.exclude('daemon');
+    // Ensure that `path` is exported, since `cli` loads it dynamically.
+    bundle.require('path', { expose: 'path' });
+    // Load our collection of thunks and wrappers around the jshint cli.
+    bundle.require(srcDir + "/rhino-cli.js", { expose: "jshint-rhino-cli" });
+  }
 
   return bundle.bundle(function(err, src) {
     var wrapped;
@@ -40,7 +52,11 @@ module.exports = function(target, done) {
     ];
 
     if (target === "rhino") {
-      wrapped.splice(0, 0, "#!/usr/bin/env rhino", "var global = this;");
+      wrapped.splice(0, 0, "#!/usr/bin/env rhino", "var global = this;",
+        "var cmdline_args = Array.prototype.slice.call(arguments);");
+      wrapped.splice(-1, 0,
+        // Start the CLI.
+        "require('jshint-rhino-cli')(cmdline_args);");
     }
 
     done(null, version, wrapped.join("\n"));

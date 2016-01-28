@@ -109,7 +109,7 @@ function getHomeDir() {
 
   while (paths.length) {
     homePath = paths.shift();
-    if (fs.existsSync(homePath)) {
+    if (homePath && fs.existsSync(homePath)) {
       return homePath;
     }
   }
@@ -691,7 +691,11 @@ var exports = {
     cli.options = {};
 
     cli.enable("version", "glob", "help");
-    cli.setApp(path.resolve(__dirname + "/../package.json"));
+    if (process.browser) {
+      cli.setApp("jshint", "__VERSION__");
+    } else {
+      cli.setApp(path.resolve(__dirname + "/../package.json"));
+    }
 
     var options = cli.parse(OPTIONS);
     // Use config file if specified

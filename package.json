@@ -54,6 +54,7 @@
 
   "devDependencies": {
     "browserify":                     "9.x",
+    "browserify-versionify":          "1.0.x",
     "conventional-changelog":         "0.4.x",
     "conventional-github-releaser":   "0.4.x",
     "coveralls":                      "2.11.x",
