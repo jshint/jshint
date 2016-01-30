@@ -2734,6 +2734,30 @@ singleGroups.bindingPower.singleExpr = function (test) {
     .addError(34, "Unnecessary grouping operator.")
     .test(code, { singleGroups: true });
 
+  code = [
+    "var x;",
+    "x = (printA || printB)``;",
+    "x = (printA || printB)`${}`;",
+    "x = (new X)``;",
+    "x = (new X)`${}`;",
+    // Should warn:
+    "x = (x.y)``;",
+    "x = (x.y)`${}`;",
+    "x = (x[x])``;",
+    "x = (x[x])`${}`;",
+    "x = (x())``;",
+    "x = (x())`${}`;"
+  ];
+
+  TestRun(test)
+    .addError(6, "Unnecessary grouping operator.")
+    .addError(7, "Unnecessary grouping operator.")
+    .addError(8, "Unnecessary grouping operator.")
+    .addError(9, "Unnecessary grouping operator.")
+    .addError(10, "Unnecessary grouping operator.")
+    .addError(11, "Unnecessary grouping operator.")
+    .test(code, { singleGroups: true, esversion: 6, supernew: true });
+
   test.done();
 };
 
