@@ -67,3 +67,42 @@ exports["test for GH-1103"] = function (test) {
 
   delete Array.prototype.ohnoes;
 };
+
+exports.identifiers = function (test) {
+  var src = [
+    "var x = {",
+    "  y: 23,",
+    "  'z': 45",
+    "};"
+  ];
+  var expected = [
+    {
+      line: 1,
+      char: 6,
+      from: 5,
+      name: 'x',
+      raw_name: 'x',
+      isProperty: false
+    },
+    {
+      line: 2,
+      char: 4,
+      from: 3,
+      name: 'y',
+      raw_name: 'y',
+      isProperty: false
+    }
+  ];
+  var actual = [];
+  this.onAddModule = function (linter) {
+    linter.on("Identifier", function(x) {
+      actual.push(x);
+    });
+  };
+
+  JSHINT(src);
+
+  test.deepEqual(actual, expected);
+
+  test.done();
+};
