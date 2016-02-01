@@ -2571,7 +2571,9 @@ var JSHINT = (function() {
           // Used to delineate an integer number literal from a dereferencing
           // punctuator (otherwise interpreted as a decimal point)
           (ret.type === "(number)" &&
-            checkPunctuator(pn, ".") && /^\d+$/.test(ret.value));
+            checkPunctuator(pn, ".") && /^\d+$/.test(ret.value)) ||
+          // Used to wrap object destructuring assignment
+          (opening.beginsStmt && ret.id === "=" && ret.left.id === "{");
       }
     }
 

@@ -3023,6 +3023,26 @@ singleGroups.postfix = function (test) {
   test.done();
 };
 
+singleGroups.destructuringAssign = function (test) {
+
+  var code = [
+    // statements
+    "({ x } = { x : 1 });",
+    "([ x ] = [ 1 ]);",
+    // expressions
+    "1, ({ x } = { x : 1 });",
+    "1, ([ x ] = [ 1 ]);"
+  ];
+
+  TestRun(test)
+    .addError(2, "Unnecessary grouping operator.")
+    .addError(3, "Unnecessary grouping operator.")
+    .addError(4, "Unnecessary grouping operator.")
+    .test(code, { esversion: 6, singleGroups: true, expr: true });
+
+  test.done();
+};
+
 exports.elision = function (test) {
   var code = [
     "var a = [1,,2];",
