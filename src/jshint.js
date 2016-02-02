@@ -2515,7 +2515,7 @@ var JSHINT = (function() {
     }
 
     var exprs = [];
-      
+
     for (;;) {
       exprs.push(expression(10));
 
