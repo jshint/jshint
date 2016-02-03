@@ -2073,3 +2073,15 @@ exports["gh-2838"] = function (test) {
 
   test.done();
 };
+
+exports["destructuring in setter parameter"] = function (test) {
+
+  TestRun(test).test([
+    "var a = {",
+    "  get x() {},",
+    "  set x({ a, b }) {}",
+    "};"
+  ], { esversion: 6 });
+
+  test.done();
+};
