@@ -2078,6 +2078,33 @@ exports["gh-2838"] = function (test) {
   test.done();
 };
 
+exports["class setters and getters parameter count"] = function (test) {
+
+  var code = [
+    "class A {",
+    "  get getter0() {}",
+    "  get getter1(a) {}",
+    "  set setter0() {}",
+    "  set setter1(a) {}",
+    "  set setter2(a, b) {}",
+    "  static get static_getter0() {}",
+    "  static get static_getter1(a) {}",
+    "  static set static_setter0() {}",
+    "  static set static_setter1(a) {}",
+    "  static set static_setter2(a, b) {}",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(3, "Unexpected parameter 'a' in get getter1 function.")
+    .addError(4, "Expected a single parameter in set setter0 function.")
+    .addError(6, "Expected a single parameter in set setter2 function.")
+    .addError(8, "Unexpected parameter 'a' in get static_getter1 function.")
+    .addError(9, "Expected a single parameter in set static_setter0 function.")
+    .addError(11, "Expected a single parameter in set static_setter2 function.")
+
+  test.done();
+};
 exports["destructuring in setter parameter"] = function (test) {
 
   TestRun(test).test([
