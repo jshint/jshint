@@ -3255,7 +3255,7 @@ var JSHINT = (function() {
           // Don't warn about getter/setter pairs if this is an ES6 concise method
           if (nextVal === "get" && i && p) {
             warning("W076", t, p[0], i);
-          } else if (nextVal === "set" && i && (!p || p.length !== 1)) {
+          } else if (nextVal === "set" && i && f["(metrics)"].arity !== 1) {
             warning("W077", t, i);
           }
         } else {
