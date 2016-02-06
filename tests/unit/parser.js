@@ -1853,7 +1853,6 @@ exports["destructuring globals with syntax error"] = function (test) {
   ];
 
   TestRun(test)
-    .addError(3, "Expected an identifier and instead saw '1'.")
     .addError(3, "Bad assignment.")
     .addError(4, "Expected ',' and instead saw ';'.")
     .addError(5, "Expected ']' to match '[' from line 5 and instead saw ';'.")
@@ -1864,11 +1863,8 @@ exports["destructuring globals with syntax error"] = function (test) {
     .addError(5, "Expected an assignment or function call and instead saw an expression.")
     .addError(6, "Bad assignment.")
     .addError(7, "Expected ',' and instead saw '.'.")
-    .addError(8, "Expected ',' and instead saw '('.")
-    .addError(8, "Expected an identifier and instead saw ')'.")
-    .addError(8, "Expected an identifier and instead saw ')'.")
-    .addError(9, "Expected ',' and instead saw '('.")
-    .addError(9, "Expected an identifier and instead saw ')'.")
+    .addError(8, "Bad assignment.")
+    .addError(9, "Bad assignment.")
     .addError(2,  "'z' is not defined.")
     .test(code, {esnext: true, unused: true, undef: true});
 
@@ -2022,6 +2018,50 @@ exports["destructuring assignment default values"] = function (test) {
     .addError(13, "It's not necessary to initialize 'x' to 'undefined'.")
     .addError(14, "Expected ']' and instead saw '='.")
     .test(code, { esnext: true });
+
+  test.done();
+};
+
+exports["destructuring assignment of valid simple assignment targets"] = function (test) {
+  TestRun(test)
+    .test([
+      "[ foo().attr ] = [];",
+      "[ function() {}.attr ] = [];",
+      "[ function() { return {}; }().attr ] = [];",
+      "[ new Ctor().attr ] = [];"
+    ], { esversion: 6 });
+
+  TestRun(test)
+    .addError(1, "Bad assignment.")
+    .test("[ foo() ] = [];", { esversion: 6 });
+
+  TestRun(test)
+    .addError(1, "Bad assignment.")
+    .test("({ x: foo() } = {});", { esversion: 6 });
+
+  TestRun(test)
+    .addError(1, "Bad assignment.")
+    .test("[ true ? x : y ] = [];", { esversion: 6 });
+
+  TestRun(test)
+    .addError(1, "Bad assignment.")
+    .test("({ x: true ? x : y } = {});", { esversion: 6 });
+
+  TestRun(test)
+    .addError(1, "Bad assignment.")
+    .test("[ x || y ] = [];", { esversion: 6 });
+
+  TestRun(test)
+    .addError(1, "Bad assignment.")
+    .test("({ x: x || y } = {});", { esversion: 6 });
+
+  TestRun(test)
+    .addError(1, "Bad assignment.")
+    .test("[ new Ctor() ] = [];", { esversion: 6 });
+
+  TestRun(test)
+    .addError(1, "Bad assignment.")
+    .test("({ x: new Ctor() } = {});", { esversion: 6 });
 
   test.done();
 };
