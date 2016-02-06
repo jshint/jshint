@@ -3366,11 +3366,7 @@ var JSHINT = (function() {
         var is_rest = checkPunctuator(state.tokens.next, "...");
 
         if (isAssignment) {
-          var identifierToken = is_rest ? peek(0) : state.tokens.next;
-          if (!identifierToken.identifier) {
-            warning("E030", identifierToken, identifierToken.value);
-          }
-          var assignTarget = expression(155);
+          var assignTarget = expression(20);
           if (assignTarget) {
             checkLeftSideAssign(assignTarget);
 
