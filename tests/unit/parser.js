@@ -140,9 +140,7 @@ exports.assignment = function (test) {
     .addError(3, "Bad assignment.")
     .addError(4, "Bad assignment.")
     .addError(5, "Bad assignment.")
-    .addError(14, "Bad assignment.")
-    .addError(14, "Expected an assignment or function call and instead saw an expression.")
-    .addError(14, "Missing semicolon.");
+    .addError(14, "Bad assignment.");
 
   run.test(code, { plusplus: true, es3: true });
   run.test(code, { plusplus: true }); // es5
@@ -1024,33 +1022,25 @@ exports["gh-2587"] = function (test) {
 
 exports.badAssignments = function (test) {
   TestRun(test)
-    .addError(1, "Missing semicolon.")
     .addError(1, "Bad assignment.")
-    .addError(1, "Expected an assignment or function call and instead saw an expression.")
     .test([
       "a() = 1;"
     ], { });
 
   TestRun(test)
-    .addError(1, "Missing semicolon.")
     .addError(1, "Bad assignment.")
-    .addError(1, "Expected an assignment or function call and instead saw an expression.")
     .test([
       "a.a() = 1;"
     ], { });
 
   TestRun(test)
-    .addError(1, "Missing semicolon.")
     .addError(1, "Bad assignment.")
-    .addError(1, "Expected an assignment or function call and instead saw an expression.")
     .test([
       "(function(){}) = 1;"
     ], { });
 
   TestRun(test)
-    .addError(1, "Missing semicolon.")
     .addError(1, "Bad assignment.")
-    .addError(1, "Expected an assignment or function call and instead saw an expression.")
     .test([
       "a.a() &= 1;"
     ], { });
@@ -1866,7 +1856,7 @@ exports["destructuring globals with syntax error"] = function (test) {
   ];
 
   TestRun(test)
-    .addError(3, "Expected an identifier and instead saw '1'.")
+    .addError(3, "Bad assignment.")
     .addError(4, "Expected ',' and instead saw ';'.")
     .addError(5, "Expected ']' to match '[' from line 5 and instead saw ';'.")
     .addError(5, "Missing semicolon.")
@@ -1876,11 +1866,8 @@ exports["destructuring globals with syntax error"] = function (test) {
     .addError(5, "Expected an assignment or function call and instead saw an expression.")
     .addError(6, "Bad assignment.")
     .addError(7, "Expected ',' and instead saw '.'.")
-    .addError(8, "Expected ',' and instead saw '('.")
-    .addError(8, "Expected an identifier and instead saw ')'.")
-    .addError(8, "Expected an identifier and instead saw ')'.")
-    .addError(9, "Expected ',' and instead saw '('.")
-    .addError(9, "Expected an identifier and instead saw ')'.")
+    .addError(8, "Bad assignment.")
+    .addError(9, "Bad assignment.")
     .addError(2,  "'z' is not defined.")
     .test(code, {esnext: true, unused: true, undef: true});
 
@@ -1908,6 +1895,8 @@ exports["destructuring globals with syntax error"] = function (test) {
     .addError(4, "Bad assignment.")
     .addError(6, "Do not assign to the exception parameter.")
     .addError(7, "Do not assign to the exception parameter.")
+    .addError(9, "Bad assignment.")
+    .addError(10, "Bad assignment.")
     .test([
       "[ Number.prototype.toString ] = [function(){}];",
       "function a() {",
@@ -1917,6 +1906,9 @@ exports["destructuring globals with syntax error"] = function (test) {
       "    ({e} = {e});",
       "    [e] = [];",
       "  }",
+      "  ({ x: null } = {});",
+      "  ({ y: [...this] } = {});",
+      "  ({ y: [...z] } = {});",
       "}"], {esnext: true, freeze: true});
 
   test.done();
@@ -2029,6 +2021,50 @@ exports["destructuring assignment default values"] = function (test) {
     .addError(13, "It's not necessary to initialize 'x' to 'undefined'.")
     .addError(14, "Expected ']' and instead saw '='.")
     .test(code, { esnext: true });
+
+  test.done();
+};
+
+exports["destructuring assignment of valid simple assignment targets"] = function (test) {
+  TestRun(test)
+    .test([
+      "[ foo().attr ] = [];",
+      "[ function() {}.attr ] = [];",
+      "[ function() { return {}; }().attr ] = [];",
+      "[ new Ctor().attr ] = [];"
+    ], { esversion: 6 });
+
+  TestRun(test)
+    .addError(1, "Bad assignment.")
+    .test("[ foo() ] = [];", { esversion: 6 });
+
+  TestRun(test)
+    .addError(1, "Bad assignment.")
+    .test("({ x: foo() } = {});", { esversion: 6 });
+
+  TestRun(test)
+    .addError(1, "Bad assignment.")
+    .test("[ true ? x : y ] = [];", { esversion: 6 });
+
+  TestRun(test)
+    .addError(1, "Bad assignment.")
+    .test("({ x: true ? x : y } = {});", { esversion: 6 });
+
+  TestRun(test)
+    .addError(1, "Bad assignment.")
+    .test("[ x || y ] = [];", { esversion: 6 });
+
+  TestRun(test)
+    .addError(1, "Bad assignment.")
+    .test("({ x: x || y } = {});", { esversion: 6 });
+
+  TestRun(test)
+    .addError(1, "Bad assignment.")
+    .test("[ new Ctor() ] = [];", { esversion: 6 });
+
+  TestRun(test)
+    .addError(1, "Bad assignment.")
+    .test("({ x: new Ctor() } = {});", { esversion: 6 });
 
   test.done();
 };
@@ -5096,8 +5132,7 @@ exports["regression test for crash from GH-964"] = function (test) {
 
   TestRun(test)
     .addError(2, "Bad assignment.")
-    .addError(2, "Expected an operator and instead saw 'new'.")
-    .addError(2, "Missing semicolon.")
+    .addError(2, "Did you mean to return a conditional instead of an assignment?")
     .test(code);
 
   test.done();

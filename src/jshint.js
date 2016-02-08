@@ -1328,6 +1328,9 @@ var JSHINT = (function() {
       if (nativeObject)
         warning("W121", left, nativeObject);
     }
+    if (checkPunctuator(left, "...")) {
+      left = left.right;
+    }
 
     if (left.identifier && !left.isMetaProperty) {
       // reassign also calls modify
@@ -1344,8 +1347,8 @@ var JSHINT = (function() {
       state.nameStack.set(state.tokens.prev);
       return true;
     } else if (left.id === "{" || left.id === "[") {
-      if (allowDestructuring && state.tokens.curr.left.destructAssign) {
-        state.tokens.curr.left.destructAssign.forEach(function(t) {
+      if (allowDestructuring && left.destructAssign) {
+        left.destructAssign.forEach(function(t) {
           if (t.id) {
             state.funct["(scope)"].block.modify(t.id, t.token);
           }
@@ -1363,10 +1366,7 @@ var JSHINT = (function() {
       }
 
       return true;
-    } else if (left.isMetaProperty) {
-      error("E031", assignToken);
-      return true;
-    } else if (left.identifier && !isReserved(left)) {
+    } else if (left.identifier && !isReserved(left) && !left.isMetaProperty) {
       if (state.funct["(scope)"].labeltype(left.value) === "exception") {
         warning("W022", left);
       }
@@ -1376,6 +1376,8 @@ var JSHINT = (function() {
 
     if (left === state.syntax["function"]) {
       warning("W023", state.tokens.curr);
+    } else {
+      error("E031", assignToken);
     }
 
     return false;
@@ -1385,12 +1387,11 @@ var JSHINT = (function() {
     var x = infix(s, typeof f === "function" ? f : function(left, that) {
       that.left = left;
 
-      if (left && checkLeftSideAssign(left, that, { allowDestructuring: true })) {
-        that.right = expression(10);
-        return that;
-      }
+      checkLeftSideAssign(left, that, { allowDestructuring: true });
 
-      error("E031", that);
+      that.right = expression(10);
+
+      return that;
     }, p);
 
     x.exps = true;
@@ -1419,11 +1420,11 @@ var JSHINT = (function() {
         warning("W016", that, that.id);
       }
 
-      if (left && checkLeftSideAssign(left, that)) {
-        that.right = expression(10);
-        return that;
-      }
-      error("E031", that);
+      checkLeftSideAssign(left, that);
+
+      that.right = expression(10);
+
+      return that;
     }, 20);
   }
 
@@ -2269,7 +2270,7 @@ var JSHINT = (function() {
 
       error("E030", state.tokens.next, state.tokens.next.value);
     }
-    expression(150);
+    this.right = expression(150);
     return this;
   });
 
@@ -3360,11 +3361,7 @@ var JSHINT = (function() {
         var is_rest = checkPunctuator(state.tokens.next, "...");
 
         if (isAssignment) {
-          var identifierToken = is_rest ? peek(0) : state.tokens.next;
-          if (!identifierToken.identifier) {
-            warning("E030", identifierToken, identifierToken.value);
-          }
-          var assignTarget = expression(155);
+          var assignTarget = expression(20);
           if (assignTarget) {
             checkLeftSideAssign(assignTarget);
 
