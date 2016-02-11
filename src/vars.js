@@ -722,3 +722,14 @@ exports.jasmine = {
   fit         : false,
   pending     : false
 };
+
+exports.protractor = {
+  "protractor" : false,
+  "browser"    : false,
+  "by"         : false,
+  "element"    : false,
+  "it"         : false,
+  "describe"   : false,
+  "beforeEach" : false,
+  "afterEach"  : false
+};

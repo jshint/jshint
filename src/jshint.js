@@ -283,6 +283,10 @@ var JSHINT = (function() {
       combine(predefined, vars.jasmine);
     }
 
+    if (state.option.protractor) {
+      combine(predefined, vars.protractor);
+    }
+
     if (state.option.jquery) {
       combine(predefined, vars.jquery);
     }
