@@ -98,11 +98,15 @@ exports.testExportedDefinedGlobals = function (test) {
 exports.testGlobalVarDeclarations = function (test) {
   var src = "var a;";
 
-  // Test should pass
-  TestRun(test).test(src, { es3: true, node: true }, {});
+  TestRun(test).test(src, { es3: true }, {});
 
   var report = JSHINT.data();
   test.deepEqual(report.globals, ['a']);
+
+  TestRun(test).test(src, { es3: true, node: true }, {});
+
+  report = JSHINT.data();
+  test.strictEqual(report.globals, undefined);
 
   TestRun(test).test("var __proto__;", { proto: true });
   report = JSHINT.data();
