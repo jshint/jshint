@@ -642,6 +642,7 @@ var exports = {
     files.forEach(function(file) {
       var config = opts.config || exports.getConfig(file);
       var code;
+      var errors = [];
 
       try {
         code = shjs.cat(file);
@@ -652,19 +653,20 @@ var exports = {
 
       mergeCLIPrereq(config);
 
-      lint(extract(code, opts.extract), results, config, data, file);
+      lint(extract(code, opts.extract), errors, config, data, file);
 
-      if (results.length) {
+      if (errors.length) {
         var offsets = extractOffsets(code, opts.extract);
         if (offsets && offsets.length) {
-          results.forEach(function(errorInfo) {
+          errors.forEach(function(errorInfo) {
             var line = errorInfo.error.line;
-            if (line >= 0 && line < offsets.length) {
-              var offset = +offsets[line];
-              errorInfo.error.character += offset;
+            if (line >= 0 && line < offsets.length && offsets[line]) {
+              errorInfo.error.character += offsets[line];
             }
           });
         }
+
+        results = results.concat(errors);
       }
     });
 
