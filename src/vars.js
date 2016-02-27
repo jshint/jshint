@@ -207,6 +207,7 @@ exports.browser = {
   setTimeout           : false,
   SharedWorker         : false,
   status               : false,
+  Storage              : false,
   SVGAElement          : false,
   SVGAltGlyphDefElement: false,
   SVGAltGlyphElement   : false,
