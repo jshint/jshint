@@ -73,6 +73,7 @@ exports.browser = {
   close                : false,
   closed               : false,
   Comment              : false,
+  CompositionEvent     : false,
   CustomEvent          : false,
   DOMParser            : false,
   defaultStatus        : false,
