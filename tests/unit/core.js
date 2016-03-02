@@ -2091,11 +2091,15 @@ exports["'super' in derived constructors"] = function (test) {
     "class A {}",
     "class B extends A {",
     "  constructor() {}",
+    "}",
+    "class C extends null {",
+    "  constructor() {}",
     "}"
   ];
 
   TestRun(test, "must be called")
     .addError(3, "You must call 'super' in derived constructors.")
+    .addError(6, "You must call 'super' in derived constructors.")
     .test(code, { esversion: 6 });
 
   var code2 = [
@@ -2145,17 +2149,11 @@ exports["'super' in derived constructors"] = function (test) {
     "  constructor() {",
     "    super();",
     "  }",
-    "}",
-    "class B extends null {",
-    "  constructor() {",
-    "    super();",
-    "  }",
     "}"
   ];
 
   TestRun(test, "can't be used in classes which don't extend another class")
     .addError(3, "'super' can only be called in derived constructors.")
-    .addError(8, "'super' can only be called in derived constructors.")
     .test(code5, { esversion: 6 });
 
   var code6 = [

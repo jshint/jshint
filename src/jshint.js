@@ -3816,8 +3816,7 @@ var JSHINT = (function() {
         continue;
       }
 
-      var superCall = c.heritage && c.heritage.type !== "null" &&
-                      name.value === "constructor" && !isStatic;
+      var superCall = c.heritage && name.value === "constructor" && !isStatic;
 
       if (!checkPunctuator(state.tokens.next, "(")) {
         // error --- class properties must be methods
