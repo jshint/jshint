@@ -422,7 +422,7 @@ function collect(fp, files, ignores, ext) {
 
   if (!shjs.test("-e", fp)) {
     cli.error("Can't open " + fp);
-    return;
+    exports.exit(1);
   }
 
   if (shjs.test("-d", fp)) {
