@@ -1284,10 +1284,11 @@ var JSHINT = (function() {
       "Array", "ArrayBuffer", "Boolean", "Collator", "DataView", "Date",
       "DateTimeFormat", "Error", "EvalError", "Float32Array", "Float64Array",
       "Function", "Infinity", "Intl", "Int16Array", "Int32Array", "Int8Array",
-      "Iterator", "Number", "NumberFormat", "Object", "RangeError",
-      "ReferenceError", "RegExp", "StopIteration", "String", "SyntaxError",
+      "Iterator", "Map", "Number", "NumberFormat", "Object", "Promise", "Proxy", "RangeError",
+      "Symbol", "Set",
+      "ReferenceError", "Reflect", "RegExp", "StopIteration", "String", "SyntaxError",
       "TypeError", "Uint16Array", "Uint32Array", "Uint8Array", "Uint8ClampedArray",
-      "URIError"
+      "URIError", "WeakMap", "WeakSet"
     ];
 
     function walkPrototype(obj) {
