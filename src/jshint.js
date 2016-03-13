@@ -1367,11 +1367,7 @@ var JSHINT = (function() {
       return true;
     }
 
-    if (left === state.syntax["function"]) {
-      warning("W023", state.tokens.curr);
-    } else {
-      error("E031", assignToken);
-    }
+    error("E031", assignToken);
 
     return false;
   }
