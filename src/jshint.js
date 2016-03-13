@@ -1632,7 +1632,7 @@ var JSHINT = (function() {
         !(r.type === "(punctuator)" && r.left &&
           r.left.identifier && r.left.value === "function")) {
       if (!state.isStrict() && state.stmtMissingStrict()) {
-        warning("E007");
+        warning("W140");
       }
     }
 
@@ -1761,7 +1761,7 @@ var JSHINT = (function() {
 
           if (state.option.strict && state.funct["(context)"]["(global)"]) {
             if (!m["use strict"] && !state.isStrict()) {
-              warning("E007");
+              warning("W140");
             }
           }
         }
@@ -1805,7 +1805,7 @@ var JSHINT = (function() {
 
         if (state.option.strict && state.funct["(context)"]["(global)"]) {
           if (!m["use strict"] && !state.isStrict()) {
-            warning("E007");
+            warning("W140");
           }
         }
 

@@ -14,7 +14,7 @@ var errors = {
   E006: "Unexpected early end of program.",
 
   // Strict mode
-  E007: "Missing \"use strict\" statement.",
+  E007: null,
   E008: "Strict violation.",
   E009: "Option 'validthis' can't be used in a global scope.",
   E010: "'with' is not allowed in strict mode.",
@@ -223,7 +223,8 @@ var warnings = {
   W136: "'{a}' must be in function scope.",
   W137: "Empty destructuring.",
   W138: "Regular parameters should not come after default parameters.",
-  W139: "Function expressions should not be used as the second operand to instanceof."
+  W139: "Function expressions should not be used as the second operand to instanceof.",
+  W140: "Missing \"use strict\" statement."
 };
 
 var info = {
