@@ -8,7 +8,8 @@ such regressions. This release comprises all changes from the release candidate
 phase along with the improvements initially released as version 2.9.0. This
 release does not itself contain any changes to the codebase. If you are
 upgrading from version 2.8.0 or earlier, please refer to the
-previously-published release notes for details on bug fixes and features.
+previously-published release notes for details on bug fixes and features--these
+can be found in the project's `CHANGELOG.md` file and on the project's website.
 
 
 <a name="2.9.1-rc3"></a>
@@ -73,6 +74,10 @@ try in your projects and let us know about any surprising behavior!
 
 <a name="2.9.0"></a>
 # [2.9.0](https://github.com/jshint/jshint/compare/2.8.0...v2.9.0) (2015-09-03)
+
+**Note** This release was revoked shortly following its publication. Please
+refer to the release notes for version 2.9.1 for more information (found in the
+project's `CHANGELOG.md` file and on the project's website).
 
 This release was a long time in the making, but it may not be the most exciting
 version we've published. Most of the changes are internal refactorings that
