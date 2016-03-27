@@ -53,6 +53,13 @@ var OPTIONS = {
 };
 
 /**
+ * Records how many total files are found.
+ * Used to give correct error codes.
+ * @type {Number}
+ */
+var foundFiles;
+
+/**
  * Returns the same text but with a deprecation notice.
  * Useful for options descriptions.
  *
@@ -422,7 +429,7 @@ function collect(fp, files, ignores, ext) {
 
   if (!shjs.test("-e", fp)) {
     cli.error("Can't open " + fp);
-    exports.exit(1);
+    return;
   }
 
   if (shjs.test("-d", fp)) {
@@ -604,6 +611,8 @@ var exports = {
     var results = [];
     var data = [];
 
+    foundFiles = files.length;
+
     function mergeCLIPrereq(config) {
       if (opts.prereq) {
         config.prereq = (config.prereq || []).concat(opts.prereq.split(/\s*,\s*/));
@@ -744,6 +753,9 @@ var exports = {
 
     function done(passed) {
       /*jshint eqnull:true */
+      if (foundFiles < 1) {
+        exports.exit(1);
+      }
 
       if (passed == null)
         return;
