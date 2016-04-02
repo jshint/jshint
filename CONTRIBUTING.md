@@ -1,8 +1,9 @@
 # How to contribute
 
-Contributions to the project generally take one of two forms:
+Contributions to the project generally take one of three forms:
 
 - Bug reports
+- Feature requests
 - Patches
 
 This document describes the best way to contribute each of these. The
@@ -26,6 +27,21 @@ issue report should have the following information:
 - Configuration values
 - Description of expected behavior
 - Description of actual behavior
+
+## Feature Requests
+
+If there is some new functionality that you think would improve JSHint, we'd
+love to hear about it! Great feature requests contain the following
+information:
+
+- Description of problem the feature solves
+- Outline of the feature's intended operation
+- List of any edge cases/exceptional circumstances, and how they should be
+  addressed
+
+If you are capable of implementing the feature and submitting a patch, then all
+the better! Please begin by making a feature request so that the maintainers
+can verify that it is appropriate and help shape its design.
 
 ## Patches
 
