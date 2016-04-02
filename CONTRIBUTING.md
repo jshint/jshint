@@ -45,9 +45,9 @@ can verify that it is appropriate and help shape its design.
 
 ## Patches
 
-The best way to make sure your issue is addressed is to submit a patch. We accept
-patches through all mediums: pull requests, email, issue comment, tweet with a link
-to a snippet, graffiti outside of Anton's apartment, etc.
+The best way to make sure your issue is addressed is to submit a patch. We
+accept patches through all mediums: pull requests, email, issue comment, tweet
+with a link to a snippet, etc.
 
 However, before sending a patch, please make sure that the following applies:
 
