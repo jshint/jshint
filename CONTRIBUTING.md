@@ -1,5 +1,34 @@
 # How to contribute
 
+Contributions to the project generally take one of two forms:
+
+- Bug reports
+- Patches
+
+This document describes the best way to contribute each of these. The
+maintenance team will assign one of the following labels to document the
+report's severity:
+
+- *P1:* Something is throwing exceptions; broken JSHint backward compatibility.
+- *P2:* Something is not being parsed correctly.
+- *P3:* Features that the core team will work on once P2s and P1s are done.
+- *P4:* Patches welcome; The request is good, but low priority.
+
+## Bug Reports
+
+If you believe you have identified incorrect behavior, please let the team know
+by filing an issue. In order to help the team diagnose and fix the problem, the
+issue report should have the following information:
+
+- Version of JSHint being used
+- Input source code (simplified to only contain details necessary to
+  demonstrate the problem)
+- Configuration values
+- Description of expected behavior
+- Description of actual behavior
+
+## Patches
+
 The best way to make sure your issue is addressed is to submit a patch. We accept
 patches through all mediums: pull requests, email, issue comment, tweet with a link
 to a snippet, graffiti outside of Anton's apartment, etc.
@@ -14,20 +43,7 @@ However, before sending a patch, please make sure that the following applies:
 * All tests and lint checks pass (`npm test`).
 * You understand that we're super grateful for your patch.
 
-## Reporting Bugs
-
-If you believe you have identified incorrect behavior, please let the team know
-by filing an issue. In order to help the team diagnose and fix the problem, the
-issue report should have the following information:
-
-- Version of JSHint being used
-- Input source code (simplified to only contain details necessary to
-  demonstrate the problem)
-- Configuration values
-- Description of expected behavior
-- Description of actual behavior
-
-## Development Environment
+### Development Environment
 
 JSHint is developed using [Node.js](http://nodejs.org/) and has a number of
 dependencies specified in its `package.json` file. To install them just run the
@@ -38,17 +54,7 @@ following command from within your repo directory:
 After that, you will be able to run the edge version of JSHint using
 `bin/jshint` or build the release bundles using `bin/build`.
 
-## Issue Priority
-
-When verifying bug reports and feature requests, the JSHint team will assign
-one of the following labels to document the report's severity:
-
-- *P1:* Something is throwing exceptions; broken JSHint backward compatibility.
-- *P2:* Something is not being parsed correctly.
-- *P3:* Features that the core team will work on once P2s and P1s are done.
-- *P4:* Patches welcome; The request is good, but low priority.
-
-## Coding Style
+### Coding Style
 
 This section describes our coding style guide. You might not agree with it and
 that's fine but if you're going to send us patches treat this guide as a law.
@@ -59,7 +65,7 @@ that's fine but if you're going to send us patches treat this guide as a law.
 > matter how many people contributed.
 > —[idiomatic.js](https://github.com/rwaldron/idiomatic.js/)
 
-### Whitespace
+#### Whitespace
 
 * We use two spaces everywhere.
 * Use one space after `if`, `for`, `while`, etc.
@@ -92,7 +98,7 @@ that's fine but if you're going to send us patches treat this guide as a law.
 
 * Wrap multi-line comments with new lines on both sides.
 
-### Variables
+#### Variables
 
 * Use one `var` per variable unless you don't assign any values to it (and it's short enough):
 
@@ -104,12 +110,12 @@ that's fine but if you're going to send us patches treat this guide as a law.
 
 * Don't be overly descriptive with your variable names but don't abuse one-letter variables either. Find a sweet spot somewhere in between.
 
-### Comments
+#### Comments
 
 * Comment everything that is not obvious.
 * If you're adding a new check, write a comment describing why this check is important and what it checks for.
 
-### Misc
+#### Misc
 
 * Always use strict mode.
 * Always use strict comparisons: `===` and `!==`.
@@ -130,7 +136,7 @@ that's fine but if you're going to send us patches treat this guide as a law.
       report.addWarning("W001");
     ```
 
-## Commit Message Guidelines
+### Commit Message Guidelines
 
 Commit messages are written in a simple format which clearly describes the purpose of a change.
 
@@ -149,7 +155,7 @@ Line lengths in commit messages are not strict, but good commit messages should 
 more than 60 characters, and bodies/footers wrapped at 100 columns. This renders nicely on Github's
 UI.
 
-### Header
+#### Header
 
 The first line is the commit message header, which will indicate the type of change, and a general
 description of the change. This should fit within 60 characters, ideally. For instance:
@@ -169,14 +175,14 @@ Several commit types are used by jshint:
 4. `[[TEST]]` --- Commit modifies tests or test infrastructure only
 5. `[[CHORE]]` --- Commit affects dev-ops, CI, or package dependencies
 
-### Body
+#### Body
 
 `<Body>` is a detailed commit message explaining exactly what has changed, and a summary of the
 reason why. Lines in the body should be wrapped to 100 characters for best rendering.
 
 For a historical example, see this [example](https://github.com/jshint/jshint/commit/5751c5ed249b7a035758a3ae876cfa1a360fd144)
 
-### Footer
+#### Footer
 
 `<Footer>` contains a description of any breaking changes, no matter how subtle, as well as a list
 of issues affected or fixed by this commit. Lines in the footer should be wrapped to 100 characters
