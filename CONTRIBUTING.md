@@ -14,6 +14,19 @@ However, before sending a patch, please make sure that the following applies:
 * All tests and lint checks pass (`npm test`).
 * You understand that we're super grateful for your patch.
 
+## Reporting Bugs
+
+If you believe you have identified incorrect behavior, please let the team know
+by filing an issue. In order to help the team diagnose and fix the problem, the
+issue report should have the following information:
+
+- Version of JSHint being used
+- Input source code (simplified to only contain details necessary to
+  demonstrate the problem)
+- Configuration values
+- Description of expected behavior
+- Description of actual behavior
+
 ## Development Environment
 
 JSHint is developed using [Node.js](http://nodejs.org/) and has a number of
