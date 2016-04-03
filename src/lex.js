@@ -1776,7 +1776,7 @@ Lexer.prototype = {
         this.triggerAsync("Identifier", {
           line: this.line,
           char: this.char,
-          from: this.form,
+          from: this.from,
           name: token.value,
           raw_name: token.text,
           isProperty: state.tokens.curr.id === "."

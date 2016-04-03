@@ -6196,32 +6196,6 @@ exports["test for GH-1089"] = function (test) {
   test.done();
 };
 
-exports["test for GH-1103"] = function (test) {
-  var code = [ "var ohnoes = 42;" ];
-
-  var run = TestRun(test);
-
-  var patch = true;
-
-  JSHINT.addModule(function (linter) {
-    if (!patch) {
-      return;
-    }
-    patch = false;
-
-    var ohnoes = "oh noes";
-    Array.prototype.ohnoes = function () {
-      linter.warn("E024", { line: 1, char: 1, data: [ ohnoes += "!" ] });
-    };
-  });
-
-  run.test(code);
-
-  test.done();
-
-  delete Array.prototype.ohnoes;
-};
-
 exports["test for GH-1105"] = function (test) {
   var code = [
     "while (true) {",
