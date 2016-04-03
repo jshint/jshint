@@ -523,15 +523,6 @@ var JSHINT = (function() {
           return;
         }
 
-        /**
-         * TODO: Remove in JSHint 3
-         */
-        if (key === "es5") {
-          if (val === "true" && state.option.es5) {
-            warning("I003");
-          }
-        }
-
         if (key === "validthis") {
           // `validthis` is valid only within a function scope.
 
@@ -655,12 +646,8 @@ var JSHINT = (function() {
 
         if (key === "esversion") {
           switch (val) {
-          case "5":
-            if (state.inES5(true)) {
-              warning("I003");
-            }
-            /* falls through */
           case "3":
+          case "5":
           case "6":
             state.option.moz = false;
             state.option.esversion = +val;
@@ -5133,10 +5120,6 @@ var JSHINT = (function() {
         } else {
           var optionKey = optionKeys[x];
           newOptionObj[optionKey] = o[optionKey];
-          if ((optionKey === "esversion" && o[optionKey] === 5) ||
-              (optionKey === "es5" && o[optionKey])) {
-            warningAt("I003", 0, 0);
-          }
         }
       }
     }

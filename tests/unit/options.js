@@ -3313,69 +3313,6 @@ exports.varstmt = function (test) {
   test.done();
 };
 
-exports.errorI003 = function(test) {
-  var code = [
-    "// jshint browser: true",
-    "function f() {",
-    "  // jshint browser: false",
-    "}",
-    "f();"
-  ];
-
-  TestRun(test, "no es5 option with enforceall")
-    .test(code, { enforceall: true });
-
-  TestRun(test, "global overriding es5")
-    .addError(0, "ES5 option is now set per default")
-    .test(code, { es5: true });
-
-  var code2 = [
-    "// jshint browser: true",
-    "function f() {",
-    "  // jshint es5: true",
-    "}",
-    "f();"
-  ];
-
-  TestRun(test, "nested overriding es5")
-    .addError(3, "ES5 option is now set per default")
-    .test(code2, { enforceall: true });
-
-  var code3 = [
-    "// jshint es5: false",
-    "// jshint es5: true",
-    "// jshint es5: false",
-    "// jshint es5: true"
-  ];
-
-  TestRun(test, "toggling es5 option")
-    .test(code3, {});
-
-  var code4 = [
-    "// jshint es5: false",
-    "function a() {",
-    "  // jshint es5: true",
-    "  function b() {",
-    "    // jshint es5: false",
-    "    function c() {",
-    "      // jshint es5: true",
-    "      function d() {",
-    "      }",
-    "      d();",
-    "    }",
-    "    c();",
-    "  }",
-    "  b();",
-    "}",
-    "a();"
-  ];
-
-  TestRun(test, "toggling es5 option through nested scopes")
-    .test(code4, {});
-
-  test.done();
-};
-
 exports.module = {};
 exports.module.behavior = function(test) {
   var code = [
@@ -3578,7 +3515,6 @@ exports.esversion = function(test) {
     .test(es6code, { esversion: 6, es3: true });
 
   TestRun(test, "incompatibility with `es5`") // TODO: Remove in JSHint 3
-    .addError(0, "ES5 option is now set per default")
     .addError(0, "Incompatible values for the 'esversion' and 'es5' linting options. (0% scanned).")
     .test(es6code, { esversion: 6, es5: true });
 
