@@ -1769,6 +1769,22 @@ exports.strictEnvs = function (test) {
     .addError(2, "Missing \"use strict\" statement.")
     .test(partialStrict, { strict: true, phantom: true });
 
+  partialStrict = [
+    '(() =>',
+    '  void 0',
+    ')();',
+  ]
+
+  TestRun(test, "Block-less arrow functions in the Browserify env")
+    .addError(3, "Missing \"use strict\" statement.")
+    .test(partialStrict, { esversion: 6, strict: true, browserify: true });
+  TestRun(test, "Block-less arrow function in the Node.js environment")
+    .addError(3, "Missing \"use strict\" statement.")
+    .test(partialStrict, { esversion: 6, strict: true, node: true });
+  TestRun(test, "Block-less arrow function in the PhantomJS environment")
+    .addError(3, "Missing \"use strict\" statement.")
+    .test(partialStrict, { esversion: 6, strict: true, phantom: true });
+
   test.done();
 };
 
