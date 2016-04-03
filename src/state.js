@@ -46,8 +46,17 @@ var state = {
 
   allowsGlobalUsd: function() {
     return this.option.strict === "global" || this.option.globalstrict ||
-      this.option.module || this.option.node || this.option.phantom ||
-      this.option.browserify;
+      this.option.module || this.impliedClosure();
+  },
+
+  /**
+   * Determine if the current configuration describes an environment that is
+   * wrapped in an immediately-invoked function expression prior to evaluation.
+   *
+   * @returns {boolean}
+   */
+  impliedClosure: function() {
+    return this.option.node || this.option.phantom || this.option.browserify;
   },
 
   // Assumption: chronologically ES3 < ES5 < ES6 < Moz

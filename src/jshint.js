@@ -3613,7 +3613,7 @@ var JSHINT = (function() {
       for (var t in tokens) {
         if (tokens.hasOwnProperty(t)) {
           t = tokens[t];
-          if (!implied && state.funct["(global)"]) {
+          if (!implied && state.funct["(global)"] && !state.impliedClosure()) {
             if (predefined[t.id] === false) {
               warning("W079", t.token, t.id);
             } else if (state.option.futurehostile === false) {

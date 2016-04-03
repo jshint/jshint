@@ -693,7 +693,7 @@ var scopeManager = function(state, predefined, exported, declared) {
 
         scopeManagerInst.funct.add(labelName, type, token, !isexported);
 
-        if (_currentFunctBody["(type)"] === "global") {
+        if (_currentFunctBody["(type)"] === "global" && !state.impliedClosure()) {
           usedPredefinedAndGlobals[labelName] = marker;
         }
       }
