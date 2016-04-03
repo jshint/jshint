@@ -191,7 +191,10 @@ var JSHINT = (function() {
     }
   }
 
-  function assume() {
+  /**
+   * Apply all linting options according to the status of the `state` object.
+   */
+  function applyOptions() {
     var badESOpt = null;
     processenforceall();
 
@@ -706,7 +709,7 @@ var JSHINT = (function() {
         error("E002", dirToken);
       });
 
-      assume();
+      applyOptions();
     }
   }
 
@@ -5398,7 +5401,7 @@ var JSHINT = (function() {
     }
 
     try {
-      assume();
+      applyOptions();
 
       // combine the passed globals after we've assumed all our options
       combine(predefined, g || {});
