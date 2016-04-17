@@ -2550,7 +2550,7 @@ exports.nonbsp = function (test) {
     .test(src, { sub: true });
 
   TestRun(test)
-    .addError(1, "This line contains non-breaking spaces: http://jshint.com/doc/options/#nonbsp")
+    .addError(1, "This line contains non-breaking spaces: http://jshint.com/docs/options/#nonbsp")
     .test(src, { nonbsp: true, sub: true });
 
   test.done();
