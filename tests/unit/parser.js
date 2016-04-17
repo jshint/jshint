@@ -7774,3 +7774,22 @@ exports.instanceOfLiterals = function (test) {
 
   test.done();
 };
+
+exports.forInExpr = function (test) {
+  TestRun(test)
+    .test([
+      "for (var x in [], []) {}"
+    ]);
+
+  TestRun(test)
+    .addError(2, "Expected ')' to match '(' from line 2 and instead saw ','.")
+    .addError(2, "Expected an identifier and instead saw ')'.")
+    .addError(2, "Expected an assignment or function call and instead saw an expression.")
+    .addError(2, "Missing semicolon.")
+    .test([
+      "for (var x in [], []) {}",
+      "for (var x of {}, {}) {}"
+    ], { esversion: 6 });
+
+  test.done();
+};
