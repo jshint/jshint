@@ -1,3 +1,33 @@
+<a name="2.9.2"></a>
+## [2.9.2](https://github.com/jshint/jshint/compare/2.9.1...v2.9.2) (2016-04-19)
+
+This release contains a number of bug fixes. As always, we thank everyone who
+reported issues and submitted patches; those contributions are essential to the
+continuing improvement of the project. We hope you'll keep it up!
+
+### Bug Fixes
+
+* (cli - extract) lines can end with "\\r\\n", not "\\n\\r" ([93818f3](https://github.com/jshint/jshint/commit/93818f3)), closes [#2825](https://github.com/jshint/jshint/issues/2825)
+* Account for implied closures ([c3b4d63](https://github.com/jshint/jshint/commit/c3b4d63))
+* Add CompositionEvent to browser globals ([56515cf](https://github.com/jshint/jshint/commit/56515cf))
+* Allow destructuring in setter parameter ([97d0ac1](https://github.com/jshint/jshint/commit/97d0ac1))
+* Allow parentheses around object destructuring assignment. ([7a0bd70](https://github.com/jshint/jshint/commit/7a0bd70)), closes [#2775](https://github.com/jshint/jshint/issues/2775)
+* Allow regex inside template literal ([5dd9c90](https://github.com/jshint/jshint/commit/5dd9c90)), closes [#2791](https://github.com/jshint/jshint/issues/2791)
+* Allow regexp literal after 'instanceof' ([caa30e6](https://github.com/jshint/jshint/commit/caa30e6)), closes [#2773](https://github.com/jshint/jshint/issues/2773)
+* Correct CLI's indentation offset logic ([47daf76](https://github.com/jshint/jshint/commit/47daf76)), closes [#2778](https://github.com/jshint/jshint/issues/2778)
+* Do not crash on invalid input ([2e0026f](https://github.com/jshint/jshint/commit/2e0026f))
+* Do not fail on valid configurations ([2fb3c24](https://github.com/jshint/jshint/commit/2fb3c24))
+* Don't throw E056 for vars used in two functions ([fd91d4a](https://github.com/jshint/jshint/commit/fd91d4a)), closes [#2838](https://github.com/jshint/jshint/issues/2838)
+* Emit correct token value from "module" API ([4a43fb9](https://github.com/jshint/jshint/commit/4a43fb9))
+* Expand forms accepted in dstr. assignment ([8bbd537](https://github.com/jshint/jshint/commit/8bbd537))
+* Improve binding power for tagged templates ([9cf2ff0](https://github.com/jshint/jshint/commit/9cf2ff0))
+* Improve reporting of "Bad assignment." ([08df19e](https://github.com/jshint/jshint/commit/08df19e))
+* Make the 'freeze' option less strict ([b76447c](https://github.com/jshint/jshint/commit/b76447c)), closes [#1600](https://github.com/jshint/jshint/issues/1600)
+* Report "Bad assignment." in destructuring ([fe559ed](https://github.com/jshint/jshint/commit/fe559ed))
+* Report character position for camelcase errors ([480252a](https://github.com/jshint/jshint/commit/480252a)), closes [#2845](https://github.com/jshint/jshint/issues/2845)
+* Reserve `await` keyword in ES6 module code ([b1c8d5b](https://github.com/jshint/jshint/commit/b1c8d5b))
+
+
 <a name="2.9.1"></a>
 ## [2.9.1](https://github.com/jshint/jshint/compare/2.9.1-rc3...v2.9.1) (2016-01-14)
 
