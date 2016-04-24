@@ -6233,6 +6233,7 @@ exports["test for crash with invalid condition"] = function (test) {
     .addError(4, "Expected ')' to match '(' from line 4 and instead saw 'b'.")
     .addError(4, "Expected an identifier and instead saw ')'.")
     .addError(4, "Missing semicolon.")
+    .addError(5, "Expected an identifier and instead saw ')'.")
     .addError(6, "Expected an identifier and instead saw ','.")
     .addError(7, "Unexpected ')'.")
     .addError(7, "Expected an identifier and instead saw ')'.")
@@ -7443,6 +7444,16 @@ exports.parsingCommas = function (test) {
     .addError(6, "Expected an assignment or function call and instead saw an expression.")
     .addError(6, "Missing semicolon.")
     .test(src);
+
+  test.done();
+};
+
+exports["gh-2863"] = function (test) {
+
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw ')'.")
+    .addError(1, "Expected an assignment or function call and instead saw an expression.")
+    .test("();");
 
   test.done();
 };

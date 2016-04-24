@@ -2505,22 +2505,26 @@ var JSHINT = (function() {
       return doFunction({ type: "arrow", parsedOpening: true });
     }
 
+    if (state.tokens.next.id === ")") {
+      error("E030", state.tokens.next, ")");
+      advance(")");
+      return;
+    }
+
     var exprs = [];
 
-    if (state.tokens.next.id !== ")") {
-      for (;;) {
-        exprs.push(expression(10));
+    for (;;) {
+      exprs.push(expression(10));
 
-        if (state.tokens.next.id !== ",") {
-          break;
-        }
-
-        if (state.option.nocomma) {
-          warning("W127");
-        }
-
-        parseComma();
+      if (state.tokens.next.id !== ",") {
+        break;
       }
+
+      if (state.option.nocomma) {
+        warning("W127");
+      }
+
+      parseComma();
     }
 
     advance(")", this);
@@ -2531,9 +2535,6 @@ var JSHINT = (function() {
       }
     }
 
-    if (!exprs.length) {
-      return;
-    }
     if (exprs.length > 1) {
       ret = Object.create(state.syntax[","]);
       ret.exprs = exprs;
