@@ -271,6 +271,19 @@ var scopeManager = function(state, predefined, exported, declared) {
         usedLabelNameList.push("__proto__");
       }
 
+      if (state.option.preferconst) {
+        var labelNameList = Object.keys(currentLabels);
+        // check for not modified let-variables
+        for (i = 0; i < labelNameList.length; i++) {
+          var labelName = labelNameList[i];
+
+          if (currentLabels[labelName]["(type)"] === "let" && currentLabels[labelName]["(lone)"] &&
+              (!currentUsages[labelName] || currentUsages[labelName]["(modified)"].length === 0)) {
+            warning("W139", currentLabels[labelName]["(token)"], labelName);
+          }
+        }
+      }
+
       for (i = 0; i < usedLabelNameList.length; i++) {
         var usedLabelName = usedLabelNameList[i];
 
@@ -617,11 +630,13 @@ var scopeManager = function(state, predefined, exported, declared) {
      * @param {Object} opts
      * @param {String} opts.type - the type of the label e.g. "param", "var", "let, "const", "function"
      * @param {Token} opts.token - the token pointing at the declaration
+     * @param {Boolean} opts.lone - true if the variable isn't defined using destructuring
      */
     addlabel: function(labelName, opts) {
 
       var type  = opts.type;
       var token = opts.token;
+      var lone  = opts.lone;
       var isblockscoped = type === "let" || type === "const" || type === "class";
       var isexported    = (isblockscoped ? _current : _currentFunctBody)["(type)"] === "global" &&
                           _.has(exported, labelName);
@@ -664,7 +679,7 @@ var scopeManager = function(state, predefined, exported, declared) {
           }
         }
 
-        scopeManagerInst.block.add(labelName, type, token, !isexported);
+        scopeManagerInst.block.add(labelName, type, token, lone, !isexported);
 
       } else {
 
@@ -691,7 +706,7 @@ var scopeManager = function(state, predefined, exported, declared) {
           }
         }
 
-        scopeManagerInst.funct.add(labelName, type, token, !isexported);
+        scopeManagerInst.funct.add(labelName, type, token, lone, !isexported);
 
         if (_currentFunctBody["(type)"] === "global" && !state.impliedClosure()) {
           usedPredefinedAndGlobals[labelName] = marker;
@@ -756,10 +771,11 @@ var scopeManager = function(state, predefined, exported, declared) {
        * Adds a new function scoped variable
        * see block.add for block scoped
        */
-      add: function(labelName, type, tok, unused) {
+      add: function(labelName, type, tok, lone, unused) {
         _current["(labels)"][labelName] = {
           "(type)" : type,
           "(token)": tok,
+          "(lone)" : lone,
           "(blockscoped)": false,
           "(function)": _currentFunctBody,
           "(unused)": unused };
@@ -827,10 +843,11 @@ var scopeManager = function(state, predefined, exported, declared) {
       /**
        * Adds a new variable
        */
-      add: function(labelName, type, tok, unused) {
+      add: function(labelName, type, tok, lone, unused) {
         _current["(labels)"][labelName] = {
           "(type)" : type,
           "(token)": tok,
+          "(lone)" : lone,
           "(blockscoped)": true,
           "(unused)": unused };
       },
