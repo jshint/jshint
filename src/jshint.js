@@ -4192,6 +4192,7 @@ var JSHINT = (function() {
     var level = 0; // BindingPattern "level" --- level 0 === no BindingPattern
     var comma; // First comma punctuator at level 0
     var initializer; // First initializer at level 0
+    var bindingPower;
 
     // If initial token is a BindingPattern, count it as such.
     if (checkPunctuators(state.tokens.next, ["{", "["])) ++level;
@@ -4210,8 +4211,13 @@ var JSHINT = (function() {
 
     // if we're in a for (… in|of …) statement
     if (_.contains(inof, nextop.value)) {
-      if (!state.inES6() && nextop.value === "of") {
-        warning("W104", nextop, "for of", "6");
+      if (nextop.value === "of") {
+        bindingPower = 20;
+        if (!state.inES6()) {
+          warning("W104", nextop, "for of", "6");
+        }
+      } else {
+        bindingPower = 0;
       }
 
       var ok = !(initializer || comma);
@@ -4238,7 +4244,13 @@ var JSHINT = (function() {
         Object.create(varstatement).fud({ prefix: true, implied: "for", ignore: !ok });
       }
       advance(nextop.value);
-      expression(20);
+      // The binding power is variable because for-in statements accept any
+      // Expression in this position, while for-of statements are limited to
+      // AssignmentExpressions. For example:
+      //
+      //     for ( LeftHandSideExpression in Expression ) Statement
+      //     for ( LeftHandSideExpression of AssignmentExpression ) Statement
+      expression(bindingPower);
       advance(")", t);
 
       if (nextop.value === "in" && state.option.forin) {
