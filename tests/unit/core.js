@@ -2089,3 +2089,219 @@ exports["destructuring in setter parameter"] = function (test) {
 
   test.done();
 };
+
+exports["'super' in derived constructors"] = function (test) {
+  var code = [
+    "class A {}",
+    "class B extends A {",
+    "  constructor() {}",
+    "}",
+    "class C extends null {",
+    "  constructor() {}",
+    "}"
+  ];
+
+  TestRun(test, "must be called")
+    .addError(3, "You must call 'super' in derived constructors.")
+    .addError(6, "You must call 'super' in derived constructors.")
+    .test(code, { esversion: 6 });
+
+  var code2 = [
+    "super();"
+  ];
+
+  TestRun(test, "can't be used in global scope")
+    .addError(1, "'super' can only be called in derived constructors.")
+    .test(code2, { esversion: 6 });
+
+  var code3 = [
+    "function x() {",
+    "  super();",
+    "}",
+    "class A {}",
+    "class B extends A {",
+    "  constructor() {",
+    "    (function() {",
+    "      super();",
+    "    })();",
+    "  }",
+    "}",
+    "function y(param = super()) {}"
+  ];
+
+  TestRun(test, "can't be used in functions")
+    .addError(2, "'super' can only be called in derived constructors.")
+    .addError(6, "You must call 'super' in derived constructors.")
+    .addError(8, "'super' can only be called in derived constructors.")
+    .addError(12, "'super' can only be called in derived constructors.")
+    .test(code3, { esversion: 6 });
+
+  var code4 = [
+    "var x = {",
+    "  constructor() {",
+    "    super();",
+    "  }",
+    "};"
+  ];
+
+  TestRun(test, "can't be used in object methods")
+    .addError(3, "'super' can only be called in derived constructors.")
+    .test(code4, { esversion: 6 });
+
+  var code5 = [
+    "class A {",
+    "  constructor() {",
+    "    super();",
+    "  }",
+    "}"
+  ];
+
+  TestRun(test, "can't be used in classes which don't extend another class")
+    .addError(3, "'super' can only be called in derived constructors.")
+    .test(code5, { esversion: 6 });
+
+  var code6 = [
+    "class A {}",
+    "class B extends A {",
+    "  static constructor() {",
+    "    super();",
+    "  }",
+    "  method() {",
+    "    super();",
+    "  }",
+    "}"
+  ];
+
+  TestRun(test, "can't be used in class methods other than `constructor`")
+    .addError(4, "'super' can only be called in derived constructors.")
+    .addError(7, "'super' can only be called in derived constructors.")
+    .test(code6, { esversion: 6 });
+
+  var code7 = [
+    "class A {}",
+    "class B extends A {",
+    "  constructor() {",
+    "    (() => super())();",
+    "  }",
+    "}",
+    "(() => super())();"
+  ];
+
+  TestRun(test, "can be used in arrow functions in `constructor`")
+    .addError(7, "'super' can only be called in derived constructors.")
+    .test(code7, { esversion: 6 });
+
+  test.done();
+};
+
+exports["this must be used after super()"] = function (test) {
+  var code = [
+    "class A {}",
+    "class B extends A {",
+    "  constructor() {",
+    "    super();",
+    "    this.x = 1;",
+    "  }",
+    "}"
+  ];
+
+  TestRun(test).test(code, { esversion: 6 });
+
+  var code2 = [
+    "class A {}",
+    "class B extends A {",
+    "  constructor() {",
+    "    this.x = 1;",
+    "    (() => this.x = 2)();", // JSHint doesn't know if this function
+                                 // is invoked after or before super
+    "    super();",
+    "  }",
+    "}"
+  ];
+
+  TestRun(test, "'this' can't be before 'super()'")
+    .addError(4, "You must call 'super' before using 'this'.")
+    .test(code2, { esversion: 6 });
+
+  var code3 = [
+    "class A {}",
+    "class B extends A {",
+    "  constructor() {",
+    "    (() => super())();",
+    "    this.x = 1;",
+    "  }",
+    "}"
+  ];
+
+  TestRun(test, "'super' is in an arrow function")
+    .test(code3, { esversion: 6 });
+
+  test.done();
+};
+
+exports["super properties must be accessed after super()"] = function (test) {
+  var code = [
+    "class A {}",
+    "class B extends A {",
+    "  constructor() {",
+    "    super();",
+    "    super.x = 1;",
+    "    super[0] = 1;",
+    "  }",
+    "}"
+  ];
+
+  TestRun(test).test(code, { esversion: 6 });
+
+  var code2 = [
+    "class A {}",
+    "class B extends A {",
+    "  constructor() {",
+    "    super.x = 1;",
+    "    super[0] = 1;",
+    "    (() => super.x = 2)();",  // JSHint doesn't know if these functions
+    "    (() => super[0] = 2)();", // are invoked after or before super()
+
+    "    super();",
+    "  }",
+    "}"
+  ];
+
+  TestRun(test, "'super.*' and 'super[*]' can't be before 'super()'")
+    .addError(4, "You must call 'super' before using 'super.*'.")
+    .addError(5, "You must call 'super' before using 'super.*'.")
+    .test(code2, { esversion: 6 });
+
+  var code3 = [
+    "class A {}",
+    "class B extends A {",
+    "  constructor() {",
+    "    (() => super())();",
+    "    super.x = 1;",
+    "    super[0] = 1;",
+    "  }",
+    "}"
+  ];
+
+  TestRun(test, "'super()' is in an arrow function")
+    .test(code3, { esversion: 6 });
+
+  test.done();
+};
+
+exports["super in es5"] = function (test) {
+  var code = [
+    "function a() {",
+    "  super();",
+    "}",
+    "var super;"
+  ];
+
+  TestRun(test)
+    .addError(2, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(4, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .test(code);
+
+  test.done();
+};
+

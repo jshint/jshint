@@ -5826,7 +5826,9 @@ exports.classes = function (test) {
 
   var run = TestRun(test)
     .addError(cdecl + 4, "Expected an identifier and instead saw 'package' (a reserved word).")
+    .addError(cdecl + 7, "You must call 'super' in derived constructors.")
     .addError(cexpr + 4, "Expected an identifier and instead saw 'package' (a reserved word).")
+    .addError(cexpr + 7, "You must call 'super' in derived constructors.")
     .addError(cdeclAssn + 4, "Reassignment of 'Foo15', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
     .addError(cdeclAssn + 7, "Reassignment of 'Foo18', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
     .addError(cdeclAssn + 7, "Reassignment of 'Foo17', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
@@ -7443,6 +7445,45 @@ exports.parsingCommas = function (test) {
     .addError(6, "Expected an assignment or function call and instead saw an expression.")
     .addError(6, "Missing semicolon.")
     .test(src);
+
+  test.done();
+};
+
+exports.invalidSuper = function (test) {
+
+  var code = [
+    "function super(super = super) {",
+    "  return super;",
+    "}",
+    "let fn = super => (super) => {};",
+    "fn(super);",
+    "super: while(super) {}",
+    "{ let [ super = super ] = [ super ]; }",
+    "{ let { super = super } = { super }; }",
+    "{ let super = 1;",
+    "  super = 3; }"
+  ];
+
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(1, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(1, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(2, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(4, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(4, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(5, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(5, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(6, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(7, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(8, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(8, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(8, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(9, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(9, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(9, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(10, "Expected an identifier and instead saw 'super' (a reserved word).")
+    .addError(10, "Bad assignment.")
+    .test(code, { esversion: 6 });
 
   test.done();
 };
