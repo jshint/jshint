@@ -219,7 +219,8 @@ var warnings = {
   W135: "{a} may not be supported by non-browser environments.",
   W136: "'{a}' must be in function scope.",
   W137: "Empty destructuring.",
-  W138: "Regular parameters should not come after default parameters."
+  W138: "Regular parameters should not come after default parameters.",
+  W139: "Assigning a value to 'undefined'."
 };
 
 var info = {

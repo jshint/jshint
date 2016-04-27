@@ -1209,7 +1209,7 @@ var JSHINT = (function() {
          (node.type === "null" && !state.option.eqnull) ||
         node.type === "true" ||
         node.type === "false" ||
-        node.type === "undefined");
+        (node.value === "undefined" && node.identifier));
   }
 
   var typeofValues = {};
@@ -1471,10 +1471,6 @@ var JSHINT = (function() {
       if (state.inES5()) {
         return val;
       }
-    }
-
-    if (fnparam && val === "undefined") {
-      return val;
     }
 
     warning("W024", state.tokens.curr, state.tokens.curr.id);
@@ -2011,7 +2007,6 @@ var JSHINT = (function() {
     }
   });
   reservevar("true");
-  reservevar("undefined");
 
   assignop("=", "assign", 20);
   assignop("+=", "assignadd", 20);
@@ -2839,6 +2834,9 @@ var JSHINT = (function() {
       } else {
         if (checkPunctuator(state.tokens.next, "...")) pastRest = true;
         ident = identifier(true);
+        if (pastRest) {
+          checkUndefined();
+        }
         if (ident) {
           paramsIds.push(ident);
           currentParams.push([ident, state.tokens.curr]);
@@ -2860,6 +2858,7 @@ var JSHINT = (function() {
         if (!state.inES6()) {
           warning("W119", state.tokens.next, "default parameters", "6");
         }
+        checkUndefined();
         advance("=");
         pastDefault = true;
         expression(10);
@@ -3330,6 +3329,12 @@ var JSHINT = (function() {
     return destructuringPatternRecursive(options);
   }
 
+  function checkUndefined() {
+    if (state.tokens.curr.value === "undefined") {
+      warning("W139", state.tokens.curr);
+    }
+  }
+
   function destructuringPatternRecursive(options) {
     var ids;
     var identifiers = [];
@@ -3370,6 +3375,9 @@ var JSHINT = (function() {
         }
         if (ident) {
           identifiers.push({ id: ident, token: state.tokens.curr });
+        }
+        if (is_rest) {
+          checkUndefined();
         }
         return is_rest;
       }
@@ -3419,6 +3427,7 @@ var JSHINT = (function() {
           warning("W130", state.tokens.next);
           element_after_rest = true;
         }
+        checkUndefined();
         if (checkPunctuator(state.tokens.next, "=")) {
           if (checkPunctuator(state.tokens.prev, "...")) {
             advance("]");
@@ -3427,7 +3436,7 @@ var JSHINT = (function() {
           }
           id = state.tokens.prev;
           value = expression(10);
-          if (value && value.type === "undefined") {
+          if (value && value.value === "undefined") {
             warning("W080", id, id.value);
           }
         }
@@ -3446,11 +3455,12 @@ var JSHINT = (function() {
       }
       while (!checkPunctuator(state.tokens.next, "}")) {
         assignmentProperty();
+        checkUndefined();
         if (checkPunctuator(state.tokens.next, "=")) {
           advance("=");
           id = state.tokens.prev;
           value = expression(10);
-          if (value && value.type === "undefined") {
+          if (value && value.value === "undefined") {
             warning("W080", id, id.value);
           }
         }
@@ -3546,6 +3556,7 @@ var JSHINT = (function() {
       }
 
       if (state.tokens.next.id === "=") {
+        checkUndefined();
         advance("=");
         if (!prefix && peek(0).id === "=" && state.tokens.next.identifier) {
           warning("W120", state.tokens.next, state.tokens.next.value);
@@ -3553,7 +3564,7 @@ var JSHINT = (function() {
         var id = state.tokens.prev;
         // don't accept `in` in expression if prefix is used for ForIn/Of loop.
         value = expression(prefix ? 120 : 10);
-        if (!prefix && value && value.type === "undefined") {
+        if (!prefix && value && value.value === "undefined") {
           warning("W080", id, id.value);
         }
         if (lone) {
@@ -3652,6 +3663,7 @@ var JSHINT = (function() {
 
       if (state.tokens.next.id === "=") {
         state.nameStack.set(state.tokens.curr);
+        checkUndefined();
 
         advance("=");
         if (peek(0).id === "=" && state.tokens.next.identifier) {
@@ -3664,7 +3676,8 @@ var JSHINT = (function() {
         var id = state.tokens.prev;
         // don't accept `in` in expression if prefix is used for ForIn/Of loop.
         value = expression(prefix ? 120 : 10);
-        if (value && !prefix && report && !state.funct["(loopage)"] && value.type === "undefined") {
+        if (value && !prefix && report && !state.funct["(loopage)"] &&
+            value.value === "undefined") {
           warning("W080", id, id.value);
         }
         if (lone) {
