@@ -678,8 +678,8 @@ exports.group = {
     var result = null;
 
     cli.run({
-      args: [dir + "../tests/unit/fixtures/ignored.js"],
-      cwd: dir + "../tests/unit/fixtures/",
+      args: [ dir +"../tests/unit/fixtures/ignoredApi"],
+      cwd: dir + "../tests/unit/fixtures/ignoredApi",
       reporter: function (results) { result = results; }
     });
 

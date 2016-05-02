@@ -66,7 +66,8 @@
     "phantomjs":                      "1.9.13",
     "regenerate":                     "1.2.x",
     "sinon":                          "1.12.x",
-    "unicode-6.3.0":                  "0.1.x"
+    "unicode-6.3.0":                  "0.1.x",
+    "recursive-readdir":              "2.1.x"
   },
 
   "license": "(MIT AND JSON)",

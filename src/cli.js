@@ -571,10 +571,11 @@ var exports = {
       (!opts.extensions ? "" : "|" +
         opts.extensions.replace(/,/g, "|").replace(/[\. ]/g, "")) + ")$");
 
-    var ignores = !opts.ignores ? loadIgnores({ cwd: opts.cwd }) :
-                                  opts.ignores.map(function(target) {
-                                    return path.resolve(target);
-                                  });
+    var ignores = opts.ignores || loadIgnores({ cwd: opts.cwd });
+
+    ignores = ignores.map(function(target) {
+      return path.resolve(target);
+    });
 
     opts.args.forEach(function(target) {
       collect(target, files, ignores, reg);

@@ -5,6 +5,7 @@ var Stream = require("stream");
 var path = require("path");
 var url = require("url");
 
+var recursive_readdir = require("recursive-readdir");
 var browserify = require("browserify");
 var buildJSHint = require(__dirname + "/../../../scripts/build");
 
@@ -22,9 +23,10 @@ var streams = {
     var fixtureStream = new Stream.Readable();
     fixtureStream._read = fixtureStream.write = function() {};
 
-    fs.readdir(fixtureDir, function(err, files) {
+    recursive_readdir(fixtureDir, function(err, files) {
       var src = "";
       var fsCache = {};
+      var absoluteHeadLength = path.resolve(fixtureDir, "../../..").length;
 
       if (err) {
         done(err);
@@ -32,10 +34,10 @@ var streams = {
       }
 
       files.forEach(function(fileName) {
-        var relativeName = "/tests/unit/fixtures/" + fileName;
+        var relativeName = fileName.substr(absoluteHeadLength).replace(/\\/g, "/");
 
         fsCache[relativeName] = fs.readFileSync(
-          fixtureDir + "/" + fileName, { encoding: "utf-8" }
+          fileName, { encoding: "utf-8" }
         );
       });
 
