@@ -7446,3 +7446,65 @@ exports.parsingCommas = function (test) {
 
   test.done();
 };
+
+exports.instanceOfLiterals = function (test) {
+  var code = [
+    "var x;",
+    "var y = [x];",
+
+    // okay
+    "function Y() {}",
+    "function template() { return Y; }",
+    "var a = x instanceof Y;",
+    "a = new X() instanceof function() { return X; }();",
+    "a = x instanceof template``;",
+    "a = x instanceof /./.constructor;",
+    "a = x instanceof \"\".constructor;",
+    "a = x instanceof [y][0];",
+    "a = x instanceof {}[constructor];",
+    "function Z() {",
+    "  let undefined = function() {};",
+    "  a = x instanceof undefined;",
+    "}",
+
+    // error: literals and unary operators cannot be used
+    "a = x instanceof +x;",
+    "a = x instanceof -x;",
+    "a = x instanceof 0;",
+    "a = x instanceof '';",
+    "a = x instanceof null;",
+    "a = x instanceof undefined;",
+    "a = x instanceof {};",
+    "a = x instanceof [];",
+    "a = x instanceof /./;",
+    "a = x instanceof ``;",
+    "a = x instanceof `${x}`;",
+
+    // warning: functions declarations should not be used
+    "a = x instanceof function() {};",
+    "a = x instanceof function MyUnusableFunction() {};",
+  ];
+
+  var errorMessage = "Non-callable values cannot be used as the second operand to instanceof.";
+  var warningMessage = "Function expressions should not be used as the second operand to instanceof.";
+
+  var run = TestRun(test)
+    .addError(13, "Expected an identifier and instead saw 'undefined' (a reserved word).")
+    .addError(16, errorMessage)
+    .addError(17, errorMessage)
+    .addError(18, errorMessage)
+    .addError(19, errorMessage)
+    .addError(20, errorMessage)
+    .addError(21, errorMessage)
+    .addError(22, errorMessage)
+    .addError(23, errorMessage)
+    .addError(24, errorMessage)
+    .addError(25, errorMessage)
+    .addError(26, errorMessage)
+    .addError(27, warningMessage)
+    .addError(28, warningMessage);
+
+  run.test(code, { esversion: 6 });
+
+  test.done();
+};
