@@ -74,7 +74,8 @@ var errors = {
   E056: "'{a}' was used before it was declared, which is illegal for '{b}' variables.",
   E057: "Invalid meta property: '{a}.{b}'.",
   E058: "Missing semicolon.",
-  E059: "Incompatible values for the '{a}' and '{b}' linting options."
+  E059: "Incompatible values for the '{a}' and '{b}' linting options.",
+  E060: "Non-callable values cannot be used as the second operand to instanceof."
 };
 
 var warnings = {
@@ -219,7 +220,8 @@ var warnings = {
   W135: "{a} may not be supported by non-browser environments.",
   W136: "'{a}' must be in function scope.",
   W137: "Empty destructuring.",
-  W138: "Regular parameters should not come after default parameters."
+  W138: "Regular parameters should not come after default parameters.",
+  W139: "Function expressions should not be used as the second operand to instanceof."
 };
 
 var info = {
