@@ -4446,6 +4446,10 @@ var JSHINT = (function() {
     x.lbp = 25;
     x.ltBoundary = "after";
   }(prefix("yield", function() {
+    if (state.inMoz()) {
+      return mozYield.call(this);
+    }
+
     var prev = state.tokens.prev;
     if (state.inES6(true) && !state.funct["(generator)"]) {
       // If it's a yield within a catch clause inside a generator then that's ok
@@ -4487,6 +4491,51 @@ var JSHINT = (function() {
     return this;
   })));
 
+  /**
+   * Parsing logic for non-standard Mozilla implementation of `yield`
+   * expressions.
+   */
+  var mozYield = function() {
+    var prev = state.tokens.prev;
+    if (state.inES6(true) && !state.funct["(generator)"]) {
+      // If it's a yield within a catch clause inside a generator then that's ok
+      if (!("(catch)" === state.funct["(name)"] && state.funct["(context)"]["(generator)"])) {
+        error("E046", state.tokens.curr, "yield");
+      }
+    } else if (!state.inES6()) {
+      warning("W104", state.tokens.curr, "yield", "6");
+    }
+    state.funct["(generator)"] = "yielded";
+    var delegatingYield = false;
+
+    if (state.tokens.next.value === "*") {
+      delegatingYield = true;
+      advance("*");
+    }
+
+    if (this.line === startLine(state.tokens.next) || !state.inMoz()) {
+      if (delegatingYield ||
+          (state.tokens.next.id !== ";" && !state.option.asi &&
+           !state.tokens.next.reach && state.tokens.next.nud)) {
+
+        nobreaknonadjacent(state.tokens.curr, state.tokens.next);
+        this.first = expression(10);
+
+        if (this.first.type === "(punctuator)" && this.first.value === "=" &&
+            !this.first.paren && !state.option.boss) {
+          warningAt("W093", this.first.line, this.first.character);
+        }
+      }
+
+      if (state.inMoz() && state.tokens.next.id !== ")" &&
+          (prev.lbp > 30 || (!prev.assign && !isEndOfExpr()) || prev.id === "yield")) {
+        error("E050", this);
+      }
+    } else if (!state.option.asi) {
+      nolinebreak(this); // always warn (Line breaking error)
+    }
+    return this;
+  };
 
   stmt("throw", function() {
     nolinebreak(this);
