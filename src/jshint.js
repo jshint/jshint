@@ -4467,27 +4467,19 @@ var JSHINT = (function() {
       advance("*");
     }
 
-    if (this.line === startLine(state.tokens.next) || !state.inMoz()) {
-      if (delegatingYield ||
-          (state.tokens.next.id !== ";" && !state.option.asi &&
-           !state.tokens.next.reach && state.tokens.next.nud)) {
+    if (delegatingYield ||
+        (state.tokens.next.id !== ";" && !state.option.asi &&
+         !state.tokens.next.reach && state.tokens.next.nud)) {
 
-        nobreaknonadjacent(state.tokens.curr, state.tokens.next);
-        this.first = expression(10);
+      nobreaknonadjacent(state.tokens.curr, state.tokens.next);
+      this.first = expression(10);
 
-        if (this.first.type === "(punctuator)" && this.first.value === "=" &&
-            !this.first.paren && !state.option.boss) {
-          warningAt("W093", this.first.line, this.first.character);
-        }
+      if (this.first.type === "(punctuator)" && this.first.value === "=" &&
+          !this.first.paren && !state.option.boss) {
+        warningAt("W093", this.first.line, this.first.character);
       }
-
-      if (state.inMoz() && state.tokens.next.id !== ")" &&
-          (prev.lbp > 30 || (!prev.assign && !isEndOfExpr()) || prev.id === "yield")) {
-        error("E050", this);
-      }
-    } else if (!state.option.asi) {
-      nolinebreak(this); // always warn (Line breaking error)
     }
+
     return this;
   })));
 
@@ -4513,7 +4505,7 @@ var JSHINT = (function() {
       advance("*");
     }
 
-    if (this.line === startLine(state.tokens.next) || !state.inMoz()) {
+    if (this.line === startLine(state.tokens.next)) {
       if (delegatingYield ||
           (state.tokens.next.id !== ";" && !state.option.asi &&
            !state.tokens.next.reach && state.tokens.next.nud)) {
@@ -4527,7 +4519,7 @@ var JSHINT = (function() {
         }
       }
 
-      if (state.inMoz() && state.tokens.next.id !== ")" &&
+      if (state.tokens.next.id !== ")" &&
           (prev.lbp > 30 || (!prev.assign && !isEndOfExpr()) || prev.id === "yield")) {
         error("E050", this);
       }
