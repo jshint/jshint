@@ -821,10 +821,6 @@ var JSHINT = (function() {
     return false;
   }
 
-  function isBeginOfExpr(prev) {
-    return !prev.left && prev.arity !== "unary";
-  }
-
   // This is the heart of JSHINT, the Pratt parser. In addition to parsing, it
   // is looking for ad hoc lint patterns. We add .fud to Pratt's model, which is
   // like .nud except that it is only used on the first token of a statement.
@@ -881,7 +877,7 @@ var JSHINT = (function() {
       left = state.tokens.curr.fud();
     } else {
       if (state.tokens.curr.nud) {
-        left = state.tokens.curr.nud();
+        left = state.tokens.curr.nud(rbp);
       } else {
         error("E030", state.tokens.curr, state.tokens.curr.id);
       }
@@ -2474,7 +2470,7 @@ var JSHINT = (function() {
     return that;
   }, 155, true).exps = true;
 
-  prefix("(", function() {
+  prefix("(", function(rbp) {
     var pn = state.tokens.next, pn1, i = -1;
     var ret, triggerFnExpr, first, last;
     var parens = 1;
@@ -2540,10 +2536,6 @@ var JSHINT = (function() {
 
       first = exprs[0];
       last = exprs[exprs.length - 1];
-
-      if (!isNecessary) {
-        isNecessary = preceeding.assign || preceeding.delim;
-      }
     } else {
       ret = first = last = exprs[0];
 
@@ -2580,7 +2572,8 @@ var JSHINT = (function() {
       // first expression *or* the current group contains multiple expressions)
       if (!isNecessary && (first.left || first.right || ret.exprs)) {
         isNecessary =
-          (!isBeginOfExpr(preceeding) && first.lbp <= preceeding.lbp) ||
+          (rbp > first.lbp) ||
+          (rbp > 0 && rbp === first.lbp) ||
           (!isEndOfExpr() && last.lbp < state.tokens.next.lbp);
       }
 
@@ -3684,11 +3677,11 @@ var JSHINT = (function() {
   });
   varstatement.exps = true;
 
-  blockstmt("class", function() {
-    return classdef.call(this, true);
+  blockstmt("class", function(rbp) {
+    return classdef.call(this, rbp, true);
   });
 
-  function classdef(isStatement) {
+  function classdef(rbp, isStatement) {
 
     /*jshint validthis:true */
     if (!state.inES6()) {

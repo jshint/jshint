@@ -2710,6 +2710,7 @@ singleGroups.bindingPower.singleExpr = function (test) {
     "var v = a % (b / c);",
     "var w = a * (b * c);",
     "var x = z === (b === c);",
+    "x = typeof (a + b);",
     // Invalid forms:
     "var j = 2 * ((3 - 4) - 5) * 6;",
     "var l = 2 * ((3 - 4 - 5)) * 6;",
@@ -2731,7 +2732,6 @@ singleGroups.bindingPower.singleExpr = function (test) {
   ];
 
   TestRun(test)
-    .addError(18, "Unnecessary grouping operator.")
     .addError(19, "Unnecessary grouping operator.")
     .addError(20, "Unnecessary grouping operator.")
     .addError(21, "Unnecessary grouping operator.")
@@ -2748,6 +2748,7 @@ singleGroups.bindingPower.singleExpr = function (test) {
     .addError(32, "Unnecessary grouping operator.")
     .addError(33, "Unnecessary grouping operator.")
     .addError(34, "Unnecessary grouping operator.")
+    .addError(35, "Unnecessary grouping operator.")
     .test(code, { singleGroups: true });
 
   code = [
@@ -2810,7 +2811,6 @@ singleGroups.multiExpr = function (test) {
   ];
 
   TestRun(test)
-    .addError(5, "Unnecessary grouping operator.")
     .test(code, { singleGroups: true });
 
   test.done();
