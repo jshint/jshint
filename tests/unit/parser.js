@@ -7485,8 +7485,8 @@ exports.instanceOfLiterals = function (test) {
     "a = x instanceof function MyUnusableFunction() {};",
   ];
 
-  var errorMessage = "Literals and unary operators cannot be used after the `instanceof` operator.";
-  var warningMessage = "Function declarations should not be used after the `instanceof` operator.";
+  var errorMessage = "Non-callable values cannot be used as the second operand to instanceof.";
+  var warningMessage = "Function expressions should not be used as the second operand to instanceof.";
 
   var run = TestRun(test)
     .addError(13, "Expected an identifier and instead saw 'undefined' (a reserved word).")

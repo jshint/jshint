@@ -2141,14 +2141,13 @@ var JSHINT = (function() {
   infix("instanceof", function(left, token) {
     var right;
     var scope = state.funct["(scope)"];
-    var redefinedUndefined = scope.has("undefined");
     token.left = left;
     token.right = right = expression(120);
 
     if (right.id === "(number)" ||
         right.id === "(string)" ||
         right.value === "null" ||
-        (right.value === "undefined" && !redefinedUndefined) ||
+        (right.value === "undefined" && !scope.has("undefined")) ||
         right.arity === "unary" ||
         right.id === "{" ||
         (right.id === "[" && !right.right) ||

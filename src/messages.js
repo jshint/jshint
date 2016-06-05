@@ -75,7 +75,7 @@ var errors = {
   E057: "Invalid meta property: '{a}.{b}'.",
   E058: "Missing semicolon.",
   E059: "Incompatible values for the '{a}' and '{b}' linting options.",
-  E060: "Literals and unary operators cannot be used after the `instanceof` operator."
+  E060: "Non-callable values cannot be used as the second operand to instanceof."
 };
 
 var warnings = {
@@ -221,7 +221,7 @@ var warnings = {
   W136: "'{a}' must be in function scope.",
   W137: "Empty destructuring.",
   W138: "Regular parameters should not come after default parameters.",
-  W139: "Function declarations should not be used after the `instanceof` operator."
+  W139: "Function expressions should not be used as the second operand to instanceof."
 };
 
 var info = {
