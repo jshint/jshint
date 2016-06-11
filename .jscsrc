@@ -24,6 +24,7 @@
       "try",
       "catch"
     ],
+	"requireCurlyBraces": false,
     "requireSpaceBeforeBinaryOperators": true,
     "requireSpaceAfterBinaryOperators": true,
     "requireSpacesInConditionalExpression": true,

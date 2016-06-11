@@ -703,31 +703,31 @@ var exports = {
     }
 
     switch (true) {
-    // JSLint reporter
-    case options.reporter === "jslint":
-    case options["jslint-reporter"]:
-      options.reporter = "./reporters/jslint_xml.js";
-      break;
+      // JSLint reporter
+      case options.reporter === "jslint":
+      case options["jslint-reporter"]:
+        options.reporter = "./reporters/jslint_xml.js";
+        break;
 
-    // CheckStyle (XML) reporter
-    case options.reporter === "checkstyle":
-    case options["checkstyle-reporter"]:
-      options.reporter = "./reporters/checkstyle.js";
-      break;
+      // CheckStyle (XML) reporter
+      case options.reporter === "checkstyle":
+      case options["checkstyle-reporter"]:
+        options.reporter = "./reporters/checkstyle.js";
+        break;
 
-    // Unix reporter
-    case options.reporter === "unix":
-      options.reporter = "./reporters/unix.js";
-      break;
+      // Unix reporter
+      case options.reporter === "unix":
+        options.reporter = "./reporters/unix.js";
+        break;
 
-    // Reporter that displays additional JSHint data
-    case options["show-non-errors"]:
-      options.reporter = "./reporters/non_error.js";
-      break;
+      // Reporter that displays additional JSHint data
+      case options["show-non-errors"]:
+        options.reporter = "./reporters/non_error.js";
+        break;
 
-    // Custom reporter
-    case options.reporter !== undefined:
-      options.reporter = path.resolve(process.cwd(), options.reporter);
+      // Custom reporter
+      case options.reporter !== undefined:
+        options.reporter = path.resolve(process.cwd(), options.reporter);
     }
 
     var reporter;

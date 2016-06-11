@@ -225,60 +225,60 @@ Lexer.prototype = {
     var ch2, ch3, ch4;
 
     switch (ch1) {
-    // Most common single-character punctuators
-    case ".":
-      if ((/^[0-9]$/).test(this.peek(1))) {
-        return null;
-      }
-      if (this.peek(1) === "." && this.peek(2) === ".") {
+      // Most common single-character punctuators
+      case ".":
+        if ((/^[0-9]$/).test(this.peek(1))) {
+          return null;
+        }
+        if (this.peek(1) === "." && this.peek(2) === ".") {
+          return {
+            type: Token.Punctuator,
+            value: "..."
+          };
+        }
+      /* falls through */
+      case "(":
+      case ")":
+      case ";":
+      case ",":
+      case "[":
+      case "]":
+      case ":":
+      case "~":
+      case "?":
         return {
           type: Token.Punctuator,
-          value: "..."
+          value: ch1
         };
-      }
-      /* falls through */
-    case "(":
-    case ")":
-    case ";":
-    case ",":
-    case "[":
-    case "]":
-    case ":":
-    case "~":
-    case "?":
-      return {
-        type: Token.Punctuator,
-        value: ch1
-      };
 
-    // A block/object opener
-    case "{":
-      this.pushContext(Context.Block);
-      return {
-        type: Token.Punctuator,
-        value: ch1
-      };
+      // A block/object opener
+      case "{":
+        this.pushContext(Context.Block);
+        return {
+          type: Token.Punctuator,
+          value: ch1
+        };
 
-    // A block/object closer
-    case "}":
-      if (this.inContext(Context.Block)) {
-        this.popContext();
-      }
-      return {
-        type: Token.Punctuator,
-        value: ch1
-      };
+      // A block/object closer
+      case "}":
+        if (this.inContext(Context.Block)) {
+          this.popContext();
+        }
+        return {
+          type: Token.Punctuator,
+          value: ch1
+        };
 
-    // A pound sign (for Node shebangs)
-    case "#":
-      return {
-        type: Token.Punctuator,
-        value: ch1
-      };
+      // A pound sign (for Node shebangs)
+      case "#":
+        return {
+          type: Token.Punctuator,
+          value: ch1
+        };
 
-    // We're at the end of input
-    case "":
-      return null;
+      // We're at the end of input
+      case "":
+        return null;
     }
 
     // Peek more characters
@@ -436,34 +436,34 @@ Lexer.prototype = {
         }
 
         switch (str) {
-        case "member":
-          commentType = "members";
-          break;
-        case "global":
-          commentType = "globals";
-          break;
-        default:
-          var options = body.split(":").map(function(v) {
-            return v.replace(/^\s+/, "").replace(/\s+$/, "");
-          });
+          case "member":
+            commentType = "members";
+            break;
+          case "global":
+            commentType = "globals";
+            break;
+          default:
+            var options = body.split(":").map(function(v) {
+              return v.replace(/^\s+/, "").replace(/\s+$/, "");
+            });
 
-          if (options.length === 2) {
-            switch (options[0]) {
-            case "ignore":
-              switch (options[1]) {
-              case "start":
-                self.ignoringLinterErrors = true;
-                isSpecial = false;
-                break;
-              case "end":
-                self.ignoringLinterErrors = false;
-                isSpecial = false;
-                break;
+            if (options.length === 2) {
+              switch (options[0]) {
+                case "ignore":
+                  switch (options[1]) {
+                    case "start":
+                      self.ignoringLinterErrors = true;
+                      isSpecial = false;
+                      break;
+                    case "end":
+                      self.ignoringLinterErrors = false;
+                      isSpecial = false;
+                      break;
+                  }
               }
             }
-          }
 
-          commentType = str;
+            commentType = str;
         }
       });
 
@@ -692,15 +692,15 @@ Lexer.prototype = {
     }
 
     switch (id) {
-    case "true":
-    case "false":
-      type = Token.BooleanLiteral;
-      break;
-    case "null":
-      type = Token.NullLiteral;
-      break;
-    default:
-      type = Token.Identifier;
+      case "true":
+      case "false":
+        type = Token.BooleanLiteral;
+        break;
+      case "null":
+        type = Token.NullLiteral;
+        break;
+      default:
+        type = Token.Identifier;
     }
 
     return {
@@ -938,91 +938,91 @@ Lexer.prototype = {
     var char = this.peek();
 
     switch (char) {
-    case "'":
-      this.triggerAsync("warning", {
-        code: "W114",
-        line: this.line,
-        character: this.char,
-        data: [ "\\'" ]
-      }, checks, function() {return state.jsonMode; });
-      break;
-    case "b":
-      char = "\\b";
-      break;
-    case "f":
-      char = "\\f";
-      break;
-    case "n":
-      char = "\\n";
-      break;
-    case "r":
-      char = "\\r";
-      break;
-    case "t":
-      char = "\\t";
-      break;
-    case "0":
-      char = "\\0";
-
-      // Octal literals fail in strict mode.
-      // Check if the number is between 00 and 07.
-      var n = parseInt(this.peek(1), 10);
-      this.triggerAsync("warning", {
-        code: "W115",
-        line: this.line,
-        character: this.char
-      }, checks,
-      function() { return n >= 0 && n <= 7 && state.isStrict(); });
-      break;
-    case "u":
-      var hexCode = this.input.substr(1, 4);
-      var code = parseInt(hexCode, 16);
-      if (isNaN(code)) {
-        this.trigger("warning", {
-          code: "W052",
+      case "'":
+        this.triggerAsync("warning", {
+          code: "W114",
           line: this.line,
           character: this.char,
-          data: [ "u" + hexCode ]
-        });
-      }
-      char = String.fromCharCode(code);
-      jump = 5;
-      break;
-    case "v":
-      this.triggerAsync("warning", {
-        code: "W114",
-        line: this.line,
-        character: this.char,
-        data: [ "\\v" ]
-      }, checks, function() { return state.jsonMode; });
+          data: [ "\\'" ]
+        }, checks, function() {return state.jsonMode; });
+        break;
+      case "b":
+        char = "\\b";
+        break;
+      case "f":
+        char = "\\f";
+        break;
+      case "n":
+        char = "\\n";
+        break;
+      case "r":
+        char = "\\r";
+        break;
+      case "t":
+        char = "\\t";
+        break;
+      case "0":
+        char = "\\0";
 
-      char = "\v";
-      break;
-    case "x":
-      var  x = parseInt(this.input.substr(1, 2), 16);
+        // Octal literals fail in strict mode.
+        // Check if the number is between 00 and 07.
+        var n = parseInt(this.peek(1), 10);
+        this.triggerAsync("warning", {
+          code: "W115",
+          line: this.line,
+          character: this.char
+        }, checks,
+        function() { return n >= 0 && n <= 7 && state.isStrict(); });
+        break;
+      case "u":
+        var hexCode = this.input.substr(1, 4);
+        var code = parseInt(hexCode, 16);
+        if (isNaN(code)) {
+          this.trigger("warning", {
+            code: "W052",
+            line: this.line,
+            character: this.char,
+            data: [ "u" + hexCode ]
+          });
+        }
+        char = String.fromCharCode(code);
+        jump = 5;
+        break;
+      case "v":
+        this.triggerAsync("warning", {
+          code: "W114",
+          line: this.line,
+          character: this.char,
+          data: [ "\\v" ]
+        }, checks, function() { return state.jsonMode; });
 
-      this.triggerAsync("warning", {
-        code: "W114",
-        line: this.line,
-        character: this.char,
-        data: [ "\\x-" ]
-      }, checks, function() { return state.jsonMode; });
+        char = "\v";
+        break;
+      case "x":
+        var  x = parseInt(this.input.substr(1, 2), 16);
 
-      char = String.fromCharCode(x);
-      jump = 3;
-      break;
-    case "\\":
-      char = "\\\\";
-      break;
-    case "\"":
-      char = "\\\"";
-      break;
-    case "/":
-      break;
-    case "":
-      allowNewLine = true;
-      char = "";
-      break;
+        this.triggerAsync("warning", {
+          code: "W114",
+          line: this.line,
+          character: this.char,
+          data: [ "\\x-" ]
+        }, checks, function() { return state.jsonMode; });
+
+        char = String.fromCharCode(x);
+        jump = 3;
+        break;
+      case "\\":
+        char = "\\\\";
+        break;
+      case "\"":
+        char = "\\\"";
+        break;
+      case "/":
+        break;
+      case "":
+        allowNewLine = true;
+        char = "";
+        break;
     }
 
     return { char: char, jump: jump, allowNewLine: allowNewLine };
@@ -1220,8 +1220,8 @@ Lexer.prototype = {
 
         allowNewLine = false;
         var char = this.peek();
-        var jump = 1; // A length of a jump, after we're done
-                      // parsing this character.
+        // A length of a jump, after we're done parsing this character.
+        var jump = 1;
 
         if (char < " ") {
           // Warn about a control character in a string.
@@ -1610,17 +1610,17 @@ Lexer.prototype = {
 
       if (type === "(punctuator)") {
         switch (value) {
-        case ".":
-        case ")":
-        case "~":
-        case "#":
-        case "]":
-        case "++":
-        case "--":
-          this.prereg = false;
-          break;
-        default:
-          this.prereg = true;
+          case ".":
+          case ")":
+          case "~":
+          case "#":
+          case "]":
+          case "++":
+          case "--":
+            this.prereg = false;
+            break;
+          default:
+            this.prereg = true;
         }
 
         obj = Object.create(state.syntax[value] || state.syntax["(error)"]);
@@ -1715,141 +1715,143 @@ Lexer.prototype = {
       }
 
       switch (token.type) {
-      case Token.StringLiteral:
-        this.triggerAsync("String", {
-          line: this.line,
-          char: this.char,
-          from: this.from,
-          startLine: token.startLine,
-          startChar: token.startChar,
-          value: token.value,
-          quote: token.quote
-        }, checks, function() { return true; });
-
-        return create("(string)", token.value, null, token);
-
-      case Token.TemplateHead:
-        this.trigger("TemplateHead", {
-          line: this.line,
-          char: this.char,
-          from: this.from,
-          startLine: token.startLine,
-          startChar: token.startChar,
-          value: token.value
-        });
-        return create("(template)", token.value, null, token);
-
-      case Token.TemplateMiddle:
-        this.trigger("TemplateMiddle", {
-          line: this.line,
-          char: this.char,
-          from: this.from,
-          startLine: token.startLine,
-          startChar: token.startChar,
-          value: token.value
-        });
-        return create("(template middle)", token.value, null, token);
-
-      case Token.TemplateTail:
-        this.trigger("TemplateTail", {
-          line: this.line,
-          char: this.char,
-          from: this.from,
-          startLine: token.startLine,
-          startChar: token.startChar,
-          value: token.value
-        });
-        return create("(template tail)", token.value, null, token);
-
-      case Token.NoSubstTemplate:
-        this.trigger("NoSubstTemplate", {
-          line: this.line,
-          char: this.char,
-          from: this.from,
-          startLine: token.startLine,
-          startChar: token.startChar,
-          value: token.value
-        });
-        return create("(no subst template)", token.value, null, token);
-
-      case Token.Identifier:
-        this.triggerAsync("Identifier", {
-          line: this.line,
-          char: this.char,
-          from: this.from,
-          name: token.value,
-          raw_name: token.text,
-          isProperty: state.tokens.curr.id === "."
-        }, checks, function() { return true; });
-
-        /* falls through */
-      case Token.Keyword:
-      case Token.NullLiteral:
-      case Token.BooleanLiteral:
-        return create("(identifier)", token.value, state.tokens.curr.id === ".", token);
-
-      case Token.NumericLiteral:
-        if (token.isMalformed) {
-          this.trigger("warning", {
-            code: "W045",
+        case Token.StringLiteral:
+          this.triggerAsync("String", {
             line: this.line,
-            character: this.char,
-            data: [ token.value ]
-          });
-        }
-
-        this.triggerAsync("warning", {
-          code: "W114",
-          line: this.line,
-          character: this.char,
-          data: [ "0x-" ]
-        }, checks, function() { return token.base === 16 && state.jsonMode; });
-
-        this.triggerAsync("warning", {
-          code: "W115",
-          line: this.line,
-          character: this.char
-        }, checks, function() {
-          return state.isStrict() && token.base === 8 && token.isLegacy;
-        });
-
-        this.trigger("Number", {
-          line: this.line,
-          char: this.char,
-          from: this.from,
-          value: token.value,
-          base: token.base,
-          isMalformed: token.malformed
-        });
-
-        return create("(number)", token.value);
-
-      case Token.RegExp:
-        return create("(regexp)", token.value);
-
-      case Token.Comment:
-        state.tokens.curr.comment = true;
-
-        if (token.isSpecial) {
-          return {
-            id: '(comment)',
+            char: this.char,
+            from: this.from,
+            startLine: token.startLine,
+            startChar: token.startChar,
             value: token.value,
-            body: token.body,
-            type: token.commentType,
-            isSpecial: token.isSpecial,
+            quote: token.quote
+          }, checks, function() { return true; });
+
+          return create("(string)", token.value, null, token);
+
+        case Token.TemplateHead:
+          this.trigger("TemplateHead", {
+            line: this.line,
+            char: this.char,
+            from: this.from,
+            startLine: token.startLine,
+            startChar: token.startChar,
+            value: token.value
+          });
+          return create("(template)", token.value, null, token);
+
+        case Token.TemplateMiddle:
+          this.trigger("TemplateMiddle", {
+            line: this.line,
+            char: this.char,
+            from: this.from,
+            startLine: token.startLine,
+            startChar: token.startChar,
+            value: token.value
+          });
+          return create("(template middle)", token.value, null, token);
+
+        case Token.TemplateTail:
+          this.trigger("TemplateTail", {
+            line: this.line,
+            char: this.char,
+            from: this.from,
+            startLine: token.startLine,
+            startChar: token.startChar,
+            value: token.value
+          });
+          return create("(template tail)", token.value, null, token);
+
+        case Token.NoSubstTemplate:
+          this.trigger("NoSubstTemplate", {
+            line: this.line,
+            char: this.char,
+            from: this.from,
+            startLine: token.startLine,
+            startChar: token.startChar,
+            value: token.value
+          });
+          return create("(no subst template)", token.value, null, token);
+
+        case Token.Identifier:
+          this.triggerAsync("Identifier", {
+            line: this.line,
+            char: this.char,
+            from: this.from,
+            name: token.value,
+            raw_name: token.text,
+            isProperty: state.tokens.curr.id === "."
+          }, checks, function() {
+            return true;
+          });
+
+          /* falls through */
+        case Token.Keyword:
+        case Token.NullLiteral:
+        case Token.BooleanLiteral:
+          return create("(identifier)", token.value, state.tokens.curr.id === ".", token);
+
+        case Token.NumericLiteral:
+          if (token.isMalformed) {
+            this.trigger("warning", {
+              code: "W045",
+              line: this.line,
+              character: this.char,
+              data: [ token.value ]
+            });
+          }
+
+          this.triggerAsync("warning", {
+            code: "W114",
             line: this.line,
             character: this.char,
-            from: this.from
-          };
-        }
+            data: [ "0x-" ]
+          }, checks, function() { return token.base === 16 && state.jsonMode; });
 
-        break;
+          this.triggerAsync("warning", {
+            code: "W115",
+            line: this.line,
+            character: this.char
+          }, checks, function() {
+            return state.isStrict() && token.base === 8 && token.isLegacy;
+          });
 
-      case "":
-        break;
+          this.trigger("Number", {
+            line: this.line,
+            char: this.char,
+            from: this.from,
+            value: token.value,
+            base: token.base,
+            isMalformed: token.malformed
+          });
 
-      default:
-        return create("(punctuator)", token.value);
+          return create("(number)", token.value);
+
+        case Token.RegExp:
+          return create("(regexp)", token.value);
+
+        case Token.Comment:
+          state.tokens.curr.comment = true;
+
+          if (token.isSpecial) {
+            return {
+              id: '(comment)',
+              value: token.value,
+              body: token.body,
+              type: token.commentType,
+              isSpecial: token.isSpecial,
+              line: this.line,
+              character: this.char,
+              from: this.from
+            };
+          }
+
+          break;
+
+        case "":
+          break;
+
+        default:
+          return create("(punctuator)", token.value);
       }
     }
   }

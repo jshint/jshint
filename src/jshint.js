@@ -46,7 +46,7 @@ var scopeManager = require("./scope-manager.js");
 // We need this module here because environments such as IE and Rhino
 // don't necessarilly expose the 'console' API and browserify uses
 // it to log things. It's a sad state of affair, really.
-var console = require("console-browserify");
+var console = require("console-browserify"); // jshint ignore:line
 
 // We build the application inside a function so that we produce only a singleton
 // variable. That function will be invoked immediately, and its return value is
@@ -545,99 +545,99 @@ var JSHINT = (function() {
 
         if (key === "quotmark") {
           switch (val) {
-          case "true":
-          case "false":
-            state.option.quotmark = (val === "true");
-            break;
-          case "double":
-          case "single":
-            state.option.quotmark = val;
-            break;
-          default:
-            error("E002", nt);
+            case "true":
+            case "false":
+              state.option.quotmark = (val === "true");
+              break;
+            case "double":
+            case "single":
+              state.option.quotmark = val;
+              break;
+            default:
+              error("E002", nt);
           }
           return;
         }
 
         if (key === "shadow") {
           switch (val) {
-          case "true":
-            state.option.shadow = true;
-            break;
-          case "outer":
-            state.option.shadow = "outer";
-            break;
-          case "false":
-          case "inner":
-            state.option.shadow = "inner";
-            break;
-          default:
-            error("E002", nt);
+            case "true":
+              state.option.shadow = true;
+              break;
+            case "outer":
+              state.option.shadow = "outer";
+              break;
+            case "false":
+            case "inner":
+              state.option.shadow = "inner";
+              break;
+            default:
+              error("E002", nt);
           }
           return;
         }
 
         if (key === "unused") {
           switch (val) {
-          case "true":
-            state.option.unused = true;
-            break;
-          case "false":
-            state.option.unused = false;
-            break;
-          case "vars":
-          case "strict":
-            state.option.unused = val;
-            break;
-          default:
-            error("E002", nt);
+            case "true":
+              state.option.unused = true;
+              break;
+            case "false":
+              state.option.unused = false;
+              break;
+            case "vars":
+            case "strict":
+              state.option.unused = val;
+              break;
+            default:
+              error("E002", nt);
           }
           return;
         }
 
         if (key === "latedef") {
           switch (val) {
-          case "true":
-            state.option.latedef = true;
-            break;
-          case "false":
-            state.option.latedef = false;
-            break;
-          case "nofunc":
-            state.option.latedef = "nofunc";
-            break;
-          default:
-            error("E002", nt);
+            case "true":
+              state.option.latedef = true;
+              break;
+            case "false":
+              state.option.latedef = false;
+              break;
+            case "nofunc":
+              state.option.latedef = "nofunc";
+              break;
+            default:
+              error("E002", nt);
           }
           return;
         }
 
         if (key === "ignore") {
           switch (val) {
-          case "line":
-            state.ignoredLines[nt.line] = true;
-            removeIgnoredMessages();
-            break;
-          default:
-            error("E002", nt);
+            case "line":
+              state.ignoredLines[nt.line] = true;
+              removeIgnoredMessages();
+              break;
+            default:
+              error("E002", nt);
           }
           return;
         }
 
         if (key === "strict") {
           switch (val) {
-          case "true":
-            state.option.strict = true;
-            break;
-          case "false":
-            state.option.strict = false;
-            break;
-          case "global":
-          case "implied":
-            state.option.strict = val;
-            break;
-          default:
-            error("E002", nt);
+            case "true":
+              state.option.strict = true;
+              break;
+            case "false":
+              state.option.strict = false;
+              break;
+            case "global":
+            case "implied":
+              state.option.strict = val;
+              break;
+            default:
+              error("E002", nt);
           }
           return;
         }
@@ -653,18 +653,18 @@ var JSHINT = (function() {
 
         if (key === "esversion") {
           switch (val) {
-          case "3":
-          case "5":
-          case "6":
-            state.option.moz = false;
-            state.option.esversion = +val;
-            break;
-          case "2015":
-            state.option.moz = false;
-            state.option.esversion = 6;
-            break;
-          default:
-            error("E002", nt);
+            case "3":
+            case "5":
+            case "6":
+              state.option.moz = false;
+              state.option.esversion = +val;
+              break;
+            case "2015":
+              state.option.moz = false;
+              state.option.esversion = 6;
+              break;
+            default:
+              error("E002", nt);
           }
           if (!hasParsedCode(state.funct)) {
             error("E055", state.tokens.next, "esversion");
@@ -745,21 +745,21 @@ var JSHINT = (function() {
   function advance(id, t) {
 
     switch (state.tokens.curr.id) {
-    case "(number)":
-      if (state.tokens.next.id === ".") {
-        warning("W005", state.tokens.curr);
-      }
-      break;
-    case "-":
-      if (state.tokens.next.id === "-" || state.tokens.next.id === "--") {
-        warning("W006");
-      }
-      break;
-    case "+":
-      if (state.tokens.next.id === "+" || state.tokens.next.id === "++") {
-        warning("W007");
-      }
-      break;
+      case "(number)":
+        if (state.tokens.next.id === ".") {
+          warning("W005", state.tokens.curr);
+        }
+        break;
+      case "-":
+        if (state.tokens.next.id === "-" || state.tokens.next.id === "--") {
+          warning("W006");
+        }
+        break;
+      case "+":
+        if (state.tokens.next.id === "+" || state.tokens.next.id === "++") {
+          warning("W007");
+        }
+        break;
     }
 
     if (id && state.tokens.next.id !== id) {
@@ -981,44 +981,44 @@ var JSHINT = (function() {
     if (state.tokens.next.identifier && !(opts.property && state.inES5())) {
       // Keywords that cannot follow a comma operator.
       switch (state.tokens.next.value) {
-      case "break":
-      case "case":
-      case "catch":
-      case "continue":
-      case "default":
-      case "do":
-      case "else":
-      case "finally":
-      case "for":
-      case "if":
-      case "in":
-      case "instanceof":
-      case "return":
-      case "switch":
-      case "throw":
-      case "try":
-      case "var":
-      case "let":
-      case "while":
-      case "with":
-        error("E024", state.tokens.next, state.tokens.next.value);
-        return false;
+        case "break":
+        case "case":
+        case "catch":
+        case "continue":
+        case "default":
+        case "do":
+        case "else":
+        case "finally":
+        case "for":
+        case "if":
+        case "in":
+        case "instanceof":
+        case "return":
+        case "switch":
+        case "throw":
+        case "try":
+        case "var":
+        case "let":
+        case "while":
+        case "with":
+          error("E024", state.tokens.next, state.tokens.next.value);
+          return false;
       }
     }
 
     if (state.tokens.next.type === "(punctuator)") {
       switch (state.tokens.next.value) {
-      case "}":
-      case "]":
-      case ",":
-        if (opts.allowTrailing) {
-          return true;
-        }
+        case "}":
+        case "]":
+        case ",":
+          if (opts.allowTrailing) {
+            return true;
+          }
 
-        /* falls through */
-      case ")":
-        error("E024", state.tokens.next, state.tokens.next.value);
-        return false;
+          /* falls through */
+        case ")":
+          error("E024", state.tokens.next, state.tokens.next.value);
+          return false;
       }
     }
     return true;
@@ -1084,8 +1084,8 @@ var JSHINT = (function() {
 
         if (this.right && this.right.isMetaProperty) {
           error("E031", this);
-        // detect increment/decrement of a const
-        // in the case of a.b, right will be the "." punctuator
+          // detect increment/decrement of a const
+          // in the case of a.b, right will be the "." punctuator
         } else if (this.right && this.right.identifier) {
           state.funct["(scope)"].block.modify(this.right.value, this);
         }
@@ -1435,8 +1435,8 @@ var JSHINT = (function() {
 
       if (left.isMetaProperty) {
         error("E031", this);
-      // detect increment/decrement of a const
-      // in the case of a.b, left will be the "." punctuator
+        // detect increment/decrement of a const
+        // in the case of a.b, left will be the "." punctuator
       } else if (left && left.identifier) {
         state.funct["(scope)"].block.modify(left.value, left);
       }
@@ -1859,17 +1859,17 @@ var JSHINT = (function() {
 
     // Don't clear and let it propagate out if it is "break", "return" or similar in switch case
     switch (state.funct["(verb)"]) {
-    case "break":
-    case "continue":
-    case "return":
-    case "throw":
-      if (iscase) {
-        break;
-      }
+      case "break":
+      case "continue":
+      case "return":
+      case "throw":
+        if (iscase) {
+          break;
+        }
 
-      /* falls through */
-    default:
-      state.funct["(verb)"] = null;
+        /* falls through */
+      default:
+        state.funct["(verb)"] = null;
     }
 
     inblock = b;
@@ -2318,35 +2318,35 @@ var JSHINT = (function() {
       if (c.identifier) {
         c["new"] = true;
         switch (c.value) {
-        case "Number":
-        case "String":
-        case "Boolean":
-        case "Math":
-        case "JSON":
-          warning("W053", state.tokens.prev, c.value);
-          break;
-        case "Symbol":
-          if (state.inES6()) {
+          case "Number":
+          case "String":
+          case "Boolean":
+          case "Math":
+          case "JSON":
             warning("W053", state.tokens.prev, c.value);
-          }
-          break;
-        case "Function":
-          if (!state.option.evil) {
-            warning("W054");
-          }
-          break;
-        case "Date":
-        case "RegExp":
-        case "this":
-          break;
-        default:
-          if (c.id !== "function") {
-            i = c.value.substr(0, 1);
-            if (state.option.newcap && (i < "A" || i > "Z") &&
-              !state.funct["(scope)"].isPredefined(c.value)) {
-              warning("W055", state.tokens.curr);
+            break;
+          case "Symbol":
+            if (state.inES6()) {
+              warning("W053", state.tokens.prev, c.value);
             }
-          }
+            break;
+          case "Function":
+            if (!state.option.evil) {
+              warning("W054");
+            }
+            break;
+          case "Date":
+          case "RegExp":
+          case "this":
+            break;
+          default:
+            if (c.id !== "function") {
+              i = c.value.substr(0, 1);
+              if (state.option.newcap && (i < "A" || i > "Z") &&
+                !state.funct["(scope)"].isPredefined(c.value)) {
+                warning("W055", state.tokens.curr);
+              }
+            }
         }
       } else {
         if (c.id !== "." && c.id !== "[" && c.id !== "(") {
@@ -3145,18 +3145,18 @@ var JSHINT = (function() {
       }
     }
     switch (id) {
-    case "=":
-    case "+=":
-    case "-=":
-    case "*=":
-    case "%=":
-    case "&=":
-    case "|=":
-    case "^=":
-    case "/=":
-      if (!paren && !state.option.boss) {
-        warning("W084");
-      }
+      case "=":
+      case "+=":
+      case "-=":
+      case "*=":
+      case "%=":
+      case "&=":
+      case "|=":
+      case "^=":
+      case "/=":
+        if (!paren && !state.option.boss) {
+          warning("W084");
+        }
     }
   }
 
@@ -4052,91 +4052,91 @@ var JSHINT = (function() {
 
     for (;;) {
       switch (state.tokens.next.id) {
-      case "case":
-        switch (state.funct["(verb)"]) {
-        case "yield":
-        case "break":
         case "case":
-        case "continue":
-        case "return":
-        case "switch":
-        case "throw":
-          break;
-        default:
-          // You can tell JSHint that you don't use break intentionally by
-          // adding a comment /* falls through */ on a line just before
-          // the next `case`.
-          if (!state.tokens.curr.caseFallsThrough) {
-            warning("W086", state.tokens.curr, "case");
+          switch (state.funct["(verb)"]) {
+            case "yield":
+            case "break":
+            case "case":
+            case "continue":
+            case "return":
+            case "switch":
+            case "throw":
+              break;
+            default:
+              // You can tell JSHint that you don't use break intentionally by
+              // adding a comment /* falls through */ on a line just before
+              // the next `case`.
+              if (!state.tokens.curr.caseFallsThrough) {
+                warning("W086", state.tokens.curr, "case");
+              }
           }
-        }
 
-        advance("case");
-        this.cases.push(expression(0));
-        increaseComplexityCount();
-        g = true;
-        advance(":");
-        state.funct["(verb)"] = "case";
-        break;
-      case "default":
-        switch (state.funct["(verb)"]) {
-        case "yield":
-        case "break":
-        case "continue":
-        case "return":
-        case "throw":
+          advance("case");
+          this.cases.push(expression(0));
+          increaseComplexityCount();
+          g = true;
+          advance(":");
+          state.funct["(verb)"] = "case";
           break;
+        case "default":
+          switch (state.funct["(verb)"]) {
+            case "yield":
+            case "break":
+            case "continue":
+            case "return":
+            case "throw":
+              break;
+            default:
+              // Do not display a warning if 'default' is the first statement or if
+              // there is a special /* falls through */ comment.
+              if (this.cases.length) {
+                if (!state.tokens.curr.caseFallsThrough) {
+                  warning("W086", state.tokens.curr, "default");
+                }
+              }
+          }
+
+          advance("default");
+          g = true;
+          advance(":");
+          break;
+        case "}":
+          if (!noindent)
+            indent -= state.option.indent;
+
+          advance("}", t);
+          state.funct["(breakage)"] -= 1;
+          state.funct["(verb)"] = undefined;
+          return;
+        case "(end)":
+          error("E023", state.tokens.next, "}");
+          return;
         default:
-          // Do not display a warning if 'default' is the first statement or if
-          // there is a special /* falls through */ comment.
-          if (this.cases.length) {
-            if (!state.tokens.curr.caseFallsThrough) {
-              warning("W086", state.tokens.curr, "default");
+          indent += state.option.indent;
+          if (g) {
+            switch (state.tokens.curr.id) {
+              case ",":
+                error("E040");
+                return;
+              case ":":
+                g = false;
+                statements();
+                break;
+              default:
+                error("E025", state.tokens.curr);
+                return;
+            }
+          } else {
+            if (state.tokens.curr.id === ":") {
+              advance(":");
+              error("E024", state.tokens.curr, ":");
+              statements();
+            } else {
+              error("E021", state.tokens.next, "case", state.tokens.next.value);
+              return;
             }
           }
-        }
-
-        advance("default");
-        g = true;
-        advance(":");
-        break;
-      case "}":
-        if (!noindent)
           indent -= state.option.indent;
-
-        advance("}", t);
-        state.funct["(breakage)"] -= 1;
-        state.funct["(verb)"] = undefined;
-        return;
-      case "(end)":
-        error("E023", state.tokens.next, "}");
-        return;
-      default:
-        indent += state.option.indent;
-        if (g) {
-          switch (state.tokens.curr.id) {
-          case ",":
-            error("E040");
-            return;
-          case ":":
-            g = false;
-            statements();
-            break;
-          default:
-            error("E025", state.tokens.curr);
-            return;
-          }
-        } else {
-          if (state.tokens.curr.id === ":") {
-            advance(":");
-            error("E024", state.tokens.curr, ":");
-            statements();
-          } else {
-            error("E021", state.tokens.next, "case", state.tokens.next.value);
-            return;
-          }
-        }
-        indent -= state.option.indent;
       }
     }
     return this;
@@ -4905,69 +4905,70 @@ var JSHINT = (function() {
       // otherwise we warn about it
       return (l === 0);
     }
-    return { stack: function() {
-          _current = new CompArray();
-          _carrays.push(_current);
-        },
-        unstack: function() {
-          _current.variables.filter(function(v) {
-            if (v.unused)
-              warning("W098", v.token, v.raw_text || v.value);
-            if (v.undef)
-              state.funct["(scope)"].block.use(v.value, v.token);
-          });
-          _carrays.splice(-1, 1);
-          _current = _carrays[_carrays.length - 1];
-        },
-        setState: function(s) {
-          if (_.contains(["use", "define", "generate", "filter"], s))
-            _current.mode = s;
-        },
-        check: function(v) {
-          if (!_current) {
-            return;
-          }
-          // When we are in "use" state of the list comp, we enqueue that var
-          if (_current && _current.mode === "use") {
-            if (use(v)) {
-              _current.variables.push({
-                funct: state.funct,
-                token: state.tokens.curr,
-                value: v,
-                undef: true,
-                unused: false
-              });
-            }
-            return true;
-          // When we are in "define" state of the list comp,
-          } else if (_current && _current.mode === "define") {
-            // check if the variable has been used previously
-            if (!declare(v)) {
-              _current.variables.push({
-                funct: state.funct,
-                token: state.tokens.curr,
-                value: v,
-                undef: false,
-                unused: true
-              });
-            }
-            return true;
-          // When we are in the "generate" state of the list comp,
-          } else if (_current && _current.mode === "generate") {
-            state.funct["(scope)"].block.use(v, state.tokens.curr);
-            return true;
-          // When we are in "filter" state,
-          } else if (_current && _current.mode === "filter") {
-            // we check whether current variable has been declared
-            if (use(v)) {
-              // if not we warn about it
-              state.funct["(scope)"].block.use(v, state.tokens.curr);
-            }
-            return true;
-          }
-          return false;
+    return {
+      stack: function() {
+        _current = new CompArray();
+        _carrays.push(_current);
+      },
+      unstack: function() {
+        _current.variables.filter(function(v) {
+          if (v.unused)
+            warning("W098", v.token, v.raw_text || v.value);
+          if (v.undef)
+            state.funct["(scope)"].block.use(v.value, v.token);
+        });
+        _carrays.splice(-1, 1);
+        _current = _carrays[_carrays.length - 1];
+      },
+      setState: function(s) {
+        if (_.contains(["use", "define", "generate", "filter"], s))
+          _current.mode = s;
+      },
+      check: function(v) {
+        if (!_current) {
+          return;
         }
-        };
+        // When we are in "use" state of the list comp, we enqueue that var
+        if (_current && _current.mode === "use") {
+          if (use(v)) {
+            _current.variables.push({
+              funct: state.funct,
+              token: state.tokens.curr,
+              value: v,
+              undef: true,
+              unused: false
+            });
+          }
+          return true;
+        // When we are in "define" state of the list comp,
+        } else if (_current && _current.mode === "define") {
+          // check if the variable has been used previously
+          if (!declare(v)) {
+            _current.variables.push({
+              funct: state.funct,
+              token: state.tokens.curr,
+              value: v,
+              undef: false,
+              unused: true
+            });
+          }
+          return true;
+        // When we are in the "generate" state of the list comp,
+        } else if (_current && _current.mode === "generate") {
+          state.funct["(scope)"].block.use(v, state.tokens.curr);
+          return true;
+        // When we are in "filter" state,
+        } else if (_current && _current.mode === "filter") {
+          // we check whether current variable has been declared
+          if (use(v)) {
+            // if not we warn about it
+            state.funct["(scope)"].block.use(v, state.tokens.curr);
+          }
+          return true;
+        }
+        return false;
+      }
+    };
   };
 
 
@@ -5034,25 +5035,25 @@ var JSHINT = (function() {
     }
 
     switch (state.tokens.next.id) {
-    case "{":
-      jsonObject();
-      break;
-    case "[":
-      jsonArray();
-      break;
-    case "true":
-    case "false":
-    case "null":
-    case "(number)":
-    case "(string)":
-      advance();
-      break;
-    case "-":
-      advance("-");
-      advance("(number)");
-      break;
-    default:
-      error("E003", state.tokens.next);
+      case "{":
+        jsonObject();
+        break;
+      case "[":
+        jsonArray();
+        break;
+      case "true":
+      case "false":
+      case "null":
+      case "(number)":
+      case "(string)":
+        advance();
+        break;
+      case "-":
+        advance("-");
+        advance("(number)");
+        break;
+      default:
+        error("E003", state.tokens.next);
     }
   }
 
@@ -5272,20 +5273,20 @@ var JSHINT = (function() {
 
       advance();
       switch (state.tokens.next.id) {
-      case "{":
-      case "[":
-        destructuringAssignOrJsonValue();
-        break;
-      default:
-        directives();
+        case "{":
+        case "[":
+          destructuringAssignOrJsonValue();
+          break;
+        default:
+          directives();
 
-        if (state.directive["use strict"]) {
-          if (!state.allowsGlobalUsd()) {
-            warning("W097", state.tokens.prev);
+          if (state.directive["use strict"]) {
+            if (!state.allowsGlobalUsd()) {
+              warning("W097", state.tokens.prev);
+            }
           }
-        }
 
-        statements();
+          statements();
       }
 
       if (state.tokens.next.id !== "(end)") {
