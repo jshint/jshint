@@ -1,47 +1,42 @@
 "use strict";
 
+// Patch the global with a Promise to support node < 0.12
+require('es6-promise').polyfill();
+
 var path = require("path");
 var phantom = require("phantom");
 var createTestServer = require("./helpers/browser/server");
-var options = {
-  /**
-   * The `phantom` module provides a Node.js API for the PhantomJS binary,
-   * while the `phantomjs` module includes the binary itself.
-   */
-  path: path.dirname(require("phantomjs").path) + "/",
 
-  /**
-   * Disable the optional `weak` module due to installation difficulties in
-   * Windows environments.
-   */
-  dnodeOpts: {
-    weak: false
-  }
-};
 var port = process.env.NODE_PORT || 8045;
 
-phantom.create(function(ph) {
-  ph.createPage(function(page) {
-    createTestServer(port, function(server) {
-      page.onConsoleMessage(function(str) {
-        console.log(str);
-      });
+var _ph, _page, _outObj;
+createTestServer(port, function(server) {
+  var shutdown = function() {
+    _page.close();
+    _ph.exit();
+    server.close();
+  };
 
-      page.set("onCallback", function(err) {
-        ph.exit();
-        server.close();
-        if (err) {
-          process.exit(1);
-        }
-      });
-
-      page.set("onError", function(msg, trace) {
-        console.error(msg);
-        console.error(trace);
-        process.exit(1);
-      });
-
-      page.open("http://localhost:" + port, function () {});
+  phantom.create(['--web-security=no']).then(function(ph) {
+    _ph = ph;
+    return _ph.createPage();
+  }).then(function(page) {
+    _page = page;
+    _page.on('onConsoleMessage', function(message) {
+      console.log(message);
     });
-  });
-}, options);
+    _page.on('onCallback', function(message) {
+      console.log(message);
+    });
+    _page.on('onError', function(message, trace) {
+      console.error(message);
+      console.error(trace);
+      throw error;
+    });
+    return _page.open('http://localhost:' + port);
+  }).then(shutdown, function(error) {
+    shutdown();
+    console.error(error);
+    process.exit(1);
+  })
+});
