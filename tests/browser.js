@@ -1,5 +1,8 @@
 "use strict";
 
+// Patch the global with a Promise to support node < 0.12
+require('es6-promise').polyfill();
+
 var path = require("path");
 var phantom = require("phantom");
 var createTestServer = require("./helpers/browser/server");
