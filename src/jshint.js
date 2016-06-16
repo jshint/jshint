@@ -2929,12 +2929,17 @@ var JSHINT = (function() {
     return funct["(global)"] && !funct["(verb)"];
   }
 
-  function doTemplateLiteral(left) {
+  /**
+   * This function is used as both a null-denotation method *and* a
+   * left-denotation method, meaning the first parameter is overloaded.
+   */
+  function doTemplateLiteral(leftOrRbp) {
     // ASSERT: this.type === "(template)"
     // jshint validthis: true
     var ctx = this.context;
     var noSubst = this.noSubst;
     var depth = this.depth;
+    var left = typeof leftOrRbp === "number" ? null : leftOrRbp;
 
     if (!noSubst) {
       while (!end()) {
