@@ -134,28 +134,22 @@ var JSHINT = (function() {
     }
     var meta = token.meta;
 
-    if (meta && meta.isFutureReservedWord) {
-      if (meta.moduleOnly && !state.option.module) {
+    if (meta && meta.isFutureReservedWord && state.inES5()) {
+      // ES3 FutureReservedWord in an ES5 environment.
+      if (!meta.es5) {
         return false;
       }
 
-      if (state.inES5()) {
-        // ES3 FutureReservedWord in an ES5 environment.
-        if (!meta.es5) {
+      // Some ES5 FutureReservedWord identifiers are active only
+      // within a strict mode environment.
+      if (meta.strictOnly) {
+        if (!state.option.strict && !state.isStrict()) {
           return false;
         }
+      }
 
-        // Some ES5 FutureReservedWord identifiers are active only
-        // within a strict mode environment.
-        if (meta.strictOnly) {
-          if (!state.option.strict && !state.isStrict()) {
-            return false;
-          }
-        }
-
-        if (token.isProperty) {
-          return false;
-        }
+      if (token.isProperty) {
+        return false;
       }
     }
 
@@ -4710,7 +4704,6 @@ var JSHINT = (function() {
   // Future Reserved Words
 
   FutureReservedWord("abstract");
-  FutureReservedWord("await", { es5: true, moduleOnly: true });
   FutureReservedWord("boolean");
   FutureReservedWord("byte");
   FutureReservedWord("char");

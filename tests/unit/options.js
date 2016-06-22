@@ -3464,43 +3464,6 @@ exports.module.newcap = function(test) {
   test.done();
 };
 
-exports.module.await = function(test) {
-  var allPositions = [
-    "var await;",
-    "function await() {}",
-    "await: while (false) {}",
-    "void { await: null };",
-    "void {}.await;"
-  ];
-
-  TestRun(test)
-    .test(allPositions, { esversion: 3 });
-  TestRun(test)
-    .test(allPositions);
-  TestRun(test)
-    .test(allPositions, { esversion: 6 });
-
-  TestRun(test)
-    .addError(1, "Expected an identifier and instead saw 'await' (a reserved word).")
-    .test("var await;", { esversion: 6, module: true });
-
-  TestRun(test)
-    .addError(1, "Expected an identifier and instead saw 'await' (a reserved word).")
-    .test("function await() {}", { esversion: 6, module: true });
-
-  TestRun(test)
-    .addError(1, "Expected an identifier and instead saw 'await' (a reserved word).")
-    .test("await: while (false) {}", { esversion: 6, module: true });
-
-  TestRun(test)
-    .test([
-      "void { await: null };",
-      "void {}.await;"
-    ], { esversion: 6, module: true });
-
-  test.done();
-};
-
 exports.esversion = function(test) {
   var code = [
     "// jshint esversion: 3",
