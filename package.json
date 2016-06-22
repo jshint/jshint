@@ -58,8 +58,11 @@
     "jshint":        "2.6.x",
     "mock-stdin":    "0.3.x",
     "nodeunit":      "0.9.x",
+<<<<<<< HEAD
     "phantom":       "~0.7.2",
     "phantomjs":     "1.9.13",
+=======
+>>>>>>> parent of cb9c2f6... [[CHORE]] ./bin/build now runs npm {prune, test, install} prior to building. Fixes gh-2305
     "regenerate":    "1.2.x",
     "sinon":         "1.12.x",
     "unicode-6.3.0": "0.1.x"
