@@ -2138,30 +2138,7 @@ var JSHINT = (function() {
   bitwise(">>", "shiftright", 120);
   bitwise(">>>", "shiftrightunsigned", 120);
   infix("in", "in", 120);
-  infix("instanceof", function(left, token) {
-    var right;
-    var scope = state.funct["(scope)"];
-    token.left = left;
-    token.right = right = expression(120);
-
-    if (right.id === "(number)" ||
-        right.id === "(string)" ||
-        right.value === "null" ||
-        (right.value === "undefined" && !scope.has("undefined")) ||
-        right.arity === "unary" ||
-        right.id === "{" ||
-        (right.id === "[" && !right.right) ||
-        right.id === "(regexp)" ||
-        (right.id === "(template)" && !right.tag)) {
-      error("E060");
-    }
-
-    if (right.id === "function") {
-      warning("W139");
-    }
-
-    return token;
-  }, 120);
+  infix("instanceof", "instanceof", 120);
   infix("+", function(left, that) {
     var right;
     that.left = left;
