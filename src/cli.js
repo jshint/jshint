@@ -280,7 +280,7 @@ function extract(code, when) {
     // in between the last </script> tag and this <script> tag to preserve
     // location information.
     inscript = true;
-    js.push.apply(js, code.slice(index, parser.endIndex).match(/\n\r|\n|\r/g));
+    js.push.apply(js, code.slice(index, parser.endIndex).match(/\r\n|\n|\r/g));
     startOffset = null;
   }
 
@@ -297,7 +297,7 @@ function extract(code, when) {
     if (!inscript)
       return;
 
-    var lines = data.split(/\n\r|\n|\r/);
+    var lines = data.split(/\r\n|\n|\r/);
 
     if (!startOffset) {
       lines.some(function(line) {
@@ -362,7 +362,7 @@ function extractOffsets(code, when) {
     // location information.
     inscript = true;
     var fragment = code.slice(index, parser.endIndex);
-    var n = (fragment.match(/\n\r|\n|\r/g) || []).length;
+    var n = (fragment.match(/\r\n|\n|\r/g) || []).length;
     lineCounter += n;
     startOffset = null;
   }
@@ -380,7 +380,7 @@ function extractOffsets(code, when) {
     if (!inscript)
       return;
 
-    var lines = data.split(/\n\r|\n|\r/);
+    var lines = data.split(/\r\n|\n|\r/);
 
     if (!startOffset) {
       lines.some(function(line) {
@@ -642,6 +642,7 @@ var exports = {
     files.forEach(function(file) {
       var config = opts.config || exports.getConfig(file);
       var code;
+      var errors = [];
 
       try {
         code = shjs.cat(file);
@@ -652,19 +653,20 @@ var exports = {
 
       mergeCLIPrereq(config);
 
-      lint(extract(code, opts.extract), results, config, data, file);
+      lint(extract(code, opts.extract), errors, config, data, file);
 
-      if (results.length) {
+      if (errors.length) {
         var offsets = extractOffsets(code, opts.extract);
         if (offsets && offsets.length) {
-          results.forEach(function(errorInfo) {
+          errors.forEach(function(errorInfo) {
             var line = errorInfo.error.line;
-            if (line >= 0 && line < offsets.length) {
-              var offset = +offsets[line];
-              errorInfo.error.character += offset;
+            if (line >= 0 && line < offsets.length && offsets[line]) {
+              errorInfo.error.character += offsets[line];
             }
           });
         }
+
+        results = results.concat(errors);
       }
     });
 

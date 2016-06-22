@@ -541,8 +541,7 @@ exports.bool = {
 
     /**
      * This option tells JSHint that your code uses ECMAScript 6 specific
-     * syntax. Note that these features are not finalized yet and not all
-     * browsers implement them.
+     * syntax. Note that not all browsers implement these features.
      *
      * More info:
      *
@@ -886,13 +885,14 @@ exports.val = {
    * them to produce errors.  It also fixes mistakes that made it difficult
    * for the JavaScript engines to perform certain optimizations.
    *
-   * - "func"    - there must be a `"use strict";` directive at function level
    * - "global"  - there must be a `"use strict";` directive at global level
    * - "implied" - lint the code as if there is the `"use strict";` directive
    * - false     - disable warnings about strict mode
-   * - true      - same as `"func"`, but environment options have precedence over
-   *               this (e.g. `node`, `module`, `browserify` and `phantomjs` can
-   *               set `strict: global`)
+   * - true      - there must be a `"use strict";` directive at function level;
+   *               this is preferable for scripts intended to be loaded in web
+   *               browsers directly because enabling strict mode globally
+   *               could adversely effect other scripts running on the same
+   *               page
    */
   strict      : true,
 

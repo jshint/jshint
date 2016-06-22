@@ -633,7 +633,7 @@ exports.group = {
 
     test.done();
   },
-  
+
   testMultipleIgnores: function (test) {
     var run = this.sinon.stub(cli, "run");
     var dir = __dirname + "/../examples/";
@@ -642,10 +642,10 @@ exports.group = {
     cli.interpret([
       "node", "jshint", "file.js", "--exclude=foo.js,bar.js"
     ]);
-    
+
     test.equal(run.args[0][0].ignores[0], path.resolve(dir, "foo.js"));
     test.equal(run.args[0][0].ignores[1], path.resolve(dir, "bar.js"));
-    
+
     test.done();
   },
 
@@ -1146,6 +1146,65 @@ exports.extract = {
       "}",
       ""
     ].join("\n");
+
+    test.equal(cli.extract(html, "auto"), js);
+
+    test.done();
+  },
+
+  usingMultipleFiles: function (test) {
+    var rep = require("../examples/reporter.js");
+    var errors = [];
+    this.sinon.stub(rep, "reporter", function (res) {
+      errors = errors.concat(res);
+    });
+
+    var dir = __dirname + "/../examples/";
+    this.sinon.stub(process, "cwd").returns(dir);
+
+    var html = [
+      "<script type='text/javascript'>",
+      "  a()",
+      "</script>",
+    ].join("\n");
+
+    this.sinon.stub(shjs, "cat")
+      .withArgs(sinon.match(/indent\.html$/)).returns(html)
+      .withArgs(sinon.match(/another\.html$/)).returns("\n\n<script>a && a();</script>");
+
+    this.sinon.stub(shjs, "test")
+      .withArgs("-e", sinon.match(/indent\.html$/)).returns(true)
+      .withArgs("-e", sinon.match(/another\.html$/)).returns(true);
+
+    cli.interpret([
+      "node", "jshint", "indent.html", "another.html", "--extract", "auto", "--reporter=reporter.js"
+    ]);
+    test.equal(cli.exit.args[0][0], 2);
+
+    test.equal(errors.length, 2, "found two errors");
+    var lintError = errors[0].error;
+    test.ok(lintError, "have error object");
+    test.equal(lintError.code, "W033", "found missing semicolon warning");
+    test.equal(lintError.line, 2, "misaligned line");
+    test.equal(lintError.character, 6, "first misaligned character at column 2");
+
+    lintError = errors[1].error;
+    test.ok(lintError, "have error object");
+    test.equal(lintError.code, "W030", "found an expression warning");
+    test.equal(lintError.line, 3, "misaligned line");
+    test.equal(lintError.character, 8, "first misaligned character at column 8");
+
+    test.done();
+  },
+
+  "\\r\\n as line terminator (gh-2825)": function (test) {
+    var html = [
+      "<script>",
+      "  var a = 3;",
+      "</script>"
+    ].join("\r\n");
+
+    var js = "\nvar a = 3;\n";
 
     test.equal(cli.extract(html, "auto"), js);
 

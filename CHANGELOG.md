@@ -1,5 +1,113 @@
+<a name="2.9.2"></a>
+## [2.9.2](https://github.com/jshint/jshint/compare/2.9.1...v2.9.2) (2016-04-19)
+
+This release contains a number of bug fixes. As always, we thank everyone who
+reported issues and submitted patches; those contributions are essential to the
+continuing improvement of the project. We hope you'll keep it up!
+
+### Bug Fixes
+
+* (cli - extract) lines can end with "\\r\\n", not "\\n\\r" ([93818f3](https://github.com/jshint/jshint/commit/93818f3)), closes [#2825](https://github.com/jshint/jshint/issues/2825)
+* Account for implied closures ([c3b4d63](https://github.com/jshint/jshint/commit/c3b4d63))
+* Add CompositionEvent to browser globals ([56515cf](https://github.com/jshint/jshint/commit/56515cf))
+* Allow destructuring in setter parameter ([97d0ac1](https://github.com/jshint/jshint/commit/97d0ac1))
+* Allow parentheses around object destructuring assignment. ([7a0bd70](https://github.com/jshint/jshint/commit/7a0bd70)), closes [#2775](https://github.com/jshint/jshint/issues/2775)
+* Allow regex inside template literal ([5dd9c90](https://github.com/jshint/jshint/commit/5dd9c90)), closes [#2791](https://github.com/jshint/jshint/issues/2791)
+* Allow regexp literal after 'instanceof' ([caa30e6](https://github.com/jshint/jshint/commit/caa30e6)), closes [#2773](https://github.com/jshint/jshint/issues/2773)
+* Correct CLI's indentation offset logic ([47daf76](https://github.com/jshint/jshint/commit/47daf76)), closes [#2778](https://github.com/jshint/jshint/issues/2778)
+* Do not crash on invalid input ([2e0026f](https://github.com/jshint/jshint/commit/2e0026f))
+* Do not fail on valid configurations ([2fb3c24](https://github.com/jshint/jshint/commit/2fb3c24))
+* Don't throw E056 for vars used in two functions ([fd91d4a](https://github.com/jshint/jshint/commit/fd91d4a)), closes [#2838](https://github.com/jshint/jshint/issues/2838)
+* Emit correct token value from "module" API ([4a43fb9](https://github.com/jshint/jshint/commit/4a43fb9))
+* Expand forms accepted in dstr. assignment ([8bbd537](https://github.com/jshint/jshint/commit/8bbd537))
+* Improve binding power for tagged templates ([9cf2ff0](https://github.com/jshint/jshint/commit/9cf2ff0))
+* Improve reporting of "Bad assignment." ([08df19e](https://github.com/jshint/jshint/commit/08df19e))
+* Make the 'freeze' option less strict ([b76447c](https://github.com/jshint/jshint/commit/b76447c)), closes [#1600](https://github.com/jshint/jshint/issues/1600)
+* Report "Bad assignment." in destructuring ([fe559ed](https://github.com/jshint/jshint/commit/fe559ed))
+* Report character position for camelcase errors ([480252a](https://github.com/jshint/jshint/commit/480252a)), closes [#2845](https://github.com/jshint/jshint/issues/2845)
+* Reserve `await` keyword in ES6 module code ([b1c8d5b](https://github.com/jshint/jshint/commit/b1c8d5b))
+
+
+<a name="2.9.1"></a>
+## [2.9.1](https://github.com/jshint/jshint/compare/2.9.1-rc3...v2.9.1) (2016-01-14)
+
+Following the revocation of version 2.9.0, we observed an extended "release
+candidate" phase where we encouraged users to vet JSHint for undesirable
+changes in behavior. During that time, we identified and resolved a number of
+such regressions. This release comprises all changes from the release candidate
+phase along with the improvements initially released as version 2.9.0. This
+release does not itself contain any changes to the codebase. If you are
+upgrading from version 2.8.0 or earlier, please refer to the
+previously-published release notes for details on bug fixes and features--these
+can be found in the project's `CHANGELOG.md` file and on the project's website.
+
+
+<a name="2.9.1-rc3"></a>
+## [2.9.1-rc3](https://github.com/jshint/jshint/compare/2.9.1-rc2...v2.9.1-rc3) (2016-01-12)
+
+
+### Bug Fixes
+
+* Do not require global USD for any envs ([3fa9ece](https://github.com/jshint/jshint/commit/3fa9ece))
+
+
+
+<a name="2.9.1-rc2"></a>
+## [2.9.1-rc2](https://github.com/jshint/jshint/compare/2.9.1-rc1...v2.9.1-rc2) (2015-12-22)
+
+
+### Bug Fixes
+
+* Abort in the presence of invalid config ([767c47d](https://github.com/jshint/jshint/commit/767c47d))
+* Allow ignoring W020 and W021 ([46db923](https://github.com/jshint/jshint/commit/46db923)), closes [#2761](https://github.com/jshint/jshint/issues/2761)
+* Correct `unused` for function-scoped vars ([91fa9fc](https://github.com/jshint/jshint/commit/91fa9fc))
+* Disallow ambiguous configuration values ([eb54a4c](https://github.com/jshint/jshint/commit/eb54a4c))
+* Do not disable ES6 when `moz` is set ([97dfd90](https://github.com/jshint/jshint/commit/97dfd90))
+* Don't throw '(NaN% scanned)' ([903b698](https://github.com/jshint/jshint/commit/903b698))
+
+
+
+<a name="2.9.1-rc1"></a>
+## [2.9.1-rc1](https://github.com/jshint/jshint/compare/2.9.0...v2.9.1-rc1) (2015-11-12)
+
+Version 2.9.0 was revoked shortly after its release due to a number of
+regressions. Although the underlying issues have been resolved, we are
+sensitive to the possibility that there may be still more; as mentioned in
+2.9.0's release notes, the variable tracking system saw a significant
+refactoring.
+
+In an effort to minimize friction with a new version, we're publishing a
+release candidate and requesting feedback from early adopters. Please give it a
+try in your projects and let us know about any surprising behavior!
+
+### Bug Fixes
+
+* `latedef` shouldn't warn when marking a var as exported ([c630994](https://github.com/jshint/jshint/commit/c630994)), closes [#2662](https://github.com/jshint/jshint/issues/2662)
+* Add `File` and `FileList` to browser global variables ([7f2a729](https://github.com/jshint/jshint/commit/7f2a729)), closes [#2690](https://github.com/jshint/jshint/issues/2690)
+* Allow comments and new lines after /* falls through */ ([3b1c925](https://github.com/jshint/jshint/commit/3b1c925)), closes [#2652](https://github.com/jshint/jshint/issues/2652) [#1660](https://github.com/jshint/jshint/issues/1660)
+* Allow let and const to be in a block outside of a block ([84a9145](https://github.com/jshint/jshint/commit/84a9145)), closes [#2685](https://github.com/jshint/jshint/issues/2685)
+* Always warn about missing "use strict" directive ([e85c2a1](https://github.com/jshint/jshint/commit/e85c2a1)), closes [#2668](https://github.com/jshint/jshint/issues/2668)
+* Disallow incompatible option values ([72ba5ad](https://github.com/jshint/jshint/commit/72ba5ad))
+* Do not enable `newcap` within strict mode ([acaf3f7](https://github.com/jshint/jshint/commit/acaf3f7))
+* Don't throw W080 when the initializer starts with `undefined` ([0d87919](https://github.com/jshint/jshint/commit/0d87919)), closes [#2699](https://github.com/jshint/jshint/issues/2699)
+* Don't warn that an exported function is used before it is defined. ([d0433d2](https://github.com/jshint/jshint/commit/d0433d2)), closes [#2658](https://github.com/jshint/jshint/issues/2658)
+* Enforce Identifier restrictions lazily ([ceca549](https://github.com/jshint/jshint/commit/ceca549))
+* Global "use strict" regressions ([04b43d2](https://github.com/jshint/jshint/commit/04b43d2)), closes [#2657](https://github.com/jshint/jshint/issues/2657) [#2661](https://github.com/jshint/jshint/issues/2661)
+* Support property assignment when destructure assigning ([b6df1f2](https://github.com/jshint/jshint/commit/b6df1f2)), closes [#2659](https://github.com/jshint/jshint/issues/2659) [#2660](https://github.com/jshint/jshint/issues/2660)
+* Throw W119 instead of "Unexpected '`'" when using templates in ES5 mode. ([87064e8](https://github.com/jshint/jshint/commit/87064e8))
+
+### Features
+
+* Support QUnit's global notOk ([73ac9b8](https://github.com/jshint/jshint/commit/73ac9b8))
+
+
+
 <a name="2.9.0"></a>
 # [2.9.0](https://github.com/jshint/jshint/compare/2.8.0...v2.9.0) (2015-09-03)
+
+**Note** This release was revoked shortly following its publication. Please
+refer to the release notes for version 2.9.1 for more information (found in the
+project's `CHANGELOG.md` file and on the project's website).
 
 This release was a long time in the making, but it may not be the most exciting
 version we've published. Most of the changes are internal refactorings that

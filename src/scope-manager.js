@@ -305,7 +305,9 @@ var scopeManager = function(state, predefined, exported, declared) {
           if ((usedLabelType === "function" || usedLabelType === "class") &&
               usage["(reassigned)"]) {
             for (j = 0; j < usage["(reassigned)"].length; j++) {
-              error("W021", usage["(reassigned)"][j], usedLabelName, usedLabelType);
+              if (!usage["(reassigned)"][j].ignoreW021) {
+                warning("W021", usage["(reassigned)"][j], usedLabelName, usedLabelType);
+              }
             }
           }
           continue;
@@ -328,7 +330,6 @@ var scopeManager = function(state, predefined, exported, declared) {
             subScopeUsage["(tokens)"] = subScopeUsage["(tokens)"].concat(usage["(tokens)"]);
             subScopeUsage["(reassigned)"] =
               subScopeUsage["(reassigned)"].concat(usage["(reassigned)"]);
-            subScopeUsage["(onlyUsedSubFunction)"] = false;
           }
         } else {
           // this is exiting global scope, so we finalise everything here - we are at the end of the file
@@ -343,7 +344,9 @@ var scopeManager = function(state, predefined, exported, declared) {
             // check for re-assigning a read-only (set to false) predefined
             if (_current["(predefined)"][usedLabelName] === false && usage["(reassigned)"]) {
               for (j = 0; j < usage["(reassigned)"].length; j++) {
-                warning("W020", usage["(reassigned)"][j]);
+                if (!usage["(reassigned)"][j].ignoreW020) {
+                  warning("W020", usage["(reassigned)"][j]);
+                }
               }
             }
           }
@@ -382,24 +385,43 @@ var scopeManager = function(state, predefined, exported, declared) {
           });
       }
 
-      // if we have a sub scope we can copy too and we are still within the function boundary
+      // If this is not a function boundary, transfer function-scoped labels to
+      // the parent block (a rough simulation of variable hoisting). Previously
+      // existing labels in the parent block should take precedence so that things and stuff.
       if (subScope && !isUnstackingFunctionBody &&
         !isUnstackingFunctionParams && !isUnstackingFunctionOuter) {
         var labelNames = Object.keys(currentLabels);
         for (i = 0; i < labelNames.length; i++) {
 
           var defLabelName = labelNames[i];
+          var defLabel = currentLabels[defLabelName];
 
-          // if its function scoped and
-          // not already defined (caught with shadow, shouldn't also trigger out of scope)
-          if (!currentLabels[defLabelName]["(blockscoped)"] &&
-            currentLabels[defLabelName]["(type)"] !== "exception" &&
-            !this.funct.has(defLabelName, { excludeCurrent: true })) {
-            subScope["(labels)"][defLabelName] = currentLabels[defLabelName];
-            // we do not warn about out of scope usages in the global scope
-            if (_currentFunctBody["(type)"] !== "global") {
-              subScope["(labels)"][defLabelName]["(useOutsideOfScope)"] = true;
+          if (!defLabel["(blockscoped)"] && defLabel["(type)"] !== "exception") {
+            var shadowed = subScope["(labels)"][defLabelName];
+
+            // Do not overwrite a label if it exists in the parent scope
+            // because it is shared by adjacent blocks. Copy the `unused`
+            // property so that any references found within the current block
+            // are counted toward that higher-level declaration.
+            if (shadowed) {
+              shadowed["(unused)"] &= defLabel["(unused)"];
+
+            // "Hoist" the variable to the parent block, decorating the label
+            // so that future references, though technically valid, can be
+            // reported as "out-of-scope" in the absence of the `funcscope`
+            // option.
+            } else {
+              defLabel["(useOutsideOfScope)"] =
+                // Do not warn about out-of-scope usages in the global scope
+                _currentFunctBody["(type)"] !== "global" &&
+                // When a higher scope contains a binding for the label, the
+                // label is a re-declaration and should not prompt "used
+                // out-of-scope" warnings.
+                !this.funct.has(defLabelName, { excludeCurrent: true });
+
+              subScope["(labels)"][defLabelName] = defLabel;
             }
+
             delete currentLabels[defLabelName];
           }
         }
@@ -671,7 +693,7 @@ var scopeManager = function(state, predefined, exported, declared) {
 
         scopeManagerInst.funct.add(labelName, type, token, !isexported);
 
-        if (_currentFunctBody["(type)"] === "global") {
+        if (_currentFunctBody["(type)"] === "global" && !state.impliedClosure()) {
           usedPredefinedAndGlobals[labelName] = marker;
         }
       }
@@ -777,6 +799,8 @@ var scopeManager = function(state, predefined, exported, declared) {
 
         _setupUsages(labelName);
 
+        _current["(usages)"][labelName]["(onlyUsedSubFunction)"] = false;
+
         if (token) {
           token["(function)"] = _currentFunctBody;
           _current["(usages)"][labelName]["(tokens)"].push(token);
@@ -784,6 +808,8 @@ var scopeManager = function(state, predefined, exported, declared) {
       },
 
       reassign: function(labelName, token) {
+        token.ignoreW020 = state.ignored.W020;
+        token.ignoreW021 = state.ignored.W021;
 
         this.modify(labelName, token);
 
@@ -794,6 +820,7 @@ var scopeManager = function(state, predefined, exported, declared) {
 
         _setupUsages(labelName);
 
+        _current["(usages)"][labelName]["(onlyUsedSubFunction)"] = false;
         _current["(usages)"][labelName]["(modified)"].push(token);
       },
 
