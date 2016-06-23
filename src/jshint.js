@@ -263,7 +263,12 @@ var JSHINT = (function() {
     }
 
     if (state.option.devel) {
-      combine(predefined, vars.devel);
+      // allow custom devel's functions
+      if (state.option.devel == 'object') {
+        combine(predefined, state.option.devel);
+      } else {
+        combine(predefined, vars.devel);
+      }
     }
 
     if (state.option.dojo) {
