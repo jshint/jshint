@@ -815,7 +815,8 @@ var JSHINT = (function() {
     if (next.id === ";" || next.id === "}" || next.id === ":") {
       return true;
     }
-    if (isInfix(next) === isInfix(curr) || (curr.id === "yield" && state.inMoz())) {
+    if (isInfix(next) === isInfix(curr) || curr.ltBoundary === "after" ||
+      next.ltBoundary === "before") {
       return curr.line !== startLine(next);
     }
     return false;
@@ -2208,10 +2209,13 @@ var JSHINT = (function() {
   suffix("++");
   prefix("++", "preinc");
   state.syntax["++"].exps = true;
+  state.syntax["++"].ltBoundary = "before";
 
   suffix("--");
   prefix("--", "predec");
   state.syntax["--"].exps = true;
+  state.syntax["--"].ltBoundary = "before";
+
   prefix("delete", function() {
     var p = expression(10);
     if (!p) {
@@ -4440,6 +4444,7 @@ var JSHINT = (function() {
   (function(x) {
     x.exps = true;
     x.lbp = 25;
+    x.ltBoundary = "after";
   }(prefix("yield", function() {
     var prev = state.tokens.prev;
     if (state.inES6(true) && !state.funct["(generator)"]) {
