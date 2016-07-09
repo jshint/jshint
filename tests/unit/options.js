@@ -2901,6 +2901,111 @@ singleGroups.generatorExpression = function (test) {
   test.done();
 };
 
+singleGroups.yield = function (test) {
+  TestRun(test, "otherwise-invalid position")
+    .test([
+      "function* g() {",
+      "  var x;",
+      "  x = 0 || (yield);",
+      "  x = 0 || (yield 0);",
+      "  x = 0 && (yield);",
+      "  x = 0 && (yield 0);",
+      "  x = !(yield);",
+      "  x = !(yield 0);",
+      "  x = !!(yield);",
+      "  x = !!(yield 0);",
+      "  x = 0 + (yield);",
+      "  x = 0 + (yield 0);",
+      "  x = 0 - (yield);",
+      "  x = 0 - (yield 0);",
+      "}"
+    ], { singleGroups: true, esversion: 6 });
+
+  TestRun(test, "operand delineation")
+    .test([
+      "function* g() {",
+      "  (yield).x = 0;",
+      "  x = (yield) ? 0 : 0;",
+      "  x = (yield 0) ? 0 : 0;",
+      "  x = (yield) / 0;",
+      "}"
+    ], { singleGroups: true, esversion: 6 });
+
+  TestRun(test)
+    .addError(2, "Unnecessary grouping operator.")
+    .addError(3, "Unnecessary grouping operator.")
+    .addError(4, "Unnecessary grouping operator.")
+    .addError(5, "Unnecessary grouping operator.")
+    .addError(6, "Unnecessary grouping operator.")
+    .addError(7, "Unnecessary grouping operator.")
+    .addError(8, "Unnecessary grouping operator.")
+    .addError(9, "Unnecessary grouping operator.")
+    .addError(10, "Unnecessary grouping operator.")
+    .addError(11, "Unnecessary grouping operator.")
+    .addError(12, "Unnecessary grouping operator.")
+    .addError(13, "Unnecessary grouping operator.")
+    .addError(14, "Unnecessary grouping operator.")
+    .addError(15, "Unnecessary grouping operator.")
+    .addError(16, "Unnecessary grouping operator.")
+    .addError(17, "Unnecessary grouping operator.")
+    .addError(18, "Unnecessary grouping operator.")
+    .addError(19, "Unnecessary grouping operator.")
+    .addError(20, "Unnecessary grouping operator.")
+    .addError(21, "Unnecessary grouping operator.")
+    .addError(22, "Unnecessary grouping operator.")
+    .addError(23, "Unnecessary grouping operator.")
+    .addError(24, "Unnecessary grouping operator.")
+    .addError(25, "Unnecessary grouping operator.")
+    .addError(26, "Unnecessary grouping operator.")
+    .addError(27, "Unnecessary grouping operator.")
+    .addError(28, "Unnecessary grouping operator.")
+    .addError(29, "Unnecessary grouping operator.")
+    .addError(30, "Unnecessary grouping operator.")
+    .addError(31, "Unnecessary grouping operator.")
+    .addError(32, "Unnecessary grouping operator.")
+    .addError(33, "Unnecessary grouping operator.")
+    .addError(34, "Unnecessary grouping operator.")
+    .test([
+      "function* g() {",
+      "  (yield);",
+      "  (yield 0);",
+      "  var x = (yield);",
+      "  var y = (yield 0);",
+      "  x = (yield);",
+      "  x = (yield 0);",
+      "  x += (yield);",
+      "  x += (yield 0);",
+      "  x -= (yield);",
+      "  x -= (yield 0);",
+      "  x *= (yield);",
+      "  x *= (yield 0);",
+      "  x /= (yield);",
+      "  x /= (yield 0);",
+      "  x %= (yield);",
+      "  x %= (yield 0);",
+      "  x <<= (yield 0);",
+      "  x <<= (yield);",
+      "  x >>= (yield);",
+      "  x >>= (yield 0);",
+      "  x >>>= (yield);",
+      "  x >>>= (yield 0);",
+      "  x &= (yield);",
+      "  x &= (yield 0);",
+      "  x ^= (yield);",
+      "  x ^= (yield 0);",
+      "  x |= (yield);",
+      "  x |= (yield 0);",
+      "  x = 0 ? (yield) : 0;",
+      "  x = 0 ? (yield 0) : 0;",
+      "  x = 0 ? 0 : (yield);",
+      "  x = 0 ? 0 : (yield 0);",
+      "  yield (yield);",
+      "}"
+    ], { singleGroups: true, esversion: 6 });
+
+  test.done();
+};
+
 singleGroups.arrowFunctions = function (test) {
   var code = [
     "var a = () => ({});",
