@@ -5153,6 +5153,13 @@ exports["automatic comma insertion GH-950"] = function (test) {
     "  return",
     "      { a: 1 }",
     "}",
+
+    "a",
+    "++",
+    "a",
+    "a",
+    "--",
+    "a",
   ];
 
   var run = TestRun(test)
@@ -5160,7 +5167,9 @@ exports["automatic comma insertion GH-950"] = function (test) {
     .addError(6, "Bad line breaking before '&&'.")
     .addError(8, "Line breaking error 'return'.")
     .addError(9, "Label 'a' on 1 statement.")
-    .addError(9, "Expected an assignment or function call and instead saw an expression.");
+    .addError(9, "Expected an assignment or function call and instead saw an expression.")
+    .addError(11, "Expected an assignment or function call and instead saw an expression.")
+    .addError(14, "Expected an assignment or function call and instead saw an expression.");
 
   run.test(code, {es3: true, asi: true});
   run.test(code, {asi: true}); // es5
@@ -5176,7 +5185,13 @@ exports["automatic comma insertion GH-950"] = function (test) {
     .addError(8, "Missing semicolon.")
     .addError(9, "Label 'a' on 1 statement.")
     .addError(9, "Expected an assignment or function call and instead saw an expression.")
-    .addError(9, "Missing semicolon.");
+    .addError(9, "Missing semicolon.")
+    .addError(11, "Expected an assignment or function call and instead saw an expression.")
+    .addError(11, "Missing semicolon.")
+    .addError(13, "Missing semicolon.")
+    .addError(14, "Expected an assignment or function call and instead saw an expression.")
+    .addError(14, "Missing semicolon.")
+    .addError(16, "Missing semicolon.");
 
   run.test(code, {es3: true, asi: false});
   run.test(code, {asi: false}); // es5
@@ -6324,7 +6339,12 @@ exports["test for line breaks with 'yield'"] = function (test) {
     .addError(6, "Bad line breaking before '+'.")
     .addError(8, "Comma warnings can be turned off with 'laxcomma'.")
     .addError(7, "Bad line breaking before ','.")
-    .addError(10, "Bad line breaking before '?'.")
+    .addError(9,  "Missing semicolon.")
+    .addError(10, "Expected an identifier and instead saw '?'.")
+    .addError(10, "Expected an assignment or function call and instead saw an expression.")
+    .addError(10, "Missing semicolon.")
+    .addError(10, "Label 'i' on j statement.")
+    .addError(10, "Expected an assignment or function call and instead saw an expression.")
     .addError(14, "Bad line breaking before '+'.");
 
   run.test(code, {esnext: true});
