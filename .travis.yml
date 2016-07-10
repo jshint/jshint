@@ -3,6 +3,7 @@ after_success: npm run coverage && cat ./coverage/lcov.info | coveralls
 node_js:
   - "0.10"
   - "0.12"
+script: npm test && npm run build && npm run test-rhino
 matrix:
   fast_finish: true
 sudo: false
