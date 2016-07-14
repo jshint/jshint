@@ -3,6 +3,8 @@ after_success: npm run coverage && cat ./coverage/lcov.info | coveralls
 node_js:
   - "0.10"
   - "0.12"
+  - 4
+  - 6
 matrix:
   fast_finish: true
 sudo: false
