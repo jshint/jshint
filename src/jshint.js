@@ -4477,6 +4477,10 @@ var JSHINT = (function() {
   }).exps = true;
 
   stmt("import", function() {
+    if (!state.funct["(scope)"].block.isGlobal()) {
+      error("E061", state.tokens.curr);
+    }
+
     if (!state.inES6()) {
       warning("W119", state.tokens.curr, "import", "6");
     }

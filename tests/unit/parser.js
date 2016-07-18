@@ -7004,6 +7004,20 @@ exports.testES6BlockExports = function (test) {
   test.done();
 };
 
+exports.testES6BlockImports = function (test) {
+  var code = [
+    "{",
+    " import x from './m.js';",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(2, "Import declarations are only allowed at the top level of module scope.")
+    .test(code, { esversion: 6, module: true });
+
+  test.done();
+};
+
 exports.testStrictDirectiveASI = function (test) {
   var options = { strict: true, asi: true, globalstrict: true, predef: ["x"] };
 

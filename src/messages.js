@@ -75,7 +75,8 @@ var errors = {
   E057: "Invalid meta property: '{a}.{b}'.",
   E058: "Missing semicolon.",
   E059: "Incompatible values for the '{a}' and '{b}' linting options.",
-  E060: "Non-callable values cannot be used as the second operand to instanceof."
+  E060: "Non-callable values cannot be used as the second operand to instanceof.",
+  E061: "Import declarations are only allowed at the top level of module scope."
 };
 
 var warnings = {
