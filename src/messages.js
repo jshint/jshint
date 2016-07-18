@@ -68,7 +68,7 @@ var errors = {
   E050: "Mozilla requires the yield expression to be parenthesized here.",
   E051: null,
   E052: "Unclosed template literal.",
-  E053: "Export declaration must be in global scope.",
+  E053: "{a} declarations are only allowed at the top level of module scope.",
   E054: "Class properties must be methods. Expected '(' but instead saw '{a}'.",
   E055: "The '{a}' option cannot be set after any executable code.",
   E056: "'{a}' was used before it was declared, which is illegal for '{b}' variables.",
