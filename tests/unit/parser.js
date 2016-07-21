@@ -6988,17 +6988,17 @@ exports.testES6BlockExports = function (test) {
   TestRun(test)
     .addError(1, "'broken' is defined but never used.")
     .addError(2, "'broken2' is defined but never used.")
-    .addError(4, "Export declaration must be in global scope.")
-    .addError(5, "Export declaration must be in global scope.")
-    .addError(6, "Export declaration must be in global scope.")
-    .addError(7, "Export declaration must be in global scope.")
-    .addError(8, "Export declaration must be in global scope.")
-    .addError(14, "Export declaration must be in global scope.")
-    .addError(15, "Export declaration must be in global scope.")
-    .addError(16, "Export declaration must be in global scope.")
-    .addError(17, "Export declaration must be in global scope.")
+    .addError(4, "export declarations are only allowed at the top level of module scope.")
+    .addError(5, "export declarations are only allowed at the top level of module scope.")
+    .addError(6, "export declarations are only allowed at the top level of module scope.")
+    .addError(7, "export declarations are only allowed at the top level of module scope.")
+    .addError(8, "export declarations are only allowed at the top level of module scope.")
+    .addError(14, "export declarations are only allowed at the top level of module scope.")
+    .addError(15, "export declarations are only allowed at the top level of module scope.")
+    .addError(16, "export declarations are only allowed at the top level of module scope.")
+    .addError(17, "export declarations are only allowed at the top level of module scope.")
     .addError(17, "Function declarations should not be placed in blocks. Use a function expression or move the statement to the top of the outer function.")
-    .addError(18, "Export declaration must be in global scope.")
+    .addError(18, "export declarations are only allowed at the top level of module scope.")
     .test(code, { esnext: true, unused: true });
 
   test.done();
@@ -7008,11 +7008,24 @@ exports.testES6BlockImports = function (test) {
   var code = [
     "{",
     " import x from './m.js';",
-    "}"
+    "}",
+    "function limitScope(){",
+    " import {x} from './m.js';",
+    "}",
+    "(function(){",
+    " import './m.js';",
+    "}());",
+    "{",
+    " import {x as y} from './m.js';",
+    "}",
+    "limitScope();"
   ];
 
   TestRun(test)
-    .addError(2, "Import declarations are only allowed at the top level of module scope.")
+    .addError(2, "import declarations are only allowed at the top level of module scope.")
+    .addError(5, "import declarations are only allowed at the top level of module scope.")
+    .addError(8, "import declarations are only allowed at the top level of module scope.")
+    .addError(11, "import declarations are only allowed at the top level of module scope.")
     .test(code, { esversion: 6, module: true });
 
   test.done();
