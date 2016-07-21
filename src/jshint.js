@@ -4478,7 +4478,7 @@ var JSHINT = (function() {
 
   stmt("import", function() {
     if (!state.funct["(scope)"].block.isGlobal()) {
-      error("E053", state.tokens.curr, state.tokens.curr.value);
+      error("E053", state.tokens.curr, "Import");
     }
 
     if (!state.inES6()) {
@@ -4579,7 +4579,7 @@ var JSHINT = (function() {
     }
 
     if (!state.funct["(scope)"].block.isGlobal()) {
-      error("E053", state.tokens.curr, state.tokens.curr.value);
+      error("E053", state.tokens.curr, "Export");
       ok = false;
     }
 
