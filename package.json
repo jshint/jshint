@@ -69,7 +69,7 @@
     "unicode-6.3.0":                  "0.1.x"
   },
 
-  "license": "(MIT AND JSON)",
+  "licenses": ["MIT", "JSON"],
 
   "preferGlobal": true,
 
