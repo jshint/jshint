@@ -3157,7 +3157,18 @@ exports.futureHostile = function (test) {
     "var Set = function() {};",
     "var Symbol = function() {};",
     "var WeakMap = function() {};",
-    "var WeakSet = function() {};"
+    "var WeakSet = function() {};",
+    "var ArrayBuffer = function() {};",
+    "var DataView = function() {};",
+    "var Int8Array = function() {};",
+    "var Int16Array = function() {};",
+    "var Int32Array = function() {};",
+    "var Uint8Array = function() {};",
+    "var Uint16Array = function() {};",
+    "var Uint32Array = function() {};",
+    "var Uint8ClampledArray = function() {};",
+    "var Float32Array = function() {};",
+    "var Float64Array = function() {};"
   ];
 
   TestRun(test, "ES3 without option")
@@ -3170,6 +3181,17 @@ exports.futureHostile = function (test) {
     .addError(7, "'Symbol' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .addError(8, "'WeakMap' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .addError(9, "'WeakSet' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(10, "'ArrayBuffer' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(11, "'DataView' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(12, "'Int8Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(13, "'Int16Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(14, "'Int32Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(15, "'Uint8Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(16, "'Uint16Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(17, "'Uint32Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(18, "'Uint8ClampledArray' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(19, "'Float32Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(20, "'Float64Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .test(code, { es3: true, es5: false, futurehostile: false });
 
   TestRun(test, "ES3 with option")
@@ -3185,6 +3207,17 @@ exports.futureHostile = function (test) {
     .addError(7, "'Symbol' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .addError(8, "'WeakMap' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .addError(9, "'WeakSet' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(10, "'ArrayBuffer' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(11, "'DataView' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(12, "'Int8Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(13, "'Int16Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(14, "'Int32Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(15, "'Uint8Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(16, "'Uint16Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(17, "'Uint32Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(18, "'Uint8ClampledArray' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(19, "'Float32Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(20, "'Float64Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .test(code, { futurehostile: false });
 
   TestRun(test, "ES5 with option")
@@ -3206,6 +3239,17 @@ exports.futureHostile = function (test) {
     .addError(7, "Redefinition of 'Symbol'.")
     .addError(8, "Redefinition of 'WeakMap'.")
     .addError(9, "Redefinition of 'WeakSet'.")
+    .addError(10, "Redefinition of 'ArrayBuffer'.")
+    .addError(11, "Redefinition of 'DataView'.")
+    .addError(12, "Redefinition of 'Int8Array'.")
+    .addError(13, "Redefinition of 'Int16Array'.")
+    .addError(14, "Redefinition of 'Int32Array'.")
+    .addError(15, "Redefinition of 'Uint8Array'.")
+    .addError(16, "Redefinition of 'Uint16Array'.")
+    .addError(17, "Redefinition of 'Uint32Array'.")
+    .addError(18, "Redefinition of 'Uint8ClampledArray'.")
+    .addError(19, "Redefinition of 'Float32Array'.")
+    .addError(20, "Redefinition of 'Float64Array'.")
     .test(code, { esnext: true, futurehostile: false });
 
   TestRun(test, "ESNext with option")
@@ -3218,6 +3262,17 @@ exports.futureHostile = function (test) {
     .addError(7, "Redefinition of 'Symbol'.")
     .addError(8, "Redefinition of 'WeakMap'.")
     .addError(9, "Redefinition of 'WeakSet'.")
+    .addError(10, "Redefinition of 'ArrayBuffer'.")
+    .addError(11, "Redefinition of 'DataView'.")
+    .addError(12, "Redefinition of 'Int8Array'.")
+    .addError(13, "Redefinition of 'Int16Array'.")
+    .addError(14, "Redefinition of 'Int32Array'.")
+    .addError(15, "Redefinition of 'Uint8Array'.")
+    .addError(16, "Redefinition of 'Uint16Array'.")
+    .addError(17, "Redefinition of 'Uint32Array'.")
+    .addError(18, "Redefinition of 'Uint8ClampledArray'.")
+    .addError(19, "Redefinition of 'Float32Array'.")
+    .addError(20, "Redefinition of 'Float64Array'.")
     .test(code, { esnext: true });
 
   TestRun(test, "ESNext with opt-out")
@@ -3233,7 +3288,18 @@ exports.futureHostile = function (test) {
         "-Set",
         "-Symbol",
         "-WeakMap",
-        "-WeakSet"
+        "-WeakSet",
+        "-ArrayBuffer",
+        "-DataView",
+        "-Int8Array",
+        "-Int16Array",
+        "-Int32Array",
+        "-Uint8Array",
+        "-Uint16Array",
+        "-Uint32Array",
+        "-Uint8ClampledArray",
+        "-Float32Array",
+        "-Float64Array"
       ]
     });
 
@@ -3246,7 +3312,18 @@ exports.futureHostile = function (test) {
     "let Set = function() {};",
     "let Symbol = function() {};",
     "let WeakMap = function() {};",
-    "let WeakSet = function() {};"
+    "let WeakSet = function() {};",
+    "let ArrayBuffer = function() {};",
+    "let DataView = function() {};",
+    "let Int8Array = function() {};",
+    "let Int16Array = function() {};",
+    "let Int32Array = function() {};",
+    "let Uint8Array = function() {};",
+    "let Uint16Array = function() {};",
+    "let Uint32Array = function() {};",
+    "let Uint8ClampledArray = function() {};",
+    "let Float32Array = function() {};",
+    "let Float64Array = function() {};"
   ];
 
   TestRun(test, "ESNext with option")
@@ -3259,6 +3336,17 @@ exports.futureHostile = function (test) {
     .addError(7, "Redefinition of 'Symbol'.")
     .addError(8, "Redefinition of 'WeakMap'.")
     .addError(9, "Redefinition of 'WeakSet'.")
+    .addError(10, "Redefinition of 'ArrayBuffer'.")
+    .addError(11, "Redefinition of 'DataView'.")
+    .addError(12, "Redefinition of 'Int8Array'.")
+    .addError(13, "Redefinition of 'Int16Array'.")
+    .addError(14, "Redefinition of 'Int32Array'.")
+    .addError(15, "Redefinition of 'Uint8Array'.")
+    .addError(16, "Redefinition of 'Uint16Array'.")
+    .addError(17, "Redefinition of 'Uint32Array'.")
+    .addError(18, "Redefinition of 'Uint8ClampledArray'.")
+    .addError(19, "Redefinition of 'Float32Array'.")
+    .addError(20, "Redefinition of 'Float64Array'.")
     .test(code, { esnext: true });
 
   TestRun(test, "ESNext with opt-out")
@@ -3274,7 +3362,18 @@ exports.futureHostile = function (test) {
         "-Set",
         "-Symbol",
         "-WeakMap",
-        "-WeakSet"
+        "-WeakSet",
+        "-ArrayBuffer",
+        "-DataView",
+        "-Int8Array",
+        "-Int16Array",
+        "-Int32Array",
+        "-Uint8Array",
+        "-Uint16Array",
+        "-Uint32Array",
+        "-Uint8ClampledArray",
+        "-Float32Array",
+        "-Float64Array"
       ]
     });
 
@@ -3287,7 +3386,18 @@ exports.futureHostile = function (test) {
     "const Set = function() {};",
     "const Symbol = function() {};",
     "const WeakMap = function() {};",
-    "const WeakSet = function() {};"
+    "const WeakSet = function() {};",
+    "const ArrayBuffer = function() {};",
+    "const DataView = function() {};",
+    "const Int8Array = function() {};",
+    "const Int16Array = function() {};",
+    "const Int32Array = function() {};",
+    "const Uint8Array = function() {};",
+    "const Uint16Array = function() {};",
+    "const Uint32Array = function() {};",
+    "const Uint8ClampledArray = function() {};",
+    "const Float32Array = function() {};",
+    "const Float64Array = function() {};"
   ];
 
   TestRun(test, "ESNext with option")
@@ -3300,6 +3410,17 @@ exports.futureHostile = function (test) {
     .addError(7, "Redefinition of 'Symbol'.")
     .addError(8, "Redefinition of 'WeakMap'.")
     .addError(9, "Redefinition of 'WeakSet'.")
+    .addError(10, "Redefinition of 'ArrayBuffer'.")
+    .addError(11, "Redefinition of 'DataView'.")
+    .addError(12, "Redefinition of 'Int8Array'.")
+    .addError(13, "Redefinition of 'Int16Array'.")
+    .addError(14, "Redefinition of 'Int32Array'.")
+    .addError(15, "Redefinition of 'Uint8Array'.")
+    .addError(16, "Redefinition of 'Uint16Array'.")
+    .addError(17, "Redefinition of 'Uint32Array'.")
+    .addError(18, "Redefinition of 'Uint8ClampledArray'.")
+    .addError(19, "Redefinition of 'Float32Array'.")
+    .addError(20, "Redefinition of 'Float64Array'.")
     .test(code, { esnext: true });
 
   TestRun(test, "ESNext with opt-out")
@@ -3315,7 +3436,18 @@ exports.futureHostile = function (test) {
         "-Set",
         "-Symbol",
         "-WeakMap",
-        "-WeakSet"
+        "-WeakSet",
+        "-ArrayBuffer",
+        "-DataView",
+        "-Int8Array",
+        "-Int16Array",
+        "-Int32Array",
+        "-Uint8Array",
+        "-Uint16Array",
+        "-Uint32Array",
+        "-Uint8ClampledArray",
+        "-Float32Array",
+        "-Float64Array"
       ]
     });
 
