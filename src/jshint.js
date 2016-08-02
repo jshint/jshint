@@ -3244,7 +3244,13 @@ var JSHINT = (function() {
             error("E034");
           }
 
-          i = propertyName();
+          // Checks if the getter and/or setter is a computed name by
+          // checking that the next value of the getter and/or setter is a [.
+          if (state.tokens.next.value === "[") {
+            i = computedPropertyName();
+          } else {
+            i = propertyName();
+          }
 
           // ES6 allows for get() {...} and set() {...} method
           // definition shorthand syntax, so we don't produce an error

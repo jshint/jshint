@@ -6026,6 +6026,24 @@ exports["computed class methods aren't duplicate"] = function (test) {
   test.done();
 };
 
+exports["computed property names for getters and setters"] = function (test) {
+  var code = [
+    "let x = 'foo';",
+    "let test = {",
+      "get [x]() { return 'bar'; }",
+    "};",
+    "let testing = {",
+      "val: null,",
+      "get ['bar']() { return this.val; },",
+      "set ['bar'](arg) { this.val = arg; }",
+    "};"
+  ];
+
+  TestRun(test).test(code, { esversion: 6 });
+
+  test.done();
+};
+
 exports["class method this"] = function (test) {
   var code = [
   "class C {",
