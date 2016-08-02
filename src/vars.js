@@ -42,12 +42,23 @@ exports.ecmaIdentifiers = {
     JSON               : false
   },
   6: {
+    ArrayBuffer        : false,
+    DataView           : false,
+    Float32Array       : false,
+    Float64Array       : false,
+    Int8Array          : false,
+    Int16Array         : false,
+    Int32Array         : false,
     Map                : false,
     Promise            : false,
     Proxy              : false,
     Reflect            : false,
     Set                : false,
     Symbol             : false,
+    Uint8Array         : false,
+    Uint16Array        : false,
+    Uint32Array        : false,
+    Uint8ClampledArray : false,
     WeakMap            : false,
     WeakSet            : false
   }
