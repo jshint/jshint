@@ -1276,7 +1276,7 @@ Lexer.prototype = {
     var flags = [];
     var malformed = false;
     var isCharSet = false;
-    var terminated;
+    var terminated, malformedDesc;
 
     var scanUnexpectedChars = function() {
       // Unexpected control character
@@ -1394,10 +1394,24 @@ Lexer.prototype = {
 
     while (index < length) {
       char = this.peek(index);
-      if (!/[gim]/.test(char)) {
+      if (!/[gimy]/.test(char)) {
         break;
       }
-      flags.push(char);
+      if (char === "y") {
+        if (!state.inES6(true)) {
+          this.trigger("warning", {
+            code: "W119",
+            line: this.line,
+            character: this.char,
+            data: [ "Sticky RegExp flag", "6" ]
+          });
+        }
+        if (value.indexOf("y") > -1) {
+          malformedDesc = "Duplicate RegExp flag";
+        }
+      } else {
+        flags.push(char);
+      }
       value += char;
       index += 1;
     }
@@ -1407,12 +1421,21 @@ Lexer.prototype = {
     try {
       new RegExp(body, flags.join(""));
     } catch (err) {
+      /**
+       * Because JSHint relies on the current engine's RegExp parser to
+       * validate RegExp literals, the description (exposed as the "data"
+       * property on the error object) is platform dependent.
+       */
+      malformedDesc = err.message;
+    }
+
+    if (malformedDesc) {
       malformed = true;
       this.trigger("error", {
         code: "E016",
         line: this.line,
         character: this.char,
-        data: [ err.message ] // Platform dependent!
+        data: [ malformedDesc ]
       });
     }
 

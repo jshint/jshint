@@ -606,6 +606,34 @@ exports.testRegexRegressions = function (test) {
   test.done();
 };
 
+exports.regexpSticky = function (test) {
+ TestRun(test)
+   .addError(1, "'Sticky RegExp flag' is only available in ES6 (use 'esversion: 6').")
+   .test("var exp = /./y;", { esversion: 5 });
+
+ TestRun(test).test("var exp = /./y;", { esversion: 6 });
+ TestRun(test).test("var exp = /./gy;", { esversion: 6 });
+ TestRun(test).test("var exp = /./yg;", { esversion: 6 });
+
+ TestRun(test, "Invalid due to repetition")
+   .addError(1, "Invalid regular expression.")
+   .addError(2, "Invalid regular expression.")
+   .test([
+      "var exp = /./yy;",
+      "var exp = /./ygy;"
+      ], { esversion: 6 });
+
+ TestRun(test, "Invalid due to other conditions")
+   .addError(1, "Invalid regular expression.")
+   .addError(2, "Invalid regular expression.")
+   .test([
+     "var exp = /./gyg;",
+     "var exp = /?/y;"
+     ] , { esversion: 6 });
+
+ test.done();
+};
+
 exports.strings = function (test) {
   var code = [
     "var a = '\u0012\\r';",
