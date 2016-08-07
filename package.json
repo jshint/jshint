@@ -28,7 +28,7 @@
     "build": "node bin/build",
     "coverage": "istanbul -- cover ./node_modules/.bin/nodeunit tests/unit",
     "data": "node scripts/generate-identifier-data",
-    "pretest": "./bin/jshint src && jscs src",
+    "pretest": "node ./bin/jshint src && jscs src",
     "changelog": "conventional-changelog -p jshint -i CHANGELOG.md -w",
     "github-release": "conventional-github-releaser -p jshint",
     "test-browser": "node tests/browser",
