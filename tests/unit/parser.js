@@ -3426,6 +3426,7 @@ exports["esnext generator with yield delegation, gh-1544"] = function(test) {
 
 
   TestRun(test).test(code, {esnext: true, noyield: true});
+  TestRun(test).test(code, {esnext: true, noyield: true, moz: true});
 
   test.done();
 };
@@ -3468,6 +3469,11 @@ exports["mozilla generator as esnext"] = function (test) {
     .addError(4,
      "A yield statement shall be within a generator function (with syntax: `function*`)")
     .test(code, {esnext: true, unused: true, undef: true, predef: ["print", "Iterator"]});
+
+  TestRun(test)
+    .addError(4,
+     "A yield statement shall be within a generator function (with syntax: `function*`)")
+    .test(code, {esnext: true, moz: true});
 
   test.done();
 };
@@ -3720,6 +3726,11 @@ exports["moz-style array comprehension as esnext"] = function (test) {
     .addError(7, "Expected 'for' and instead saw 'i'.")
     .addError(7, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
     .test(code, {esnext: true, unused: true, undef: true, predef: ["print"]});
+
+  TestRun(test)
+    .addError(3, "A yield statement shall be within a generator function (with syntax: " +
+      "`function*`)")
+    .test(code, {esnext: true, moz: true});
 
   test.done();
 };
