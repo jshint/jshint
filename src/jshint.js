@@ -4507,8 +4507,6 @@ var JSHINT = (function() {
       if (!("(catch)" === state.funct["(name)"] && state.funct["(context)"]["(generator)"])) {
         error("E046", state.tokens.curr, "yield");
       }
-    } else if (!state.inES6()) {
-      warning("W104", state.tokens.curr, "yield", "6");
     }
     state.funct["(generator)"] = "yielded";
     var delegatingYield = false;
