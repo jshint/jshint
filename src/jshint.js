@@ -809,9 +809,12 @@ var JSHINT = (function() {
     return token.infix || (!token.identifier && !token.template && !!token.led);
   }
 
-  function isEndOfExpr() {
-    var curr = state.tokens.curr;
-    var next = state.tokens.next;
+  function isEndOfExpr(curr, next) {
+    if (arguments.length === 0) {
+      curr = state.tokens.curr;
+      next = state.tokens.next;
+    }
+
     if (next.id === ";" || next.id === "}" || next.id === ":") {
       return true;
     }
@@ -1682,12 +1685,13 @@ var JSHINT = (function() {
    * read all directives
    */
   function directives() {
+    var current = state.tokens.next;
     while (state.tokens.next.id === "(string)") {
-      var p = peekIgnoreEOL();
-      if (p.lbp > 0 && p.lbp !== 150 ||
-          (startLine(p) === state.tokens.next.line && checkPunctuators(p, ["++", "--"]))) {
+      var next = peekIgnoreEOL();
+      if (!isEndOfExpr(current, next)) {
         break;
       }
+      current = next;
 
       advance();
       var directive = state.tokens.curr.value;
