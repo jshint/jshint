@@ -716,16 +716,16 @@ var JSHINT = (function() {
     }
 
     while (j <= i) {
-      t = lookahead[j];
-      if (!t) {
-        t = lookahead[j] = lex.token();
-      }
-      j += 1;
-    }
+      t = lex.token();
 
-    // Peeking past the end of the program should produce the "(end)" token.
-    if (!t && state.tokens.next.id === "(end)") {
-      return state.tokens.next;
+      // Peeking past the end of the program should produce the "(end)" token
+      // and should not extend the lookahead buffer.
+      if (!t && state.tokens.next.id === "(end)") {
+        return state.tokens.next;
+      }
+
+      lookahead[j] = t;
+      j += 1;
     }
 
     return t;

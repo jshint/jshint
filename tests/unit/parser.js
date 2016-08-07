@@ -458,6 +458,11 @@ exports.comments = function (test) {
   TestRun(test).test(src);
   TestRun(test).test(fs.readFileSync(__dirname + "/fixtures/gruntComment.js", "utf8"));
 
+  TestRun(test)
+    .addError(1, "Unmatched '{'.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .test("({");
+
   test.done();
 };
 
