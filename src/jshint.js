@@ -3244,10 +3244,8 @@ var JSHINT = (function() {
             error("E034");
           }
 
-          // Checks if the getter and/or setter is a computed name by
-          // checking that the next value of the getter and/or setter is a [.
-          if (state.tokens.next.value === "[") {
-            i = computedPropertyName();
+          if (state.tokens.next.type === "(punctuator)" && state.tokens.next.id === "[") {
+            i = computedPropertyName().value;
           } else {
             i = propertyName();
           }
