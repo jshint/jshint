@@ -3431,6 +3431,7 @@ exports["esnext generator with yield delegation, gh-1544"] = function(test) {
 
 
   TestRun(test).test(code, {esnext: true, noyield: true});
+  TestRun(test).test(code, {esnext: true, noyield: true, moz: true});
 
   test.done();
 };
@@ -3473,6 +3474,11 @@ exports["mozilla generator as esnext"] = function (test) {
     .addError(4,
      "A yield statement shall be within a generator function (with syntax: `function*`)")
     .test(code, {esnext: true, unused: true, undef: true, predef: ["print", "Iterator"]});
+
+  TestRun(test)
+    .addError(4,
+     "A yield statement shall be within a generator function (with syntax: `function*`)")
+    .test(code, {esnext: true, moz: true});
 
   test.done();
 };
@@ -3725,6 +3731,11 @@ exports["moz-style array comprehension as esnext"] = function (test) {
     .addError(7, "Expected 'for' and instead saw 'i'.")
     .addError(7, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
     .test(code, {esnext: true, unused: true, undef: true, predef: ["print"]});
+
+  TestRun(test)
+    .addError(3, "A yield statement shall be within a generator function (with syntax: " +
+      "`function*`)")
+    .test(code, {esnext: true, moz: true});
 
   test.done();
 };
@@ -6269,11 +6280,46 @@ exports["test for crash with invalid condition"] = function (test) {
 exports["test 'yield' in compound expressions."] = function (test) {
   var code = fs.readFileSync(path.join(__dirname, "./fixtures/yield-expressions.js"), "utf8");
 
-  var run = TestRun(test)
+  var run = TestRun(test);
+
+  run
+    .addError(22, "Did you mean to return a conditional instead of an assignment?")
+    .addError(23, "Invalid position for 'yield' expression (consider wrapping in parenthesis).", { character: 22 })
+    .addError(31, "Did you mean to return a conditional instead of an assignment?")
+    .addError(32, "Invalid position for 'yield' expression (consider wrapping in parenthesis).", { character: 20 })
+    .addError(32, "Bad operand.", { character: 17 })
+    .addError(51, "Invalid position for 'yield' expression (consider wrapping in parenthesis).", { character: 10 })
+    .addError(53, "Invalid position for 'yield' expression (consider wrapping in parenthesis).", { character: 10 })
+    .addError(54, "Invalid position for 'yield' expression (consider wrapping in parenthesis).", { character: 16 })
+    .addError(57, "Invalid position for 'yield' expression (consider wrapping in parenthesis).", { character: 10 })
+    .addError(58, "Bad operand.", { character: 11 })
+    .addError(59, "Invalid position for 'yield' expression (consider wrapping in parenthesis).", { character: 10 })
+    .addError(59, "Bad operand.", { character: 16 })
+    .addError(60, "Bad operand.", { character: 11 })
+    .addError(60, "Invalid position for 'yield' expression (consider wrapping in parenthesis).", { character: 14 })
+    .addError(64, "Invalid position for 'yield' expression (consider wrapping in parenthesis).", { character: 6 })
+    .addError(65, "Invalid position for 'yield' expression (consider wrapping in parenthesis).", { character: 7 })
+    .addError(66, "Invalid position for 'yield' expression (consider wrapping in parenthesis).", { character: 6 })
+    .addError(67, "Invalid position for 'yield' expression (consider wrapping in parenthesis).", { character: 7 })
+    .addError(70, "Invalid position for 'yield' expression (consider wrapping in parenthesis).", { character: 6 })
+    .addError(71, "Invalid position for 'yield' expression (consider wrapping in parenthesis).", { character: 7 })
+    .addError(77, "Bad operand.", { character: 11 })
+    .addError(78, "Bad operand.", { character: 11 })
+    .addError(78, "Bad operand.", { character: 19 })
+    .addError(79, "Bad operand.", { character: 11 })
+    .addError(79, "Bad operand.", { character: 19 })
+    .addError(79, "Bad operand.", { character: 47 })
+    .addError(82, "Bad operand.", { character: 11 })
+    .addError(83, "Bad operand.", { character: 11 })
+    .addError(83, "Bad operand.", { character: 19 })
+    .addError(84, "Bad operand.", { character: 11 })
+    .addError(84, "Bad operand.", { character: 19 })
+    .addError(84, "Bad operand.", { character: 43 })
+    .test(code, {maxerr: 1000, expr: true, esnext: true});
+
+  run = TestRun(test)
     .addError(22, "Did you mean to return a conditional instead of an assignment?")
     .addError(31, "Did you mean to return a conditional instead of an assignment?");
-
-  run.test(code, {maxerr: 1000, expr: true, esnext: true});
 
   // These are line-column pairs for the Mozilla paren errors.
   var needparen = [
@@ -6302,6 +6348,106 @@ exports["test 'yield' in compound expressions."] = function (test) {
     .addError(74, "'function*' is only available in ES6 (use 'esversion: 6').");
 
   run.test(code, {maxerr: 1000, expr: true, moz: true});
+
+  test.done();
+};
+
+exports["test 'yield' in invalid positions"] = function (test) {
+  var testRun = TestRun(test, "as an invalid operand")
+    .addError(1, "Invalid position for 'yield' expression (consider wrapping in parenthesis).");
+
+  testRun.test("function* g() { null || yield; }", { esversion: 6, expr: true });
+  testRun.test("function* g() { null || yield null; }", { esversion: 6, expr: true });
+  testRun.test("function* g() { null || yield* g(); }", { esversion: 6, expr: true });
+  testRun.test("function* g() { null && yield; }", { esversion: 6, expr: true });
+  testRun.test("function* g() { null && yield null; }", { esversion: 6, expr: true });
+  testRun.test("function* g() { null && yield* g(); }", { esversion: 6, expr: true });
+  testRun.test("function* g() { !yield; }", { esversion: 6, expr: true });
+  testRun.test("function* g() { !yield null; }", { esversion: 6, expr: true });
+  testRun.test("function* g() { !yield* g(); }", { esversion: 6, expr: true });
+  testRun.test("function* g() { !!yield; }", { esversion: 6, expr: true });
+  testRun.test("function* g() { !!yield null; }", { esversion: 6, expr: true });
+  testRun.test("function* g() { !!yield* g(); }", { esversion: 6, expr: true });
+  testRun.test("function* g() { 1 + yield; }", { esversion: 6, expr: true });
+  testRun.test("function* g() { 1 + yield null; }", { esversion: 6, expr: true });
+  testRun.test("function* g() { 1 + yield* g(); }", { esversion: 6, expr: true });
+  testRun.test("function* g() { 1 - yield; }", { esversion: 6, expr: true });
+  testRun.test("function* g() { 1 - yield null; }", { esversion: 6, expr: true });
+  testRun.test("function* g() { 1 - yield* g(); }", { esversion: 6, expr: true });
+
+  testRun = TestRun(test, "with an invalid operand")
+    .addError(1, "Bad operand.");
+
+  testRun.test("function* g() { yield.x; }", { esversion: 6, expr: true });
+  testRun.test("function* g() { yield*.x; }", { esversion: 6, expr: true });
+  testRun.test("function* g() { yield ? null : null; }", { esversion: 6, expr: true });
+  testRun.test("function* g() { yield* ? null : null; }", { esversion: 6, expr: true });
+  testRun.test("function* g() { (yield ? 1 : 1); }", { esversion: 6, expr: true });
+  testRun.test("function* g() { (yield* ? 1 : 1); }", { esversion: 6, expr: true });
+  testRun.test("function* g() { yield / 1; }", { esversion: 6, expr: true });
+  TestRun(test)
+    .addError(1, "Unclosed regular expression.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .test("function* g() { yield* / 1; }", { esversion: 6, expr: true });
+
+  TestRun(test, 'as a valid operand')
+    .test([
+      "function* g() {",
+      "  (yield);",
+      "  var x = yield;",
+      "  x = yield;",
+      "  x = (yield, null);",
+      "  x = (null, yield);",
+      "  x = (null, yield, null);",
+      "  x += yield;",
+      "  x -= yield;",
+      "  x *= yield;",
+      "  x /= yield;",
+      "  x %= yield;",
+      "  x <<= yield;",
+      "  x >>= yield;",
+      "  x >>>= yield;",
+      "  x &= yield;",
+      "  x ^= yield;",
+      "  x |= yield;",
+      "  x = (yield) ? 0 : 0;",
+      "  x = yield 0 ? 0 : 0;",
+      "  x = 0 ? yield : 0;",
+      "  x = 0 ? 0 : yield;",
+      "  x = 0 ? yield : yield;",
+      "  yield yield;",
+      "}"
+    ], { esversion: 6 });
+
+  TestRun(test, "with a valid operand")
+    .test([
+      "function *g() {",
+      "  yield g;",
+      "  yield{};",
+      // Misleading cases; potential future warning.
+      "  yield + 1;",
+      "  yield - 1;",
+      "  yield[0];",
+      "}"
+    ], { esversion: 6 });
+
+  var code = [
+    "function* g() {",
+    "  var x;",
+    "  x++",
+    "  yield;",
+    "  x--",
+    "  yield;",
+    "}"
+  ];
+
+  TestRun(test, "asi")
+    .addError(3, "Missing semicolon.")
+    .addError(5, "Missing semicolon.")
+    .test(code, { esversion: 6, expr: true });
+
+  TestRun(test, "asi (ignoring warnings)")
+    .test(code, { esversion: 6, expr: true, asi: true });
 
   test.done();
 };
@@ -6340,17 +6486,22 @@ exports["test for line breaks with 'yield'"] = function (test) {
   ];
 
   var run = TestRun(test)
-    .addError(3, "Bad line breaking before 'c'.")
-    .addError(6, "Bad line breaking before '+'.")
-    .addError(8, "Comma warnings can be turned off with 'laxcomma'.")
+    .addError(3, "Expected ')' to match '(' from line 2 and instead saw 'c'.")
+    .addError(3, "Missing semicolon.")
+    .addError(4, "Expected an identifier and instead saw ')'.")
+    .addError(4, "Expected an assignment or function call and instead saw an expression.")
+    .addError(5, "Missing semicolon.")
+    .addError(6, "Expected an assignment or function call and instead saw an expression.")
     .addError(7, "Bad line breaking before ','.")
-    .addError(9,  "Missing semicolon.")
+    .addError(8, "Comma warnings can be turned off with 'laxcomma'.")
+    .addError(9, "Missing semicolon.")
     .addError(10, "Expected an identifier and instead saw '?'.")
     .addError(10, "Expected an assignment or function call and instead saw an expression.")
     .addError(10, "Missing semicolon.")
     .addError(10, "Label 'i' on j statement.")
     .addError(10, "Expected an assignment or function call and instead saw an expression.")
-    .addError(14, "Bad line breaking before '+'.");
+    .addError(13, "Missing semicolon.")
+    .addError(14, "Expected an assignment or function call and instead saw an expression.");
 
   run.test(code, {esnext: true});
 
@@ -6403,12 +6554,12 @@ exports["test for line breaks with 'yield'"] = function (test) {
     "}"
   ];
 
-  TestRun(test, "gh-2530")
+  TestRun(test, "gh-2530 (asi: true)")
     .addError(5, "Bad line breaking before 'fn'.")
     .test(code2, { esnext: true, undef: false, asi: true });
 
-  TestRun(test, "gh-2530")
-    .addError(3, "Bad line breaking before 'fn'.")
+  TestRun(test, "gh-2530 (asi: false)")
+    .addError(2, "Missing semicolon.")
     .addError(5, "Bad line breaking before 'fn'.")
     .test(code2, { esnext: true, undef: false });
 
