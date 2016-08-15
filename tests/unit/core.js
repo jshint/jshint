@@ -2082,26 +2082,31 @@ exports["class setters and getters parameter count"] = function (test) {
 
   var code = [
     "class A {",
-    "  get getter0() {}",
-    "  get getter1(a) {}",
-    "  set setter0() {}",
-    "  set setter1(a) {}",
-    "  set setter2(a, b) {}",
-    "  static get static_getter0() {}",
-    "  static get static_getter1(a) {}",
-    "  static set static_setter0() {}",
-    "  static set static_setter1(a) {}",
-    "  static set static_setter2(a, b) {}",
+    "  get zero_params() {}",
+    "  get one_param(a) {}",
+    "  get two_params(a, b) {}",
+    "  set zero_params() {}",
+    "  set one_param(a) {}",
+    "  set two_params(a, b) {}",
+    "  static get static_zero_params() {}",
+    "  static get static_one_param(a) {}",
+    "  static get static_two_params(a, b) {}",
+    "  static set static_zero_params() {}",
+    "  static set static_one_param(a) {}",
+    "  static set static_two_params(a, b) {}",
     "}"
   ];
 
   TestRun(test)
-    .addError(3, "Unexpected parameter 'a' in get getter1 function.")
-    .addError(4, "Expected a single parameter in set setter0 function.")
-    .addError(6, "Expected a single parameter in set setter2 function.")
-    .addError(8, "Unexpected parameter 'a' in get static_getter1 function.")
-    .addError(9, "Expected a single parameter in set static_setter0 function.")
-    .addError(11, "Expected a single parameter in set static_setter2 function.")
+    .addError(3, "Unexpected parameter 'a' in get one_param function.")
+    .addError(4, "Unexpected parameter 'a' in get two_params function.")
+    .addError(5, "Expected a single parameter in set zero_params function.")
+    .addError(7, "Expected a single parameter in set two_params function.")
+    .addError(9, "Unexpected parameter 'a' in get static_one_param function.")
+    .addError(10, "Unexpected parameter 'a' in get static_two_params function.")
+    .addError(11, "Expected a single parameter in set static_zero_params function.")
+    .addError(13, "Expected a single parameter in set static_two_params function.")
+    .test(code, { esversion: 6 });
 
   test.done();
 };
