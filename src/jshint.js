@@ -2501,7 +2501,7 @@ var JSHINT = (function() {
       i += 1;
       pn1 = pn;
       pn = peek(i);
-    } while (!(parens === 0 && pn1.value === ")") && pn.value !== ";" && pn.type !== "(end)");
+    } while (!(parens === 0 && pn1.value === ")") && pn.type !== "(end)");
 
     if (state.tokens.next.id === "function") {
       triggerFnExpr = state.tokens.next.immed = true;

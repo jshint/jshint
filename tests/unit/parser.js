@@ -5410,6 +5410,15 @@ exports["expressions in place of arrow function parameters"] = function (test) {
   test.done();
 };
 
+exports["arrow function parameter containing semicolon (gh-3002)"] = function (test) {
+  TestRun(test)
+    .addError(1, "Unnecessary semicolon.", { character: 19 })
+    .addError(1, "Expected an assignment or function call and instead saw an expression.", { character: 27 })
+    .test("(x = function() { ; }) => 0;", { esversion: 6 });
+
+  test.done();
+};
+
 var conciseMethods = exports.conciseMethods = {};
 
 conciseMethods.basicSupport = function (test) {
