@@ -805,7 +805,11 @@ var JSHINT = (function() {
   }
 
   function isInfix(token) {
-    return token.infix || (!token.identifier && !token.template && !!token.led);
+    return token.infix ||
+      (!token.identifier && !token.template && !!token.led) ||
+      // Although implemented as an Identifier, the `yield` keyword behaves as
+      // an operator when it appears in the body of a generator function.
+      (token.id === "yield" && !!state.funct["(generator)"]);
   }
 
   function isEndOfExpr(curr, next) {
@@ -2579,7 +2583,7 @@ var JSHINT = (function() {
       // The operator may be necessary to override the default binding power of
       // neighboring operators (whenever there is an operator in use within the
       // first expression *or* the current group contains multiple expressions)
-      if (!isNecessary && (first.left || first.right || ret.exprs)) {
+      if (!isNecessary && (isInfix(first) || first.right || ret.exprs)) {
         isNecessary =
           (rbp > first.lbp) ||
           (rbp > 0 && rbp === first.lbp) ||
@@ -4428,7 +4432,15 @@ var JSHINT = (function() {
     x.lbp = 25;
     x.ltBoundary = "after";
   }(prefix("yield", function() {
+    if (state.inMoz()) {
+      return mozYield.call(this);
+    }
     var prev = state.tokens.prev;
+
+    if (!this.beginsStmt && prev.lbp > 30 && !checkPunctuators(prev, ["("])) {
+      error("E061", this);
+    }
+
     if (state.inES6(true) && !state.funct["(generator)"]) {
       // If it's a yield within a catch clause inside a generator then that's ok
       if (!("(catch)" === state.funct["(name)"] && state.funct["(context)"]["(generator)"])) {
@@ -4445,7 +4457,48 @@ var JSHINT = (function() {
       advance("*");
     }
 
-    if (this.line === startLine(state.tokens.next) || !state.inMoz()) {
+    // Parse operand
+    if (!isEndOfExpr() && state.tokens.next.id !== ",") {
+      if (state.tokens.next.nud) {
+
+        nobreaknonadjacent(state.tokens.curr, state.tokens.next);
+        this.first = expression(10);
+
+        if (this.first.type === "(punctuator)" && this.first.value === "=" &&
+            !this.first.paren && !state.option.boss) {
+          warningAt("W093", this.first.line, this.first.character);
+        }
+      } else if (state.tokens.next.led) {
+        if (state.tokens.next.id !== ",") {
+          error("W017", state.tokens.next);
+        }
+      }
+    }
+
+    return this;
+  })));
+
+  /**
+   * Parsing logic for non-standard Mozilla implementation of `yield`
+   * expressions.
+   */
+  var mozYield = function() {
+    var prev = state.tokens.prev;
+    if (state.inES6(true) && !state.funct["(generator)"]) {
+      // If it's a yield within a catch clause inside a generator then that's ok
+      if (!("(catch)" === state.funct["(name)"] && state.funct["(context)"]["(generator)"])) {
+        error("E046", state.tokens.curr, "yield");
+      }
+    }
+    state.funct["(generator)"] = "yielded";
+    var delegatingYield = false;
+
+    if (state.tokens.next.value === "*") {
+      delegatingYield = true;
+      advance("*");
+    }
+
+    if (this.line === startLine(state.tokens.next)) {
       if (delegatingYield ||
           (state.tokens.next.id !== ";" && !state.option.asi &&
            !state.tokens.next.reach && state.tokens.next.nud)) {
@@ -4459,7 +4512,7 @@ var JSHINT = (function() {
         }
       }
 
-      if (state.inMoz() && state.tokens.next.id !== ")" &&
+      if (state.tokens.next.id !== ")" &&
           (prev.lbp > 30 || (!prev.assign && !isEndOfExpr()) || prev.id === "yield")) {
         error("E050", this);
       }
@@ -4467,8 +4520,7 @@ var JSHINT = (function() {
       nolinebreak(this); // always warn (Line breaking error)
     }
     return this;
-  })));
-
+  };
 
   stmt("throw", function() {
     nolinebreak(this);
