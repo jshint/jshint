@@ -6421,7 +6421,6 @@ exports["test 'yield' in invalid positions"] = function (test) {
   testRun.test("function* g() { yield* ? null : null; }", { esversion: 6, expr: true });
   testRun.test("function* g() { (yield ? 1 : 1); }", { esversion: 6, expr: true });
   testRun.test("function* g() { (yield* ? 1 : 1); }", { esversion: 6, expr: true });
-  testRun.test("function* g() { yield / 1; }", { esversion: 6, expr: true });
   TestRun(test)
     .addError(1, "Unclosed regular expression.")
     .addError(1, "Unrecoverable syntax error. (100% scanned).")
@@ -6599,6 +6598,57 @@ exports["test for line breaks with 'yield'"] = function (test) {
     .addError(2, "Missing semicolon.")
     .addError(5, "Bad line breaking before 'fn'.")
     .test(code2, { esnext: true, undef: false });
+
+  test.done();
+};
+
+// Regression test for gh-2956
+exports.yieldRegExp = function (test) {
+  var code = [
+    "function* g() {",
+    "  yield /./;",
+    "  yield/./;",
+    "  yield",
+    "  /./;",
+    "  yield /* comment */;",
+    "  yield /* comment *//./;",
+    "  yield 1 / 1;",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(1, "'function*' is only available in ES6 (use 'esversion: 6').")
+    .addError(2, "'yield' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .addError(3, "'yield' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .addError(4, "'yield' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .addError(4, "Missing semicolon.")
+    .addError(5, "Expected an assignment or function call and instead saw an expression.")
+    .addError(6, "'yield' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .addError(7, "'yield' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .addError(8, "'yield' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .test(code);
+
+  TestRun(test)
+    .addError(4, "Missing semicolon.")
+    .addError(5, "Expected an assignment or function call and instead saw an expression.")
+    .test(code, { esversion: 6 });
+
+  code = [
+    "function* g() {",
+    "  yield / 2;",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(1, "'function*' is only available in ES6 (use 'esversion: 6').")
+    .addError(2, "Unclosed regular expression.")
+    .addError(2, "Unrecoverable syntax error. (66% scanned).")
+    .test(code);
+
+  TestRun(test)
+    .addError(2, "Unclosed regular expression.")
+    .addError(2, "Unrecoverable syntax error. (66% scanned).")
+    .test(code, { esversion: 6 });
 
   test.done();
 };

@@ -1650,7 +1650,7 @@ Lexer.prototype = {
       }
 
       if (type === "(identifier)") {
-        if (value === "return" || value === "case" ||
+        if (value === "return" || value === "case" || value === "yield" ||
             value === "typeof" || value === "instanceof") {
           this.prereg = true;
         }
