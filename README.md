@@ -109,7 +109,7 @@ Page](https://github.com/lukeapage).
 
 Originating from the JSLint project in 2010, JSHint has been maintained by a
 number of dedicated individuals. In chronological order, they are: Douglas
-Crockford, Anton Kovalev, and Mike Sherov. We appreciate their long-term
+Crockford, Anton Kovalyov, and Mike Sherov. We appreciate their long-term
 commitment!
 
 ## Thank you!
