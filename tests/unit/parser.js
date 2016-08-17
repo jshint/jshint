@@ -647,17 +647,24 @@ exports.strings = function (test) {
     "var d = '\\\\';",
     "var e = '\\x6b..\\x6e';",
     "var f = '\\b\\f\\n\\/';",
-    "var g = 'ax",
+    "var g = '\\u{61}';",
+    "var h = '\\u{102c0}';",
+    "var i = '\\u{0000000041}';",
+    "var j = 'ax"
   ];
 
   var run = TestRun(test)
     .addError(1, "Control character in string: <non-printable>.", {character: 10})
     .addError(1, "This character may get silently deleted by one or more browsers.")
-    .addError(7, "Unclosed string.")
-    .addError(7, "Missing semicolon.");
+    .addError(10, "Unclosed string.")
+    .addError(10, "Missing semicolon.");
+  run.test(code, { esnext: true });
+  run
+    .addError(7, "'\\u{...}' is only available in ES6 (use 'esversion: 6').")
+    .addError(8, "'\\u{...}' is only available in ES6 (use 'esversion: 6').")
+    .addError(9, "'\\u{...}' is only available in ES6 (use 'esversion: 6').");
   run.test(code, {es3: true});
   run.test(code, {}); // es5
-  run.test(code, {esnext: true});
   run.test(code, {moz: true});
 
   test.done();
@@ -665,15 +672,34 @@ exports.strings = function (test) {
 
 exports.badStrings = function (test) {
   var code = [
-    "var a = '\\uNOTHEX';"
+    "var a = '\\uNOTHEX';",
+    "var c = '\\u{10abcde}';" // 10abcde > 10ffff
   ];
 
   var run = TestRun(test)
-    .addError(1, "Unexpected 'uNOTH'.");
+    .addError(1, "Unexpected '\\uNOTH'.")
+    .addError(2, "Unexpected '\\u{10abcde}'.");
+  run.test(code, {esnext: true});
+  run.addError(2, "'\\u{...}' is only available in ES6 (use 'esversion: 6').");
   run.test(code, {es3: true});
   run.test(code, {}); // es5
-  run.test(code, {esnext: true});
   run.test(code, {moz: true});
+
+  var unclosedBrace = [
+    "var a = '\\u{abc';",
+    "var b = '\\u{abcs}';" // "s" isn't an hex digit
+  ];
+
+  var run = TestRun(test)
+    .addError(1, "Expected '}' to match '{' from line 1 and instead saw '''.")
+    .addError(2, "Expected '}' to match '{' from line 2 and instead saw 's'.");
+  run.test(unclosedBrace, { esnext: true });
+  run
+    .addError(1, "'\\u{...}' is only available in ES6 (use 'esversion: 6').")
+    .addError(2, "'\\u{...}' is only available in ES6 (use 'esversion: 6').");
+  run.test(unclosedBrace, {es3: true});
+  run.test(unclosedBrace, {}); // es5
+  run.test(unclosedBrace, {moz: true});
 
   test.done();
 };
@@ -1232,35 +1258,101 @@ exports.testIdentifiers = function (test) {
   run.test(src, {esnext: true, unused: true });
   run.test(src, {moz: true, unused: true });
 
+  src = [
+    "var \\u{64};",
+    "var a\\u{64};",
+    "var \\u{64}a;",
+    "var \\u{102c1};",
+    "var a\\u{102c1};",
+    "var \\u{102c1}a;",
+    "var 𐋀;",  // U+102C0
+    "var a𐋀;", // U+102C0
+    "var 𐋀a;", // U+102C0
+    "var a\\u{10a0c};", // ID_Continue
+    "var b𐨌;", // U+10A0C,
+    "var \\u{00000065};"
+  ];
+
+  run = TestRun(test)
+    .addError(1, "'\\u{64}' is defined but never used.")
+    .addError(2, "'a\\u{64}' is defined but never used.")
+    .addError(3, "'\\u{64}a' is defined but never used.")
+    .addError(4, "'\\u{102c1}' is defined but never used.")
+    .addError(5, "'a\\u{102c1}' is defined but never used.")
+    .addError(6, "'\\u{102c1}a' is defined but never used.")
+    .addError(7, "'𐋀' is defined but never used.")
+    .addError(8, "'a𐋀' is defined but never used.")
+    .addError(9, "'𐋀a' is defined but never used.")
+    .addError(10, "'a\\u{10a0c}' is defined but never used.")
+    .addError(11, "'b𐨌' is defined but never used.")
+    .addError(12, "'\\u{00000065}' is defined but never used.");
+  run.test(src, { esnext: true, unused: true });
+
+  run
+    .addError(1, "'\\u{...}' is only available in ES6 (use 'esversion: 6').")
+    .addError(2, "'\\u{...}' is only available in ES6 (use 'esversion: 6').")
+    .addError(3, "'\\u{...}' is only available in ES6 (use 'esversion: 6').")
+    .addError(4, "'\\u{...}' is only available in ES6 (use 'esversion: 6').")
+    .addError(5, "'\\u{...}' is only available in ES6 (use 'esversion: 6').")
+    .addError(6, "'\\u{...}' is only available in ES6 (use 'esversion: 6').")
+    .addError(7, "'Astral symbols in identifiers' is only available in ES6 (use 'esversion: 6').")
+    .addError(8, "'Astral symbols in identifiers' is only available in ES6 (use 'esversion: 6').")
+    .addError(9, "'Astral symbols in identifiers' is only available in ES6 (use 'esversion: 6').")
+    .addError(10, "'\\u{...}' is only available in ES6 (use 'esversion: 6').")
+    .addError(11, "'Astral symbols in identifiers' is only available in ES6 (use 'esversion: 6').")
+    .addError(12, "'\\u{...}' is only available in ES6 (use 'esversion: 6').");
+  run.test(src, { es3: true, unused: true });
+  run.test(src, { unused: true }); // es5
+  run.test(src, { moz: true, unused: true });
+
+  src = [
+    "var \\u{000000078};",
+    "var a = \\u{78};"
+  ];
+
+  TestRun(test)
+    .addError(2, "'a' is defined but never used.")
+    .test(src, { esnext: true, unused: true });
+
   test.done();
 };
 
 exports.badIdentifiers = function (test) {
-  var badUnicode = [
-    "var \\uNOTHEX;"
-  ];
+  var badUnicode = "var \\uNOTHEX;";
 
   var run = TestRun(test)
-    .addError(1, "Unexpected '\\'.")
-    .addError(1, "Expected an identifier and instead saw ''.")
-    .addError(1, "Unrecoverable syntax error. (100% scanned).");
+    .addError(1, "Unexpected '\\uNOTH'.");
   run.test(badUnicode, {es3: true});
   run.test(badUnicode, {}); // es5
   run.test(badUnicode, {esnext: true});
   run.test(badUnicode, {moz: true});
 
   var invalidUnicodeIdent = [
-    "var \\u0000;"
+    "var \\u0000;",
+    "var \\u{200000};"
   ];
 
   var run = TestRun(test)
-    .addError(1, "Unexpected '\\'.")
-    .addError(1, "Expected an identifier and instead saw ''.")
-    .addError(1, "Unrecoverable syntax error. (100% scanned).");
+    .addError(1, "Unexpected '\\u0000'.")
+    .addError(2, "Unexpected '\\u{200000}'.");
+  run.test(invalidUnicodeIdent, {esnext: true});
+
+  run.addError(2, "'\\u{...}' is only available in ES6 (use 'esversion: 6').");
   run.test(invalidUnicodeIdent, {es3: true});
   run.test(invalidUnicodeIdent, {}); // es5
-  run.test(invalidUnicodeIdent, {esnext: true});
   run.test(invalidUnicodeIdent, {moz: true});
+
+  var unclosedBrace = "var \\u{1a;";
+
+  TestRun(test)
+    .addError(1, "Expected '}' to match '{' from line 1 and instead saw ';'.")
+    .test(unclosedBrace, { esnext: true });
+
+  var missingHexValue = "var \\u{};";
+
+  TestRun(test)
+    .addError(1, "Unexpected '\\u{}'.")
+    .test(missingHexValue, { esnext: true });
 
   test.done();
 };

@@ -36,3 +36,6 @@ exports.fallsThrough = /^\s*falls?\sthrough\s*$/;
 // very conservative rule (eg: only one space between the start of the comment and the first character)
 // to relax the maxlen option
 exports.maxlenException = /^(?:(?:\/\/|\/\*|\*) ?)?[^ ]+$/;
+
+// Unicode escape sequences (\uXXXX and \u{XXXXXX})
+exports.unicodeEscapeSequence = /\\u(?:([0-9a-fA-F]{4})|\{([0-9a-fA-F]+)\})/g;

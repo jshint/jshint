@@ -17,6 +17,6 @@ for (var i = 0; i < 128; i++) {
 }
 
 module.exports = {
-  asciiIdentifierStartTable: identifierStartTable,
-  asciiIdentifierPartTable: identifierPartTable
+  start: identifierStartTable,
+  part: identifierPartTable
 };
