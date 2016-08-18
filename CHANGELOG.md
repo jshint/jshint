@@ -1,3 +1,25 @@
+<a name="2.9.3"></a>
+## [2.9.3](https://github.com/jshint/jshint/compare/2.9.2...v2.9.3) (2016-08-18)
+
+
+### Bug Fixes
+
+* Add TypedArray globals for ES2015 ([ee0acab](https://github.com/jshint/jshint/commit/ee0acab))
+* Allow Expression within for-in head ([56c95d0](https://github.com/jshint/jshint/commit/56c95d0))
+* Avoid crash when peeking past end of prog (#2937) ([330d429](https://github.com/jshint/jshint/commit/330d429))
+* Correct behavior of singleGroups (#2951) ([97fefb7](https://github.com/jshint/jshint/commit/97fefb7))
+* Correct interpretation of ASI (#2977) ([3ef7a03](https://github.com/jshint/jshint/commit/3ef7a03))
+* Correctly recognize asi after directives ([039ee2e](https://github.com/jshint/jshint/commit/039ee2e)), closes [#2714](https://github.com/jshint/jshint/issues/2714)
+* Disallow Import declarations below top lvl ([d800e44](https://github.com/jshint/jshint/commit/d800e44))
+* Support `y` RegExp flag in ES2015 code (#2999) ([a801433](https://github.com/jshint/jshint/commit/a801433))
+* Support semicolons within arrow fn params (#3003) ([179a9d6](https://github.com/jshint/jshint/commit/179a9d6))
+
+### Features
+
+* Error for literals on rhs of `instanceof` ([e3e745b](https://github.com/jshint/jshint/commit/e3e745b)), closes [#2777](https://github.com/jshint/jshint/issues/2777)
+
+
+
 <a name="2.9.2"></a>
 ## [2.9.2](https://github.com/jshint/jshint/compare/2.9.1...v2.9.2) (2016-04-19)
 
