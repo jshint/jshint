@@ -377,7 +377,7 @@ Lexer.prototype = {
    * also recognizes JSHint- and JSLint-specific comments such as
    * /*jshint, /*jslint, /*globals and so on.
    */
-  scanComments: function() {
+  scanComments: function(checks) {
     var ch1 = this.peek();
     var ch2 = this.peek(1);
     var rest = this.input.substr(2);
@@ -514,7 +514,7 @@ Lexer.prototype = {
 
           // If we hit EOF and our comment is still unclosed,
           // trigger an error and end the comment implicitly.
-          if (!this.nextLine()) {
+          if (!this.nextLine(checks)) {
             this.trigger("error", {
               code: "E017",
               line: startLine,
@@ -1068,7 +1068,7 @@ Lexer.prototype = {
     while (this.peek() !== "`") {
       while ((ch = this.peek()) === "") {
         value += "\n";
-        if (!this.nextLine()) {
+        if (!this.nextLine(checks)) {
           // Unclosed template literal --- point to the starting "`"
           var startPos = this.templateStarts.pop();
           this.trigger("error", {
@@ -1199,7 +1199,7 @@ Lexer.prototype = {
         // If we get an EOF inside of an unclosed string, show an
         // error and implicitly close it at the EOF point.
 
-        if (!this.nextLine()) {
+        if (!this.nextLine(checks)) {
           this.trigger("error", {
             code: "E029",
             line: startLine,
@@ -1480,7 +1480,7 @@ Lexer.prototype = {
     // Methods that work with multi-line structures and move the
     // character pointer.
 
-    var match = this.scanComments() ||
+    var match = this.scanComments(checks) ||
       this.scanStringLiteral(checks) ||
       this.scanTemplateLiteral(checks);
 
@@ -1511,7 +1511,7 @@ Lexer.prototype = {
    * Switch to the next line and reset all char pointers. Once
    * switched, this method also checks for other minor warnings.
    */
-  nextLine: function() {
+  nextLine: function(checks) {
     var char;
 
     if (this.line >= this.getLines().length) {
@@ -1554,7 +1554,12 @@ Lexer.prototype = {
     char = this.scanUnsafeChars();
 
     if (char >= 0) {
-      this.trigger("warning", { code: "W100", line: this.line, character: char });
+      this.triggerAsync(
+        "warning",
+        { code: "W100", line: this.line, character: char },
+        checks,
+        function() { return true; }
+      );
     }
 
     // If there is a limit on line length, warn when lines get too
@@ -1699,7 +1704,7 @@ Lexer.prototype = {
 
     for (;;) {
       if (!this.input.length) {
-        if (this.nextLine()) {
+        if (this.nextLine(checks)) {
           return create("(endline)", "");
         }
 

@@ -21,6 +21,31 @@ exports.unsafe = function (test) {
   test.done();
 };
 
+exports.unsafeGh3013 = function (test) {
+  TestRun(test)
+    .addError(2, "This character may get silently deleted by one or more browsers.")
+    .test([
+      "(function() {",
+      "  void '\u200f';",
+      "}());"
+    ]);
+
+  TestRun(test)
+    .test([
+      "(function() {",
+      "  // jshint -W100",
+      "  void '\u200f';",
+      "}());"
+    ]);
+
+  TestRun(test)
+    .test([
+      'void `${ /* jshint -W100 */0',
+      '}\u200f`;'
+    ], { esversion: 6 });
+  test.done();
+};
+
 exports.other = function (test) {
   var code = [
     "\\",
