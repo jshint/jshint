@@ -1577,14 +1577,6 @@ Lexer.prototype = {
   },
 
   /*
-   * This is simply a synonym for nextLine() method with a friendlier
-   * public name.
-   */
-  start: function() {
-    this.nextLine();
-  },
-
-  /*
    * Produce the next token. This function is called by advance() to get
    * the next token. It returns a token in a JSLint-compatible format.
    */
