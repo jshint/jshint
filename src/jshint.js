@@ -4661,7 +4661,7 @@ var JSHINT = (function() {
 
     if (state.tokens.next.type === "default") {
       // ExportDeclaration ::
-      //      export default [lookahead  { function, class }] AssignmentExpression[In] ;
+      //      export default [lookahead ∉ { function, class }] AssignmentExpression[In] ;
       //      export default HoistableDeclaration
       //      export default ClassDeclaration
       state.nameStack.set(state.tokens.next);
