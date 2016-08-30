@@ -730,7 +730,5 @@ exports.jasmine = {
   beforeAll   : false,
   afterAll    : false,
   fail        : false,
-  fdescribe   : false,
-  fit         : false,
   pending     : false
 };
