@@ -1867,8 +1867,11 @@ var JSHINT = (function() {
 
   function countMember(m) {
     if (membersOnly && typeof membersOnly[m] !== "boolean") {
-      warning("W036", state.tokens.curr, m);
+      if (m !== null && !membersOnly.hasOwnProperty(String(m))) {
+        warning("W036", state.tokens.curr, m);
+      }
     }
+
     if (typeof member[m] === "number") {
       member[m] += 1;
     } else {
@@ -3245,7 +3248,12 @@ var JSHINT = (function() {
           }
 
           if (state.tokens.next.type === "(punctuator)" && state.tokens.next.id === "[") {
-            i = computedPropertyName().value;
+            i = computedPropertyName();
+
+            if (i && i.value) {
+              i = i.value;
+            }
+
           } else {
             i = propertyName();
           }
@@ -4902,6 +4910,11 @@ var JSHINT = (function() {
     }
     var value = expression(10);
     advance("]");
+
+    if (value.type !== "(string)" && value.identifier) {
+      value = null ;
+    }
+
     return value;
   }
 
