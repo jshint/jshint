@@ -21,28 +21,47 @@ exports.unsafe = function (test) {
   test.done();
 };
 
-exports.unsafeGh3013 = function (test) {
-  TestRun(test)
-    .addError(2, "This character may get silently deleted by one or more browsers.")
-    .test([
-      "(function() {",
-      "  void '\u200f';",
-      "}());"
-    ]);
+exports.peekOverDirectives = function (test) {
+  var code = fs.readFileSync(__dirname + "/fixtures/peek-over-directives.js", "utf8");
 
   TestRun(test)
-    .test([
-      "(function() {",
-      "  // jshint -W100",
-      "  void '\u200f';",
-      "}());"
-    ]);
+    // Within object literal
+    .addError(18, "This character may get silently deleted by one or more browsers.")
+    .addError(18, "Unexpected control character in regular expression.")
+    .addError(19, "Unexpected escaped character '<' in regular expression.")
+    .addError(20, "Line is too long.")
+    .addError(21, "Control character in string: <non-printable>.")
+    .addError(21, "This character may get silently deleted by one or more browsers.")
+    .addError(22, "'Octal integer literal' is only available in ES6 (use 'esversion: 6').")
+    .addError(23, "'Binary integer literal' is only available in ES6 (use 'esversion: 6').")
+    .addError(24, "'template literal syntax' is only available in ES6 (use 'esversion: 6').")
+    .addError(25, "'Sticky RegExp flag' is only available in ES6 (use 'esversion: 6').")
 
-  TestRun(test)
-    .test([
-      'void `${ /* jshint -W100 */0',
-      '}\u200f`;'
-    ], { esversion: 6 });
+    // Within array literal:
+    .addError(44, "This character may get silently deleted by one or more browsers.")
+    .addError(44, "Unexpected control character in regular expression.")
+    .addError(45, "Unexpected escaped character '<' in regular expression.")
+    .addError(46, "Line is too long.")
+    .addError(47, "Control character in string: <non-printable>.")
+    .addError(47, "This character may get silently deleted by one or more browsers.")
+    .addError(48, "'Octal integer literal' is only available in ES6 (use 'esversion: 6').")
+    .addError(49, "'Binary integer literal' is only available in ES6 (use 'esversion: 6').")
+    .addError(50, "'template literal syntax' is only available in ES6 (use 'esversion: 6').")
+    .addError(51, "'Sticky RegExp flag' is only available in ES6 (use 'esversion: 6').")
+
+    // Within grouping operator:
+    .addError(70, "This character may get silently deleted by one or more browsers.")
+    .addError(70, "Unexpected control character in regular expression.")
+    .addError(71, "Unexpected escaped character '<' in regular expression.")
+    .addError(72, "Line is too long.")
+    .addError(73, "Control character in string: <non-printable>.")
+    .addError(73, "This character may get silently deleted by one or more browsers.")
+    .addError(74, "'Octal integer literal' is only available in ES6 (use 'esversion: 6').")
+    .addError(75, "'Binary integer literal' is only available in ES6 (use 'esversion: 6').")
+    .addError(76, "'template literal syntax' is only available in ES6 (use 'esversion: 6').")
+    .addError(77, "'Sticky RegExp flag' is only available in ES6 (use 'esversion: 6').")
+    .test(code);
+
   test.done();
 };
 
