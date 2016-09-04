@@ -1772,6 +1772,46 @@ exports.strictEnvs = function (test) {
   test.done();
 };
 
+/**
+ * The following test asserts sub-optimal behavior.
+ *
+ * Through the `strict` and `globalstrict` options, JSHint can be configured to
+ * issue warnings when code is not in strict mode. Historically, JSHint has
+ * issued these warnings on a per-statement basis in global code, leading to
+ * "noisy" output through the repeated reporting of the missing directive.
+ */
+exports.strictNoise = function (test) {
+  TestRun(test, "global scope")
+    .addError(1, "Missing \"use strict\" statement.")
+    .addError(2, "Missing \"use strict\" statement.")
+    .test([
+      "void 0;",
+      "void 0;",
+    ], { strict: true, globalstrict: true });
+
+  TestRun(test, "function scope")
+    .addError(2, "Missing \"use strict\" statement.")
+    .test([
+      "(function() {",
+      "  void 0;",
+      "  void 0;",
+      "}());",
+    ], { strict: true });
+
+  TestRun(test, "function scope")
+    .addError(2, "Missing \"use strict\" statement.")
+    .test([
+      "(function() {",
+      "  (function() {",
+      "    void 0;",
+      "    void 0;",
+      "  }());",
+      "}());",
+    ], { strict: true });
+
+  test.done();
+};
+
 /** Option `globalstrict` allows you to use global "use strict"; */
 exports.globalstrict = function (test) {
   var code = [
@@ -1864,6 +1904,22 @@ exports.globalstrict = function (test) {
 
   TestRun(test, "gh-2661")
     .test("'use strict';", { strict: false, globalstrict: true });
+
+  TestRun(test, "gh-2836 (1)")
+    .test([
+      "// jshint globalstrict: true",
+      // The specific option set by the following directive is not relevant.
+      // Any option set by another directive will trigger the regression.
+      "// jshint undef: true"
+    ]);
+
+  TestRun(test, "gh-2836 (2)")
+    .test([
+      "// jshint strict: true, globalstrict: true",
+      // The specific option set by the following directive is not relevant.
+      // Any option set by another directive will trigger the regression.
+      "// jshint undef: true"
+    ]);
 
   test.done();
 };
