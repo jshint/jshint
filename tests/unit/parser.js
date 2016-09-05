@@ -6036,10 +6036,41 @@ exports["computed property names for getters and setters"] = function (test) {
       "val: null,",
       "get ['bar']() { return this.val; },",
       "set ['bar'](arg) { this.val = arg; }",
+    "};",
+    "let y = {",
+      "get[2](x){ return 1; },",
+      "get[1](){ return 'bar'; }",
+    "};",
+    "let z = {",
+      "get['a'](){ return true; },",
+      "get['a']() { return false; }",
+    "};",
+    "let zz = {",
+      "get [1 + 2]() {return 'foo'; },",
+      "get '+'() { return 'bar'; }",
     "};"
   ];
 
-  TestRun(test).test(code, { esversion: 6 });
+  TestRun(test)
+  .addError(11, "Unexpected parameter 'x' in get 2 function.")
+  .addError(16, "Duplicate key 'a'.")
+  .test(code, { esversion: 6 });
+
+  test.done();
+};
+
+exports["computed property names for getters and setters with members"] = function (test) {
+  var code = [
+    "/* members abc, d */",
+    "let test = {",
+      "get ['a' + 'b' + 'c'](){ return 'bar'; }, ",
+      "get['e'](){ return foo; }",
+    "};"
+  ];
+
+  TestRun(test)
+  .addError(4, "Unexpected /*member 'e'.")
+  .test(code, { esversion: 6 });
 
   test.done();
 };

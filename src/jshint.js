@@ -4911,8 +4911,22 @@ var JSHINT = (function() {
     var value = expression(10);
     advance("]");
 
+    /**
+     * Test if {value.type} is not a string because we will not currently check non-string values
+     * in ES6 for computed properties.  Else if the value has a left and a right property that are not strings,
+     * we combine the values to ensure the combined value is being evaluated, not each individual item of the expression.
+     * @param {value.type} string
+     * @param {value.identifier} boolean
+     * @returns {token}
+     */
+
     if (value.type !== "(string)" && value.identifier) {
       value = null ;
+    } else if (value.left && value.right) {
+      if (value.right.type !== "(string)" && value.left.type !== "(string)") {
+        var currValue = value;
+        value.value = value.left + currValue.value + value.right;
+      }
     }
 
     return value;
