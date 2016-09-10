@@ -5207,8 +5207,8 @@ exports["automatic comma insertion GH-950"] = function (test) {
   ];
 
   var run = TestRun(test)
-    .addError(2, "Bad line breaking before 'instanceof'.")
-    .addError(6, "Bad line breaking before '&&'.")
+    .addError(2, "Misleading line break before 'instanceof'; readers may interpret this as an expression boundary.")
+    .addError(6, "Misleading line break before '&&'; readers may interpret this as an expression boundary.")
     .addError(8, "Line breaking error 'return'.")
     .addError(9, "Label 'a' on 1 statement.")
     .addError(9, "Expected an assignment or function call and instead saw an expression.")
@@ -5221,10 +5221,10 @@ exports["automatic comma insertion GH-950"] = function (test) {
   run.test(code, {moz: true, asi: true});
 
   run = TestRun(test)
-    .addError(2, "Bad line breaking before 'instanceof'.")
+    .addError(2, "Misleading line break before 'instanceof'; readers may interpret this as an expression boundary.")
     .addError(3, "Missing semicolon.")
     .addError(4, "Missing semicolon.")
-    .addError(6, "Bad line breaking before '&&'.")
+    .addError(6, "Misleading line break before '&&'; readers may interpret this as an expression boundary.")
     .addError(8, "Line breaking error 'return'.")
     .addError(8, "Missing semicolon.")
     .addError(9, "Label 'a' on 1 statement.")
@@ -6529,7 +6529,7 @@ exports["test for line breaks with 'yield'"] = function (test) {
     .addError(4, "Expected an assignment or function call and instead saw an expression.")
     .addError(5, "Missing semicolon.")
     .addError(6, "Expected an assignment or function call and instead saw an expression.")
-    .addError(7, "Bad line breaking before ','.")
+    .addError(7, "Misleading line break before ','; readers may interpret this as an expression boundary.")
     .addError(8, "Comma warnings can be turned off with 'laxcomma'.")
     .addError(9, "Missing semicolon.")
     .addError(10, "Expected an identifier and instead saw '?'.")
@@ -6558,7 +6558,7 @@ exports["test for line breaks with 'yield'"] = function (test) {
     .addError(4, "Expected an assignment or function call and instead saw an expression.")
     .addError(6, "Expected an assignment or function call and instead saw an expression.")
     .addError(8, "Comma warnings can be turned off with 'laxcomma'.")
-    .addError(7, "Bad line breaking before ','.")
+    .addError(7, "Misleading line break before ','; readers may interpret this as an expression boundary.")
     .addError(10, "Expected an identifier and instead saw '?'.")
     .addError(10, "Missing semicolon.")
     .addError(10, "Expected an assignment or function call and instead saw an expression.")
@@ -6592,12 +6592,12 @@ exports["test for line breaks with 'yield'"] = function (test) {
   ];
 
   TestRun(test, "gh-2530 (asi: true)")
-    .addError(5, "Bad line breaking before 'fn'.")
+    .addError(5, "Misleading line break before 'fn'; readers may interpret this as an expression boundary.")
     .test(code2, { esnext: true, undef: false, asi: true });
 
   TestRun(test, "gh-2530 (asi: false)")
     .addError(2, "Missing semicolon.")
-    .addError(5, "Bad line breaking before 'fn'.")
+    .addError(5, "Misleading line break before 'fn'; readers may interpret this as an expression boundary.")
     .test(code2, { esnext: true, undef: false });
 
   test.done();
@@ -7273,7 +7273,7 @@ exports.testStrictDirectiveASI = function (test) {
     .test("'use strict'\n!x;", options);
 
   TestRun(test, 12)
-    .addError(2, "Bad line breaking before '+'.")
+    .addError(2, "Misleading line break before '+'; readers may interpret this as an expression boundary.")
     .addError(2, "Missing \"use strict\" statement.")
     .addError(2, "Expected an assignment or function call and instead saw an expression.")
     .test("'use strict'\n+x;", options);
@@ -7698,7 +7698,7 @@ exports.parsingCommas = function (test) {
   TestRun(test)
     .addError(2, "Unexpected ','.")
     .addError(2, "Comma warnings can be turned off with 'laxcomma'.")
-    .addError(1, "Bad line breaking before ','.")
+    .addError(1, "Misleading line break before ','; readers may interpret this as an expression boundary.")
     .addError(2, "Expected an identifier and instead saw ';'.")
     .addError(2, "Expected an identifier and instead saw ')'.")
     .addError(2, "Expected ';' and instead saw '{'.")
