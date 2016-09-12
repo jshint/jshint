@@ -634,7 +634,7 @@ exports.safeasi = function (test) {
   TestRun(test, 1)
     // TOOD consider setting an option to suppress these errors so that
     // the tests don't become tightly interdependent
-    .addError(10, "Bad line breaking before '/'.")
+    .addError(10, "Misleading line break before '/'; readers may interpret this as an expression boundary.")
     .addError(10, "Expected an identifier and instead saw '.'.")
     .addError(10, "Expected an assignment or function call and instead saw an expression.")
     .addError(10, "Missing semicolon.")
@@ -644,10 +644,10 @@ exports.safeasi = function (test) {
     .test(src, {});
 
   TestRun(test, 2)
-    .addError(5, "Bad line breaking before '('.")
-    .addError(8, "Bad line breaking before '('.")
-    .addError(10, "Bad line breaking before '/'.")
-    .addError(10, "Bad line breaking before '/'.")
+    .addError(5, "Misleading line break before '('; readers may interpret this as an expression boundary.")
+    .addError(8, "Misleading line break before '('; readers may interpret this as an expression boundary.")
+    .addError(10, "Misleading line break before '/'; readers may interpret this as an expression boundary.")
+    .addError(10, "Misleading line break before '/'; readers may interpret this as an expression boundary.")
     .addError(10, "Expected an identifier and instead saw '.'.")
     .addError(10, "Expected an assignment or function call and instead saw an expression.")
     .addError(10, "Missing semicolon.")
@@ -1962,9 +1962,9 @@ exports.laxbreak = function (test) {
   var src = fs.readFileSync(__dirname + '/fixtures/laxbreak.js', 'utf8');
 
   TestRun(test)
-    .addError(2, "Bad line breaking before ','.")
+    .addError(2, "Misleading line break before ','; readers may interpret this as an expression boundary.")
     .addError(3, "Comma warnings can be turned off with 'laxcomma'.")
-    .addError(12, "Bad line breaking before ','.")
+    .addError(12, "Misleading line break before ','; readers may interpret this as an expression boundary.")
     .test(src, { es3: true });
 
   var ops = [ '||', '&&', '*', '/', '%', '+', '-', '>=',
@@ -1973,7 +1973,7 @@ exports.laxbreak = function (test) {
   for (var i = 0, op, code; op = ops[i]; i += 1) {
     code = ['var a = b ', op + ' c;'];
     TestRun(test)
-      .addError(2, "Bad line breaking before '" + op + "'.")
+      .addError(2, "Misleading line break before '" + op + "'; readers may interpret this as an expression boundary.")
       .test(code, { es3: true });
 
     TestRun(test).test(code, { es3: true, laxbreak: true });
@@ -1981,7 +1981,7 @@ exports.laxbreak = function (test) {
 
   code = [ 'var a = b ', '? c : d;' ];
   TestRun(test)
-    .addError(2, "Bad line breaking before '?'.")
+    .addError(2, "Misleading line break before '?'; readers may interpret this as an expression boundary.")
     .test(code, { es3: true });
 
   TestRun(test).test(code, { es3: true, laxbreak: true });
@@ -2240,26 +2240,26 @@ exports.laxcomma = function (test) {
 
   // All errors.
   TestRun(test)
-    .addError(1, "Bad line breaking before ','.")
+    .addError(1, "Misleading line break before ','; readers may interpret this as an expression boundary.")
     .addError(2, "Comma warnings can be turned off with 'laxcomma'.")
-    .addError(2, "Bad line breaking before ','.")
-    .addError(6, "Bad line breaking before ','.")
-    .addError(10, "Bad line breaking before '&&'.")
-    .addError(15, "Bad line breaking before '?'.")
+    .addError(2, "Misleading line break before ','; readers may interpret this as an expression boundary.")
+    .addError(6, "Misleading line break before ','; readers may interpret this as an expression boundary.")
+    .addError(10, "Misleading line break before '&&'; readers may interpret this as an expression boundary.")
+    .addError(15, "Misleading line break before '?'; readers may interpret this as an expression boundary.")
     .test(src, {es3: true});
 
   // Allows bad line breaking, but not on commas.
   TestRun(test)
-    .addError(1, "Bad line breaking before ','.")
+    .addError(1, "Misleading line break before ','; readers may interpret this as an expression boundary.")
     .addError(2, "Comma warnings can be turned off with 'laxcomma'.")
-    .addError(2, "Bad line breaking before ','.")
-    .addError(6, "Bad line breaking before ','.")
+    .addError(2, "Misleading line break before ','; readers may interpret this as an expression boundary.")
+    .addError(6, "Misleading line break before ','; readers may interpret this as an expression boundary.")
     .test(src, {es3: true, laxbreak: true });
 
   // Allows comma-first style but warns on bad line breaking
   TestRun(test)
-    .addError(10, "Bad line breaking before '&&'.")
-    .addError(15, "Bad line breaking before '?'.")
+    .addError(10, "Misleading line break before '&&'; readers may interpret this as an expression boundary.")
+    .addError(15, "Misleading line break before '?'; readers may interpret this as an expression boundary.")
     .test(src, {es3: true, laxcomma: true });
 
   // No errors if both laxbreak and laxcomma are turned on

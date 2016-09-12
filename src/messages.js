@@ -93,7 +93,7 @@ var warnings = {
   W011: null,
   W012: null,
   W013: null,
-  W014: "Bad line breaking before '{a}'.",
+  W014: "Misleading line break before '{a}'; readers may interpret this as an expression boundary.",
   W015: null,
   W016: "Unexpected use of '{a}'.",
   W017: "Bad operand.",
