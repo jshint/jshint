@@ -406,10 +406,10 @@ var scopeManager = function(state, predefined, exported, declared) {
             if (shadowed) {
               shadowed["(unused)"] &= defLabel["(unused)"];
 
-            // "Hoist" the variable to the parent block, decorating the label
-            // so that future references, though technically valid, can be
-            // reported as "out-of-scope" in the absence of the `funcscope`
-            // option.
+              // "Hoist" the variable to the parent block, decorating the label
+              // so that future references, though technically valid, can be
+              // reported as "out-of-scope" in the absence of the `funcscope`
+              // option.
             } else {
               defLabel["(useOutsideOfScope)"] =
                 // Do not warn about out-of-scope usages in the global scope

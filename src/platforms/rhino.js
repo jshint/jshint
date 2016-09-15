@@ -71,12 +71,12 @@
       } else {
         opts[o[0]] = (function(ov) {
           switch (ov) {
-          case "true":
-            return true;
-          case "false":
-            return false;
-          default:
-            return ov;
+            case "true":
+              return true;
+            case "false":
+              return false;
+            default:
+              return ov;
           }
         }(o[1]));
       }

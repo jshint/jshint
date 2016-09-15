@@ -1,5 +1,7 @@
 "use strict";
 
+// jscs:disable validateIndentation
+
 // These are the JSHint boolean options.
 exports.bool = {
   enforcing: {
