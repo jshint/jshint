@@ -1,5 +1,6 @@
 // Author: Boy Baukema
 // http://github.com/relaxnow
+/*jshint strict:false */
 module.exports =
 {
   reporter: function(results, data, opts) {

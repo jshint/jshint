@@ -1,3 +1,4 @@
+/*jshint strict:false */
 module.exports =
 {
   reporter: function(results) {
