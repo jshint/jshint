@@ -2613,6 +2613,7 @@ exports.enforceall = function (test) {
 
   // Throws errors not normally on be default
   TestRun(test)
+    .addError(1, "This line contains non-breaking spaces: http://jshint.com/docs/options/#nonbsp")
     .addError(1, "['key'] is better written in dot notation.")
     .addError(1, "'obj' is not defined.")
     .addError(1, "Missing semicolon.")
