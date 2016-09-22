@@ -13,24 +13,23 @@
 [![devDependency Status](https://img.shields.io/david/dev/jshint/jshint.svg?style=flat)](https://david-dm.org/jshint/jshint#info=devDependencies)
 [![Coverage Status](https://img.shields.io/coveralls/jshint/jshint.svg?style=flat)](https://coveralls.io/r/jshint/jshint?branch=master)
 
-JSHint is a community-driven tool to detect errors and potential problems in
-JavaScript code and to enforce your team's coding conventions. It is very
-flexible so you can easily adjust it to your particular coding guidelines and
-the environment you expect your code to execute in. JSHint is open source and
+JSHint is a community-driven tool that detects errors and potential problems in
+JavaScript code. Since JSHint is so flexible, you can easily adjust it in 
+the environment you expect your code to execute. JSHint is open source and
 will always stay this way.
 
 ## Our goal
 
-The goal of this project is to help JavaScript developers write complex programs
+The project aims to help JavaScript developers write complex programs
 without worrying about typos and language gotchas.
 
-Any code base eventually becomes huge at some point, and simple mistakes—that
-would not show themselves when written—can become show stoppers and waste
-hours of debugging. And this is when static code analysis tools come into play
-and help developers to spot such problems. JSHint scans a program written in
+Any code base eventually becomes huge at some point, so simple mistakes — that
+would not show themselves when written — can become show stoppers and add 
+extra hours of debugging. So, static code analysis tools come into play
+and help developers spot such problems. JSHint scans a program written in
 JavaScript and reports about commonly made mistakes and potential bugs. The
-potential problem could be a syntax error, a bug due to implicit type
-conversion, a leaking variable or something else.
+potential problem could be a syntax error, a bug due to an implicit type
+conversion, a leaking variable, or something else entirely.
 
 Only 15% of all programs linted on [jshint.com](http://jshint.com) pass the
 JSHint checks. In all other cases, JSHint finds some red flags that could've
@@ -52,8 +51,8 @@ JSHint including but not limited to:
  * When JSHint complains about valid JavaScript code that works in all browsers
  * When you simply want a new option or feature
 
-Before reporting a bug look around to see if there are any open or closed tickets
-that cover your issue. And remember the wisdom: pull request > bug report > tweet.
+Before reporting a bug, please look around to see if there are any open or closed tickets
+that discuss your issue, and remember the wisdom: pull request > bug report > tweet.
 
 ## Who uses JSHint?
 
@@ -86,6 +85,7 @@ Engineers from these companies and projects use JSHint:
 * [Pandoo TEK](http://pandootek.com/)
 * [Zendesk](http://zendesk.com/)
 * [Apache CouchDB](http://couchdb.apache.org/)
+* [Google](https://www.google.com/)
 
 And many more!
 
