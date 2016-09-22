@@ -5329,8 +5329,6 @@ var JSHINT = (function() {
       emitter.emit("Number", ev);
     });
 
-    lex.start();
-
     // Check options
     for (var name in o) {
       if (_.has(o, name)) {
