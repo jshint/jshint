@@ -53,19 +53,19 @@
   },
 
   "devDependencies": {
-    "browserify":                     "9.x",
-    "conventional-changelog":         "0.4.x",
-    "conventional-github-releaser":   "0.4.x",
+    "browserify":                     "12.x",
+    "conventional-changelog":         "0.5.x",
+    "conventional-github-releaser":   "0.5.x",
     "coveralls":                      "2.11.x",
-    "istanbul":                       "0.3.x",
+    "istanbul":                       "0.4.x",
     "jscs":                           "1.11.x",
-    "jshint":                         "2.6.x",
+    "jshint":                         "2.9.1-rc2",
     "mock-stdin":                     "0.3.x",
     "nodeunit":                       "0.9.x",
-    "phantom":                        "~0.7.2",
-    "phantomjs":                      "1.9.13",
+    "phantom":                        "~0.8.4",
+    "phantomjs":                      "1.9.19",
     "regenerate":                     "1.2.x",
-    "sinon":                          "1.12.x",
+    "sinon":                          "1.17.x",
     "unicode-6.3.0":                  "0.1.x"
   },
 
