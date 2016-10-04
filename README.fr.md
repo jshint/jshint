@@ -78,4 +78,12 @@ Les ingénieurs de ces sociétés et de ces projets, utilisent JSHint:
 
 Et bien d'autres encore !
 
+## Licence
+
+La plupart des fichiers sont publiés selon la licence suivante [the standard MIT Expat
+license](https://www.gnu.org/licenses/license-list.html#Expat). 
+En revanche, un fichier est diffusé sous une version légèrement modifiée de cette licence.
+Ce fichier sous [JSON license](https://www.gnu.org/licenses/license-list.html#JSON)
+est soumis à licence payante que malheureusement, nous ne pouvons modifier pour raisons historiques.
+Cette licence est un dispositif du fichier au sein duquel elle est incluse.
 
