@@ -101,3 +101,8 @@ Dans l'ordre chronologique, ces personnes sont :
 Douglas Crockford, Anton Kovalyov, and Mike Sherov. 
 
 Nous remercions leur engagement à long terme ! 
+
+## Merci!
+
+Nous vous remercions tout particulièrement pour vos remarques et contributions.
+Merci d'utiliser et de supporter JSHint ! 
