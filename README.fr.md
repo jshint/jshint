@@ -32,4 +32,14 @@ Le reste des programmes contient des erreurs et des problèmes potentiels, trouv
 Notez toutefois que même si un outil d'analyse statique du code peut révéler différentes sortes d'erreurs, il ne peut détecter si le programme est correct, rapide ou a des fuites de mémoires.
 Vous devez toujours combiner des outils comme JSHint avec des tests unitaires et fonctionnels ainsi que des vérifications de code.
 
-## Rapport d'erreurs
+## Rapporter des erreurs
+
+Pour rapporter des erreurs, il suffit de créer un [new GitHub Issue](https://github.com/jshint/jshint/issues/new) et décrire le problème ou la suggestion d'amélioration.
+Nous accueillons avec bienveillance toutes sortes de remarques à propos de JSHint, notamment, et non limitativement :
+
+ * Quand JSHint ne fonctionne pas comme il le devrait 
+ * Quand JSHint critique un code Javascript valide qui fonctionne sur tous les navigateurs 
+ * Quand vous souhaitez simplement une nouvelle option ou une nouvelle fonctionnalité 
+
+Avant de rapporter une erreur, vérifiez auparavant qu'il n'existe pas déjà un ticket en cours, ou clôturé, qui traite de votre problème, et souvenez vous de cette sagesse immuable : pull request > bug report > tweet.
+
