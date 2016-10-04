@@ -43,3 +43,39 @@ Nous accueillons avec bienveillance toutes sortes de remarques à propos de JSHi
 
 Avant de rapporter une erreur, vérifiez auparavant qu'il n'existe pas déjà un ticket en cours, ou clôturé, qui traite de votre problème, et souvenez vous de cette sagesse immuable : pull request > bug report > tweet.
 
+## Qui utilise JSHint ?
+
+Les ingénieurs de ces sociétés et de ces projets, utilisent JSHint:
+
+* [Mozilla](https://www.mozilla.org/)
+* [Wikipedia](https://wikipedia.org/)
+* [Facebook](https://facebook.com/)
+* [Twitter](https://twitter.com/)
+* [Bootstrap](http://getbootstrap.com/)
+* [Disqus](https://disqus.com/)
+* [Medium](https://medium.com/)
+* [Yahoo!](https://yahoo.com/)
+* [SmugMug](http://smugmug.com/)
+* [jQuery](http://jquery.com/)
+* [PDF.js](http://mozilla.github.io/pdf.js)
+* [Coursera](http://coursera.com/)
+* [Adobe Brackets](http://brackets.io/)
+* [Apache Cordova](http://cordova.io/)
+* [RedHat](http://redhat.com/)
+* [SoundCloud](http://soundcloud.com/)
+* [Nodejitsu](http://nodejitsu.com/)
+* [Yelp](https://yelp.com/)
+* [Voxer](http://voxer.com/)
+* [EnyoJS](http://enyojs.com/)
+* [QuickenLoans](http://quickenloans.com/)
+* [oDesk](http://www.odesk.com/)
+* [Cloud9](http://c9.io/)
+* [CodeClimate](https://codeclimate.com/)
+* [Pandoo TEK](http://pandootek.com/)
+* [Zendesk](http://zendesk.com/)
+* [Apache CouchDB](http://couchdb.apache.org/)
+* [Google](https://www.google.com/)
+
+Et bien d'autres encore !
+
+
