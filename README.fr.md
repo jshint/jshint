@@ -87,3 +87,9 @@ Ce fichier sous [JSON license](https://www.gnu.org/licenses/license-list.html#JS
 est soumis à licence payante que malheureusement, nous ne pouvons modifier pour raisons historiques.
 Cette licence est un dispositif du fichier au sein duquel elle est incluse.
 
+## L'équipe JSHint
+
+JSHint est actuellement maintenu par [Rick Waldron](https://github.com/rwaldron/),
+[Caitlin Potter](https://github.com/caitp/), [Mike
+Pennisi](https://github.com/jugglinmike/), and [Luke
+Page](https://github.com/lukeapage).
