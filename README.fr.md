@@ -93,3 +93,11 @@ JSHint est actuellement maintenu par [Rick Waldron](https://github.com/rwaldron/
 [Caitlin Potter](https://github.com/caitp/), [Mike
 Pennisi](https://github.com/jugglinmike/), and [Luke
 Page](https://github.com/lukeapage).
+
+## Précédents membres de l'équipe
+
+À l'origine du projet en 2010, JSHint a été maintenu par un certain nombre de personnes dévouées. 
+Dans l'ordre chronologique, ces personnes sont :
+Douglas Crockford, Anton Kovalyov, and Mike Sherov. 
+
+Nous remercions leur engagement à long terme ! 
