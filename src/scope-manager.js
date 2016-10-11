@@ -283,10 +283,7 @@ var scopeManager = function(state, predefined, exported, declared) {
             var usedTokens = usage["(tokens)"];
             if (usedTokens) {
               for (j = 0; j < usedTokens.length; j++) {
-                // Keep the consistency of https://github.com/jshint/jshint/issues/2409
-                if (usedLabel["(function)"] === usedTokens[j]["(function)"]) {
-                  error("W038", usedTokens[j], usedLabelName);
-                }
+                error("W038", usedTokens[j], usedLabelName);
               }
             }
           }
@@ -761,7 +758,6 @@ var scopeManager = function(state, predefined, exported, declared) {
           "(type)" : type,
           "(token)": tok,
           "(blockscoped)": false,
-          "(function)": _currentFunctBody,
           "(unused)": unused };
       }
     },
