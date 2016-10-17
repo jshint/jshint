@@ -2454,7 +2454,7 @@ var JSHINT = (function() {
             left.value === "execScript") {
           warning("W061", left);
 
-          if (p[0] && [0].id === "(string)") {
+          if (p[0] && p[0].id === "(string)") {
             addInternalSrc(left, p[0].value);
           }
         } else if (p[0] && p[0].id === "(string)" &&

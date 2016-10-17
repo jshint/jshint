@@ -452,7 +452,23 @@ exports.escapedEvil = function (test) {
 
   TestRun(test)
     .addError(1, "eval can be harmful.")
+    .addError(1, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, "Missing semicolon.")
     .test(code, { evil: false });
+
+  test.done();
+};
+
+exports.lintEval = function (test) {
+  TestRun(test, "Via direct eval")
+    .addError(1, "eval can be harmful.")
+    .addError(1, "Expected an assignment or function call and instead saw an expression.")
+    .test("void eval('0;');");
+
+  TestRun(test, "Via Function constructor")
+    .addError(1, "eval can be harmful.")
+    .addError(1, "Expected an assignment or function call and instead saw an expression.")
+    .test("void Function('0;');");
 
   test.done();
 };
