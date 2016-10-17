@@ -2454,9 +2454,16 @@ var JSHINT = (function() {
             left.value === "execScript") {
           warning("W061", left);
 
-          if (p[0] && [0].id === "(string)") {
-            addInternalSrc(left, p[0].value);
-          }
+          // This conditional expression was initially implemented with a typo
+          // which prevented the branch's execution in all cases. While
+          // enabling the code will produce behavior that is consistent with
+          // the other forms of code evaluation that follow, such a change is
+          // also technically incompatable with prior versions of JSHint (due
+          // to the fact that the behavior was never formally documented). This
+          // branch should be enabled as part of a major release.
+          //if (p[0] && p[0].id === "(string)") {
+          //  addInternalSrc(left, p[0].value);
+          //}
         } else if (p[0] && p[0].id === "(string)" &&
              (left.value === "setTimeout" ||
             left.value === "setInterval")) {
