@@ -5226,7 +5226,8 @@ exports["regression test for crash from GH-964"] = function (test) {
   test.done();
 };
 
-exports["automatic comma insertion GH-950"] = function (test) {
+exports.ASI = {};
+exports.ASI.gh950 = function (test) {
   var code = [
     "var a = b",
     "instanceof c;",
@@ -5285,6 +5286,45 @@ exports["automatic comma insertion GH-950"] = function (test) {
   run.test(code, {asi: false}); // es5
   run.test(code, {esnext: true, asi: false});
   run.test(code, {moz: true, asi: false});
+
+  test.done();
+};
+
+// gh-3037 - weird behaviour (yield related)
+// https://github.com/jshint/jshint/issues/3037
+exports.ASI.followingYield = function (test) {
+  var code = [
+    "function* g() {",
+    "  void 0",
+    "  yield;",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(2, "Missing semicolon.")
+    .test(code, { esversion: 6 });
+
+  TestRun(test)
+    .test(code, { esversion: 6, asi: true });
+
+  test.done();
+};
+
+exports.ASI.followingPostfix = function (test) {
+  var code = [
+    "x++",
+    "void 0;",
+    "x--",
+    "void 0;"
+  ];
+
+  TestRun(test)
+    .addError(1, "Missing semicolon.")
+    .addError(3, "Missing semicolon.")
+    .test(code);
+
+  TestRun(test)
+    .test(code, { asi: true });
 
   test.done();
 };
