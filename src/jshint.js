@@ -805,12 +805,15 @@ var JSHINT = (function() {
     }
   }
 
-  function isInfix(token) {
-    return token.infix ||
-      (!token.identifier && !token.template && !!token.led) ||
-      // Although implemented as an Identifier, the `yield` keyword behaves as
-      // an operator when it appears in the body of a generator function.
-      (token.id === "yield" && !!state.funct["(generator)"]);
+  /**
+   * Determine whether a given token is an operator.
+   *
+   * @param {token} token
+   *
+   * @returns {boolean}
+   */
+  function isOperator(token) {
+    return token.first || token.right || token.left || token.id === "yield";
   }
 
   function isEndOfExpr(curr, next) {
@@ -822,7 +825,7 @@ var JSHINT = (function() {
     if (next.id === ";" || next.id === "}" || next.id === ":") {
       return true;
     }
-    if (isInfix(next) === isInfix(curr) || curr.ltBoundary === "after" ||
+    if (next.infix === curr.infix || curr.ltBoundary === "after" ||
       next.ltBoundary === "before") {
       return curr.line !== startLine(next);
     }
@@ -1165,6 +1168,7 @@ var JSHINT = (function() {
   function application(s) {
     var x = symbol(s, 42);
 
+    x.infix = true;
     x.led = function(left) {
       nobreaknonadjacent(state.tokens.prev, state.tokens.curr);
 
@@ -1178,6 +1182,7 @@ var JSHINT = (function() {
   function relation(s, f) {
     var x = symbol(s, 100);
 
+    x.infix = true;
     x.led = function(left) {
       nobreaknonadjacent(state.tokens.prev, state.tokens.curr);
       this.left = left;
@@ -1400,6 +1405,7 @@ var JSHINT = (function() {
   function bitwise(s, f, p) {
     var x = symbol(s, p);
     reserveName(x);
+    x.infix = true;
     x.led = (typeof f === "function") ? f : function(left) {
       if (state.option.bitwise) {
         warning("W016", this, this.id);
@@ -2584,7 +2590,7 @@ var JSHINT = (function() {
       // The operator may be necessary to override the default binding power of
       // neighboring operators (whenever there is an operator in use within the
       // first expression *or* the current group contains multiple expressions)
-      if (!isNecessary && (isInfix(first) || first.right || ret.exprs)) {
+      if (!isNecessary && (isOperator(first) || ret.exprs)) {
         isNecessary =
           (rbp > first.lbp) ||
           (rbp > 0 && rbp === first.lbp) ||
