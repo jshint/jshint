@@ -2127,6 +2127,12 @@ var JSHINT = (function() {
     token.left = left;
     token.right = right = expression(120);
 
+    // This condition reflects a syntax error which will be reported by the
+    // `expression` function.
+    if (!right) {
+      return token;
+    }
+
     if (right.id === "(number)" ||
         right.id === "(string)" ||
         right.value === "null" ||

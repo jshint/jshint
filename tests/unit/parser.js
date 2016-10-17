@@ -7875,6 +7875,12 @@ exports.instanceOfLiterals = function (test) {
 
   run.test(code, { esversion: 6 });
 
+  TestRun(test)
+    .addError(1, "Expected an identifier and instead saw ';'.")
+    .addError(1, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, "Missing semicolon.")
+    .test('0 instanceof;');
+
   test.done();
 };
 
