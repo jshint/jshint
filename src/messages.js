@@ -89,7 +89,8 @@ var errors = {
   E071: "Unclosed string.",
   E072: "Octal literals are not allowed in strict mode.",
   E073: "Invalid element after rest element.",
-  E074: "Invalid parameter after rest parameter."
+  E074: "Invalid parameter after rest parameter.",
+  E075: "Invalid for-{a} loop left-hand-side: {b}."
 };
 
 var warnings = {
@@ -230,7 +231,7 @@ var warnings = {
   W130: null,
   W131: null,
   W132: "`var` declarations are forbidden. Use `let` or `const` instead.",
-  W133: "Invalid for-{a} loop left-hand-side: {b}.",
+  W133: null,
   W134: "The '{a}' option is only available when linting ECMAScript {b} code.",
   W135: "{a} may not be supported by non-browser environments.",
   W136: "'{a}' must be in function scope.",

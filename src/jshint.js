@@ -4261,11 +4261,11 @@ var JSHINT = (function() {
 
       var ok = !(initializer || comma);
       if (initializer) {
-        error("W133", comma, nextop.value, "initializer is forbidden");
+        error("E075", comma, nextop.value, "initializer is forbidden");
       }
 
       if (comma) {
-        error("W133", comma, nextop.value, "more than one ForBinding");
+        error("E075", comma, nextop.value, "more than one ForBinding");
       }
 
       if (state.tokens.next.id === "var") {
