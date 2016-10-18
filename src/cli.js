@@ -238,7 +238,7 @@ function isIgnored(fp, patterns) {
       return true;
     }
 
-    if (shjs.test("-d", fp) && ip.match(/^[^\/]*\/?$/) &&
+    if (shjs.test("-d", fp) && ip.match(/^[^\/\\]*[\/\\]?$/) &&
       fp.match(new RegExp("^" + ip + ".*"))) {
       return true;
     }
