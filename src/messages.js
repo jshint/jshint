@@ -10,7 +10,7 @@ var errors = {
   // JSHint input
   E003: "Expected a JSON value.",
   E004: "Input is neither a string nor an array of strings.",
-  E005: "Input is empty.",
+  E005: null,
   E006: "Unexpected early end of program.",
 
   // Strict mode
@@ -57,7 +57,7 @@ var errors = {
   E039: "Function declarations are not invocable. Wrap the whole function invocation in parens.",
   E040: "Each value should have its own case label.",
   E041: "Unrecoverable syntax error.",
-  E042: "Stopping.",
+  E042: null,
   E043: "Too many errors.",
   E044: null,
   E045: "Invalid for each loop.",
