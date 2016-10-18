@@ -925,12 +925,13 @@ exports.testConstRedeclaration = function (test) {
   ];
 
   TestRun(test)
-      .addError(2, "'a' has already been declared.")
-      .addError(9, "'a' has already been declared.")
-      .addError(13, "'b' has already been declared.")
-      .test(src, {
-        esnext: true
-      });
+    .addError(2, "'a' has already been declared.")
+    .addError(6, "'a' was used before it was declared, which is illegal for 'const' variables.")
+    .addError(9, "'a' has already been declared.")
+    .addError(13, "'b' has already been declared.")
+    .test(src, {
+      esnext: true
+    });
 
   test.done();
 };
@@ -2086,6 +2087,106 @@ exports["destructuring in setter parameter"] = function (test) {
     "  set x({ a, b }) {}",
     "};"
   ], { esversion: 6 });
+
+  test.done();
+};
+
+exports["TDZ within initializer of lexical declarations"] = function(test) {
+  var code = [
+    "let a = a;",
+    "const b = b;",
+    "let c = () => c;",
+    "const d = () => d;",
+    // line 5
+    "let e = {",
+    "  x: e,",
+    "  y: () => e",
+    "};",
+    "const f = {",
+    "  x: f,",
+    "  y: () => f",
+    "};",
+    // line 13
+    "let g, h = g;",
+    "const i = 0, j = i;",
+    "let [ k, l ] = l;",
+    "const [ m, n ] = n;",
+    // line 17
+    "let o = (() => o) + o;",
+    "const p = (() => p) + p;"
+  ];
+
+  TestRun(test)
+    .addError(1, "'a' was used before it was declared, which is illegal for 'let' variables.")
+    .addError(2, "'b' was used before it was declared, which is illegal for 'const' variables.")
+    .addError(6, "'e' was used before it was declared, which is illegal for 'let' variables.")
+    .addError(10, "'f' was used before it was declared, which is illegal for 'const' variables.")
+    .addError(15, "'l' was used before it was declared, which is illegal for 'let' variables.")
+    .addError(16, "'n' was used before it was declared, which is illegal for 'const' variables.")
+    .addError(17, "'o' was used before it was declared, which is illegal for 'let' variables.")
+    .addError(18, "'p' was used before it was declared, which is illegal for 'const' variables.")
+    .test(code, { esversion: 6 });
+
+  test.done();
+};
+
+exports["TDZ within class heritage definition"] = function(test) {
+  var code = [
+    "let A = class extends A {};",
+    "let B = class extends { B } {};",
+    "let C = class extends { method() { return C; } } {};",
+    // line 4
+    "const D = class extends D {};",
+    "const E = class extends { E } {};",
+    "const F = class extends { method() { return F; } } {};",
+    // line 7
+    "class G extends G {}",
+    "class H extends { H } {}",
+    "class I extends { method() { return I; }} {}"
+  ];
+
+  TestRun(test)
+    .addError(1, "'A' was used before it was declared, which is illegal for 'let' variables.")
+    .addError(2, "'B' was used before it was declared, which is illegal for 'let' variables.")
+    .addError(4, "'D' was used before it was declared, which is illegal for 'const' variables.")
+    .addError(5, "'E' was used before it was declared, which is illegal for 'const' variables.")
+    .addError(7, "'G' was used before it was declared, which is illegal for 'class' variables.")
+    .addError(8, "'H' was used before it was declared, which is illegal for 'class' variables.")
+    .test(code, { esversion: 6 });
+
+  test.done();
+};
+
+exports["TDZ within for in/of head"] = function(test) {
+  var code = [
+    "for (let a   in a);",
+    "for (const b in b);",
+    "for (let c   of c);",
+    "for (const d of d);",
+
+    // line 5
+    "for (let e   in { e });",
+    "for (const f in { f });",
+    "for (let g   of { g });",
+    "for (const h of { h });",
+
+    // line 9
+    "for (let i   in { method() { return i; } });",
+    "for (const j in { method() { return j; } });",
+    "for (let k   of { method() { return k; } });",
+    "for (const l of { method() { return l; } });"
+  ];
+
+  TestRun(test)
+    .addError(1, "'a' was used before it was declared, which is illegal for 'let' variables.")
+    .addError(2, "'b' was used before it was declared, which is illegal for 'const' variables.")
+    .addError(3, "'c' was used before it was declared, which is illegal for 'let' variables.")
+    .addError(4, "'d' was used before it was declared, which is illegal for 'const' variables.")
+    .addError(5, "'e' was used before it was declared, which is illegal for 'let' variables.")
+    .addError(6, "'f' was used before it was declared, which is illegal for 'const' variables.")
+    .addError(7, "'g' was used before it was declared, which is illegal for 'let' variables.")
+    .addError(8, "'h' was used before it was declared, which is illegal for 'const' variables.")
+    .test(code, { esversion: 6 });
 
   test.done();
 };

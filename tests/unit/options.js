@@ -116,7 +116,9 @@ exports.shadowEs6 = function (test) {
     [344, "'zzi' has already been declared."],
     [345, "'zzj' has already been declared."],
     [349, "'zzl' has already been declared."],
+    [349, "'zzl' was used before it was declared, which is illegal for 'const' variables."],
     [350, "'zzm' has already been declared."],
+    [350, "'zzm' was used before it was declared, which is illegal for 'let' variables."],
     [364, "'zj' has already been declared."]
   ];
 
@@ -759,11 +761,8 @@ exports.undef = function (test) {
 
   // block scope cannot use themselves in the declaration
   TestRun(test)
-    // JSHint does not currently enforce the correct temporal dead zone
-    // semantics in this case. Once this is fixed, the following errors
-    // should be thrown:
-    //.addError(1, "'a' was used before it was declared, which is illegal for 'let' variables.")
-    //.addError(2, "'b' was used before it was declared, which is illegal for 'const' variables.")
+    .addError(1, "'a' was used before it was declared, which is illegal for 'let' variables.")
+    .addError(2, "'b' was used before it was declared, which is illegal for 'const' variables.")
     .addError(5, "'e' is already defined.")
     .test([
       'let a = a;',
