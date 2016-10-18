@@ -80,7 +80,8 @@ var errors = {
   E062: "Expected an identifier and instead saw '{a}' (a reserved word).",
   E063: "Missing name in function declaration.",
   E064: "Unexpected '{a}'.",
-  E065: "Bad invocation."
+  E065: "Bad invocation.",
+  E066: "Unexpected parameter '{a}' in get {b} function."
 };
 
 var warnings = {
@@ -162,7 +163,7 @@ var warnings = {
   W073: "Blocks are nested too deeply. ({a})",
   W074: "This function's cyclomatic complexity is too high. ({a})",
   W075: "Duplicate {a} '{b}'.",
-  W076: "Unexpected parameter '{a}' in get {b} function.",
+  W076: null,
   W077: "Expected a single parameter in set {a} function.",
   W078: "Setter is defined without getter.",
   W079: "Redefinition of '{a}'.",
