@@ -5398,7 +5398,7 @@ var JSHINT = (function() {
           reason    : err.reason,
           line      : err.line || nt.line,
           character : err.character || nt.from
-        }, null);
+        });
       } else {
         throw err;
       }
