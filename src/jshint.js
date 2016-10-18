@@ -407,15 +407,13 @@ var JSHINT = (function() {
   }
 
   // Tracking of "internal" scripts, like eval containing a static string
-  function addInternalSrc(elem, src) {
-    var i;
-    i = {
+  function addInternalSrc(elem, token) {
+    JSHINT.internals.push({
       id: "(internal)",
       elem: elem,
-      value: src
-    };
-    JSHINT.internals.push(i);
-    return i;
+      token: token,
+      code: token.value.replace(/([^\\])(\\*)\2\\n/g, "$1\n")
+    });
   }
 
   function doOption() {
@@ -2472,13 +2470,13 @@ var JSHINT = (function() {
           // to the fact that the behavior was never formally documented). This
           // branch should be enabled as part of a major release.
           //if (p[0] && p[0].id === "(string)") {
-          //  addInternalSrc(left, p[0].value);
+          //  addInternalSrc(left, p[0]);
           //}
         } else if (p[0] && p[0].id === "(string)" &&
              (left.value === "setTimeout" ||
             left.value === "setInterval")) {
           warning("W066", left);
-          addInternalSrc(left, p[0].value);
+          addInternalSrc(left, p[0]);
 
         // window.setTimeout/setInterval
         } else if (p[0] && p[0].id === "(string)" &&
@@ -2487,7 +2485,7 @@ var JSHINT = (function() {
              (left.right === "setTimeout" ||
             left.right === "setInterval")) {
           warning("W066", left);
-          addInternalSrc(left, p[0].value);
+          addInternalSrc(left, p[0]);
         }
       }
       if (!left.identifier && left.id !== "." && left.id !== "[" && left.id !== "=>" &&
@@ -5170,13 +5168,38 @@ var JSHINT = (function() {
     }
   }
 
+  /**
+   * Lint dynamically-evaluated code, appending any resulting errors/warnings
+   * into the global `errors` array.
+   *
+   * @param {array} internals - collection of "internals" objects describing
+   *                            string tokens that contain evaluated code
+   * @param {object} options - linting options to apply
+   * @param {object} globals - globally-defined bindings for the evaluated code
+   */
+  function lintEvalCode(internals, options, globals) {
+    var priorErrorCount, idx, jdx, internal;
+
+    for (idx = 0; idx < internals.length; idx += 1) {
+      internal = internals[idx];
+      options.scope = internal.elem;
+      priorErrorCount = JSHINT.errors.length;
+
+      itself(internal.code, options, globals);
+
+      for (jdx = priorErrorCount; jdx < JSHINT.errors.length; jdx += 1) {
+        JSHINT.errors[jdx].line += internal.token.line - 1;
+      }
+    }
+  }
+
   var escapeRegex = function(str) {
     return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
   };
 
   // The actual JSHINT function itself.
   var itself = function(s, o, g) {
-    var i, k, x, reIgnoreStr, reIgnore;
+    var x, reIgnoreStr, reIgnore;
     var optionKeys;
     var newOptionObj = {};
     var newIgnoredObj = {};
@@ -5423,15 +5446,8 @@ var JSHINT = (function() {
     }
 
     // Loop over the listed "internals", and check them as well.
-
     if (JSHINT.scope === "(main)") {
-      o = o || {};
-
-      for (i = 0; i < JSHINT.internals.length; i += 1) {
-        k = JSHINT.internals[i];
-        o.scope = k.elem;
-        itself(k.value, o, g);
-      }
+      lintEvalCode(JSHINT.internals, o || {}, g);
     }
 
     return JSHINT.errors.length === 0;
