@@ -77,7 +77,8 @@ var errors = {
   E059: "Incompatible values for the '{a}' and '{b}' linting options.",
   E060: "Non-callable values cannot be used as the second operand to instanceof.",
   E061: "Invalid position for 'yield' expression (consider wrapping in parenthesis).",
-  E062: "Expected an identifier and instead saw '{a}' (a reserved word)."
+  E062: "Expected an identifier and instead saw '{a}' (a reserved word).",
+  E063: "Missing name in function declaration."
 };
 
 var warnings = {
@@ -106,7 +107,7 @@ var warnings = {
   W022: "Do not assign to the exception parameter.",
   W023: null,
   W024: null,
-  W025: "Missing name in function declaration.",
+  W025: null,
   W026: "Inner functions should be listed at the top of the outer function.",
   W027: "Unreachable '{a}' after '{b}'.",
   W028: "Label '{a}' on {b} statement.",

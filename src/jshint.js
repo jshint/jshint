@@ -3900,7 +3900,7 @@ var JSHINT = (function() {
       token: state.tokens.curr });
 
     if (i === undefined) {
-      warning("W025");
+      warning("E063");
     } else if (inexport) {
       state.funct["(scope)"].setExported(i, state.tokens.prev);
     }
