@@ -85,7 +85,8 @@ var errors = {
   E067: "Expected a single parameter in set {a} function.",
   E068: "'{a}' is not a statement label.",
   E069: "Unexpected comma.",
-  E070: "Expected a string and instead saw {a}."
+  E070: "Expected a string and instead saw {a}.",
+  E071: "Unclosed string."
 };
 
 var warnings = {
@@ -204,7 +205,7 @@ var warnings = {
   W108: "Strings must use doublequote.",
   W109: "Strings must use singlequote.",
   W110: "Mixed double and single quotes.",
-  W112: "Unclosed string.",
+  W112: null,
   W113: "Control character in string: {a}.",
   W114: "Avoid {a}.",
   W115: "Octal literals are not allowed in strict mode.",

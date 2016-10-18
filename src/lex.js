@@ -1187,10 +1187,8 @@ Lexer.prototype = {
         // but it generates too many false positives.
 
         if (!allowNewLine) {
-          // This condition unequivocally describes a syntax error.
-          // TODO: Re-factor as an "error" (not a "warning").
-          this.trigger("warning", {
-            code: "W112",
+          this.trigger("error", {
+            code: "E071",
             line: this.line,
             character: this.char
           });
