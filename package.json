@@ -34,7 +34,7 @@
     "test-browser": "node tests/browser",
     "test-cli": "nodeunit tests/cli.js",
     "test-node": "npm run test-unit && npm run test-cli && npm run test-regression",
-    "test-regression": "nodeunit tests/regression",
+    "test-regression": "nodeunit tests/regression && node bin/jshint src",
     "test-unit": "nodeunit tests/unit",
     "test": "npm run test-node && npm run test-browser"
   },
