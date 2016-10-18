@@ -3439,7 +3439,7 @@ var JSHINT = (function() {
       while (!checkPunctuator(state.tokens.next, "]")) {
         if (nextInnerDE() && !element_after_rest &&
             checkPunctuator(state.tokens.next, ",")) {
-          warning("W130", state.tokens.next);
+          error("E073", state.tokens.next);
           element_after_rest = true;
         }
         if (checkPunctuator(state.tokens.next, "=")) {

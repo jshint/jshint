@@ -87,7 +87,8 @@ var errors = {
   E069: "Unexpected comma.",
   E070: "Expected a string and instead saw {a}.",
   E071: "Unclosed string.",
-  E072: "Octal literals are not allowed in strict mode."
+  E072: "Octal literals are not allowed in strict mode.",
+  E073: "Invalid element after rest element."
 };
 
 var warnings = {
@@ -225,7 +226,7 @@ var warnings = {
   W128: "Empty array elements require elision=true.",
   W129: "'{a}' is defined in a future version of JavaScript. Use a " +
     "different variable name to avoid migration issues.",
-  W130: "Invalid element after rest element.",
+  W130: null,
   W131: "Invalid parameter after rest parameter.",
   W132: "`var` declarations are forbidden. Use `let` or `const` instead.",
   W133: "Invalid for-{a} loop left-hand-side: {b}.",
