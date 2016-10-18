@@ -611,12 +611,19 @@ var scopeManager = function(state, predefined, exported, declared) {
       this.block.use(labelName, token);
     },
 
+    initialize: function(labelName) {
+      if (_current["(labels)"][labelName]) {
+        _current["(labels)"][labelName]["(initialized)"] = true;
+      }
+    },
+
     /**
      * adds an indentifier to the relevant current scope and creates warnings/errors as necessary
      * @param {string} labelName
      * @param {Object} opts
      * @param {String} opts.type - the type of the label e.g. "param", "var", "let, "const", "function"
      * @param {Token} opts.token - the token pointing at the declaration
+     * @param {boolean} opts.initialized - whether the binding should be created in an "initialized" state.
      */
     addlabel: function(labelName, opts) {
 
@@ -664,7 +671,9 @@ var scopeManager = function(state, predefined, exported, declared) {
           }
         }
 
-        scopeManagerInst.block.add(labelName, type, token, !isexported);
+        scopeManagerInst.block.add(
+          labelName, type, token, !isexported, opts.initialized
+        );
 
       } else {
 
@@ -805,6 +814,12 @@ var scopeManager = function(state, predefined, exported, declared) {
           token["(function)"] = _currentFunctBody;
           _current["(usages)"][labelName]["(tokens)"].push(token);
         }
+
+        // blockscoped vars can't be used within their initializer (TDZ)
+        var label = _current["(labels)"][labelName];
+        if (label && label["(blockscoped)"] && !label["(initialized)"]) {
+          error("E056", token, labelName, label["(type)"]);
+        }
       },
 
       reassign: function(labelName, token) {
@@ -827,10 +842,11 @@ var scopeManager = function(state, predefined, exported, declared) {
       /**
        * Adds a new variable
        */
-      add: function(labelName, type, tok, unused) {
+      add: function(labelName, type, tok, unused, initialized) {
         _current["(labels)"][labelName] = {
           "(type)" : type,
           "(token)": tok,
+          "(initialized)": !!initialized,
           "(blockscoped)": true,
           "(unused)": unused };
       },
