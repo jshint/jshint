@@ -977,8 +977,8 @@ Lexer.prototype = {
       // Octal literals fail in strict mode.
       // Check if the number is between 00 and 07.
       var n = parseInt(this.peek(1), 10);
-      this.triggerAsync("warning", {
-        code: "W115",
+      this.triggerAsync("error", {
+        code: "E072",
         line: this.line,
         character: this.char
       }, checks,
@@ -1872,8 +1872,8 @@ Lexer.prototype = {
           data: [ "0x-" ]
         }, checks, function() { return token.base === 16 && state.jsonMode; });
 
-        this.triggerAsync("warning", {
-          code: "W115",
+        this.triggerAsync("error", {
+          code: "E072",
           line: this.line,
           character: this.char
         }, checks, function() {

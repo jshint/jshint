@@ -86,7 +86,8 @@ var errors = {
   E068: "'{a}' is not a statement label.",
   E069: "Unexpected comma.",
   E070: "Expected a string and instead saw {a}.",
-  E071: "Unclosed string."
+  E071: "Unclosed string.",
+  E072: "Octal literals are not allowed in strict mode."
 };
 
 var warnings = {
@@ -208,7 +209,7 @@ var warnings = {
   W112: null,
   W113: "Control character in string: {a}.",
   W114: "Avoid {a}.",
-  W115: "Octal literals are not allowed in strict mode.",
+  W115: null,
   W116: "Expected '{a}' and instead saw '{b}'.",
   W117: "'{a}' is not defined.",
   W118: "'{a}' is only available in Mozilla JavaScript extensions (use moz option).",
