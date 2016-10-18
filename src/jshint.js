@@ -1511,7 +1511,7 @@ var JSHINT = (function() {
       }
 
       if (!state.tokens.next.identifier) {
-        warning("E024", state.tokens.curr, "...");
+        warning("E024", state.tokens.curr, state.tokens.next.id);
         return;
       }
 
