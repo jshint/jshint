@@ -2482,7 +2482,7 @@ var JSHINT = (function() {
       if (!left.identifier && left.id !== "." && left.id !== "[" && left.id !== "=>" &&
           left.id !== "(" && left.id !== "&&" && left.id !== "||" && left.id !== "?" &&
           !(state.inES6() && left["(name)"])) {
-        warning("W067", that);
+        warning("E065", that);
       }
     }
 

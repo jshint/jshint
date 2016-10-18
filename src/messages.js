@@ -79,7 +79,8 @@ var errors = {
   E061: "Invalid position for 'yield' expression (consider wrapping in parenthesis).",
   E062: "Expected an identifier and instead saw '{a}' (a reserved word).",
   E063: "Missing name in function declaration.",
-  E064: "Unexpected '{a}'."
+  E064: "Unexpected '{a}'.",
+  E065: "Bad invocation."
 };
 
 var warnings = {
@@ -152,7 +153,7 @@ var warnings = {
   W064: "Missing 'new' prefix when invoking a constructor.",
   W065: "Missing radix parameter.",
   W066: "Implied eval. Consider passing a function instead of a string.",
-  W067: "Bad invocation.",
+  W067: null,
   W068: "Wrapping non-IIFE function literals in parens is unnecessary.",
   W069: "['{a}'] is better written in dot notation.",
   W070: "Extra comma. (it breaks older versions of IE)",
