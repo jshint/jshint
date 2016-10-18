@@ -7588,7 +7588,9 @@ exports.extraRestOperator = function (test) {
     .addError(1, "Unexpected '...'.")
     .addError(2, "Unexpected '...'.")
     .addError(3, "Unexpected '...'.")
+    .addError(3, "Unexpected ')'.")
     .addError(4, "Unexpected '...'.")
+    .addError(4, "Unexpected ')'.")
     .addError(5, "Unexpected '...'.")
     .addError(6, "Unexpected '...'.")
     .addError(7, "Unexpected '...'.")
@@ -7624,16 +7626,16 @@ exports.restOperatorWithoutIdentifier = function (test) {
   ];
 
   TestRun(test)
-    .addError(1, "Unexpected '...'.")
-    .addError(2, "Unexpected '...'.")
-    .addError(3, "Unexpected '...'.")
-    .addError(4, "Unexpected '...'.")
-    .addError(5, "Unexpected '...'.")
-    .addError(6, "Unexpected '...'.")
-    .addError(7, "Unexpected '...'.")
-    .addError(8, "Unexpected '...'.")
-    .addError(9, "Unexpected '...'.")
-    .addError(10, "Unexpected '...'.")
+    .addError(1, "Unexpected ']'.")
+    .addError(2, "Unexpected ']'.")
+    .addError(3, "Unexpected ')'.")
+    .addError(4, "Unexpected ')'.")
+    .addError(5, "Unexpected ']'.")
+    .addError(6, "Unexpected ']'.")
+    .addError(7, "Unexpected ')'.")
+    .addError(8, "Unexpected ')'.")
+    .addError(9, "Unexpected ']'.")
+    .addError(10, "Unexpected ']'.")
     .test(code, { esnext: true });
 
   test.done();
