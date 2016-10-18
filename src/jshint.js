@@ -3247,7 +3247,12 @@ var JSHINT = (function() {
           advance(nextVal);
 
           if (!state.inES5()) {
-            error("E034");
+            warning(
+              "W119",
+              state.tokens.curr,
+              nextVal === "get" ? "`get` method" : "`set` method",
+              5
+            );
           }
 
           i = propertyName();

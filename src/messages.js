@@ -49,7 +49,7 @@ var errors = {
   E031: "Bad assignment.", // FIXME: Rephrase
   E032: "Expected a small integer or 'false' and instead saw '{a}'.",
   E033: "Expected an operator and instead saw '{a}'.",
-  E034: "get/set are ES5 features.",
+  E034: null,
   E035: "Missing property name.",
   E036: "Expected to see a statement and instead saw a block.",
   E037: null,

@@ -3775,7 +3775,7 @@ exports.esversion = function(test) {
   ];
 
   TestRun(test, "ES5 syntax as ES3")
-    .addError(2, "get/set are ES5 features.")
+    .addError(2, "'`get` method' is only available in ES5 (use 'esversion: 5').")
     .test(es5code, { esversion: 3 });
 
   TestRun(test, "ES5 syntax as ES5")
@@ -3890,7 +3890,7 @@ exports.esversion = function(test) {
   ];
 
   TestRun(test, "correctly swap between moz and esversion")
-    .addError(4, "get/set are ES5 features.")
+    .addError(4, "'`get` method' is only available in ES5 (use 'esversion: 5').")
     .test(code5);
 
 
