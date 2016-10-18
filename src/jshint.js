@@ -1474,7 +1474,7 @@ var JSHINT = (function() {
       return val;
     }
 
-    warning("W024", state.tokens.curr, state.tokens.curr.id);
+    warning("E062", state.tokens.curr, state.tokens.curr.id);
     return val;
   }
 
@@ -1589,7 +1589,7 @@ var JSHINT = (function() {
     // anyway.
 
     if (res && t.meta && t.meta.isFutureReservedWord && peek().id === ":") {
-      warning("W024", t, t.id);
+      warning("E062", t, t.id);
       res = false;
     }
 
