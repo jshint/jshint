@@ -1346,13 +1346,7 @@ var JSHINT = (function() {
       state.nameStack.set(state.tokens.prev);
       return true;
     } else if (left.id === "{" || left.id === "[") {
-      if (allowDestructuring && left.destructAssign) {
-        left.destructAssign.forEach(function(t) {
-          if (t.id) {
-            state.funct["(scope)"].block.modify(t.id, t.token);
-          }
-        });
-      } else {
+      if (!allowDestructuring || !left.destructAssign) {
         if (left.id === "{" || !left.left) {
           warning("E031", assignToken);
         } else if (left.left.value === "arguments" && !state.isStrict()) {
@@ -4425,10 +4419,9 @@ var JSHINT = (function() {
   stmt("continue", function() {
     var v = state.tokens.next.value;
 
-    if (state.funct["(breakage)"] === 0)
+    if (state.funct["(breakage)"] === 0 || !state.funct["(loopage)"]) {
       warning("W052", state.tokens.next, this.value);
-    if (!state.funct["(loopage)"])
-      warning("W052", state.tokens.next, this.value);
+    }
 
     if (!state.option.asi)
       nolinebreak(this);
