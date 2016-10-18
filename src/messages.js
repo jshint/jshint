@@ -81,7 +81,8 @@ var errors = {
   E063: "Missing name in function declaration.",
   E064: "Unexpected '{a}'.",
   E065: "Bad invocation.",
-  E066: "Unexpected parameter '{a}' in get {b} function."
+  E066: "Unexpected parameter '{a}' in get {b} function.",
+  E067: "Expected a single parameter in set {a} function."
 };
 
 var warnings = {
@@ -164,7 +165,7 @@ var warnings = {
   W074: "This function's cyclomatic complexity is too high. ({a})",
   W075: "Duplicate {a} '{b}'.",
   W076: null,
-  W077: "Expected a single parameter in set {a} function.",
+  W077: null,
   W078: "Setter is defined without getter.",
   W079: "Redefinition of '{a}'.",
   W080: "It's not necessary to initialize '{a}' to 'undefined'.",

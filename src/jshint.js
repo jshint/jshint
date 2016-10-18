@@ -3278,7 +3278,7 @@ var JSHINT = (function() {
           if (nextVal === "get" && i && p) {
             warning("E066", t, p[0], i);
           } else if (nextVal === "set" && i && f["(metrics)"].arity !== 1) {
-            warning("W077", t, i);
+            warning("E067", t, i);
           }
         } else {
           if (state.tokens.next.value === "*" && state.tokens.next.type === "(punctuator)") {
