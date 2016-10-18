@@ -90,7 +90,8 @@ var errors = {
   E072: "Octal literals are not allowed in strict mode.",
   E073: "Invalid element after rest element.",
   E074: "Invalid parameter after rest parameter.",
-  E075: "Invalid for-{a} loop left-hand-side: {b}."
+  E075: "Invalid for-{a} loop left-hand-side: {b}.",
+  E076: "'{a}' must be in function scope."
 };
 
 var warnings = {
@@ -234,7 +235,7 @@ var warnings = {
   W133: null,
   W134: "The '{a}' option is only available when linting ECMAScript {b} code.",
   W135: "{a} may not be supported by non-browser environments.",
-  W136: "'{a}' must be in function scope.",
+  W136: null,
   W137: "Empty destructuring.",
   W138: "Regular parameters should not come after default parameters.",
   W139: "Function expressions should not be used as the second operand to instanceof.",

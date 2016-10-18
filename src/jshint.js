@@ -2317,7 +2317,7 @@ var JSHINT = (function() {
         c = c["(context)"];
       }
       if (!inFunction) {
-        warning("W136", state.tokens.prev, "new.target");
+        warning("E076", state.tokens.prev, "new.target");
       }
     });
     if (mp) { return mp; }
