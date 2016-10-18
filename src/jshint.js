@@ -2883,7 +2883,7 @@ var JSHINT = (function() {
 
       if (state.tokens.next.id === ",") {
         if (pastRest) {
-          warning("W131", state.tokens.next);
+          error("E074", state.tokens.next);
         }
         parseComma();
       } else {

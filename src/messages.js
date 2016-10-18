@@ -88,7 +88,8 @@ var errors = {
   E070: "Expected a string and instead saw {a}.",
   E071: "Unclosed string.",
   E072: "Octal literals are not allowed in strict mode.",
-  E073: "Invalid element after rest element."
+  E073: "Invalid element after rest element.",
+  E074: "Invalid parameter after rest parameter."
 };
 
 var warnings = {
@@ -227,7 +228,7 @@ var warnings = {
   W129: "'{a}' is defined in a future version of JavaScript. Use a " +
     "different variable name to avoid migration issues.",
   W130: null,
-  W131: "Invalid parameter after rest parameter.",
+  W131: null,
   W132: "`var` declarations are forbidden. Use `let` or `const` instead.",
   W133: "Invalid for-{a} loop left-hand-side: {b}.",
   W134: "The '{a}' option is only available when linting ECMAScript {b} code.",
