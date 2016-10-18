@@ -52,9 +52,7 @@ exports.setup.testRun = function (test, name) {
 
     test: function (source, options, globals) {
       var ret = !!JSHINT(source, options, globals);
-      var errors = JSHINT.errors.filter(function (er) {
-        return er;
-      });
+      var errors = JSHINT.errors;
 
       if (errors.length === 0 && definedErrors.length === 0) {
         return;
