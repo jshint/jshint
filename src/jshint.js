@@ -5089,7 +5089,7 @@ var JSHINT = (function() {
           if (state.tokens.next.id === "(end)") {
             error("E026", state.tokens.next, t.line);
           } else if (state.tokens.next.id === "}") {
-            warning("W094", state.tokens.curr);
+            error("E069", state.tokens.curr);
             break;
           } else if (state.tokens.next.id === ",") {
             error("E028", state.tokens.next);
@@ -5125,7 +5125,7 @@ var JSHINT = (function() {
           if (state.tokens.next.id === "(end)") {
             error("E027", state.tokens.next, t.line);
           } else if (state.tokens.next.id === "]") {
-            warning("W094", state.tokens.curr);
+            error("E069", state.tokens.curr);
             break;
           } else if (state.tokens.next.id === ",") {
             error("E028", state.tokens.next);

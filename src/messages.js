@@ -83,7 +83,8 @@ var errors = {
   E065: "Bad invocation.",
   E066: "Unexpected parameter '{a}' in get {b} function.",
   E067: "Expected a single parameter in set {a} function.",
-  E068: "'{a}' is not a statement label."
+  E068: "'{a}' is not a statement label.",
+  E069: "Unexpected comma."
 };
 
 var warnings = {
@@ -185,7 +186,7 @@ var warnings = {
   W090: null,
   W091: null,
   W093: "Did you mean to return a conditional instead of an assignment?",
-  W094: "Unexpected comma.",
+  W094: null,
   W095: "Expected a string and instead saw {a}.",
   W096: "The '{a}' key may produce unexpected results.",
   W097: "Use the function form of \"use strict\".",
