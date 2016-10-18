@@ -5094,7 +5094,7 @@ var JSHINT = (function() {
           } else if (state.tokens.next.id === ",") {
             error("E028", state.tokens.next);
           } else if (state.tokens.next.id !== "(string)") {
-            warning("W095", state.tokens.next, state.tokens.next.value);
+            warning("E070", state.tokens.next, state.tokens.next.value);
           }
           if (o[state.tokens.next.value] === true) {
             warning("W075", state.tokens.next, "key", state.tokens.next.value);
