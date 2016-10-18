@@ -4402,7 +4402,7 @@ var JSHINT = (function() {
     if (state.tokens.next.id !== ";" && !state.tokens.next.reach &&
         state.tokens.curr.line === startLine(state.tokens.next)) {
       if (!state.funct["(scope)"].funct.hasBreakLabel(v)) {
-        warning("W090", state.tokens.next, v);
+        error("E068", state.tokens.next, v);
       }
       this.first = state.tokens.next;
       advance();
@@ -4430,7 +4430,7 @@ var JSHINT = (function() {
     if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
       if (state.tokens.curr.line === startLine(state.tokens.next)) {
         if (!state.funct["(scope)"].funct.hasBreakLabel(v)) {
-          warning("W090", state.tokens.next, v);
+          error("E068", state.tokens.next, v);
         }
         this.first = state.tokens.next;
         advance();

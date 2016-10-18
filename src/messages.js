@@ -82,7 +82,8 @@ var errors = {
   E064: "Unexpected '{a}'.",
   E065: "Bad invocation.",
   E066: "Unexpected parameter '{a}' in get {b} function.",
-  E067: "Expected a single parameter in set {a} function."
+  E067: "Expected a single parameter in set {a} function.",
+  E068: "'{a}' is not a statement label."
 };
 
 var warnings = {
@@ -181,7 +182,7 @@ var warnings = {
   W088: "Creating global 'for' variable. Should be 'for (var {a} ...'.",
   W089: "The body of a for in should be wrapped in an if statement to filter " +
     "unwanted properties from the prototype.",
-  W090: "'{a}' is not a statement label.",
+  W090: null,
   W091: null,
   W093: "Did you mean to return a conditional instead of an assignment?",
   W094: "Unexpected comma.",
