@@ -988,10 +988,8 @@ Lexer.prototype = {
       var hexCode = this.input.substr(1, 4);
       var code = parseInt(hexCode, 16);
       if (isNaN(code)) {
-        // This condition unequivocally describes a syntax error.
-        // TODO: Re-factor as an "error" (not a "warning").
-        this.trigger("warning", {
-          code: "W052",
+        this.trigger("error", {
+          code: "E064",
           line: this.line,
           character: this.char,
           data: [ "u" + hexCode ]

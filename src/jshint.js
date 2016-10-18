@@ -3828,7 +3828,7 @@ var JSHINT = (function() {
           }
         }
       } else {
-        warning("W052", state.tokens.next, state.tokens.next.value || state.tokens.next.type);
+        error("E064", state.tokens.next, state.tokens.next.value || state.tokens.next.type);
         advance();
         continue;
       }
@@ -4408,7 +4408,7 @@ var JSHINT = (function() {
       advance();
     } else {
       if (state.funct["(breakage)"] === 0)
-        warning("W052", state.tokens.next, this.value);
+        error("E064", state.tokens.next, this.value);
     }
 
     reachable(this);
@@ -4421,7 +4421,7 @@ var JSHINT = (function() {
     var v = state.tokens.next.value;
 
     if (state.funct["(breakage)"] === 0 || !state.funct["(loopage)"]) {
-      warning("W052", state.tokens.next, this.value);
+      warning("E064", state.tokens.next, this.value);
     }
 
     if (!state.option.asi)

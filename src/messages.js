@@ -78,7 +78,8 @@ var errors = {
   E060: "Non-callable values cannot be used as the second operand to instanceof.",
   E061: "Invalid position for 'yield' expression (consider wrapping in parenthesis).",
   E062: "Expected an identifier and instead saw '{a}' (a reserved word).",
-  E063: "Missing name in function declaration."
+  E063: "Missing name in function declaration.",
+  E064: "Unexpected '{a}'."
 };
 
 var warnings = {
@@ -134,7 +135,7 @@ var warnings = {
   W049: "Unexpected escaped character '{a}' in regular expression.",
   W050: "JavaScript URL.",
   W051: "Variables should not be deleted.",
-  W052: "Unexpected '{a}'.",
+  W052: null,
   W053: "Do not use {a} as a constructor.",
   W054: "The Function constructor is a form of eval.",
   W055: "A constructor name should start with an uppercase letter.",
