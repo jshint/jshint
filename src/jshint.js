@@ -28,7 +28,6 @@
  */
 
 /*jshint quotmark:double */
-/*global console:true */
 /*exported console */
 
 var _            = require("lodash");
