@@ -6126,7 +6126,7 @@ exports["class method this"] = function (test) {
   ];
 
   TestRun(test)
-    .addError(10, "Possible strict violation.")
+    .addError(10, "If a strict mode function is executed using function invocation, its 'this' value will be undefined.")
     .test(code, {esnext: true});
 
   test.done();

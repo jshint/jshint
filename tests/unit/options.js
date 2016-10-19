@@ -1705,7 +1705,7 @@ exports.strict = function (test) {
 
   // Test for strict mode violations
   run = TestRun(test)
-    .addError(4, 'Possible strict violation.')
+    .addError(4, "If a strict mode function is executed using function invocation, its 'this' value will be undefined.")
     .addError(7, 'Strict violation.')
     .addError(8, 'Strict violation.');
   run.test(src, { es3: true, strict: true });
@@ -1992,9 +1992,9 @@ exports.validthis = function (test) {
   var src = fs.readFileSync(__dirname + '/fixtures/strict_this.js', 'utf8');
 
   TestRun(test)
-    .addError(8, "Possible strict violation.")
-    .addError(9, "Possible strict violation.")
-    .addError(11, "Possible strict violation.")
+    .addError(8, "If a strict mode function is executed using function invocation, its 'this' value will be undefined.")
+    .addError(9, "If a strict mode function is executed using function invocation, its 'this' value will be undefined.")
+    .addError(11, "If a strict mode function is executed using function invocation, its 'this' value will be undefined.")
     .test(src, {es3: true});
 
   src = fs.readFileSync(__dirname + '/fixtures/strict_this2.js', 'utf8');
@@ -3596,12 +3596,12 @@ exports.module.behavior = function(test) {
   TestRun(test)
     .addError(0, "The 'module' option is only available when linting ECMAScript 6 code.")
     .addError(1, "Expected an identifier and instead saw 'package' (a reserved word).")
-    .addError(2, "Possible strict violation.")
+    .addError(2, "If a strict mode function is executed using function invocation, its 'this' value will be undefined.")
     .test(code, { module: true });
 
   TestRun(test)
     .addError(1, "Expected an identifier and instead saw 'package' (a reserved word).")
-    .addError(2, "Possible strict violation.")
+    .addError(2, "If a strict mode function is executed using function invocation, its 'this' value will be undefined.")
     .test(code, { module: true, esnext: true });
 
   code = [
@@ -3613,14 +3613,14 @@ exports.module.behavior = function(test) {
   TestRun(test)
     .addError(1, "The 'module' option is only available when linting ECMAScript 6 code.")
     .addError(2, "Expected an identifier and instead saw 'package' (a reserved word).")
-    .addError(3, "Possible strict violation.")
+    .addError(3, "If a strict mode function is executed using function invocation, its 'this' value will be undefined.")
     .test(code);
 
   code[0] = "/* jshint module: true, esnext: true */";
 
   TestRun(test)
     .addError(2, "Expected an identifier and instead saw 'package' (a reserved word).")
-    .addError(3, "Possible strict violation.")
+    .addError(3, "If a strict mode function is executed using function invocation, its 'this' value will be undefined.")
     .test(code);
 
   test.done();

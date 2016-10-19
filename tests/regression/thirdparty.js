@@ -152,7 +152,7 @@ exports.lodash_0_6_1 = function (test) {
   };
 
   TestRun(test)
-    .addError(168, "Possible strict violation.")
+    .addError(168, "If a strict mode function is executed using function invocation, its 'this' value will be undefined.")
     .addError(170, "Missing '()' invoking a constructor.")
     .addError(632, "Missing semicolon.")
     .addError(920, "Reassignment of 'isArguments', which is is a function. Use 'var' or 'let' to declare bindings that may change.")
@@ -164,15 +164,15 @@ exports.lodash_0_6_1 = function (test) {
     .addError(1159, "'isArr' used out of scope.")
     .addError(1490, "Use '===' to compare with '0'.")
     .addError(1670, "Missing semicolon.")
-    .addError(3374, "Possible strict violation.")
+    .addError(3374, "If a strict mode function is executed using function invocation, its 'this' value will be undefined.")
     .addError(3377, "Missing '()' invoking a constructor.")
     .addError(3384, "Missing semicolon.")
     .addError(3677, "Missing '()' invoking a constructor.")
     .addError(3683, "Missing '()' invoking a constructor.")
-    .addError(3825, "Possible strict violation.")
-    .addError(4225, "Possible strict violation.")
-    .addError(4226, "Possible strict violation.")
-    .addError(4242, "Possible strict violation.")
+    .addError(3825, "If a strict mode function is executed using function invocation, its 'this' value will be undefined.")
+    .addError(4225, "If a strict mode function is executed using function invocation, its 'this' value will be undefined.")
+    .addError(4226, "If a strict mode function is executed using function invocation, its 'this' value will be undefined.")
+    .addError(4242, "If a strict mode function is executed using function invocation, its 'this' value will be undefined.")
     .test(src, options, globals);
 
   test.done();
