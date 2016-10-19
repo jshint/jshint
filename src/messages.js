@@ -119,7 +119,8 @@ var warnings = {
   W037: "'{a}' is a statement label.",
   W038: "'{a}' used out of scope.",
   W039: "'{a}' is not allowed.",
-  W040: "Possible strict violation.",
+  W040: "If a strict mode function is executed using function invocation, " +
+    "its 'this' value will be undefined.",
   W041: "Use '{a}' to compare with '{b}'.",
   W042: "Avoid EOL escaping.",
   W043: "Bad escaping of EOL. Use option multistr if needed.",
