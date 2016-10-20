@@ -113,7 +113,11 @@ var state = {
         return badOpt;
       }
 
-      this.esVersion = this.option.esversion;
+      if (this.option.esversion === 2015) {
+        this.esVersion = 6;
+      } else {
+        this.esVersion = this.option.esversion;
+      }
     } else if (this.option.es3) {
       this.esVersion = 3;
     } else if (this.option.esnext) {

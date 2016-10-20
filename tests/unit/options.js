@@ -3787,19 +3787,25 @@ exports.esversion = function(test) {
   var es6code = [
     "var a = {",
     "  ['b']: 1",
-    "};"
+    "};",
+    "var b = () => {};"
   ];
 
   TestRun(test, "ES6 syntax as ES3")
     .addError(2, "'computed property names' is only available in ES6 (use 'esversion: 6').")
+    .addError(4, "'arrow function syntax (=>)' is only available in ES6 (use 'esversion: 6').")
     .test(es6code, { esversion: 3 });
 
   TestRun(test, "ES6 syntax as ES5")
     .addError(2, "'computed property names' is only available in ES6 (use 'esversion: 6').")
+    .addError(4, "'arrow function syntax (=>)' is only available in ES6 (use 'esversion: 6').")
     .test(es6code); // esversion: 5 (default)
 
   TestRun(test, "ES6 syntax as ES6")
     .test(es6code, { esversion: 6 });
+
+  TestRun(test, "ES6 syntax as ES6 (via option value `2015`)")
+    .test(es5code, { esversion: 2015 });
 
   // Array comprehensions aren't defined in ECMAScript 6,
   // but they can be enabled using the `esnext` option
@@ -3853,7 +3859,7 @@ exports.esversion = function(test) {
   ].concat(es6code);
 
   TestRun(test, "incompatible options specified in-line") // TODO: Remove in JSHint 3
-    .addError(1, "Incompatible values for the 'esversion' and 'esnext' linting options. (25% scanned).")
+    .addError(1, "Incompatible values for the 'esversion' and 'esnext' linting options. (20% scanned).")
     .test(code2);
 
   var code3 = [

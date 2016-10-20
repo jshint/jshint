@@ -667,12 +667,9 @@ var JSHINT = (function() {
           case "3":
           case "5":
           case "6":
-            state.option.moz = false;
-            state.option.esversion = +val;
-            break;
           case "2015":
             state.option.moz = false;
-            state.option.esversion = 6;
+            state.option.esversion = +val;
             break;
           default:
             error("E002", dirToken);
