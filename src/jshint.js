@@ -407,7 +407,7 @@ var JSHINT = (function() {
   }
 
   // Tracking of "internal" scripts, like eval containing a static string
-  function addInternalSrc(elem, token) {
+  function addEvalCode(elem, token) {
     JSHINT.internals.push({
       id: "(internal)",
       elem: elem,
@@ -2464,13 +2464,13 @@ var JSHINT = (function() {
           // to the fact that the behavior was never formally documented). This
           // branch should be enabled as part of a major release.
           //if (p[0] && p[0].id === "(string)") {
-          //  addInternalSrc(left, p[0]);
+          //  addEvalCode(left, p[0]);
           //}
         } else if (p[0] && p[0].id === "(string)" &&
              (left.value === "setTimeout" ||
             left.value === "setInterval")) {
           warning("W066", left);
-          addInternalSrc(left, p[0]);
+          addEvalCode(left, p[0]);
 
         // window.setTimeout/setInterval
         } else if (p[0] && p[0].id === "(string)" &&
@@ -2479,7 +2479,7 @@ var JSHINT = (function() {
              (left.right === "setTimeout" ||
             left.right === "setInterval")) {
           warning("W066", left);
-          addInternalSrc(left, p[0]);
+          addEvalCode(left, p[0]);
         }
       }
       if (!left.identifier && left.id !== "." && left.id !== "[" && left.id !== "=>" &&
