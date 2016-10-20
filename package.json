@@ -28,11 +28,14 @@
     "build": "node bin/build",
     "coverage": "istanbul -- cover ./node_modules/.bin/nodeunit tests/unit",
     "data": "node scripts/generate-identifier-data",
+    "fetch-test262": "git submodule init && git submodule update",
     "pretest": "node ./bin/jshint src && jscs src",
     "changelog": "conventional-changelog -p jshint -i CHANGELOG.md -w",
     "github-release": "conventional-github-releaser -p jshint",
+    "test-262": "node tests/test262",
     "test-browser": "node tests/browser",
     "test-cli": "nodeunit tests/cli.js",
+    "test-ci": "npm run test && npm run test-262",
     "test-node": "npm run test-unit && npm run test-cli && npm run test-regression",
     "test-regression": "nodeunit tests/regression",
     "test-unit": "nodeunit tests/unit",
@@ -53,6 +56,7 @@
   },
 
   "devDependencies": {
+    "async":                          "~2.1.2",
     "browserify":                     "9.x",
     "conventional-changelog":         "0.4.x",
     "conventional-github-releaser":   "0.4.x",
