@@ -794,6 +794,16 @@ exports.undef = function (test) {
 
   test.strictEqual(JSHINT.data().implieds, undefined);
 
+  // See gh-3055 "Labels Break JSHint"
+  TestRun(test, "following labeled block")
+    .addError(4, "'x' is not defined.")
+    .test([
+      "label: {",
+      "  let x;",
+      "}",
+      "void x;"
+    ], { esversion: 6, undef: true });
+
   test.done();
 };
 
