@@ -427,7 +427,6 @@ var JSHINT = (function() {
    * @param {Token} previous - the token that preceeds the directive
    */
   function lintingDirective(dirToken, previous) {
-    var dirToken = state.tokens.next;
     var body = dirToken.body.split(",").map(function(s) { return s.trim(); });
     var predef = {};
 
@@ -658,7 +657,7 @@ var JSHINT = (function() {
            * TODO: Extend this restriction to *all* "environmental" options.
            */
           if (!hasParsedCode(state.funct)) {
-            error("E055", state.tokens.next, "module");
+            error("E055", dirToken, "module");
           }
         }
 
@@ -675,7 +674,7 @@ var JSHINT = (function() {
             error("E002", dirToken);
           }
           if (!hasParsedCode(state.funct)) {
-            error("E055", state.tokens.next, "esversion");
+            error("E055", dirToken, "esversion");
           }
           return;
         }
