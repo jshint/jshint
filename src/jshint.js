@@ -1622,6 +1622,11 @@ var JSHINT = (function() {
       //  }
       var iscase = (state.funct["(verb)"] === "case" && state.tokens.curr.value === ":");
       block(true, true, false, false, iscase);
+
+      if (hasOwnScope) {
+        state.funct["(scope)"].unstack();
+      }
+
       return;
     }
 
