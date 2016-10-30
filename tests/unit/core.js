@@ -867,6 +867,14 @@ exports.testES6Modules = function (test) {
   TestRun(test)
     .test(src2, {});
 
+  // See gh-3055 "Labels Break JSHint"
+  TestRun(test, "following labeled block")
+    .test([
+      "label: {}",
+      "export function afterLabelExported() {}",
+      "import afterLabelImported from 'elsewhere';"
+    ], { esversion: 6 });
+
   test.done();
 };
 
@@ -1756,6 +1764,14 @@ exports.labelsOutOfScope = function (test) {
     .addError(22, "'bar' is not a statement label.")
     .addError(24, "'baz' is not a statement label.")
     .test(src);
+
+  // See gh-3055 "Labels Break JSHint"
+  TestRun(test, "following labeled block")
+    .addError(2, "'x' is not a statement label.")
+    .test([
+      "x: {}",
+      "break x;"
+    ]);
 
   test.done();
 };
