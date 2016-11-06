@@ -8372,3 +8372,188 @@ exports["regression test for GH-3230"] = function (test) {
 
   test.done();
 };
+
+exports.exponentiation = {};
+
+exports.exponentiation.esversion = function (test) {
+  var src = "x = 2 ** 3;";
+
+  TestRun(test)
+    .addError(1, 7, "'Exponentiation operator' is only available in ES7 (use 'esversion: 7').")
+    .test(src);
+
+  TestRun(test)
+    .addError(1, 7, "'Exponentiation operator' is only available in ES7 (use 'esversion: 7').")
+    .test(src, { esversion: 6 });
+
+  TestRun(test)
+    .test(src, { esversion: 7 });
+
+  test.done();
+};
+
+exports.exponentiation.whitespace = function (test) {
+  TestRun(test)
+    .test([
+      "2 ** 3;",
+      "2** 3;",
+      "2 **3;",
+    ], { expr: true, esversion: 7 });
+
+  TestRun(test, "newlines")
+    .addError(2, 1, "Misleading line break before '**'; readers may interpret this as an expression boundary.")
+    .test([
+      "2",
+      "** 3;",
+      "2 **",
+      "3;"
+    ], { expr: true, esversion: 7 });
+
+  TestRun(test, "invalid")
+    .addError(1, 5, "Expected an identifier and instead saw '*'.")
+    .addError(1, 6, "Missing semicolon.")
+    .test([
+      "2 * * 3;"
+    ], { expr: true, esversion: 7 });
+
+  test.done();
+};
+
+exports.exponentiation.leftPrecedence = function (test) {
+  TestRun(test, "UpdateExpressions")
+    .test([
+      "++x ** y;",
+      "--x ** y;",
+      "x++ ** y;",
+      "x-- ** y;",
+    ], { expr: true, esversion: 7 });
+
+  TestRun(test, "UnaryExpressions")
+    .addError(1, 10, "Variables should not be deleted.")
+    .addError(1, 10, "Unexpected '**'.")
+    .addError(2, 8, "Unexpected '**'.")
+    .addError(3, 10, "Unexpected '**'.")
+    .addError(4, 4, "Unexpected '**'.")
+    .addError(5, 4, "Unexpected '**'.")
+    .addError(6, 4, "Unexpected '**'.")
+    .addError(7, 4, "Unexpected '**'.")
+    .test([
+      "delete 2 ** 3;",
+      "void 2 ** 3;",
+      "typeof 2 ** 3;",
+      "+2 ** 3;",
+      "-2 ** 3;",
+      "~2 ** 3;",
+      "!2 ** 3;"
+    ], { expr: true, esversion: 7 });
+
+  TestRun(test, "Grouping")
+    .addError(1, 10, "Variables should not be deleted.")
+    .test([
+      "(delete 2) ** 3;",
+      "(void 2) ** 3;",
+      "(typeof 2) ** 3;",
+      "(+2) ** 3;",
+      "(-2) ** 3;",
+      "(~2) ** 3;",
+      "(!2) ** 3;"
+    ], { expr: true, esversion: 7 });
+
+  test.done();
+};
+
+exports.exponentiation.rightPrecedence = function (test) {
+  TestRun(test, "ExponentiationExpression")
+    .test([
+      "x ** x ** y;",
+      "x ** ++x ** y;",
+      "x ** --x ** y;",
+      "x ** x++ ** y;",
+      "x ** x-- ** y;"
+    ], { expr: true, esversion: 7 });
+
+  TestRun(test, "UnaryExpression")
+    .test([
+      "x ** delete x.y;",
+      "x ** void y;",
+      "x ** typeof y;",
+      "x ** +y;",
+      "x ** -y;",
+      "x ** ~y;",
+      "x ** !y;"
+    ], { expr: true, esversion: 7 });
+
+  test.done();
+};
+
+exports.exponentiation.compoundAssignment = function (test) {
+  var src = [
+      "x **= x;",
+      "x**=x;",
+      "x **= -2;",
+      "x **= 2 ** 4;"
+    ];
+
+  TestRun(test, "valid (esversion: 6)")
+    .addError(1, 3, "'Exponentiation operator' is only available in ES7 (use 'esversion: 7').")
+    .addError(2, 2, "'Exponentiation operator' is only available in ES7 (use 'esversion: 7').")
+    .addError(3, 3, "'Exponentiation operator' is only available in ES7 (use 'esversion: 7').")
+    .addError(4, 3, "'Exponentiation operator' is only available in ES7 (use 'esversion: 7').")
+    .addError(4, 9, "'Exponentiation operator' is only available in ES7 (use 'esversion: 7').")
+    .test(src, { esversion: 5 });
+
+  TestRun(test, "valid (esversion: 6)")
+    .addError(1, 3, "'Exponentiation operator' is only available in ES7 (use 'esversion: 7').")
+    .addError(2, 2, "'Exponentiation operator' is only available in ES7 (use 'esversion: 7').")
+    .addError(3, 3, "'Exponentiation operator' is only available in ES7 (use 'esversion: 7').")
+    .addError(4, 3, "'Exponentiation operator' is only available in ES7 (use 'esversion: 7').")
+    .addError(4, 9, "'Exponentiation operator' is only available in ES7 (use 'esversion: 7').")
+    .test(src, { esversion: 6 });
+
+  TestRun(test, "valid (esversion: 7)")
+    .test(src, { esversion: 7 });
+
+  TestRun(test, "invalid syntax - whitespace 1")
+    .addError(1, 5, "Expected an identifier and instead saw '*='.")
+    .addError(1, 5, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, 8, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, 7, "Missing semicolon.")
+    .test("x * *= x;", { esversion: 7 });
+
+  TestRun(test, "invalid syntax - whitespace 2")
+    .addError(1, 5, "Expected an identifier and instead saw '*='.")
+    .addError(1, 5, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, 7, "Missing semicolon.")
+    .addError(1, 8, "Expected an assignment or function call and instead saw an expression.")
+    .test("x * *= x;", { esversion: 7 });
+
+  TestRun(test, "invalid syntax - newline 1")
+    .addError(2, 1, "Expected an identifier and instead saw '*='.")
+    .addError(2, 1, "Expected an assignment or function call and instead saw an expression.")
+    .addError(2, 3, "Missing semicolon.")
+    .addError(2, 4, "Expected an assignment or function call and instead saw an expression.")
+    .test([
+      "x *",
+      "*= x;"
+    ], { esversion: 7 });
+
+  TestRun(test, "invalid syntax - newline 2")
+    .addError(2, 1, "Expected an identifier and instead saw '='.")
+    .addError(2, 1, "Expected an assignment or function call and instead saw an expression.")
+    .addError(2, 2, "Missing semicolon.")
+    .addError(2, 3, "Expected an assignment or function call and instead saw an expression.")
+    .test([
+      "x **",
+      "= x;"
+    ], { esversion: 7 });
+
+  TestRun(test, 'invalid assignment target')
+    .addError(1, 3, "Bad assignment.")
+    .addError(2, 6, "Bad assignment.")
+    .test([
+      "0 **= x;",
+      "this **= x;"
+    ], { esversion: 7 });
+
+  test.done();
+};
