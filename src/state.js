@@ -77,13 +77,11 @@ var state = {
   },
 
   /**
-   * @param {boolean} strict - When `true`, return `true` only when
-   *                           esVersion is exactly 5
+   * Determine if constructs introduced in ECMAScript 5 should be accepted.
+   *
+   * @returns {boolean}
    */
-  inES5: function(strict) {
-    if (strict) {
-      return (!this.esVersion || this.esVersion === 5) && !this.option.moz;
-    }
+  inES5: function() {
     return !this.esVersion || this.esVersion >= 5 || this.option.moz;
   },
 
