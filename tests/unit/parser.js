@@ -8041,3 +8041,182 @@ exports.lookaheadBeyondEnd = function (test) {
 
   test.done();
 };
+
+exports.exponentiation = {};
+
+exports.exponentiation.esversion = function (test) {
+  var src = "x = 2 ** 3;";
+
+  TestRun(test)
+    .addError(1, "'Exponentiation operator' is only available in ES7 (use 'esversion: 7').")
+    .test(src);
+
+  TestRun(test)
+    .addError(1, "'Exponentiation operator' is only available in ES7 (use 'esversion: 7').")
+    .test(src, { esversion: 6 });
+
+  TestRun(test)
+    .test(src, { esversion: 7 });
+
+  test.done();
+};
+
+exports.exponentiation.whitespace = function (test) {
+  TestRun(test)
+    .test([
+      "2 ** 3;",
+      "2** 3;",
+      "2 **3;",
+    ], { expr: true, esversion: 7 });
+
+  TestRun(test, "newlines")
+    .addError(2, "Misleading line break before '**'; readers may interpret this as an expression boundary.")
+    .test([
+      "2",
+      "** 3;",
+      "2 **",
+      "3;"
+    ], { expr: true, esversion: 7 });
+
+  TestRun(test, "invalid")
+    .addError(1, "Expected an identifier and instead saw '*'.")
+    .addError(1, "Missing semicolon.")
+    .test([
+      "2 * * 3;"
+    ], { expr: true, esversion: 7 });
+
+  test.done();
+};
+
+exports.exponentiation.leftPrecedence = function (test) {
+  TestRun(test, "UpdateExpressions")
+    .test([
+      "++x ** y;",
+      "--x ** y;",
+      "x++ ** y;",
+      "x-- ** y;",
+    ], { expr: true, esversion: 7 });
+
+  TestRun(test, "UnaryExpressions")
+    .addError(1, "Variables should not be deleted.")
+    .addError(1, "Unexpected '**'.")
+    .addError(2, "Unexpected '**'.")
+    .addError(3, "Unexpected '**'.")
+    .addError(4, "Unexpected '**'.")
+    .addError(5, "Unexpected '**'.")
+    .addError(6, "Unexpected '**'.")
+    .addError(7, "Unexpected '**'.")
+    .test([
+      "delete 2 ** 3;",
+      "void 2 ** 3;",
+      "typeof 2 ** 3;",
+      "+2 ** 3;",
+      "-2 ** 3;",
+      "~2 ** 3;",
+      "!2 ** 3;"
+    ], { expr: true, esversion: 7 });
+
+  TestRun(test, "Grouping")
+    .addError(1, "Variables should not be deleted.")
+    .test([
+      "(delete 2) ** 3;",
+      "(void 2) ** 3;",
+      "(typeof 2) ** 3;",
+      "(+2) ** 3;",
+      "(-2) ** 3;",
+      "(~2) ** 3;",
+      "(!2) ** 3;"
+    ], { expr: true, esversion: 7 });
+
+  test.done();
+};
+
+exports.exponentiation.rightPrecedence = function (test) {
+  TestRun(test, "ExponentiationExpression")
+    .test([
+      "x ** x ** y;",
+      "x ** ++x ** y;",
+      "x ** --x ** y;",
+      "x ** x++ ** y;",
+      "x ** x-- ** y;"
+    ], { expr: true, esversion: 7 });
+
+  TestRun(test, "UnaryExpression")
+    .test([
+      "x ** delete x.y;",
+      "x ** void y;",
+      "x ** typeof y;",
+      "x ** +y;",
+      "x ** -y;",
+      "x ** ~y;",
+      "x ** !y;"
+    ], { expr: true, esversion: 7 });
+
+  test.done();
+};
+
+exports.exponentiation.compundAssignment = function (test) {
+  var src = [
+      "x **= x;",
+      "x**=x;",
+      "x **= -2;",
+      "x **= 2 ** 4;"
+    ];
+
+  TestRun(test, "valid (esversion: 6)")
+    .addError(1, "'Exponentiation operator' is only available in ES7 (use 'esversion: 7').")
+    .addError(2, "'Exponentiation operator' is only available in ES7 (use 'esversion: 7').")
+    .addError(3, "'Exponentiation operator' is only available in ES7 (use 'esversion: 7').")
+    .addError(4, "'Exponentiation operator' is only available in ES7 (use 'esversion: 7').")
+    .test(src, { esversion: 5 });
+
+  TestRun(test, "valid (esversion: 6)")
+    .addError(1, "'Exponentiation operator' is only available in ES7 (use 'esversion: 7').")
+    .addError(2, "'Exponentiation operator' is only available in ES7 (use 'esversion: 7').")
+    .addError(3, "'Exponentiation operator' is only available in ES7 (use 'esversion: 7').")
+    .addError(4, "'Exponentiation operator' is only available in ES7 (use 'esversion: 7').")
+    .test(src, { esversion: 6 });
+
+  TestRun(test, "valid (esversion: 7)")
+    .test(src, { esversion: 7 });
+
+  TestRun(test, "invalid syntax - whitespace 1")
+    .addError(1, "Expected an identifier and instead saw '*='.")
+    .addError(1, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, "Missing semicolon.")
+    .test("x * *= x;", { esversion: 7 });
+
+  TestRun(test, "invalid syntax - whitespace 2")
+    .addError(1, "Expected an identifier and instead saw '*='.")
+    .addError(1, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, "Missing semicolon.")
+    .test("x * *= x;", { esversion: 7 });
+
+  TestRun(test, "invalid syntax - newline 1")
+    .addError(2, "Expected an identifier and instead saw '*='.")
+    .addError(2, "Expected an assignment or function call and instead saw an expression.")
+    .addError(2, "Missing semicolon.")
+    .test([
+      "x *",
+      "*= x;"
+    ], { esversion: 7 });
+
+  TestRun(test, "invalid syntax - newline 2")
+    .addError(2, "Expected an identifier and instead saw '='.")
+    .addError(2, "Expected an assignment or function call and instead saw an expression.")
+    .addError(2, "Missing semicolon.")
+    .test([
+      "x **",
+      "= x;"
+    ], { esversion: 7 });
+
+  TestRun(test, 'invalid assignment target')
+    .addError(1, "Bad assignment.")
+    .addError(2, "Bad assignment.")
+    .test([
+      "0 **= x;",
+      "this **= x;"
+    ], { esversion: 7 });
+
+  test.done();
+};

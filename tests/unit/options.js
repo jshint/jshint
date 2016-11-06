@@ -3099,6 +3099,104 @@ singleGroups.arrowFunctions = function (test) {
   test.done();
 };
 
+singleGroups.exponentiation = function (test) {
+  TestRun(test)
+    .addError(1, "Unnecessary grouping operator.")
+    .addError(2, "Unnecessary grouping operator.")
+    .test([
+      "(2) ** 2;",
+      "2 ** (2);",
+    ], { singleGroups: true, expr: true, esversion: 7 });
+
+  TestRun(test, "UpdateExpression")
+    .addError(2, "Unnecessary grouping operator.")
+    .addError(3, "Unnecessary grouping operator.")
+    .addError(4, "Unnecessary grouping operator.")
+    .addError(5, "Unnecessary grouping operator.")
+    .addError(6, "Unnecessary grouping operator.")
+    .addError(7, "Unnecessary grouping operator.")
+    .addError(8, "Unnecessary grouping operator.")
+    .addError(9, "Unnecessary grouping operator.")
+    .test([
+      "var x;",
+      "(++x) ** 2;",
+      "(x++) ** 2;",
+      "(--x) ** 2;",
+      "(x--) ** 2;",
+      "2 ** (++x);",
+      "2 ** (x++);",
+      "2 ** (--x);",
+      "2 ** (x--);"
+    ], { singleGroups: true, expr: true, esversion: 7 });
+
+  TestRun(test, "UnaryExpression")
+    .addError(1, "Variables should not be deleted.")
+    .addError(8, "Variables should not be deleted.")
+    .test([
+      "delete (2 ** 3);",
+      "void (2 ** 3);",
+      "typeof (2 ** 3);",
+      "+(2 ** 3);",
+      "-(2 ** 3);",
+      "~(2 ** 3);",
+      "!(2 ** 3);",
+      "(delete 2) ** 3;",
+      "(void 2) ** 3;",
+      "(typeof 2) ** 3;",
+      "(+2) ** 3;",
+      "(-2) ** 3;",
+      "(~2) ** 3;",
+      "(!2) ** 3;"
+    ], { singleGroups: true, expr: true, esversion: 7 });
+
+  TestRun(test, "MultiplicativeExpression")
+    .addError(2, "Unnecessary grouping operator.")
+    .addError(4, "Unnecessary grouping operator.")
+    .addError(6, "Unnecessary grouping operator.")
+    .addError(8, "Unnecessary grouping operator.")
+    .addError(10, "Unnecessary grouping operator.")
+    .addError(12, "Unnecessary grouping operator.")
+    .test([
+      "(2 * 3) ** 4;",
+      "2 * (3 ** 4);",
+      "2 ** (3 * 4);",
+      "(2 ** 3) * 4;",
+      "(2 / 3) ** 4;",
+      "2 / (3 ** 4);",
+      "2 ** (3 / 4);",
+      "(2 ** 3) / 4;",
+      "(2 % 3) ** 4;",
+      "2 % (3 ** 4);",
+      "2 ** (3 % 4);",
+      "(2 ** 3) % 4;",
+    ], { singleGroups: true, expr: true, esversion: 7 });
+
+  TestRun(test, "AdditiveExpression")
+    .addError(2, "Unnecessary grouping operator.")
+    .addError(4, "Unnecessary grouping operator.")
+    .addError(6, "Unnecessary grouping operator.")
+    .addError(8, "Unnecessary grouping operator.")
+    .test([
+      "(2 + 3) ** 4;",
+      "2 + (3 ** 4);",
+      "2 ** (3 + 4);",
+      "(2 ** 3) + 4;",
+      "(2 - 3) ** 4;",
+      "2 - (3 ** 4);",
+      "2 ** (3 - 4);",
+      "(2 ** 3) - 4;",
+    ], { singleGroups: true, expr: true, esversion: 7 });
+
+  TestRun(test, "Exponentiation")
+    .addError(2, "Unnecessary grouping operator.")
+    .test([
+      "(2 ** 3) ** 4;",
+      "2 ** (3 ** 4);",
+    ], { singleGroups: true, expr: true, esversion: 7 });
+
+  test.done();
+};
+
 singleGroups.objectLiterals = function (test) {
   var code = [
     "({}).method();",
