@@ -3255,6 +3255,148 @@ exports["destructuring function default values"] = function (test) {
   test.done();
 };
 
+exports["non-simple parameter list strict transition"] = function (test) {
+  var noTransitionNonStrict = [
+    "function f() {}",
+    "function f(x) {}",
+    "var a = x => {};",
+    "function f({ x }) {}",
+    "function f([ x ]) {}",
+    "function f(...x) {}",
+    "function f(x = 0) {}"
+  ];
+
+  TestRun(test, "no transition: ES6 & non-strict mode")
+    .test(noTransitionNonStrict, { esversion: 6 });
+  TestRun(test, "no transition: ES7 & non-strict mode")
+    .test(noTransitionNonStrict, { esversion: 7 });
+
+  var noTransitionStrict = [
+    "'use strict';",
+    "function f() {",
+    "  'use strict';",
+    "}",
+    "function f(x) {",
+    "  'use strict';",
+    "}",
+    "var a = x => {",
+    "  'use strict';",
+    "};",
+    "function f({ x }) {",
+    "  'use strict';",
+    "}",
+    "function f([ x ]) {",
+    "  'use strict';",
+    "}",
+    "function f(...x) {",
+    "  'use strict';",
+    "}",
+    "function f(x = 0) {",
+    "  'use strict';",
+    "}"
+  ];
+
+  TestRun(test, "no transition: ES6 & strict mode")
+    .addError(1, "Use the function form of \"use strict\".")
+    .addError(3, "Unnecessary directive \"use strict\".")
+    .addError(6, "Unnecessary directive \"use strict\".")
+    .addError(9, "Unnecessary directive \"use strict\".")
+    .addError(12, "Unnecessary directive \"use strict\".")
+    .addError(15, "Unnecessary directive \"use strict\".")
+    .addError(18, "Unnecessary directive \"use strict\".")
+    .addError(21, "Unnecessary directive \"use strict\".")
+    .test(noTransitionStrict, { esversion: 6 });
+  TestRun(test, "no transition: ES7 & strict mode")
+    .addError(1, "Use the function form of \"use strict\".")
+    .addError(3, "Unnecessary directive \"use strict\".")
+    .addError(6, "Unnecessary directive \"use strict\".")
+    .addError(9, "Unnecessary directive \"use strict\".")
+    .addError(12, "Unnecessary directive \"use strict\".")
+    .addError(15, "Unnecessary directive \"use strict\".")
+    .addError(18, "Unnecessary directive \"use strict\".")
+    .addError(21, "Unnecessary directive \"use strict\".")
+    .test(noTransitionStrict, { esversion: 7 });
+
+  var directTransition = [
+    "function f() {",
+    "  'use strict';",
+    "}",
+    "function f(x) {",
+    "  'use strict';",
+    "}",
+    "var a = x => {",
+    "  'use strict';",
+    "};",
+    "function f({ x }) {",
+    "  'use strict';",
+    "}",
+    "function f([ x ]) {",
+    "  'use strict';",
+    "}",
+    "function f(...x) {",
+    "  'use strict';",
+    "}",
+    "function f(x = 0) {",
+    "  'use strict';",
+    "}"
+  ];
+
+  TestRun(test, "direct transition: ES6")
+    .test(directTransition, { esversion: 6 });
+
+  TestRun(test, "direct transition: ES7")
+    .addError(11, "Functions defined outside of strict mode with non-simple parameter lists may not enable strict mode.")
+    .addError(14, "Functions defined outside of strict mode with non-simple parameter lists may not enable strict mode.")
+    .addError(17, "Functions defined outside of strict mode with non-simple parameter lists may not enable strict mode.")
+    .addError(20, "Functions defined outside of strict mode with non-simple parameter lists may not enable strict mode.")
+    .test(directTransition, { esversion: 7 });
+
+  var indirectTransition = [
+    "function f() {",
+    "  function g() {",
+    "    'use strict';",
+    "  }",
+    "}",
+    "function f(x) {",
+    "  function g() {",
+    "    'use strict';",
+    "  }",
+    "}",
+    "var a = x => {",
+    "  function g() {",
+    "    'use strict';",
+    "  }",
+    "};",
+    "function f({ x }) {",
+    "  function g() {",
+    "    'use strict';",
+    "  }",
+    "}",
+    "function f([ x ]) {",
+    "  function g() {",
+    "    'use strict';",
+    "  }",
+    "}",
+    "function f(...x) {",
+    "  function g() {",
+    "    'use strict';",
+    "  }",
+    "}",
+    "function f(x = 0) {",
+    "  function g() {",
+    "    'use strict';",
+    "  }",
+    "}",
+  ];
+
+  TestRun(test, "indirect transition: ES6")
+    .test(indirectTransition, { esversion: 6 });
+  TestRun(test, "indirect transition: ES7")
+    .test(indirectTransition, { esversion: 7 });
+
+  test.done();
+};
+
 exports["non var destructuring assignment statement"] = function (test) {
   var codeValid = [
     "let b;",
