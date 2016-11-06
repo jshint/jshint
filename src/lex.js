@@ -345,15 +345,22 @@ Lexer.prototype = {
       };
     }
 
-    // 2-character punctuators: <= >= == != ++ -- << >> && ||
-    // += -= *= %= &= |= ^= /=
-    if (ch1 === ch2 && ("+-<>&|".indexOf(ch1) >= 0)) {
+    // 2-character punctuators: ++ -- << >> && || **
+    if (ch1 === ch2 && ("+-<>&|*".indexOf(ch1) >= 0)) {
+      if (ch1 === "*" && ch3 === "=") {
+        return {
+          type: Token.Punctuator,
+          value: ch1 + ch2 + ch3
+        };
+      }
+
       return {
         type: Token.Punctuator,
         value: ch1 + ch2
       };
     }
 
+    // <= >= != += -= *= %= &= |= ^= /=
     if ("<>=!+-*%&|^/".indexOf(ch1) >= 0) {
       if (ch2 === "=") {
         return {
