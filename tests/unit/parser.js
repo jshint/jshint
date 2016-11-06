@@ -5656,6 +5656,7 @@ exports["fat arrows support"] = function (test) {
     .addError(8, 13, "'z' is not defined.");
 
   run.test(code, { undef: true, esnext: true });
+  run.test(code, { undef: true, esversion: 2016 });
 
   run = TestRun(test)
     .addError(1, 14, "'arrow function syntax (=>)' is only available in ES6 (use 'esversion: 6').")
@@ -8245,6 +8246,7 @@ exports["new.target"] = function (test) {
     .test(code);
 
   TestRun(test, "only in ES6").test(code, { esnext: true });
+  TestRun(test, "ES7").test(code, { esversion: 7 });
 
   var code2 = [
     "var a = new.target;",
@@ -8275,6 +8277,12 @@ exports["new.target"] = function (test) {
     .addError(4, 15, "'new.target' must be in function scope.")
     .addError(6, 13, "'new.target' must be in function scope.")
     .test(code2, { esnext: true });
+
+  TestRun(test, "must be in function scope")
+    .addError(1, 12, "'new.target' must be in function scope.")
+    .addError(4, 15, "'new.target' must be in function scope.")
+    .addError(6, 13, "'new.target' must be in function scope.")
+    .test(code2, { esversion: 2016 });
 
   var code3 = [
     "var x = new.meta;"
