@@ -629,7 +629,6 @@ language/expressions/function/params-trailing-comma-length.js
 language/expressions/function/params-trailing-comma.js
 language/expressions/function/scope-param-rest-elem-var-close.js
 language/expressions/function/scope-param-rest-elem-var-open.js
-language/expressions/function/use-strict-with-non-simple-param.js
 language/expressions/generators/arguments-with-arguments-fn.js
 language/expressions/generators/arguments-with-arguments-lex.js
 language/expressions/generators/dstr-ary-ptrn-rest-ary-elem.js
@@ -656,7 +655,6 @@ language/expressions/generators/params-trailing-comma-length.js
 language/expressions/generators/params-trailing-comma.js
 language/expressions/generators/scope-param-rest-elem-var-close.js
 language/expressions/generators/scope-param-rest-elem-var-open.js
-language/expressions/generators/use-strict-with-non-simple-param.js
 language/expressions/generators/yield-as-function-expression-binding-identifier.js
 language/expressions/generators/yield-as-identifier-in-nested-function.js
 language/expressions/generators/yield-as-logical-or-expression.js
@@ -834,13 +832,11 @@ language/expressions/object/yield-non-strict-access.js
 language/expressions/object/yield-non-strict-syntax.js
 language/expressions/object/method-definition/async-super-call-body.js
 language/expressions/object/method-definition/async-super-call-param.js
-language/expressions/object/method-definition/early-errors-object-method-NSPL-with-USD.js
 language/expressions/object/method-definition/generator-param-init-yield.js
 language/expressions/object/method-definition/generator-prop-name-yield-expr.js
 language/expressions/object/method-definition/generator-prop-name-yield-id.js
 language/expressions/object/method-definition/generator-super-call-body.js
 language/expressions/object/method-definition/generator-super-call-param.js
-language/expressions/object/method-definition/generator-use-strict-with-non-simple-param.js
 language/expressions/object/method-definition/name-param-id-yield.js
 language/expressions/object/method-definition/name-param-init-yield.js
 language/expressions/object/method-definition/name-prop-name-yield-expr.js
@@ -859,8 +855,6 @@ language/expressions/object/method-definition/params-dflt-meth-rest.js
 language/expressions/object/method-definition/params-trailing-comma-arguments.js
 language/expressions/object/method-definition/params-trailing-comma-length.js
 language/expressions/object/method-definition/params-trailing-comma.js
-language/expressions/object/method-definition/setter-use-strict-with-non-simple-param.js
-language/expressions/object/method-definition/use-strict-with-non-simple-param.js
 language/expressions/object/method-definition/yield-as-expression-with-rhs.js
 language/expressions/object/method-definition/yield-as-expression-without-rhs.js
 language/expressions/object/method-definition/yield-as-function-expression-binding-identifier.js
@@ -909,7 +903,6 @@ language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no
 language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-duplicates.js
 language/expressions/arrow-function/syntax/early-errors/asi-restriction-invalid-parenless-parameters-expression-body.js
 language/expressions/arrow-function/syntax/early-errors/asi-restriction-invalid-parenless-parameters.js
-language/expressions/arrow-function/syntax/early-errors/use-strict-with-non-simple-param.js
 language/statements/break/12.8-1.js
 language/statements/async-function/declaration-returns-promise.js
 language/statements/async-function/evaluation-body-that-returns-after-await.js
@@ -1080,7 +1073,6 @@ language/statements/generators/params-trailing-comma-length.js
 language/statements/generators/params-trailing-comma.js
 language/statements/generators/scope-param-rest-elem-var-close.js
 language/statements/generators/scope-param-rest-elem-var-open.js
-language/statements/generators/use-strict-with-non-simple-param.js
 language/statements/generators/yield-as-function-expression-binding-identifier.js
 language/statements/generators/yield-as-generator-declaration-binding-identifier.js
 language/statements/generators/yield-as-identifier-in-nested-function.js
@@ -1129,7 +1121,6 @@ language/statements/function/params-trailing-comma-length.js
 language/statements/function/params-trailing-comma.js
 language/statements/function/scope-param-rest-elem-var-close.js
 language/statements/function/scope-param-rest-elem-var-open.js
-language/statements/function/use-strict-with-non-simple-param.js
 language/statements/return/S12.9_A1_T1.js
 language/statements/return/S12.9_A1_T10.js
 language/statements/return/S12.9_A1_T2.js
