@@ -79,7 +79,9 @@ var errors = {
   E061: "Invalid position for 'yield' expression (consider wrapping in parenthesis).",
   E062: "Rest parameter does not a support default value.",
   E063: "Super property may only be used within method bodies.",
-  E064: "Super call may only be used within class method bodies."
+  E064: "Super call may only be used within class method bodies.",
+  E065: "Functions defined outside of strict mode with non-simple parameter lists may not " +
+    "enable strict mode."
 };
 
 var warnings = {
