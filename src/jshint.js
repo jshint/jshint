@@ -1706,6 +1706,18 @@ var JSHINT = (function() {
         warning("W034", state.tokens.curr, directive);
       }
 
+      // From ECMAScript 2016:
+      //
+      // > 14.1.2 Static Semantics: Early Errors
+      // >
+      // > [...]
+      // > - It is a Syntax Error if ContainsUseStrict of FunctionBody is true
+      // >   and IsSimpleParameterList of FormalParameters is false.
+      if (directive === "use strict" && state.inES7() &&
+        !state.funct["(global)"] && state.funct["(hasSimpleParams)"] === false) {
+        error("E065", state.tokens.curr);
+      }
+
       // there's no directive negation, so always set to true
       state.directive[directive] = true;
 
@@ -2837,7 +2849,8 @@ var JSHINT = (function() {
    *                                  single-argument shorthand.
    * @param {bool} [options.parsedOpening] Whether the opening parenthesis has
    *                                       already been parsed.
-   * @returns {{ arity: number, params: Array.<string>}}
+   *
+   * @returns {{ arity: number, params: Array.<string>, isSimple: boolean }}
    */
   function functionparams(options) {
     var next;
@@ -2849,10 +2862,11 @@ var JSHINT = (function() {
     var pastRest = false;
     var arity = 0;
     var loneArg = options && options.loneArg;
+    var hasDestructuring = false;
 
     if (loneArg && loneArg.identifier === true) {
       state.funct["(scope)"].addParam(loneArg.value, loneArg);
-      return { arity: 1, params: [ loneArg.value ] };
+      return { arity: 1, params: [ loneArg.value ], isSimple: true };
     }
 
     next = state.tokens.next;
@@ -2876,6 +2890,7 @@ var JSHINT = (function() {
       var currentParams = [];
 
       if (_.includes(["{", "["], state.tokens.next.id)) {
+        hasDestructuring = true;
         tokens = destructuringPattern();
         for (t in tokens) {
           t = tokens[t];
@@ -2928,7 +2943,11 @@ var JSHINT = (function() {
         parseComma();
       } else {
         advance(")", next);
-        return { arity: arity, params: paramsIds };
+        return {
+          arity: arity,
+          params: paramsIds,
+          isSimple: !hasDestructuring && !pastRest && !pastDefault
+        };
       }
     }
   }
@@ -3104,10 +3123,12 @@ var JSHINT = (function() {
 
     if (paramsInfo) {
       state.funct["(params)"] = paramsInfo.params;
+      state.funct["(hasSimpleParams)"] = paramsInfo.isSimple;
       state.funct["(metrics)"].arity = paramsInfo.arity;
       state.funct["(metrics)"].verifyMaxParametersPerFunction();
     } else {
       state.funct["(metrics)"].arity = 0;
+      state.funct["(hasSimpleParams)"] = true;
     }
 
     if (isArrow) {
