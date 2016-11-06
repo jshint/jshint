@@ -66,14 +66,19 @@ var state = {
   },
 
   /**
-   * @param {boolean} strict - When `true`, only consider ES6 when in
-   *                           "esversion: 6" code.
+   * Determine if constructs introduced in ECMAScript 6 should be accepted.
+   *
+   * @param {boolean} strict - When `true`, do not interpret the `moz` option
+   *                           as ECMAScript 6
+   *
+   * @returns {boolean}
    */
   inES6: function(strict) {
-    if (strict) {
-      return this.esVersion === 6;
+    if (!strict && this.option.moz) {
+      return true;
     }
-    return this.option.moz || this.esVersion >= 6;
+
+    return this.esVersion >= 6;
   },
 
   /**
