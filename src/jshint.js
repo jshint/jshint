@@ -661,9 +661,15 @@ var JSHINT = (function() {
           case "3":
           case "5":
           case "6":
-          case "2015":
+          case "7":
             state.option.moz = false;
             state.option.esversion = +val;
+            break;
+          case "2015":
+          case "2016":
+            state.option.moz = false;
+            // Translate specification publication year to version number.
+            state.option.esversion = +val - 2009;
             break;
           default:
             error("E002", directiveToken);
