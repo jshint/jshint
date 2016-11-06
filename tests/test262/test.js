@@ -85,7 +85,7 @@ module.exports = function test(src) {
     var result, exception;
 
     try {
-      JSHint(src, { esversion: 6, maxerr: Infinity, module: isModule });
+      JSHint(src, { esversion: 7, maxerr: Infinity, module: isModule });
     } catch (e) {
       exception = e;
     }
