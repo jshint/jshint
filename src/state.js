@@ -66,6 +66,15 @@ var state = {
   },
 
   /**
+   * Determine if constructs introduced in ECMAScript 7 should be accepted.
+   *
+   * @returns {boolean}
+   */
+  inES7: function() {
+    return this.esVersion >= 7;
+  },
+
+  /**
    * Determine if constructs introduced in ECMAScript 6 should be accepted.
    *
    * @param {boolean} strict - When `true`, do not interpret the `moz` option
