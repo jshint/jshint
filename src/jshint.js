@@ -423,19 +423,20 @@ var JSHINT = (function() {
   /**
    * Process an inline linting directive
    *
-   * @param {Token} dirToken - the directive-bearing comment token
+   * @param {Token} directiveToken - the directive-bearing comment token
    * @param {Token} previous - the token that preceeds the directive
    */
-  function lintingDirective(dirToken, previous) {
-    var body = dirToken.body.split(",").map(function(s) { return s.trim(); });
+  function lintingDirective(directiveToken, previous) {
+    var body = directiveToken.body.split(",")
+      .map(function(s) { return s.trim(); });
     var predef = {};
 
-    if (dirToken.type === "falls through") {
+    if (directiveToken.type === "falls through") {
       previous.caseFallsThrough = true;
       return;
     }
 
-    if (dirToken.type === "globals") {
+    if (directiveToken.type === "globals") {
       body.forEach(function(g, idx) {
         g = g.split(":");
         var key = (g[0] || "").trim();
@@ -446,7 +447,7 @@ var JSHINT = (function() {
           if (idx > 0 && idx === body.length - 1) {
             return;
           }
-          error("E002", dirToken);
+          error("E002", directiveToken);
           return;
         }
 
@@ -465,19 +466,19 @@ var JSHINT = (function() {
 
       for (var key in predef) {
         if (_.has(predef, key)) {
-          declared[key] = dirToken;
+          declared[key] = directiveToken;
         }
       }
     }
 
-    if (dirToken.type === "exported") {
+    if (directiveToken.type === "exported") {
       body.forEach(function(e, idx) {
         if (!e.length) {
           // Ignore trailing comma
           if (idx > 0 && idx === body.length - 1) {
             return;
           }
-          error("E002", dirToken);
+          error("E002", directiveToken);
           return;
         }
 
@@ -485,7 +486,7 @@ var JSHINT = (function() {
       });
     }
 
-    if (dirToken.type === "members") {
+    if (directiveToken.type === "members") {
       membersOnly = membersOnly || {};
 
       body.forEach(function(m) {
@@ -512,13 +513,13 @@ var JSHINT = (function() {
       "indent"
     ];
 
-    if (dirToken.type === "jshint" || dirToken.type === "jslint") {
+    if (directiveToken.type === "jshint" || directiveToken.type === "jslint") {
       body.forEach(function(g) {
         g = g.split(":");
         var key = (g[0] || "").trim();
         var val = (g[1] || "").trim();
 
-        if (!checkOption(key, dirToken)) {
+        if (!checkOption(key, directiveToken)) {
           return;
         }
 
@@ -528,7 +529,7 @@ var JSHINT = (function() {
             val = +val;
 
             if (typeof val !== "number" || !isFinite(val) || val <= 0 || Math.floor(val) !== val) {
-              error("E032", dirToken, g[1].trim());
+              error("E032", directiveToken, g[1].trim());
               return;
             }
 
@@ -547,7 +548,7 @@ var JSHINT = (function() {
             return void error("E009");
 
           if (val !== "true" && val !== "false")
-            return void error("E002", dirToken);
+            return void error("E002", directiveToken);
 
           state.option.validthis = (val === "true");
           return;
@@ -564,7 +565,7 @@ var JSHINT = (function() {
             state.option.quotmark = val;
             break;
           default:
-            error("E002", dirToken);
+            error("E002", directiveToken);
           }
           return;
         }
@@ -582,7 +583,7 @@ var JSHINT = (function() {
             state.option.shadow = "inner";
             break;
           default:
-            error("E002", dirToken);
+            error("E002", directiveToken);
           }
           return;
         }
@@ -600,7 +601,7 @@ var JSHINT = (function() {
             state.option.unused = val;
             break;
           default:
-            error("E002", dirToken);
+            error("E002", directiveToken);
           }
           return;
         }
@@ -617,7 +618,7 @@ var JSHINT = (function() {
             state.option.latedef = "nofunc";
             break;
           default:
-            error("E002", dirToken);
+            error("E002", directiveToken);
           }
           return;
         }
@@ -625,11 +626,11 @@ var JSHINT = (function() {
         if (key === "ignore") {
           switch (val) {
           case "line":
-            state.ignoredLines[dirToken.line] = true;
+            state.ignoredLines[directiveToken.line] = true;
             removeIgnoredMessages();
             break;
           default:
-            error("E002", dirToken);
+            error("E002", directiveToken);
           }
           return;
         }
@@ -647,7 +648,7 @@ var JSHINT = (function() {
             state.option.strict = val;
             break;
           default:
-            error("E002", dirToken);
+            error("E002", directiveToken);
           }
           return;
         }
@@ -657,7 +658,7 @@ var JSHINT = (function() {
            * TODO: Extend this restriction to *all* "environmental" options.
            */
           if (!hasParsedCode(state.funct)) {
-            error("E055", dirToken, "module");
+            error("E055", directiveToken, "module");
           }
         }
 
@@ -671,10 +672,10 @@ var JSHINT = (function() {
             state.option.esversion = +val;
             break;
           default:
-            error("E002", dirToken);
+            error("E002", directiveToken);
           }
           if (!hasParsedCode(state.funct)) {
-            error("E055", dirToken, "esversion");
+            error("E055", directiveToken, "esversion");
           }
           return;
         }
@@ -688,7 +689,7 @@ var JSHINT = (function() {
 
         var tn;
         if (val === "true" || val === "false") {
-          if (dirToken.type === "jslint") {
+          if (directiveToken.type === "jslint") {
             tn = options.renamed[key] || key;
             state.option[tn] = (val === "true");
 
@@ -702,7 +703,7 @@ var JSHINT = (function() {
           return;
         }
 
-        error("E002", dirToken);
+        error("E002", directiveToken);
       });
 
       applyOptions();
