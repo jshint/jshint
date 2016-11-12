@@ -7944,3 +7944,14 @@ exports.forInExpr = function (test) {
 
   test.done();
 };
+
+// See gh-3004, "Starting jsdoc comment causes 'Unclosed regular expression'
+// error"
+exports.lookaheadBeyondEnd = function (test) {
+  TestRun(test)
+    .addError(1, "Unmatched '{'.")
+    .addError(1, "Unrecoverable syntax error. (100% scanned).")
+    .test("({ a: {");
+
+  test.done();
+};
