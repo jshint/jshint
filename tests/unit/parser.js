@@ -3469,7 +3469,7 @@ exports["esnext generator without yield"] = function (test) {
     "  print(g.next());"
   ];
   TestRun(test)
-    .addError(7, "A generator function shall contain a yield statement.")
+    .addError(7, "A generator function should contain at least one yield expression.")
     .test(code, {esnext: true, unused: true, undef: true, predef: ["print"]});
 
   test.done();
@@ -3498,7 +3498,7 @@ exports["esnext generator with yield delegation, gh-1544"] = function(test) {
     .addError(1, "'function*' is only available in ES6 (use 'esversion: 6').")
     .addError(2, "'yield' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(2, "'function*' is only available in ES6 (use 'esversion: 6').")
-    .addError(2, "A generator function shall contain a yield statement.")
+    .addError(2, "A generator function should contain at least one yield expression.")
     .test(code);
 
 
@@ -3544,18 +3544,18 @@ exports["mozilla generator as esnext"] = function (test) {
   ];
   TestRun(test)
     .addError(4,
-     "A yield statement shall be within a generator function (with syntax: `function*`)")
+     "Yield expressions may only occur within generator functions.")
     .test(code, {esnext: true, unused: true, undef: true, predef: ["print", "Iterator"]});
 
   TestRun(test)
     .addError(4,
-     "A yield statement shall be within a generator function (with syntax: `function*`)")
+     "Yield expressions may only occur within generator functions.")
     .test(code, {esnext: true, moz: true});
 
   test.done();
 };
 
-exports["yield statement within try-catch"] = function (test) {
+exports["yield expression within try-catch"] = function (test) {
   // see issue: https://github.com/jshint/jshint/issues/1505
   var code = [
     "function* fib() {",
@@ -3796,8 +3796,7 @@ exports["moz-style array comprehension as esnext"] = function (test) {
     "print('evens:', evens);"
   ];
   TestRun(test)
-    .addError(3, "A yield statement shall be within a generator function (with syntax: " +
-      "`function*`)")
+    .addError(3, "Yield expressions may only occur within generator functions.")
     .addError(6, "Expected 'for' and instead saw 'i'.")
     .addError(6, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
     .addError(7, "Expected 'for' and instead saw 'i'.")
@@ -3805,8 +3804,7 @@ exports["moz-style array comprehension as esnext"] = function (test) {
     .test(code, {esnext: true, unused: true, undef: true, predef: ["print"]});
 
   TestRun(test)
-    .addError(3, "A yield statement shall be within a generator function (with syntax: " +
-      "`function*`)")
+    .addError(3, "Yield expressions may only occur within generator functions.")
     .test(code, {esnext: true, moz: true});
 
   test.done();
