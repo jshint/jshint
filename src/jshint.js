@@ -1552,6 +1552,12 @@ var JSHINT = (function() {
     }
   }
 
+  /**
+   * Consume the semicolon that delimits the statement currently being parsed,
+   * emitting relevant warnings/errors as appropriate.
+   *
+   * @param {token} stmt - token describing the statement under consideration
+   */
   function parseFinalSemicolon(stmt) {
     if (state.tokens.next.id !== ";") {
       // don't complain about unclosed templates / strings
@@ -1703,7 +1709,7 @@ var JSHINT = (function() {
       // there's no directive negation, so always set to true
       state.directive[directive] = true;
 
-      parseFinalSemicolon();
+      parseFinalSemicolon(current);
     }
 
     if (state.isStrict()) {
