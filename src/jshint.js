@@ -1561,7 +1561,7 @@ var JSHINT = (function() {
                      state.tokens.next.id !== "(end)";
       var blockEnd = checkPunctuator(state.tokens.next, "}");
 
-      if (sameLine && !blockEnd && !(stmt.value === "do" && state.inES6(true))) {
+      if (sameLine && !blockEnd && !(stmt.id === "do" && state.inES6(true))) {
         errorAt("E058", state.tokens.curr.line, state.tokens.curr.character);
       } else if (!state.option.asi) {
         // If this is the last statement in a block that ends on
