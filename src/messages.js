@@ -167,7 +167,8 @@ var warnings = {
   W082: "Function declarations should not be placed in blocks. " +
     "Use a function expression or move the statement to the top of " +
     "the outer function.",
-  W083: "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.",
+  W083: "Functions declared within loops referencing an outer scoped" +
+    "variable may lead to confusing semantics.",
   W084: "Expected a conditional expression and instead saw an assignment.",
   W085: "Don't use 'with'.",
   W086: "Expected a 'break' statement before '{a}'.",
