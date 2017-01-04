@@ -491,7 +491,8 @@ Lexer.prototype = {
     }
 
     // HTML-like comments start with <!-- and cause the line to be ignored upto the EOL
-    if (ch1 === "<" && ch2 === "!" && this.peek(2) === "-" && this.peek(3) === "-") {
+    if (!state.option.htmlcomments && ch1 === "<" && ch2 === "!" &&
+      this.peek(2) === "-" && this.peek(3) === "-") {
       // Warn if HTML-like comments are used before ES5, where they were
       // standardised, but still widely implemented.
       if (!state.inES5()) {
@@ -1632,7 +1633,7 @@ Lexer.prototype = {
       var inComment = this.inComment ||
         startsWith.call(inputTrimmed, "//") ||
         startsWith.call(inputTrimmed, "/*") ||
-        startsWith.call(inputTrimmed, "<!--");
+        (!state.option.htmlcomments && startsWith.call(inputTrimmed, "<!--"));
 
       var shouldTriggerError = !inComment || !reg.maxlenException.test(inputTrimmed);
 
