@@ -490,7 +490,24 @@ Lexer.prototype = {
       return null;
     }
 
-    // Comments must start either with // or /*
+    // HTML-like comments start with <!-- and cause the line to be ignored upto the EOL
+    if (ch1 === "<" && ch2 === "!" && this.peek(2) === "-" && this.peek(3) === "-") {
+      // Warn if HTML-like comments are used before ES5, where they were
+      // standardised, but still widely implemented.
+      if (!state.inES5()) {
+        this.triggerAsync("warning", {
+            code: "W140",
+            line: this.line,
+            character: this.char,
+          }, checks, function() { return true; }
+        );
+      }
+      this.skip(this.input.length);  // Skip to the EOL
+      // Remove the two -- characters in rest
+      return commentToken("<!--", rest.substr(2));
+    }
+
+    // Comments must start with either // or /* if they aren't HTML-like
     if (ch1 !== "/" || (ch2 !== "*" && ch2 !== "/")) {
       return null;
     }
@@ -1613,7 +1630,8 @@ Lexer.prototype = {
       state.option.maxlen < this.input.length) {
       var inComment = this.inComment ||
         startsWith.call(inputTrimmed, "//") ||
-        startsWith.call(inputTrimmed, "/*");
+        startsWith.call(inputTrimmed, "/*") ||
+        startsWith.call(inputTrimmed, "<!--");
 
       var shouldTriggerError = !inComment || !reg.maxlenException.test(inputTrimmed);
 

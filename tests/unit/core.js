@@ -1333,7 +1333,7 @@ exports.testES6TemplateLiteralReturnValue = function (test) {
 
   TestRun(test).test(src, { esnext: true });
 
-  var src = [
+  src = [
     'function* sayHello(to) {',
     '  yield `Hello, ${to}!`;',
     '}',
@@ -1356,7 +1356,7 @@ exports.testES6TemplateLiteralMultilineReturnValue = function (test) {
 
   TestRun(test).test(src, { esnext: true });
 
-  var src = [
+  src = [
     'function* sayHello(to) {',
     '  yield `Hello, ',
     '    ${to}!`;',
@@ -1382,7 +1382,7 @@ exports.testES6TaggedTemplateLiteralMultilineReturnValue = function (test) {
 
   TestRun(test).test(src, { esnext: true });
 
-  var src = [
+  src = [
     'function tag() {}',
     'function* sayHello(to) {',
     '  yield tag`Hello, ',
@@ -1441,7 +1441,7 @@ exports.testMultilineReturnValueStringLiteral = function (test) {
 
   TestRun(test).test(src, { multistr: true });
 
-  var src = [
+  src = [
     'function* sayHello(to) {',
     '  yield "Hello, \\',
     '    " + to;',
@@ -1586,7 +1586,7 @@ exports.testDuplicateParamNames = function (test) {
 exports.testClonePassedObjects = function (test) {
   var options = { predef: ["sup"] };
   JSHINT("", options);
-  test.ok(options.predef.length == 1);
+  test.ok(options.predef.length === 1);
   test.done();
 };
 
@@ -1844,7 +1844,7 @@ exports.unlabeledBreakWithoutLoop = function(test) {
     .test(src);
 
   test.done();
-}
+};
 
 exports.unlabeledContinueWithoutLoop = function(test) {
   var src = [
@@ -1861,7 +1861,7 @@ exports.unlabeledContinueWithoutLoop = function(test) {
     .test(src);
 
   test.done();
-}
+};
 
 exports.labelsContinue = function (test) {
   var src = [
@@ -1902,7 +1902,7 @@ exports.tryWithoutCatch = function (test) {
     .addError(2, "Expected 'catch' and instead saw 'if'.")
     .test(src);
 
-  var src = [
+  src = [
     "try{}"
   ];
 
@@ -2188,6 +2188,22 @@ exports["TDZ within for in/of head"] = function(test) {
     .addError(7, "'g' was used before it was declared, which is illegal for 'let' variables.")
     .addError(8, "'h' was used before it was declared, which is illegal for 'const' variables.")
     .test(code, { esversion: 6 });
+
+  test.done();
+};
+
+exports["HTML-like comments (<!--)"] = function(test) {
+  var code = [
+    "<!--global c",
+    // --> does not end a HTML-like comment
+    "<!--c-->c",
+    "c.c = 1;"
+  ];
+
+  TestRun(test).test(code, { esversion: 5 });
+  TestRun(test)
+    .addError(2, "HTML-like comments (`<!--`) may not be supported before ES5.")
+    .test(code, { esversion: 3 });
 
   test.done();
 };
