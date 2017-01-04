@@ -2192,7 +2192,7 @@ exports["TDZ within for in/of head"] = function(test) {
   test.done();
 };
 
-exports.htmlLikeComments = function(test) {
+exports["HTML-like comments (<!--)"] = function(test) {
   var code = [
     "<!--global c",
     // --> does not end a HTML-like comment
@@ -2202,9 +2202,7 @@ exports.htmlLikeComments = function(test) {
 
   TestRun(test).test(code, { esversion: 5 });
   TestRun(test)
-    .addError(1, "HTML-like comments (`<!--`) may not be supported before ES5.")
     .addError(2, "HTML-like comments (`<!--`) may not be supported before ES5.")
-    .addError(3, "HTML-like comments (`<!--`) may not be supported before ES5.")
     .test(code, { esversion: 3 });
 
   test.done();
