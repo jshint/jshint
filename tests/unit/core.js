@@ -2202,7 +2202,7 @@ exports["HTML-like comments (<!--)"] = function(test) {
 
   TestRun(test).test(code, { esversion: 5 });
   TestRun(test)
-    .addError(2, "HTML-like comments (`<!--`) may not be supported before ES5.")
+    .addError(2, "'<!--' is only available in ES5 (use 'esversion: 5').")
     .test(code, { esversion: 3 });
 
   test.done();

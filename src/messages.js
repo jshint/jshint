@@ -223,8 +223,7 @@ var warnings = {
   W136: "'{a}' must be in function scope.",
   W137: "Empty destructuring.",
   W138: "Regular parameters should not come after default parameters.",
-  W139: "Function expressions should not be used as the second operand to instanceof.",
-  W140: "HTML-like comments (`<!--`) may not be supported before ES5."
+  W139: "Function expressions should not be used as the second operand to instanceof."
 };
 
 var info = {

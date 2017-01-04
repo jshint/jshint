@@ -496,9 +496,10 @@ Lexer.prototype = {
       // standardised, but still widely implemented.
       if (!state.inES5()) {
         this.triggerAsync("warning", {
-            code: "W140",
+            code: "W119",
             line: this.line,
             character: this.char,
+            data: ["<!--", "5"]
           }, checks, function() { return true; }
         );
       }
