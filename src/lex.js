@@ -495,12 +495,12 @@ Lexer.prototype = {
       // Warn if HTML-like comments are used before ES5, where they were
       // standardised, but still widely implemented.
       if (!state.inES5()) {
-          this.triggerAsync("warning", {
-              code: "W140",
-              line: this.line,
-              character: this.char,
-            }, checks, function() { return true; }
-          );
+        this.triggerAsync("warning", {
+            code: "W140",
+            line: this.line,
+            character: this.char,
+          }, checks, function() { return true; }
+        );
       }
       this.skip(this.input.length);  // Skip to the EOL
       // Remove the two -- characters in rest
