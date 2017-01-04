@@ -1333,7 +1333,7 @@ exports.testES6TemplateLiteralReturnValue = function (test) {
 
   TestRun(test).test(src, { esnext: true });
 
-  src = [
+  var src = [
     'function* sayHello(to) {',
     '  yield `Hello, ${to}!`;',
     '}',
@@ -1356,7 +1356,7 @@ exports.testES6TemplateLiteralMultilineReturnValue = function (test) {
 
   TestRun(test).test(src, { esnext: true });
 
-  src = [
+  var src = [
     'function* sayHello(to) {',
     '  yield `Hello, ',
     '    ${to}!`;',
@@ -1382,7 +1382,7 @@ exports.testES6TaggedTemplateLiteralMultilineReturnValue = function (test) {
 
   TestRun(test).test(src, { esnext: true });
 
-  src = [
+  var src = [
     'function tag() {}',
     'function* sayHello(to) {',
     '  yield tag`Hello, ',
@@ -1441,7 +1441,7 @@ exports.testMultilineReturnValueStringLiteral = function (test) {
 
   TestRun(test).test(src, { multistr: true });
 
-  src = [
+  var src = [
     'function* sayHello(to) {',
     '  yield "Hello, \\',
     '    " + to;',
@@ -1586,7 +1586,7 @@ exports.testDuplicateParamNames = function (test) {
 exports.testClonePassedObjects = function (test) {
   var options = { predef: ["sup"] };
   JSHINT("", options);
-  test.ok(options.predef.length === 1);
+  test.ok(options.predef.length == 1);
   test.done();
 };
 
@@ -1844,7 +1844,7 @@ exports.unlabeledBreakWithoutLoop = function(test) {
     .test(src);
 
   test.done();
-};
+}
 
 exports.unlabeledContinueWithoutLoop = function(test) {
   var src = [
@@ -1861,7 +1861,7 @@ exports.unlabeledContinueWithoutLoop = function(test) {
     .test(src);
 
   test.done();
-};
+}
 
 exports.labelsContinue = function (test) {
   var src = [
@@ -1902,7 +1902,7 @@ exports.tryWithoutCatch = function (test) {
     .addError(2, "Expected 'catch' and instead saw 'if'.")
     .test(src);
 
-  src = [
+  var src = [
     "try{}"
   ];
 
