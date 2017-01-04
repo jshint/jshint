@@ -405,6 +405,7 @@ exports.devel = {
 
 exports.worker = {
   importScripts  : true,
+  onmessage      : true,
   postMessage    : true,
   self           : true,
   FileReaderSync : true
