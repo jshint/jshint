@@ -277,7 +277,7 @@ exports.bool = {
      *     text = "Hello
      *     World"; // Warning, no escape character.
      *
-     *     text = "Hello\ 
+     *     text = "Hello\
      *     World"; // Warning, there is a space after \
      *
      * @deprecated JSHint is limiting its scope to issues of code correctness.
