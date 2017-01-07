@@ -18,7 +18,7 @@ var OPTIONS = {
   "prereq": [
     "prereq",
     "Comma-separated list of prerequisites (paths). E.g. files which include " +
-    "definitions of global variabls used throughout your project",
+    "definitions of global variables used throughout your project",
     "string",
     null
   ],
