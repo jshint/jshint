@@ -17,7 +17,7 @@ var OPTIONS = {
   "reporter": ["reporter", "Custom reporter (<PATH>|jslint|checkstyle|unix)", "string", undefined ],
   "prereq": [
     "prereq",
-    "Comma-separate list of prerequisite (paths). E.g. files which include" +
+    "Comma-separated list of prerequisites (paths). E.g. files which include " +
     "definitions of global variabls used throughout your project",
     "string",
     null
