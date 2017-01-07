@@ -2191,3 +2191,19 @@ exports["TDZ within for in/of head"] = function(test) {
 
   test.done();
 };
+
+exports["HTML-like comments (<!--)"] = function(test) {
+  var code = [
+    "<!--global c",
+    // --> does not end a HTML-like comment
+    "<!--c-->c",
+    "c.c = 1;"
+  ];
+
+  TestRun(test).test(code, { esversion: 5, htmlcomments: false });
+  TestRun(test)
+    .addError(2, "'<!--' is only available in ES5 (use 'esversion: 5').")
+    .test(code, { esversion: 3, htmlcomments: false });
+
+  test.done();
+};
