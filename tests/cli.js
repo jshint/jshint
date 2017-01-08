@@ -1326,5 +1326,35 @@ exports.useStdin = {
     test.equal(errors.length, 0, "should be no errors.");
     test.equal(cli.exit.args[0][0], 0, "status code should be 0 when there is no linting error.");
     test.done();
+  },
+
+  testFileNameIgnore: function (test) {
+    var dir = __dirname + "/../examples/";
+    this.sinon.stub(process, "cwd").returns(dir);
+    this.sinon.stub(process.stdout, "write");
+
+    this.sinon.stub(shjs, "cat")
+      .withArgs(sinon.match(/\.jshintignore$/)).returns("ignore-me.js");
+
+    this.sinon.stub(shjs, "test")
+      .withArgs("-e", sinon.match(/\.jshintignore$/)).returns(true);
+
+    cli.interpret(["node", "jshint", "--filename", "do-not-ignore-me.js", "-"]);
+
+    this.stdin.send("This is not valid JavaScript.");
+    this.stdin.end();
+
+    test.equal(cli.exit.args[0][0], 2, "The input is linted because the specified file name is not ignored.");
+
+    this.stdin.reset();
+
+    cli.interpret(["node", "jshint", "--filename", "ignore-me.js", "-"]);
+
+    this.stdin.send("This is not valid JavaScript.");
+    this.stdin.end();
+
+    test.equal(cli.exit.args[1][0], 0, "The input is not linted because the specified file name is ignored.");
+
+    test.done();
   }
 };
