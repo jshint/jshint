@@ -28,14 +28,16 @@
 
 /*jshint node: true, eqnull: true*/
 
-var JSHINT = require('../../src/jshint.js').JSHINT;
+'use strict';
+
+var JSHINT = require("../..").JSHINT;
 
 if (exports.setup === undefined || exports.setup === null) {
   exports.setup = {};
 }
 
 exports.setup.testRun = function (test, name) {
-  var initCounter = 0, runCounter = 0, seq = 0, checked = [], definedErrors = [];
+  var definedErrors = [];
 
   var helperObj = {
     addError: function (line, message, extras) {
@@ -50,9 +52,7 @@ exports.setup.testRun = function (test, name) {
 
     test: function (source, options, globals) {
       var ret = !!JSHINT(source, options, globals);
-      var errors = JSHINT.errors.filter(function (er) {
-        return er;
-      });
+      var errors = JSHINT.errors;
 
       if (errors.length === 0 && definedErrors.length === 0) {
         return;
@@ -111,6 +111,12 @@ exports.setup.testRun = function (test, name) {
       }).filter(function (er) {
         return !!er;
       });
+      var duplicateErrors = errors.filter(function (er) {
+        return errors.filter(function (other) {
+          return er.line === other.line && er.character === other.character &&
+            er.reason === other.reason;
+        }).length > 1;
+      });
 
       // remove undefined errors, if there is a definition with wrong line number
       undefinedErrors = undefinedErrors.filter(function (er) {
@@ -125,9 +131,12 @@ exports.setup.testRun = function (test, name) {
       });
 
       test.ok(
-        undefinedErrors.length === 0 && unthrownErrors.length === 0 && wrongLineNumbers.length === 0,
+        undefinedErrors.length === 0 &&
+          unthrownErrors.length === 0 &&
+          wrongLineNumbers.length === 0 &&
+          duplicateErrors.length === 0,
 
-        (name == null ? "" : "\n  TestRun: [bold]{" + name + "}") +
+        (name === null ? "" : "\n  TestRun: [bold]{" + name + "}") +
         unthrownErrors.map(function (el, idx) {
           return (idx === 0 ? "\n  [yellow]{Errors defined, but not thrown by JSHINT}\n" : "") +
             " [bold]{Line " + el.line + ", Char " + el.character + "} " + el.message;
@@ -139,6 +148,10 @@ exports.setup.testRun = function (test, name) {
         wrongLineNumbers.map(function (el, idx) {
           return (idx === 0 ? "\n  [yellow]{Errors with wrong line number}\n" : "") +
             "  [bold]{Line " + el.line + "} " + el.message + " [red]{not in line(s)} [bold]{" + el.definedIn.join(", ") + "}";
+        }).join("\n") +
+        duplicateErrors.map(function (el, idx) {
+          return (idx === 0 ? "\n  [yellow]{Duplicated errors}\n": "") +
+            "  [bold]{Line " + el.line + ", Char " + el.character + "} " + el.reason;
         }).join("\n") + "\n"
       );
     }

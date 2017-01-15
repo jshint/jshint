@@ -1,6 +1,6 @@
 {
   "name":     "jshint",
-  "version":  "2.5.11",
+  "version":  "2.9.4",
   "homepage": "http://jshint.com/",
   "description": "Static analysis tool for JavaScript",
 
@@ -24,44 +24,51 @@
   },
 
   "scripts": {
+    "browser-test-server": "node tests/helpers/browser/server",
     "build": "node bin/build",
     "coverage": "istanbul -- cover ./node_modules/.bin/nodeunit tests/unit",
     "data": "node scripts/generate-identifier-data",
-    "pretest": "jshint src",
-    "test": "nodeunit tests tests/regression tests/unit"
+    "pretest": "node ./bin/jshint src && jscs src",
+    "changelog": "conventional-changelog -p jshint -i CHANGELOG.md -w",
+    "github-release": "conventional-github-releaser -p jshint",
+    "test-browser": "node tests/browser",
+    "test-cli": "nodeunit tests/cli.js",
+    "test-node": "npm run test-unit && npm run test-cli && npm run test-regression",
+    "test-regression": "nodeunit tests/regression",
+    "test-unit": "nodeunit tests/unit",
+    "test": "npm run test-node && npm run test-browser"
   },
 
   "main": "./src/jshint.js",
 
   "dependencies": {
-    "cli":                 "0.6.x",
+    "cli":                 "~1.0.0",
     "console-browserify":  "1.1.x",
     "exit":                "0.1.x",
     "htmlparser2":         "3.8.x",
-    "minimatch":           "1.0.x",
+    "minimatch":           "~3.0.2",
     "shelljs":             "0.3.x",
     "strip-json-comments": "1.0.x",
-    "underscore":          "1.6.x"
+    "lodash":              "3.7.x"
   },
 
   "devDependencies": {
-    "browserify":    "6.x",
-    "coveralls":     "2.11.x",
-    "istanbul":      "0.3.x",
-    "jshint":        "2.5.x",
-    "mock-stdin":    "0.3.x",
-    "nodeunit":      "0.9.x",
-    "regenerate":    "1.0.x",
-    "sinon":         "1.11.x",
-    "unicode-6.3.0": "0.1.x"
+    "browserify":                     "9.x",
+    "conventional-changelog":         "0.4.x",
+    "conventional-github-releaser":   "0.4.x",
+    "coveralls":                      "2.11.x",
+    "istanbul":                       "0.3.x",
+    "jscs":                           "1.11.x",
+    "mock-stdin":                     "0.3.x",
+    "nodeunit":                       "0.9.x",
+    "phantom":                        "~0.7.2",
+    "phantomjs":                      "1.9.13",
+    "regenerate":                     "1.2.x",
+    "sinon":                          "1.12.x",
+    "unicode-6.3.0":                  "0.1.x"
   },
 
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://github.com/jshint/jshint/blob/master/LICENSE"
-    }
-  ],
+  "license": "(MIT AND JSON)",
 
   "preferGlobal": true,
 

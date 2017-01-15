@@ -17,3 +17,13 @@ Boolean.prototype = {
 NonArray.prototype.random = function () {
   return 4;
 };
+
+{
+  let Array = {};
+  Array.prototype.method = function() {};
+}
+
+(function() {
+  var Array = 2;
+  Array.prototype.method = function() {};
+}());

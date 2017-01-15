@@ -1,6 +1,6 @@
 "use strict";
 
-var _                 = require("underscore");
+var _                 = require("lodash");
 var fs                = require("fs");
 var cli               = require("cli");
 var path              = require("path");
@@ -15,6 +15,13 @@ var defReporter       = require("./reporters/default").reporter;
 var OPTIONS = {
   "config": ["c", "Custom configuration file", "string", false ],
   "reporter": ["reporter", "Custom reporter (<PATH>|jslint|checkstyle|unix)", "string", undefined ],
+  "prereq": [
+    "prereq",
+    "Comma-separated list of prerequisites (paths). E.g. files which include " +
+    "definitions of global variables used throughout your project",
+    "string",
+    null
+  ],
   "exclude": ["exclude",
     "Exclude files matching the given filename pattern (same as .jshintignore)", "string", null],
   "exclude-path": ["exclude-path", "Pass in a custom jshintignore file path", "string", null],
@@ -74,18 +81,18 @@ function deprecated(text, alt) {
 function findConfig(file) {
   var dir  = path.dirname(path.resolve(file));
   var envs = getHomeDir();
-
-  if (!envs)
-    return home;
-
-  var home = path.normalize(path.join(envs, ".jshintrc"));
-
   var proj = findFile(".jshintrc", dir);
+  var home;
+
   if (proj)
     return proj;
 
-  if (shjs.test("-e", home))
-    return home;
+  else if (envs) {
+    home = path.normalize(path.join(envs, ".jshintrc"));
+
+    if (shjs.test("-e", home))
+      return home;
+  }
 
   return null;
 }
@@ -191,20 +198,21 @@ function findFile(name, cwd) {
  * @return {array} a list of files to ignore.
  */
 function loadIgnores(params) {
-  var file = findFile(params.excludePath || ".jshintignore", params.cwd);
+  var file = findFile(params.excludePath || ".jshintignore", params.cwd) || "";
 
   if (!file && !params.exclude) {
     return [];
   }
 
   var lines = (file ? shjs.cat(file) : "").split("\n");
-  lines.unshift(params.exclude || "");
+  var exclude = params.exclude || "";
+  lines.unshift.apply(lines, exclude.split(","));
 
   return lines
-    .filter(function (line) {
+    .filter(function(line) {
       return !!line.trim();
     })
-    .map(function (line) {
+    .map(function(line) {
       if (line[0] === "!")
         return "!" + path.resolve(path.dirname(file), line.substr(1).trim());
 
@@ -221,7 +229,7 @@ function loadIgnores(params) {
  * @return {boolean} 'true' if file should be ignored, 'false' otherwise.
  */
 function isIgnored(fp, patterns) {
-  return patterns.some(function (ip) {
+  return patterns.some(function(ip) {
     if (minimatch(path.resolve(fp), ip, { nocase: true })) {
       return true;
     }
@@ -230,7 +238,7 @@ function isIgnored(fp, patterns) {
       return true;
     }
 
-    if (shjs.test("-d", fp) && ip.match(/^[^\/]*\/?$/) &&
+    if (shjs.test("-d", fp) && ip.match(/^[^\/\\]*[\/\\]?$/) &&
       fp.match(new RegExp("^" + ip + ".*"))) {
       return true;
     }
@@ -272,7 +280,7 @@ function extract(code, when) {
     // in between the last </script> tag and this <script> tag to preserve
     // location information.
     inscript = true;
-    js.push.apply(js, code.slice(index, parser.endIndex).match(/\n\r|\n|\r/g));
+    js.push.apply(js, code.slice(index, parser.endIndex).match(/\r\n|\n|\r/g));
     startOffset = null;
   }
 
@@ -289,10 +297,10 @@ function extract(code, when) {
     if (!inscript)
       return;
 
-    var lines = data.split(/\n\r|\n|\r/);
+    var lines = data.split(/\r\n|\n|\r/);
 
     if (!startOffset) {
-      lines.some(function (line) {
+      lines.some(function(line) {
         if (!line) return;
         startOffset = /^(\s*)/.exec(line)[1];
         return true;
@@ -301,7 +309,7 @@ function extract(code, when) {
 
     // check for startOffset again to remove leading white space from first line
     if (startOffset) {
-      lines = lines.map(function (line) {
+      lines = lines.map(function(line) {
         return line.replace(startOffset, "");
       });
       data = lines.join("\n");
@@ -354,7 +362,7 @@ function extractOffsets(code, when) {
     // location information.
     inscript = true;
     var fragment = code.slice(index, parser.endIndex);
-    var n = (fragment.match(/\n\r|\n|\r/g) || []).length;
+    var n = (fragment.match(/\r\n|\n|\r/g) || []).length;
     lineCounter += n;
     startOffset = null;
   }
@@ -372,10 +380,10 @@ function extractOffsets(code, when) {
     if (!inscript)
       return;
 
-    var lines = data.split(/\n\r|\n|\r/);
+    var lines = data.split(/\r\n|\n|\r/);
 
     if (!startOffset) {
-      lines.some(function (line) {
+      lines.some(function(line) {
         if (!line) return;
         startOffset = /^(\s*)/.exec(line)[1];
         return true;
@@ -383,7 +391,7 @@ function extractOffsets(code, when) {
     }
 
     // check for startOffset again to remove leading white space from first line
-    lines.forEach(function () {
+    lines.forEach(function() {
       lineCounter += 1;
       if (startOffset) {
         offsets[lineCounter] = startOffset.length;
@@ -418,7 +426,7 @@ function collect(fp, files, ignores, ext) {
   }
 
   if (shjs.test("-d", fp)) {
-    shjs.ls(fp).forEach(function (item) {
+    shjs.ls(fp).forEach(function(item) {
       var itempath = path.join(fp, item);
       if (shjs.test("-d", itempath) || item.match(ext)) {
         collect(itempath, files, ignores, ext);
@@ -449,7 +457,7 @@ function lint(code, results, config, data, file) {
   config = JSON.parse(JSON.stringify(config));
 
   if (config.prereq) {
-    config.prereq.forEach(function (fp) {
+    config.prereq.forEach(function(fp) {
       fp = path.join(config.dirname, fp);
       if (shjs.test("-e", fp))
         buffer.push(shjs.cat(fp));
@@ -464,7 +472,7 @@ function lint(code, results, config, data, file) {
 
   if (config.overrides) {
     if (file) {
-      _.each(config.overrides, function (options, pattern) {
+      _.each(config.overrides, function(options, pattern) {
         if (minimatch(path.normalize(file), pattern, { nocase: true, matchBase: true })) {
           if (options.globals) {
             globals = _.extend(globals || {}, options.globals);
@@ -485,7 +493,7 @@ function lint(code, results, config, data, file) {
   buffer = buffer.replace(/^\uFEFF/, ""); // Remove potential Unicode BOM.
 
   if (!JSHINT(buffer, config, globals)) {
-    JSHINT.errors.forEach(function (err) {
+    JSHINT.errors.forEach(function(err) {
       if (err) {
         results.push({ file: file || "stdin", error: err });
       }
@@ -507,7 +515,7 @@ var exports = {
   /**
    * Returns a configuration file or nothing, if it can't be found.
    */
-  getConfig: function (fp) {
+  getConfig: function(fp) {
     return loadNpmConfig(fp) || exports.loadConfig(findConfig(fp));
   },
 
@@ -517,7 +525,7 @@ var exports = {
    * @param {string} fp a path to the config file
    * @returns {object} config object
    */
-  loadConfig: function (fp) {
+  loadConfig: function(fp) {
     if (!fp) {
       return {};
     }
@@ -533,14 +541,17 @@ var exports = {
 
       if (config['extends']) {
         var baseConfig = exports.loadConfig(path.resolve(config.dirname, config['extends']));
-        config.globals = _.extend({}, baseConfig.globals, config.globals);
-        _.defaults(config, baseConfig);
+        config = _.merge({}, baseConfig, config, function(a, b) {
+          if (_.isArray(a)) {
+            return a.concat(b);
+          }
+        });
         delete config['extends'];
       }
 
       return config;
     } catch (err) {
-      cli.error("Can't parse config file: " + fp);
+      cli.error("Can't parse config file: " + fp + "\nError:" + err);
       exports.exit(1);
     }
   },
@@ -553,19 +564,19 @@ var exports = {
    *                   ignores  - A list of files/dirs to ignore (defaults to .jshintignores)
    *                   extensions - A list of non-dot-js extensions to check
    */
-  gather: function (opts) {
+  gather: function(opts) {
     var files = [];
 
     var reg = new RegExp("\\.(js" +
       (!opts.extensions ? "" : "|" +
         opts.extensions.replace(/,/g, "|").replace(/[\. ]/g, "")) + ")$");
 
-    var ignores = !opts.ignores ? loadIgnores({cwd: opts.cwd}) :
-                                  opts.ignores.map(function (target) {
+    var ignores = !opts.ignores ? loadIgnores({ cwd: opts.cwd }) :
+                                  opts.ignores.map(function(target) {
                                     return path.resolve(target);
                                   });
 
-    opts.args.forEach(function (target) {
+    opts.args.forEach(function(target) {
       collect(target, files, ignores, reg);
     });
 
@@ -588,42 +599,50 @@ var exports = {
    * @returns {bool} 'true' if all files passed, 'false' otherwise and 'null'
    *                 when function will be finished asynchronously.
    */
-  run: function (opts, cb) {
+  run: function(opts, cb) {
     var files = exports.gather(opts);
     var results = [];
     var data = [];
 
-    if (opts.useStdin) {
-      cli.withStdin(function (code) {
-        var config = opts.config;
-        var filename;
+    function mergeCLIPrereq(config) {
+      if (opts.prereq) {
+        config.prereq = (config.prereq || []).concat(opts.prereq.split(/\s*,\s*/));
+      }
+    }
 
-        // There is an if(filename) check in the lint() function called below.
-        // passing a filename of undefined is the same as calling the function
-        // without a filename.  If there is no opts.filename, filename remains
-        // undefined and lint() is effectively called with 4 parameters.
-        if (opts.filename) {
-          filename = path.resolve(opts.filename);
-        }
+    var filename;
+
+    // There is an if(filename) check in the lint() function called below.
+    // passing a filename of undefined is the same as calling the function
+    // without a filename.  If there is no opts.filename, filename remains
+    // undefined and lint() is effectively called with 4 parameters.
+    if (opts.filename) {
+      filename = path.resolve(opts.filename);
+    }
+    if (opts.useStdin && opts.ignores.indexOf(filename) === -1) {
+      cli.withStdin(function(code) {
+        var config = opts.config;
 
         if (filename && !config) {
-          config = loadNpmConfig(filename) ||
-            exports.loadConfig(findConfig(filename));
+          config = exports.getConfig(filename);
         }
 
         config = config || {};
 
+        mergeCLIPrereq(config);
+
         lint(extract(code, opts.extract), results, config, data, filename);
         (opts.reporter || defReporter)(results, data, { verbose: opts.verbose });
         cb(results.length === 0);
-      });
 
+      });
       return null;
     }
 
-    files.forEach(function (file) {
+    files.forEach(function(file) {
       var config = opts.config || exports.getConfig(file);
       var code;
+      var errors = [];
 
       try {
         code = shjs.cat(file);
@@ -632,19 +651,22 @@ var exports = {
         exports.exit(1);
       }
 
-      lint(extract(code, opts.extract), results, config, data, file);
+      mergeCLIPrereq(config);
 
-      if (results.length) {
+      lint(extract(code, opts.extract), errors, config, data, file);
+
+      if (errors.length) {
         var offsets = extractOffsets(code, opts.extract);
         if (offsets && offsets.length) {
-          results.forEach(function (errorInfo) {
+          errors.forEach(function(errorInfo) {
             var line = errorInfo.error.line;
-            if (line >= 0 && line < offsets.length) {
-              var offset = +offsets[line];
-              errorInfo.error.character += offset;
+            if (line >= 0 && line < offsets.length && offsets[line]) {
+              errorInfo.error.character += offsets[line];
             }
           });
         }
+
+        results = results.concat(errors);
       }
     });
 
@@ -656,7 +678,7 @@ var exports = {
    * Helper exposed for testing.
    * Used to determine is stdout has any buffered output before exiting the program
    */
-  getBufferSize: function () {
+  getBufferSize: function() {
     return process.stdout.bufferSize;
   },
 
@@ -666,7 +688,7 @@ var exports = {
    *
    * @param {object} args, arguments in the process.argv format.
    */
-  interpret: function (args) {
+  interpret: function(args) {
     cli.setArgv(args);
     cli.options = {};
 
@@ -735,12 +757,13 @@ var exports = {
       args:       cli.args,
       config:     config,
       reporter:   reporter,
-      ignores:    loadIgnores({exclude: options.exclude, excludePath: options["exclude-path"]}),
+      ignores:    loadIgnores({ exclude: options.exclude, excludePath: options["exclude-path"] }),
       extensions: options["extra-ext"],
       verbose:    options.verbose,
       extract:    options.extract,
       filename:   options.filename,
-      useStdin:   {"-": true, "/dev/stdin": true}[args[args.length - 1]]
+      prereq:     options.prereq,
+      useStdin:   { "-": true, "/dev/stdin": true }[args[args.length - 1]]
     }, done));
   }
 };

@@ -3,36 +3,36 @@
 
 "use strict";
 
-var browserify = require("browserify");
-var bundle     = browserify();
 var path       = require("path");
-var version    = require("../package.json").version;
+var build      = require("../scripts/build");
 require("shelljs/make");
 
 var distDir    = path.join(__dirname, "../dist");
-var srcDir     = path.join(__dirname, "../src");
 
 if (!test("-e", distDir))
   mkdir(distDir);
 
-bundle.require(srcDir + "/jshint.js", { expose: "jshint" });
-bundle.bundle(function (err, src) {
-  var web   = distDir + "/jshint.js";
-  var rhino = distDir + "/jshint-rhino.js";
+build("web", function(err, version, src) {
+  if (err) {
+    console.error(err);
+    process.exit(1);
+  }
 
-  [ "/*! " + version + " */",
-    "var JSHINT;",
-    "if (typeof window === 'undefined') window = {};",
-    "(function () {",
-      "var require;",
-      src,
-      "JSHINT = require('jshint').JSHINT;",
-      "if (typeof exports === 'object' && exports) exports.JSHINT = JSHINT;",
-    "}());"
-  ].join("\n").to(web);
+  src.to(distDir + "/jshint.js");
+  console.log("Built: " + version + " (web)");
+});
 
-  ("#!/usr/bin/env rhino\nvar window = {};\n" + cat(web, srcDir + "/platforms/rhino.js")).to(rhino);
-  chmod("+x", rhino);
+build("rhino", function(err, version, src) {
+  var dest;
 
-  console.log("Built: ", version);
+  if (err) {
+    console.error(err);
+    process.exit(1);
+  }
+
+  dest  = distDir + "/jshint-rhino.js";
+  chmod("+x", dest);
+
+  src.to(dest);
+  console.log("Built: " + version + " (Rhino)");
 });

@@ -4,7 +4,7 @@
 
 "use strict";
 
-var _      = require("underscore");
+var _      = require("lodash");
 var events = require("events");
 var reg    = require("./reg.js");
 var state  = require("./state.js").state;
@@ -31,7 +31,13 @@ var Token = {
   RegExp: 9,
   TemplateHead: 10,
   TemplateMiddle: 11,
-  TemplateTail: 12
+  TemplateTail: 12,
+  NoSubstTemplate: 13
+};
+
+var Context = {
+  Block: 1,
+  Template: 2
 };
 
 // Object that handles postponed lexing verifications that checks the parsed
@@ -41,11 +47,11 @@ function asyncTrigger() {
   var _checks = [];
 
   return {
-    push: function (fn) {
+    push: function(fn) {
       _checks.push(fn);
     },
 
-    check: function () {
+    check: function() {
       for (var check = 0; check < _checks.length; ++check) {
         _checks[check]();
       }
@@ -70,7 +76,7 @@ function asyncTrigger() {
  * to token() method returning the next token, the Lexer object also
  * emits events.
  *
- *   lex.on("Identifier", function (data) {
+ *   lex.on("Identifier", function(data) {
  *     if (data.name.indexOf("_") >= 0) {
  *       // Produce a warning.
  *     }
@@ -111,9 +117,8 @@ function Lexer(source) {
   this.from = 1;
   this.input = "";
   this.inComment = false;
-  this.inTemplate = false;
-  this.templateLine = null;
-  this.templateChar = null;
+  this.context = [];
+  this.templateStarts = [];
 
   for (var i = 0; i < state.option.indent; i += 1) {
     state.tab += " ";
@@ -123,12 +128,32 @@ function Lexer(source) {
 Lexer.prototype = {
   _lines: [],
 
-  getLines: function () {
+  inContext: function(ctxType) {
+    return this.context.length > 0 && this.context[this.context.length - 1].type === ctxType;
+  },
+
+  pushContext: function(ctxType) {
+    this.context.push({ type: ctxType });
+  },
+
+  popContext: function() {
+    return this.context.pop();
+  },
+
+  isContext: function(context) {
+    return this.context.length > 0 && this.context[this.context.length - 1] === context;
+  },
+
+  currentContext: function() {
+    return this.context.length > 0 && this.context[this.context.length - 1];
+  },
+
+  getLines: function() {
     this._lines = state.lines;
     return this._lines;
   },
 
-  setLines: function (val) {
+  setLines: function(val) {
     this._lines = val;
     state.lines = this._lines;
   },
@@ -137,14 +162,14 @@ Lexer.prototype = {
    * Return the next i character without actually moving the
    * char pointer.
    */
-  peek: function (i) {
+  peek: function(i) {
     return this.input.charAt(i || 0);
   },
 
   /*
    * Move the char pointer forward i times.
    */
-  skip: function (i) {
+  skip: function(i) {
     i = i || 1;
     this.char += i;
     this.input = this.input.slice(i);
@@ -155,12 +180,12 @@ Lexer.prototype = {
    * Underscore.js i.e. you can subscribe to multiple events with
    * one call:
    *
-   *   lex.on("Identifier Number", function (data) {
+   *   lex.on("Identifier Number", function(data) {
    *     // ...
    *   });
    */
-  on: function (names, listener) {
-    names.split(" ").forEach(function (name) {
+  on: function(names, listener) {
+    names.split(" ").forEach(function(name) {
       this.emitter.on(name, listener);
     }.bind(this));
   },
@@ -169,7 +194,7 @@ Lexer.prototype = {
    * Trigger a token event. All arguments will be passed to each
    * listener.
    */
-  trigger: function () {
+  trigger: function() {
     this.emitter.emit.apply(this.emitter, Array.prototype.slice.call(arguments));
   },
 
@@ -180,8 +205,8 @@ Lexer.prototype = {
    * by the parser. This avoids parser's peek() to give the lexer
    * a false context.
    */
-  triggerAsync: function (type, args, checks, fn) {
-    checks.push(function () {
+  triggerAsync: function(type, args, checks, fn) {
+    checks.push(function() {
       if (fn()) {
         this.trigger(type, args);
       }
@@ -195,7 +220,7 @@ Lexer.prototype = {
    * This method's implementation was heavily influenced by the
    * scanPunctuator function in the Esprima parser's source code.
    */
-  scanPunctuator: function () {
+  scanPunctuator: function() {
     var ch1 = this.peek();
     var ch2, ch3, ch4;
 
@@ -216,13 +241,29 @@ Lexer.prototype = {
     case ")":
     case ";":
     case ",":
-    case "{":
-    case "}":
     case "[":
     case "]":
     case ":":
     case "~":
     case "?":
+      return {
+        type: Token.Punctuator,
+        value: ch1
+      };
+
+    // A block/object opener
+    case "{":
+      this.pushContext(Context.Block);
+      return {
+        type: Token.Punctuator,
+        value: ch1
+      };
+
+    // A block/object closer
+    case "}":
+      if (this.inContext(Context.Block)) {
+        this.popContext();
+      }
       return {
         type: Token.Punctuator,
         value: ch1
@@ -301,7 +342,7 @@ Lexer.prototype = {
     }
 
     // 2-character punctuators: <= >= == != ++ -- << >> && ||
-    // += -= *= %= &= |= ^= (but not /=, see below)
+    // += -= *= %= &= |= ^= /=
     if (ch1 === ch2 && ("+-<>&|".indexOf(ch1) >= 0)) {
       return {
         type: Token.Punctuator,
@@ -309,7 +350,7 @@ Lexer.prototype = {
       };
     }
 
-    if ("<>=!+-*%&|^".indexOf(ch1) >= 0) {
+    if ("<>=!+-*%&|^/".indexOf(ch1) >= 0) {
       if (ch2 === "=") {
         return {
           type: Token.Punctuator,
@@ -320,22 +361,6 @@ Lexer.prototype = {
       return {
         type: Token.Punctuator,
         value: ch1
-      };
-    }
-
-    // Special case: /=.
-
-    if (ch1 === "/") {
-      if (ch2 === "=") {
-        return {
-          type: Token.Punctuator,
-          value: "/="
-        };
-      }
-
-      return {
-        type: Token.Punctuator,
-        value: "/"
       };
     }
 
@@ -352,12 +377,13 @@ Lexer.prototype = {
    * also recognizes JSHint- and JSLint-specific comments such as
    * /*jshint, /*jslint, /*globals and so on.
    */
-  scanComments: function () {
+  scanComments: function(checks) {
     var ch1 = this.peek();
     var ch2 = this.peek(1);
     var rest = this.input.substr(2);
     var startLine = this.line;
     var startChar = this.char;
+    var self = this;
 
     // Create a comment token object and make sure it
     // has all the data JSHint needs to work with special
@@ -376,7 +402,12 @@ Lexer.prototype = {
 
       body = body.replace(/\n/g, " ");
 
-      special.forEach(function (str) {
+      if (label === "/*" && reg.fallsThrough.test(body)) {
+        isSpecial = true;
+        commentType = "falls through";
+      }
+
+      special.forEach(function(str) {
         if (isSpecial) {
           return;
         }
@@ -412,6 +443,26 @@ Lexer.prototype = {
           commentType = "globals";
           break;
         default:
+          var options = body.split(":").map(function(v) {
+            return v.replace(/^\s+/, "").replace(/\s+$/, "");
+          });
+
+          if (options.length === 2) {
+            switch (options[0]) {
+            case "ignore":
+              switch (options[1]) {
+              case "start":
+                self.ignoringLinterErrors = true;
+                isSpecial = false;
+                break;
+              case "end":
+                self.ignoringLinterErrors = false;
+                isSpecial = false;
+                break;
+              }
+            }
+          }
+
           commentType = str;
         }
       });
@@ -463,7 +514,7 @@ Lexer.prototype = {
 
           // If we hit EOF and our comment is still unclosed,
           // trigger an error and end the comment implicitly.
-          if (!this.nextLine()) {
+          if (!this.nextLine(checks)) {
             this.trigger("error", {
               code: "E017",
               line: startLine,
@@ -492,7 +543,7 @@ Lexer.prototype = {
    * Extract a keyword out of the next sequence of characters or
    * return 'null' if its not possible.
    */
-  scanKeyword: function () {
+  scanKeyword: function() {
     var result = /^[a-zA-Z_$][a-zA-Z0-9_$]*/.exec(this.input);
     var keywords = [
       "if", "in", "do", "var", "for", "new",
@@ -521,7 +572,7 @@ Lexer.prototype = {
    * to Identifier this method can also produce BooleanLiteral
    * (true/false) and NullLiteral (null).
    */
-  scanIdentifier: function () {
+  scanIdentifier: function() {
     var id = "";
     var index = 0;
     var type, char;
@@ -566,7 +617,7 @@ Lexer.prototype = {
       return null;
     }.bind(this);
 
-    var getIdentifierStart = function () {
+    var getIdentifierStart = function() {
       /*jshint validthis:true */
       var chr = this.peek(index);
       var code = chr.charCodeAt(0);
@@ -592,7 +643,7 @@ Lexer.prototype = {
       return null;
     }.bind(this);
 
-    var getIdentifierPart = function () {
+    var getIdentifierPart = function() {
       /*jshint validthis:true */
       var chr = this.peek(index);
       var code = chr.charCodeAt(0);
@@ -669,7 +720,7 @@ Lexer.prototype = {
    * This method's implementation was heavily influenced by the
    * scanNumericLiteral function in the Esprima parser's source code.
    */
-  scanNumericLiteral: function () {
+  scanNumericLiteral: function(checks) {
     var index = 0;
     var value = "";
     var length = this.input.length;
@@ -726,13 +777,18 @@ Lexer.prototype = {
           isAllowedDigit = isOctalDigit;
           base = 8;
 
-          if (!state.option.esnext) {
-            this.trigger("warning", {
-              code: "W119",
-              line: this.line,
-              character: this.char,
-              data: [ "Octal integer literal" ]
-            });
+          if (!state.inES6(true)) {
+            this.triggerAsync(
+              "warning",
+              {
+                code: "W119",
+                line: this.line,
+                character: this.char,
+                data: [ "Octal integer literal", "6" ]
+              },
+              checks,
+              function() { return true; }
+            );
           }
 
           index += 1;
@@ -744,13 +800,18 @@ Lexer.prototype = {
           isAllowedDigit = isBinaryDigit;
           base = 2;
 
-          if (!state.option.esnext) {
-            this.trigger("warning", {
-              code: "W119",
-              line: this.line,
-              character: this.char,
-              data: [ "Binary integer literal" ]
-            });
+          if (!state.inES6(true)) {
+            this.triggerAsync(
+              "warning",
+              {
+                code: "W119",
+                line: this.line,
+                character: this.char,
+                data: [ "Binary integer literal", "6" ]
+              },
+              checks,
+              function() { return true; }
+            );
           }
 
           index += 1;
@@ -880,7 +941,7 @@ Lexer.prototype = {
 
 
   // Assumes previously parsed character was \ (=== '\\') and was not skipped.
-  scanEscapeSequence: function (checks) {
+  scanEscapeSequence: function(checks) {
     var allowNewLine = false;
     var jump = 1;
     this.skip();
@@ -893,7 +954,7 @@ Lexer.prototype = {
         line: this.line,
         character: this.char,
         data: [ "\\'" ]
-      }, checks, function () {return state.jsonMode; });
+      }, checks, function() {return state.jsonMode; });
       break;
     case "b":
       char = "\\b";
@@ -921,10 +982,22 @@ Lexer.prototype = {
         line: this.line,
         character: this.char
       }, checks,
-      function () { return n >= 0 && n <= 7 && state.directive["use strict"]; });
+      function() { return n >= 0 && n <= 7 && state.isStrict(); });
       break;
     case "u":
-      char = String.fromCharCode(parseInt(this.input.substr(1, 4), 16));
+      var hexCode = this.input.substr(1, 4);
+      var code = parseInt(hexCode, 16);
+      if (isNaN(code)) {
+        // This condition unequivocally describes a syntax error.
+        // TODO: Re-factor as an "error" (not a "warning").
+        this.trigger("warning", {
+          code: "W052",
+          line: this.line,
+          character: this.char,
+          data: [ "u" + hexCode ]
+        });
+      }
+      char = String.fromCharCode(code);
       jump = 5;
       break;
     case "v":
@@ -933,7 +1006,7 @@ Lexer.prototype = {
         line: this.line,
         character: this.char,
         data: [ "\\v" ]
-      }, checks, function () { return state.jsonMode; });
+      }, checks, function() { return state.jsonMode; });
 
       char = "\v";
       break;
@@ -945,7 +1018,7 @@ Lexer.prototype = {
         line: this.line,
         character: this.char,
         data: [ "\\x-" ]
-      }, checks, function () { return state.jsonMode; });
+      }, checks, function() { return state.jsonMode; });
 
       char = String.fromCharCode(x);
       jump = 3;
@@ -964,7 +1037,7 @@ Lexer.prototype = {
       break;
     }
 
-    return {char: char, jump: jump, allowNewLine: allowNewLine};
+    return { char: char, jump: jump, allowNewLine: allowNewLine };
   },
 
   /*
@@ -973,78 +1046,101 @@ Lexer.prototype = {
    * literals can span across multiple lines, this method has to move
    * the char pointer.
    */
-  scanTemplateLiteral: function (checks) {
+  scanTemplateLiteral: function(checks) {
     var tokenType;
-    var value = '';
+    var value = "";
     var ch;
+    var startLine = this.line;
+    var startChar = this.char;
+    var depth = this.templateStarts.length;
 
-    // String must start with a backtick.
-    if (!this.inTemplate) {
-      if (!state.option.esnext || this.peek() !== "`") {
-        return null;
+    if (this.peek() === "`") {
+      if (!state.inES6(true)) {
+        this.triggerAsync(
+          "warning",
+          {
+            code: "W119",
+            line: this.line,
+            character: this.char,
+            data: ["template literal syntax", "6"]
+          },
+          checks,
+          function() { return true; }
+        );
       }
-      this.templateLine = this.line;
-      this.templateChar = this.char;
+      // Template must start with a backtick.
+      tokenType = Token.TemplateHead;
+      this.templateStarts.push({ line: this.line, char: this.char });
+      depth = this.templateStarts.length;
       this.skip(1);
-    } else if (this.peek() !== '}') {
-      // If we're in a template, and we don't have a '}', lex something else instead.
+      this.pushContext(Context.Template);
+    } else if (this.inContext(Context.Template) && this.peek() === "}") {
+      // If we're in a template context, and we have a '}', lex a TemplateMiddle.
+      tokenType = Token.TemplateMiddle;
+    } else {
+      // Go lex something else.
       return null;
     }
 
     while (this.peek() !== "`") {
       while ((ch = this.peek()) === "") {
-        if (!this.nextLine()) {
-          // Unclosed template literal --- point to the starting line, or the EOF?
-          tokenType = this.inTemplate ? Token.TemplateHead : Token.TemplateMiddle;
-          this.inTemplate = false;
+        value += "\n";
+        if (!this.nextLine(checks)) {
+          // Unclosed template literal --- point to the starting "`"
+          var startPos = this.templateStarts.pop();
           this.trigger("error", {
             code: "E052",
-            line: this.templateLine,
-            character: this.templateChar
+            line: startPos.line,
+            character: startPos.char
           });
           return {
             type: tokenType,
             value: value,
-            isUnclosed: true
+            startLine: startLine,
+            startChar: startChar,
+            isUnclosed: true,
+            depth: depth,
+            context: this.popContext()
           };
         }
       }
 
       if (ch === '$' && this.peek(1) === '{') {
         value += '${';
-        tokenType = value.charAt(0) === '}' ? Token.TemplateMiddle : Token.TemplateHead;
-        // Either TokenHead or TokenMiddle --- depending on if the initial value
-        // is '}' or not.
         this.skip(2);
-        this.inTemplate = true;
         return {
           type: tokenType,
           value: value,
-          isUnclosed: false
+          startLine: startLine,
+          startChar: startChar,
+          isUnclosed: false,
+          depth: depth,
+          context: this.currentContext()
         };
       } else if (ch === '\\') {
         var escape = this.scanEscapeSequence(checks);
         value += escape.char;
         this.skip(escape.jump);
-      } else if (ch === '`') {
-        break;
-      } else {
+      } else if (ch !== '`') {
         // Otherwise, append the value and continue.
         value += ch;
         this.skip(1);
       }
     }
 
-    // Final value is either TokenTail or NoSubstititionTemplate --- essentially a string
-    tokenType = this.inTemplate ? Token.TemplateTail : Token.StringLiteral;
-    this.inTemplate = false;
+    // Final value is either NoSubstTemplate or TemplateTail
+    tokenType = tokenType === Token.TemplateHead ? Token.NoSubstTemplate : Token.TemplateTail;
     this.skip(1);
+    this.templateStarts.pop();
 
     return {
       type: tokenType,
       value: value,
+      startLine: startLine,
+      startChar: startChar,
       isUnclosed: false,
-      quote: "`"
+      depth: depth,
+      context: this.popContext()
     };
   },
 
@@ -1059,7 +1155,7 @@ Lexer.prototype = {
    *   var str = "hello\
    *   world";
    */
-  scanStringLiteral: function (checks) {
+  scanStringLiteral: function(checks) {
     /*jshint loopfunc:true */
     var quote = this.peek();
 
@@ -1073,7 +1169,7 @@ Lexer.prototype = {
       code: "W108",
       line: this.line,
       character: this.char // +1?
-    }, checks, function () { return state.jsonMode && quote !== "\""; });
+    }, checks, function() { return state.jsonMode && quote !== "\""; });
 
     var value = "";
     var startLine = this.line;
@@ -1083,7 +1179,7 @@ Lexer.prototype = {
     this.skip();
 
     while (this.peek() !== quote) {
-      while (this.peek() === "") { // End Of Line
+      if (this.peek() === "") { // End Of Line
 
         // If an EOL is not preceded by a backslash, show a warning
         // and proceed like it was a legit multi-line string where
@@ -1093,6 +1189,8 @@ Lexer.prototype = {
         // but it generates too many false positives.
 
         if (!allowNewLine) {
+          // This condition unequivocally describes a syntax error.
+          // TODO: Re-factor as an "error" (not a "warning").
           this.trigger("warning", {
             code: "W112",
             line: this.line,
@@ -1108,19 +1206,19 @@ Lexer.prototype = {
             code: "W043",
             line: this.line,
             character: this.char
-          }, checks, function () { return !state.option.multistr; });
+          }, checks, function() { return !state.option.multistr; });
 
           this.triggerAsync("warning", {
             code: "W042",
             line: this.line,
             character: this.char
-          }, checks, function () { return state.jsonMode && state.option.multistr; });
+          }, checks, function() { return state.jsonMode && state.option.multistr; });
         }
 
         // If we get an EOF inside of an unclosed string, show an
         // error and implicitly close it at the EOF point.
 
-        if (!this.nextLine()) {
+        if (!this.nextLine(checks)) {
           this.trigger("error", {
             code: "E029",
             line: startLine,
@@ -1130,43 +1228,54 @@ Lexer.prototype = {
           return {
             type: Token.StringLiteral,
             value: value,
+            startLine: startLine,
+            startChar: startChar,
             isUnclosed: true,
             quote: quote
           };
         }
+
+      } else { // Any character other than End Of Line
+
+        allowNewLine = false;
+        var char = this.peek();
+        var jump = 1; // A length of a jump, after we're done
+                      // parsing this character.
+
+        if (char < " ") {
+          // Warn about a control character in a string.
+          this.triggerAsync(
+            "warning",
+            {
+              code: "W113",
+              line: this.line,
+              character: this.char,
+              data: [ "<non-printable>" ]
+            },
+            checks,
+            function() { return true; }
+          );
+        }
+
+        // Special treatment for some escaped characters.
+        if (char === "\\") {
+          var parsed = this.scanEscapeSequence(checks);
+          char = parsed.char;
+          jump = parsed.jump;
+          allowNewLine = parsed.allowNewLine;
+        }
+
+        value += char;
+        this.skip(jump);
       }
-
-      allowNewLine = false;
-      var char = this.peek();
-      var jump = 1; // A length of a jump, after we're done
-                    // parsing this character.
-
-      if (char < " ") {
-        // Warn about a control character in a string.
-        this.trigger("warning", {
-          code: "W113",
-          line: this.line,
-          character: this.char,
-          data: [ "<non-printable>" ]
-        });
-      }
-
-      // Special treatment for some escaped characters.
-      if (char === "\\") {
-        var parsed = this.scanEscapeSequence(checks);
-        char = parsed.char;
-        jump = parsed.jump;
-        allowNewLine = parsed.allowNewLine;
-      }
-
-      value += char;
-      this.skip(jump);
     }
 
     this.skip();
     return {
       type: Token.StringLiteral,
       value: value,
+      startLine: startLine,
+      startChar: startChar,
       isUnclosed: false,
       quote: quote
     };
@@ -1182,7 +1291,7 @@ Lexer.prototype = {
    * rare edge cases where one JavaScript engine complains about
    * your regular expression while others don't.
    */
-  scanRegExp: function () {
+  scanRegExp: function(checks) {
     var index = 0;
     var length = this.input.length;
     var char = this.peek();
@@ -1191,28 +1300,38 @@ Lexer.prototype = {
     var flags = [];
     var malformed = false;
     var isCharSet = false;
-    var terminated;
+    var terminated, malformedDesc;
 
-    var scanUnexpectedChars = function () {
+    var scanUnexpectedChars = function() {
       // Unexpected control character
       if (char < " ") {
         malformed = true;
-        this.trigger("warning", {
-          code: "W048",
-          line: this.line,
-          character: this.char
-        });
+        this.triggerAsync(
+          "warning",
+          {
+            code: "W048",
+            line: this.line,
+            character: this.char
+          },
+          checks,
+          function() { return true; }
+        );
       }
 
       // Unexpected escaped character
       if (char === "<") {
         malformed = true;
-        this.trigger("warning", {
-          code: "W049",
-          line: this.line,
-          character: this.char,
-          data: [ char ]
-        });
+        this.triggerAsync(
+          "warning",
+          {
+            code: "W049",
+            line: this.line,
+            character: this.char,
+            data: [ char ]
+          },
+          checks,
+          function() { return true; }
+        );
       }
     }.bind(this);
 
@@ -1309,10 +1428,29 @@ Lexer.prototype = {
 
     while (index < length) {
       char = this.peek(index);
-      if (!/[gim]/.test(char)) {
+      if (!/[gimy]/.test(char)) {
         break;
       }
-      flags.push(char);
+      if (char === "y") {
+        if (!state.inES6(true)) {
+          this.triggerAsync(
+            "warning",
+            {
+              code: "W119",
+              line: this.line,
+              character: this.char,
+              data: [ "Sticky RegExp flag", "6" ]
+            },
+            checks,
+            function() { return true; }
+          );
+        }
+        if (value.indexOf("y") > -1) {
+          malformedDesc = "Duplicate RegExp flag";
+        }
+      } else {
+        flags.push(char);
+      }
       value += char;
       index += 1;
     }
@@ -1322,12 +1460,21 @@ Lexer.prototype = {
     try {
       new RegExp(body, flags.join(""));
     } catch (err) {
+      /**
+       * Because JSHint relies on the current engine's RegExp parser to
+       * validate RegExp literals, the description (exposed as the "data"
+       * property on the error object) is platform dependent.
+       */
+      malformedDesc = err.message;
+    }
+
+    if (malformedDesc) {
       malformed = true;
       this.trigger("error", {
         code: "E016",
         line: this.line,
         character: this.char,
-        data: [ err.message ] // Platform dependent!
+        data: [ malformedDesc ]
       });
     }
 
@@ -1344,7 +1491,7 @@ Lexer.prototype = {
    * can be mistakenly typed on OS X with option-space. Non UTF-8 web
    * pages with non-breaking pages produce syntax errors.
    */
-  scanNonBreakingSpaces: function () {
+  scanNonBreakingSpaces: function() {
     return state.option.nonbsp ?
       this.input.search(/(\u00A0)/) : -1;
   },
@@ -1352,7 +1499,7 @@ Lexer.prototype = {
   /*
    * Scan for characters that get silently deleted by one or more browsers.
    */
-  scanUnsafeChars: function () {
+  scanUnsafeChars: function() {
     return this.input.search(reg.unsafeChars);
   },
 
@@ -1360,24 +1507,19 @@ Lexer.prototype = {
    * Produce the next raw token or return 'null' if no tokens can be matched.
    * This method skips over all space characters.
    */
-  next: function (checks) {
+  next: function(checks) {
     this.from = this.char;
 
     // Move to the next non-space character.
-    var start;
-    if (/\s/.test(this.peek())) {
-      start = this.char;
-
-      while (/\s/.test(this.peek())) {
-        this.from += 1;
-        this.skip();
-      }
+    while (/\s/.test(this.peek())) {
+      this.from += 1;
+      this.skip();
     }
 
     // Methods that work with multi-line structures and move the
     // character pointer.
 
-    var match = this.scanComments() ||
+    var match = this.scanComments(checks) ||
       this.scanStringLiteral(checks) ||
       this.scanTemplateLiteral(checks);
 
@@ -1388,11 +1530,11 @@ Lexer.prototype = {
     // Methods that don't move the character pointer.
 
     match =
-      this.scanRegExp() ||
+      this.scanRegExp(checks) ||
       this.scanPunctuator() ||
       this.scanKeyword() ||
       this.scanIdentifier() ||
-      this.scanNumericLiteral();
+      this.scanNumericLiteral(checks);
 
     if (match) {
       this.skip(match.tokenLength || match.value.length);
@@ -1408,7 +1550,7 @@ Lexer.prototype = {
    * Switch to the next line and reset all char pointers. Once
    * switched, this method also checks for other minor warnings.
    */
-  nextLine: function () {
+  nextLine: function(checks) {
     var char;
 
     if (this.line >= this.getLines().length) {
@@ -1422,21 +1564,21 @@ Lexer.prototype = {
 
     var inputTrimmed = this.input.trim();
 
-    var startsWith = function () {
-      return _.some(arguments, function (prefix) {
+    var startsWith = function() {
+      return _.some(arguments, function(prefix) {
         return inputTrimmed.indexOf(prefix) === 0;
       });
     };
 
-    var endsWith = function () {
-      return _.some(arguments, function (suffix) {
+    var endsWith = function() {
+      return _.some(arguments, function(suffix) {
         return inputTrimmed.indexOf(suffix, inputTrimmed.length - suffix.length) !== -1;
       });
     };
 
     // If we are ignoring linter errors, replace the input with empty string
     // if it doesn't already at least start or end a multi-line comment
-    if (state.ignoreLinterErrors === true) {
+    if (this.ignoringLinterErrors === true) {
       if (!startsWith("/*", "//") && !(this.inComment && endsWith("*/"))) {
         this.input = "";
       }
@@ -1444,20 +1586,31 @@ Lexer.prototype = {
 
     char = this.scanNonBreakingSpaces();
     if (char >= 0) {
-      this.trigger("warning", { code: "W125", line: this.line, character: char + 1 });
+      this.triggerAsync(
+        "warning",
+        { code: "W125", line: this.line, character: char + 1 },
+        checks,
+        function() { return true; }
+      );
     }
 
     this.input = this.input.replace(/\t/g, state.tab);
     char = this.scanUnsafeChars();
 
     if (char >= 0) {
-      this.trigger("warning", { code: "W100", line: this.line, character: char });
+      this.triggerAsync(
+        "warning",
+        { code: "W100", line: this.line, character: char },
+        checks,
+        function() { return true; }
+      );
     }
 
     // If there is a limit on line length, warn when lines get too
     // long.
 
-    if (state.option.maxlen && state.option.maxlen < this.input.length) {
+    if (!this.ignoringLinterErrors && state.option.maxlen &&
+      state.option.maxlen < this.input.length) {
       var inComment = this.inComment ||
         startsWith.call(inputTrimmed, "//") ||
         startsWith.call(inputTrimmed, "/*");
@@ -1465,7 +1618,12 @@ Lexer.prototype = {
       var shouldTriggerError = !inComment || !reg.maxlenException.test(inputTrimmed);
 
       if (shouldTriggerError) {
-        this.trigger("warning", { code: "W101", line: this.line, character: this.input.length });
+        this.triggerAsync(
+          "warning",
+          { code: "W101", line: this.line, character: this.input.length },
+          checks,
+          function() { return true; }
+        );
       }
     }
 
@@ -1473,18 +1631,10 @@ Lexer.prototype = {
   },
 
   /*
-   * This is simply a synonym for nextLine() method with a friendlier
-   * public name.
-   */
-  start: function () {
-    this.nextLine();
-  },
-
-  /*
    * Produce the next token. This function is called by advance() to get
    * the next token. It returns a token in a JSLint-compatible format.
    */
-  token: function () {
+  token: function() {
     /*jshint loopfunc:true */
     var checks = asyncTrigger();
     var token;
@@ -1496,7 +1646,7 @@ Lexer.prototype = {
       }
       var meta = token.meta;
 
-      if (meta && meta.isFutureReservedWord && state.option.inES5()) {
+      if (meta && meta.isFutureReservedWord && state.inES5()) {
         // ES3 FutureReservedWord in an ES5 environment.
         if (!meta.es5) {
           return false;
@@ -1505,7 +1655,7 @@ Lexer.prototype = {
         // Some ES5 FutureReservedWord identifiers are active only
         // within a strict mode environment.
         if (meta.strictOnly) {
-          if (!state.option.strict && !state.directive["use strict"]) {
+          if (!state.option.strict && !state.isStrict()) {
             return false;
           }
         }
@@ -1519,7 +1669,7 @@ Lexer.prototype = {
     }
 
     // Produce a token object.
-    var create = function (type, value, isProperty, token) {
+    var create = function(type, value, isProperty, token) {
       /*jshint validthis:true */
       var obj;
 
@@ -1546,7 +1696,8 @@ Lexer.prototype = {
       }
 
       if (type === "(identifier)") {
-        if (value === "return" || value === "case" || value === "typeof") {
+        if (value === "return" || value === "case" || value === "yield" ||
+            value === "typeof" || value === "instanceof") {
           this.prereg = true;
         }
 
@@ -1560,6 +1711,10 @@ Lexer.prototype = {
         }
       }
 
+      if (type === "(template)" || type === "(template middle)") {
+        this.prereg = true;
+      }
+
       if (!obj) {
         obj = Object.create(state.syntax[type]);
       }
@@ -1571,6 +1726,21 @@ Lexer.prototype = {
       obj.character = this.char;
       obj.from = this.from;
       if (obj.identifier && token) obj.raw_text = token.text || token.value;
+      if (token && token.startLine && token.startLine !== this.line) {
+        obj.startLine = token.startLine;
+      }
+      if (token && token.context) {
+        // Context of current token
+        obj.context = token.context;
+      }
+      if (token && token.depth) {
+        // Nested template depth
+        obj.depth = token.depth;
+      }
+      if (token && token.isUnclosed) {
+        // Mark token as unclosed string / template literal
+        obj.isUnclosed = token.isUnclosed;
+      }
 
       if (isProperty && obj.identifier) {
         obj.isProperty = isProperty;
@@ -1583,7 +1753,16 @@ Lexer.prototype = {
 
     for (;;) {
       if (!this.input.length) {
-        return create(this.nextLine() ? "(endline)" : "(end)", "");
+        if (this.nextLine(checks)) {
+          return create("(endline)", "");
+        }
+
+        if (this.exhausted) {
+          return null;
+        }
+
+        this.exhausted = true;
+        return create("(end)", "");
       }
 
       token = this.next(checks);
@@ -1610,48 +1789,67 @@ Lexer.prototype = {
           line: this.line,
           char: this.char,
           from: this.from,
+          startLine: token.startLine,
+          startChar: token.startChar,
           value: token.value,
           quote: token.quote
-        }, checks, function () { return true; });
+        }, checks, function() { return true; });
 
-        return create("(string)", token.value);
+        return create("(string)", token.value, null, token);
 
       case Token.TemplateHead:
         this.trigger("TemplateHead", {
           line: this.line,
           char: this.char,
           from: this.from,
+          startLine: token.startLine,
+          startChar: token.startChar,
           value: token.value
         });
-        return create("(template)", token.value);
+        return create("(template)", token.value, null, token);
 
       case Token.TemplateMiddle:
         this.trigger("TemplateMiddle", {
           line: this.line,
           char: this.char,
           from: this.from,
+          startLine: token.startLine,
+          startChar: token.startChar,
           value: token.value
         });
-        return create("(template middle)", token.value);
+        return create("(template middle)", token.value, null, token);
 
       case Token.TemplateTail:
         this.trigger("TemplateTail", {
           line: this.line,
           char: this.char,
           from: this.from,
+          startLine: token.startLine,
+          startChar: token.startChar,
           value: token.value
         });
-        return create("(template tail)", token.value);
+        return create("(template tail)", token.value, null, token);
 
-      case Token.Identifier:
-        this.trigger("Identifier", {
+      case Token.NoSubstTemplate:
+        this.trigger("NoSubstTemplate", {
           line: this.line,
           char: this.char,
-          from: this.form,
+          from: this.from,
+          startLine: token.startLine,
+          startChar: token.startChar,
+          value: token.value
+        });
+        return create("(no subst template)", token.value, null, token);
+
+      case Token.Identifier:
+        this.triggerAsync("Identifier", {
+          line: this.line,
+          char: this.char,
+          from: this.from,
           name: token.value,
           raw_name: token.text,
           isProperty: state.tokens.curr.id === "."
-        });
+        }, checks, function() { return true; });
 
         /* falls through */
       case Token.Keyword:
@@ -1661,6 +1859,8 @@ Lexer.prototype = {
 
       case Token.NumericLiteral:
         if (token.isMalformed) {
+          // This condition unequivocally describes a syntax error.
+          // TODO: Re-factor as an "error" (not a "warning").
           this.trigger("warning", {
             code: "W045",
             line: this.line,
@@ -1674,14 +1874,14 @@ Lexer.prototype = {
           line: this.line,
           character: this.char,
           data: [ "0x-" ]
-        }, checks, function () { return token.base === 16 && state.jsonMode; });
+        }, checks, function() { return token.base === 16 && state.jsonMode; });
 
         this.triggerAsync("warning", {
           code: "W115",
           line: this.line,
           character: this.char
-        }, checks, function () {
-          return state.directive["use strict"] && token.base === 8 && token.isLegacy;
+        }, checks, function() {
+          return state.isStrict() && token.base === 8 && token.isLegacy;
         });
 
         this.trigger("Number", {
@@ -1727,3 +1927,4 @@ Lexer.prototype = {
 };
 
 exports.Lexer = Lexer;
+exports.Context = Context;

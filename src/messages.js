@@ -1,6 +1,6 @@
 "use strict";
 
-var _ = require("underscore");
+var _ = require("lodash");
 
 var errors = {
   // JSHint options
@@ -20,7 +20,7 @@ var errors = {
   E010: "'with' is not allowed in strict mode.",
 
   // Constants
-  E011: "const '{a}' has already been declared.",
+  E011: "'{a}' has already been declared.",
   E012: "const '{a}' is initialized to 'undefined'.",
   E013: "Attempting to override '{a}' which is a constant.",
 
@@ -62,14 +62,21 @@ var errors = {
   E044: null,
   E045: "Invalid for each loop.",
   E046: "A yield statement shall be within a generator function (with syntax: `function*`)",
-  E047: null, // Vacant
-  E048: "Let declaration not directly within block.",
+  E047: null,
+  E048: "{a} declaration not directly within block.",
   E049: "A {a} cannot be named '{b}'.",
   E050: "Mozilla requires the yield expression to be parenthesized here.",
-  E051: "Regular parameters cannot come after default parameters.",
+  E051: null,
   E052: "Unclosed template literal.",
-  E053: "Export declaration must be in global scope.",
-  E054: "Class properties must be methods. Expected '(' but instead saw '{a}'."
+  E053: "{a} declarations are only allowed at the top level of module scope.",
+  E054: "Class properties must be methods. Expected '(' but instead saw '{a}'.",
+  E055: "The '{a}' option cannot be set after any executable code.",
+  E056: "'{a}' was used before it was declared, which is illegal for '{b}' variables.",
+  E057: "Invalid meta property: '{a}.{b}'.",
+  E058: "Missing semicolon.",
+  E059: "Incompatible values for the '{a}' and '{b}' linting options.",
+  E060: "Non-callable values cannot be used as the second operand to instanceof.",
+  E061: "Invalid position for 'yield' expression (consider wrapping in parenthesis)."
 };
 
 var warnings = {
@@ -86,14 +93,15 @@ var warnings = {
   W011: null,
   W012: null,
   W013: null,
-  W014: "Bad line breaking before '{a}'.",
+  W014: "Misleading line break before '{a}'; readers may interpret this as an expression boundary.",
   W015: null,
   W016: "Unexpected use of '{a}'.",
   W017: "Bad operand.",
   W018: "Confusing use of '{a}'.",
   W019: "Use the isNaN function to compare with NaN.",
   W020: "Read only.",
-  W021: "'{a}' is a function.",
+  W021: "Reassignment of '{a}', which is is a {b}. " +
+    "Use 'var' or 'let' to declare bindings that may change.",
   W022: "Do not assign to the exception parameter.",
   W023: "Expected an identifier in an assignment and instead saw a function invocation.",
   W024: "Expected an identifier and instead saw '{a}' (a reserved word).",
@@ -111,7 +119,8 @@ var warnings = {
   W037: "'{a}' is a statement label.",
   W038: "'{a}' used out of scope.",
   W039: "'{a}' is not allowed.",
-  W040: "Possible strict violation.",
+  W040: "If a strict mode function is executed using function invocation, " +
+    "its 'this' value will be undefined.",
   W041: "Use '{a}' to compare with '{b}'.",
   W042: "Avoid EOL escaping.",
   W043: "Bad escaping of EOL. Use option multistr if needed.",
@@ -167,7 +176,7 @@ var warnings = {
   W089: "The body of a for in should be wrapped in an if statement to filter " +
     "unwanted properties from the prototype.",
   W090: "'{a}' is not a statement label.",
-  W091: "'{a}' is out of scope.",
+  W091: null,
   W093: "Did you mean to return a conditional instead of an assignment?",
   W094: "Unexpected comma.",
   W095: "Expected a string and instead saw {a}.",
@@ -179,7 +188,7 @@ var warnings = {
   W101: "Line is too long.",
   W102: null,
   W103: "The '{a}' property is deprecated.",
-  W104: "'{a}' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).",
+  W104: "'{a}' is available in ES{b} (use 'esversion: {b}') or Mozilla JS extensions (use moz).",
   W105: "Unexpected {a} in '{b}'.",
   W106: "Identifier '{a}' is not in camel case.",
   W107: "Script URL.",
@@ -193,17 +202,29 @@ var warnings = {
   W116: "Expected '{a}' and instead saw '{b}'.",
   W117: "'{a}' is not defined.",
   W118: "'{a}' is only available in Mozilla JavaScript extensions (use moz option).",
-  W119: "'{a}' is only available in ES6 (use esnext option).",
+  W119: "'{a}' is only available in ES{b} (use 'esversion: {b}').",
   W120: "You might be leaking a variable ({a}) here.",
   W121: "Extending prototype of native object: '{a}'.",
   W122: "Invalid typeof value '{a}'",
   W123: "'{a}' is already defined in outer scope.",
   W124: "A generator function shall contain a yield statement.",
-  W125: "This line contains non-breaking spaces: http://jshint.com/doc/options/#nonbsp",
-  W126: "Grouping operator is unnecessary for lone expressions.",
+  W125: "This line contains non-breaking spaces: http://jshint.com/docs/options/#nonbsp",
+  W126: "Unnecessary grouping operator.",
   W127: "Unexpected use of a comma operator.",
   W128: "Empty array elements require elision=true.",
-  W129: "Missing comma."
+  W129: "'{a}' is defined in a future version of JavaScript. Use a " +
+    "different variable name to avoid migration issues.",
+  W130: "Invalid element after rest element.",
+  W131: "Invalid parameter after rest parameter.",
+  W132: "`var` declarations are forbidden. Use `let` or `const` instead.",
+  W133: "Invalid for-{a} loop left-hand-side: {b}.",
+  W134: "The '{a}' option is only available when linting ECMAScript {b} code.",
+  W135: "{a} may not be supported by non-browser environments.",
+  W136: "'{a}' must be in function scope.",
+  W137: "Empty destructuring.",
+  W138: "Regular parameters should not come after default parameters.",
+  W139: "Function expressions should not be used as the second operand to instanceof.",
+  W140: "Missing comma."
 };
 
 var info = {
@@ -216,14 +237,14 @@ exports.errors = {};
 exports.warnings = {};
 exports.info = {};
 
-_.each(errors, function (desc, code) {
+_.each(errors, function(desc, code) {
   exports.errors[code] = { code: code, desc: desc };
 });
 
-_.each(warnings, function (desc, code) {
+_.each(warnings, function(desc, code) {
   exports.warnings[code] = { code: code, desc: desc };
 });
 
-_.each(info, function (desc, code) {
+_.each(info, function(desc, code) {
   exports.info[code] = { code: code, desc: desc };
 });

@@ -25,6 +25,11 @@ exports.bool = {
     /**
      * This option allows you to force all variable names to use either
      * camelCase style or UPPER_CASE with underscores.
+     *
+     * @deprecated JSHint is limiting its scope to issues of code correctness.
+     *             If you would like to enforce rules relating to code style,
+     *             check out [the JSCS
+     *             project](https://github.com/jscs-dev/node-jscs).
      */
     camelcase   : true,
 
@@ -57,27 +62,20 @@ exports.bool = {
     eqeqeq      : true,
 
     /**
-     * This option suppresses warnings about invalid `typeof` operator values.
-     * This operator has only [a limited set of possible return
-     * values](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof).
-     * By default, JSHint warns when you compare its result with an invalid
-     * value which often can be a typo.
-     *
-     *     // 'fuction' instead of 'function'
-     *     if (typeof a == "fuction") { // Invalid typeof value 'fuction'
-     *       // ...
-     *     }
-     *
-     * Do not use this option unless you're absolutely sure you don't want
-     * these checks.
+     * This option enables warnings about the use of identifiers which are
+     * defined in future versions of JavaScript. Although overwriting them has
+     * no effect in contexts where they are not implemented, this practice can
+     * cause issues when migrating codebases to newer versions of the language.
      */
-    notypeof    : true,
+    futurehostile: true,
 
     /**
      * This option tells JSHint that your code needs to adhere to ECMAScript 3
      * specification. Use this option if you need your program to be executable
      * in older browsers—such as Internet Explorer 6/7/8/9—and other legacy
      * JavaScript environments.
+     *
+     * @deprecated Use `esversion: 3` instead.
      */
     es3         : true,
 
@@ -85,6 +83,8 @@ exports.bool = {
      * This option enables syntax first defined in [the ECMAScript 5.1
      * specification](http://es5.github.io/). This includes allowing reserved
      * keywords as object properties.
+     *
+     * @deprecated Use `esversion: 5` instead.
      */
     es5         : true,
 
@@ -110,47 +110,17 @@ exports.bool = {
     forin       : true,
 
     /**
-     * This option suppresses warnings about declaring variables inside of
-     * control
-     * structures while accessing them later from the outside. Even though
-     * JavaScript has only two real scopes—global and function—such practice
-     * leads to confusion among people new to the language and hard-to-debug
-     * bugs. This is why, by default, JSHint warns about variables that are
-     * used outside of their intended scope.
-     *
-     *     function test() {
-     *       if (true) {
-     *         var x = 0;
-     *       }
-     *
-     *       x += 1; // Default: 'x' used out of scope.
-     *                 // No warning when funcscope:true
-     *     }
-     */
-    funcscope   : true,
-
-    /**
-     * This option suppresses warnings about the use of global strict mode.
-     * Global strict mode can break third-party widgets so it is not
-     * recommended.
-     *
-     * For more info about strict mode see the `strict` option.
-     */
-    globalstrict: true,
-
-    /**
      * This option prohibits the use of immediate function invocations without
      * wrapping them in parentheses. Wrapping parentheses assists readers of
      * your code in understanding that the expression is the result of a
      * function, and not the function itself.
+     *
+     * @deprecated JSHint is limiting its scope to issues of code correctness.
+     *             If you would like to enforce rules relating to code style,
+     *             check out [the JSCS
+     *             project](https://github.com/jscs-dev/node-jscs).
      */
     immed       : true,
-
-    /**
-     * This option suppresses warnings about the `__iterator__` property. This
-     * property is not supported by all browsers so use it carefully.
-     */
-    iterator    : true,
 
     /**
      * This option requires you to capitalize names of constructor functions.
@@ -165,6 +135,11 @@ exports.bool = {
      * important because when the function that was intended to be used with
      * `new` is used without it, `this` will point to the global object instead
      * of a new object.
+     *
+     * @deprecated JSHint is limiting its scope to issues of code correctness.
+     *             If you would like to enforce rules relating to code style,
+     *             check out [the JSCS
+     *             project](https://github.com/jscs-dev/node-jscs).
      */
     newcap      : true,
 
@@ -189,6 +164,11 @@ exports.bool = {
      * originally warning for all empty blocks and we simply made it optional.
      * There were no studies reporting that empty blocks in JavaScript break
      * your code in any way.
+     *
+     * @deprecated JSHint is limiting its scope to issues of code correctness.
+     *             If you would like to enforce rules relating to code style,
+     *             check out [the JSCS
+     *             project](https://github.com/jscs-dev/node-jscs).
      */
     noempty     : true,
 
@@ -229,19 +209,35 @@ exports.bool = {
     undef       : true,
 
     /**
-     * This option prohibits the use of the grouping operator for
-     * single-expression statements. This unecessary usage commonly reflects
-     * a misunderstanding of unary operators, for example:
+     * This option prohibits the use of the grouping operator when it is not
+     * strictly required. Such usage commonly reflects a misunderstanding of
+     * unary operators, for example:
      *
      *     // jshint singleGroups: true
      *
-     *     delete(obj.attr); // Warning: Grouping operator is unnecessary for lone expressions.
+     *     delete(obj.attr); // Warning: Unnecessary grouping operator.
      */
     singleGroups: false,
 
     /**
-     * This option is a short hand for the most strict JSHint configuration. It
-     * enables all enforcing options and disables all relaxing options.
+     * When set to true, the use of VariableStatements are forbidden.
+     * For example:
+     *
+     *     // jshint varstmt: true
+     *
+     *     var a; // Warning: `var` declarations are forbidden. Use `let` or `const` instead.
+     */
+    varstmt: false,
+
+    /**
+     * This option is a short hand for the most strict JSHint configuration as
+     * available in JSHint version 2.6.3. It enables all enforcing options and
+     * disables all relaxing options that were defined in that release.
+     *
+     * @deprecated The option cannot be maintained without automatically opting
+     *             users in to new features. This can lead to unexpected
+     *             warnings/errors in when upgrading between minor versions of
+     *             JSHint.
      */
     enforceall : false,
 
@@ -323,6 +319,11 @@ exports.bool = {
      *
      *     text = "Hello\
      *     World"; // Warning, there is a space after \
+     *
+     * @deprecated JSHint is limiting its scope to issues of code correctness.
+     *             If you would like to enforce rules relating to code style,
+     *             check out [the JSCS
+     *             project](https://github.com/jscs-dev/node-jscs).
      */
     multistr    : true,
 
@@ -347,21 +348,66 @@ exports.bool = {
     boss        : true,
 
     /**
-     * This option defines globals available when your core is running inside
-     * of the PhantomJS runtime environment. [PhantomJS](http://phantomjs.org/)
-     * is a headless WebKit scriptable with a JavaScript API. It has fast and
-     * native support for various web standards: DOM handling, CSS selector,
-     * JSON, Canvas, and SVG.
-     */
-    phantom     : true,
-
-    /**
      * This option suppresses warnings about the use of `eval`. The use of
      * `eval` is discouraged because it can make your code vulnerable to
      * various injection attacks and it makes it hard for JavaScript
      * interpreter to do certain optimizations.
     */
     evil        : true,
+
+    /**
+     * This option suppresses warnings about declaring variables inside of
+     * control
+     * structures while accessing them later from the outside. Even though
+     * JavaScript has only two real scopes—global and function—such practice
+     * leads to confusion among people new to the language and hard-to-debug
+     * bugs. This is why, by default, JSHint warns about variables that are
+     * used outside of their intended scope.
+     *
+     *     function test() {
+     *       if (true) {
+     *         var x = 0;
+     *       }
+     *
+     *       x += 1; // Default: 'x' used out of scope.
+     *                 // No warning when funcscope:true
+     *     }
+     */
+    funcscope   : true,
+
+    /**
+     * This option suppresses warnings about the use of global strict mode.
+     * Global strict mode can break third-party widgets so it is not
+     * recommended.
+     *
+     * For more info about strict mode see the `strict` option.
+     *
+     * @deprecated Use `strict: "global"`.
+     */
+    globalstrict: true,
+
+    /**
+     * This option suppresses warnings about the `__iterator__` property. This
+     * property is not supported by all browsers so use it carefully.
+     */
+    iterator    : true,
+
+     /**
+     * This option suppresses warnings about invalid `typeof` operator values.
+     * This operator has only [a limited set of possible return
+     * values](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof).
+     * By default, JSHint warns when you compare its result with an invalid
+     * value which often can be a typo.
+     *
+     *     // 'fuction' instead of 'function'
+     *     if (typeof a == "fuction") { // Invalid typeof value 'fuction'
+     *       // ...
+     *     }
+     *
+     * Do not use this option unless you're absolutely sure you don't want
+     * these checks.
+     */
+    notypeof    : true,
 
     /**
      * This option prohibits the use of unary increment and decrement
@@ -383,23 +429,13 @@ exports.bool = {
     scripturl   : true,
 
     /**
-     * This option requires all functions to run in ECMAScript 5's strict mode.
-     * [Strict mode](https://developer.mozilla.org/en/JavaScript/Strict_mode)
-     * is a way to opt in to a restricted variant of JavaScript. Strict mode
-     * eliminates some JavaScript pitfalls that didn't cause errors by changing
-     * them to produce errors.  It also fixes mistakes that made it difficult
-     * for the JavaScript engines to perform certain optimizations.
-     *
-     * *Note:* This option enables strict mode for function scope only. It
-     * *prohibits* the global scoped strict mode because it might break
-     * third-party widgets on your page. If you really want to use global
-     * strict mode, see the *globalstrict* option.
-     */
-    strict      : true,
-
-    /**
      * This option suppresses warnings about using `[]` notation when it can be
      * expressed in dot notation: `person['name']` vs. `person.name`.
+     *
+     * @deprecated JSHint is limiting its scope to issues of code correctness.
+     *             If you would like to enforce rules relating to code style,
+     *             check out [the JSCS
+     *             project](https://github.com/jscs-dev/node-jscs).
      */
     sub         : true,
 
@@ -421,6 +457,11 @@ exports.bool = {
      * This option suppresses most of the warnings about possibly unsafe line
      * breakings in your code. It doesn't suppress warnings about comma-first
      * coding style. To suppress those you have to use `laxcomma` (see below).
+     *
+     * @deprecated JSHint is limiting its scope to issues of code correctness.
+     *             If you would like to enforce rules relating to code style,
+     *             check out [the JSCS
+     *             project](https://github.com/jscs-dev/node-jscs).
      */
     laxbreak    : true,
 
@@ -432,6 +473,11 @@ exports.bool = {
      *       , handle: 'valueof'
      *       , role: 'SW Engineer'
      *     };
+     *
+     * @deprecated JSHint is limiting its scope to issues of code correctness.
+     *             If you would like to enforce rules relating to code style,
+     *             check out [the JSCS
+     *             project](https://github.com/jscs-dev/node-jscs).
      */
     laxcomma    : true,
 
@@ -535,13 +581,14 @@ exports.bool = {
 
     /**
      * This option tells JSHint that your code uses ECMAScript 6 specific
-     * syntax. Note that these features are not finalized yet and not all
-     * browsers implement them.
+     * syntax. Note that not all browsers implement these features.
      *
      * More info:
      *
-     * * [Draft Specification for ES.next (ECMA-262 Ed.
-     *   6)](http://wiki.ecmascript.org/doku.php?id=harmony:specification_drafts)
+     * * [Specification for ECMAScript
+     *   6](http://www.ecma-international.org/ecma-262/6.0/index.html)
+     *
+     * @deprecated Use `esversion: 6` instead.
      */
     esnext      : true,
 
@@ -629,6 +676,12 @@ exports.bool = {
     mocha       : true,
 
     /**
+     * This option informs JSHint that the input code describes an ECMAScript 6
+     * module. All module code is interpreted as strict mode code.
+     */
+    module      : true,
+
+    /**
      * This option defines globals available when your code is running as a
      * script for the [Windows Script
      * Host](http://en.wikipedia.org/wiki/Windows_Script_Host).
@@ -687,7 +740,16 @@ exports.bool = {
      * * [JavaScript typed
      *   arrays](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays)
      */
-    typed       : true
+    typed       : true,
+
+    /**
+     * This option defines globals available when your core is running inside
+     * of the PhantomJS runtime environment. [PhantomJS](http://phantomjs.org/)
+     * is a headless WebKit scriptable with a JavaScript API. It has fast and
+     * native support for various web standards: DOM handling, CSS selector,
+     * JSON, Canvas, and SVG.
+     */
+    phantom     : true
   },
 
   // Obsolete options
@@ -705,11 +767,19 @@ exports.val = {
 
   /**
    * This option lets you set the maximum length of a line.
+   *
+   * @deprecated JSHint is limiting its scope to issues of code correctness. If
+   *             you would like to enforce rules relating to code style, check
+   *             out [the JSCS project](https://github.com/jscs-dev/node-jscs).
    */
   maxlen       : false,
 
   /**
    * This option sets a specific tab width for your code.
+   *
+   * @deprecated JSHint is limiting its scope to issues of code correctness. If
+   *             you would like to enforce rules relating to code style, check
+   *             out [the JSCS project](https://github.com/jscs-dev/node-jscs).
    */
   indent       : false,
 
@@ -719,7 +789,18 @@ exports.val = {
    */
   maxerr       : false,
 
-  predef       : false, // predef is deprecated and being replaced by globals
+  /**
+   * This option allows you to control which variables JSHint considers to be
+   * implicitly defined in the environment. Configure it with an array of
+   * string values. Prefixing a variable name with a hyphen (-) character will
+   * remove that name from the collection of predefined variables.
+   *
+   * JSHint will consider variables declared in this way to be read-only.
+   *
+   * This option cannot be specified in-line; it may only be used via the
+   * JavaScript API or from an external configuration file.
+   */
+  predef       : false,
 
   /**
    * This option can be used to specify a white list of global variables that
@@ -734,6 +815,9 @@ exports.val = {
    * See also the "environment" options: a set of options to be used as short
    * hand for enabling global variables defined in common JavaScript
    * environments.
+   *
+   * To configure `globals` within an individual file, see [Inline
+   * Configuration](http://jshint.com/docs/#inline-configuration).
    */
   globals      : false,
 
@@ -743,6 +827,10 @@ exports.val = {
    * one particular style but want some consistency, `"single"` if you want to
    * allow only single quotes and `"double"` if you want to allow only double
    * quotes.
+   *
+   * @deprecated JSHint is limiting its scope to issues of code correctness. If
+   *             you would like to enforce rules relating to code style, check
+   *             out [the JSCS project](https://github.com/jscs-dev/node-jscs).
    */
   quotmark     : false,
 
@@ -830,6 +918,25 @@ exports.val = {
   shadow       : false,
 
   /**
+   * This option requires the code to run in ECMAScript 5's strict mode.
+   * [Strict mode](https://developer.mozilla.org/en/JavaScript/Strict_mode)
+   * is a way to opt in to a restricted variant of JavaScript. Strict mode
+   * eliminates some JavaScript pitfalls that didn't cause errors by changing
+   * them to produce errors.  It also fixes mistakes that made it difficult
+   * for the JavaScript engines to perform certain optimizations.
+   *
+   * - "global"  - there must be a `"use strict";` directive at global level
+   * - "implied" - lint the code as if there is the `"use strict";` directive
+   * - false     - disable warnings about strict mode
+   * - true      - there must be a `"use strict";` directive at function level;
+   *               this is preferable for scripts intended to be loaded in web
+   *               browsers directly because enabling strict mode globally
+   *               could adversely effect other scripts running on the same
+   *               page
+   */
+  strict      : true,
+
+  /**
    * This option warns when you define and never use your variables. It is very
    * useful for general code cleanup, especially when used in addition to
    * `undef`.
@@ -879,8 +986,24 @@ exports.val = {
                         //   end      - stop ignoring lines, starting on the next line
                         //   line     - ignore warnings / errors for just a single line
                         //              (this option does not bypass the lexer)
-  ignoreDelimiters: false // array of start/end delimiters used to ignore
-                          // certain chunks from code
+
+  ignoreDelimiters: false, // array of start/end delimiters used to ignore
+                           // certain chunks from code
+
+  /**
+   * This option is used to specify the ECMAScript version to which the code
+   * must adhere. It can assume one of the following values:
+   *  - `3` - If you need your program to be executable
+   *    in older browsers—such as Internet Explorer 6/7/8/9—and other legacy
+   *    JavaScript environments
+   *  - `5` - To enable syntax first defined in [the ECMAScript 5.1
+   *    specification](http://www.ecma-international.org/ecma-262/5.1/index.html).
+   *    This includes allowing reserved keywords as object properties.
+   *  - `6` - To tell JSHint that your code uses [ECMAScript
+   *    6](http://www.ecma-international.org/ecma-262/6.0/index.html) specific
+   *    syntax. Note that not all browsers implement them.
+   */
+  esversion: 5
 };
 
 // These are JSHint boolean options which are shared with JSLint
@@ -920,4 +1043,11 @@ exports.removed = {
   gcl: true,
   smarttabs: true,
   trailing: true
+};
+
+// Add options here which should not be automatically enforced by
+// `enforceall`.
+exports.noenforceall = {
+  varstmt: true,
+  strict: true
 };

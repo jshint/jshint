@@ -37,10 +37,9 @@ immutable7.pop();
 // Comma separated is ok.
 const immutable8 = "testing", immutable9 = true;
 
-// In current implementations, const doesn't have block scope.
+// immutable9 has block scope.
 for (var i = 0; i < 1; i += 1) {
-  // :(
-  // const immutable9 = false;
+  const immutable9 = false;
 }
 
 // In scope

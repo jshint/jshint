@@ -6,7 +6,9 @@ import { one } from "foo";
 import { default as _ } from "underscore";
 import {} from "ember";
 import "ember";
-import * as ember from "ember";
+import * as ember2 from "ember";
+import _2, * as ember3 from "ember";
+import _3, { default as ember } from "ember";
 
 $.ajax();
 emGet("foo");
@@ -26,7 +28,8 @@ export default function() {
 }
 
 export { foo };
-export { foo, bar };
+export { foo, bar } from "source";
+export { foo, bar as biz } from "source";
 
 // gettin' fancy
 
@@ -43,3 +46,22 @@ export var c = "c";
 export class Foo {}
 export class List extends Array {}
 export default class Bar {}
+
+// imports are const's and cannot be re-assigned
+$ = null;
+emGet = null;
+one = null;
+_ = null;
+ember2 = null;
+// they also cannot be imported twice
+import $ from "jquery";
+import { get as emGet, set } from "ember";
+import { default as _ } from "underscore";
+import * as ember2 from "ember";
+// or used before definition
+if (newImport) {
+  $();
+}
+import newImport from 'newImport';
+
+export function* gen() { yield 1; }

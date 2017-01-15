@@ -7,10 +7,13 @@ exports["Backbone.js 0.5.3"] = function (test) {
   var src = fs.readFileSync(__dirname + '/libs/backbone.js', 'utf8');
 
   TestRun(test)
+    .addError(32, "Unnecessary grouping operator.")
+    .addError(784, "Unnecessary grouping operator.")
+    .addError(864, "Unnecessary grouping operator.")
     .addError(685, "Missing '()' invoking a constructor.")
     .addError(764, "Use '===' to compare with '0'.")
     .addError(859, "Use '!==' to compare with '0'.")
-    .test(src, { expr: true, eqnull: true, boss: true, regexdash: true });
+    .test(src, { expr: true, eqnull: true, boss: true, regexdash: true, singleGroups: true });
 
   test.done();
 };
@@ -64,7 +67,7 @@ exports.prototype_1_7 = function (test) {
     .addError(260, "'length' is already defined.")
     .addError(261, "'key' is already defined.")
     .addError(261, "'str' is already defined.")
-    .addError(319, "'isArray' is a function.")
+    .addError(319, "Reassignment of 'isArray', which is is a function. Use 'var' or 'let' to declare bindings that may change.")
     .addError(392, "Missing semicolon.")
     .addError(400, "Missing semicolon.")
     .addError(409, "Missing semicolon.")
@@ -85,8 +88,9 @@ exports.prototype_1_7 = function (test) {
     .addError(2989, "'tagName' used out of scope.")
     .addError(2989, "'tagName' used out of scope.")
     .addError(2990, "'tagName' used out of scope.")
-    .addError(3844, "'positionedOffset' is a function.")
-    .addError(3860, "'cumulativeOffset' is a function.")
+    .addError(3827, "Reassignment of 'getOffsetParent', which is is a function. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(3844, "Reassignment of 'positionedOffset', which is is a function. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(3860, "Reassignment of 'cumulativeOffset', which is is a function. Use 'var' or 'let' to declare bindings that may change.")
     .addError(4036, "'ret' is already defined.")
     .addError(4072, "'cur' used out of scope.")
     .addError(4085, "'i' is already defined.")
@@ -148,11 +152,11 @@ exports.lodash_0_6_1 = function (test) {
   };
 
   TestRun(test)
-    .addError(168, "Possible strict violation.")
+    .addError(168, "If a strict mode function is executed using function invocation, its 'this' value will be undefined.")
     .addError(170, "Missing '()' invoking a constructor.")
     .addError(632, "Missing semicolon.")
-    .addError(920, "'isArguments' is a function.")
-    .addError(963, "'isFunction' is a function.")
+    .addError(920, "Reassignment of 'isArguments', which is is a function. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(963, "Reassignment of 'isFunction', which is is a function. Use 'var' or 'let' to declare bindings that may change.")
     .addError(1122, "'isArr' used out of scope.")
     .addError(1127, "'className' used out of scope.")
     .addError(1129, "Use '===' to compare with 'true'.")
@@ -160,17 +164,15 @@ exports.lodash_0_6_1 = function (test) {
     .addError(1159, "'isArr' used out of scope.")
     .addError(1490, "Use '===' to compare with '0'.")
     .addError(1670, "Missing semicolon.")
-    .addError(2731, "'array' is already defined.")
-    .addError(2732, "'array' is a statement label.")
-    .addError(3374, "Possible strict violation.")
+    .addError(3374, "If a strict mode function is executed using function invocation, its 'this' value will be undefined.")
     .addError(3377, "Missing '()' invoking a constructor.")
     .addError(3384, "Missing semicolon.")
     .addError(3677, "Missing '()' invoking a constructor.")
     .addError(3683, "Missing '()' invoking a constructor.")
-    .addError(3825, "Possible strict violation.")
-    .addError(4225, "Possible strict violation.")
-    .addError(4226, "Possible strict violation.")
-    .addError(4242, "Possible strict violation.")
+    .addError(3825, "If a strict mode function is executed using function invocation, its 'this' value will be undefined.")
+    .addError(4225, "If a strict mode function is executed using function invocation, its 'this' value will be undefined.")
+    .addError(4226, "If a strict mode function is executed using function invocation, its 'this' value will be undefined.")
+    .addError(4242, "If a strict mode function is executed using function invocation, its 'this' value will be undefined.")
     .test(src, options, globals);
 
   test.done();
@@ -182,7 +184,7 @@ exports.json2 = function (test) {
   TestRun(test)
     .addError(177, "'key' is defined but never used.")
     .addError(191, "'key' is defined but never used.")
-    .test(src, { undef: true, unused: true, laxbreak: true }, { JSON: true });
+    .test(src, { singleGroups: true, undef: true, unused: true, laxbreak: true, predef: ["-JSON"] }, { JSON: true });
 
   test.done();
 };
@@ -209,18 +211,10 @@ exports.codemirror3 = function (test) {
   };
 
   TestRun(test)
-    .addError(1157, "'result' is defined but never used.")
     .addError(1342, "Value of 'e' may be overwritten in IE 8 and earlier.")
     .addError(1526, "Value of 'e' may be overwritten in IE 8 and earlier.")
-    .addError(1532, "'mX' is defined but never used.")
-    .addError(1532, "'mY' is defined but never used.")
     .addError(1533, "Value of 'e' may be overwritten in IE 8 and earlier.")
-    .addError(2218, "'state' is defined but never used.")
-    .addError(2427, "'style' is defined but never used.")
-    .addError(2696, "'target' is defined but never used.")
-    .addError(3168, "'ok' is defined but never used.")
     .addError(4093, "Unnecessary semicolon.")
-    .addError(4277, "'range' is defined but never used.")
     .test(src, opt, { CodeMirror: true });
 
   test.done();

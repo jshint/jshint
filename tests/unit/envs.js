@@ -4,7 +4,7 @@
 
 "use strict";
 
-var JSHINT  = require('../../src/jshint.js').JSHINT;
+var JSHINT  = require("../..").JSHINT;
 var fs      = require('fs');
 var TestRun = require("../helpers/testhelper").setup.testRun;
 
@@ -30,7 +30,7 @@ function globalsImplied(test, globals, options) {
   JSHINT(wrap(globals), options || {});
   var report = JSHINT.data();
 
-  test.ok(report.implieds !== null);
+  test.ok(report.implieds != null);
   test.ok(report.globals === undefined);
 
   var implieds = [];
@@ -85,6 +85,9 @@ exports.node = function (test) {
   TestRun(test)
     .addError(1, "Read only.")
     .test(overwrites, { es3: true, browserify: true });
+
+  TestRun(test, "gh-2657")
+    .test("'use strict';var a;", { node: true });
 
   test.done();
 };
@@ -206,6 +209,91 @@ exports.phantom = function (test) {
   TestRun(test)
     .test(globalStrict, { es3: true, phantom: true, strict: true });
 
+
+  test.done();
+};
+
+exports.globals = function (test) {
+  var src = [
+    "/* global first */",
+    "var first;"
+  ];
+
+  TestRun(test)
+    .addError(2, "Redefinition of 'first'.")
+    .test(src);
+  TestRun(test)
+    .test(src, { browserify: true });
+  TestRun(test)
+    .test(src, { node: true });
+  TestRun(test)
+    .test(src, { phantom: true });
+
+  TestRun(test, "Late configuration of `browserify`")
+    .test([
+      "/* global first */",
+      "void 0;",
+      "// jshint browserify: true",
+      "var first;"
+    ]);
+
+  TestRun(test)
+    .test([
+      "// jshint browserify: true",
+      "/* global first */",
+      "var first;"
+    ]);
+
+  TestRun(test)
+    .test([
+      "/* global first */",
+      "// jshint browserify: true",
+      "var first;"
+    ]);
+
+  TestRun(test, "Late configuration of `node`")
+    .test([
+      "/* global first */",
+      "void 0;",
+      "// jshint node: true",
+      "var first;"
+    ]);
+
+  TestRun(test)
+    .test([
+      "// jshint node: true",
+      "/* global first */",
+      "var first;"
+    ]);
+
+  TestRun(test)
+    .test([
+      "/* global first */",
+      "// jshint node: true",
+      "var first;"
+    ]);
+
+  TestRun(test, "Late configuration of `phantom`")
+    .test([
+      "/* global first */",
+      "void 0;",
+      "// jshint phantom: true",
+      "var first;"
+    ]);
+
+  TestRun(test)
+    .test([
+      "// jshint phantom: true",
+      "/* global first */",
+      "var first;"
+    ]);
+
+  TestRun(test)
+    .test([
+      "/* global first */",
+      "// jshint phantom: true",
+      "var first;"
+    ]);
 
   test.done();
 };
