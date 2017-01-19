@@ -735,3 +735,23 @@ exports.jasmine = {
   fit         : false,
   pending     : false
 };
+
+exports.jest = {
+  afterAll: false,
+	afterEach: false,
+	beforeAll: false,
+	beforeEach: false,
+	check: false,
+	describe: false,
+	expect: false,
+	gen: false,
+	it: false,
+	fit: false,
+	jest: false,
+	pit: false,
+	require: false,
+	test: false,
+	xdescribe: false,
+	xit: false,
+	xtest: false
+};
