@@ -583,6 +583,12 @@ exports.bool = {
     jasmine     : true,
 
     /**
+     * This option defines globals exposed by [the Jest unit testing
+     * framework](http://facebook.github.io/jest/).
+     */
+    jasmine     : true,
+
+    /**
      * This option defines globals exposed by the [jQuery](http://jquery.com/)
      * JavaScript library.
      */
