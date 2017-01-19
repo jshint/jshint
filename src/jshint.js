@@ -288,6 +288,10 @@ var JSHINT = (function() {
       combine(predefined, vars.jasmine);
     }
 
+    if (state.option.jest) {
+      combine(predefined, vars.jest);
+    }
+
     if (state.option.jquery) {
       combine(predefined, vars.jquery);
     }
