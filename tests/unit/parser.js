@@ -7211,6 +7211,21 @@ exports["'for of' shouldn't be subject to 'for in' rules"] = function (test) {
   test.done();
 };
 
+// See gh-3099, "TypeError: Cannot read property 'type' of undefined"
+exports["enforcement of `forin` option should be tolerant of invalid syntax"] = function (test) {
+  TestRun(test)
+    .addError(1, "Creating global 'for' variable. Should be 'for (var x ...'.")
+    .addError(2, "Unrecoverable syntax error. (66% scanned).")
+    .addError(3, "Expected an identifier and instead saw '}'.")
+    .test([
+      "for (x in x) {",
+      "  if (",
+      "}"
+    ], { forin: true });
+
+  test.done();
+};
+
 exports["Ignore strings containing braces within array literal declarations"] = function (test) {
   TestRun(test).test("var a = [ '[' ];");
   test.done();
