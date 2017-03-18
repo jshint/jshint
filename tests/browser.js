@@ -1,6 +1,5 @@
 "use strict";
 
-var path = require("path");
 var phantom = require("phantom");
 var createTestServer = require("./helpers/browser/server");
 var options = {
@@ -8,40 +7,40 @@ var options = {
    * The `phantom` module provides a Node.js API for the PhantomJS binary,
    * while the `phantomjs` module includes the binary itself.
    */
-  path: path.dirname(require("phantomjs").path) + "/",
-
-  /**
-   * Disable the optional `weak` module due to installation difficulties in
-   * Windows environments.
-   */
-  dnodeOpts: {
-    weak: false
-  }
+  phantomPath: require("phantomjs-prebuilt").path
 };
 var port = process.env.NODE_PORT || 8045;
+var ph;
 
-phantom.create(function(ph) {
-  ph.createPage(function(page) {
-    createTestServer(port, function(server) {
-      page.onConsoleMessage(function(str) {
-        console.log(str);
-      });
+phantom.create([], options)
+  .then(function(_ph) {
+      ph = _ph;
+      return ph.createPage();
+    })
+  .then(function(page) {
+      createTestServer(port, function(server) {
+        page.on("onConsoleMessage", function(str) {
+          console.log(str);
+        });
 
-      page.set("onCallback", function(err) {
-        ph.exit();
-        server.close();
-        if (err) {
+        page.on("onCallback", function(err) {
+          ph.exit();
+          server.close();
+          if (err) {
+            process.exit(1);
+          }
+        });
+
+        page.on("onError", function(msg, trace) {
+          console.error(msg);
+          console.error(trace);
           process.exit(1);
-        }
-      });
+        });
 
-      page.set("onError", function(msg, trace) {
-        console.error(msg);
-        console.error(trace);
-        process.exit(1);
+        return page.open("http://localhost:" + port);
       });
-
-      page.open("http://localhost:" + port, function () {});
+    })
+  .then(null, function(err) {
+      console.error(err);
+      process.exit(1);
     });
-  });
-}, options);
