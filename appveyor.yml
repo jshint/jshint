@@ -6,6 +6,8 @@ environment:
   matrix:
     - nodejs_version: 0.10
     - nodejs_version: 0.12
+    - nodejs_version: 4
+    - nodejs_version: 6
 
 install:
   - ps: Install-Product node $env:nodejs_version
@@ -16,7 +18,8 @@ build: off
 
 test_script:
   - node --version && npm --version
-  - npm test
+  - npm run test-node
+  - if "%nodejs_version%" == "6" npm run test-browser
   - npm run test-262
 
 cache:
