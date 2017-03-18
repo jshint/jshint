@@ -9,6 +9,7 @@ environment:
 
 install:
   - ps: Install-Product node $env:nodejs_version
+  - git submodule update --init --recursive
   - npm install
 
 build: off
@@ -16,6 +17,7 @@ build: off
 test_script:
   - node --version && npm --version
   - npm test
+  - npm run test-262
 
 cache:
   - node_modules            # local npm modules

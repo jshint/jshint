@@ -1,5 +1,15 @@
 "use strict";
 
+/**
+ * Normalize directory name separators to be Unix-like forward slashes. Also
+ * condenses repeated slashes to a single slash.
+ *
+ * Source: https://github.com/jonschlinkert/normalize-path
+ */
+function normalize(filePath) {
+  return filePath.replace(/[\\\/]+/g, "/");
+}
+
 module.exports = function report(results, allowed) {
   var expected = {
     success: [],
@@ -17,8 +27,9 @@ module.exports = function report(results, allowed) {
   var totalUnexpected;
 
   results.forEach(function(result) {
-    var isAllowed = allowed[result.name];
-    delete allowed[result.name];
+    var normalizedName = normalize(result.name);
+    var isAllowed = allowed[normalizedName];
+    delete allowed[normalizedName];
 
     if (!!result.parseFailure === result.expected) {
       if (isAllowed) {
