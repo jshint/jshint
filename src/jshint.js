@@ -1208,16 +1208,6 @@ var JSHINT = (function() {
     return x;
   }
 
-  function isPoorRelation(node) {
-    return node &&
-        ((node.type === "(number)" && +node.value === 0) ||
-         (node.type === "(string)" && node.value === "") ||
-         (node.type === "null" && !state.option.eqnull) ||
-        node.type === "true" ||
-        node.type === "false" ||
-        node.type === "undefined");
-  }
-
   var typeofValues = {};
   typeofValues.legacy = [
     // E4X extended the `typeof` operator to return "xml" for the XML and
@@ -2061,12 +2051,6 @@ var JSHINT = (function() {
         this.from = this.character;
         warning("W116", this, "===", "==");
         break;
-      case isPoorRelation(left):
-        warning("W041", this, "===", left.value);
-        break;
-      case isPoorRelation(right):
-        warning("W041", this, "===", right.value);
-        break;
       case isTypoTypeof(right, left, state):
         warning("W122", this, right.value);
         break;
@@ -2092,10 +2076,6 @@ var JSHINT = (function() {
     if (!eqnull && state.option.eqeqeq) {
       this.from = this.character;
       warning("W116", this, "!==", "!=");
-    } else if (isPoorRelation(left)) {
-      warning("W041", this, "!==", left.value);
-    } else if (isPoorRelation(right)) {
-      warning("W041", this, "!==", right.value);
     } else if (isTypoTypeof(right, left, state)) {
       warning("W122", this, right.value);
     } else if (isTypoTypeof(left, right, state)) {

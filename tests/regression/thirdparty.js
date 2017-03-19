@@ -206,7 +206,6 @@ exports.codemirror3 = function (test) {
     "-W008":  true, // Ignore warnings about leading dots in numbers.
     "-W038":  true, // Ignore scope warnings.
     "-W040":  true, // Ignore possible strict violations.
-    "-W041":  true, // Ignore poor relations warnings.
 
   };
 

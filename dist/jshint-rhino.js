@@ -15710,7 +15710,6 @@ var warnings = {
   W039: "'{a}' is not allowed.",
   W040: "If a strict mode function is executed using function invocation, " +
     "its 'this' value will be undefined.",
-  W041: "Use '{a}' to compare with '{b}'.",
   W042: "Avoid EOL escaping.",
   W043: "Bad escaping of EOL. Use option multistr if needed.",
   W044: "Bad or unnecessary escaping.", /* TODO(caitp): remove W044 */
@@ -20943,12 +20942,6 @@ var JSHINT = (function() {
         this.from = this.character;
         warning("W116", this, "===", "==");
         break;
-      case isPoorRelation(left):
-        warning("W041", this, "===", left.value);
-        break;
-      case isPoorRelation(right):
-        warning("W041", this, "===", right.value);
-        break;
       case isTypoTypeof(right, left, state):
         warning("W122", this, right.value);
         break;
@@ -20974,10 +20967,6 @@ var JSHINT = (function() {
     if (!eqnull && state.option.eqeqeq) {
       this.from = this.character;
       warning("W116", this, "!==", "!=");
-    } else if (isPoorRelation(left)) {
-      warning("W041", this, "!==", left.value);
-    } else if (isPoorRelation(right)) {
-      warning("W041", this, "!==", right.value);
     } else if (isTypoTypeof(right, left, state)) {
       warning("W122", this, right.value);
     } else if (isTypoTypeof(left, right, state)) {

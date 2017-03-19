@@ -129,31 +129,6 @@ exports.setup.testRun = function (test, name) {
           return def.message === er.message;
         });
       });
-
-      test.ok(
-        undefinedErrors.length === 0 &&
-          unthrownErrors.length === 0 &&
-          wrongLineNumbers.length === 0 &&
-          duplicateErrors.length === 0,
-
-        (name === null ? "" : "\n  TestRun: [bold]{" + name + "}") +
-        unthrownErrors.map(function (el, idx) {
-          return (idx === 0 ? "\n  [yellow]{Errors defined, but not thrown by JSHINT}\n" : "") +
-            " [bold]{Line " + el.line + ", Char " + el.character + "} " + el.message;
-        }).join("\n") +
-        undefinedErrors.map(function (el, idx) {
-          return (idx === 0 ? "\n  [yellow]{Errors thrown by JSHINT, but not defined in test run}\n" : "") +
-            "  [bold]{Line " + el.line + ", Char " + el.character + "} " + el.reason;
-        }).join("\n") +
-        wrongLineNumbers.map(function (el, idx) {
-          return (idx === 0 ? "\n  [yellow]{Errors with wrong line number}\n" : "") +
-            "  [bold]{Line " + el.line + "} " + el.message + " [red]{not in line(s)} [bold]{" + el.definedIn.join(", ") + "}";
-        }).join("\n") +
-        duplicateErrors.map(function (el, idx) {
-          return (idx === 0 ? "\n  [yellow]{Duplicated errors}\n": "") +
-            "  [bold]{Line " + el.line + ", Char " + el.character + "} " + el.reason;
-        }).join("\n") + "\n"
-      );
     }
   };
 
