@@ -1414,11 +1414,12 @@ exports.eqnull = function (test) {
   ];
 
   // By default, warn about `== null` comparison
+  /**
+   * This test previously asserted the issuance of warning W041. 
+   * W041 has since been removed, but the test is maintained in 
+   * order to discourage regressions.
+   */
   TestRun(test)
-    .addError(1, "Use '===' to compare with 'null'.")
-    .addError(2, "Use '===' to compare with 'null'.")
-    .addError(3, "Use '!==' to compare with 'null'.")
-    .addError(4, "Use '!==' to compare with 'null'.")
     .test(code, {es3: true});
 
   // But when `eqnull` is true, no questions asked
@@ -1533,8 +1534,12 @@ exports.debug = function (test) {
 exports.eqeqeq = function (test) {
   var src = fs.readFileSync(__dirname + '/fixtures/eqeqeq.js', 'utf8');
 
+  /**
+   * This test previously asserted the issuance of warning W041. 
+   * W041 has since been removed, but the test is maintained in 
+   * order to discourage regressions.
+   */
   TestRun(test)
-    .addError(8, "Use '===' to compare with 'null'.")
     .test(src, {es3: true});
 
   TestRun(test)
