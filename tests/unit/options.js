@@ -3899,6 +3899,45 @@ exports.esversion = function(test) {
     .addError(4, "get/set are ES5 features.")
     .test(code5);
 
+  test.done();
+};
+
+// Option `trailingcomma` requires a comma after each element in an array or
+// object literal.
+exports.trailingcomma = function (test) {
+  var code = [
+    "var a = [];",
+    "var b = [1];",
+    "var c = [1,];",
+    "var d = [1,2];",
+    "var e = [1,2,];",
+    "var f = {};",
+    "var g = {a: 1};",
+    "var h = {a: 1,};",
+    "var i = {a: 1, b: 2};",
+    "var j = {a: 1, b: 2,};"
+  ];
+
+  TestRun(test, "trailingcomma=true ES6")
+    .addError(2, "Missing comma.")
+    .addError(4, "Missing comma.")
+    .addError(7, "Missing comma.")
+    .addError(9, "Missing comma.")
+    .test(code, { trailingcomma: true, esversion: 6 });
+
+  TestRun(test, "trailingcomma=true ES5")
+    .addError(2, "Missing comma.")
+    .addError(4, "Missing comma.")
+    .addError(7, "Missing comma.")
+    .addError(9, "Missing comma.")
+    .test(code, { trailingcomma: true });
+
+  TestRun(test, "trailingcomma=true ES3")
+    .addError(3, "Extra comma. (it breaks older versions of IE)")
+    .addError(5, "Extra comma. (it breaks older versions of IE)")
+    .addError(8, "Extra comma. (it breaks older versions of IE)")
+    .addError(10, "Extra comma. (it breaks older versions of IE)")
+    .test(code, { trailingcomma: true, es3: true });
 
   test.done();
 };
