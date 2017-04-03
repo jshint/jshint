@@ -3945,6 +3945,11 @@ var JSHINT = (function() {
     state.condition = true;
     advance("(");
     var expr = expression(0);
+
+    if (!expr) {
+      quit("E041", this);
+    }
+
     checkCondAssignment(expr);
 
     // When the if is within a for-in loop, check if the condition
