@@ -710,12 +710,23 @@ var JSHINT = (function() {
     }
   }
 
-  // We need a peek function. If it has an argument, it peeks that much farther
-  // ahead. It is used to distinguish
-  //     for ( var i in ...
-  // from
-  //     for ( var i = ...
-
+  /**
+   * Return a token beyond the token available in `state.tokens.next`. If no
+   * such token exists, return the "(end)" token. This function is used to
+   * determine parsing strategies in cases where the value of the next token
+   * does not provide sufficient information, as is the case with `for` loops,
+   * e.g.:
+   *
+   *     for ( var i in ...
+   *
+   * versus:
+   *
+   *     for ( var i = ...
+   *
+   * @param {number} [p] - offset of desired token; defaults to 0
+   *
+   * @returns {token}
+   */
   function peek(p) {
     var i = p || 0, j = lookahead.length, t;
 
@@ -726,10 +737,18 @@ var JSHINT = (function() {
     while (j <= i) {
       t = lex.token();
 
-      // Peeking past the end of the program should produce the "(end)" token
-      // and should not extend the lookahead buffer.
-      if (!t && state.tokens.next.id === "(end)") {
-        return state.tokens.next;
+      // When the lexer is exhausted, this function should produce the "(end)"
+      // token, even in cases where the requested token is beyond the end of
+      // the input stream.
+      if (!t) {
+        // If the lookahead buffer is empty, the expected "(end)" token was
+        // already emitted by the most recent invocation of `advance` and is
+        // available as the next token.
+        if (!lookahead.length) {
+          return state.tokens.next;
+        }
+
+        return lookahead[j - 1];
       }
 
       lookahead[j] = t;
