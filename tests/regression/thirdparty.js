@@ -11,8 +11,6 @@ exports["Backbone.js 0.5.3"] = function (test) {
     .addError(784, "Unnecessary grouping operator.")
     .addError(864, "Unnecessary grouping operator.")
     .addError(685, "Missing '()' invoking a constructor.")
-    .addError(764, "Use '===' to compare with '0'.")
-    .addError(859, "Use '!==' to compare with '0'.")
     .test(src, { expr: true, eqnull: true, boss: true, regexdash: true, singleGroups: true });
 
   test.done();
@@ -73,10 +71,6 @@ exports.prototype_1_7 = function (test) {
     .addError(409, "Missing semicolon.")
     .addError(430, "Missing semicolon.")
     .addError(451, "Missing semicolon.")
-    .addError(633, "Use '!==' to compare with 'undefined'.")
-    .addError(737, "Use '===' to compare with ''.")
-    .addError(807, "Use '===' to compare with ''.")
-    .addError(1137, "Use '===' to compare with '0'.")
     .addError(1215, "Missing semicolon.")
     .addError(1224, "Unnecessary semicolon.")
     .addError(1916, "Missing semicolon.")
@@ -102,18 +96,12 @@ exports.prototype_1_7 = function (test) {
     .addError(4322, "'nodeCheck' used out of scope.")
     .addError(4520, "'i' is already defined.")
     .addError(4538, "Expected a 'break' statement before 'case'.")
-    .addError(4547, "Use '===' to compare with '0'.")
-    .addError(4565, "Use '===' to compare with '0'.")
-    .addError(4566, "Use '===' to compare with '0'.")
-    .addError(4568, "Use '===' to compare with '0'.")
     .addError(4656, "'i' is already defined.")
     .addError(4722, "Missing '()' invoking a constructor.")
     .addError(4988, "Missing semicolon.")
     .addError(4988, "Missing semicolon.")
     .addError(5021, "Missing semicolon.")
     .addError(5397, "Missing semicolon.")
-    .addError(5112, "Use '!==' to compare with 'undefined'.")
-    .addError(5140, "Use '!==' to compare with ''.")
     .addError(5224, "'values' is already defined.")
     .addError(5495, "Function declarations should not be placed in blocks. Use a function " +
       "expression or move the statement to the top of the outer function.")
@@ -159,10 +147,8 @@ exports.lodash_0_6_1 = function (test) {
     .addError(963, "Reassignment of 'isFunction', which is is a function. Use 'var' or 'let' to declare bindings that may change.")
     .addError(1122, "'isArr' used out of scope.")
     .addError(1127, "'className' used out of scope.")
-    .addError(1129, "Use '===' to compare with 'true'.")
     .addError(1153, "'isArr' used out of scope.")
     .addError(1159, "'isArr' used out of scope.")
-    .addError(1490, "Use '===' to compare with '0'.")
     .addError(1670, "Missing semicolon.")
     .addError(3374, "If a strict mode function is executed using function invocation, its 'this' value will be undefined.")
     .addError(3377, "Missing '()' invoking a constructor.")
@@ -206,7 +192,6 @@ exports.codemirror3 = function (test) {
     "-W008":  true, // Ignore warnings about leading dots in numbers.
     "-W038":  true, // Ignore scope warnings.
     "-W040":  true, // Ignore possible strict violations.
-    "-W041":  true, // Ignore poor relations warnings.
 
   };
 

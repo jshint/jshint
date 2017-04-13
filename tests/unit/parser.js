@@ -1039,7 +1039,6 @@ exports["gh-2587"] = function (test) {
   TestRun(test)
     .addError(1, "Expected an identifier and instead saw 'if'.")
     .addError(1, "Unrecoverable syntax error. (100% scanned).")
-    .addError(1, "Use '===' to compare with 'true'.")
     .test([
     "true == if"
   ], {});
@@ -1047,7 +1046,6 @@ exports["gh-2587"] = function (test) {
   TestRun(test)
     .addError(1, "Expected an identifier and instead saw 'if'.")
     .addError(1, "Unrecoverable syntax error. (100% scanned).")
-    .addError(1, "Use '!==' to compare with 'true'.")
     .test([
     "true != if"
   ], {});
@@ -6920,8 +6918,12 @@ exports.ignoreDirective["should be a good option and only accept start, end or l
 exports.ignoreDirective["should allow the linter to skip blocked-out lines to continue finding errors in the rest of the code"] = function (test) {
   var code = fs.readFileSync(__dirname + "/fixtures/gh826.js", "utf8");
 
+  /**
+   * This test previously asserted the issuance of warning W041. 
+   * W041 has since been removed, but the test is maintained in 
+   * order to discourage regressions.
+   */
   TestRun(test)
-    .addError(34, "Use '===' to compare with '0'.")
     .test(code);
 
   test.done();
@@ -7027,7 +7029,6 @@ exports["should be able to ignore a single line with a trailing comment: // jshi
 exports["regression test for GH-1431"] = function (test) {
   // The code is invalid but it should not crash JSHint.
   TestRun(test)
-    .addError(1, "Use '!==' to compare with 'null'.")
     .addError(1, "Expected ';' and instead saw ')'.")
     .addError(1, "Expected ')' and instead saw ';'.")
     .addError(1, "Expected an identifier and instead saw ';'.")
