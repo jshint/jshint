@@ -984,6 +984,21 @@ Lexer.prototype = {
       }, checks,
       function() { return n >= 0 && n <= 7 && state.isStrict(); });
       break;
+    case "1":
+    case "2":
+    case "3":
+    case "4":
+    case "5":
+    case "6":
+    case "7":
+      char = "\\" + char;
+      this.triggerAsync("warning", {
+        code: "W115",
+        line: this.line,
+        character: this.char
+      }, checks,
+      function() { return state.isStrict(); });
+      break;
     case "u":
       var hexCode = this.input.substr(1, 4);
       var code = parseInt(hexCode, 16);

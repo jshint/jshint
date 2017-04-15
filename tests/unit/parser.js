@@ -7960,3 +7960,43 @@ exports.forInExpr = function (test) {
 
   test.done();
 };
+
+exports.octalEscape = function (test) {
+  TestRun(test)
+    .addError(3, "Octal literals are not allowed in strict mode.")
+    .addError(4, "Octal literals are not allowed in strict mode.")
+    .addError(5, "Octal literals are not allowed in strict mode.")
+    .addError(6, "Octal literals are not allowed in strict mode.")
+    .addError(7, "Octal literals are not allowed in strict mode.")
+    .addError(8, "Octal literals are not allowed in strict mode.")
+    .addError(9, "Octal literals are not allowed in strict mode.")
+    .test([
+      "'use strict';",
+      "void '\\0';",
+      "void '\\1';",
+      "void '\\2';",
+      "void '\\3';",
+      "void '\\4';",
+      "void '\\5';",
+      "void '\\6';",
+      "void '\\7';",
+      "void '\\8';",
+      "void '\\9';"
+    ], { strict: "global" });
+
+  TestRun(test)
+    .test([
+      "void '\\0';",
+      "void '\\1';",
+      "void '\\2';",
+      "void '\\3';",
+      "void '\\4';",
+      "void '\\5';",
+      "void '\\6';",
+      "void '\\7';",
+      "void '\\8';",
+      "void '\\9';"
+    ]);
+
+  test.done();
+};
