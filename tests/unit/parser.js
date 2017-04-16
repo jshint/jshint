@@ -709,11 +709,20 @@ exports.strings = function (test) {
 
 exports.badStrings = function (test) {
   var code = [
-    "var a = '\\uNOTHEX';"
+    "var a = '\\uNOTHEX';",
+    "void '\\u0000';",
+    "void '\\ug000';",
+    "void '\\u0g00';",
+    "void '\\u00g0';",
+    "void '\\u000g';"
   ];
 
   var run = TestRun(test)
-    .addError(1, "Unexpected 'uNOTH'.");
+    .addError(1, "Unexpected 'uNOTH'.")
+    .addError(3, "Unexpected 'ug000'.")
+    .addError(4, "Unexpected 'u0g00'.")
+    .addError(5, "Unexpected 'u00g0'.")
+    .addError(6, "Unexpected 'u000g'.");
   run.test(code, {es3: true});
   run.test(code, {}); // es5
   run.test(code, {esnext: true});
