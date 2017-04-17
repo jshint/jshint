@@ -40,6 +40,14 @@ var Context = {
   Template: 2
 };
 
+function isHex(str) {
+  return /^[0-9a-fA-F]+$/.test(str);
+}
+
+function isHexDigit(str) {
+  return str.length === 1 && isHex(str);
+}
+
 // Object that handles postponed lexing verifications that checks the parsed
 // environment state.
 
@@ -585,10 +593,6 @@ Lexer.prototype = {
       return isNonAsciiIdentifierStart(code) || nonAsciiIdentifierPartTable.indexOf(code) > -1;
     }
 
-    function isHexDigit(str) {
-      return (/^[0-9a-fA-F]$/).test(str);
-    }
-
     var readUnicodeEscapeSequence = function() {
       /*jshint validthis:true */
       index += 1;
@@ -597,18 +601,16 @@ Lexer.prototype = {
         return null;
       }
 
-      var ch1 = this.peek(index + 1);
-      var ch2 = this.peek(index + 2);
-      var ch3 = this.peek(index + 3);
-      var ch4 = this.peek(index + 4);
+      var sequence = this.peek(index + 1) + this.peek(index + 2) +
+        this.peek(index + 3) + this.peek(index + 4);
       var code;
 
-      if (isHexDigit(ch1) && isHexDigit(ch2) && isHexDigit(ch3) && isHexDigit(ch4)) {
-        code = parseInt(ch1 + ch2 + ch3 + ch4, 16);
+      if (isHex(sequence)) {
+        code = parseInt(sequence, 16);
 
         if (asciiIdentifierPartTable[code] || isNonAsciiIdentifierPart(code)) {
           index += 5;
-          return "\\u" + ch1 + ch2 + ch3 + ch4;
+          return "\\u" + sequence;
         }
 
         return null;
@@ -740,10 +742,6 @@ Lexer.prototype = {
 
     function isBinaryDigit(str) {
       return (/^[01]$/).test(str);
-    }
-
-    function isHexDigit(str) {
-      return (/^[0-9a-fA-F]$/).test(str);
     }
 
     function isIdentifierStart(ch) {
@@ -984,17 +982,32 @@ Lexer.prototype = {
       }, checks,
       function() { return n >= 0 && n <= 7 && state.isStrict(); });
       break;
+    case "1":
+    case "2":
+    case "3":
+    case "4":
+    case "5":
+    case "6":
+    case "7":
+      char = "\\" + char;
+      this.triggerAsync("warning", {
+        code: "W115",
+        line: this.line,
+        character: this.char
+      }, checks,
+      function() { return state.isStrict(); });
+      break;
     case "u":
-      var hexCode = this.input.substr(1, 4);
-      var code = parseInt(hexCode, 16);
-      if (isNaN(code)) {
+      var sequence = this.input.substr(1, 4);
+      var code = parseInt(sequence, 16);
+      if (!isHex(sequence)) {
         // This condition unequivocally describes a syntax error.
         // TODO: Re-factor as an "error" (not a "warning").
         this.trigger("warning", {
           code: "W052",
           line: this.line,
           character: this.char,
-          data: [ "u" + hexCode ]
+          data: [ "u" + sequence ]
         });
       }
       char = String.fromCharCode(code);

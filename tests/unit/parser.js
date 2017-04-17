@@ -709,11 +709,20 @@ exports.strings = function (test) {
 
 exports.badStrings = function (test) {
   var code = [
-    "var a = '\\uNOTHEX';"
+    "var a = '\\uNOTHEX';",
+    "void '\\u0000';",
+    "void '\\ug000';",
+    "void '\\u0g00';",
+    "void '\\u00g0';",
+    "void '\\u000g';"
   ];
 
   var run = TestRun(test)
-    .addError(1, "Unexpected 'uNOTH'.");
+    .addError(1, "Unexpected 'uNOTH'.")
+    .addError(3, "Unexpected 'ug000'.")
+    .addError(4, "Unexpected 'u0g00'.")
+    .addError(5, "Unexpected 'u00g0'.")
+    .addError(6, "Unexpected 'u000g'.");
   run.test(code, {es3: true});
   run.test(code, {}); // es5
   run.test(code, {esnext: true});
@@ -7957,6 +7966,46 @@ exports.forInExpr = function (test) {
       "for (var x in [], []) {}",
       "for (var x of {}, {}) {}"
     ], { esversion: 6 });
+
+  test.done();
+};
+
+exports.octalEscape = function (test) {
+  TestRun(test)
+    .addError(3, "Octal literals are not allowed in strict mode.")
+    .addError(4, "Octal literals are not allowed in strict mode.")
+    .addError(5, "Octal literals are not allowed in strict mode.")
+    .addError(6, "Octal literals are not allowed in strict mode.")
+    .addError(7, "Octal literals are not allowed in strict mode.")
+    .addError(8, "Octal literals are not allowed in strict mode.")
+    .addError(9, "Octal literals are not allowed in strict mode.")
+    .test([
+      "'use strict';",
+      "void '\\0';",
+      "void '\\1';",
+      "void '\\2';",
+      "void '\\3';",
+      "void '\\4';",
+      "void '\\5';",
+      "void '\\6';",
+      "void '\\7';",
+      "void '\\8';",
+      "void '\\9';"
+    ], { strict: "global" });
+
+  TestRun(test)
+    .test([
+      "void '\\0';",
+      "void '\\1';",
+      "void '\\2';",
+      "void '\\3';",
+      "void '\\4';",
+      "void '\\5';",
+      "void '\\6';",
+      "void '\\7';",
+      "void '\\8';",
+      "void '\\9';"
+    ]);
 
   test.done();
 };
