@@ -441,10 +441,6 @@ language/eval-code/indirect/var-env-var-init-global-exstng.js
 language/eval-code/indirect/var-env-var-non-strict.js
 language/eval-code/indirect/var-env-var-init-global-new.js
 language/eval-code/indirect/var-env-var-strict.js
-language/literals/string/S7.8.4_A4.3_T1.js
-language/literals/string/S7.8.4_A4.3_T2.js
-language/literals/string/S7.8.4_A7.1_T4.js
-language/literals/string/legacy-octal-escape-sequence-strict.js
 language/literals/numeric/S7.8.3_A6.1_T1.js
 language/literals/numeric/S7.8.3_A6.1_T2.js
 language/literals/numeric/binary-invalid-truncated.js
@@ -624,7 +620,6 @@ language/expressions/yield/rhs-omitted.js
 language/expressions/yield/rhs-primitive.js
 language/expressions/yield/rhs-template-middle.js
 language/expressions/template-literal/invalid-hexidecimal-character-escape-sequence-truncated-2.js
-language/expressions/template-literal/invalid-unicode-escape-sequence-4.js
 language/expressions/template-literal/tv-utf16-escape-sequence.js
 language/expressions/function/arguments-with-arguments-fn.js
 language/expressions/function/arguments-with-arguments-lex.js
