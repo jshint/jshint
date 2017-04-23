@@ -814,8 +814,7 @@ exports.testES6Modules = function (test) {
     [58, "'emGet' has already been declared."],
     [58, "'set' has already been declared."],
     [59, "'_' has already been declared."],
-    [60, "'ember2' has already been declared."],
-    [65, "'newImport' was used before it was declared, which is illegal for 'const' variables."]
+    [60, "'ember2' has already been declared."]
   ];
 
   var testRun = TestRun(test);

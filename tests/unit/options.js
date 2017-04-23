@@ -250,7 +250,7 @@ exports.latedef = function (test) {
     .addError(18, "Inner functions should be listed at the top of the outer function.")
     .test(src, { es3: true, latedef: true });
 
-  TestRun(test)
+  var es2015Errors = TestRun(test)
       .addError(4, "'c' was used before it was defined.")
       .addError(6, "'e' was used before it was defined.")
       .addError(8, "'h' was used before it was defined.")
@@ -259,7 +259,14 @@ exports.latedef = function (test) {
       .addError(20, "'ai' was used before it was defined.")
       .addError(31, "'bi' was used before it was defined.")
       .addError(48, "'ci' was used before it was defined.")
-      .test(esnextSrc, {esnext: true, latedef: true});
+      .addError(75, "'importedName' was used before it was defined.")
+      .addError(76, "'importedModule' was used before it was defined.")
+      .addError(77, "'importedNamespace' was used before it was defined.");
+
+  es2015Errors
+      .test(esnextSrc, {esversion: 2015, latedef: true});
+  es2015Errors
+      .test(esnextSrc, {esversion: 2015, latedef: "nofunc"});
 
   TestRun(test, "shouldn't warn when marking a var as exported")
     .test("var a;", { exported: ["a"], latedef: true });

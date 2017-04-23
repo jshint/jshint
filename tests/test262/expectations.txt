@@ -491,9 +491,6 @@ language/module-code/eval-rqstd-abrupt.js
 language/module-code/eval-rqstd-once.js
 language/module-code/eval-rqstd-order.js
 language/module-code/eval-self-once.js
-language/module-code/instn-iee-bndng-fun.js
-language/module-code/instn-iee-bndng-gen.js
-language/module-code/instn-iee-bndng-var.js
 language/module-code/instn-iee-err-ambiguous-as.js
 language/module-code/instn-iee-err-ambiguous.js
 language/module-code/instn-iee-err-circular-as.js
@@ -504,16 +501,6 @@ language/module-code/instn-iee-err-not-found-as.js
 language/module-code/instn-iee-err-not-found.js
 language/module-code/instn-iee-star-cycle.js
 language/module-code/instn-iee-trlng-comma.js
-language/module-code/instn-named-bndng-dflt-fun-anon.js
-language/module-code/instn-named-bndng-dflt-gen-anon.js
-language/module-code/instn-named-bndng-dflt-fun-named.js
-language/module-code/instn-named-bndng-dflt-gen-named.js
-language/module-code/instn-named-bndng-dflt-star.js
-language/module-code/instn-named-bndng-dflt-named.js
-language/module-code/instn-named-bndng-fun.js
-language/module-code/instn-named-bndng-gen.js
-language/module-code/instn-named-bndng-trlng-comma.js
-language/module-code/instn-named-bndng-var.js
 language/module-code/instn-named-err-ambiguous-as.js
 language/module-code/instn-named-err-ambiguous.js
 language/module-code/instn-named-err-dflt-thru-star-as.js
@@ -529,7 +516,6 @@ language/module-code/instn-resolve-err-reference.js
 language/module-code/instn-resolve-err-syntax.js
 language/module-code/instn-resolve-order-depth.js
 language/module-code/instn-resolve-order-src.js
-language/module-code/instn-star-binding.js
 language/module-code/instn-star-err-not-found.js
 language/module-code/instn-star-star-cycle.js
 language/module-code/parse-err-decl-pos-export-switch-case-dflt.js

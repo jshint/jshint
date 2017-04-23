@@ -67,3 +67,11 @@ export class df {}
 export var dg;
 export let dh;
 export const di = {};
+
+void importedName;
+void importedModule;
+void importedNamespace;
+
+import { importedName } from './m.js';
+import importedModule from './m.js';
+import * as importedNamespace from './m.js';
