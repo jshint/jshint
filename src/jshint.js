@@ -816,7 +816,7 @@ var JSHINT = (function() {
             relatedToken.line, nextToken.value);
         }
       } else if (nextToken.type !== "(identifier)" || nextToken.value !== expected) {
-        error("W116", nextToken, expected, nextToken.value);
+        error("E021", nextToken, expected, nextToken.value);
       }
     }
 
