@@ -709,7 +709,7 @@ exports.testForIn = function (test) {
   ];
 
   TestRun(test)
-    .addError(2, "Expected an identifier and instead saw 'i'.")
+    .addError(2, "Bad assignment.")
     .test(src);
 
   src = [
@@ -743,6 +743,20 @@ exports.testForIn = function (test) {
     .addError(4, "Invalid for-in loop left-hand-side: initializer is forbidden.")
     .addError(5, "Invalid for-in loop left-hand-side: initializer is forbidden.")
     .test(src, { esnext: true });
+
+  TestRun(test, "Left-hand side as MemberExpression")
+    .test([
+      "for (x.y in {}) {}",
+      "for (x[z] in {}) {}",
+    ]);
+
+  TestRun(test, "Left-hand side as MemberExpression (invalid)")
+    .addError(1, "Bad assignment.", {character: 10})
+    .addError(2, "Bad assignment.", {character: 13})
+    .test([
+      "for (x+y in {}) {}",
+      "for ((this) in {}) {}"
+    ]);
 
   test.done();
 };
