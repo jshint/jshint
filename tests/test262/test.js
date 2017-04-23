@@ -39,6 +39,11 @@ function forEachVersion(src, run) {
  */
 var incorrectSeverity = {
   E007: true,
+  // E013 describes a runtime error: the modification of a constant binding.
+  // Although (unlike the other errors referenced in this object) this
+  // condition is guaranteed to produce errors, it is not technically an early
+  // error and should therefore be ignored when interpreting Test262 tests.
+  E013: true,
   E034: true,
 
   W024: true,

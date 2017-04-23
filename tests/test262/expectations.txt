@@ -342,7 +342,6 @@ language/asi/S7.9_A6.1_T9.js
 language/asi/S7.9_A7_T8.js
 language/asi/S7.9_A7_T9.js
 language/function-code/S10.2.1_A4_T1.js
-language/global-code/decl-lex.js
 language/global-code/export.js
 language/global-code/import.js
 language/global-code/return.js
@@ -505,7 +504,6 @@ language/module-code/instn-iee-err-not-found-as.js
 language/module-code/instn-iee-err-not-found.js
 language/module-code/instn-iee-star-cycle.js
 language/module-code/instn-iee-trlng-comma.js
-language/module-code/instn-local-bndng-const.js
 language/module-code/instn-named-bndng-dflt-fun-anon.js
 language/module-code/instn-named-bndng-dflt-gen-anon.js
 language/module-code/instn-named-bndng-dflt-fun-named.js
@@ -764,7 +762,6 @@ language/expressions/assignment/dstr-array-elem-iter-thrw-close.js
 language/expressions/assignment/dstr-array-elem-nested-array-yield-expr.js
 language/expressions/assignment/dstr-array-elem-nested-array-yield-ident-valid.js
 language/expressions/assignment/dstr-array-elem-nested-obj-yield-ident-valid.js
-language/expressions/assignment/dstr-array-elem-put-const.js
 language/expressions/assignment/dstr-array-elem-target-simple-no-strict.js
 language/expressions/assignment/dstr-array-elem-target-yield-expr.js
 language/expressions/assignment/dstr-array-elem-target-yield-valid.js
@@ -800,20 +797,17 @@ language/expressions/assignment/dstr-array-rest-nested-obj-undefined.js
 language/expressions/assignment/dstr-array-rest-nested-obj-yield-expr.js
 language/expressions/assignment/dstr-array-rest-nested-obj-yield-ident-valid.js
 language/expressions/assignment/dstr-array-rest-nested-obj.js
-language/expressions/assignment/dstr-array-rest-put-const.js
 language/expressions/assignment/dstr-array-rest-yield-expr.js
 language/expressions/assignment/dstr-array-rest-yield-ident-valid.js
 language/expressions/assignment/dstr-obj-id-identifier-yield-ident-valid.js
 language/expressions/assignment/dstr-obj-id-init-simple-no-strict.js
 language/expressions/assignment/dstr-obj-id-init-yield-ident-valid.js
-language/expressions/assignment/dstr-obj-id-put-const.js
 language/expressions/assignment/dstr-obj-id-simple-no-strict.js
 language/expressions/assignment/dstr-obj-prop-elem-init-yield-ident-valid.js
 language/expressions/assignment/dstr-obj-prop-elem-target-yield-expr.js
 language/expressions/assignment/dstr-obj-prop-elem-target-yield-ident-valid.js
 language/expressions/assignment/dstr-obj-prop-nested-array-yield-ident-valid.js
 language/expressions/assignment/dstr-obj-prop-nested-obj-yield-ident-valid.js
-language/expressions/assignment/dstr-obj-prop-put-const.js
 language/expressions/object/cover-initialized-name.js
 language/expressions/object/dstr-gen-meth-ary-ptrn-rest-ary-elem.js
 language/expressions/object/dstr-gen-meth-ary-ptrn-rest-ary-elision.js
@@ -1292,8 +1286,6 @@ language/statements/const/function-local-use-before-initialization-in-prior-stat
 language/statements/const/global-use-before-initialization-in-declaration-statement.js
 language/statements/const/global-use-before-initialization-in-prior-statement.js
 language/statements/const/syntax/const-invalid-assignment-next-expression-for.js
-language/statements/const/syntax/const-invalid-assignment-statement-body-for-in.js
-language/statements/const/syntax/const-invalid-assignment-statement-body-for-of.js
 language/statements/const/syntax/const-outer-inner-let-bindings.js
 language/statements/const/syntax/with-initializer-label-statement.js
 language/statements/let/block-local-use-before-initialization-in-declaration-statement.js
