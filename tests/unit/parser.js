@@ -4302,6 +4302,20 @@ exports["for of as esnext"] = function (test) {
     .addError(18, "Invalid for-of loop left-hand-side: more than one ForBinding.")
     .test(code, {esnext: true, undef: true, predef: ["print"]});
 
+  TestRun(test, "Left-hand side as MemberExpression")
+    .test([
+      "for (x.y of []) {}",
+      "for (x[z] of []) {}",
+    ], {esversion: 2015});
+
+  TestRun(test, "Left-hand side as MemberExpression (invalid)")
+    .addError(1, "Bad assignment.", {character: 10})
+    .addError(2, "Bad assignment.", {character: 13})
+    .test([
+      "for (x+y of {}) {}",
+      "for ((this) of {}) {}"
+    ], {esversion: 2015});
+
   test.done();
 };
 

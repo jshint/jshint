@@ -4274,11 +4274,23 @@ var JSHINT = (function() {
         letscope = true;
         state.funct["(scope)"].stack();
         state.tokens.curr.fud({ prefix: true });
-      } else {
-        // Parse as a var statement, with implied bindings. Ignore errors if an error
-        // was already reported
+
+      // Parse the set of tokens before the head's `in` or `of` token as though
+      // they part of a `var` declaration if they satisfy any of the following
+      // conditions:
+      //
+      // - It contains an invalid initializer or comma operator (these errors
+      //   are common enough to warrant dedicated messages which are emitted
+      //   above)
+      // - It contains a single token
+      // - It describes a destructuring binding pattern
+      } else if (initializer || comma || peek() === nextop ||
+        checkPunctuators(state.tokens.next, ["{", "["])) {
         Object.create(varstatement).fud({ prefix: true, implied: "for", ignore: !ok });
+      } else {
+        checkLeftSideAssign(expression(120), nextop);
       }
+
       advance(nextop.value);
       // The binding power is variable because for-in statements accept any
       // Expression in this position, while for-of statements are limited to
