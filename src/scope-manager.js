@@ -278,6 +278,7 @@ var scopeManager = function(state, predefined, exported, declared) {
         var usedLabel = currentLabels[usedLabelName];
         if (usedLabel) {
           var usedLabelType = usedLabel["(type)"];
+          var isImmutable = usedLabelType === "const" || usedLabelType === "import";
 
           if (usedLabel["(useOutsideOfScope)"] && !state.option.funcscope) {
             var usedTokens = usage["(tokens)"];
@@ -295,7 +296,7 @@ var scopeManager = function(state, predefined, exported, declared) {
           _current["(labels)"][usedLabelName]["(unused)"] = false;
 
           // check for modifying a const
-          if (usedLabelType === "const" && usage["(modified)"]) {
+          if (isImmutable && usage["(modified)"]) {
             for (j = 0; j < usage["(modified)"].length; j++) {
               error("E013", usage["(modified)"][j], usedLabelName);
             }
@@ -621,7 +622,7 @@ var scopeManager = function(state, predefined, exported, declared) {
      * adds an indentifier to the relevant current scope and creates warnings/errors as necessary
      * @param {string} labelName
      * @param {Object} opts
-     * @param {String} opts.type - the type of the label e.g. "param", "var", "let, "const", "function"
+     * @param {String} opts.type - the type of the label e.g. "param", "var", "let, "const", "import", "function"
      * @param {Token} opts.token - the token pointing at the declaration
      * @param {boolean} opts.initialized - whether the binding should be created in an "initialized" state.
      */
@@ -629,14 +630,15 @@ var scopeManager = function(state, predefined, exported, declared) {
 
       var type  = opts.type;
       var token = opts.token;
-      var isblockscoped = type === "let" || type === "const" || type === "class";
+      var isblockscoped = type === "let" || type === "const" ||
+        type === "class" || type === "import";
+      var ishoisted = type === "function" || type === "import";
       var isexported    = (isblockscoped ? _current : _currentFunctBody)["(type)"] === "global" &&
                           _.has(exported, labelName);
 
       // outer shadow check (inner is only on non-block scoped)
       _checkOuterShadow(labelName, token, type);
 
-      // if is block scoped (let or const)
       if (isblockscoped) {
 
         var declaredInCurrentScope = _current["(labels)"][labelName];
@@ -651,9 +653,9 @@ var scopeManager = function(state, predefined, exported, declared) {
         if (!declaredInCurrentScope && _current["(usages)"][labelName]) {
           var usage = _current["(usages)"][labelName];
           // if its in a sub function it is not necessarily an error, just latedef
-          if (usage["(onlyUsedSubFunction)"]) {
+          if (usage["(onlyUsedSubFunction)"] || ishoisted) {
             _latedefWarning(type, labelName, token);
-          } else {
+          } else if (!ishoisted) {
             // this is a clear illegal usage for block scoped variables
             warning("E056", token, labelName, type);
           }

@@ -4586,7 +4586,7 @@ var JSHINT = (function() {
       this.name = identifier();
       // Import bindings are immutable (see ES6 8.1.1.5.5)
       state.funct["(scope)"].addlabel(this.name, {
-        type: "const",
+        type: "import",
         initialized: true,
         token: state.tokens.curr });
 
@@ -4613,7 +4613,7 @@ var JSHINT = (function() {
         this.name = identifier();
         // Import bindings are immutable (see ES6 8.1.1.5.5)
         state.funct["(scope)"].addlabel(this.name, {
-          type: "const",
+          type: "import",
           initialized: true,
           token: state.tokens.curr });
       }
@@ -4639,7 +4639,7 @@ var JSHINT = (function() {
 
         // Import bindings are immutable (see ES6 8.1.1.5.5)
         state.funct["(scope)"].addlabel(importName, {
-          type: "const",
+          type: "import",
           initialized: true,
           token: state.tokens.curr });
 
