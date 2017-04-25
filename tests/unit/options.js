@@ -686,6 +686,27 @@ exports["missing semicolons not influenced by asi"] = function (test) {
 
   TestRun(test).test(code, { expr: true, asi: true });
 
+  code = "do {} while (false) var a;";
+
+  TestRun(test, "do-while as es5")
+    .addError(1, "Missing semicolon.", { code: "E058" })
+    .test(code);
+
+  TestRun(test, "do-while as es5+moz")
+    .addError(1, "Missing semicolon.", { code: "E058" })
+    .test(code, { moz: true });
+
+  TestRun(test, "do-while as es6")
+    .addError(1, "Missing semicolon.", { code: "W033" })
+    .test(code, { esversion: 6 });
+
+  TestRun(test, "do-while as es6 with asi")
+    .test(code, { esversion: 6, asi: true });
+
+  TestRun(test, "do-while false positive")
+    .addError(1, "Missing semicolon.", { code: "E058" })
+    .test("'do' var x;", { esversion: 6, expr: true });
+
   test.done();
 };
 
