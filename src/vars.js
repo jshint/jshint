@@ -166,6 +166,7 @@ exports.browser = {
   localStorage         : false,
   location             : false,
   matchMedia           : false,
+  MediaRecorder        : false,
   MessageChannel       : false,
   MessageEvent         : false,
   MessagePort          : false,
