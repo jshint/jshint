@@ -936,7 +936,6 @@ language/statements/for-in/decl-gen.js
 language/statements/for-in/dstr-array-rest-init.js
 language/statements/for-in/head-const-bound-names-fordecl-tdz.js
 language/statements/for-in/head-let-bound-names-fordecl-tdz.js
-language/statements/for-in/head-lhs-cover.js
 language/statements/for-in/head-lhs-let.js
 language/statements/for-in/head-var-bound-names-let.js
 language/statements/for/decl-cls.js
@@ -1143,7 +1142,6 @@ language/statements/return/S12.9_A1_T7.js
 language/statements/return/S12.9_A1_T8.js
 language/statements/return/S12.9_A1_T9.js
 language/statements/for-of/arguments-mapped-mutation.js
-language/statements/for-of/body-put-error.js
 language/statements/for-of/decl-cls.js
 language/statements/for-of/decl-fun.js
 language/statements/for-of/decl-gen.js
@@ -1227,8 +1225,6 @@ language/statements/for-of/dstr-var-ary-ptrn-rest-obj-id.js
 language/statements/for-of/dstr-var-ary-ptrn-rest-obj-prop-id.js
 language/statements/for-of/head-const-bound-names-fordecl-tdz.js
 language/statements/for-of/head-let-bound-names-fordecl-tdz.js
-language/statements/for-of/head-lhs-cover.js
-language/statements/for-of/head-lhs-member.js
 language/statements/for-of/head-var-bound-names-let.js
 language/statements/switch/S12.11_A2_T1.js
 language/statements/switch/scope-lex-close-case.js
