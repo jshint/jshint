@@ -203,7 +203,7 @@ var warnings = {
   W117: "'{a}' is not defined.",
   W118: "'{a}' is only available in Mozilla JavaScript extensions (use moz option).",
   W119: "'{a}' is only available in ES{b} (use 'esversion: {b}').",
-  W120: "You might be leaking a variable ({a}) here.",
+  W120: "'{a}' has been declared in a higher scope. Did you intend to create a new binding?",
   W121: "Extending prototype of native object: '{a}'.",
   W122: "Invalid typeof value '{a}'",
   W123: "'{a}' is already defined in outer scope.",
