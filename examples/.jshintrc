@@ -75,6 +75,7 @@
     "mocha"         : true,     // Mocha
     "mootools"      : false,    // MooTools
     "node"          : false,    // Node.js
+    "meteor"        : false,    // Meteor.js platform
     "nonstandard"   : false,    // Widely adopted globals (escape, unescape, etc)
     "phantom"       : false,    // PhantomJS
     "prototypejs"   : false,    // Prototype and Scriptaculous

@@ -737,3 +737,12 @@ exports.jasmine = {
   fit         : false,
   pending     : false
 };
+
+exports.meteor = {
+  Meteor      : false,
+  Package     : false,
+  Npm         : false,
+  Assets      : false,
+  App         : false,
+  Cordova     : false
+};
