@@ -1,7 +1,7 @@
 var a = 1;
 var b = 2;
 
-b += 1;
+a = 2;
 
 function main(e, f) {
     var c = 3;
