@@ -1,0 +1,139 @@
+#!/usr/bin/env node	
+
+/*
+ * jshint
+ *
+ * cli frontend for jshint.js
+ * 
+ * Ole Martin Bjørndalen
+ * ombdalen@gmail.com
+ * http://nerdly.info/ole/
+ * 
+ * License: MIT
+ *
+ * jshint.js must be installed in the same directory as jshint
+ *
+ */
+ wrapper = (function () {
+    
+    // 'use strict';
+    
+    var fs = require('fs');
+    var sys = require('sys');
+    var path = require('path');
+
+    // require.paths.push();
+    var modulefile = path.dirname(__filename) + '/jshint.js';
+    var jshint = require(modulefile);
+    var lint = jshint.JSHINT;
+
+    function readfile(filename, callback) {
+        var source = '';
+
+        var s = fs.createReadStream(filename);
+        s.on('data', function(data) {
+            source += data;
+        });
+        s.on('end', function() {
+            callback(source);
+	});
+    }
+
+    function checkfile(filename, options) {
+
+        function run_jshint(source) {
+            var i;
+	    var j;
+            var err;
+
+            if (lint(source, options) === false) {
+                for (i = 0; i < lint.errors.length; i++) {
+                    err = lint.errors[i];
+
+                    if (err === null) {
+                        break;  // Too many errors
+                    }
+
+                    sys.puts(filename + ':' + err.line + ': ' + err.reason);
+                    if (err.evidence === undefined) {
+                        sys.puts('');
+                    } else {
+                        sys.puts('  ' + err.evidence);
+                    }
+
+                    // Print caret (point to the problem)
+		    for(j = 0; j < (1 + err.character); j++) {
+                        sys.print(' ');
+                    }
+                    sys.puts('^');
+                }
+            }
+        }
+
+        readfile(filename, run_jshint);
+    }
+
+    var options = {};
+    var descriptions = {};
+
+    readfile(modulefile, function (text) {
+	// Read options from jshint.js
+	var re = /([a-z]+)\s+:\s+(true|false), \/\/ (.*)\n/g;
+	var match;
+        while (match = re.exec(text)) {
+            options[match[1]] = eval(match[2]);
+            descriptions[match[1]] = match[3];
+        }
+
+	var args = process.argv.slice(2);
+	var opt;
+	var name;
+	var errors = false;
+	
+	// Check for options (comma-separated list of options to turn off)
+	if(args[0] == '-o' || args[0] == '--options') {
+            args[1].split(',').forEach(function (opt) {
+		if (options[opt] == undefined) {
+                    sys.print('Unknown option ' + opt + '\n');
+		    errors = true;
+		} else {
+                    options[opt] = false;
+		}
+            });
+            args = args.slice(2);  // Remove this option
+	}
+	
+	if(args[0] == '-h' || args[0] == '--help') {
+            var p = sys.print;
+
+	    p('Usage: jshint [OPTIONS] FILE [FILE ...]\n');
+            p('\n')
+            p("JSHint detects errors and potential problems in JavaScript\n")
+            p("code, and helps to enforce your team's coding conventions.\n")
+            p('\n')
+	    p(' -h --help     print this help text\n')
+	    p(' -o --off      comma separated list of options to turn off (see below)\n')
+	    p('\n')
+
+            for (opt in options) {
+		name = opt;
+		while (name.length < 12) {
+		    name = ' ' + name;  // Ugly. Should use ' '.repeat() or something
+		}
+		p(name + '  ' + descriptions[opt] + '\n');  // Todo: print explanation
+            }
+            args = args.slice(1);
+	    process.exit(code=0);
+	}
+
+	if (errors) {
+	    process.exit(1);
+        }
+	
+	args.forEach(function (filename) {
+            checkfile(filename, options);
+	});
+    });
+
+
+}) ();
