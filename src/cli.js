@@ -11,6 +11,7 @@ var exit              = require("exit");
 var stripJsonComments = require("strip-json-comments");
 var JSHINT            = require("./jshint.js").JSHINT;
 var defReporter       = require("./reporters/default").reporter;
+var expandHomeDir     = require("expand-home-dir");
 
 var OPTIONS = {
   "config": ["c", "Custom configuration file", "string", false ],
@@ -540,7 +541,8 @@ var exports = {
       config.dirname = path.dirname(fp);
 
       if (config['extends']) {
-        var baseConfig = exports.loadConfig(path.resolve(config.dirname, config['extends']));
+        var basePath = expandTilde(config['extends']);
+        var baseConfig = exports.loadConfig(path.resolve(config.dirname, basePath));
         config = _.merge({}, baseConfig, config, function(a, b) {
           if (_.isArray(a)) {
             return a.concat(b);
@@ -553,6 +555,11 @@ var exports = {
     } catch (err) {
       cli.error("Can't parse config file: " + fp + "\nError:" + err);
       exports.exit(1);
+    }
+
+    function expandTilde(path) {
+      if (path.substr(0, 2) === '~/') return expandHomeDir('~') + path.substr(1);
+      else return path;
     }
   },
 
