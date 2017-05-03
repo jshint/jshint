@@ -17,7 +17,7 @@ exports["Backbone.js 0.5.3"] = function (test) {
 };
 
 exports.jQuery_1_7 = function (test) {
-  var src = fs.readFileSync(__dirname + '/libs/jquery-1.7.js', 'utf8');
+  var src = fs.readFileSync(__dirname + '/libs/jquery-1.11.3.js', 'utf8');
   var globals = { DOMParser: false, ActiveXObject: false, define: false };
 
   TestRun(test)
