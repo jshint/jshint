@@ -2013,7 +2013,7 @@ exports["destructuring globals with syntax error"] = function (test) {
     .addError(6, 7, "Do not assign to the exception parameter.")
     .addError(7, 6, "Do not assign to the exception parameter.")
     .addError(9, 9, "Bad assignment.")
-    .addError(10, 10, "Bad assignment.")
+    .addError(10, 13, "Bad assignment.")
     .test([
       "[ Number.prototype.toString ] = [function(){}];",
       "function a() {",
@@ -2136,7 +2136,8 @@ exports["destructuring assignment default values"] = function (test) {
     .addError(11, 7, "It's not necessary to initialize 'u' to 'undefined'.")
     .addError(12, 7, "It's not necessary to initialize 'v' to 'undefined'.")
     .addError(13, 10, "It's not necessary to initialize 'x' to 'undefined'.")
-    .addError(14, 12, "Expected ']' and instead saw '='.")
+    .addError(14, 12, "Expected ',' and instead saw '='.")
+    .addError(14, 14, "Expected an identifier and instead saw '3'.")
     .test(code, { esnext: true });
 
   test.done();
@@ -8056,14 +8057,14 @@ exports.extraRestOperator = function (test) {
 
   TestRun(test)
     .addError(1, 23, "Unexpected '...'.")
-    // The reported column number for this parsing error is incorrect.
-    .addError(1, 23, "Unexpected ')'.")
+    .addError(1, 26, "Expected an identifier and instead saw ')'.")
+    .addError(1, 30, "Unrecoverable syntax error. (100% scanned).")
     .test('function fn3(a, b, ......) { }', { esnext: true });
 
   TestRun(test)
     .addError(1, 17, "Unexpected '...'.")
-    // The reported column number for this parsing error is incorrect.
-    .addError(1, 17, "Unexpected ')'.")
+    .addError(1, 20, "Expected an identifier and instead saw ')'.")
+    .addError(1, 24, "Unrecoverable syntax error. (100% scanned).")
     .test('function fn4(......) { }', { esnext: true });
 
   TestRun(test)
@@ -8117,17 +8118,68 @@ exports.restOperatorWithoutIdentifier = function (test) {
   ];
 
   TestRun(test)
-    .addError(1, 20, "Unexpected ']'.")
-    .addError(2, 15, "Unexpected ']'.")
-    .addError(3, 20, "Unexpected ')'.")
-    .addError(4, 14, "Unexpected ')'.")
-    .addError(5, 6, "Unexpected ']'.")
-    .addError(6, 12, "Unexpected ']'.")
-    .addError(7, 14, "Unexpected ')'.")
-    .addError(8, 21, "Unexpected ')'.")
-    .addError(9, 16, "Unexpected ']'.")
-    .addError(10, 22, "Unexpected ']'.")
+    .addError(1, 23, "Expected an identifier and instead saw ']'.")
+    .addError(1, 24, "Expected ',' and instead saw ')'.")
+    .addError(1, 26, "Empty destructuring: this is unnecessary and can be removed.")
+    .addError(2, 1, "Expected ',' and instead saw 'function'.")
+    .addError(2, 13, "Expected ',' and instead saw '('.")
+    .addError(2, 18, "Expected an identifier and instead saw ']'.")
+    .addError(2, 19, "Expected ',' and instead saw ')'.")
+    .addError(2, 21, "Empty destructuring: this is unnecessary and can be removed.")
+    .addError(3, 1, "Expected ',' and instead saw 'function'.")
+    .addError(3, 13, "Expected ',' and instead saw '('.")
+    .addError(3, 23, "Expected an identifier and instead saw ')'.")
+    .addError(3, 25, "Expected ',' and instead saw '{'.")
+    .addError(3, 27, "Expected an identifier and instead saw '}'.")
+    .addError(4, 1, "Expected ',' and instead saw 'function'.")
+    .addError(4, 13, "Expected ',' and instead saw '('.")
+    .addError(4, 17, "Expected an identifier and instead saw ')'.")
+    .addError(4, 19, "Expected ',' and instead saw '{'.")
+    .addError(4, 21, "Expected an identifier and instead saw '}'.")
+    .addError(5, 1, "Expected ',' and instead saw 'var'.")
+    .addError(5, 9, "Expected an identifier and instead saw ']'.")
+    .addError(5, 11, "Expected ',' and instead saw '='.")
+    .addError(5, 14, "Expected an identifier and instead saw '1'.")
+    .addError(5, 17, "Expected an identifier and instead saw '2'.")
+    .addError(5, 20, "Expected an identifier and instead saw '3'.")
+    .addError(5, 22, "Expected ',' and instead saw ';'.")
+    .addError(6, 1, "Expected an identifier and instead saw 'var' (a reserved word).")
+    .addError(6, 5, "Expected ',' and instead saw '['.")
+    .addError(6, 15, "Expected an identifier and instead saw ']'.")
+    .addError(6, 17, "Expected ',' and instead saw '='.")
+    .addError(6, 20, "Expected an identifier and instead saw '1'.")
+    .addError(6, 23, "Expected an identifier and instead saw '2'.")
+    .addError(6, 26, "Expected an identifier and instead saw '3'.")
+    .addError(6, 28, "Expected ',' and instead saw ';'.")
+    .addError(7, 1, "Expected an identifier and instead saw 'var' (a reserved word).")
+    .addError(7, 5, "Expected ',' and instead saw 'arrow'.")
+    .addError(7, 11, "Expected an identifier and instead saw '='.")
+    .addError(7, 13, "Expected ',' and instead saw '('.")
+    .addError(7, 17, "Expected an identifier and instead saw ')'.")
+    .addError(7, 19, "Expected ',' and instead saw '=>'.")
+    .addError(7, 22, "Expected an identifier and instead saw 'void' (a reserved word).")
+    .addError(7, 27, "Expected ',' and instead saw '0'.")
+    .addError(7, 28, "Expected an identifier and instead saw ';'.")
+    .addError(7, 28, "Expected ',' and instead saw ';'.")
+    .addError(8, 1, "Expected an identifier and instead saw 'var' (a reserved word).")
+    .addError(8, 5, "Expected ',' and instead saw 'arrow2'.")
+    .addError(8, 12, "Expected an identifier and instead saw '='.")
+    .addError(8, 14, "Expected ',' and instead saw '('.")
+    .addError(8, 24, "Expected an identifier and instead saw ')'.")
+    .addError(8, 26, "Expected ',' and instead saw '=>'.")
+    .addError(8, 30, "Expected ',' and instead saw ';'.")
+    .addError(8, 30, "Too many errors. (44% scanned).")
     .test(code, { esnext: true });
+
+  test.done();
+};
+
+exports.invalidSpread = function (test) {
+  TestRun(test)
+    .addError(1, 6, "Expected an identifier and instead saw '...'.")
+    .addError(1, 9, "Missing semicolon.")
+    .addError(1, 9, "Expected an assignment or function call and instead saw an expression.")
+    .test('void ...x;', { esversion: 6 });
 
   test.done();
 };
