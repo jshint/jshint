@@ -1535,6 +1535,34 @@ var JSHINT = (function() {
     return val;
   }
 
+  /**
+   * Consume the "..." token which designates "spread" and "rest" operations if
+   * it is present. If the operator is repeated, consume every repetition, and
+   * issue a single error describing the syntax error.
+   *
+   * @returns {boolean} a value describing whether or not any tokens were
+   *                    consumed in this way
+   */
+  function spreadrest() {
+    if (!checkPunctuator(state.tokens.next, "...")) {
+      return false;
+    }
+
+    if (!state.inES6(true)) {
+      warning("W119", state.tokens.next, "spread/rest operator", "6");
+    }
+    advance();
+
+    if (checkPunctuator(state.tokens.next, "...")) {
+      warning("E024", state.tokens.next, "...");
+      while (checkPunctuator(state.tokens.next, "...")) {
+        advance();
+      }
+    }
+
+    return true;
+  }
+
   // fnparam means that this identifier is being defined as a function
   // argument
   // prop means that this identifier is that of an object property
@@ -1544,36 +1572,14 @@ var JSHINT = (function() {
       return i;
     }
 
-    // parameter destructuring with rest operator
-    if (state.tokens.next.value === "...") {
-      if (!state.inES6(true)) {
-        warning("W119", state.tokens.next, "spread/rest operator", "6");
-      }
+    error("E030", state.tokens.next, state.tokens.next.value);
+
+    // The token should be consumed after a warning is issued so the parser
+    // can continue as though an identifier were found. The semicolon token
+    // should not be consumed in this way so that the parser interprets it as
+    // a statement delimeter;
+    if (!fnparam && state.tokens.next.id !== ";") {
       advance();
-
-      if (checkPunctuator(state.tokens.next, "...")) {
-        warning("E024", state.tokens.next, "...");
-        while (checkPunctuator(state.tokens.next, "...")) {
-          advance();
-        }
-      }
-
-      if (!state.tokens.next.identifier) {
-        warning("E024", state.tokens.curr, state.tokens.next.id);
-        return;
-      }
-
-      return identifier(fnparam, prop);
-    } else {
-      error("E030", state.tokens.next, state.tokens.next.value);
-
-      // The token should be consumed after a warning is issued so the parser
-      // can continue as though an identifier were found. The semicolon token
-      // should not be consumed in this way so that the parser interprets it as
-      // a statement delimeter;
-      if (state.tokens.next.id !== ";") {
-        advance();
-      }
     }
   }
 
@@ -2334,51 +2340,7 @@ var JSHINT = (function() {
     return this;
   });
 
-  prefix("...", function() {
-    if (!state.inES6(true)) {
-      warning("W119", this, "spread/rest operator", "6");
-    }
-
-    // TODO: Allow all AssignmentExpression
-    // once parsing permits.
-    //
-    // How to handle eg. number, boolean when the built-in
-    // prototype of may have an @@iterator definition?
-    //
-    // Number.prototype[Symbol.iterator] = function * () {
-    //   yield this.valueOf();
-    // };
-    //
-    // var a = [ ...1 ];
-    // console.log(a); // [1];
-    //
-    // for (let n of [...10]) {
-    //    console.log(n);
-    // }
-    // // 10
-    //
-    //
-    // Boolean.prototype[Symbol.iterator] = function * () {
-    //   yield this.valueOf();
-    // };
-    //
-    // var a = [ ...true ];
-    // console.log(a); // [true];
-    //
-    // for (let n of [...false]) {
-    //    console.log(n);
-    // }
-    // // false
-    //
-    if (!state.tokens.next.identifier &&
-        state.tokens.next.type !== "(string)" &&
-          !checkPunctuators(state.tokens.next, ["[", "("])) {
-
-      error("E030", state.tokens.next, state.tokens.next.value);
-    }
-    this.right = expression(150);
-    return this;
-  });
+  infix("...");
 
   prefix("!", function() {
     this.arity = "unary";
@@ -2538,6 +2500,8 @@ var JSHINT = (function() {
 
     if (state.tokens.next.id !== ")") {
       for (;;) {
+        spreadrest();
+
         p[p.length] = expression(10);
         n += 1;
         if (state.tokens.next.id !== ",") {
@@ -2839,6 +2803,8 @@ var JSHINT = (function() {
         break;
       }
 
+      spreadrest();
+
       this.first.push(expression(10));
       if (state.tokens.next.id === ",") {
         parseComma({ allowTrailing: true });
@@ -2964,7 +2930,7 @@ var JSHINT = (function() {
           }
         }
       } else {
-        if (checkPunctuator(state.tokens.next, "...")) pastRest = true;
+        pastRest = spreadrest();
         ident = identifier(true);
         if (ident) {
           paramsIds.push(ident);
@@ -3494,8 +3460,6 @@ var JSHINT = (function() {
         nextInnerDE();
         advance(")");
       } else {
-        var is_rest = checkPunctuator(state.tokens.next, "...");
-
         if (isAssignment) {
           var assignTarget = expression(20);
           if (assignTarget) {
@@ -3512,9 +3476,7 @@ var JSHINT = (function() {
         if (ident) {
           identifiers.push({ id: ident, token: state.tokens.curr });
         }
-        return is_rest;
       }
-      return false;
     };
     var assignmentProperty = function() {
       var id;
@@ -3555,12 +3517,16 @@ var JSHINT = (function() {
       }
       var element_after_rest = false;
       while (!checkPunctuator(state.tokens.next, "]")) {
-        if (nextInnerDE() && !element_after_rest &&
+        var isRest = spreadrest();
+
+        nextInnerDE();
+
+        if (isRest && !element_after_rest &&
             checkPunctuator(state.tokens.next, ",")) {
           warning("W130", state.tokens.next);
           element_after_rest = true;
         }
-        if (checkPunctuator(state.tokens.next, "=")) {
+        if (!isRest && checkPunctuator(state.tokens.next, "=")) {
           if (checkPunctuator(state.tokens.prev, "...")) {
             advance("]");
           } else {
