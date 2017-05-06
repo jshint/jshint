@@ -767,37 +767,50 @@ var JSHINT = (function() {
     return t;
   }
 
-  // Produce the next token. It looks for programming errors.
-
-  function advance(id, t) {
+  /**
+   * Consume the next token.
+   *
+   * @param {string} [expected] - the expected value of the next token's `id`
+   *                              property (in the case of punctuators) or
+   *                              `value` property (in the case of identifiers
+   *                              and literals); if unspecified, any token will
+   *                              be accepted
+   * @param {object} [relatedToken] - the token that informed the expected
+   *                                  value, if any (for example: the opening
+   *                                  brace when a closing brace is expected);
+   *                                  used to produce more meaningful errors
+   */
+  function advance(expected, relatedToken) {
+    var nextToken = state.tokens.next;
 
     switch (state.tokens.curr.id) {
     case "(number)":
-      if (state.tokens.next.id === ".") {
+      if (nextToken.id === ".") {
         warning("W005", state.tokens.curr);
       }
       break;
     case "-":
-      if (state.tokens.next.id === "-" || state.tokens.next.id === "--") {
+      if (nextToken.id === "-" || nextToken.id === "--") {
         warning("W006");
       }
       break;
     case "+":
-      if (state.tokens.next.id === "+" || state.tokens.next.id === "++") {
+      if (nextToken.id === "+" || nextToken.id === "++") {
         warning("W007");
       }
       break;
     }
 
-    if (id && state.tokens.next.id !== id) {
-      if (t) {
-        if (state.tokens.next.id === "(end)") {
-          error("E019", t, t.id);
+    if (expected && nextToken.id !== expected) {
+      if (relatedToken) {
+        if (nextToken.id === "(end)") {
+          error("E019", relatedToken, relatedToken.id);
         } else {
-          error("E020", state.tokens.next, id, t.id, t.line, state.tokens.next.value);
+          error("E020", nextToken, expected, relatedToken.id,
+            relatedToken.line, nextToken.value);
         }
-      } else if (state.tokens.next.type !== "(identifier)" || state.tokens.next.value !== id) {
-        warning("W116", state.tokens.next, id, state.tokens.next.value);
+      } else if (nextToken.type !== "(identifier)" || nextToken.value !== expected) {
+        error("W116", nextToken, expected, nextToken.value);
       }
     }
 
