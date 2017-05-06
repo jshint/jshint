@@ -1843,7 +1843,7 @@ exports["destructuring globals as moz"] = function (test) {
     .addError(4, 11,  "'z' is not defined.")
     .addError(11, 9, "['b'] is better written in dot notation.")
     .addError(12, 3, "['b'] is better written in dot notation.")
-    .addError(13, 3, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(13, 3, "'rest operator' is only available in ES6 (use 'esversion: 6').")
     .test(code, {moz: true, unused: true, undef: true});
 
   test.done();
@@ -1913,7 +1913,7 @@ exports["destructuring globals as es5"] = function (test) {
     .addError(12, 3, "['b'] is better written in dot notation.")
     .addError(12, 1, "'destructuring assignment' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(13, 1, "'destructuring assignment' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(13, 3, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(13, 3, "'rest operator' is only available in ES6 (use 'esversion: 6').")
     .test(code, {unused: true, undef: true}); // es5
 
   test.done();
@@ -1952,7 +1952,7 @@ exports["destructuring globals as legacy JS"] = function (test) {
     .addError(12, 3, "['b'] is better written in dot notation.")
     .addError(12, 1, "'destructuring assignment' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(13, 1, "'destructuring assignment' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(13, 3, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(13, 3, "'rest operator' is only available in ES6 (use 'esversion: 6').")
     .test(code, {es3: true, unused: true, undef: true});
 
   test.done();
@@ -5986,38 +5986,38 @@ exports["spread & rest operator support"] = function (test) {
     .test(code, {esnext: true});
 
   TestRun(test)
-    .addError(1, 5, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
-    .addError(2, 5, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
-    .addError(3, 5, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
-    .addError(4, 5, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
-    .addError(5, 5, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
-    .addError(7, 18, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
-    .addError(8, 14, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
-    .addError(9, 14, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
-    .addError(10, 12, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(1, 5, "'spread operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(2, 5, "'spread operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(3, 5, "'spread operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(4, 5, "'spread operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(5, 5, "'spread operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(7, 18, "'spread operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(8, 14, "'spread operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(9, 14, "'rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(10, 12, "'rest operator' is only available in ES6 (use 'esversion: 6').")
     .addError(10, 19, "'arrow function syntax (=>)' is only available in ES6 (use 'esversion: 6').")
-    .addError(11, 5, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
-    .addError(12, 5, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(11, 5, "'spread operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(12, 5, "'spread operator' is only available in ES6 (use 'esversion: 6').")
     .test(code, {moz: true});
 
   TestRun(test)
-    .addError(1, 5, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
-    .addError(2, 5, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
-    .addError(3, 5, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
-    .addError(4, 5, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
-    .addError(5, 5, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(1, 5, "'spread operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(2, 5, "'spread operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(3, 5, "'spread operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(4, 5, "'spread operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(5, 5, "'spread operator' is only available in ES6 (use 'esversion: 6').")
     .addError(6, 1, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(7, 1, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
 
-    .addError(7, 18, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(7, 18, "'spread operator' is only available in ES6 (use 'esversion: 6').")
     .addError(8, 1, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(8, 14, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
-    .addError(9, 14, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(8, 14, "'spread operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(9, 14, "'rest operator' is only available in ES6 (use 'esversion: 6').")
     .addError(10, 1, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(10, 12, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(10, 12, "'rest operator' is only available in ES6 (use 'esversion: 6').")
     .addError(10, 19, "'arrow function syntax (=>)' is only available in ES6 (use 'esversion: 6').")
-    .addError(11, 5, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
-    .addError(12, 5, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(11, 5, "'spread operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(12, 5, "'spread operator' is only available in ES6 (use 'esversion: 6').")
     .test(code);
 
   test.done();
@@ -6069,15 +6069,15 @@ exports["parameter destructuring with rest"] = function (test) {
     .addError(1, 19, "'arrow function syntax (=>)' is only available in ES6 (use 'esversion: 6').")
     .addError(4, 26, "'arrow function syntax (=>)' is only available in ES6 (use 'esversion: 6').")
     .addError(7, 17, "'arrow function syntax (=>)' is only available in ES6 (use 'esversion: 6').")
-    .addError(7, 10, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
-    .addError(1, 11, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
-    .addError(2, 19, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
-    .addError(3, 13, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
-    .addError(4, 18, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
-    .addError(5, 26, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
-    .addError(6, 20, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
-    .addError(8, 18, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
-    .addError(9, 12, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').");
+    .addError(7, 10, "'rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(1, 11, "'rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(2, 19, "'rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(3, 13, "'rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(4, 18, "'rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(5, 26, "'rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(6, 20, "'rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(8, 18, "'rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(9, 12, "'rest operator' is only available in ES6 (use 'esversion: 6').");
 
   run.test(code, {moz: true});
 
@@ -6085,36 +6085,35 @@ exports["parameter destructuring with rest"] = function (test) {
     .addError(1, 19, "'arrow function syntax (=>)' is only available in ES6 (use 'esversion: 6').")
     .addError(1, 9, "'destructuring binding' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(1, 1, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(1, 11, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(1, 11, "'rest operator' is only available in ES6 (use 'esversion: 6').")
 
     .addError(2, 17, "'destructuring binding' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(2, 1, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(2, 19, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(2, 19, "'rest operator' is only available in ES6 (use 'esversion: 6').")
 
     .addError(3, 11, "'destructuring binding' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(3, 13, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(3, 13, "'rest operator' is only available in ES6 (use 'esversion: 6').")
 
     .addError(4, 26, "'arrow function syntax (=>)' is only available in ES6 (use 'esversion: 6').")
     .addError(4, 9, "'destructuring binding' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(4, 1, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(4, 18, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(4, 18, "'rest operator' is only available in ES6 (use 'esversion: 6').")
 
     .addError(5, 17, "'destructuring binding' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(5, 1, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(5, 26, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(5, 26, "'rest operator' is only available in ES6 (use 'esversion: 6').")
 
     .addError(6, 11, "'destructuring binding' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(6, 20, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(6, 20, "'rest operator' is only available in ES6 (use 'esversion: 6').")
 
     .addError(7, 17, "'arrow function syntax (=>)' is only available in ES6 (use 'esversion: 6').")
     .addError(7, 1, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(7, 10, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(7, 10, "'rest operator' is only available in ES6 (use 'esversion: 6').")
 
     .addError(8, 1, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(8, 18, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').")
+    .addError(8, 18, "'rest operator' is only available in ES6 (use 'esversion: 6').")
 
-    .addError(9, 12, "'spread/rest operator' is only available in ES6 (use 'esversion: 6').");
-
+    .addError(9, 12, "'rest operator' is only available in ES6 (use 'esversion: 6').");
 
   run.test(code);
 
