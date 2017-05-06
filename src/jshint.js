@@ -3376,6 +3376,13 @@ var JSHINT = (function() {
           } else if (nextVal === "set" && i && f["(metrics)"].arity !== 1) {
             warning("W077", t, i);
           }
+
+        } else if (spreadrest("spread")) {
+          if (!state.option.unstable.objspreadrest) {
+            warning("W141", state.tokens.next, "object spread property", "objspreadrest");
+          }
+
+          expression(10);
         } else {
           if (state.tokens.next.value === "*" && state.tokens.next.type === "(punctuator)") {
             if (!state.inES6()) {
@@ -3508,8 +3515,19 @@ var JSHINT = (function() {
         nextInnerDE();
       } else {
         // this id will either be the property name or the property name and the assigning identifier
-        id = identifier();
-        if (checkPunctuator(state.tokens.next, ":")) {
+        var isRest = spreadrest("rest");
+
+        if (isRest) {
+          if (!state.option.unstable.objspreadrest) {
+            warning("W141", state.tokens.next, "object rest property", "objspreadrest");
+          }
+
+          nextInnerDE();
+        } else {
+          id = identifier();
+        }
+
+        if (!isRest && checkPunctuator(state.tokens.next, ":")) {
           advance(":");
           nextInnerDE();
         } else if (id) {
@@ -3518,6 +3536,10 @@ var JSHINT = (function() {
             checkLeftSideAssign(state.tokens.curr);
           }
           identifiers.push({ id: id, token: state.tokens.curr });
+        }
+
+        if (isRest && checkPunctuator(state.tokens.next, ",")) {
+          warning("W130", state.tokens.next);
         }
       }
     };
