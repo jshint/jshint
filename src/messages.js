@@ -234,7 +234,8 @@ var warnings = {
   W141: "Empty {a}: this is unnecessary and can be removed.",
   W142: "Empty {a}: consider replacing with `import '{b}';`.",
   W143: "Assignment to properties of a mapped arguments object may cause " +
-    "unexpected changes to formal parameters."
+    "unexpected changes to formal parameters.",
+  W144: "'{a}' is a non-standard language feature. Enable it using the '{b}' unstable option."
 };
 
 var info = {
