@@ -124,7 +124,7 @@ findTests(paths.test262, function(err, testNames) {
         console.log(output);
       } else {
         console.error(output);
-        process.exit(1);
+        process.exitCode = 1;
       }
     });
   });
