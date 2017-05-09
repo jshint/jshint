@@ -979,6 +979,27 @@ exports["test typeof in TDZ"] = function (test) {
   test.done();
 };
 
+exports["test typeof in TDZ"] = function (test) {
+
+  var src = [
+    "let a = typeof b;", // error, use in TDZ
+    "let b;",
+    "function d() { return typeof c; }", // d may be called after declaration, no error
+    "let c = typeof e;", // e is not in scope, no error
+    "{",
+    "  let e;",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(2, "'b' was used before it was declared, which is illegal for 'let' variables.")
+    .test(src, {
+      esnext: true
+    });
+
+  test.done();
+};
+
 exports.testConstModification = function (test) {
 
   var src = [
