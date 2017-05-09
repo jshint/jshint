@@ -28,8 +28,8 @@ exports.bool = {
      *
      * @deprecated JSHint is limiting its scope to issues of code correctness.
      *             If you would like to enforce rules relating to code style,
-     *             check out [the JSCS
-     *             project](https://github.com/jscs-dev/node-jscs).
+     *             check out [the ESLint
+     *             project](http://eslint.org).
      */
     camelcase   : true,
 
@@ -117,8 +117,8 @@ exports.bool = {
      *
      * @deprecated JSHint is limiting its scope to issues of code correctness.
      *             If you would like to enforce rules relating to code style,
-     *             check out [the JSCS
-     *             project](https://github.com/jscs-dev/node-jscs).
+     *             check out [the ESLint
+     *             project](http://eslint.org).
      */
     immed       : true,
 
@@ -138,8 +138,8 @@ exports.bool = {
      *
      * @deprecated JSHint is limiting its scope to issues of code correctness.
      *             If you would like to enforce rules relating to code style,
-     *             check out [the JSCS
-     *             project](https://github.com/jscs-dev/node-jscs).
+     *             check out [the ESLint
+     *             project](http://eslint.org).
      */
     newcap      : true,
 
@@ -167,8 +167,8 @@ exports.bool = {
      *
      * @deprecated JSHint is limiting its scope to issues of code correctness.
      *             If you would like to enforce rules relating to code style,
-     *             check out [the JSCS
-     *             project](https://github.com/jscs-dev/node-jscs).
+     *             check out [the ESLint
+     *             project](http://eslint.org).
      */
     noempty     : true,
 
@@ -322,8 +322,8 @@ exports.bool = {
      *
      * @deprecated JSHint is limiting its scope to issues of code correctness.
      *             If you would like to enforce rules relating to code style,
-     *             check out [the JSCS
-     *             project](https://github.com/jscs-dev/node-jscs).
+     *             check out [the ESLint
+     *             project](http://eslint.org).
      */
     multistr    : true,
 
@@ -434,8 +434,8 @@ exports.bool = {
      *
      * @deprecated JSHint is limiting its scope to issues of code correctness.
      *             If you would like to enforce rules relating to code style,
-     *             check out [the JSCS
-     *             project](https://github.com/jscs-dev/node-jscs).
+     *             check out [the ESLint
+     *             project](http://eslint.org).
      */
     sub         : true,
 
@@ -460,8 +460,8 @@ exports.bool = {
      *
      * @deprecated JSHint is limiting its scope to issues of code correctness.
      *             If you would like to enforce rules relating to code style,
-     *             check out [the JSCS
-     *             project](https://github.com/jscs-dev/node-jscs).
+     *             check out [the ESLint
+     *             project](http://eslint.org).
      */
     laxbreak    : true,
 
@@ -476,8 +476,8 @@ exports.bool = {
      *
      * @deprecated JSHint is limiting its scope to issues of code correctness.
      *             If you would like to enforce rules relating to code style,
-     *             check out [the JSCS
-     *             project](https://github.com/jscs-dev/node-jscs).
+     *             check out [the ESLint
+     *             project](http://eslint.org).
      */
     laxcomma    : true,
 
@@ -770,7 +770,7 @@ exports.val = {
    *
    * @deprecated JSHint is limiting its scope to issues of code correctness. If
    *             you would like to enforce rules relating to code style, check
-   *             out [the JSCS project](https://github.com/jscs-dev/node-jscs).
+   *             out [the ESLint project](http://eslint.org).
    */
   maxlen       : false,
 
@@ -779,7 +779,7 @@ exports.val = {
    *
    * @deprecated JSHint is limiting its scope to issues of code correctness. If
    *             you would like to enforce rules relating to code style, check
-   *             out [the JSCS project](https://github.com/jscs-dev/node-jscs).
+   *             out [the ESLint project](http://eslint.org).
    */
   indent       : false,
 
@@ -830,7 +830,7 @@ exports.val = {
    *
    * @deprecated JSHint is limiting its scope to issues of code correctness. If
    *             you would like to enforce rules relating to code style, check
-   *             out [the JSCS project](https://github.com/jscs-dev/node-jscs).
+   *             out [the ESLint project](http://eslint.org).
    */
   quotmark     : false,
 
