@@ -737,3 +737,31 @@ exports.jasmine = {
   fit         : false,
   pending     : false
 };
+
+exports.greasemonkey = {
+  GM_info                : false,
+  GM_deleteValue         : false,
+  GM_getValue            : false,
+  GM_listValues          : false,
+  GM_setValue            : false,
+  GM_getResourceText     : false,
+  GM_getResourceURL      : false,
+  GM_addStyle            : false,
+  GM_log                 : false,
+  GM_openInTab           : false,
+  GM_registerMenuCommand : false,
+  GM_setClipboard        : false,
+  GM_xmlhttpRequest      : false,
+  unsafeWindow           : false
+};
+
+exports.tampermonkey = {
+  GM_addValueChangeListener    : false,
+  GM_removeValueChangeListener : false,
+  GM_unregisterMenuCommand     : false,
+  GM_download                  : false,
+  GM_getTab                    : false,
+  GM_saveTab                   : false,
+  GM_getTabs                   : false,
+  GM_notification              : false
+};
