@@ -23,7 +23,7 @@ test_script:
   - npm run test-262
 
 cache:
-  - node_modules            # local npm modules
+  - 'node_modules -> package.json'      # local npm modules
 
 matrix:
   fast_finish: true
