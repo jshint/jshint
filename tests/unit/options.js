@@ -294,7 +294,7 @@ exports.notypeof = function (test) {
   var src = fs.readFileSync(__dirname + '/fixtures/typeofcomp.js', 'utf8');
 
   TestRun(test)
-    .addError(1, "Invalid typeof value 'funtion'")
+    .addError(1, "Invalid typeof value 'function'")
     .addError(2, "Invalid typeof value 'double'")
     .addError(3, "Invalid typeof value 'bool'")
     .addError(4, "Invalid typeof value 'obj'")
