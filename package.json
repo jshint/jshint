@@ -74,8 +74,6 @@
 
   "license": "(MIT AND JSON)",
 
-  "preferGlobal": true,
-
   "files": [
     "bin",
     "data",
