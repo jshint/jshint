@@ -811,7 +811,11 @@ exports.val = {
    * Setting an entry to `true` enables reading and writing to that variable.
    * Setting it to `false` will trigger JSHint to consider that variable
    * read-only.
-   *
+   * 
+   * This option accepts an object, like so:
+   * 
+   *   // jshint globals:{"React": false, "_": false}
+   * 
    * See also the "environment" options: a set of options to be used as short
    * hand for enabling global variables defined in common JavaScript
    * environments.
