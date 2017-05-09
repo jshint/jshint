@@ -632,6 +632,21 @@ exports.group = {
 
     test.done();
   },
+  
+  testMultipleIgnores: function (test) {
+    var run = this.sinon.stub(cli, "run");
+    var dir = __dirname + "/../examples/";
+    this.sinon.stub(process, "cwd").returns(dir);
+
+    cli.interpret([
+      "node", "jshint", "file.js", "--exclude=foo.js,bar.js"
+    ]);
+    
+    test.equal(run.args[0][0].ignores[0], path.resolve(dir, "foo.js"));
+    test.equal(run.args[0][0].ignores[1], path.resolve(dir, "bar.js"));
+    
+    test.done();
+  },
 
   testIgnoresWithSpecialChars: function (test) {
     this.sinon.stub(process, "cwd").returns(path.resolve(__dirname, "special++chars"));
