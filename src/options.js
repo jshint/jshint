@@ -596,7 +596,7 @@ exports.bool = {
      * This option tells JSHint that your code uses ES3 array elision elements,
      * or empty elements (for example, `[1, , , 4, , , 7]`).
      */
-    elision     : true,
+    elision     : true
   },
 
   // Third party globals

@@ -1248,7 +1248,7 @@ var JSHINT = (function() {
     "unknown"
   ];
   typeofValues.es3 = [
-    "undefined", "boolean", "number", "string", "function", "object",
+    "undefined", "boolean", "number", "string", "function", "object"
   ];
   typeofValues.es3 = typeofValues.es3.concat(typeofValues.legacy);
   typeofValues.es6 = typeofValues.es3.concat("symbol");
@@ -1943,7 +1943,7 @@ var JSHINT = (function() {
 
   var baseTemplateSyntax = {
     identifier: false,
-    template: true,
+    template: true
   };
   state.syntax["(template)"] = _.extend({
     lbp: 155,

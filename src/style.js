@@ -91,7 +91,7 @@ exports.register = function(linter) {
     if (code) {
       linter.warn(code, {
         line: data.line,
-        char: data.char,
+        char: data.char
       });
     }
   });
