@@ -28,8 +28,8 @@ exports.bool = {
      *
      * @deprecated JSHint is limiting its scope to issues of code correctness.
      *             If you would like to enforce rules relating to code style,
-     *             check out [the JSCS
-     *             project](https://github.com/jscs-dev/node-jscs).
+     *             check out [the ESLint
+     *             project](http://eslint.org).
      */
     camelcase   : true,
 
