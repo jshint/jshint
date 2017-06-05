@@ -359,6 +359,8 @@ exports.group = {
       cli.interpret([
         "node", "jshint", "file.js", "--reporter", "invalid.js"
       ]);
+      // reporter error now thrown from getReporter sub-routine
+      cli.getReporter('invalid.js');
     } catch (err) {
       var msg = out.args[0][0];
       test.equal(msg.slice(0, 25), "Can't load reporter file:");
@@ -391,36 +393,81 @@ exports.group = {
     test.done();
   },
 
+  testMultipleReporters: function (test) {
+    test.expect(2);
+
+    var _cli = require("cli");
+    var rep = require("../examples/reporter.js");
+    var run = this.sinon.stub(cli, "run");
+    var out = this.sinon.stub(_cli, "error");
+    var dir = __dirname + "/../examples/";
+    this.sinon.stub(process, "cwd").returns(dir);
+
+    cli.exit.throws("ProcessExit");
+
+    // Test successful attempt.
+    run.restore();
+    this.sinon.stub(rep, "reporter");
+    this.sinon.stub(shjs, "test")
+        .withArgs("-e", sinon.match(/file\.js$/)).returns(true);
+
+    this.sinon.stub(shjs, "cat")
+        .withArgs(sinon.match(/file\.js$/)).returns("func()");
+
+    try {
+      cli.interpret([
+        "node", "jshint", "file.js", "--reporter", "checkstyle,reporter.js"
+      ]);
+    } catch (err) {
+      if (err.name !== "ProcessExit") {
+        throw err;
+      }
+
+      test.equal(rep.reporter.args[0][0][0].error.raw, "Missing semicolon.");
+      test.ok(rep.reporter.calledOnce);
+    }
+
+    test.done();
+  },
+
   testJSLintReporter: function (test) {
+    test.expect(2);
+
     var rep = require("../src/reporters/jslint_xml.js");
     var run = this.sinon.stub(cli, "run");
 
     cli.interpret([
       "node", "jshint", "file.js", "--reporter", "jslint"
     ]);
-    test.equal(run.args[0][0].reporter, rep.reporter);
+    test.equal(cli.getReporter(cli.run.args[0][0].reporters[0]), rep.reporter);
 
+    // --jslint-reporter depcreated functionality...
     cli.interpret([
       "node", "jshint", "file.js", "--jslint-reporter"
     ]);
-    test.equal(run.args[1][0].reporter, rep.reporter);
+    // deprecated arg is mapped manually. should just remove in next major version
+    test.equal(cli.getReporter('jslint'), rep.reporter);
 
     test.done();
   },
 
   testCheckStyleReporter: function (test) {
+    test.expect(2);
+
     var rep = require("../src/reporters/checkstyle.js");
     var run = this.sinon.stub(cli, "run");
 
     cli.interpret([
       "node", "jshint", "file.js", "--reporter", "checkstyle"
     ]);
-    test.equal(run.args[0][0].reporter, rep.reporter);
+    test.equal(cli.getReporter(run.args[0][0].reporters[0]), rep.reporter);
 
+    // --checkstyle-reporter depcreated functionality...
     cli.interpret([
       "node", "jshint", "file.js", "--checkstyle-reporter"
     ]);
-    test.equal(run.args[1][0].reporter, rep.reporter);
+    // deprecated arg is mapped manually. should just remove in next major version
+    test.equal(cli.getReporter('checkstyle'), rep.reporter);
 
     test.done();
   },
@@ -432,7 +479,7 @@ exports.group = {
     cli.interpret([
       "node", "jshint", "file.js", "--show-non-errors"
     ]);
-    test.equal(run.args[0][0].reporter, rep.reporter);
+    test.equal(cli.getReporter(run.args[0][0].reporters[0]), rep.reporter);
 
     test.done();
   },
