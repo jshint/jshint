@@ -872,12 +872,15 @@ var JSHINT = (function() {
     return token.first || token.right || token.left || token.id === "yield";
   }
 
-  function isEndOfExpr(curr, next) {
-    if (arguments.length === 0) {
+  function isEndOfExpr(context, curr, next) {
+    if (arguments.length <= 1) {
       curr = state.tokens.curr;
       next = state.tokens.next;
     }
 
+    if (next.id === "in" && context & prodParams.noin) {
+      return true;
+    }
     if (next.id === ";" || next.id === "}" || next.id === ":") {
       return true;
     }
@@ -952,7 +955,7 @@ var JSHINT = (function() {
         error("E030", state.tokens.curr, state.tokens.curr.id);
       }
 
-      while (rbp < state.tokens.next.lbp && !isEndOfExpr()) {
+      while (rbp < state.tokens.next.lbp && !isEndOfExpr(context)) {
         isArray = state.tokens.curr.value === "Array";
         isObject = state.tokens.curr.value === "Object";
 
@@ -1780,7 +1783,7 @@ var JSHINT = (function() {
     var current = state.tokens.next;
     while (state.tokens.next.id === "(string)") {
       var next = peekIgnoreEOL();
-      if (!isEndOfExpr(current, next)) {
+      if (!isEndOfExpr(0, current, next)) {
         break;
       }
       current = next;
@@ -2152,7 +2155,7 @@ var JSHINT = (function() {
   infix("?", function(context, left, that) {
     increaseComplexityCount();
     that.left = left;
-    that.right = expression(10, context);
+    that.right = expression(10, context & ~prodParams.noin);
     advance(":");
     that["else"] = expression(10, context);
     return that;
@@ -2705,7 +2708,8 @@ var JSHINT = (function() {
   application("=>");
 
   infix("[", function(context, left, that) {
-    var e = expression(10, context), s;
+    var e = expression(10, context & ~prodParams.noin);
+    var s;
     if (e && e.type === "(string)") {
       if (!state.option.evil && (e.value === "eval" || e.value === "execScript")) {
         if (isGlobalEval(left, state)) {
@@ -3128,6 +3132,8 @@ var JSHINT = (function() {
       ignoreLoopFunc = options.ignoreLoopFunc;
     }
 
+    context &= ~prodParams.noin;
+
     state.option = Object.create(state.option);
     state.ignored = Object.create(state.ignored);
 
@@ -3463,6 +3469,8 @@ var JSHINT = (function() {
   function destructuringPattern(context, options) {
     var isAssignment = options && options.assignment;
 
+    context &= ~prodParams.noin;
+
     if (!state.inES6()) {
       warning("W104", state.tokens.curr,
         isAssignment ? "destructuring assignment" : "destructuring binding", "6");
@@ -3655,7 +3663,7 @@ var JSHINT = (function() {
   function blockVariableStatement(type, statement, context) {
     // used for both let and const statements
 
-    var prefix = context & prodParams.prefix;
+    var noin = context & prodParams.noin;
     var inexport = context & prodParams.export;
     var isLet = type === "let";
     var isConst = type === "const";
@@ -3687,7 +3695,13 @@ var JSHINT = (function() {
         lone = true;
       }
 
-      if (!prefix && isConst && state.tokens.next.id !== "=") {
+      // A `const` declaration without an initializer is permissible within the
+      // head of for-in and for-of statements. If this binding list is being
+      // parsed as part of a `for` statement of any kind, allow the initializer
+      // to be omitted. Although this may erroneously allow such forms from
+      // "C-style" `for` statements (i.e. `for (;;) {}`, the `for` statement
+      // logic includes dedicated logic to issue the error for such cases.
+      if (!noin && isConst && state.tokens.next.id !== "=") {
         warning("E012", state.tokens.curr, state.tokens.curr.value);
       }
 
@@ -3709,14 +3723,15 @@ var JSHINT = (function() {
       }
 
       if (state.tokens.next.id === "=") {
+        statement.hasInitializer = true;
+
         advance("=");
-        if (!prefix && peek(0).id === "=" && state.tokens.next.identifier) {
+        if (!noin && peek(0).id === "=" && state.tokens.next.identifier) {
           warning("W120", state.tokens.next, state.tokens.next.value);
         }
         var id = state.tokens.prev;
-        // don't accept `in` in expression if prefix is used for ForIn/Of loop.
-        value = expression(prefix ? 120 : 10, context);
-        if (!prefix && value && value.type === "undefined") {
+        value = expression(10, context);
+        if (value && value.type === "undefined") {
           warning("W080", id, id.value);
         }
         if (lone) {
@@ -3726,7 +3741,10 @@ var JSHINT = (function() {
         }
       }
 
-      if (!prefix) {
+      // Bindings are not immediately initialized in for-in and for-of
+      // statements. As with `const` initializers (described above), the `for`
+      // statement parsing logic includes
+      if (!noin) {
         for (t in tokens) {
           if (tokens.hasOwnProperty(t)) {
             t = tokens[t];
@@ -3744,6 +3762,8 @@ var JSHINT = (function() {
       if (state.tokens.next.id !== ",") {
         break;
       }
+
+      statement.hasComma = true;
       parseComma();
     }
     if (letblock) {
@@ -3767,7 +3787,7 @@ var JSHINT = (function() {
   letstatement.exps = true;
 
   var varstatement = stmt("var", function(context) {
-    var prefix = context & prodParams.prefix;
+    var noin = context & prodParams.noin;
     var inexport = context & prodParams.export;
     var tokens, lone, value;
 
@@ -3786,7 +3806,6 @@ var JSHINT = (function() {
         warning("W132", this);
       }
 
-      this.first = this.first.concat(names);
 
       for (var t in tokens) {
         if (tokens.hasOwnProperty(t)) {
@@ -3815,20 +3834,21 @@ var JSHINT = (function() {
       }
 
       if (state.tokens.next.id === "=") {
+        this.hasInitializer = true;
+
         state.nameStack.set(state.tokens.curr);
 
         advance("=");
         if (peek(0).id === "=" && state.tokens.next.identifier) {
-          if (!prefix &&
+          if (!noin &&
               !state.funct["(params)"] ||
               state.funct["(params)"].indexOf(state.tokens.next.value) === -1) {
             warning("W120", state.tokens.next, state.tokens.next.value);
           }
         }
         var id = state.tokens.prev;
-        // don't accept `in` in expression if prefix is used for ForIn/Of loop.
-        value = expression(prefix ? 120 : 10, context);
-        if (value && !prefix && !state.funct["(loopage)"] && value.type === "undefined") {
+        value = expression(10, context);
+        if (value && !state.funct["(loopage)"] && value.type === "undefined") {
           warning("W080", id, id.value);
         }
         if (lone) {
@@ -3838,9 +3858,12 @@ var JSHINT = (function() {
         }
       }
 
+      this.first = this.first.concat(names);
+
       if (state.tokens.next.id !== ",") {
         break;
       }
+      this.hasComma = true;
       parseComma();
     }
 
@@ -4363,102 +4386,105 @@ var JSHINT = (function() {
 
     // what kind of for(…) statement it is? for(…of…)? for(…in…)? for(…;…;…)?
     var nextop; // contains the token of the "in" or "of" operator
-    var i = 0;
-    var inof = ["in", "of"];
-    var level = 0; // BindingPattern "level" --- level 0 === no BindingPattern
     var comma; // First comma punctuator at level 0
     var initializer; // First initializer at level 0
     var bindingPower;
     var targets;
     var target;
+    var decl;
 
-    // If initial token is a BindingPattern, count it as such.
-    if (checkPunctuators(state.tokens.next, ["{", "["])) ++level;
-    do {
-      nextop = peek(i);
-      ++i;
-      if (checkPunctuators(nextop, ["{", "["])) ++level;
-      else if (checkPunctuators(nextop, ["}", "]"])) --level;
-      if (level < 0) break;
-      if (level === 0) {
-        if (!comma && checkPunctuator(nextop, ",")) comma = nextop;
-        else if (!initializer && checkPunctuator(nextop, "=")) initializer = nextop;
+    var headContext = context | prodParams.noin;
+
+    if (state.tokens.next.id === "var") {
+      advance("var");
+      decl = state.tokens.curr.fud(headContext);
+      comma = decl.hasComma ? decl : null;
+      initializer = decl.hasInitializer ? decl : null;
+    } else if (state.tokens.next.id === "let" || state.tokens.next.id === "const") {
+      advance(state.tokens.next.id);
+      // create a new block scope
+      letscope = true;
+      state.funct["(scope)"].stack();
+      decl = state.tokens.curr.fud(headContext);
+      comma = decl.hasComma ? decl : null;
+      initializer = decl.hasInitializer ? decl : null;
+    } else if (!checkPunctuator(state.tokens.next, ";")) {
+      targets = [];
+
+      while (state.tokens.next.value !== "in" &&
+        state.tokens.next.value !== "of" &&
+        !checkPunctuator(state.tokens.next, ";")) {
+
+        if (checkPunctuators(state.tokens.next, ["{", "["])) {
+          destructuringPattern(headContext, { assignment: true })
+            .forEach(function(elem) {
+              this.push(elem.token);
+            }, targets);
+          if (checkPunctuator(state.tokens.next, "=")) {
+            advance("=");
+            initializer = state.tokens.curr;
+            expression(10, headContext);
+          }
+        } else {
+          target = expression(10, headContext);
+
+          if (target) {
+            if (target.type === "(identifier)") {
+              targets.push(target);
+            } else if (checkPunctuator(target, "=")) {
+              initializer = target;
+              targets.push(target);
+            }
+          }
+        }
+
+        if (checkPunctuator(state.tokens.next, ",")) {
+          advance(",");
+
+          if (!comma) {
+            comma = state.tokens.curr;
+          }
+        }
       }
-    } while (level > 0 || !_.contains(inof, nextop.value) && nextop.value !== ";" &&
-    nextop.type !== "(end)"); // Is this a JSCS bug? This looks really weird.
+
+      //checkLeftSideAssign(target, nextop);
+
+      // In the event of a syntax error, do no issue warnings regarding the
+      // implicit creation of bindings.
+      if (!initializer && !comma) {
+        targets.forEach(function(token) {
+          if (!state.funct["(scope)"].has(token.value)) {
+            warning("W088", token, token.value);
+          }
+        });
+      }
+    }
+
+    nextop = state.tokens.next;
 
     // if we're in a for (… in|of …) statement
-    if (_.contains(inof, nextop.value)) {
+    if (_.contains(["in", "of"], nextop.value)) {
       if (nextop.value === "of") {
         bindingPower = 20;
+
         if (!state.inES6()) {
           warning("W104", nextop, "for of", "6");
         }
       } else {
         bindingPower = 0;
       }
-
-      if (initializer) {
-        error("W133", comma, nextop.value, "initializer is forbidden");
-      }
-
       if (comma) {
         error("W133", comma, nextop.value, "more than one ForBinding");
       }
-
-      if (state.tokens.next.id === "var") {
-        advance("var");
-        state.tokens.curr.fud(context | prodParams.prefix);
-      } else if (state.tokens.next.id === "let" || state.tokens.next.id === "const") {
-        advance(state.tokens.next.id);
-        // create a new block scope
-        letscope = true;
-        state.funct["(scope)"].stack();
-        state.tokens.curr.fud(context | prodParams.prefix);
-      } else {
-        targets = [];
-
-        // The following parsing logic recognizes initializers and the comma
-        // operator despite the fact that they are not supported by the
-        // grammar. Doing so allows JSHint to emit more a meaningful error
-        // message (i.e. W133) in response to a common programming mistake.
-        do {
-          if (checkPunctuators(state.tokens.next, ["{", "["])) {
-            destructuringPattern(context, { assignment: true }).forEach(function(elem) {
-              this.push(elem.token);
-            }, targets);
-          } else {
-            target = expression(120, context);
-
-            if (target.type === "(identifier)") {
-              targets.push(target);
-            }
-
-            checkLeftSideAssign(target, nextop);
-          }
-
-          if (checkPunctuator(state.tokens.next, "=")) {
-            advance("=");
-            expression(120, context);
-          }
-
-          if (checkPunctuator(state.tokens.next, ",")) {
-            advance(",");
-          }
-        } while (state.tokens.next !== nextop);
-
-        // In the event of a syntax error, do no issue warnings regarding the
-        // implicit creation of bindings.
-        if (!initializer && !comma) {
-          targets.forEach(function(token) {
-            if (!state.funct["(scope)"].has(token.value)) {
-              warning("W088", token, token.value);
-            }
-          });
-        }
+      if (initializer) {
+        error("W133", initializer, nextop.value, "initializer is forbidden");
+      }
+      if (target && !comma && !initializer) {
+        checkLeftSideAssign(target, nextop);
       }
 
       advance(nextop.value);
+
       // The binding power is variable because for-in statements accept any
       // Expression in this position, while for-of statements are limited to
       // AssignmentExpressions. For example:
@@ -4507,32 +4533,18 @@ var JSHINT = (function() {
 
       state.funct["(breakage)"] -= 1;
       state.funct["(loopage)"] -= 1;
+
     } else {
       if (foreachtok) {
         error("E045", foreachtok);
       }
-      if (state.tokens.next.id !== ";") {
-        if (state.tokens.next.id === "var") {
-          advance("var");
-          state.tokens.curr.fud(context);
-        } else if (state.tokens.next.id === "let") {
-          advance("let");
-          // create a new block scope
-          letscope = true;
-          state.funct["(scope)"].stack();
-          state.tokens.curr.fud(context);
-        } else {
-          for (;;) {
-            expression(0, context);
-            if (state.tokens.next.id !== ",") {
-              break;
-            }
-            parseComma();
-          }
-        }
-      }
       nolinebreak(state.tokens.curr);
       advance(";");
+      if (decl) {
+        decl.first.forEach(function(token) {
+          state.funct["(scope)"].initialize(token.value);
+        });
+      }
 
       // start loopage after the first ; as the next two expressions are executed
       // on every loop
@@ -4559,8 +4571,8 @@ var JSHINT = (function() {
       block(context, true, true);
       state.funct["(breakage)"] -= 1;
       state.funct["(loopage)"] -= 1;
-
     }
+
     // unstack loop blockscope
     if (letscope) {
       state.funct["(scope)"].unstack();
@@ -5102,7 +5114,7 @@ var JSHINT = (function() {
     if (!state.inES6()) {
       warning("W119", state.tokens.curr, "computed property names", "6");
     }
-    var value = expression(10, context);
+    var value = expression(10, context & ~prodParams.noin);
     advance("]");
     return value;
   }

@@ -758,6 +758,21 @@ exports.testForIn = function (test) {
       "for ((this) in {}) {}"
     ]);
 
+  TestRun(test, "expression context")
+    .test([
+      "for (0 ? 0 in {} : 0 ; false; false ) {}",
+      "for (x[0 in {}] ; false; false ) {}",
+      "for (x = function() { return 0 in {}; } ; false; false ) {}"
+    ]);
+
+  TestRun(test, "expression context (ES2015 forms)")
+    .test([
+      "for (({ [x in {}]: null }); false; false ) {}",
+      "for (var { prop = 'x' in {} } of [{}]) {}",
+      "for (x = () => { return 0 in {}; } ; false; false ) {}",
+      "for (x = function(x = 0 in {}) {} ; false; false ) {}"
+    ], { esversion: 2015 });
+
   test.done();
 };
 
