@@ -19,9 +19,10 @@ module.exports = {
   export: 1,
 
   /**
-   * Enabled when parsing binding lists within the "head" of `for` statements.
+   * Enabled when parsing expressions within the head of `for` statements,
+   * allowing to distinguish between `for-in` and "C-style" `for` statements.
    */
-  prefix: 2,
+  noin: 2,
 
   /**
    * Enabled when the expression begins the statement, allowing the parser to

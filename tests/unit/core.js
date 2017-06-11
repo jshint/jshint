@@ -719,8 +719,8 @@ exports.testForIn = function (test) {
 
   TestRun(test, "bad lhs errors")
     .addError(2, 7, "Invalid for-in loop left-hand-side: more than one ForBinding.")
-    .addError(3, 11, "Invalid for-in loop left-hand-side: more than one ForBinding.")
-    .addError(4, 6, "Invalid for-in loop left-hand-side: initializer is forbidden.")
+    .addError(3, 6, "Invalid for-in loop left-hand-side: more than one ForBinding.")
+    .addError(4, 8, "Invalid for-in loop left-hand-side: initializer is forbidden.")
     .addError(5, 6, "Invalid for-in loop left-hand-side: initializer is forbidden.")
     .test(src);
 
@@ -734,8 +734,8 @@ exports.testForIn = function (test) {
   ];
 
   TestRun(test, "bad lhs errors (lexical)")
-    .addError(2, 11, "Invalid for-in loop left-hand-side: more than one ForBinding.")
-    .addError(3, 13, "Invalid for-in loop left-hand-side: more than one ForBinding.")
+    .addError(2, 6, "Invalid for-in loop left-hand-side: more than one ForBinding.")
+    .addError(3, 6, "Invalid for-in loop left-hand-side: more than one ForBinding.")
     .addError(4, 6, "Invalid for-in loop left-hand-side: initializer is forbidden.")
     .addError(5, 6, "Invalid for-in loop left-hand-side: initializer is forbidden.")
     .test(src, { esnext: true });
@@ -753,6 +753,21 @@ exports.testForIn = function (test) {
       "for (x+y in {}) {}",
       "for ((this) in {}) {}"
     ]);
+
+  TestRun(test, "expression context")
+    .test([
+      "for (0 ? 0 in {} : 0 ; false; false ) {}",
+      "for (x[0 in {}] ; false; false ) {}",
+      "for (x = function() { return 0 in {}; } ; false; false ) {}"
+    ]);
+
+  TestRun(test, "expression context (ES2015 forms)")
+    .test([
+      "for (({ [x in {}]: null }); false; false ) {}",
+      "for (var { prop = 'x' in {} } of [{}]) {}",
+      "for (x = () => { return 0 in {}; } ; false; false ) {}",
+      "for (x = function(x = 0 in {}) {} ; false; false ) {}"
+    ], { esversion: 2015 });
 
   test.done();
 };
