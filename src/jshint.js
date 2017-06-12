@@ -529,7 +529,7 @@ var JSHINT = (function() {
             val = +val;
 
             if (typeof val !== "number" || !isFinite(val) || val <= 0 || Math.floor(val) !== val) {
-              error("E032", directiveToken, g[1].trim());
+              error("E032", directiveToken, (g[1] || "").trim());
               return;
             }
 
