@@ -1352,13 +1352,13 @@ exports.loopfunc = function (test) {
 
   // By default, not functions are allowed inside loops
   TestRun(test)
-    .addError(4, "Don't make functions within a loop.")
-    .addError(8, "Don't make functions within a loop.")
-    .addError(20, "Don't make functions within a loop.")
-    .addError(25, "Don't make functions within a loop.")
+    .addError(4, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
+    .addError(8, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
+    .addError(20, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
+    .addError(25, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
     .addError(12, "Function declarations should not be placed in blocks. Use a function " +
             "expression or move the statement to the top of the outer function.")
-    .addError(42, "Don't make functions within a loop.")
+    .addError(42, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
     .test(src, {es3: true});
 
   // When loopfunc is true, only function declaration should fail.
@@ -1389,11 +1389,11 @@ exports.loopfunc = function (test) {
     "}"
   ];
   TestRun(test)
-    .addError(2, "Don't make functions within a loop.")
-    .addError(5, "Don't make functions within a loop.")
-    .addError(11, "Don't make functions within a loop.")
-    .addError(14, "Don't make functions within a loop.")
-    .addError(17, "Don't make functions within a loop.")
+    .addError(2, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
+    .addError(5, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
+    .addError(11, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
+    .addError(14, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
+    .addError(17, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
     .test(es6LoopFuncSrc, {esnext: true});
 
   // functions declared in the expressions that loop should warn
@@ -1404,8 +1404,8 @@ exports.loopfunc = function (test) {
     "for(var c = function(){return j;};;){c();}"];
 
   TestRun(test)
-    .addError(1, "Don't make functions within a loop.")
-    .addError(3, "Don't make functions within a loop.")
+    .addError(1, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
+    .addError(3, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
     .test(src2, { es3: true, loopfunc: false, boss: true });
 
   test.done();
