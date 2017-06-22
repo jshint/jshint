@@ -1,3 +1,28 @@
+<a name="2.9.5"></a>
+## [2.9.5](https://github.com/jshint/jshint/compare/2.9.4...v2.9.5) (2017-06-22)
+
+
+### Bug Fixes
+
+* Account for hoisting of importing bindings ([bd36953](https://github.com/jshint/jshint/commit/bd36953))
+* Add onmessage to vars.worker ([540ed85](https://github.com/jshint/jshint/commit/540ed85))
+* Added missing "Storage" browser variable ([8cfe5ad](https://github.com/jshint/jshint/commit/8cfe5ad))
+* Avoid crash when peeking past end of prog ([c083866](https://github.com/jshint/jshint/commit/c083866))
+* Avoid false positive ([44d9e0b](https://github.com/jshint/jshint/commit/44d9e0b))
+* Close synthetic scope for labeled blocks ([5f0f789](https://github.com/jshint/jshint/commit/5f0f789))
+* Fail gracefully on invalid `if` syntax (#3103) ([8c6ac87](https://github.com/jshint/jshint/commit/8c6ac87))
+* Honor "ignore" file when linting STDIN ([d4f83a4](https://github.com/jshint/jshint/commit/d4f83a4))
+* Parse `for-in/of` head LHS as asnmt target ([da52ad9](https://github.com/jshint/jshint/commit/da52ad9))
+* Removed warning message W041 (#3115) ([376fa62](https://github.com/jshint/jshint/commit/376fa62))
+* Throw W033 instead of E058 when the ; after a do-while stmt is missing ([6907cd4](https://github.com/jshint/jshint/commit/6907cd4))
+
+### Features
+
+* Add enforcing option: `trailingcomma` (#3090) ([42dc572](https://github.com/jshint/jshint/commit/42dc572))
+* Add MediaRecorder to vars.js ([b075919](https://github.com/jshint/jshint/commit/b075919))
+
+
+
 <a name="2.9.4"></a>
 ## [2.9.4](https://github.com/jshint/jshint/compare/2.9.3...v2.9.4) (2016-10-20)
 
