@@ -3206,13 +3206,17 @@ singleGroups.objectLiterals = function (test) {
     // Invalid forms
     "var a = ({}).method();",
     "if (({}).method()) {}",
-    "var b = { a: ({}).method() };"
+    "var b = { a: ({}).method() };",
+    "for (({}); ;) {}",
+    "for (; ;({})) {}"
   ];
 
   TestRun(test, "grouping operator not required")
     .addError(4, "Unnecessary grouping operator.")
     .addError(5, "Unnecessary grouping operator.")
     .addError(6, "Unnecessary grouping operator.")
+    .addError(7, "Unnecessary grouping operator.")
+    .addError(8, "Unnecessary grouping operator.")
     .test(code, { singleGroups: true });
 
   test.done();
@@ -3334,13 +3338,17 @@ singleGroups.destructuringAssign = function (test) {
     "([ x ] = [ 1 ]);",
     // expressions
     "1, ({ x } = { x : 1 });",
-    "1, ([ x ] = [ 1 ]);"
+    "1, ([ x ] = [ 1 ]);",
+    "for (({ x } = { X: 1 }); ;) {}",
+    "for (; ;({ x } = { X: 1 })) {}"
   ];
 
   TestRun(test)
     .addError(2, "Unnecessary grouping operator.")
     .addError(3, "Unnecessary grouping operator.")
     .addError(4, "Unnecessary grouping operator.")
+    .addError(5, "Unnecessary grouping operator.")
+    .addError(6, "Unnecessary grouping operator.")
     .test(code, { esversion: 6, singleGroups: true, expr: true });
 
   test.done();
