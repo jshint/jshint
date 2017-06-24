@@ -3148,7 +3148,8 @@ exports["let block and let expression"] = function (test) {
     "{",
     "  let(t=4) print(x, y, z, t);",
     "  print(let(u=4) u,x);",
-    "}"
+    "}",
+    "for (; ; let (x = 1) x) {}"
   ];
 
   TestRun(test)
@@ -3163,13 +3164,16 @@ exports["let block and let expression as esnext"] = function (test) {
     "{",
     "  let(t=4) print(x, y, z, t);",
     "  print(let(u=4) u,x);",
-    "}"
+    "}",
+    "for (; ; let (x = 1) x) {}"
   ];
 
   TestRun(test)
     .addError(1, 5, "'let block' is only available in Mozilla JavaScript extensions (use moz option).")
     .addError(3, 6, "'let block' is only available in Mozilla JavaScript extensions (use moz option).")
     .addError(4, 9, "'let expressions' is only available in Mozilla JavaScript extensions " +
+      "(use moz option).")
+    .addError(6, 10, "'let expressions' is only available in Mozilla JavaScript extensions " +
       "(use moz option).")
     .test(code, {esnext: true, unused: true, undef: true, predef: ["print"]});
   test.done();
