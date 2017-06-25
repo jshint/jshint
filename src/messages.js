@@ -227,7 +227,8 @@ var warnings = {
   W138: "Regular parameters should not come after default parameters.",
   W139: "Function expressions should not be used as the second operand to instanceof.",
   W140: "Missing comma.",
-  W141: "'{a}' is a non-standard language feature. Enable it using the '{b}' unstable option."
+  W141: "'{a}' is a non-standard language feature. Enable it using the '{b}' unstable option.",
+  W142: "Superfluous 'case' clause."
 };
 
 var info = {

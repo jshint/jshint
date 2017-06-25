@@ -4222,6 +4222,12 @@ var JSHINT = (function() {
         case "switch":
         case "throw":
           break;
+        case "default":
+          if (state.option.leanswitch) {
+            warning("W142", state.tokens.curr);
+          }
+
+          break;
         default:
           // You can tell JSHint that you don't use break intentionally by
           // adding a comment /* falls through */ on a line just before
@@ -4246,6 +4252,12 @@ var JSHINT = (function() {
         case "return":
         case "throw":
           break;
+        case "case":
+          if (state.option.leanswitch) {
+            warning("W142", state.tokens.curr);
+          }
+
+          break;
         default:
           // Do not display a warning if 'default' is the first statement or if
           // there is a special /* falls through */ comment.
@@ -4259,6 +4271,7 @@ var JSHINT = (function() {
         advance("default");
         g = true;
         advance(":");
+        state.funct["(verb)"] = "default";
         break;
       case "}":
         if (!noindent)

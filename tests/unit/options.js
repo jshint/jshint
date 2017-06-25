@@ -4132,3 +4132,90 @@ exports.unstable = function (test) {
 
   test.done();
 };
+
+exports.leanswitch = function (test) {
+  var code = [
+      "switch (0) {",
+      "  case 0:",
+      "  default:",
+      "    break;",
+      "}"
+    ];
+  TestRun(test, "empty case clause followed by default")
+    .test(code);
+  TestRun(test, "empty case clause followed by default")
+    .addError(2, "Superfluous 'case' clause.")
+    .test(code, { leanswitch: true });
+
+  code = [
+      "switch (0) {",
+      "  case 0:",
+      "  case 1:",
+      "    break;",
+      "}"
+    ];
+  TestRun(test, "empty case clause followed by case")
+    .test(code);
+  TestRun(test, "empty case clause followed by case")
+    .test(code, { leanswitch: true });
+
+  code = [
+      "switch (0) {",
+      "  default:",
+      "  case 0:",
+      "    break;",
+      "}"
+    ];
+  TestRun(test, "empty default clause followed by case")
+    .test(code);
+  TestRun(test, "empty default clause followed by case")
+    .addError(2, "Superfluous 'case' clause.")
+    .test(code, { leanswitch: true });
+
+  code = [
+      "switch (0) {",
+      "  case 0:",
+      "    void 0;",
+      "  default:",
+      "    break;",
+      "}"
+    ];
+  TestRun(test, "non-empty case clause followed by default")
+    .addError(3, "Expected a 'break' statement before 'default'.")
+    .test(code);
+  TestRun(test, "non-empty case clause followed by default")
+    .addError(3, "Expected a 'break' statement before 'default'.")
+    .test(code, { leanswitch: true });
+
+  code = [
+      "switch (0) {",
+      "  case 0:",
+      "    void 0;",
+      "  case 1:",
+      "    break;",
+      "}"
+    ];
+  TestRun(test, "non-empty case clause followed by case")
+    .addError(3, "Expected a 'break' statement before 'case'.")
+    .test(code);
+  TestRun(test, "non-empty case clause followed by case")
+    .addError(3, "Expected a 'break' statement before 'case'.")
+    .test(code, { leanswitch: true });
+
+  code = [
+      "switch (0) {",
+      "  default:",
+      "    void 0;",
+      "  case 0:",
+      "    break;",
+      "}"
+    ];
+  TestRun(test, "non-empty default clause followed by case")
+    .addError(3, "Expected a 'break' statement before 'case'.")
+    .test(code);
+  TestRun(test, "non-empty default clause followed by case")
+    .addError(3, "Expected a 'break' statement before 'case'.")
+    .test(code, { leanswitch: true });
+
+  test.done();
+};
