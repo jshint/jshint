@@ -123,6 +123,21 @@ exports.bool = {
     immed       : true,
 
     /**
+     * This option prohibits unnecessary clauses within `switch` statements,
+     * e.g.
+     *
+     *     switch (x) {
+     *       case 1:
+     *       default:
+     *         z();
+     *     }
+     *
+     * While clauses like these are techincally valid, they do not effect
+     * program behavior and may indicate an erroneous refactoring.
+     */
+    leanswitch  : true,
+
+    /**
      * This option requires you to capitalize names of constructor functions.
      * Capitalizing functions that are intended to be used with `new` operator
      * is just a convention that helps programmers to visually distinguish

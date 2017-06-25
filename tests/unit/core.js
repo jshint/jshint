@@ -270,7 +270,6 @@ exports.switchFallThrough = function (test) {
   var src = fs.readFileSync(__dirname + '/fixtures/switchFallThrough.js', 'utf8');
   TestRun(test)
     .addError(3, "Expected a 'break' statement before 'case'.")
-    .addError(18, "Expected a 'break' statement before 'default'.")
     .addError(40, "Unexpected ':'.")
     .test(src);
 
