@@ -233,7 +233,8 @@ var warnings = {
   W140: "Missing comma.",
   W141: "Empty {a}: this is unnecessary and can be removed.",
   W142: "Empty {a}: consider replacing with `import '{b}';`.",
-  W143: "'{a}' is a non-standard language feature. Enable it using the '{b}' unstable option."
+  W143: "'{a}' is a non-standard language feature. Enable it using the '{b}' unstable option.",
+  W144: "Superfluous 'case' clause."
 };
 
 var info = {
