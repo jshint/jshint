@@ -1203,7 +1203,7 @@ Lexer.prototype = {
 
         if (!allowNewLine) {
           // This condition unequivocally describes a syntax error.
-          // TODO: Re-factor as an "error" (not a "warning").
+          // TODO: Emit error E029 and remove W112.
           this.trigger("warning", {
             code: "W112",
             line: this.line,
@@ -1232,12 +1232,6 @@ Lexer.prototype = {
         // error and implicitly close it at the EOF point.
 
         if (!this.nextLine(checks)) {
-          this.trigger("error", {
-            code: "E029",
-            line: startLine,
-            character: startChar
-          });
-
           return {
             type: Token.StringLiteral,
             value: value,
@@ -1278,8 +1272,14 @@ Lexer.prototype = {
           allowNewLine = parsed.allowNewLine;
         }
 
-        value += char;
-        this.skip(jump);
+        // If char is the empty string, end of the line has been reached. In
+        // this case, `this.char` should not be incremented so that warnings
+        // and errors reported in the subsequent loop iteration have the
+        // correct character column offset.
+        if (char !== "") {
+          value += char;
+          this.skip(jump);
+        }
       }
     }
 

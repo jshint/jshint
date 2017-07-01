@@ -2066,21 +2066,21 @@ exports.strings = function (test) {
   var src = fs.readFileSync(__dirname + '/fixtures/strings.js', 'utf8');
 
   TestRun(test)
-    .addError(9, "Unclosed string.")
-    .addError(10, "Unclosed string.")
-    .addError(15, "Unclosed string.")
+    .addError(9, "Unclosed string.", {character: 20})
+    .addError(10, "Unclosed string.", {character: 1})
+    .addError(15, "Unclosed string.", {character: 1})
     .addError(25, "Octal literals are not allowed in strict mode.")
     .test(src, { es3: true, multistr: true });
 
   TestRun(test)
-    .addError(3, "Bad escaping of EOL. Use option multistr if needed.")
-    .addError(4, "Bad escaping of EOL. Use option multistr if needed.")
-    .addError(9, "Unclosed string.")
-    .addError(10, "Unclosed string.")
-    .addError(14, "Bad escaping of EOL. Use option multistr if needed.")
-    .addError(15, "Unclosed string.")
+    .addError(3, "Bad escaping of EOL. Use option multistr if needed.", {character: 21})
+    .addError(4, "Bad escaping of EOL. Use option multistr if needed.", {character: 2})
+    .addError(9, "Unclosed string.", {character: 20})
+    .addError(10, "Unclosed string.", {character: 1})
+    .addError(14, "Bad escaping of EOL. Use option multistr if needed.", {character: 21})
+    .addError(15, "Unclosed string.", {character: 1})
     .addError(25, "Octal literals are not allowed in strict mode.")
-    .addError(29, "Bad escaping of EOL. Use option multistr if needed.")
+    .addError(29, "Bad escaping of EOL. Use option multistr if needed.", {character: 36})
     .test(src, { es3: true });
 
   test.done();
