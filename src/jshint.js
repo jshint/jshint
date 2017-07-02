@@ -2531,7 +2531,8 @@ var JSHINT = (function() {
     // current token marks the beginning of a "fat arrow" function and parsing
     // should proceed accordingly.
     if (pn.value === "=>") {
-      return doFunction({ type: "arrow", parsedOpening: true });
+      pn.funct = doFunction({ type: "arrow", parsedOpening: true });
+      return pn;
     }
 
     var exprs = [];
@@ -2576,7 +2577,7 @@ var JSHINT = (function() {
         isNecessary =
           // Used to distinguish from an ExpressionStatement which may not
           // begin with the `{` and `function` tokens
-          (opening.beginsStmt && (ret.id === "{" || triggerFnExpr || isFunctor(ret))) ||
+          (opening.beginsStmt && (ret.id === "{" || triggerFnExpr)) ||
           // Used to signal that a function expression is being supplied to
           // some other operator.
           (triggerFnExpr &&
@@ -2587,7 +2588,7 @@ var JSHINT = (function() {
             (!isEndOfExpr() || state.tokens.prev.id !== "}")) ||
           // Used to demarcate an arrow function as the left-hand side of some
           // operator.
-          (isFunctor(ret) && !isEndOfExpr()) ||
+          (ret.id === "=>" && !isEndOfExpr()) ||
           // Used as the return value of a single-statement arrow function
           (ret.id === "{" && preceeding.id === "=>") ||
           // Used to cover a unary expression as the left-hand side of the
