@@ -79,6 +79,11 @@ exports.rest = function (test) {
   ];
 
   TestRun(test, "nested array pattern, final")
+    .addError(1, "Expected an identifier and instead saw '['.")
+    .addError(2, "Expected an identifier and instead saw '['.")
+    .addError(3, "Expected an identifier and instead saw '['.")
+    .addError(4, "Expected an identifier and instead saw '['.")
+    .addError(5, "Expected an identifier and instead saw '['.")
     .test(code, { esversion: 6, unstable: { objspreadrest: true } });
 
   code = [
@@ -90,19 +95,24 @@ exports.rest = function (test) {
   ];
 
   TestRun(test, "nested array pattern, not final")
+    .addError(1, "Expected an identifier and instead saw '['.")
     .addError(1, "Invalid element after rest element.")
+    .addError(2, "Expected an identifier and instead saw '['.")
     .addError(2, "Invalid element after rest element.")
+    .addError(3, "Expected an identifier and instead saw '['.")
     .addError(3, "Invalid element after rest element.")
+    .addError(4, "Expected an identifier and instead saw '['.")
     .addError(4, "Invalid element after rest element.")
+    .addError(5, "Expected an identifier and instead saw '['.")
     .addError(5, "Invalid element after rest element.")
     .test(code, { esversion: 6, unstable: { objspreadrest: true } });
 
   TestRun(test, "nested array pattern, empty")
-    .addError(1, "Empty destructuring.")
+    .addError(1, "Expected an identifier and instead saw '['.")
     .test("({ ...[] } = {});", { esversion: 6, unstable: { objspreadrest: true } });
 
   TestRun(test, "nested object pattern, empty")
-    .addError(1, "Empty destructuring.")
+    .addError(1, "Expected an identifier and instead saw '{'.")
     .test("({ ...{} } = {});", { esversion: 6, unstable: { objspreadrest: true } });
 
   test.done();
