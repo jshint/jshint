@@ -3467,7 +3467,8 @@ var JSHINT = (function() {
       }
     };
     var assignmentProperty = function() {
-      var id;
+      var id, expr;
+
       if (checkPunctuator(state.tokens.next, "[")) {
         advance("[");
         expression(10);
@@ -3488,7 +3489,16 @@ var JSHINT = (function() {
             warning("W144", state.tokens.next, "object rest property", "objspreadrest");
           }
 
-          nextInnerDE();
+          // Due to visual symmetry with the array rest property (and the early
+          // design of the language feature), developers may mistakenly assume
+          // any expression is valid in this position.  Parse an expression and
+          // issue an error in order to recover more gracefully from this
+          // condition.
+          expr = expression(10);
+
+          if (expr.type !== "(identifier)") {
+            error("E030", expr, expr.value);
+          }
         } else {
           id = identifier();
         }
