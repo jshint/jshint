@@ -79,6 +79,11 @@ exports.rest = function (test) {
   ];
 
   TestRun(test, "nested array pattern, final")
+    .addError(1, 7, "Expected an identifier and instead saw '['.")
+    .addError(2, 10, "Expected an identifier and instead saw '['.")
+    .addError(3, 14, "Expected an identifier and instead saw '['.")
+    .addError(4, 13, "Expected an identifier and instead saw '['.")
+    .addError(5, 17, "Expected an identifier and instead saw '['.")
     .test(code, { esversion: 6, unstable: { objspreadrest: true } });
 
   code = [
@@ -90,19 +95,24 @@ exports.rest = function (test) {
   ];
 
   TestRun(test, "nested array pattern, not final")
+    .addError(1, 7, "Expected an identifier and instead saw '['.")
     .addError(1, 16, "Invalid element after rest element.")
+    .addError(2, 10, "Expected an identifier and instead saw '['.")
     .addError(2, 19, "Invalid element after rest element.")
+    .addError(3, 14, "Expected an identifier and instead saw '['.")
     .addError(3, 23, "Invalid element after rest element.")
+    .addError(4, 13, "Expected an identifier and instead saw '['.")
     .addError(4, 22, "Invalid element after rest element.")
+    .addError(5, 17, "Expected an identifier and instead saw '['.")
     .addError(5, 26, "Invalid element after rest element.")
     .test(code, { esversion: 6, unstable: { objspreadrest: true } });
 
   TestRun(test, "nested array pattern, empty")
-    .addError(1, 7, "Empty destructuring: this is unnecessary and can be removed.")
+    .addError(1, 7, "Expected an identifier and instead saw '['.")
     .test("({ ...[] } = {});", { esversion: 6, unstable: { objspreadrest: true } });
 
   TestRun(test, "nested object pattern, empty")
-    .addError(1, 7, "Empty destructuring: this is unnecessary and can be removed.")
+    .addError(1, 7, "Expected an identifier and instead saw '{'.")
     .test("({ ...{} } = {});", { esversion: 6, unstable: { objspreadrest: true } });
 
   test.done();
