@@ -1891,8 +1891,11 @@ var JSHINT = (function() {
 
   function countMember(m) {
     if (membersOnly && typeof membersOnly[m] !== "boolean") {
-      warning("W036", state.tokens.curr, m);
+      if (m !== null && !membersOnly.hasOwnProperty(String(m))) {
+        warning("W036", state.tokens.curr, m);
+      }
     }
+
     if (typeof member[m] === "number") {
       member[m] += 1;
     } else {
@@ -3274,7 +3277,16 @@ var JSHINT = (function() {
             error("E034");
           }
 
-          i = propertyName();
+          if (state.tokens.next.type === "(punctuator)" && state.tokens.next.id === "[") {
+            i = computedPropertyName();
+
+            if (i && i.value) {
+              i = i.value;
+            }
+
+          } else {
+            i = propertyName();
+          }
 
           // ES6 allows for get() {...} and set() {...} method
           // definition shorthand syntax, so we don't produce an error
@@ -4982,6 +4994,25 @@ var JSHINT = (function() {
     }
     var value = expression(10);
     advance("]");
+
+    /**
+     * Test if {value.type} is not a string because we will not currently check non-string values
+     * in ES6 for computed properties.  Else if the value has a left and a right property that are not strings,
+     * we combine the values to ensure the combined value is being evaluated, not each individual item of the expression.
+     * @param {value.type} string
+     * @param {value.identifier} boolean
+     * @returns {token}
+     */
+
+    if (value.type !== "(string)" && value.identifier) {
+      value = null ;
+    } else if (value.left && value.right) {
+      if (value.right.type !== "(string)" && value.left.type !== "(string)") {
+        var currValue = value;
+        value.value = value.left + currValue.value + value.right;
+      }
+    }
+
     return value;
   }
 
