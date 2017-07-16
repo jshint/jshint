@@ -2981,10 +2981,6 @@ var JSHINT = (function() {
     return funct;
   }
 
-  function isFunctor(token) {
-    return "(scope)" in token;
-  }
-
   /**
    * Determine if the parser has begun parsing executable code.
    *
