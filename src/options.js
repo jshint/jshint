@@ -957,10 +957,10 @@ exports.val = {
    * In addition to that, this option will warn you about unused global
    * variables declared via the `global` directive.
    *
-   * This can be set to `vars` to only check for variables, not function
-   * parameters, or `strict` to check all variables and parameters.  The
-   * default (true) behavior is to allow unused parameters that are followed by
-   * a used parameter.
+   * When set to `true`, unused parameters that are followed by a used
+   * parameter will not produce warnings. This option can be set to `vars` to
+   * only check for variables, not function parameters, or `strict` to check
+   * all variables and parameters.
    */
   unused       : true,
 
