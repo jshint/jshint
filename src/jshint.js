@@ -3274,13 +3274,17 @@ var JSHINT = (function() {
             error("E034");
           }
 
-          i = propertyName();
+          if (state.tokens.next.id === "[") {
+            i = computedPropertyName();
+          } else {
+            i = propertyName();
 
-          // ES6 allows for get() {...} and set() {...} method
-          // definition shorthand syntax, so we don't produce an error
-          // if linting ECMAScript 6 code.
-          if (!i && !state.inES6()) {
-            error("E035");
+            // ES6 allows for get() {...} and set() {...} method
+            // definition shorthand syntax, so we don't produce an error
+            // if linting ECMAScript 6 code.
+            if (!i && !state.inES6()) {
+              error("E035");
+            }
           }
 
           // We don't want to save this getter unless it's an actual getter
