@@ -5676,9 +5676,13 @@ exports["object ComputedPropertyName"] = function (test) {
     "var c = { [b]: 1 };",
     "var d = { 0: 1 };",
     "var e = { ['s']: 1 };",
+    "var f = { get [0]() {} };",
+    "var g = { set [0](_) {} };",
   ];
 
-  TestRun(test).test(code, { esnext: true });
+  TestRun(test)
+    .addError(19, "Setter is defined without getter.")
+    .test(code, { esnext: true });
 
   TestRun(test)
     .addError(6, "'computed property names' is only available in ES6 (use 'esversion: 6').")
@@ -5691,6 +5695,9 @@ exports["object ComputedPropertyName"] = function (test) {
     .addError(13, "'computed property names' is only available in ES6 (use 'esversion: 6').")
     .addError(15, "'computed property names' is only available in ES6 (use 'esversion: 6').")
     .addError(17, "'computed property names' is only available in ES6 (use 'esversion: 6').")
+    .addError(18, "'computed property names' is only available in ES6 (use 'esversion: 6').")
+    .addError(19, "'computed property names' is only available in ES6 (use 'esversion: 6').")
+    .addError(19, "Setter is defined without getter.")
   .test(code);
 
   test.done();
