@@ -605,7 +605,6 @@ exports.testReserved = function (test) {
     .test(src, {es3: true});
 
   TestRun(test)
-    .addError(5, 5, "Expected an identifier and instead saw 'let' (a reserved word).")
     .addError(10, 7, "Expected an identifier and instead saw 'let' (a reserved word).")
     .test(src, {}); // es5
 
