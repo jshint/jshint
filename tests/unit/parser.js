@@ -2407,7 +2407,10 @@ exports["let statement as esnext"] = function (test) {
     "  }",
     "  print(x + ' ' + y);",
     "}",
-    "print(x);"
+    "print(x);",
+    "let",
+    "y;",
+    "print(y);"
   ];
 
   TestRun(test)
@@ -2821,6 +2824,9 @@ exports["let statement in for loop as esnext"] = function (test) {
     "}",
     "for (let i=0 ; i < 10 ; i++ ) {",
     "print(i);",
+    "}",
+    "for (let of; false; false) {",
+    "  print(of);",
     "}"
   ];
 
@@ -3079,7 +3085,16 @@ exports["let statement (as seen in jetpack) as esnext"] = function (test) {
   ];
 
   TestRun(test)
-    .addError(3, 5, "'let block' is only available in Mozilla JavaScript extensions (use moz option).")
+    .addError(6, 57, "Missing semicolon.")
+    .addError(3, 1, "'let' is not defined.")
+    .addError(3, 6, "'str' is not defined.")
+    .addError(10, 1, "'str' is not defined.")
+    .addError(12, 42, "'str' is not defined.")
+    .addError(12, 47, "'str' is not defined.")
+    .addError(5, 5, "'converter' is not defined.")
+    .addError(8, 1, "'converter' is not defined.")
+    .addError(9, 1, "'converter' is not defined.")
+    .addError(10, 12, "'converter' is not defined.")
     .test(code, {esnext: true, unused: true, undef: true,
            predef: ["require", "xferable", "options"]});
   test.done();
@@ -3106,8 +3121,16 @@ exports["let statement (as seen in jetpack) as es5"] = function (test) {
   TestRun(test)
     .addError(1, 1, "'const' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(1, 1, "'destructuring binding' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(3, 1, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(3, 5, "'let block' is only available in Mozilla JavaScript extensions (use moz option).")
+    .addError(6, 57, "Missing semicolon.")
+    .addError(3, 1, "'let' is not defined.")
+    .addError(3, 6, "'str' is not defined.")
+    .addError(10, 1, "'str' is not defined.")
+    .addError(12, 42, "'str' is not defined.")
+    .addError(12, 47, "'str' is not defined.")
+    .addError(5, 5, "'converter' is not defined.")
+    .addError(8, 1, "'converter' is not defined.")
+    .addError(9, 1, "'converter' is not defined.")
+    .addError(10, 12, "'converter' is not defined.")
     .test(code, {unused: true, undef: true,
            predef: ["require", "xferable", "options"]}); // es5
   test.done();
@@ -3134,8 +3157,16 @@ exports["let statement (as seen in jetpack) as legacy JS"] = function (test) {
   TestRun(test)
     .addError(1, 1, "'const' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(1, 1, "'destructuring binding' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(3, 1, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(3, 5, "'let block' is only available in Mozilla JavaScript extensions (use moz option).")
+    .addError(6, 57, "Missing semicolon.")
+    .addError(3, 1, "'let' is not defined.")
+    .addError(3, 6, "'str' is not defined.")
+    .addError(10, 1, "'str' is not defined.")
+    .addError(12, 42, "'str' is not defined.")
+    .addError(12, 47, "'str' is not defined.")
+    .addError(5, 5, "'converter' is not defined.")
+    .addError(8, 1, "'converter' is not defined.")
+    .addError(9, 1, "'converter' is not defined.")
+    .addError(10, 12, "'converter' is not defined.")
     .test(code, {es3: true, unused: true, undef: true,
            predef: ["require", "xferable", "options"]});
   test.done();
@@ -3169,12 +3200,32 @@ exports["let block and let expression as esnext"] = function (test) {
   ];
 
   TestRun(test)
-    .addError(1, 5, "'let block' is only available in Mozilla JavaScript extensions (use moz option).")
-    .addError(3, 6, "'let block' is only available in Mozilla JavaScript extensions (use moz option).")
-    .addError(4, 9, "'let expressions' is only available in Mozilla JavaScript extensions " +
-      "(use moz option).")
-    .addError(6, 10, "'let expressions' is only available in Mozilla JavaScript extensions " +
-      "(use moz option).")
+    .addError(1, 20, "Missing semicolon.")
+    .addError(3, 11, "Missing semicolon.")
+    .addError(4, 18, "Expected ')' and instead saw 'u'.")
+    .addError(4, 20, "Expected an assignment or function call and instead saw an expression.")
+    .addError(4, 21, "Missing semicolon.")
+    .addError(4, 21, "Expected an identifier and instead saw ')'.")
+    .addError(4, 21, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, 1, "'let' is not defined.")
+    .addError(3, 3, "'let' is not defined.")
+    .addError(4, 9, "'let' is not defined.")
+    .addError(1, 6, "'x' is not defined.")
+    .addError(3, 18, "'x' is not defined.")
+    .addError(4, 20, "'x' is not defined.")
+    .addError(1, 11, "'y' is not defined.")
+    .addError(3, 21, "'y' is not defined.")
+    .addError(1, 16, "'z' is not defined.")
+    .addError(3, 24, "'z' is not defined.")
+    .addError(3, 7, "'t' is not defined.")
+    .addError(3, 27, "'t' is not defined.")
+    .addError(4, 13, "'u' is not defined.")
+    .addError(6, 22, "Expected ')' to match '(' from line 6 and instead saw 'x'.")
+    .addError(6, 23, "Expected an identifier and instead saw ')'.")
+    .addError(6, 23, "Expected an assignment or function call and instead saw an expression.")
+    .addError(6, 24, "Missing semicolon.")
+    .addError(6, 10, "'let' is not defined.")
+    .addError(6, 15, "'x' is not defined.")
     .test(code, {esnext: true, unused: true, undef: true, predef: ["print"]});
   test.done();
 };
@@ -3190,13 +3241,26 @@ exports["let block and let expression as es5"] = function (test) {
   ];
 
   TestRun(test)
-    .addError(1, 1, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(1, 5, "'let block' is only available in Mozilla JavaScript extensions (use moz option).")
-    .addError(3, 3, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(3, 6, "'let block' is only available in Mozilla JavaScript extensions (use moz option).")
-    .addError(4, 9, "'let expressions' is only available in Mozilla JavaScript extensions " +
-      "(use moz option).")
-    .addError(4, 12, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .addError(1, 20, "Missing semicolon.")
+    .addError(3, 11, "Missing semicolon.")
+    .addError(4, 18, "Expected ')' and instead saw 'u'.")
+    .addError(4, 20, "Expected an assignment or function call and instead saw an expression.")
+    .addError(4, 21, "Missing semicolon.")
+    .addError(4, 21, "Expected an identifier and instead saw ')'.")
+    .addError(4, 21, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, 1, "'let' is not defined.")
+    .addError(3, 3, "'let' is not defined.")
+    .addError(4, 9, "'let' is not defined.")
+    .addError(1, 6, "'x' is not defined.")
+    .addError(3, 18, "'x' is not defined.")
+    .addError(4, 20, "'x' is not defined.")
+    .addError(1, 11, "'y' is not defined.")
+    .addError(3, 21, "'y' is not defined.")
+    .addError(1, 16, "'z' is not defined.")
+    .addError(3, 24, "'z' is not defined.")
+    .addError(3, 7, "'t' is not defined.")
+    .addError(3, 27, "'t' is not defined.")
+    .addError(4, 13, "'u' is not defined.")
     .test(code, {unused: true, undef: true, predef: ["print"]}); // es5
   test.done();
 };
@@ -3212,13 +3276,26 @@ exports["let block and let expression as legacy JS"] = function (test) {
   ];
 
   TestRun(test)
-    .addError(1, 1, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(1, 5, "'let block' is only available in Mozilla JavaScript extensions (use moz option).")
-    .addError(3, 3, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(3, 6, "'let block' is only available in Mozilla JavaScript extensions (use moz option).")
-    .addError(4, 9, "'let expressions' is only available in Mozilla JavaScript extensions " +
-      "(use moz option).")
-    .addError(4, 12, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .addError(1, 20, "Missing semicolon.")
+    .addError(3, 11, "Missing semicolon.")
+    .addError(4, 18, "Expected ')' and instead saw 'u'.")
+    .addError(4, 20, "Expected an assignment or function call and instead saw an expression.")
+    .addError(4, 21, "Missing semicolon.")
+    .addError(4, 21, "Expected an identifier and instead saw ')'.")
+    .addError(4, 21, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, 1, "'let' is not defined.")
+    .addError(3, 3, "'let' is not defined.")
+    .addError(4, 9, "'let' is not defined.")
+    .addError(1, 6, "'x' is not defined.")
+    .addError(3, 18, "'x' is not defined.")
+    .addError(4, 20, "'x' is not defined.")
+    .addError(1, 11, "'y' is not defined.")
+    .addError(3, 21, "'y' is not defined.")
+    .addError(1, 16, "'z' is not defined.")
+    .addError(3, 24, "'z' is not defined.")
+    .addError(3, 7, "'t' is not defined.")
+    .addError(3, 27, "'t' is not defined.")
+    .addError(4, 13, "'u' is not defined.")
     .test(code, {es3: true, unused: true, undef: true, predef: ["print"]});
   test.done();
 };
@@ -4758,6 +4835,9 @@ exports["for of as esnext"] = function (test) {
       "for (x+y of {}) {}",
       "for ((this) of {}) {}"
     ], {esversion: 2015});
+
+  TestRun(test, "let binding named `of`")
+    .test("for (let of of []) {}", {esversion: 2015});
 
   test.done();
 };
@@ -6406,6 +6486,8 @@ exports.classes = function (test) {
   cexprAssn = code.indexOf(cexprAssn) + 1;
 
   var run = TestRun(test)
+    .addError(cdecl + 3, 7, "Expected an identifier and instead saw 'protected' (a reserved word).")
+    .addError(cexpr + 3, 20, "Expected an identifier and instead saw 'protected' (a reserved word).")
     .addError(cdecl + 4, 15, "Expected an identifier and instead saw 'package' (a reserved word).")
     .addError(cexpr + 4, 15, "Expected an identifier and instead saw 'package' (a reserved word).")
     .addError(cdeclAssn + 4, 21, "Reassignment of 'Foo15', which is a class. Use 'var' or 'let' to declare bindings that may change.")
@@ -6420,14 +6502,12 @@ exports.classes = function (test) {
 
   run
     .addError(cdecl + 1, 7, "'Foo0' is defined but never used.")
-    .addError(cdecl + 3, 7, "Expected an identifier and instead saw 'protected' (a reserved word).")
     .addError(cdecl + 3, 7, "'protected' is defined but never used.")
     .addError(cdecl + 4, 15, "'package' is defined but never used.");
   run
     .addError(cexpr + 1, 5, "'Foo7' is defined but never used.")
     .addError(cexpr + 3, 5, "Expected an identifier and instead saw 'static' (a reserved word).")
     .addError(cexpr + 3, 5, "'static' is defined but never used.")
-    .addError(cexpr + 3, 20, "Expected an identifier and instead saw 'protected' (a reserved word).")
     .addError(cexpr + 4, 15, "'package' is defined but never used.");
 
   code[0] = "'use strict';" + code[0];
@@ -8921,6 +9001,81 @@ exports.exponentiation.compoundAssignment = function (test) {
       "0 **= x;",
       "this **= x;"
     ], { esversion: 7 });
+
+  test.done();
+};
+
+exports.letAsIdentifier = function (test) {
+  TestRun(test, "variable binding")
+    .test([
+      "var let;",
+      "function f(let) {}"
+    ]);
+
+  TestRun(test, "function binding")
+    .test("function let(let) {}");
+
+  var src = [
+    "var let;",
+    "var x = let;",
+    "let;",
+    "void let;",
+    "let();",
+    "let(let);",
+    "let(let());",
+    "for (let; false; false) {}",
+    "for (let in {}) {}",
+    "for (let = 0; false; false) {}",
+    "for (let || 0; false; false) {}"
+  ];
+
+  TestRun(test, "identifier reference (ES5)")
+    .addError(3, 1, "Expected an assignment or function call and instead saw an expression.")
+    .test(src, {esversion: 5});
+
+  TestRun(test, "identifier reference (ES2015)")
+    .addError(3, 1, "Expected an assignment or function call and instead saw an expression.")
+    .test(src, {esversion: 6});
+
+  // The same source code is expected to be parsed as a `let` declaration in
+  // ES2015 and later.
+  TestRun(test, "identifier reference with ASI")
+    .addError(1, 1, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, 4, "Missing semicolon.")
+    .addError(2, 1, "Expected an assignment or function call and instead saw an expression.")
+    .addError(3, 1, "Expected an assignment or function call and instead saw an expression.")
+    .addError(3, 4, "Missing semicolon.")
+    .addError(6, 1, "Misleading line break before '='; readers may interpret this as an expression boundary.")
+    .test([
+      "let",
+      "x;",
+      "let",
+      "void 0;",
+      "let",
+      "= 0;"
+    ], {esversion: 5});
+
+  // The same source code is expected to be parsed as a `let` declaration in
+  // ES2015 and later.
+  TestRun(test, "identifier reference with ASI")
+    .addError(1, 1, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, 4, "Missing semicolon.")
+    .addError(4, 1, "Misleading line break before '='; readers may interpret this as an expression boundary.")
+    .test([
+      "let",
+      "void 0;",
+      "let",
+      "= 0;"
+    ], {esversion: 6});
+
+  TestRun(test, "other uses")
+    .test([
+      "let: while (false) {",
+      "  break let;",
+      "}",
+      "void { let: 0 };",
+      "void {}.let;"
+    ]);
 
   test.done();
 };
