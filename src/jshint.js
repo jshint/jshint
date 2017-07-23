@@ -913,6 +913,7 @@ var JSHINT = (function() {
   function expression(rbp, context) {
     var left, isArray = false, isObject = false;
     var initial = context & prodParams.initial;
+    var curr;
 
     context &= ~prodParams.initial;
 
@@ -937,7 +938,9 @@ var JSHINT = (function() {
       state.tokens.curr.beginsStmt = true;
     }
 
-    if (initial && state.tokens.curr.fud) {
+    curr = state.tokens.curr;
+
+    if (initial && curr.fud && (!curr.useFud || curr.useFud(context))) {
       left = state.tokens.curr.fud(context);
     } else {
       if (state.tokens.curr.nud) {
@@ -3924,10 +3927,7 @@ var JSHINT = (function() {
       warning("W104", state.tokens.curr, type, "6");
     }
 
-    if (isLet && state.tokens.next.value === "(") {
-      if (!state.inMoz()) {
-        warning("W118", state.tokens.next, "let block");
-      }
+    if (isLet && isMozillaLet()) {
       advance("(");
       state.funct["(scope)"].stack();
       letblock = true;
@@ -3959,6 +3959,13 @@ var JSHINT = (function() {
       for (var t in tokens) {
         if (tokens.hasOwnProperty(t)) {
           t = tokens[t];
+
+          // It is a Syntax Error if the BoundNames of BindingList contains
+          // "let".
+          if (t.id === "let") {
+            warning("W024", t.token, t.id);
+          }
+
           if (state.funct["(scope)"].block.isGlobal()) {
             if (predefined[t.id] === false) {
               warning("W079", t.token, t.id);
@@ -4030,14 +4037,35 @@ var JSHINT = (function() {
   });
   conststatement.exps = true;
 
+
+  /**
+   * Determine if the current `let` token designates the beginning of a "let
+   * block" or "let expression" as implemented in the Mozilla SpiderMonkey
+   * engine.
+   *
+   * This function will only return `true` if Mozilla extensions have been
+   * enabled. It would be preferable to detect the language feature regardless
+   * of the parser's state because this would allow JSHint to instruct users to
+   * enable the `moz` option where necessary. This is not possible because the
+   * language extension is not compatible with standard JavaScript. For
+   * example, the following program code may describe a "let block" or a
+   * function invocation:
+   *
+   *     let(x)
+   *     {
+   *       typeof x;
+   *     }
+   *
+   * @returns {boolean}
+   */
+  function isMozillaLet() {
+    return state.tokens.next.id === "(" && state.inMoz();
+  }
   var letstatement = stmt("let", function(context) {
     return blockVariableStatement("let", this, context);
   });
   letstatement.nud = function(context, rbp) {
-    if (state.tokens.next.value === "(") {
-      if (!state.inMoz()) {
-        warning("W118", state.tokens.next, "let expressions");
-      }
+    if (isMozillaLet()) {
       // create a new block scope we use only for the current expression
       state.funct["(scope)"].stack();
       advance("(");
@@ -4045,9 +4073,37 @@ var JSHINT = (function() {
       advance(")");
       expression(rbp, context);
       state.funct["(scope)"].unstack();
+    } else {
+      this.exps = false;
+      return state.syntax["(identifier)"].nud.apply(this, arguments);
     }
   };
+  letstatement.meta = { es5: true, isFutureReservedWord: true, strictOnly: true };
   letstatement.exps = true;
+  letstatement.useFud = function() {
+    var next = state.tokens.next;
+    var nextIsBindingName;
+
+    if (this.line !== next.line && !state.inES6()) {
+      return false;
+    }
+
+    // JSHint generally interprets `let` as a reserved word even though it is
+    // not considered as such by the ECMAScript specification because doing so
+    // simplifies parsing logic. It is special-cased here so that code such as
+    //
+    //     let
+    //     let
+    //
+    // is correctly interpreted as an invalid LexicalBinding. (Without this
+    // consideration, the code above would be parsed as two
+    // IdentifierReferences.)
+    nextIsBindingName = next.identifier && (!isReserved(next) ||
+      next.id === "let");
+
+    return nextIsBindingName || checkPunctuators(next, ["{", "["]) ||
+      isMozillaLet();
+  };
 
   var varstatement = stmt("var", function(context) {
     var noin = context & prodParams.noin;
@@ -4684,6 +4740,7 @@ var JSHINT = (function() {
     var targets;
     var target;
     var decl;
+    var afterNext = peek();
 
     var headContext = context | prodParams.noin;
 
@@ -4692,7 +4749,13 @@ var JSHINT = (function() {
       decl = state.tokens.curr.fud(headContext);
       comma = decl.hasComma ? decl : null;
       initializer = decl.hasInitializer ? decl : null;
-    } else if (state.tokens.next.id === "let" || state.tokens.next.id === "const") {
+    } else if (state.tokens.next.id === "const" ||
+      // The "let" keyword only signals a lexical binding if it is followed by
+      // an identifier, `{`, or `[`. Otherwise, it should be parsed as an
+      // IdentifierReference (i.e. in a subsquent branch).
+      (state.tokens.next.id === "let" &&
+        ((afterNext.identifier && afterNext.id !== "in") ||
+         checkPunctuators(afterNext, ["{", "["])))) {
       advance(state.tokens.next.id);
       // create a new block scope
       letscope = true;

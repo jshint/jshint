@@ -1647,38 +1647,6 @@ Lexer.prototype = {
     var checks = asyncTrigger();
     var token;
 
-
-    function isReserved(token, isProperty) {
-      // At present all current identifiers have reserved set.
-      // Preserving check anyway, for future-proofing.
-      /* istanbul ignore if */
-      if (!token.reserved) {
-        return false;
-      }
-      var meta = token.meta;
-
-      if (meta && meta.isFutureReservedWord && state.inES5()) {
-        // ES3 FutureReservedWord in an ES5 environment.
-        if (!meta.es5) {
-          return false;
-        }
-
-        // Some ES5 FutureReservedWord identifiers are active only
-        // within a strict mode environment.
-        if (meta.strictOnly) {
-          if (!state.option.strict && !state.isStrict()) {
-            return false;
-          }
-        }
-
-        if (isProperty) {
-          return false;
-        }
-      }
-
-      return true;
-    }
-
     // Produce a token object.
     var create = function(type, value, isProperty, token) {
       /*jshint validthis:true */
@@ -1713,11 +1681,7 @@ Lexer.prototype = {
         }
 
         if (_.has(state.syntax, value)) {
-          obj = Object.create(state.syntax[value]);
-          // If this can't be a reserved keyword, reset the object.
-          if (!isReserved(obj, isProperty && type === "(identifier)")) {
-            obj = null;
-          }
+          obj = Object.create(state.syntax[value] || state.syntax["(error)"]);
         }
       }
 
