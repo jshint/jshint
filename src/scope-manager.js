@@ -9,8 +9,25 @@ var events = require("events");
 var marker = {};
 
 /**
- * Creates a scope manager that handles variables and labels, storing usages
- * and resolving when variables are used and undefined
+ * A factory function for creating scope managers. A scope manager tracks
+ * variables and JSHint "labels", detecting when variables are referenced
+ * (through "usages").
+ *
+ * Note that in this context, the term "label" describes an implementation
+ * detail of JSHint and is not related to the ECMAScript language construct of
+ * the same name. Where possible, the former is referred to as a "JSHint label"
+ * to avoid confusion.
+ *
+ * @param {object} state - the global state object (see `state.js`)
+ * @param {Array} predefined - a set of JSHint label names for built-in
+ *                             bindings provided by the environment
+ * @param {object} exported - a hash for JSHint label names that are intended
+ *                            to be referenced in contexts beyond the current
+ *                            program code
+ * @param {object} declared - a hash for JSHint label names that were defined
+ *                            as global bindings via linting configuration
+ *
+ * @returns {object} - a scope manager
  */
 var scopeManager = function(state, predefined, exported, declared) {
 
@@ -107,10 +124,10 @@ var scopeManager = function(state, predefined, exported, declared) {
   };
 
   /**
-   * Checks the current scope for unused identifiers
+   * Check the current scope for unused identifiers
    */
   function _checkForUnused() {
-    // function params are handled specially
+    // function parameters are validated by a dedicated function
     // assume that parameters are the only thing declared in the param scope
     if (_current["(type)"] === "functionparams") {
       _checkParams();
@@ -128,8 +145,9 @@ var scopeManager = function(state, predefined, exported, declared) {
   }
 
   /**
-   * Checks the current scope for unused parameters
-   * Must be called in a function parameter scope
+   * Check the current scope for unused parameters and issue warnings as
+   * necessary. This function may only be invoked when the current scope is a
+   * "function parameter" scope.
    */
   function _checkParams() {
     var params = _current["(params)"];
@@ -146,8 +164,12 @@ var scopeManager = function(state, predefined, exported, declared) {
 
       unused_opt = _getUnusedOption(state.funct["(unusedOption)"]);
 
-      // 'undefined' is a special case for (function(window, undefined) { ... })();
-      // patterns.
+      // 'undefined' is a special case for the common pattern where `undefined`
+      // is used as a formal parameter name to defend against global
+      // re-assignment, e.g.
+      //
+      //     (function(window, undefined) {
+      //     })();
       if (param === "undefined")
         return;
 
@@ -162,8 +184,13 @@ var scopeManager = function(state, predefined, exported, declared) {
   }
 
   /**
-   * Finds the relevant label's scope, searching from nearest outwards
-   * @returns {Object} the scope the label was found in
+   * Find the relevant JSHint label's scope. The owning scope is located by
+   * first inspecting the current scope and then moving "downward" through the
+   * stack of scopes.
+   *
+   * @param {string} labelName - the value of the identifier
+   *
+   * @returns {Object} - the scope in which the JSHint label was found
    */
   function _getLabel(labelName) {
     for (var i = _scopeStack.length - 1 ; i >= 0; --i) {
@@ -174,8 +201,15 @@ var scopeManager = function(state, predefined, exported, declared) {
     }
   }
 
+  /**
+   * Determine if a given JSHint label name has been referenced within the
+   * current function or any function defined within.
+   *
+   * @param {string} labelName - the value of the identifier
+   *
+   * @returns {boolean}
+   */
   function usedSoFarInCurrentFunction(labelName) {
-    // used so far in this whole function and any sub functions
     for (var i = _scopeStack.length - 1; i >= 0; i--) {
       var current = _scopeStack[i];
       if (current["(usages)"][labelName]) {
@@ -238,8 +272,11 @@ var scopeManager = function(state, predefined, exported, declared) {
     },
 
     /**
-     * Tell the manager we are entering a new block of code
-     * @param {string} [type] - The type of the block. Valid values are
+     * Create a new scope within the current scope. As the topmost value, the
+     * new scope will be interpreted as the current scope until it is
+     * exited--see the `unstack` method.
+     *
+     * @param {string} [type] - The type of the scope. Valid values are
      *                          "functionparams", "catchparams" and
      *                          "functionouter"
      */
@@ -255,6 +292,10 @@ var scopeManager = function(state, predefined, exported, declared) {
       }
     },
 
+    /**
+     * Valldate all binding references and declarations in the current scope
+     * and set the next scope on the stack as the active scope.
+     */
     unstack: function() {
       // jshint proto: true
       var subScope = _scopeStack.length > 1 ? _scopeStack[_scopeStack.length - 2] : null;
@@ -442,10 +483,11 @@ var scopeManager = function(state, predefined, exported, declared) {
     },
 
     /**
-     * Add a param to the current scope
-     * @param {string} labelName
+     * Add a function parameter to the current scope.
+     *
+     * @param {string} labelName - the value of the identifier
      * @param {Token} token
-     * @param {string} [type="param"] param type
+     * @param {string} [type] - JSHint label type; defaults to "param"
      */
     addParam: function(labelName, token, type) {
       type = type || "param";
@@ -532,7 +574,8 @@ var scopeManager = function(state, predefined, exported, declared) {
     },
 
     /**
-     * Gets an array of implied globals
+     * Get an array of implied globals
+     *
      * @returns {Array.<{ name: string, line: Array.<number>}>}
      */
     getImpliedGlobals: function() {
@@ -557,19 +600,35 @@ var scopeManager = function(state, predefined, exported, declared) {
     },
 
     /**
-     * Returns a list of unused variables
-     * @returns {Array}
+     * Get an array of objects describing unused bindings.
+     *
+     * @returns {Array<Object>}
      */
     getUnuseds: function() {
       return unuseds;
     },
 
+    /**
+     * Determine if a given name has been defined in the current scope or any
+     * lower scope.
+     *
+     * @param {string} labelName - the value of the identifier
+     *
+     * @return {boolean}
+     */
     has: function(labelName) {
       return Boolean(_getLabel(labelName));
     },
 
+    /**
+     * Retrieve  described by `labelName` or null
+     *
+     * @param {string} labelName - the value of the identifier
+     *
+     * @returns {string|null} - the type of the JSHint label or `null` if no
+     *                          such label exists
+     */
     labeltype: function(labelName) {
-      // returns a labels type or null if not present
       var scopeLabels = _getLabel(labelName);
       if (scopeLabels) {
         return scopeLabels[labelName]["(type)"];
@@ -578,7 +637,9 @@ var scopeManager = function(state, predefined, exported, declared) {
     },
 
     /**
-     * for the exported options, indicating a variable is used outside the file
+     * For the exported options, indicating a variable is used outside the file
+     *
+     * @param {string} labelName - the value of the identifier
      */
     addExported: function(labelName) {
       var globalLabels = _scopeStack[0]["(labels)"];
@@ -606,12 +667,22 @@ var scopeManager = function(state, predefined, exported, declared) {
     },
 
     /**
-     * Mark an indentifier as es6 module exported
+     * Mark a JSHint label as "exported" by an ES2015 module
+     *
+     * @param {string} labelName - the value of the identifier
+     * @param {object} token
      */
     setExported: function(labelName, token) {
       this.block.use(labelName, token);
     },
 
+    /**
+     * Mark a JSHint label as "initialized." This is necessary to enforce the
+     * "temporal dead zone" (TDZ) of block-scoped bindings which are not
+     * hoisted.
+     *
+     * @param {string} labelName - the value of the identifier
+     */
     initialize: function(labelName) {
       if (_current["(labels)"][labelName]) {
         _current["(labels)"][labelName]["(initialized)"] = true;
@@ -619,12 +690,17 @@ var scopeManager = function(state, predefined, exported, declared) {
     },
 
     /**
-     * adds an indentifier to the relevant current scope and creates warnings/errors as necessary
+     * Create a new JSHint label and add it to the current scope. Delegates to
+     * the internal `block.add` or `func.add` methods depending on the type.
+     * Produces warnings and errors as necessary.
+     *
      * @param {string} labelName
      * @param {Object} opts
-     * @param {String} opts.type - the type of the label e.g. "param", "var", "let, "const", "import", "function"
-     * @param {Token} opts.token - the token pointing at the declaration
-     * @param {boolean} opts.initialized - whether the binding should be created in an "initialized" state.
+     * @param {String} opts.type - the type of the label e.g. "param", "var",
+     *                             "let, "const", "import", "function"
+     * @param {object} opts.token - the token pointing at the declaration
+     * @param {boolean} opts.initialized - whether the binding should be
+     *                                     created in an "initialized" state.
      */
     addlabel: function(labelName, opts) {
 
@@ -712,12 +788,15 @@ var scopeManager = function(state, predefined, exported, declared) {
 
     funct: {
       /**
-       * Returns the label type given certain options
-       * @param labelName
-       * @param {Object=} options
-       * @param {Boolean=} options.onlyBlockscoped - only include block scoped labels
-       * @param {Boolean=} options.excludeParams - exclude the param scope
-       * @param {Boolean=} options.excludeCurrent - exclude the current scope
+       * Return the type of the provided JSHint label given certain options
+       *
+       * @param {string} labelName
+       * @param {Object=} [options]
+       * @param {boolean} [options.onlyBlockscoped] - only include block scoped
+       *                                              labels
+       * @param {boolean} [options.excludeParams] - exclude the param scope
+       * @param {boolean} [options.excludeCurrent] - exclude the current scope
+       *
        * @returns {String}
        */
       labeltype: function(labelName, options) {
@@ -737,9 +816,13 @@ var scopeManager = function(state, predefined, exported, declared) {
         }
         return null;
       },
+
       /**
-       * Returns if a break label exists in the function scope
-       * @param {string} labelName
+       * Determine whether a `break` statement label exists in the function
+       * scope.
+       *
+       * @param {string} labelName - the value of the identifier
+       *
        * @returns {boolean}
        */
       hasBreakLabel: function(labelName) {
@@ -755,17 +838,32 @@ var scopeManager = function(state, predefined, exported, declared) {
         }
         return false;
       },
+
       /**
-       * Returns if the label is in the current function scope
-       * See scopeManager.funct.labelType for options
+       * Determine if a given name has been defined in the current function
+       * scope.
+       *
+       * @param {string} labelName - the value of the identifier
+       * @param {object} options - options as supported by the
+       *                           `funct.labeltype` method
+       *
+       * @return {boolean}
        */
       has: function(labelName, options) {
         return Boolean(this.labeltype(labelName, options));
       },
 
       /**
-       * Adds a new function scoped variable
-       * see block.add for block scoped
+       * Create a new function-scoped JSHint label and add it to the current
+       * scope. See the `block.add` method for coresponding logic to create
+       * block-scoped JSHint labels.
+       *
+       * @param {string} labelName - the value of the identifier
+       * @param {string} type - the type of the JSHint label; either "function"
+       *                        or "var"
+       * @param {object} tok - the token that triggered the definition
+       * @param {boolean} unused - `true` if the JSHint label has not been
+       *                           referenced
        */
       add: function(labelName, type, tok, unused) {
         _current["(labels)"][labelName] = {
@@ -780,19 +878,32 @@ var scopeManager = function(state, predefined, exported, declared) {
     block: {
 
       /**
-       * is the current block global?
+       * Determine whether the current block scope is the global scope.
+       *
        * @returns Boolean
        */
       isGlobal: function() {
         return _current["(type)"] === "global";
       },
 
+      /**
+       * Resolve a reference to a binding and mark the corresponding JSHint
+       * label as "used."
+       *
+       * @param {string} labelName - the value of the identifier
+       * @param {object} token - the token value that triggered the reference
+       */
       use: function(labelName, token) {
-
-        // if resolves to current function params, then do not store usage just resolve
-        // this is because function(a) { var a; a = a; } will resolve to the param, not
-        // to the unset var
-        // first check the param is used
+        // If the name resolves to a parameter of the current function, then do
+        // not store usage. This is because in cases such as the following:
+        //
+        //     function(a) {
+        //       var a;
+        //       a = a;
+        //     }
+        //
+        // the usage of `a` will resolve to the parameter, not to the unset
+        // variable binding.
         var paramScope = _currentFunctBody["(parent)"];
         if (paramScope && paramScope["(labels)"][labelName] &&
           paramScope["(labels)"][labelName]["(type)"] === "param") {
@@ -817,7 +928,8 @@ var scopeManager = function(state, predefined, exported, declared) {
           _current["(usages)"][labelName]["(tokens)"].push(token);
         }
 
-        // blockscoped vars can't be used within their initializer (TDZ)
+        // Block-scoped bindings can't be used within their initializer due to
+        // "temporal dead zone" (TDZ) restrictions.
         var label = _current["(labels)"][labelName];
         if (label && label["(blockscoped)"] && !label["(initialized)"]) {
           error("E056", token, labelName, label["(type)"]);
@@ -842,7 +954,20 @@ var scopeManager = function(state, predefined, exported, declared) {
       },
 
       /**
-       * Adds a new variable
+       * Create a new block-scoped JSHint label and add it to the current
+       * scope. See the `funct.add` method for coresponding logic to create
+       * function-scoped JSHint labels.
+       *
+       * @param {string} labelName - the value of the identifier
+       * @param {string} type - the type of the JSHint label; one of "class",
+       *                        "const", "function", "import", or "let"
+       * @param {object} tok - the token that triggered the definition
+       * @param {boolean} unused - `true` if the JSHint label has not been
+       *                           referenced
+       * @param {boolean} initialized - `true` if the JSHint label has been
+       *                                initialized (as is the case with JSHint
+       *                                labels created via `import`
+       *                                declarations)
        */
       add: function(labelName, type, tok, unused, initialized) {
         _current["(labels)"][labelName] = {

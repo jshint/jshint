@@ -1,3 +1,23 @@
+/**
+ * The NameStack class is used to approximate function name inference as
+ * introduced by ECMAScript 2015. In that edition, the `name` property of
+ * function objects is set according to the function's syntactic form. For
+ * certain forms, this value depends on values available to the runtime during
+ * execution. For example:
+ *
+ *     var fnName = function() {};
+ *
+ * In the program code above, the function object's `name` property is set to
+ * `"fnName"` during execution.
+ *
+ * This general "name inference" behavior extends to a number of additional
+ * syntactic forms, not all of which can be implemented statically. `NameStack`
+ * is a support class representing a "best-effort" attempt to implement the
+ * specified behavior in cases where this may be done statically.
+ *
+ * For more information on this behavior, see the following blog post:
+ * https://bocoup.com/blog/whats-in-a-function-name
+ */
 "use strict";
 
 function NameStack() {
