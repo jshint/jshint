@@ -132,17 +132,13 @@ var JSHINT = (function() {
     return true;
   }
 
-  function isReserved(token) {
+  function isReserved(context, token) {
     if (!token.reserved) {
       return false;
     }
     var meta = token.meta;
 
     if (meta && meta.isFutureReservedWord) {
-      if (meta.moduleOnly && !state.option.module) {
-        return false;
-      }
-
       if (state.inES5()) {
         // ES3 FutureReservedWord in an ES5 environment.
         if (!meta.es5) {
@@ -161,6 +157,9 @@ var JSHINT = (function() {
           return false;
         }
       }
+    }
+    if (token.id === "await" && (!(context & prodParams.async) && !state.option.module)) {
+      return false;
     }
 
     return true;
@@ -675,12 +674,14 @@ var JSHINT = (function() {
           case "6":
           case "7":
           case "8":
+          case "9":
             state.option.moz = false;
             state.option.esversion = +val;
             break;
           case "2015":
           case "2016":
           case "2017":
+          case "2018":
             state.option.moz = false;
             // Translate specification publication year to version number.
             state.option.esversion = +val - 2009;
@@ -865,7 +866,7 @@ var JSHINT = (function() {
    * @returns {boolean}
    */
   function isOperator(token) {
-    return token.first || token.right || token.left || token.id === "yield";
+    return token.first || token.right || token.left || token.id === "yield" || token.id === "await";
   }
 
   function isEndOfExpr(context, curr, next) {
@@ -1202,7 +1203,7 @@ var JSHINT = (function() {
         }
 
         if (this.right) {
-          checkLeftSideAssign(this.right, this);
+          checkLeftSideAssign(context, this.right, this);
         }
       }
 
@@ -1260,8 +1261,6 @@ var JSHINT = (function() {
    *                   see the `expression` function for more detail
    * @param {boolean} [meta.es5] - `true` if the identifier is reserved
    *                               in ECMAScript 5 or later
-   * @param {boolean} [meta.moduleOnly] - `true` if the identifier is only
-   *                                      reserved in module code
    * @param {boolean} [meta.strictOnly] - `true` if the identifier is only
    *                                      reserved in strict mode code.
    *
@@ -1535,6 +1534,8 @@ var JSHINT = (function() {
    * Determine if the given token is a valid assignment target; emit errors
    * and/or warnings as appropriate
    *
+   * @param {number} context - the parsing context; see `prod-params.js` for
+   *                           more information
    * @param {token} left - the left hand side of the assignment
    * @param {token=} assignToken - the token for the assignment, used for
    *                               reporting
@@ -1544,7 +1545,7 @@ var JSHINT = (function() {
    *
    * @returns {boolean} Whether the left hand side is OK
    */
-  function checkLeftSideAssign(left, assignToken, options) {
+  function checkLeftSideAssign(context, left, assignToken, options) {
 
     var allowDestructuring = options && options.allowDestructuring;
 
@@ -1586,7 +1587,7 @@ var JSHINT = (function() {
       }
 
       return true;
-    } else if (left.identifier && !isReserved(left) && !left.isMetaProperty &&
+    } else if (left.identifier && !isReserved(context, left) && !left.isMetaProperty &&
       left.value !== "eval" && left.value !== "arguments") {
       if (state.funct["(scope)"].labeltype(left.value) === "exception") {
         warning("W022", left);
@@ -1617,7 +1618,7 @@ var JSHINT = (function() {
     var x = infix(s, typeof f === "function" ? f : function(context, left, that) {
       that.left = left;
 
-      checkLeftSideAssign(left, that, { allowDestructuring: true });
+      checkLeftSideAssign(context, left, that, { allowDestructuring: true });
 
       that.right = expression(10, context);
 
@@ -1671,7 +1672,7 @@ var JSHINT = (function() {
         warning("W016", that, that.id);
       }
 
-      checkLeftSideAssign(left, that);
+      checkLeftSideAssign(context, left, that);
 
       that.right = expression(10, context);
 
@@ -1698,7 +1699,7 @@ var JSHINT = (function() {
         warning("W016", this, this.id);
       }
 
-      checkLeftSideAssign(left, this);
+      checkLeftSideAssign(context, left, this);
 
       this.left = left;
       return this;
@@ -1710,13 +1711,15 @@ var JSHINT = (function() {
    * Retrieve the value of the current token if it is an identifier and
    * optionally advance the parser.
    *
+   * @param {number} context - the parsing context; see `prod-params.js` for
+   *                           more information
    * @param {boolean} [prop] -`true` if this identifier is that of an object
    *                           property
    * @param {boolean} [preserve] - `true` if the token should not be consumed
    *
    * @returns {string|undefined} - the value of the identifier, if present
    */
-  function optionalidentifier(prop, preserve) {
+  function optionalidentifier(context, prop, preserve) {
     if (!state.tokens.next.identifier) {
       return;
     }
@@ -1728,7 +1731,7 @@ var JSHINT = (function() {
     var curr = state.tokens.curr;
     var val  = state.tokens.curr.value;
 
-    if (!isReserved(curr)) {
+    if (!isReserved(context, curr)) {
       return val;
     }
 
@@ -1779,13 +1782,15 @@ var JSHINT = (function() {
   /**
    * Ensure that the current token is an identifier and retrieve its value.
    *
+   * @param {number} context - the parsing context; see `prod-params.js` for
+   *                           more information
    * @param {boolean} [prop] -`true` if this identifier is that of an object
    *                           property
    *
    * @returns {string|undefined} - the value of the identifier, if present
    */
-  function identifier(prop) {
-    var i = optionalidentifier(prop, false);
+  function identifier(context, prop) {
+    var i = optionalidentifier(context, prop, false);
     if (i) {
       return i;
     }
@@ -1886,7 +1891,7 @@ var JSHINT = (function() {
     }
 
     // Is this a labelled statement?
-    var res = isReserved(t);
+    var res = isReserved(context, t);
 
     // We're being more tolerant here: if someone uses
     // a FutureReservedWord (that is not meant to start a statement)
@@ -2343,7 +2348,7 @@ var JSHINT = (function() {
 
     that.left = left;
 
-    checkLeftSideAssign(left, that);
+    checkLeftSideAssign(context, left, that);
 
     that.right = expression(10, context);
 
@@ -2601,7 +2606,7 @@ var JSHINT = (function() {
     return this;
   });
   prefix("new", function(context) {
-    var mp = metaProperty("target", function() {
+    var mp = metaProperty(context, "target", function() {
       if (!state.inES6(true)) {
         warning("W119", state.tokens.prev, "new.target", "6");
       }
@@ -2683,7 +2688,7 @@ var JSHINT = (function() {
     if (state.tokens.next.identifier && state.tokens.next.value !== "extends") {
       classNameToken = state.tokens.next;
       className = classNameToken.value;
-      identifier();
+      identifier(context);
       // unintialized, so that the 'extends' clause is parsed while the class is in TDZ
       state.funct["(scope)"].addlabel(className, {
         type: "class",
@@ -2728,7 +2733,7 @@ var JSHINT = (function() {
     if (state.tokens.next.identifier && state.tokens.next.value !== "extends") {
       classNameToken = state.tokens.next;
       className = classNameToken.value;
-      identifier();
+      identifier(context);
     }
 
     // Class Declaration: 'class <Classname> extends <Superclass>'
@@ -2766,10 +2771,35 @@ var JSHINT = (function() {
     while (state.tokens.next.value !== "}") {
       isStatic = false;
       inGenerator = false;
+      context &= ~prodParams.preAsync;
+
       if (state.tokens.next.value === "static") {
         isStatic = true;
         advance();
       }
+
+      if (state.tokens.next.value === "async") {
+        if (!checkPunctuator(peek(), "(")) {
+          context |= prodParams.preAsync;
+          advance();
+
+          nolinebreak(state.tokens.curr);
+
+          if (checkPunctuator(state.tokens.next, "*")) {
+            inGenerator = true;
+            advance("*");
+
+            if (!state.inES9()) {
+              warning("W119", state.tokens.next, "async generators", "9");
+            }
+          }
+
+          if (!state.inES8()) {
+            warning("W119", state.tokens.curr, "async functions", "8");
+          }
+        }
+      }
+
       if (state.tokens.next.value === "*") {
         inGenerator = true;
         advance();
@@ -2784,11 +2814,11 @@ var JSHINT = (function() {
         case "constructor":
           if (isStatic) {
             // treat like a regular method -- static methods can be called 'constructor'
-            name = propertyName();
+            name = propertyName(context);
             saveProperty(props, name, token, true, isStatic);
             doMethod(classToken, context, name, inGenerator);
           } else {
-            if (inGenerator) {
+            if (inGenerator || context & prodParams.preAsync) {
               error("E024", token, token.value);
             }
             if (hasConstructor) {
@@ -2811,7 +2841,7 @@ var JSHINT = (function() {
             name = computedPropertyName(context);
             doMethod(classToken, context, name, false);
           } else {
-            name = propertyName();
+            name = propertyName(context);
             if (name === "prototype" || name === "constructor") {
               error("E049", state.tokens.curr, "class " + accessorType + "ter method", name);
             }
@@ -2826,7 +2856,7 @@ var JSHINT = (function() {
           // We don't check names (via calling saveProperty()) of computed expressions like ["Symbol.iterator"]()
           break;
         default:
-          name = propertyName();
+          name = propertyName(context);
           if (!name) {
             error("E024", token, token.value);
             advance();
@@ -2863,7 +2893,7 @@ var JSHINT = (function() {
         if (state.tokens.next.value === "}") {
           warning("W116", state.tokens.next, "(", state.tokens.next.value);
           advance();
-          identifier();
+          identifier(context);
           advance();
         }
         return;
@@ -2883,7 +2913,7 @@ var JSHINT = (function() {
   prefix("void").exps = true;
 
   infix(".", function(context, left, that) {
-    var m = identifier(true);
+    var m = identifier(context, true);
 
     if (typeof m === "string") {
       countMember(m);
@@ -3011,13 +3041,10 @@ var JSHINT = (function() {
     return that;
   }, 155, true).exps = true;
 
-  prefix("(", function(context, rbp) {
-    var pn = state.tokens.next, pn1, i = -1;
-    var ret, triggerFnExpr, first, last;
-    var parens = 1;
-    var opening = state.tokens.curr;
-    var preceeding = state.tokens.prev;
-    var isNecessary = !state.option.singleGroups;
+  function peekThroughParens(parens) {
+    var pn = state.tokens.next;
+    var i = -1;
+    var pn1;
 
     do {
       if (pn.value === "(") {
@@ -3030,6 +3057,16 @@ var JSHINT = (function() {
       pn1 = pn;
       pn = peek(i);
     } while (!(parens === 0 && pn1.value === ")") && pn.type !== "(end)");
+
+    return pn;
+  }
+
+  prefix("(", function(context, rbp) {
+    var ret, triggerFnExpr, first, last;
+    var opening = state.tokens.curr;
+    var preceeding = state.tokens.prev;
+    var isNecessary = !state.option.singleGroups;
+    var pn = peekThroughParens(1);
 
     if (state.tokens.next.id === "function") {
       triggerFnExpr = state.tokens.next.immed = true;
@@ -3156,7 +3193,7 @@ var JSHINT = (function() {
         s = state.syntax[e.value];
 
         if (s) {
-          canUseDot = !isReserved(s);
+          canUseDot = !isReserved(context, s);
         } else {
           // This branch exists to preserve legacy behavior with version 2.9.5
           // and earlier. In those releases, `eval` and `arguments` were
@@ -3308,14 +3345,14 @@ var JSHINT = (function() {
     return !!state.funct["(method)"];
   }
 
-  function propertyName(preserveOrToken) {
+  function propertyName(context, preserveOrToken) {
     var id;
     var preserve = true;
     if (typeof preserveOrToken === "object") {
       id = preserveOrToken;
     } else {
       preserve = preserveOrToken;
-      id = optionalidentifier(true, preserve);
+      id = optionalidentifier(context, true, preserve);
     }
 
     if (!id) {
@@ -3402,7 +3439,8 @@ var JSHINT = (function() {
         }
       } else {
         pastRest = spreadrest("rest");
-        ident = identifier();
+        ident = identifier(context);
+
         if (ident) {
           paramsIds.push(ident);
           currentParams.push([ident, state.tokens.curr]);
@@ -3492,6 +3530,7 @@ var JSHINT = (function() {
       "(comparray)" : null,
       "(generator)" : null,
       "(arrow)"     : null,
+      "(async)"     : null,
       "(params)"    : null
     };
 
@@ -3589,6 +3628,7 @@ var JSHINT = (function() {
       isMethod, ignoreLoopFunc;
     var oldOption = state.option;
     var oldIgnored = state.ignored;
+    var isAsync = context & prodParams.preAsync;
 
     if (options) {
       name = options.name;
@@ -3602,6 +3642,13 @@ var JSHINT = (function() {
 
     context &= ~prodParams.noin;
 
+    if (isAsync) {
+      context |= prodParams.async;
+    } else {
+      context &= ~prodParams.async;
+    }
+    context &= ~prodParams.preAsync;
+
     state.option = Object.create(state.option);
     state.ignored = Object.create(state.ignored);
 
@@ -3610,7 +3657,8 @@ var JSHINT = (function() {
       "(context)":   state.funct,
       "(arrow)":     isArrow,
       "(method)":    isMethod,
-      "(generator)": isGenerator
+      "(generator)": isGenerator,
+      "(async)":     isAsync
     });
 
     f = state.funct;
@@ -3786,11 +3834,11 @@ var JSHINT = (function() {
     }
   }
 
-  function metaProperty(name, c) {
+  function metaProperty(context, name, c) {
     if (checkPunctuator(state.tokens.next, ".")) {
       var left = state.tokens.curr.id;
       advance(".");
-      var id = identifier();
+      var id = identifier(context);
       state.tokens.curr.isMetaProperty = true;
       if (name !== id) {
         error("E057", state.tokens.prev, left, id);
@@ -3806,6 +3854,7 @@ var JSHINT = (function() {
     x.nud = function(context) {
       var b, f, i, params, t, isGeneratorMethod = false, nextVal;
       var props = Object.create(null); // All properties, including accessors
+      var isAsyncMethod = false;
 
       b = state.tokens.curr.line !== startLine(state.tokens.next);
       if (b) {
@@ -3835,7 +3884,7 @@ var JSHINT = (function() {
           if (!state.inES6()) {
             warning("W104", state.tokens.next, "object short notation", "6");
           }
-          i = propertyName(true);
+          i = propertyName(context, true);
           saveProperty(props, i, state.tokens.next);
 
           expression(10, context);
@@ -3850,7 +3899,7 @@ var JSHINT = (function() {
           if (state.tokens.next.id === "[") {
             i = computedPropertyName();
           } else {
-            i = propertyName();
+            i = propertyName(context);
 
             // ES6 allows for get() {...} and set() {...} method
             // definition shorthand syntax, so we don't produce an error
@@ -3884,10 +3933,26 @@ var JSHINT = (function() {
 
           expression(10, context);
         } else {
+          if (state.tokens.next.id === "async" && !checkPunctuators(peek(), ["(", ":"])) {
+            if (!state.inES8()) {
+              warning("W119", state.tokens.next, "async functions", "8");
+            }
+
+            isAsyncMethod = true;
+            advance();
+
+            nolinebreak(state.tokens.curr);
+          } else {
+            isAsyncMethod = false;
+          }
+
           if (state.tokens.next.value === "*" && state.tokens.next.type === "(punctuator)") {
-            if (!state.inES6()) {
+            if (isAsyncMethod && !state.inES9()) {
+              warning("W119", state.tokens.next, "async generators", "9");
+            } else if (!state.inES6()) {
               warning("W104", state.tokens.next, "generator functions", "6");
             }
+
             advance("*");
             isGeneratorMethod = true;
           } else {
@@ -3899,7 +3964,7 @@ var JSHINT = (function() {
             state.nameStack.set(i);
           } else {
             state.nameStack.set(state.tokens.next);
-            i = propertyName();
+            i = propertyName(context);
             saveProperty(props, i, state.tokens.next);
 
             if (typeof i !== "string") {
@@ -3911,7 +3976,8 @@ var JSHINT = (function() {
             if (!state.inES6()) {
               warning("W104", state.tokens.curr, "concise methods", "6");
             }
-            doFunction(context, {
+
+            doFunction(isAsyncMethod ? context | prodParams.preAsync : context, {
               isMethod: true,
               type: isGeneratorMethod ? "generator" : null
             });
@@ -3990,7 +4056,7 @@ var JSHINT = (function() {
         if (isAssignment) {
           var assignTarget = expression(20, context);
           if (assignTarget) {
-            checkLeftSideAssign(assignTarget);
+            checkLeftSideAssign(context, assignTarget);
 
             // if the target was a simple identifier, add it to the list to return
             if (assignTarget.identifier) {
@@ -3998,7 +4064,7 @@ var JSHINT = (function() {
             }
           }
         } else {
-          ident = identifier();
+          ident = identifier(context);
         }
         if (ident) {
           identifiers.push({ id: ident, token: state.tokens.curr });
@@ -4040,7 +4106,7 @@ var JSHINT = (function() {
             error("E030", expr, expr.value);
           }
         } else {
-          id = identifier();
+          id = identifier(context);
         }
 
         if (!isRest && checkPunctuator(state.tokens.next, ":")) {
@@ -4049,7 +4115,7 @@ var JSHINT = (function() {
         } else if (id) {
           // in this case we are assigning (not declaring), so check assignment
           if (isAssignment) {
-            checkLeftSideAssign(state.tokens.curr);
+            checkLeftSideAssign(context, state.tokens.curr);
           }
           identifiers.push({ id: id, token: state.tokens.curr });
         }
@@ -4172,7 +4238,7 @@ var JSHINT = (function() {
         tokens = destructuringPattern(context);
         lone = false;
       } else {
-        tokens = [ { id: identifier(), token: state.tokens.curr } ];
+        tokens = [ { id: identifier(context), token: state.tokens.curr } ];
         lone = true;
       }
 
@@ -4312,7 +4378,7 @@ var JSHINT = (function() {
   letstatement.meta = { es5: true, isFutureReservedWord: true, strictOnly: true };
   letstatement.exps = true;
   letstatement.declaration = true;
-  letstatement.useFud = function() {
+  letstatement.useFud = function(context) {
     var next = state.tokens.next;
     var nextIsBindingName;
 
@@ -4330,7 +4396,7 @@ var JSHINT = (function() {
     // is correctly interpreted as an invalid LexicalBinding. (Without this
     // consideration, the code above would be parsed as two
     // IdentifierReferences.)
-    nextIsBindingName = next.identifier && (!isReserved(next) ||
+    nextIsBindingName = next.identifier && (!isReserved(context, next) ||
       next.id === "let");
 
     return nextIsBindingName || checkPunctuators(next, ["{", "["]) ||
@@ -4350,7 +4416,7 @@ var JSHINT = (function() {
         lone = false;
       } else {
         tokens = [];
-        id = identifier();
+        id = identifier(context);
 
         if (id) {
           tokens.push({ id: id, token: state.tokens.curr });
@@ -4430,18 +4496,31 @@ var JSHINT = (function() {
   blockstmt("function", function(context) {
     var inexport = context & prodParams.export;
     var generator = false;
-    if (state.tokens.next.value === "*") {
-      advance("*");
-      if (state.inES6(true)) {
-        generator = true;
-      } else {
-        warning("W119", state.tokens.curr, "function*", "6");
-      }
+    var isAsync = context & prodParams.preAsync;
+    var labelType = "";
+
+    if (isAsync) {
+      labelType = "async ";
     }
+
+    if (state.tokens.next.value === "*") {
+      if (isAsync && !state.inES9()) {
+        warning("W119", state.tokens.prev, "async generators", "9");
+      } else if (!isAsync && !state.inES6(true)) {
+        warning("W119", state.tokens.next, "function*", "6");
+      }
+
+      advance("*");
+      labelType += "generator ";
+      generator = true;
+    }
+
+    labelType += "function";
+
     if (inblock) {
       warning("W082", state.tokens.curr);
     }
-    var nameToken = optionalidentifier() ? state.tokens.curr : null;
+    var nameToken = optionalidentifier(context) ? state.tokens.curr : null;
 
     if (!nameToken) {
       if (!inexport) {
@@ -4449,7 +4528,7 @@ var JSHINT = (function() {
       }
     } else {
       state.funct["(scope)"].addlabel(nameToken.value, {
-        type: generator ? "generator function" : "function",
+        type: labelType,
         token: state.tokens.curr,
         initialized: true });
 
@@ -4485,16 +4564,23 @@ var JSHINT = (function() {
 
   prefix("function", function(context) {
     var generator = false;
+    var isAsync = context & prodParams.preAsync;
 
     if (state.tokens.next.value === "*") {
-      if (!state.inES6()) {
+      if (isAsync && !state.inES9()) {
+        warning("W119", state.tokens.prev, "async generators", "9");
+      } else if (!isAsync && !state.inES6(true)) {
         warning("W119", state.tokens.curr, "function*", "6");
       }
+
       advance("*");
       generator = true;
     }
 
-    var nameToken = optionalidentifier() ? state.tokens.curr : null;
+    // This context modification restricts the use of `await` as the optional
+    // BindingIdentifier in async function expressions.
+    var nameToken = optionalidentifier(isAsync ? context | prodParams.async : context) ?
+      state.tokens.curr : null;
 
     var f = doFunction(context, {
       name: nameToken && nameToken.value,
@@ -4579,7 +4665,7 @@ var JSHINT = (function() {
       } else {
         // only advance if an identifier is present. This allows JSHint to
         // recover from the case where no value is specified.
-        state.funct["(scope)"].addParam(identifier(), state.tokens.curr, "exception");
+        state.funct["(scope)"].addParam(identifier(context), state.tokens.curr, "exception");
       }
 
       if (state.tokens.next.value === "if") {
@@ -4922,7 +5008,7 @@ var JSHINT = (function() {
         error("W133", initializer, nextop.value, "initializer is forbidden");
       }
       if (target && !comma && !initializer) {
-        checkLeftSideAssign(target, nextop);
+        checkLeftSideAssign(context, target, nextop);
       }
 
       advance(nextop.value);
@@ -5096,6 +5182,79 @@ var JSHINT = (function() {
     return this;
   }).exps = true;
 
+  prefix("await", function(context) {
+    if (context & prodParams.async) {
+      // If the parameters of the current function scope have not been defined,
+      // it is because the current expression is contained within the parameter
+      // list.
+      if (!state.funct["(params)"]) {
+        error("E024", this, "await");
+      }
+
+      expression(0, context);
+      return this;
+    } else {
+      this.exps = false;
+      return state.syntax["(identifier)"].nud.apply(this, arguments);
+    }
+  }).exps = true;
+
+  (function(asyncSymbol) {
+    asyncSymbol.meta = { es5: true, isFutureReservedWord: true, strictOnly: true };
+    asyncSymbol.isFunc = function() {
+      var next = state.tokens.next;
+      var afterParens;
+
+      if (this.line !== next.line) {
+        return false;
+      }
+
+      if (next.id === "function") {
+        return true;
+      }
+
+      if (next.id === "(") {
+        afterParens = peekThroughParens(0);
+
+        return afterParens.id === "=>";
+      }
+
+      if (next.identifier) {
+        return peek().id === "=>";
+      }
+
+      return false;
+    };
+    asyncSymbol.useFud = asyncSymbol.isFunc;
+    // async function declaration
+    asyncSymbol.fud = function(context) {
+      if (!state.inES8()) {
+        warning("W119", this, "async functions", "8");
+      }
+      context |= prodParams.preAsync;
+      context |= prodParams.initial;
+      this.func = expression(0, context);
+      this.block = this.func.block;
+      this.exps = this.func.exps;
+      return this;
+    };
+    asyncSymbol.exps = true;
+    delete asyncSymbol.reserved;
+  }(prefix("async", function(context, rbp) {
+    if (this.isFunc(context)) {
+      if (!state.inES8()) {
+        warning("W119", this, "async functions", "8");
+      }
+
+      context |= prodParams.preAsync;
+      this.func = expression(rbp, context);
+      return this;
+    }
+
+    this.exps = false;
+    return state.syntax["(identifier)"].nud.apply(this, arguments);
+  })));
+
   (function(x) {
     x.exps = true;
     x.lbp = x.rbp = 25;
@@ -5205,7 +5364,7 @@ var JSHINT = (function() {
     return this;
   }).exps = true;
 
-  stmt("import", function() {
+  stmt("import", function(context) {
     if (!state.funct["(scope)"].block.isGlobal()) {
       error("E053", state.tokens.curr, "Import");
     }
@@ -5222,7 +5381,7 @@ var JSHINT = (function() {
 
     if (state.tokens.next.identifier) {
       // ImportClause :: ImportedDefaultBinding
-      this.name = identifier();
+      this.name = identifier(context);
       // Import bindings are immutable (see ES6 8.1.1.5.5)
       state.funct["(scope)"].addlabel(this.name, {
         type: "import",
@@ -5249,7 +5408,7 @@ var JSHINT = (function() {
       advance("*");
       advance("as");
       if (state.tokens.next.identifier) {
-        this.name = identifier();
+        this.name = identifier(context);
         // Import bindings are immutable (see ES6 8.1.1.5.5)
         state.funct["(scope)"].addlabel(this.name, {
           type: "import",
@@ -5269,11 +5428,11 @@ var JSHINT = (function() {
           importName = "default";
           advance("default");
         } else {
-          importName = identifier();
+          importName = identifier(context);
         }
         if (state.tokens.next.value === "as") {
           advance("as");
-          importName = identifier();
+          importName = identifier(context);
         }
 
         // Import bindings are immutable (see ES6 8.1.1.5.5)
@@ -5448,6 +5607,10 @@ var JSHINT = (function() {
    * @returns {boolean}
    */
   function supportsSuper(type, funct) {
+    if (type === "call" && funct["(async)"]) {
+      return false;
+    }
+
     if (type === "property" && funct["(method)"]) {
       return true;
     }
@@ -5485,7 +5648,6 @@ var JSHINT = (function() {
   // Future Reserved Words
 
   FutureReservedWord("abstract");
-  FutureReservedWord("await", { es5: true, moduleOnly: true });
   FutureReservedWord("boolean");
   FutureReservedWord("byte");
   FutureReservedWord("char");

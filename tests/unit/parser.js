@@ -6903,6 +6903,16 @@ exports.super.superCall = function (test) {
       "super();"
     ], { esversion: 6 });
 
+  TestRun(test, "within async method")
+    .addError(3, 5, "Super call may only be used within class method bodies.")
+    .test([
+      "class C {",
+      "  async m() {",
+      "    super();",
+      "  }",
+      "}"
+    ], { esversion: 8 });
+
   test.done();
 };
 
@@ -9181,6 +9191,437 @@ exports.trailingArgumentsComma = function(test) {
     .test([
       "f(0,,);",
     ], { esversion: 8 })
+
+  test.done();
+};
+
+exports.asyncFunctions = {};
+
+exports.asyncFunctions.asyncIdentifier = function (test) {
+  var code = [
+    "var async;",
+    "{ let async; }",
+    "{ const async = null; }",
+    "async: while (false) {}",
+    "void { async };",
+    "void { async: 0 };",
+    "void { async() {} };",
+    "void { get async() {} };",
+    "async();",
+    "async(async);",
+    "async(async());"
+  ];
+  var strictCode = ["'use strict';"].concat(code);
+
+  TestRun(test)
+    .test(code, { esversion: 7 });
+
+  TestRun(test)
+    .test(strictCode, { esversion: 7, strict: "global" });
+
+  TestRun(test)
+    .test(code, { esversion: 8 });
+
+  TestRun(test)
+    .test(strictCode, { esversion: 8, strict: "global" });
+
+  TestRun(test)
+    .addError(1, 9, "Expected an assignment or function call and instead saw an expression.")
+    .test("async=>{};", { esversion: 6 });
+
+  TestRun(test)
+    .addError(1, 9, "Expected an assignment or function call and instead saw an expression.")
+    .test("async=>{};", { esversion: 8 });
+
+  TestRun(test, "Line termination")
+    .addError(1, 1, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, 6, "Missing semicolon.")
+    .addError(3, 1, "Expected an assignment or function call and instead saw an expression.")
+    .addError(3, 6, "Missing semicolon.")
+    .addError(4, 7, "Expected an assignment or function call and instead saw an expression.")
+    .test([
+      "async",
+      "function f() {}",
+      "async",
+      "x => {};"
+    ], { esversion: 8 });
+
+  test.done();
+};
+
+exports.asyncFunctions.awaitIdentifier = function (test) {
+  var code = [
+    "var await;",
+    "{ let await; }",
+    "{ const await = null; }",
+    "await: while (false) {}",
+    "void { await };",
+    "void { await: 0 };",
+    "void { await() {} };",
+    "void { get await() {} };",
+    "await();",
+    "await(await);",
+    "await(await());",
+    "await;"
+  ];
+  var functionCode = ["(function() {"].concat(code).concat("}());");
+  var strictCode = ["'use strict';"].concat(code);
+
+  TestRun(test)
+    .addError(12, 1, "Expected an assignment or function call and instead saw an expression.")
+    .test(code, { esversion: 7 });
+  TestRun(test)
+    .addError(13, 1, "Expected an assignment or function call and instead saw an expression.")
+    .test(functionCode, { esversion: 7 });
+  TestRun(test)
+    .addError(13, 1, "Expected an assignment or function call and instead saw an expression.")
+    .test(strictCode, { esversion: 7, strict: "global" });
+
+  TestRun(test)
+    .addError(12, 1, "Expected an assignment or function call and instead saw an expression.")
+    .test(code, { esversion: 8 });
+  TestRun(test)
+    .addError(13, 1, "Expected an assignment or function call and instead saw an expression.")
+    .test(functionCode, { esversion: 8 });
+  TestRun(test)
+    .addError(13, 1, "Expected an assignment or function call and instead saw an expression.")
+    .test(strictCode, { esversion: 8, strict: "global" });
+
+  TestRun(test, "nested inside a non-async function")
+    .addError(3, 5, "Expected an assignment or function call and instead saw an expression.")
+    .addError(6, 5, "Expected an assignment or function call and instead saw an expression.")
+    .addError(9, 5, "Expected an assignment or function call and instead saw an expression.")
+    .addError(13, 5, "Expected an assignment or function call and instead saw an expression.")
+    .addError(17, 5, "Expected an assignment or function call and instead saw an expression.")
+    .addError(21, 7, "Expected an assignment or function call and instead saw an expression.")
+    .addError(24, 7, "Expected an assignment or function call and instead saw an expression.")
+    .addError(27, 7, "Expected an assignment or function call and instead saw an expression.")
+    .test([
+      "async function a() {",
+      "  function f() {",
+      "    await;",
+      "  }",
+      "  void function() {",
+      "    await;",
+      "  };",
+      "  function* g() {",
+      "    await;",
+      "    yield 0;",
+      "  }",
+      "  void function*() {",
+      "    await;",
+      "    yield 0;",
+      "  };",
+      "  void (() => {",
+      "    await;",
+      "  });",
+      "  void {",
+      "    get a() {",
+      "      await;",
+      "    },",
+      "    m() {",
+      "      await;",
+      "    },",
+      "    *g() {",
+      "      await;",
+      "      yield 0;",
+      "    }",
+      "  };",
+      "}"
+    ], { esversion: 8 });
+
+  test.done();
+};
+
+exports.asyncFunctions.expression = function (test) {
+  TestRun(test, "Statement position")
+    .addError(1, 15, "Missing name in function declaration.")
+    .test("async function() {}", { esversion: 8 });
+
+  TestRun(test, "Expression position (disallowed prior to ES8)")
+    .addError(1, 6, "'async functions' is only available in ES8 (use 'esversion: 8').")
+    .test("void async function() {};", { esversion: 7 });
+
+  TestRun(test, "Expression position")
+    .test("void async function() {};", { esversion: 8 });
+
+  TestRun(test, "AwaitExpression in parameter list")
+    .addError(1, 26, "Unexpected 'await'.")
+    .test("void async function (x = await 0) {};", { esversion: 8 });
+
+  test.done();
+};
+
+exports.asyncFunctions.awaitOperator = function (test) {
+  TestRun(test, "Operands")
+    .test([
+      "void async function() {",
+      "  await 0;",
+      "  await /(?:)/;",
+      "  await await 0;",
+      "  await async function() {};",
+      "};"
+    ], { esversion: 8 });
+
+  TestRun(test, "missing operands")
+    .addError(2, 8, "Expected an identifier and instead saw ';'.")
+    .addError(2, 9, "Missing semicolon.")
+    .test([
+      "void async function() {",
+      "  await;",
+      "};",
+    ], { esversion: 8 });
+
+  test.done();
+};
+
+exports.asyncFunctions.arrow = function (test) {
+  TestRun(test, "Statement position")
+    .addError(1, 14, "Expected an assignment or function call and instead saw an expression.")
+    .addError(2, 13, "Expected an assignment or function call and instead saw an expression.")
+    .addError(3, 15, "Expected an assignment or function call and instead saw an expression.")
+    .addError(4, 18, "Expected an assignment or function call and instead saw an expression.")
+    .addError(5, 24, "Expected an assignment or function call and instead saw an expression.")
+    .test([
+      "async () => {};",
+      "async x => {};",
+      "async (x) => {};",
+      "async (x, y) => {};",
+      "async (x, y = x()) => {};"
+    ], { esversion: 8 })
+
+  var expressions = [
+    "void (async () => {});",
+    "void (async x => {});",
+    "void (async (x) => {});",
+    "void (async (x, y) => {});",
+    "void (async (x, y = x()) => {});"
+  ];
+
+  TestRun(test, "Expression position (disallowed prior to ES8)")
+    .addError(1, 7, "'async functions' is only available in ES8 (use 'esversion: 8').")
+    .addError(2, 7, "'async functions' is only available in ES8 (use 'esversion: 8').")
+    .addError(3, 7, "'async functions' is only available in ES8 (use 'esversion: 8').")
+    .addError(4, 7, "'async functions' is only available in ES8 (use 'esversion: 8').")
+    .addError(5, 7, "'async functions' is only available in ES8 (use 'esversion: 8').")
+    .test(expressions, { esversion: 7 })
+
+  TestRun(test, "Expression position")
+    .test(expressions, { esversion: 8 })
+
+  TestRun(test, "AwaitExpression in parameter list")
+    .addError(1, 18, "Unexpected 'await'.")
+    .test("void (async (x = await 0) => {});", { esversion: 8 });
+
+  test.done();
+};
+
+exports.asyncFunctions.declaration = function (test) {
+  TestRun(test)
+    .addError(1, 1, "'async functions' is only available in ES8 (use 'esversion: 8').")
+    .test("async function f() {}", { esversion: 7 });
+
+  TestRun(test)
+    .test("async function f() {}", { esversion: 8 });
+
+  TestRun(test)
+    .addError(1, 22, "Unnecessary semicolon.")
+    .test("async function f() {};", { esversion: 8 });
+
+  TestRun(test, "AwaitExpression in parameter list")
+    .addError(1, 22, "Unexpected 'await'.")
+    .test("async function f(x = await 0) {}", { esversion: 8 });
+
+  test.done();
+};
+
+exports.asyncFunctions.objectMethod = function (test) {
+  var code = [
+    "void { async m() {} };",
+    "void { async 'm'() {} };",
+    "void { async ['m']() {} };",
+  ];
+
+  TestRun(test, "Disallowed prior to ES8")
+    .addError(1, 8, "'async functions' is only available in ES8 (use 'esversion: 8').")
+    .addError(2, 8, "'async functions' is only available in ES8 (use 'esversion: 8').")
+    .addError(3, 8, "'async functions' is only available in ES8 (use 'esversion: 8').")
+    .test(code, { esversion: 7 });
+
+  TestRun(test, "Allowed in ES8")
+    .test(code, { esversion: 8 });
+
+  TestRun(test)
+    .test([
+      "void { async m() { await 0; } };"
+    ], { esversion: 8 });
+
+  TestRun(test)
+    .addError(3, 9, "Expected an assignment or function call and instead saw an expression.")
+    .addError(3, 14, "Missing semicolon.")
+    .addError(3, 15, "Expected an assignment or function call and instead saw an expression.")
+    .test([
+      "void {",
+      "  async m() { await 0; },",
+      "  n() { await 0; },",
+      "};"
+    ], { esversion: 8 });
+
+  TestRun(test, "AwaitExpression in parameter list")
+    .addError(1, 20, "Unexpected 'await'.")
+    .test("void { async m(x = await 0) {} };", { esversion: 9 });
+
+  TestRun(test, "Illegal line break")
+    .addError(2, 3, "Line breaking error 'async'.")
+    .test([
+      "void {",
+      "  async",
+      "  m() {}",
+      "};"
+    ], { esversion: 9 });
+
+  test.done();
+};
+
+exports.asyncFunctions.classMethod = function (test) {
+  var code = [
+    "void class { async m() {} };",
+    "void class { async 'm'() {} };",
+    "void class { async ['m']() {} };",
+  ];
+
+  TestRun(test, "Disallowed prior to ES8")
+    .addError(1, 14, "'async functions' is only available in ES8 (use 'esversion: 8').")
+    .addError(2, 14, "'async functions' is only available in ES8 (use 'esversion: 8').")
+    .addError(3, 14, "'async functions' is only available in ES8 (use 'esversion: 8').")
+    .test(code, { esversion: 7 });
+
+  TestRun(test, "Allowed in ES8")
+    .test(code, { esversion: 8 });
+
+  TestRun(test)
+    .test([
+      "class C { async m() { await 0; } }"
+    ], { esversion: 8 });
+
+  TestRun(test)
+    .addError(3, 9, "Expected an assignment or function call and instead saw an expression.")
+    .addError(3, 14, "Missing semicolon.")
+    .addError(3, 15, "Expected an assignment or function call and instead saw an expression.")
+    .test([
+      "class C {",
+      "  async m() { await 0; }",
+      "  n() { await 0; }",
+      "}"
+    ], { esversion: 8 });
+
+  TestRun(test, "AwaitExpression in parameter list")
+    .addError(1, 23, "Unexpected 'await'.")
+    .test("class C { async m(x = await 0) {} }", { esversion: 8 });
+
+  TestRun(test, "Illegal line break")
+    .addError(2, 3, "Line breaking error 'async'.")
+    .test([
+      "class C {",
+      "  async",
+      "  m() {}",
+      "}"
+    ], { esversion: 8 });
+
+  TestRun(test, "Illegal constructor")
+    .addError(1, 17, "Unexpected 'constructor'.")
+    .test("class C { async constructor() {} }", { esversion: 8 });
+
+  test.done();
+};
+
+exports.asyncGenerators = {};
+
+exports.asyncGenerators.expression = function (test) {
+  TestRun(test, "Statement position")
+    .addError(1, 18, "Missing name in function declaration.")
+    .test("async function * () { await 0; yield 0; }", { esversion: 9 });
+
+  TestRun(test, "Expression position (disallowed prior to ES9)")
+    .addError(1, 6, "'async generators' is only available in ES9 (use 'esversion: 9').")
+    .test("void async function * () { await 0; yield 0; };", { esversion: 8 });
+
+  TestRun(test, "Expression position")
+    .test("void async function * () { await 0; yield 0; };", { esversion: 9 });
+
+  TestRun(test, "YieldExpression in parameter list")
+    .addError(1, 28, "Unexpected 'yield'.")
+    .test("void async function * (x = yield) { await 0; yield 0; };", { esversion: 9 });
+
+  TestRun(test, "AwaitExpression in parameter list")
+    .addError(1, 28, "Unexpected 'await'.")
+    .test("void async function * (x = await 0) { await 0; yield 0; };", { esversion: 9 });
+
+  test.done();
+};
+
+exports.asyncGenerators.declaration = function (test) {
+  TestRun(test)
+    .addError(1, 1, "'async generators' is only available in ES9 (use 'esversion: 9').")
+    .test("async function * f() { await 0; yield 0; }", { esversion: 8 });
+
+  TestRun(test)
+    .test("async function * f() { await 0; yield 0; }", { esversion: 9 });
+
+  TestRun(test)
+    .addError(1, 43, "Unnecessary semicolon.")
+    .test("async function * f() { await 0; yield 0; };", { esversion: 9 });
+
+  TestRun(test, "YieldExpression in parameter list")
+    .addError(1, 24, "Unexpected 'yield'.")
+    .test("async function * f(x = yield) { await 0; yield 0; }", { esversion: 9 });
+
+  TestRun(test, "AwaitExpression in parameter list")
+    .addError(1, 24, "Unexpected 'await'.")
+    .test("async function * f(x = await 0) { await 0; yield 0; }", { esversion: 9 });
+
+  test.done();
+};
+
+exports.asyncGenerators.method = function (test) {
+  TestRun(test)
+    .addError(1, 14, "'async generators' is only available in ES9 (use 'esversion: 9').")
+    .test("void { async * m() { await 0; yield 0; } };", { esversion: 8 });
+
+  TestRun(test)
+    .test("void { async * m() { await 0; yield 0; } };", { esversion: 9 });
+
+  TestRun(test, "YieldExpression in parameter list")
+    .addError(1, 22, "Unexpected 'yield'.")
+    .test("void { async * m(x = yield) { await 0; yield 0; } };", { esversion: 9 });
+
+  TestRun(test, "AwaitExpression in parameter list")
+    .addError(1, 22, "Unexpected 'await'.")
+    .test("void { async * m(x = await 0) { await 0; yield 0; } };", { esversion: 9 });
+
+  test.done();
+};
+
+exports.asyncGenerators.classMethod = function (test) {
+  TestRun(test)
+    .addError(1, 19, "'async generators' is only available in ES9 (use 'esversion: 9').")
+    .test("class C { async * m() { await 0; yield 0; } }", { esversion: 8 });
+
+  TestRun(test)
+    .test("class C { async * m() { await 0; yield 0; } }", { esversion: 9 });
+
+  TestRun(test, "YieldExpression in parameter list")
+    .addError(1, 25, "Unexpected 'yield'.")
+    .test("class C { async * m(x = yield) { await 0; yield 0; } }", { esversion: 9 });
+
+  TestRun(test, "AwaitExpression in parameter list")
+    .addError(1, 25, "Unexpected 'await'.")
+    .test("class C { async * m(x = await 0) { await 0; yield 0; } }", { esversion: 9 });
+
+  TestRun(test, "Illegal constructor")
+    .addError(1, 19, "Unexpected 'constructor'.")
+    .addError(1,44, "Yield expressions may only occur within generator functions.")
+    .test("class C { async * constructor() { await 0; yield 0; } }", { esversion: 9 });
 
   test.done();
 };
