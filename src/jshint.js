@@ -3908,14 +3908,16 @@ var JSHINT = (function() {
     }
     var i = optionalidentifier();
 
-    state.funct["(scope)"].addlabel(i, {
-      type: "function",
-      token: state.tokens.curr });
-
     if (i === undefined) {
       warning("W025");
-    } else if (inexport) {
-      state.funct["(scope)"].setExported(i, state.tokens.prev);
+    } else {
+      state.funct["(scope)"].addlabel(i, {
+        type: "function",
+        token: state.tokens.curr });
+
+      if (inexport) {
+        state.funct["(scope)"].setExported(i, state.tokens.prev);
+      }
     }
 
     doFunction({

@@ -1668,6 +1668,10 @@ exports.testUnnamedFuncStatement = function (test) {
     .addError(1, "Missing name in function declaration.")
     .test("function() {}");
 
+  TestRun(test, "with 'unused' option")
+    .addError(1, "Missing name in function declaration.")
+    .test("function() {}", { unused: true });
+
   test.done();
 };
 
