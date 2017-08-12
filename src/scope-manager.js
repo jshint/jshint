@@ -250,7 +250,8 @@ var scopeManager = function(state, predefined, exported, declared) {
     var isFunction;
 
     if (state.option.latedef) {
-      isFunction = type === "function" || type === "generator function";
+      isFunction = type === "function" || type === "generator function" ||
+        type === "async function";
 
       // if either latedef is strict and this is a function
       //    or this is not a function
@@ -303,7 +304,7 @@ var scopeManager = function(state, predefined, exported, declared) {
         isUnstackingFunctionParams = _current["(type)"] === "functionparams",
         isUnstackingFunctionOuter = _current["(type)"] === "functionouter";
 
-      var i, j, isImmutable;
+      var i, j, isImmutable, isFunction;
       var currentUsages = _current["(usages)"];
       var currentLabels = _current["(labels)"];
       var usedLabelNameList = Object.keys(currentUsages);
@@ -342,9 +343,12 @@ var scopeManager = function(state, predefined, exported, declared) {
             }
           }
 
+          isFunction = usedLabelType === "function" ||
+            usedLabelType === "generator function" ||
+            usedLabelType === "async fuction";
+
           // check for re-assigning a function declaration
-          if ((usedLabelType === "function" || usedLabelType === "generator function" ||
-            usedLabelType === "class") && usage["(reassigned)"]) {
+          if ((isFunction || usedLabelType === "class") && usage["(reassigned)"]) {
             for (j = 0; j < usage["(reassigned)"].length; j++) {
               if (!usage["(reassigned)"][j].ignoreW021) {
                 warning("W021", usage["(reassigned)"][j], usedLabelName, usedLabelType);
@@ -719,7 +723,8 @@ var scopeManager = function(state, predefined, exported, declared) {
      * @param {Object} opts
      * @param {String} opts.type - the type of the label e.g. "param", "var",
      *                             "let, "const", "import", "function",
-     *                             "generator function"
+     *                             "generator function", "async function",
+     *                             "async generator function"
      * @param {object} opts.token - the token pointing at the declaration
      * @param {boolean} opts.initialized - whether the binding should be
      *                                     created in an "initialized" state.
@@ -729,9 +734,10 @@ var scopeManager = function(state, predefined, exported, declared) {
       var type  = opts.type;
       var token = opts.token;
       var isblockscoped = type === "let" || type === "const" ||
-        type === "class" || type === "import" || type === "generator function";
+        type === "class" || type === "import" || type === "generator function" ||
+        type === "async function" || type === "async generator function";
       var ishoisted = type === "function" || type === "generator function" ||
-        type === "import";
+        type === "async function" || type === "import";
       var isexported    = (isblockscoped ? _current : _currentFunctBody)["(type)"] === "global" &&
                           _.has(exported, labelName);
 
