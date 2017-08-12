@@ -4016,7 +4016,9 @@ exports.module.await = function(test) {
     .test("function await() {}", { esversion: 6, module: true });
 
   TestRun(test)
-    .addError(1, 1, "Expected an identifier and instead saw 'await' (a reserved word).")
+    .addError(1, 1, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, 6, "Missing semicolon.")
+    .addError(1, 1, "Unrecoverable syntax error. (100% scanned).")
     .test("await: while (false) {}", { esversion: 6, module: true });
 
   TestRun(test)
@@ -4038,11 +4040,17 @@ exports.esversion = function(test) {
     "// jshint esversion: 7",
     "// jshint esversion: 2016",
     "// jshint esversion: 8",
-    "// jshint esversion: 2017"
+    "// jshint esversion: 2017",
+    "// jshint esversion: 9",
+    "// jshint esversion: 2018",
+    "// jshint esversion: 10",
+    "// jshint esversion: 2019"
   ];
 
   TestRun(test, "Value")
     .addError(2, 1, "Bad option value.")
+    .addError(12, 1, "Bad option value.")
+    .addError(13, 1, "Bad option value.")
     .test(code);
 
   var es5code = [
