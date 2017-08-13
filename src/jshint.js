@@ -910,26 +910,12 @@ var JSHINT = (function() {
    *                           detail)
    */
   function expression(rbp, context) {
-    var left, isArray = false, isObject = false, isLetExpr = false;
+    var left, isArray = false, isObject = false;
     var initial = context & prodParams.initial;
 
     context &= ~prodParams.initial;
 
     state.nameStack.push();
-
-    // if current expression is a let expression
-    if (!initial && state.tokens.next.value === "let" && peek(0).value === "(") {
-      if (!state.inMoz()) {
-        warning("W118", state.tokens.next, "let expressions");
-      }
-      isLetExpr = true;
-      // create a new block scope we use only for the current expression
-      state.funct["(scope)"].stack();
-      advance("let");
-      advance("(");
-      state.tokens.prev.fud(context);
-      advance(")");
-    }
 
     if (state.tokens.next.id === "(end)")
       error("E006", state.tokens.curr);
@@ -988,9 +974,6 @@ var JSHINT = (function() {
           error("E033", state.tokens.curr, state.tokens.curr.id);
         }
       }
-    }
-    if (isLetExpr) {
-      state.funct["(scope)"].unstack();
     }
 
     state.nameStack.pop();
@@ -4265,6 +4248,20 @@ var JSHINT = (function() {
   var letstatement = stmt("let", function(context) {
     return blockVariableStatement("let", this, context);
   });
+  letstatement.nud = function(context, rbp) {
+    if (state.tokens.next.value === "(") {
+      if (!state.inMoz()) {
+        warning("W118", state.tokens.next, "let expressions");
+      }
+      // create a new block scope we use only for the current expression
+      state.funct["(scope)"].stack();
+      advance("(");
+      state.tokens.prev.fud(context);
+      advance(")");
+      expression(rbp, context);
+      state.funct["(scope)"].unstack();
+    }
+  };
   letstatement.exps = true;
   letstatement.declaration = true;
 
