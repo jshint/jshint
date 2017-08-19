@@ -103,6 +103,7 @@ exports.setup.testRun = function (test, name) {
         if (lines.length) {
           return {
             line: er.line,
+            character: er.character,
             message: er.reason,
             definedIn: lines
           };
@@ -130,29 +131,39 @@ exports.setup.testRun = function (test, name) {
         });
       });
 
-      test.ok(
-        undefinedErrors.length === 0 &&
-          unthrownErrors.length === 0 &&
-          wrongLineNumbers.length === 0 &&
-          duplicateErrors.length === 0,
+      var errorDetails = "";
 
-        (name === null ? "" : "\n  TestRun: [bold]{" + name + "}") +
-        unthrownErrors.map(function (el, idx) {
-          return (idx === 0 ? "\n  [yellow]{Errors defined, but not thrown by JSHINT}\n" : "") +
-            " [bold]{Line " + el.line + ", Char " + el.character + "} " + el.message;
-        }).join("\n") +
-        undefinedErrors.map(function (el, idx) {
-          return (idx === 0 ? "\n  [yellow]{Errors thrown by JSHINT, but not defined in test run}\n" : "") +
-            "  [bold]{Line " + el.line + ", Char " + el.character + "} " + el.reason;
-        }).join("\n") +
-        wrongLineNumbers.map(function (el, idx) {
-          return (idx === 0 ? "\n  [yellow]{Errors with wrong line number}\n" : "") +
-            "  [bold]{Line " + el.line + "} " + el.message + " [red]{not in line(s)} [bold]{" + el.definedIn.join(", ") + "}";
-        }).join("\n") +
-        duplicateErrors.map(function (el, idx) {
-          return (idx === 0 ? "\n  [yellow]{Duplicated errors}\n": "") +
-            "  [bold]{Line " + el.line + ", Char " + el.character + "} " + el.reason;
-        }).join("\n") + "\n"
+      if (unthrownErrors.length > 0) {
+        errorDetails += "\n  Errors defined, but not thrown by JSHint:\n" +
+          unthrownErrors.map(function (el) {
+            return "    {Line " + el.line + ", Char " + el.character + "} " + el.message;
+          }).join("\n");
+      }
+
+      if (undefinedErrors.length > 0) {
+        errorDetails += "\n  Errors thrown by JSHint, but not defined in test run:\n" +
+          undefinedErrors.map(function (el) {
+            return "    {Line " + el.line + ", Char " + el.character + "} " + el.reason;
+          }).join("\n");
+      }
+
+      if (wrongLineNumbers.length > 0) {
+        errorDetails += "\n  Errors with wrong line number:\n" +
+          wrongLineNumbers.map(function (el) {
+            return "    {Line " + el.line + ", Char " + el.character + "} " + el.message + " {not in line(s)} {" + el.definedIn.join(", ") + "}";
+          }).join("\n");
+      }
+
+      if (duplicateErrors.length > 0) {
+        errorDetails += "\n  Duplicated errors:\n" +
+          duplicateErrors.map(function (el) {
+            return "    {Line " + el.line + ", Char " + el.character + "} " + el.reason;
+          }).join("\n");
+      }
+
+      test.ok(
+        errorDetails === "",
+        (name ? "\n  TestRun: '" + name + "'" : "") + errorDetails
       );
     }
   };
