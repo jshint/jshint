@@ -41,6 +41,27 @@ exports.setup.testRun = function (test, name) {
 
   var helperObj = {
     addError: function (line, message, extras) {
+      var alreadyDefined = definedErrors.some(function(err) {
+        if (err.message !== message) {
+          return false;
+        }
+
+        if (err.line !== line) {
+          return false;
+        }
+
+        if (extras && err.character !== extras.character) {
+          return false;
+        }
+
+        return true;
+      });
+
+      if (alreadyDefined) {
+        throw new Error("An expected error with the message '" + message +
+          "' and line number " + line +
+          " has already been defined for this test.");
+      }
       definedErrors.push({
         line: line,
         message: message,
@@ -87,25 +108,32 @@ exports.setup.testRun = function (test, name) {
       var unthrownErrors = definedErrors.filter(function (def) {
         return !errors.some(function (er) {
           return def.line === er.line &&
+            (!def.extras || !("character" in def.extras) || def.extras.character === er.character) &&
             def.message === er.reason;
         });
       });
 
-      // elements that only differs in line number
-      var wrongLineNumbers = undefinedErrors.map(function (er) {
-        var lines = unthrownErrors.filter(function (def) {
-          return def.line !== er.line &&
-            def.message === er.reason;
+      // elements that only differ in location
+      var wrongLocations = undefinedErrors.map(function (er) {
+        var locations = unthrownErrors.filter(function (def) {
+          if (def.message !== er.reason) {
+            return false;
+          }
+
+          return def.line !== er.line || (def.extras && "character" in def.extras && def.extras.character !== er.character);
         }).map(function (def) {
-          return def.line;
+          return {
+            line: def.line,
+            character: def.extras && def.extras.character
+          };
         });
 
-        if (lines.length) {
+        if (locations.length) {
           return {
             line: er.line,
             character: er.character,
             message: er.reason,
-            definedIn: lines
+            definedIn: locations
           };
         }
         return null;
@@ -121,12 +149,12 @@ exports.setup.testRun = function (test, name) {
 
       // remove undefined errors, if there is a definition with wrong line number
       undefinedErrors = undefinedErrors.filter(function (er) {
-        return !wrongLineNumbers.some(function (def) {
+        return !wrongLocations.some(function (def) {
           return def.message === er.reason;
         });
       });
       unthrownErrors = unthrownErrors.filter(function (er) {
-        return !wrongLineNumbers.some(function (def) {
+        return !wrongLocations.some(function (def) {
           return def.message === er.message;
         });
       });
@@ -136,7 +164,7 @@ exports.setup.testRun = function (test, name) {
       if (unthrownErrors.length > 0) {
         errorDetails += "\n  Errors defined, but not thrown by JSHint:\n" +
           unthrownErrors.map(function (el) {
-            return "    {Line " + el.line + ", Char " + el.character + "} " + el.message;
+            return "    {Line " + el.line + ", Char " + (el.extras && el.extras.character) + "} " + el.message;
           }).join("\n");
       }
 
@@ -147,10 +175,13 @@ exports.setup.testRun = function (test, name) {
           }).join("\n");
       }
 
-      if (wrongLineNumbers.length > 0) {
-        errorDetails += "\n  Errors with wrong line number:\n" +
-          wrongLineNumbers.map(function (el) {
-            return "    {Line " + el.line + ", Char " + el.character + "} " + el.message + " {not in line(s)} {" + el.definedIn.join(", ") + "}";
+      if (wrongLocations.length > 0) {
+        errorDetails += "\n  Errors with wrong location:\n" +
+          wrongLocations.map(function (el) {
+            var locations = el.definedIn.map(function(location) {
+              return "{Line " + location.line + ", Char " + location.character + "}";
+            });
+            return "    {Line " + el.line + ", Char " + el.character + "} " + el.message + " - Not in line(s) " + locations.join(", ");
           }).join("\n");
       }
 

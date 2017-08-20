@@ -585,10 +585,10 @@ exports.testSparseArrays = function (test) {
   var src = "var arr = ['a',, null,, '',, undefined,,];";
 
   TestRun(test)
-    .addError(1, "Extra comma. (it breaks older versions of IE)")
-    .addError(1, "Extra comma. (it breaks older versions of IE)")
-    .addError(1, "Extra comma. (it breaks older versions of IE)")
-    .addError(1, "Extra comma. (it breaks older versions of IE)")
+    .addError(1, "Extra comma. (it breaks older versions of IE)", { character: 16 })
+    .addError(1, "Extra comma. (it breaks older versions of IE)", { character: 23 })
+    .addError(1, "Extra comma. (it breaks older versions of IE)", { character: 28 })
+    .addError(1, "Extra comma. (it breaks older versions of IE)", { character: 40 })
     .test(src, {es3: true});
 
   TestRun(test)

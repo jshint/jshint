@@ -646,8 +646,8 @@ exports.safeasi = function (test) {
     .addError(10, "Misleading line break before '/'; readers may interpret this as an expression boundary.")
     .addError(10, "Expected an identifier and instead saw '.'.")
     .addError(10, "Expected an assignment or function call and instead saw an expression.")
-    .addError(10, "Missing semicolon.")
-    .addError(10, "Missing semicolon.")
+    .addError(10, "Missing semicolon.", { character: 9 })
+    .addError(10, "Missing semicolon.", { character: 30 })
     .addError(11, "Missing semicolon.")
     .addError(21, "Missing semicolon.")
     .test(src, {});
@@ -655,8 +655,7 @@ exports.safeasi = function (test) {
   TestRun(test, 2)
     .addError(5, "Misleading line break before '('; readers may interpret this as an expression boundary.")
     .addError(8, "Misleading line break before '('; readers may interpret this as an expression boundary.")
-    .addError(10, "Misleading line break before '/'; readers may interpret this as an expression boundary.")
-    .addError(10, "Misleading line break before '/'; readers may interpret this as an expression boundary.")
+    .addError(10, "Misleading line break before '/'; readers may interpret this as an expression boundary.", { character: 5 })
     .addError(10, "Expected an identifier and instead saw '.'.")
     .addError(10, "Expected an assignment or function call and instead saw an expression.")
     .addError(10, "Missing semicolon.")
@@ -890,7 +889,6 @@ exports.unused.basic = function (test) {
     [58, "'constUsed' is defined but never used."],
     [62, "'letUsed' is defined but never used."],
     [63, "'anotherUnused' is defined but never used."],
-    [63, "'anotherUnused' is defined but never used."],
     [91, "'inTry6' is defined but never used."],
     [94, "'inTry9' is defined but never used."],
     [95, "'inTry10' is defined but never used."],
@@ -910,15 +908,12 @@ exports.unused.basic = function (test) {
 
   var all_param_errors = [
     [15, "'err' is defined but never used."],
-    [28, "'a' is defined but never used."],
-    [28, "'b' is defined but never used."],
-    [28, "'c' is defined but never used."],
     [71, "'y' is defined but never used."]
   ];
 
   var true_run = TestRun(test, {esnext: true});
 
-  var_errors.concat(last_param_errors).forEach(function (e) {
+  var_errors.slice().concat(last_param_errors).forEach(function (e) {
     true_run.addError.apply(true_run, e);
   });
 
@@ -927,7 +922,7 @@ exports.unused.basic = function (test) {
 
   // Test checking all function params via unused="strict"
   var all_run = TestRun(test);
-  var_errors.concat(last_param_errors, all_param_errors).forEach(function (e) {
+  var_errors.slice().concat(last_param_errors, all_param_errors).forEach(function (e) {
     all_run.addError.apply(true_run, e);
   });
 
@@ -1714,12 +1709,11 @@ exports.immed = function (test) {
   // Regression for GH-900
   TestRun(test)
     .addError(1, "Expected an assignment or function call and instead saw an expression.")
-    .addError(1, "Missing semicolon.")
     .addError(1, "Expected an identifier and instead saw ')'.")
-    .addError(1, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, "Expected an assignment or function call and instead saw an expression.", { character: 30 })
     .addError(1, "Unmatched '{'.")
-    .addError(1, "Expected an assignment or function call and instead saw an expression.")
-    .addError(1, "Missing semicolon.")
+    .addError(1, "Expected an assignment or function call and instead saw an expression.", { character: 31 })
+    .addError(1, "Missing semicolon.", { character: 31 })
     .addError(1, "Unrecoverable syntax error. (100% scanned).")
     .test("(function () { if (true) { }());", { es3: true, immed: true });
 
@@ -2178,10 +2172,12 @@ exports.quotes = function (test) {
     .test(src, { es3: true, quotmark: 'double' });
 
   // test multiple runs (must have the same result)
-  var run = TestRun(test);
-  run.addError(3, "Mixed double and single quotes.")
+  TestRun(test)
+    .addError(3, "Mixed double and single quotes.")
     .test(src, { es3: true, quotmark: true });
-  run.addError(3, "Mixed double and single quotes.")
+
+  TestRun(test)
+    .addError(3, "Mixed double and single quotes.")
     .test(src2, { es3: true, quotmark: true });
 
   test.done();
@@ -3334,13 +3330,13 @@ exports.elision = function (test) {
 
   TestRun(test, "elision=false ES3")
     .addError(1, "Extra comma. (it breaks older versions of IE)")
-    .addError(2, "Extra comma. (it breaks older versions of IE)")
-    .addError(2, "Extra comma. (it breaks older versions of IE)")
-    .addError(2, "Extra comma. (it breaks older versions of IE)")
+    .addError(2, "Extra comma. (it breaks older versions of IE)", { character: 12 })
+    .addError(2, "Extra comma. (it breaks older versions of IE)", { character: 13 })
+    .addError(2, "Extra comma. (it breaks older versions of IE)", { character: 14 })
     .addError(3, "Extra comma. (it breaks older versions of IE)")
     .addError(4, "Extra comma. (it breaks older versions of IE)")
-    .addError(5, "Extra comma. (it breaks older versions of IE)")
-    .addError(5, "Extra comma. (it breaks older versions of IE)")
+    .addError(5, "Extra comma. (it breaks older versions of IE)", { character: 10 })
+    .addError(5, "Extra comma. (it breaks older versions of IE)", { character: 11 })
     .test(code, { elision: false, es3: true });
 
   TestRun(test, "elision=true ES5")
