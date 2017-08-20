@@ -262,7 +262,7 @@ var scopeManager = function(state, predefined, exported, declared) {
         isUnstackingFunctionParams = _current["(type)"] === "functionparams",
         isUnstackingFunctionOuter = _current["(type)"] === "functionouter";
 
-      var i, j;
+      var i, j, isImmutable;
       var currentUsages = _current["(usages)"];
       var currentLabels = _current["(labels)"];
       var usedLabelNameList = Object.keys(currentUsages);
@@ -278,7 +278,7 @@ var scopeManager = function(state, predefined, exported, declared) {
         var usedLabel = currentLabels[usedLabelName];
         if (usedLabel) {
           var usedLabelType = usedLabel["(type)"];
-          var isImmutable = usedLabelType === "const" || usedLabelType === "import";
+          isImmutable = usedLabelType === "const" || usedLabelType === "import";
 
           if (usedLabel["(useOutsideOfScope)"] && !state.option.funcscope) {
             var usedTokens = usage["(tokens)"];
@@ -314,11 +314,14 @@ var scopeManager = function(state, predefined, exported, declared) {
           continue;
         }
 
-        if (isUnstackingFunctionOuter) {
-          state.funct["(isCapturing)"] = true;
-        }
-
         if (subScope) {
+          var labelType = this.labeltype(usedLabelName);
+          isImmutable = labelType === "const" ||
+            (labelType === null && _scopeStack[0]["(predefined)"][usedLabelName] === false);
+          if (isUnstackingFunctionOuter && !isImmutable) {
+            state.funct["(isCapturing)"] = true;
+          }
+
           // not exiting the global scope, so copy the usage down in case its an out of scope usage
           if (!subScope["(usages)"][usedLabelName]) {
             subScope["(usages)"][usedLabelName] = usage;
