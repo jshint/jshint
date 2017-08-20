@@ -1408,6 +1408,74 @@ exports.loopfunc = function (test) {
     .addError(3, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
     .test(src2, { es3: true, loopfunc: false, boss: true });
 
+  TestRun(test, "Allows closing over immutable bindings (ES5)")
+    .addError(6, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
+    .addError(7, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
+    .test([
+        "var outerVar;",
+        "",
+        "while (false) {",
+        "  var innerVar;",
+        "",
+        "  void function() { var localVar; return outerVar; };",
+        "  void function() { var localVar; return innerVar; };",
+        "  void function() { var localVar; return localVar; };",
+        "",
+        "}",
+      ]);
+
+  TestRun(test, "Allows closing over immutable bindings (globals)")
+    .addError(8, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
+    .addError(15, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
+    .test([
+        "/* globals immutableGlobal: false, mutableGlobal: true */",
+        "while (false) {",
+        "  void function() { return eval; };",
+        "  void function() { return Infinity; };",
+        "  void function() { return NaN; };",
+        "  void function() { return undefined; };",
+        "  void function() { return immutableGlobal; };",
+        "  void function() { return mutableGlobal; };",
+        "}",
+        "",
+        "// Should recognize shadowing",
+        "(function() {",
+        "  var immutableGlobal;",
+        "  while (false) {",
+        "    void function() { return immutableGlobal; };",
+        "  }",
+        "}());"
+      ]);
+
+  TestRun(test, "Allows closing over immutable bindings (ES2015)")
+    .addError(10, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
+    .addError(11, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
+    .addError(18, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
+    .addError(19, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
+    .test([
+        "let outerLet;",
+        "const outerConst = 0;",
+        "class OuterClass {}",
+        "",
+        "while (false) {",
+        "  let innerLet;",
+        "  const innerConst = 0;",
+        "  class InnerClass {}",
+        "",
+        "  void function() { let localLet; return outerLet; };",
+        "  void function() { let localLet; return innerLet; };",
+        "  void function() { let localLet; return localLet; };",
+        "",
+        "  void function() { const localConst = 0; return outerConst; };",
+        "  void function() { const localConst = 0; return innerConst; };",
+        "  void function() { const localConst = 0; return localConst; };",
+        "",
+        "  void function() { class LocalClass {} return OuterClass; };",
+        "  void function() { class LocalClass {} return InnerClass; };",
+        "  void function() { class LocalClass {} return LocalClass; };",
+        "}"
+      ], { esversion: 2015 });
+
   test.done();
 };
 
