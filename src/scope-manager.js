@@ -696,7 +696,7 @@ var scopeManager = function(state, predefined, exported, declared) {
         } else if (state.option.shadow !== true) {
           // now since we didn't get any block scope variables, test for var/function
           // shadowing
-          if (declaredInCurrentFunctionScope && labelName !== "__proto__") {
+          if (declaredInCurrentFunctionScope) {
 
             // see https://github.com/jshint/jshint/issues/2400
             if (_currentFunctBody["(type)"] !== "global") {

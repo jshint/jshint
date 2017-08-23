@@ -4935,7 +4935,7 @@ var JSHINT = (function() {
       name = tkn.value;
     }
 
-    if (props[name] && name !== "__proto__") {
+    if (props[name]) {
       warning("W075", state.tokens.next, msg, name);
     } else {
       props[name] = Object.create(null);
@@ -4971,7 +4971,7 @@ var JSHINT = (function() {
     state.nameStack.set(tkn);
 
     if (props[name]) {
-      if ((props[name].basic || props[name][flagName]) && name !== "__proto__") {
+      if (props[name].basic || props[name][flagName]) {
         warning("W075", state.tokens.next, msg, name);
       }
     } else {

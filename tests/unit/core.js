@@ -1971,9 +1971,8 @@ exports.duplicateProto = function (test) {
     "}());"
   ];
 
-  // TODO: Enable this expected warning in the next major release
   TestRun(test, "Duplicate `var`s")
-    //.addError(3, "'__proto__' is already defined.")
+    .addError(3, "'__proto__' is already defined.")
     .test(src, { proto: true });
 
   src = [
@@ -2005,9 +2004,8 @@ exports.duplicateProto = function (test) {
     "};"
   ];
 
-  // TODO: Enable this expected warning in the next major release
   TestRun(test, "Duplicate keys (data)")
-    //.addError(3, "Duplicate key '__proto__'.")
+    .addError(3, "Duplicate key '__proto__'.")
     .test(src, { proto: true });
 
   src = [
@@ -2017,9 +2015,8 @@ exports.duplicateProto = function (test) {
     "};"
   ];
 
-  // TODO: Enable this expected warning in the next major release
   TestRun(test, "Duplicate keys (data and accessor)")
-    //.addError(3, "Duplicate key '__proto__'.")
+    .addError(3, "Duplicate key '__proto__'.")
     .test(src, { proto: true });
 
   src = [
