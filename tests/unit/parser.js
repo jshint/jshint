@@ -2924,7 +2924,6 @@ exports["let statement (as seen in jetpack) as es5"] = function (test) {
   TestRun(test)
     .addError(1, "'const' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(1, "'destructuring binding' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(3, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(3, "'let block' is only available in Mozilla JavaScript extensions (use moz option).")
     .test(code, {unused: true, undef: true,
            predef: ["require", "xferable", "options"]}); // es5
@@ -2952,7 +2951,6 @@ exports["let statement (as seen in jetpack) as legacy JS"] = function (test) {
   TestRun(test)
     .addError(1, "'const' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(1, "'destructuring binding' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(3, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(3, "'let block' is only available in Mozilla JavaScript extensions (use moz option).")
     .test(code, {es3: true, unused: true, undef: true,
            predef: ["require", "xferable", "options"]});
@@ -3004,13 +3002,10 @@ exports["let block and let expression as es5"] = function (test) {
   ];
 
   TestRun(test)
-    .addError(1, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(1, "'let block' is only available in Mozilla JavaScript extensions (use moz option).")
-    .addError(3, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(3, "'let block' is only available in Mozilla JavaScript extensions (use moz option).")
     .addError(4, "'let expressions' is only available in Mozilla JavaScript extensions " +
       "(use moz option).")
-    .addError(4, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .test(code, {unused: true, undef: true, predef: ["print"]}); // es5
   test.done();
 };
@@ -3026,13 +3021,10 @@ exports["let block and let expression as legacy JS"] = function (test) {
   ];
 
   TestRun(test)
-    .addError(1, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(1, "'let block' is only available in Mozilla JavaScript extensions (use moz option).")
-    .addError(3, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(3, "'let block' is only available in Mozilla JavaScript extensions (use moz option).")
     .addError(4, "'let expressions' is only available in Mozilla JavaScript extensions " +
       "(use moz option).")
-    .addError(4, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .test(code, {es3: true, unused: true, undef: true, predef: ["print"]});
   test.done();
 };
