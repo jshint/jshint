@@ -30,12 +30,16 @@ exports.testCustomGlobals = function (test) {
   code = [
     "/*global bar*/",
     "foo = {};",
-    "bar = {};"
+    "bar = {};",
+    "foo++;",
+    "bar--;"
   ];
 
   TestRun(test)
     .addError(2, "Read only.")
     .addError(3, "Read only.")
+    .addError(4, "Read only.")
+    .addError(5, "Read only.")
     .test(code, { es3: true, unused: true, predef: { foo: false }});
 
   test.done();
