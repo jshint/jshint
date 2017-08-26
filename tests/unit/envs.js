@@ -54,7 +54,7 @@ exports.node = function (test) {
   ].join('\n');
 
   TestRun(test)
-    .addError(1, 'Use the function form of "use strict".')
+    .addError(1, 1, 'Use the function form of "use strict".')
     .test(globalStrict, { es3: true, strict: true });
 
   TestRun(test)
@@ -79,11 +79,11 @@ exports.node = function (test) {
   ];
 
   TestRun(test)
-    .addError(1, "Read only.")
+    .addError(1, 1, "Read only.")
     .test(overwrites, { es3: true, node: true });
 
   TestRun(test)
-    .addError(1, "Read only.")
+    .addError(1, 1, "Read only.")
     .test(overwrites, { es3: true, browserify: true });
 
   TestRun(test, "gh-2657")
@@ -120,71 +120,71 @@ exports.es5 = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/es5.js", "utf8");
 
   TestRun(test)
-    .addError(3, "Extra comma. (it breaks older versions of IE)")
-    .addError(8, "Extra comma. (it breaks older versions of IE)")
-    .addError(15, "get/set are ES5 features.")
-    .addError(16, "get/set are ES5 features.")
-    .addError(20, "get/set are ES5 features.")
-    .addError(22, "get/set are ES5 features.")
-    .addError(26, "get/set are ES5 features.")
-    .addError(30, "get/set are ES5 features.")
-    .addError(31, "get/set are ES5 features.")
-    .addError(36, "get/set are ES5 features.")
-    .addError(41, "get/set are ES5 features.")
-    .addError(42, "get/set are ES5 features.")
-    .addError(43, "Duplicate key 'x'.")
-    .addError(47, "get/set are ES5 features.")
-    .addError(48, "get/set are ES5 features.")
-    .addError(48, "Duplicate key 'x'.")
-    .addError(52, "get/set are ES5 features.")
-    .addError(53, "get/set are ES5 features.")
-    .addError(54, "get/set are ES5 features.")
-    .addError(54, "Duplicate key 'x'.")
-    .addError(58, "get/set are ES5 features.")
-    .addError(58, "Unexpected parameter 'a' in get x function.")
-    .addError(59, "get/set are ES5 features.")
-    .addError(59, "Unexpected parameter 'a' in get y function.")
-    .addError(60, "get/set are ES5 features.")
-    .addError(62, "get/set are ES5 features.")
-    .addError(62, "Expected a single parameter in set x function.")
-    .addError(63, "get/set are ES5 features.")
-    .addError(64, "get/set are ES5 features.")
-    .addError(64, "Expected a single parameter in set z function.")
-    .addError(68, "get/set are ES5 features.")
-    .addError(69, "get/set are ES5 features.")
-    .addError(68, "Missing property name.")
-    .addError(69, "Missing property name.")
-    .addError(75, "get/set are ES5 features.")
-    .addError(76, "get/set are ES5 features.")
-    .addError(80, "get/set are ES5 features.")
+    .addError(3, 6, "Extra comma. (it breaks older versions of IE)")
+    .addError(8, 9, "Extra comma. (it breaks older versions of IE)")
+    .addError(15, 13, "get/set are ES5 features.")
+    .addError(16, 13, "get/set are ES5 features.")
+    .addError(20, 13, "get/set are ES5 features.")
+    .addError(22, 13, "get/set are ES5 features.")
+    .addError(26, 13, "get/set are ES5 features.")
+    .addError(30, 13, "get/set are ES5 features.")
+    .addError(31, 13, "get/set are ES5 features.")
+    .addError(36, 13, "get/set are ES5 features.")
+    .addError(41, 13, "get/set are ES5 features.")
+    .addError(42, 13, "get/set are ES5 features.")
+    .addError(43, 10, "Duplicate key 'x'.")
+    .addError(47, 13, "get/set are ES5 features.")
+    .addError(48, 13, "get/set are ES5 features.")
+    .addError(48, 14, "Duplicate key 'x'.")
+    .addError(52, 13, "get/set are ES5 features.")
+    .addError(53, 13, "get/set are ES5 features.")
+    .addError(54, 13, "get/set are ES5 features.")
+    .addError(54, 14, "Duplicate key 'x'.")
+    .addError(58, 13, "get/set are ES5 features.")
+    .addError(58, 14, "Unexpected parameter 'a' in get x function.")
+    .addError(59, 13, "get/set are ES5 features.")
+    .addError(59, 14, "Unexpected parameter 'a' in get y function.")
+    .addError(60, 13, "get/set are ES5 features.")
+    .addError(62, 13, "get/set are ES5 features.")
+    .addError(62, 14, "Expected a single parameter in set x function.")
+    .addError(63, 13, "get/set are ES5 features.")
+    .addError(64, 13, "get/set are ES5 features.")
+    .addError(64, 14, "Expected a single parameter in set z function.")
+    .addError(68, 13, "get/set are ES5 features.")
+    .addError(69, 13, "get/set are ES5 features.")
+    .addError(68, 13, "Missing property name.")
+    .addError(69, 13, "Missing property name.")
+    .addError(75, 13, "get/set are ES5 features.")
+    .addError(76, 13, "get/set are ES5 features.")
+    .addError(80, 13, "get/set are ES5 features.")
     .test(src, { es3: true });
 
   TestRun(test)
-    .addError(36, "Setter is defined without getter.")
-    .addError(43, "Duplicate key 'x'.")
-    .addError(48, "Duplicate key 'x'.")
-    .addError(54, "Duplicate key 'x'.")
-    .addError(58, "Unexpected parameter 'a' in get x function.")
-    .addError(59, "Unexpected parameter 'a' in get y function.")
-    .addError(62, "Expected a single parameter in set x function.")
-    .addError(64, "Expected a single parameter in set z function.")
-    .addError(68, "Missing property name.")
-    .addError(69, "Missing property name.")
-    .addError(80, "Setter is defined without getter.")
+    .addError(36, 13, "Setter is defined without getter.")
+    .addError(43, 10, "Duplicate key 'x'.")
+    .addError(48, 14, "Duplicate key 'x'.")
+    .addError(54, 14, "Duplicate key 'x'.")
+    .addError(58, 14, "Unexpected parameter 'a' in get x function.")
+    .addError(59, 14, "Unexpected parameter 'a' in get y function.")
+    .addError(62, 14, "Expected a single parameter in set x function.")
+    .addError(64, 14, "Expected a single parameter in set z function.")
+    .addError(68, 13, "Missing property name.")
+    .addError(69, 13, "Missing property name.")
+    .addError(80, 13, "Setter is defined without getter.")
     .test(src, {  }); // es5
 
   // JSHint should not throw "Missing property name" error on nameless getters/setters
   // using Method Definition Shorthand if esnext flag is enabled.
   TestRun(test)
-    .addError(36, "Setter is defined without getter.")
-    .addError(43, "Duplicate key 'x'.")
-    .addError(48, "Duplicate key 'x'.")
-    .addError(54, "Duplicate key 'x'.")
-    .addError(58, "Unexpected parameter 'a' in get x function.")
-    .addError(59, "Unexpected parameter 'a' in get y function.")
-    .addError(62, "Expected a single parameter in set x function.")
-    .addError(64, "Expected a single parameter in set z function.")
-    .addError(80, "Setter is defined without getter.")
+    .addError(36, 13, "Setter is defined without getter.")
+    .addError(43, 10, "Duplicate key 'x'.")
+    .addError(48, 14, "Duplicate key 'x'.")
+    .addError(54, 14, "Duplicate key 'x'.")
+    .addError(58, 14, "Unexpected parameter 'a' in get x function.")
+    .addError(59, 14, "Unexpected parameter 'a' in get y function.")
+    .addError(62, 14, "Expected a single parameter in set x function.")
+    .addError(64, 14, "Expected a single parameter in set z function.")
+    .addError(80, 13, "Setter is defined without getter.")
     .test(src, { esnext: true });
 
   // Make sure that JSHint parses getters/setters as function expressions
@@ -203,7 +203,7 @@ exports.phantom = function (test) {
   ].join('\n');
 
   TestRun(test)
-    .addError(1, 'Use the function form of "use strict".')
+    .addError(1, 1, 'Use the function form of "use strict".')
     .test(globalStrict, { es3: true, strict: true });
 
   TestRun(test)
@@ -220,7 +220,7 @@ exports.globals = function (test) {
   ];
 
   TestRun(test)
-    .addError(2, "Redefinition of 'first'.")
+    .addError(2, 5, "Redefinition of 'first'.")
     .test(src);
   TestRun(test)
     .test(src, { browserify: true });
