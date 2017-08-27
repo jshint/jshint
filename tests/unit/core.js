@@ -1044,7 +1044,7 @@ exports.testConstModification = function (test) {
       .addError(3, 1, "Attempting to override 'a' which is a constant.")
       .addError(4, 1, "Attempting to override 'b' which is a constant.")
       .addError(5, 1, "Attempting to override 'a' which is a constant.")
-      .addError(6, 1, "Attempting to override 'a' which is a constant.")
+      .addError(6, 3, "Attempting to override 'a' which is a constant.")
       .addError(7, 1, "Attempting to override 'a' which is a constant.")
       .addError(8, 9, "Attempting to override 'a' which is a constant.")
       .addError(8, 9, "You might be leaking a variable (a) here.")

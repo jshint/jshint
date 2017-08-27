@@ -259,7 +259,6 @@ language/asi/S7.9_A10_T12.js
 language/asi/S7.9_A10_T7.js
 language/asi/S7.9_A10_T9.js
 language/asi/S7.9_A2.js
-language/asi/S7.9_A5.7_T1.js
 language/asi/S7.9_A6.1_T10.js
 language/asi/S7.9_A6.1_T11.js
 language/asi/S7.9_A6.1_T12.js
@@ -431,7 +430,6 @@ language/module-code/parse-err-hoist-lex-fun.js
 language/module-code/parse-err-hoist-lex-gen.js
 language/module-code/parse-err-invoke-anon-fun-decl.js
 language/module-code/parse-err-invoke-anon-gen-decl.js
-language/module-code/parse-err-reference.js
 language/module-code/parse-err-return.js
 language/module-code/parse-export-empty.js
 language/expressions/async-arrow-function/arrow-returns-promise.js
@@ -483,16 +481,8 @@ language/expressions/division/S11.5.2_A2.2_T1.js
 language/expressions/division/S11.5.2_A3_T1.5.js
 language/expressions/instanceof/S11.8.6_A3.js
 language/expressions/postfix-decrement/11.3.2-2-3-s.js
-language/expressions/postfix-decrement/non-simple.js
-language/expressions/postfix-decrement/target-cover-yieldexpr.js
-language/expressions/postfix-increment/non-simple.js
-language/expressions/postfix-increment/target-cover-yieldexpr.js
 language/expressions/prefix-decrement/11.4.5-2-3-s.js
-language/expressions/prefix-decrement/non-simple.js
-language/expressions/prefix-decrement/target-cover-yieldexpr.js
 language/expressions/prefix-increment/11.4.4-2-3-s.js
-language/expressions/prefix-increment/non-simple.js
-language/expressions/prefix-increment/target-cover-yieldexpr.js
 language/expressions/tagged-template/constructor-invocation.js
 language/expressions/tagged-template/invalid-escape-sequences.js
 language/expressions/yield/formal-parameters-after-reassignment-non-strict.js

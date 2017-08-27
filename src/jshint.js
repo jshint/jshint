@@ -1104,17 +1104,10 @@ var JSHINT = (function() {
       if (this.id === "++" || this.id === "--") {
         if (state.option.plusplus) {
           warning("W016", this, this.id);
-        } else if (this.right && (!this.right.identifier || isReserved(this.right)) &&
-            this.right.id !== "." && this.right.id !== "[") {
-          warning("W017", this);
         }
 
-        if (this.right && this.right.isMetaProperty) {
-          error("E031", this);
-        // detect increment/decrement of a const
-        // in the case of a.b, right will be the "." punctuator
-        } else if (this.right && this.right.identifier) {
-          state.funct["(scope)"].block.modify(this.right.value, this);
+        if (this.right) {
+          checkLeftSideAssign(this.right, this);
         }
       }
 
@@ -1439,17 +1432,9 @@ var JSHINT = (function() {
       // left = symbol operated e.g. "a" identifier or "a.b" punctuator
       if (state.option.plusplus) {
         warning("W016", this, this.id);
-      } else if ((!left.identifier || isReserved(left)) && left.id !== "." && left.id !== "[") {
-        warning("W017", this);
       }
 
-      if (left.isMetaProperty) {
-        error("E031", this);
-      // detect increment/decrement of a const
-      // in the case of a.b, left will be the "." punctuator
-      } else if (left && left.identifier) {
-        state.funct["(scope)"].block.modify(left.value, left);
-      }
+      checkLeftSideAssign(left, this);
 
       this.left = left;
       return this;
