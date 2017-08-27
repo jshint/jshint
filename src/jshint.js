@@ -1105,11 +1105,19 @@ var JSHINT = (function() {
       this.right = expression(150);
 
       if (this.id === "++" || this.id === "--") {
+
+        var rightHandSideIsDeRef = this.right && (this.right.id === "." || this.right.id === "[");
+        if (this.right && (!this.right.identifier || isReserved(this.right)) &&
+          rightHandSideIsDeRef && !this.right.left) {
+          error("E031", this);
+        }
         if (state.option.plusplus) {
           warning("W016", this, this.id);
-        } else if (this.right && (!this.right.identifier || isReserved(this.right)) &&
-            this.right.id !== "." && this.right.id !== "[") {
-          warning("W017", this);
+        } else {
+          if (this.right && (!this.right.identifier || isReserved(this.right)) &&
+            !rightHandSideIsDeRef) {
+            warning("W017", this);
+          }
         }
 
         if (this.right && this.right.isMetaProperty) {
@@ -1444,9 +1452,18 @@ var JSHINT = (function() {
     x.led = function(left) {
       // this = suffix e.g. "++" punctuator
       // left = symbol operated e.g. "a" identifier or "a.b" punctuator
+
+      var leftHandSideIsDeRef = left && (left.id === "." || left.id === "[");
+      var leftHandSideIsPlusPlus = left && (left.id === "++" || left.id === "--");
+      if (left && (!left.identifier || isReserved(left)) &&
+        ((leftHandSideIsDeRef && !left.left) || leftHandSideIsPlusPlus)) {
+        error("E031", this);
+      }
+
       if (state.option.plusplus) {
         warning("W016", this, this.id);
-      } else if ((!left.identifier || isReserved(left)) && left.id !== "." && left.id !== "[") {
+      } else if ((!left.identifier || isReserved(left)) && !leftHandSideIsDeRef &&
+        !leftHandSideIsPlusPlus) {
         warning("W017", this);
       }
 
