@@ -6,7 +6,8 @@
 
 exports.reservedVars = {
   arguments : false,
-  NaN       : false
+  NaN       : false,
+  undefined : false
 };
 
 exports.ecmaIdentifiers = {
@@ -23,6 +24,7 @@ exports.ecmaIdentifiers = {
     EvalError          : false,
     Function           : false,
     hasOwnProperty     : false,
+    Infinity           : false,
     isFinite           : false,
     isNaN              : false,
     Math               : false,

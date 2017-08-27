@@ -211,10 +211,6 @@ built-ins/AsyncFunction/AsyncFunctionPrototype-to-string.js
 built-ins/AsyncFunction/instance-has-name.js
 built-ins/AsyncFunction/instance-length.js
 built-ins/AsyncFunction/instance-prototype-property.js
-built-ins/Infinity/S15.1.1.2_A2_T2.js
-built-ins/global/10.2.1.1.3-4-18-s.js
-built-ins/undefined/15.1.1.3-1.js
-built-ins/undefined/15.1.1.3-3.js
 built-ins/ArrayIteratorPrototype/next/args-mapped-expansion-after-exhaustion.js
 built-ins/ArrayIteratorPrototype/next/args-mapped-expansion-before-exhaustion.js
 built-ins/ArrayIteratorPrototype/next/args-mapped-truncation-before-exhaustion.js
@@ -272,7 +268,6 @@ language/asi/S7.9_A6.1_T8.js
 language/asi/S7.9_A6.1_T9.js
 language/asi/S7.9_A7_T8.js
 language/asi/S7.9_A7_T9.js
-language/function-code/S10.2.1_A4_T1.js
 language/global-code/export.js
 language/global-code/import.js
 language/global-code/return.js
@@ -300,8 +295,6 @@ language/arguments-object/10.6-10-c-ii-2.js
 language/arguments-object/10.6-13-c-1-s.js
 language/arguments-object/10.6-1gs.js
 language/arguments-object/10.6-2gs.js
-language/arguments-object/10.6-6-3.js
-language/arguments-object/10.6-6-4.js
 language/arguments-object/S10.6_A3_T4.js
 language/arguments-object/S10.6_A5_T4.js
 language/arguments-object/unmapped/via-params-dflt.js
@@ -384,10 +377,6 @@ language/literals/regexp/u-surrogate-pairs-atom-escape-char-class.js
 language/literals/regexp/u-surrogate-pairs-atom-escape-decimal.js
 language/literals/regexp/u-surrogate-pairs.js
 language/literals/regexp/u-unicode-esc.js
-language/types/number/S8.5_A10_T1.js
-language/types/number/S8.5_A10_T2.js
-language/types/undefined/S8.1_A3_T1.js
-language/types/undefined/S8.1_A3_T2.js
 language/block-scope/syntax/function-declarations/in-statement-position-do-statement-while-expression.js
 language/block-scope/syntax/function-declarations/in-statement-position-for-statement.js
 language/block-scope/syntax/function-declarations/in-statement-position-if-expression-statement-else-statement.js
@@ -446,7 +435,6 @@ language/expressions/await/syntax-await-has-UnaryExpression-with-MultiplicativeE
 language/expressions/await/syntax-await-has-UnaryExpression.js
 language/expressions/call/S11.2.3_A3_T2.js
 language/expressions/call/S11.2.3_A3_T3.js
-language/expressions/call/eval-realm-indirect.js
 language/expressions/call/trailing-comma.js
 language/expressions/conditional/in-branch-1.js
 language/expressions/exponentiation/applying-the-exp-operator_A1.js
@@ -491,8 +479,6 @@ language/expressions/yield/rhs-primitive.js
 language/expressions/yield/rhs-template-middle.js
 language/expressions/template-literal/invalid-hexidecimal-character-escape-sequence-truncated-2.js
 language/expressions/template-literal/tv-utf16-escape-sequence.js
-language/expressions/function/arguments-with-arguments-fn.js
-language/expressions/function/arguments-with-arguments-lex.js
 language/expressions/function/dstr-ary-ptrn-rest-ary-elem.js
 language/expressions/function/dstr-ary-ptrn-rest-ary-elision.js
 language/expressions/function/dstr-ary-ptrn-rest-ary-rest.js
@@ -516,8 +502,6 @@ language/expressions/function/params-dflt-args-unmapped.js
 language/expressions/function/scope-param-rest-elem-var-close.js
 language/expressions/function/scope-param-rest-elem-var-open.js
 language/expressions/function/use-strict-with-non-simple-param.js
-language/expressions/generators/arguments-with-arguments-fn.js
-language/expressions/generators/arguments-with-arguments-lex.js
 language/expressions/generators/dstr-ary-ptrn-rest-ary-elem.js
 language/expressions/generators/dstr-ary-ptrn-rest-ary-elision.js
 language/expressions/generators/dstr-ary-ptrn-rest-ary-empty.js
@@ -733,16 +717,12 @@ language/expressions/arrow-function/dstr-dflt-ary-ptrn-rest-ary-rest.js
 language/expressions/arrow-function/dstr-dflt-ary-ptrn-rest-init-id.js
 language/expressions/arrow-function/dstr-dflt-ary-ptrn-rest-obj-id.js
 language/expressions/arrow-function/dstr-dflt-ary-ptrn-rest-obj-prop-id.js
-language/expressions/arrow-function/lexical-bindings-overriden-by-formal-parameters-non-strict.js
 language/expressions/arrow-function/scope-param-rest-elem-var-close.js
 language/expressions/arrow-function/scope-param-rest-elem-var-open.js
 language/expressions/arrow-function/syntax/arrowparameters-bindingidentifier-yield.js
-language/expressions/arrow-function/syntax/arrowparameters-cover-formalparameters-arguments.js
-language/expressions/arrow-function/syntax/arrowparameters-cover-formalparameters-eval.js
 language/expressions/arrow-function/syntax/arrowparameters-cover-formalparameters-yield.js
 language/expressions/arrow-function/syntax/early-errors/arrowparameters-bindingidentifier-identifier-futurereservedword.js
 language/expressions/arrow-function/syntax/early-errors/arrowparameters-bindingidentifier-identifier-strict-futurereservedword.js
-language/expressions/arrow-function/syntax/early-errors/arrowparameters-bindingidentifier-no-eval.js
 language/expressions/arrow-function/syntax/early-errors/asi-restriction-invalid-parenless-parameters-expression-body.js
 language/expressions/arrow-function/syntax/early-errors/asi-restriction-invalid-parenless-parameters.js
 language/expressions/arrow-function/syntax/early-errors/use-strict-with-non-simple-param.js
@@ -890,8 +870,6 @@ language/statements/if/if-stmt-else-cls.js
 language/statements/if/if-stmt-else-decl-strict.js
 language/statements/if/if-stmt-else-fun-strict.js
 language/statements/if/if-stmt-else-gen.js
-language/statements/generators/arguments-with-arguments-fn.js
-language/statements/generators/arguments-with-arguments-lex.js
 language/statements/generators/dstr-ary-ptrn-rest-ary-elem.js
 language/statements/generators/dstr-ary-ptrn-rest-ary-elision.js
 language/statements/generators/dstr-ary-ptrn-rest-ary-empty.js
@@ -924,13 +902,6 @@ language/statements/labeled/decl-gen.js
 language/statements/labeled/decl-let.js
 language/statements/labeled/value-yield-non-strict.js
 language/statements/function/S13_A13_T3.js
-language/statements/function/S13_A15_T1.js
-language/statements/function/S13_A15_T2.js
-language/statements/function/S13_A15_T3.js
-language/statements/function/S13_A15_T4.js
-language/statements/function/S13_A15_T5.js
-language/statements/function/arguments-with-arguments-fn.js
-language/statements/function/arguments-with-arguments-lex.js
 language/statements/function/dstr-ary-ptrn-rest-ary-elem.js
 language/statements/function/dstr-ary-ptrn-rest-ary-elision.js
 language/statements/function/dstr-ary-ptrn-rest-ary-empty.js
@@ -1657,7 +1628,6 @@ built-ins/RegExp/property-escapes/generated/White_Space.js
 built-ins/RegExp/property-escapes/generated/XID_Continue.js
 built-ins/RegExp/property-escapes/generated/XID_Start.js
 
-annexB/language/function-code/block-decl-func-skip-arguments.js
 annexB/language/eval-code/indirect/global-block-decl-eval-global-existing-block-fn-no-init.js
 annexB/language/eval-code/indirect/global-block-decl-eval-global-existing-block-fn-update.js
 annexB/language/eval-code/indirect/global-block-decl-eval-global-existing-fn-no-init.js
@@ -1723,7 +1693,6 @@ annexB/language/eval-code/indirect/global-switch-dflt-eval-global-existing-globa
 annexB/language/eval-code/indirect/global-switch-dflt-eval-global-existing-var-no-init.js
 annexB/language/eval-code/indirect/global-switch-dflt-eval-global-existing-var-update.js
 annexB/built-ins/escape/escape-above-astral.js
-language/global-code/decl-lex-restricted-global.js
 
 language/arguments-object/cls-decl-gen-meth-args-trailing-comma-null.js
 language/arguments-object/cls-decl-gen-meth-args-trailing-comma-multiple.js

@@ -238,7 +238,7 @@ exports.testUndefinedAsParam = function (test) {
 
   // But it must never tolerate reassigning of undefined
   TestRun(test)
-    .addError(1, 5, "Expected an identifier and instead saw 'undefined' (a reserved word).")
+    .addError(1, 5, "Redefinition of 'undefined'.")
     .test(code1);
 
   test.done();

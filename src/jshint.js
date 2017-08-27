@@ -1365,7 +1365,8 @@ var JSHINT = (function() {
       }
 
       return true;
-    } else if (left.identifier && !isReserved(left) && !left.isMetaProperty) {
+    } else if (left.identifier && !isReserved(left) && !left.isMetaProperty &&
+      left.value !== "eval" && left.value !== "arguments") {
       if (state.funct["(scope)"].labeltype(left.value) === "exception") {
         warning("W022", left);
       }
@@ -1970,14 +1971,8 @@ var JSHINT = (function() {
   reserve("catch");
   reserve("default").reach = true;
   reserve("finally");
-  reservevar("arguments", function(x) {
-    if (state.isStrict() && state.funct["(global)"]) {
-      warning("E008", x);
-    }
-  });
-  reservevar("eval");
-  reservevar("false");
-  reservevar("Infinity");
+  reserve("true", function() { return this; });
+  reserve("false", function() { return this; });
   reservevar("null");
   reservevar("this", function(x) {
     if (state.isStrict() && !isMethod() &&
@@ -1986,8 +1981,6 @@ var JSHINT = (function() {
       warning("W040", x);
     }
   });
-  reservevar("true");
-  reservevar("undefined");
 
   assignop("=", "assign", 20);
   assignop("+=", "assignadd", 20);
@@ -2574,7 +2567,9 @@ var JSHINT = (function() {
   application("=>");
 
   infix("[", function(left, that) {
-    var e = expression(10), s;
+    var e = expression(10);
+    var s, canUseDot;
+
     if (e && e.type === "(string)") {
       if (!state.option.evil && (e.value === "eval" || e.value === "execScript")) {
         if (isGlobalEval(left, state)) {
@@ -2585,7 +2580,20 @@ var JSHINT = (function() {
       countMember(e.value);
       if (!state.option.sub && reg.identifier.test(e.value)) {
         s = state.syntax[e.value];
-        if (!s || !isReserved(s)) {
+
+        if (s) {
+          canUseDot = !isReserved(s);
+        } else {
+          // This branch exists to preserve legacy behavior with version 2.9.5
+          // and earlier. In those releases, `eval` and `arguments` were
+          // incorrectly interpreted as reserved keywords, so Member
+          // Expressions such as `object["eval"]` did not trigger warning W069.
+          //
+          // TODO: Remove in JSHint 3
+          canUseDot = e.value !== "eval" && e.value !== "arguments";
+        }
+
+        if (canUseDot) {
           warning("W069", state.tokens.prev, e.value);
         }
       }
@@ -3414,7 +3422,7 @@ var JSHINT = (function() {
           }
           id = state.tokens.prev;
           value = expression(10);
-          if (value && value.type === "undefined") {
+          if (value && value.identifier && value.value === "undefined") {
             warning("W080", id, id.value);
           }
         }
@@ -3437,7 +3445,7 @@ var JSHINT = (function() {
           advance("=");
           id = state.tokens.prev;
           value = expression(10);
-          if (value && value.type === "undefined") {
+          if (value && value.identifier && value.value === "undefined") {
             warning("W080", id, id.value);
           }
         }
@@ -3536,7 +3544,7 @@ var JSHINT = (function() {
         var id = state.tokens.prev;
         // don't accept `in` in expression if prefix is used for ForIn/Of loop.
         value = expression(prefix ? 120 : 10);
-        if (!prefix && value && value.type === "undefined") {
+        if (!prefix && value && value.identifier && value.value === "undefined") {
           warning("W080", id, id.value);
         }
         if (lone) {
@@ -3589,7 +3597,7 @@ var JSHINT = (function() {
   var varstatement = stmt("var", function(context) {
     var prefix = context && context.prefix;
     var inexport = context && context.inexport;
-    var tokens, lone, value;
+    var tokens, lone, value, id;
 
     this.first = [];
     for (;;) {
@@ -3598,7 +3606,13 @@ var JSHINT = (function() {
         tokens = destructuringPattern();
         lone = false;
       } else {
-        tokens = [ { id: identifier(), token: state.tokens.curr } ];
+        tokens = [];
+        id = identifier();
+
+        if (id) {
+          tokens.push({ id: id, token: state.tokens.curr });
+        }
+
         lone = true;
       }
 
@@ -3645,10 +3659,11 @@ var JSHINT = (function() {
             warning("W120", state.tokens.next, state.tokens.next.value);
           }
         }
-        var id = state.tokens.prev;
+        id = state.tokens.prev;
         // don't accept `in` in expression if prefix is used for ForIn/Of loop.
         value = expression(prefix ? 120 : 10);
-        if (value && !prefix && !state.funct["(loopage)"] && value.type === "undefined") {
+        if (value && !prefix && !state.funct["(loopage)"] &&
+          value.identifier && value.value === "undefined") {
           warning("W080", id, id.value);
         }
         if (lone) {
@@ -3675,6 +3690,9 @@ var JSHINT = (function() {
   function classdef(rbp, isStatement) {
 
     /*jshint validthis:true */
+    var wasInClassBody = state.inClassBody;
+    state.inClassBody = true;
+
     if (!state.inES6()) {
       warning("W104", state.tokens.curr, "class", "6");
     }
@@ -3696,6 +3714,8 @@ var JSHINT = (function() {
 
     classtail(this);
 
+    state.inClassBody = wasInClassBody;
+
     if (isStatement) {
       state.funct["(scope)"].initialize(this.name);
     }
@@ -3704,19 +3724,16 @@ var JSHINT = (function() {
   }
 
   function classtail(c) {
-    var wasInClassBody = state.inClassBody;
     // ClassHeritage(opt)
     if (state.tokens.next.value === "extends") {
       advance("extends");
       expression(10);
     }
 
-    state.inClassBody = true;
     advance("{");
     // ClassBody(opt)
     c.body = classbody(c);
     advance("}");
-    state.inClassBody = wasInClassBody;
   }
 
   function classbody(c) {

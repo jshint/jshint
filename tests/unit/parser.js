@@ -3614,10 +3614,10 @@ exports["catch block no curlies"] = function (test) {
 exports["strict violation - use of arguments"] = function (test) {
   var code = [
     "'use strict';",
-    "arguments[0]();"
+    "var arguments;"
   ];
   TestRun(test)
-    .addError(2, 1, "Strict violation.")
+    .addError(2, 5, "Strict violation.")
     .test(code, { strict: "global"});
 
   test.done();
@@ -6086,8 +6086,8 @@ exports["class and method naming"] = function (test) {
     "}"
   ];
   var run = TestRun(test)
-    .addError(1, 7, "Expected an identifier and instead saw 'eval' (a reserved word).")
-    .addError(2, 7, "Expected an identifier and instead saw 'arguments' (a reserved word).")
+    .addError(1, 7, "Strict violation.")
+    .addError(2, 7, "Strict violation.")
     .addError(4, 7, "A class getter method cannot be named 'constructor'.")
     .addError(5, 7, "A class setter method cannot be named 'constructor'.")
     .addError(6, 3, "A class method cannot be named 'prototype'.")
@@ -7967,7 +7967,6 @@ exports.instanceOfLiterals = function (test) {
   var warningMessage = "Function expressions should not be used as the second operand to instanceof.";
 
   var run = TestRun(test)
-    .addError(13, 7, "Expected an identifier and instead saw 'undefined' (a reserved word).")
     .addError(16, 20, errorMessage)
     .addError(17, 20, errorMessage)
     .addError(18, 19, errorMessage)
