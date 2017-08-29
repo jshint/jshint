@@ -1,6 +1,5 @@
 // Based on https://gist.github.com/mathiasbynens/6334847 by @mathias
-
-'use strict';
+"use strict';
 
 var regenerate = require('regenerate');
 
