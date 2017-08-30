@@ -3769,7 +3769,7 @@ var JSHINT = (function() {
     // ClassHeritage(opt)
     if (state.tokens.next.value === "extends") {
       advance("extends");
-      c.heritage = expression(10);
+      expression(10);
     }
 
     state.inClassBody = true;
