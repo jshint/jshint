@@ -2918,7 +2918,6 @@ var JSHINT = (function() {
       "(name)"      : name,
       "(breakage)"  : 0,
       "(loopage)"   : 0,
-      "(tokens)"    : {},
 
       "(global)"    : false,
 
