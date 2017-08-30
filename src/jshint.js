@@ -5097,7 +5097,6 @@ var JSHINT = (function() {
           if (_current && _current.mode === "use") {
             if (use(v)) {
               _current.variables.push({
-                funct: state.funct,
                 token: state.tokens.curr,
                 value: v,
                 undef: true,
@@ -5110,7 +5109,6 @@ var JSHINT = (function() {
             // check if the variable has been used previously
             if (!declare(v)) {
               _current.variables.push({
-                funct: state.funct,
                 token: state.tokens.curr,
                 value: v,
                 undef: false,
