@@ -1753,7 +1753,6 @@ var JSHINT = (function() {
       old_indent = indent,
       m,
       t,
-      line,
       d;
 
     inblock = ordinary;
@@ -1771,7 +1770,6 @@ var JSHINT = (function() {
       state.funct["(scope)"].stack();
       state.funct["(noblockscopedvar)"] = false;
 
-      line = state.tokens.curr.line;
       if (state.tokens.next.id !== "}") {
         indent += state.option.indent;
         while (!ordinary && state.tokens.next.from > indent) {
