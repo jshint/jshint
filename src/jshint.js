@@ -3053,7 +3053,6 @@ var JSHINT = (function() {
 
     f = state.funct;
     token = state.tokens.curr;
-    token.funct = state.funct;
 
     functions.push(state.funct);
 
