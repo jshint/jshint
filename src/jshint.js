@@ -90,7 +90,6 @@ var JSHINT = (function() {
     membersOnly,
     predefined,    // Global variables defined by option
 
-    stack,
     urls,
 
     extraModules = [],
@@ -5339,7 +5338,6 @@ var JSHINT = (function() {
 
     functions = [state.funct];
     urls = [];
-    stack = null;
     member = {};
     membersOnly = null;
     inblock = false;
