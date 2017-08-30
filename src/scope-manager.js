@@ -250,7 +250,6 @@ var scopeManager = function(state, predefined, exported, declared) {
       if (!type && previousScope["(type)"] === "functionparams") {
 
         _current["(isFuncBody)"] = true;
-        _current["(context)"] = _currentFunctBody;
         _currentFunctBody = _current;
       }
     },
