@@ -5250,7 +5250,6 @@ var JSHINT = (function() {
       JSHINT.scope = o.scope;
     } else {
       JSHINT.errors = [];
-      JSHINT.undefs = [];
       JSHINT.internals = [];
       JSHINT.blacklist = {};
       JSHINT.scope = "(main)";
