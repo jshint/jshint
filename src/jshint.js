@@ -4540,10 +4540,8 @@ var JSHINT = (function() {
       warning("W104", state.tokens.curr, "yield", "6");
     }
     state.funct["(generator)"] = "yielded";
-    var delegatingYield = false;
 
     if (state.tokens.next.value === "*") {
-      delegatingYield = true;
       advance("*");
     }
 
