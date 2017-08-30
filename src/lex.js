@@ -1912,8 +1912,6 @@ Lexer.prototype = {
         return create("(regexp)", token.value);
 
       case Token.Comment:
-        state.tokens.curr.comment = true;
-
         if (token.isSpecial) {
           return {
             id: '(comment)',
