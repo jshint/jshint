@@ -1954,7 +1954,6 @@ var JSHINT = (function() {
   state.syntax["(template middle)"] = _.extend({
     lbp: 0,
     type: "(template middle)",
-    middle: true,
     noSubst: false
   }, baseTemplateSyntax);
 
