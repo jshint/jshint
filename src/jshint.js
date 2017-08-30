@@ -2919,7 +2919,6 @@ var JSHINT = (function() {
       "(breakage)"  : 0,
       "(loopage)"   : 0,
       "(tokens)"    : {},
-      "(properties)": {},
 
       "(global)"    : false,
 
