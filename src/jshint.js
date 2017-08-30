@@ -2697,7 +2697,7 @@ var JSHINT = (function() {
       advance("if");
       advance("(");
       state.funct["(comparray)"].setState("filter");
-      res.filter = expression(10);
+      expression(10);
       advance(")");
     }
 
