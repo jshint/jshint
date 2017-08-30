@@ -2063,7 +2063,7 @@ var JSHINT = (function() {
     that.left = left;
     that.right = expression(10);
     advance(":");
-    that["else"] = expression(10);
+    expression(10);
     return that;
   }, 30);
 
