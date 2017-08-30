@@ -1631,7 +1631,6 @@ var JSHINT = (function() {
         warning("W028", state.tokens.next, t.value, state.tokens.next.value);
       }
 
-      state.tokens.next.label = t.value;
       t = state.tokens.next;
     }
 
