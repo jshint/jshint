@@ -481,7 +481,6 @@ Lexer.prototype = {
         value: value,
         body: body,
         isSpecial: isSpecial,
-        isMultiline: opt.isMultiline || false,
         isMalformed: opt.isMalformed || false
       };
     }
