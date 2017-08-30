@@ -4920,7 +4920,6 @@ var JSHINT = (function() {
         }
       }
       if (checkPunctuator(pn, ";")) {
-        ret.isBlock = true;
         ret.notJson = true;
       }
     } while (bracketStack > 0 && pn.id !== "(end)");
