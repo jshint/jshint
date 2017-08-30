@@ -140,7 +140,6 @@ var state = {
     this.ignored = {};
     this.directive = {};
     this.jsonMode = false;
-    this.jsonWarnings = [];
     this.lines = [];
     this.tab = "";
     this.cache = {}; // Node.JS doesn't have Map. Sniff.

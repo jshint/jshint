@@ -90,7 +90,6 @@ var JSHINT = (function() {
     membersOnly,
     predefined,    // Global variables defined by option
 
-    stack,
     urls,
 
     extraModules = [],
@@ -1631,7 +1630,6 @@ var JSHINT = (function() {
         warning("W028", state.tokens.next, t.value, state.tokens.next.value);
       }
 
-      state.tokens.next.label = t.value;
       t = state.tokens.next;
     }
 
@@ -1756,7 +1754,6 @@ var JSHINT = (function() {
       old_indent = indent,
       m,
       t,
-      line,
       d;
 
     inblock = ordinary;
@@ -1774,7 +1771,6 @@ var JSHINT = (function() {
       state.funct["(scope)"].stack();
       state.funct["(noblockscopedvar)"] = false;
 
-      line = state.tokens.curr.line;
       if (state.tokens.next.id !== "}") {
         indent += state.option.indent;
         while (!ordinary && state.tokens.next.from > indent) {
@@ -1956,7 +1952,6 @@ var JSHINT = (function() {
   state.syntax["(template middle)"] = _.extend({
     lbp: 0,
     type: "(template middle)",
-    middle: true,
     noSubst: false
   }, baseTemplateSyntax);
 
@@ -2064,7 +2059,7 @@ var JSHINT = (function() {
     that.left = left;
     that.right = expression(10);
     advance(":");
-    that["else"] = expression(10);
+    expression(10);
     return that;
   }, 30);
 
@@ -2346,7 +2341,6 @@ var JSHINT = (function() {
     var c = expression(155), i;
     if (c && c.id !== "function") {
       if (c.identifier) {
-        c["new"] = true;
         switch (c.value) {
         case "Number":
         case "String":
@@ -2697,7 +2691,7 @@ var JSHINT = (function() {
       advance("if");
       advance("(");
       state.funct["(comparray)"].setState("filter");
-      res.filter = expression(10);
+      expression(10);
       advance(")");
     }
 
@@ -2922,10 +2916,7 @@ var JSHINT = (function() {
       "(name)"      : name,
       "(breakage)"  : 0,
       "(loopage)"   : 0,
-      "(tokens)"    : {},
-      "(properties)": {},
 
-      "(catch)"     : false,
       "(global)"    : false,
 
       "(line)"      : null,
@@ -3056,7 +3047,6 @@ var JSHINT = (function() {
 
     f = state.funct;
     token = state.tokens.curr;
-    token.funct = state.funct;
 
     functions.push(state.funct);
 
@@ -3770,7 +3760,7 @@ var JSHINT = (function() {
     // ClassHeritage(opt)
     if (state.tokens.next.value === "extends") {
       advance("extends");
-      c.heritage = expression(10);
+      expression(10);
     }
 
     state.inClassBody = true;
@@ -4199,7 +4189,6 @@ var JSHINT = (function() {
         indent -= state.option.indent;
       }
     }
-    return this;
   }).labelled = true;
 
   stmt("debugger", function() {
@@ -4549,10 +4538,8 @@ var JSHINT = (function() {
       warning("W104", state.tokens.curr, "yield", "6");
     }
     state.funct["(generator)"] = "yielded";
-    var delegatingYield = false;
 
     if (state.tokens.next.value === "*") {
-      delegatingYield = true;
       advance("*");
     }
 
@@ -4921,7 +4908,6 @@ var JSHINT = (function() {
         }
       }
       if (checkPunctuator(pn, ";")) {
-        ret.isBlock = true;
         ret.notJson = true;
       }
     } while (bracketStack > 0 && pn.id !== "(end)");
@@ -5098,7 +5084,6 @@ var JSHINT = (function() {
           if (_current && _current.mode === "use") {
             if (use(v)) {
               _current.variables.push({
-                funct: state.funct,
                 token: state.tokens.curr,
                 value: v,
                 undef: true,
@@ -5111,7 +5096,6 @@ var JSHINT = (function() {
             // check if the variable has been used previously
             if (!declare(v)) {
               _current.variables.push({
-                funct: state.funct,
                 token: state.tokens.curr,
                 value: v,
                 undef: false,
@@ -5266,7 +5250,6 @@ var JSHINT = (function() {
       JSHINT.scope = o.scope;
     } else {
       JSHINT.errors = [];
-      JSHINT.undefs = [];
       JSHINT.internals = [];
       JSHINT.blacklist = {};
       JSHINT.scope = "(main)";
@@ -5350,7 +5333,6 @@ var JSHINT = (function() {
 
     functions = [state.funct];
     urls = [];
-    stack = null;
     member = {};
     membersOnly = null;
     inblock = false;

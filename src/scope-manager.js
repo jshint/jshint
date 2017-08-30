@@ -250,7 +250,6 @@ var scopeManager = function(state, predefined, exported, declared) {
       if (!type && previousScope["(type)"] === "functionparams") {
 
         _current["(isFuncBody)"] = true;
-        _current["(context)"] = _currentFunctBody;
         _currentFunctBody = _current;
       }
     },
@@ -471,7 +470,7 @@ var scopeManager = function(state, predefined, exported, declared) {
       // The variable was declared in an outer scope
       } else {
         // if this scope has the variable defined, it's a re-definition error
-        _checkOuterShadow(labelName, token, type);
+        _checkOuterShadow(labelName, token);
 
         _current["(labels)"][labelName] = {
           "(type)" : type,
@@ -640,7 +639,7 @@ var scopeManager = function(state, predefined, exported, declared) {
                           _.has(exported, labelName);
 
       // outer shadow check (inner is only on non-block scoped)
-      _checkOuterShadow(labelName, token, type);
+      _checkOuterShadow(labelName, token);
 
       if (isblockscoped) {
 
