@@ -1490,7 +1490,6 @@ Lexer.prototype = {
     return {
       type: Token.RegExp,
       value: value,
-      flags: flags,
       isMalformed: malformed
     };
   },
