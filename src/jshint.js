@@ -2921,7 +2921,6 @@ var JSHINT = (function() {
       "(tokens)"    : {},
       "(properties)": {},
 
-      "(catch)"     : false,
       "(global)"    : false,
 
       "(line)"      : null,
