@@ -2345,7 +2345,6 @@ var JSHINT = (function() {
     var c = expression(155), i;
     if (c && c.id !== "function") {
       if (c.identifier) {
-        c["new"] = true;
         switch (c.value) {
         case "Number":
         case "String":
