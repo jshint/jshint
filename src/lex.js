@@ -727,7 +727,6 @@ Lexer.prototype = {
     var value = "";
     var length = this.input.length;
     var char = this.peek(index);
-    var bad;
     var isAllowedDigit = isDecimalDigit;
     var base = 10;
     var isLegacy = false;
@@ -821,7 +820,6 @@ Lexer.prototype = {
           isAllowedDigit = isOctalDigit;
           base = 8;
           isLegacy = true;
-          bad = false;
 
           index += 1;
           value += char;
@@ -839,11 +837,9 @@ Lexer.prototype = {
       while (index < length) {
         char = this.peek(index);
 
-        if (isLegacy && isDecimalDigit(char)) {
-          // Numbers like '019' (note the 9) are not valid octals
-          // but we still parse them and mark as malformed.
-          bad = true;
-        } else if (!isAllowedDigit(char)) {
+        // Numbers like '019' (note the 9) are not valid octals
+        // but we still parse them and mark as malformed.
+        if (!(isLegacy && isDecimalDigit(char)) && !isAllowedDigit(char)) {
           break;
         }
         value += char;
