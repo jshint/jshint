@@ -387,7 +387,6 @@ exports["implied and unused should respect hoisting"] = function (test) {
     .addError(14, 5, "'fun4' is not defined.")
     .test(src, { undef: true }); // es5
 
-  JSHINT.flag = true;
   JSHINT(src, { undef: true });
   var report = JSHINT.data();
 
@@ -1515,8 +1514,8 @@ exports.eqnull = function (test) {
 
   // By default, warn about `== null` comparison
   /**
-   * This test previously asserted the issuance of warning W041. 
-   * W041 has since been removed, but the test is maintained in 
+   * This test previously asserted the issuance of warning W041.
+   * W041 has since been removed, but the test is maintained in
    * order to discourage regressions.
    */
   TestRun(test)
@@ -1613,7 +1612,7 @@ exports.debug = function (test) {
 };
 
 /** `debugger` statements without semicolons are found on the correct line */
-exports.debug = function (test) {
+exports.debuggerWithoutSemicolons = function (test) {
   var src = [
     "function test () {",
     "debugger",
@@ -1633,8 +1632,8 @@ exports.eqeqeq = function (test) {
   var src = fs.readFileSync(__dirname + '/fixtures/eqeqeq.js', 'utf8');
 
   /**
-   * This test previously asserted the issuance of warning W041. 
-   * W041 has since been removed, but the test is maintained in 
+   * This test previously asserted the issuance of warning W041.
+   * W041 has since been removed, but the test is maintained in
    * order to discourage regressions.
    */
   TestRun(test)
