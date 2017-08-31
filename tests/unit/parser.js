@@ -4444,7 +4444,7 @@ exports["for of as legacy JS"] = function (test) {
     .addError(17, 17, "Invalid for-of loop left-hand-side: initializer is forbidden.")
     .addError(17, 17, "Invalid for-of loop left-hand-side: more than one ForBinding.")
     .addError(17, 6, "'const' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .test(code, {es3: true, undef: true, predef: ["print"]}); // es5
+    .test(code, {es3: true, undef: true, predef: ["print"]});
 
   test.done();
 };
