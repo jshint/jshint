@@ -16,7 +16,7 @@ function globalsKnown(test, globals, options) {
   JSHINT(wrap(globals), options || {});
   var report = JSHINT.data();
 
-  test.ok(report.implied === undefined);
+  test.ok(report.implieds === undefined);
   test.equal(report.globals.length, globals.length);
 
   for (var i = 0, g; g = report.globals[i]; i += 1)
