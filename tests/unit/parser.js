@@ -600,10 +600,10 @@ exports.regexp = function (test) {
   TestRun(test).test("var y = Math.sqrt(16) / 180;", {moz: true});
 
   // "~"
-  TestRun(test).test("var y = Math.sqrt(16) / 180;", {es3: true});
-  TestRun(test).test("var y = Math.sqrt(16) / 180;", {}); // es5
-  TestRun(test).test("var y = Math.sqrt(16) / 180;", {esnext: true});
-  TestRun(test).test("var y = Math.sqrt(16) / 180;", {moz: true});
+  TestRun(test).test("var y = ~16 / 180;", {es3: true});
+  TestRun(test).test("var y = ~16 / 180;", {}); // es5
+  TestRun(test).test("var y = ~16 / 180;", {esnext: true});
+  TestRun(test).test("var y = ~16 / 180;", {moz: true});
 
 
   // "]" (GH-803)
@@ -4444,7 +4444,7 @@ exports["for of as legacy JS"] = function (test) {
     .addError(17, 17, "Invalid for-of loop left-hand-side: initializer is forbidden.")
     .addError(17, 17, "Invalid for-of loop left-hand-side: more than one ForBinding.")
     .addError(17, 6, "'const' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .test(code, {undef: true, predef: ["print"]}); // es5
+    .test(code, {es3: true, undef: true, predef: ["print"]});
 
   test.done();
 };
@@ -5553,7 +5553,7 @@ conciseMethods.getWithoutSet = function (test) {
   test.done();
 };
 
-conciseMethods.getWithoutSet = function (test) {
+conciseMethods.setWithoutGet = function (test) {
   var code = [
     "var a = [1, 2, 3, 4, 5];",
     "var strange = {",
@@ -6925,8 +6925,8 @@ exports.ignoreDirective["should allow the linter to skip blocked-out lines to co
   var code = fs.readFileSync(__dirname + "/fixtures/gh826.js", "utf8");
 
   /**
-   * This test previously asserted the issuance of warning W041. 
-   * W041 has since been removed, but the test is maintained in 
+   * This test previously asserted the issuance of warning W041.
+   * W041 has since been removed, but the test is maintained in
    * order to discourage regressions.
    */
   TestRun(test)
