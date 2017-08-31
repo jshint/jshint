@@ -1602,7 +1602,7 @@ exports.debug = function (test) {
 
   // By default disallow debugger statements.
   TestRun(test)
-    .addError(1, 23232323, "Forgotten 'debugger' statement?")
+    .addError(1, 20, "Forgotten 'debugger' statement?")
     .test(code, {es3: true});
 
   // But allow them if debug is true.
