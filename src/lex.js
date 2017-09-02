@@ -1708,8 +1708,7 @@ Lexer.prototype = {
         }
 
         if (_.has(state.syntax, value)) {
-          obj = Object.create(state.syntax[value] || state.syntax["(error)"]);
-
+          obj = Object.create(state.syntax[value]);
           // If this can't be a reserved keyword, reset the object.
           if (!isReserved(obj, isProperty && type === "(identifier)")) {
             obj = null;
