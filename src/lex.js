@@ -1917,9 +1917,6 @@ Lexer.prototype = {
 
         break;
 
-      case "":
-        break;
-
       default:
         return create("(punctuator)", token.value);
       }
