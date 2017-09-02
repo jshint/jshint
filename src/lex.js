@@ -1644,6 +1644,9 @@ Lexer.prototype = {
 
 
     function isReserved(token, isProperty) {
+      // At present all current identifiers have reserved set.
+      // Preserving check anyway, for future-proofing.
+      /* istanbul ignore if */
       if (!token.reserved) {
         return false;
       }
