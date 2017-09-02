@@ -148,10 +148,6 @@ Lexer.prototype = {
     return this.context.pop();
   },
 
-  isContext: function(context) {
-    return this.context.length > 0 && this.context[this.context.length - 1] === context;
-  },
-
   currentContext: function() {
     return this.context.length > 0 && this.context[this.context.length - 1];
   },
