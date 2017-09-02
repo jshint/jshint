@@ -9,7 +9,7 @@ var fs      = require('fs');
 var TestRun = require("../helpers/testhelper").setup.testRun;
 
 function wrap(globals) {
-  return '(function () { return [ ' + globals.join(',') + ' ]; }());';
+  return 'void [ ' + globals.join(',') + ' ];';
 }
 
 function globalsKnown(test, globals, options) {
@@ -88,6 +88,9 @@ exports.node = function (test) {
 
   TestRun(test, "gh-2657")
     .test("'use strict';var a;", { node: true });
+
+  TestRun(test, "`arguments` binding")
+    .test("void arguments;", { node: true, undef: true });
 
   test.done();
 };
@@ -418,6 +421,7 @@ exports.qunit = function (test) {
 exports.rhino = function (test) {
 
   var globals = [
+    "arguments",
     "defineClass",
     "deserialize",
     "gc",

@@ -3019,6 +3019,10 @@ var JSHINT = (function() {
         classExprBinding ? "class" : "function", state.tokens.curr, false);
     }
 
+    if (!isArrow) {
+      state.funct["(scope)"].funct.add("arguments", "var", token, false);
+    }
+
     // create the param scope (params added in functionparams)
     state.funct["(scope)"].stack("functionparams");
 
