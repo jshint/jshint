@@ -1795,7 +1795,7 @@ var JSHINT = (function() {
       advance("}", t);
 
       if (isfunc) {
-        state.funct["(scope)"].validateParams();
+        state.funct["(scope)"].validateParams(isfatarrow);
         if (m) {
           state.directive = m;
         }
@@ -1810,6 +1810,10 @@ var JSHINT = (function() {
 
         if (stmt && !isfatarrow && !state.inMoz()) {
           error("W118", state.tokens.curr, "function closure expressions");
+        }
+
+        if (isfatarrow) {
+          state.funct["(scope)"].validateParams(true);
         }
 
         expression(10);
