@@ -447,10 +447,6 @@ var scopeManager = function(state, predefined, exported, declared) {
     addParam: function(labelName, token, type) {
       type = type || "param";
 
-      if (state.isStrict() && (labelName === "arguments" || labelName === "eval")) {
-        warning("E008", token);
-      }
-
       if (type === "exception") {
         // if defined in the current function
         var previouslyDefinedLabelType = this.funct.labeltype(labelName);
@@ -502,12 +498,20 @@ var scopeManager = function(state, predefined, exported, declared) {
       currentFunctParamScope["(params)"].forEach(function(labelName) {
         var label = currentFunctParamScope["(labels)"][labelName];
 
-        if (label && label.duplicated) {
+        if (!label) {
+          return;
+        }
+
+        if (label.duplicated) {
           if (isStrict || isArrow) {
             warning("E011", label["(token)"], labelName);
           } else if (state.option.shadow !== true) {
             warning("W004", label["(token)"], labelName);
           }
+        }
+
+        if (isStrict && (labelName === "arguments" || labelName === "eval")) {
+          warning("E008", label["(token)"]);
         }
       });
     },
