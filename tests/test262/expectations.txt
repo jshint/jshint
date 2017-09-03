@@ -753,17 +753,6 @@ language/expressions/arrow-function/syntax/arrowparameters-cover-formalparameter
 language/expressions/arrow-function/syntax/early-errors/arrowparameters-bindingidentifier-identifier-futurereservedword.js
 language/expressions/arrow-function/syntax/early-errors/arrowparameters-bindingidentifier-identifier-strict-futurereservedword.js
 language/expressions/arrow-function/syntax/early-errors/arrowparameters-bindingidentifier-no-eval.js
-language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-duplicates-binding-array-1.js
-language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-duplicates-binding-array-2.js
-language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-duplicates-binding-array-3.js
-language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-duplicates-binding-object-1.js
-language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-duplicates-binding-object-2.js
-language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-duplicates-binding-object-3.js
-language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-duplicates-binding-object-4.js
-language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-duplicates-binding-object-5.js
-language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-duplicates-binding-object-6.js
-language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-duplicates-rest.js
-language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-duplicates.js
 language/expressions/arrow-function/syntax/early-errors/asi-restriction-invalid-parenless-parameters-expression-body.js
 language/expressions/arrow-function/syntax/early-errors/asi-restriction-invalid-parenless-parameters.js
 language/expressions/arrow-function/syntax/early-errors/use-strict-with-non-simple-param.js
