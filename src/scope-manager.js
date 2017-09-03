@@ -487,7 +487,7 @@ var scopeManager = function(state, predefined, exported, declared) {
       }
     },
 
-    validateParams: function() {
+    validateParams: function(isArrow) {
       var isStrict = state.isStrict();
       var currentFunctParamScope = _currentFunctBody["(parent)"];
 
@@ -499,7 +499,7 @@ var scopeManager = function(state, predefined, exported, declared) {
         var label = currentFunctParamScope["(labels)"][labelName];
 
         if (label && label.duplicated) {
-          if (isStrict) {
+          if (isStrict || isArrow) {
             warning("E011", label["(token)"], labelName);
           } else if (state.option.shadow !== true) {
             warning("W004", label["(token)"], labelName);

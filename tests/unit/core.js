@@ -1597,6 +1597,28 @@ exports.testDuplicateParamNames = function (test) {
     .addError(18, 3, "Unnecessary directive \"use strict\".")
     .test(src, { shadow: false });
 
+  src = [
+    "void ((x, x) => null);",
+    "void ((x, x) => {});",
+    "void ((x, x) => { 'use strict'; });",
+    "function f() {",
+    "  'use strict';",
+    "  void ((x, x) => null);",
+    "  void ((x, x) => {});",
+    "  void ((x, x) => { 'use strict'; });",
+    "}"
+  ];
+
+  TestRun(test, "Arrow functions - strict mode restriction")
+    .addError(1, 8, "'x' has already been declared.")
+    .addError(2, 8, "'x' has already been declared.")
+    .addError(3, 8, "'x' has already been declared.")
+    .addError(6, 10, "'x' has already been declared.")
+    .addError(7, 10, "'x' has already been declared.")
+    .addError(8, 10, "'x' has already been declared.")
+    .addError(8, 21, "Unnecessary directive \"use strict\".")
+    .test(src, { esversion: 6 });
+
   test.done();
 };
 
