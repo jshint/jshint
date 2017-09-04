@@ -10,7 +10,9 @@ var minimatch         = paraquire("minimatch");
 var htmlparser        = paraquire("htmlparser2", {
   builtin: ["events", "util"],
 });
-var exit              = require("exit");
+var exit              = paraquire("exit", {
+  process: ["exit", "stderr", "stdout"],
+});
 var stripJsonComments = paraquire("strip-json-comments");
 var JSHINT            = require("./jshint.js").JSHINT;
 var defReporter       = require("./reporters/default").reporter;
