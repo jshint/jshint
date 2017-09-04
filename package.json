@@ -51,6 +51,7 @@
     "exit":                "0.1.x",
     "htmlparser2":         "3.8.x",
     "minimatch":           "~3.0.2",
+    "paraquire":           "^1.3.1",
     "shelljs":             "0.3.x",
     "strip-json-comments": "1.0.x",
     "lodash":              "3.7.x"

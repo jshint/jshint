@@ -1,6 +1,7 @@
 "use strict";
+var paraquire = require("paraquire")(module);
 
-var _                 = require("lodash");
+var _                 = paraquire("lodash");
 var fs                = require("fs");
 var cli               = require("cli");
 var path              = require("path");
