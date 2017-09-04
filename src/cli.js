@@ -9,7 +9,7 @@ var shjs              = require("shelljs");
 var minimatch         = paraquire("minimatch");
 var htmlparser        = require("htmlparser2");
 var exit              = require("exit");
-var stripJsonComments = require("strip-json-comments");
+var stripJsonComments = paraquire("strip-json-comments");
 var JSHINT            = require("./jshint.js").JSHINT;
 var defReporter       = require("./reporters/default").reporter;
 
