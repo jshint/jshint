@@ -7,7 +7,9 @@ var cli               = require("cli");
 var path              = require("path");
 var shjs              = require("shelljs");
 var minimatch         = paraquire("minimatch");
-var htmlparser        = require("htmlparser2");
+var htmlparser        = paraquire("htmlparser2", {
+  builtin: ["events", "util"],
+});
 var exit              = require("exit");
 var stripJsonComments = paraquire("strip-json-comments");
 var JSHINT            = require("./jshint.js").JSHINT;
