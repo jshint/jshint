@@ -498,10 +498,6 @@ var scopeManager = function(state, predefined, exported, declared) {
       currentFunctParamScope["(params)"].forEach(function(labelName) {
         var label = currentFunctParamScope["(labels)"][labelName];
 
-        if (!label) {
-          return;
-        }
-
         if (label.duplicated) {
           if (isStrict || isArrow) {
             warning("E011", label["(token)"], labelName);
