@@ -3611,14 +3611,32 @@ exports["catch block no curlies"] = function (test) {
   test.done();
 };
 
-exports["strict violation - use of arguments"] = function (test) {
+exports["strict violation - use of arguments and eval"] = function (test) {
   var code = [
     "'use strict';",
-    "var arguments;"
+    "var arguments;",
+    "(function() {",
+    "  var eval;",
+    "}());"
   ];
   TestRun(test)
     .addError(2, 5, "Strict violation.")
+    .addError(4, 7, "Strict violation.")
     .test(code, { strict: "global"});
+
+  TestRun(test, "via parameter (valid)")
+    .test([
+      "function f1(arguments) {}",
+      "function f2(eval) {}"
+    ]);
+
+  TestRun(test, "via parameter - (invalid)")
+    .addError(1, 13, "Strict violation.")
+    .addError(2, 13, "Strict violation.")
+    .test([
+      "function f1(arguments) { 'use strict'; }",
+      "function f2(eval) { 'use strict'; }"
+    ]);
 
   test.done();
 };
