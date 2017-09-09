@@ -1,14 +1,19 @@
 "use strict";
+var paraquire = require("paraquire")(module);
 
-var _                 = require("lodash");
+var _                 = paraquire("lodash");
 var fs                = require("fs");
 var cli               = require("cli");
 var path              = require("path");
 var shjs              = require("shelljs");
-var minimatch         = require("minimatch");
-var htmlparser        = require("htmlparser2");
-var exit              = require("exit");
-var stripJsonComments = require("strip-json-comments");
+var minimatch         = paraquire("minimatch");
+var htmlparser        = paraquire("htmlparser2", {
+  builtin: ["events", "util"],
+});
+var exit              = paraquire("exit", {
+  process: ["exit", "stderr", "stdout"],
+});
+var stripJsonComments = paraquire("strip-json-comments");
 var JSHINT            = require("./jshint.js").JSHINT;
 var defReporter       = require("./reporters/default").reporter;
 
