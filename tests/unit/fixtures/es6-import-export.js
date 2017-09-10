@@ -72,4 +72,5 @@ import { x, } from "source";
 
 // Empty
 export {};
+export {} from "source";
 import {} from "source";
