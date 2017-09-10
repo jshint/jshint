@@ -3412,7 +3412,7 @@ var JSHINT = (function() {
         advance("[");
       }
       if (checkPunctuator(state.tokens.next, "]")) {
-        warning("W137", state.tokens.curr, "destructuring");
+        warning("W137", state.tokens.curr);
       }
       var element_after_rest = false;
       while (!checkPunctuator(state.tokens.next, "]")) {
@@ -3444,7 +3444,7 @@ var JSHINT = (function() {
         advance("{");
       }
       if (checkPunctuator(state.tokens.next, "}")) {
-        warning("W137", state.tokens.curr, "destructuring");
+        warning("W137", state.tokens.curr);
       }
       while (!checkPunctuator(state.tokens.next, "}")) {
         assignmentProperty();
@@ -4634,10 +4634,6 @@ var JSHINT = (function() {
     } else {
       // ImportClause :: NamedImports
       advance("{");
-      // Breaking change
-      // if (checkPunctuator(state.tokens.next, "}")) {
-      //   warning("W137", state.tokens.next, "import");
-      // }
       for (;;) {
         if (state.tokens.next.value === "}") {
           advance("}");
@@ -4676,6 +4672,15 @@ var JSHINT = (function() {
     // FromClause
     advance("from");
     advance("(string)");
+
+    // Support for ES2015 modules was released without warning for `import`
+    // declarations that lack bindings. Issuing a warning would therefor
+    // constitute a breaking change.
+    // TODO: enable this warning in JSHint 3
+    // if (hasBindings) {
+    //   warning("W142", this, "import", moduleSpecifier);
+    // }
+
     return this;
   }).exps = true;
 
@@ -4683,6 +4688,7 @@ var JSHINT = (function() {
     var ok = true;
     var token;
     var identifier;
+    var moduleSpecifier;
 
     if (!state.inES6()) {
       warning("W119", state.tokens.curr, "export", "6");
@@ -4735,9 +4741,6 @@ var JSHINT = (function() {
     if (state.tokens.next.value === "{") {
       // ExportDeclaration :: export ExportClause
       advance("{");
-      if (checkPunctuator(state.tokens.next, "}")) {
-        warning("W137", state.tokens.next, "export");
-      }
       var exportedTokens = [];
       while (!checkPunctuator(state.tokens.next, "}")) {
         if (!state.tokens.next.identifier) {
@@ -4763,12 +4766,22 @@ var JSHINT = (function() {
       if (state.tokens.next.value === "from") {
         // ExportDeclaration :: export ExportClause FromClause
         advance("from");
+        moduleSpecifier = state.tokens.next;
         advance("(string)");
       } else if (ok) {
         exportedTokens.forEach(function(token) {
           state.funct["(scope)"].setExported(token.value, token);
         });
       }
+
+      if (exportedTokens.length === 0) {
+        if (moduleSpecifier) {
+          warning("W142", this, "export", moduleSpecifier.value);
+        } else {
+          warning("W141", this, "export");
+        }
+      }
+
       return this;
     }
 

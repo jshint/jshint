@@ -828,7 +828,8 @@ exports.testES6Modules = function (test) {
   ];
 
   var testRun = TestRun(test)
-    .addError(74, 9, "Empty export: this is unnecessary and can be removed.");
+    .addError(74, 1, "Empty export: this is unnecessary and can be removed.")
+    .addError(75, 1, "Empty export: consider replacing with `import 'source';`.");
   importConstErrors.forEach(function(error) { testRun.addError.apply(testRun, error); });
   testRun.test(src, {esnext: true});
 
@@ -867,7 +868,8 @@ exports.testES6Modules = function (test) {
     .addError(70, 1, "'export' is only available in ES6 (use 'esversion: 6').")
     .addError(71, 1, "'import' is only available in ES6 (use 'esversion: 6').")
     .addError(74, 1, "'export' is only available in ES6 (use 'esversion: 6').")
-    .addError(75, 1, "'import' is only available in ES6 (use 'esversion: 6').")
+    .addError(75, 1, "'export' is only available in ES6 (use 'esversion: 6').")
+    .addError(76, 1, "'import' is only available in ES6 (use 'esversion: 6').")
     .test(src);
 
   var src2 = [
