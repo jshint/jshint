@@ -456,6 +456,10 @@ var scopeManager = function(state, predefined, exported, declared) {
             warning("W002", state.tokens.next, labelName);
           }
         }
+
+        if (state.isStrict() && (labelName === "arguments" || labelName === "eval")) {
+          warning("E008", token);
+        }
       }
 
       // The variable was declared in the current scope

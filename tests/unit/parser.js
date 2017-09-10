@@ -3624,6 +3624,21 @@ exports["strict violation - use of arguments and eval"] = function (test) {
     .addError(4, 7, "Strict violation.")
     .test(code, { strict: "global"});
 
+  TestRun(test, "via `catch` clause binding (valid)")
+    .test([
+      "try {} catch (arguments) {}",
+      "try {} catch (eval) {}"
+    ]);
+
+  TestRun(test, "via `catch` clause binding (invalid)")
+    .addError(2, 15, "Strict violation.")
+    .addError(3, 15, "Strict violation.")
+    .test([
+      "'use strict';",
+      "try {} catch (arguments) {}",
+      "try {} catch (eval) {}"
+    ], { strict: "global" });
+
   TestRun(test, "via parameter (valid)")
     .test([
       "function f1(arguments) {}",
