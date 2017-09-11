@@ -3742,6 +3742,7 @@ var JSHINT = (function() {
     var props = Object.create(null);
     var staticProps = Object.create(null);
     var computed;
+    var f;
     for (var i = 0; state.tokens.next.id !== "}"; ++i) {
       name = state.tokens.next;
       isStatic = false;
@@ -3836,11 +3837,17 @@ var JSHINT = (function() {
 
       propertyName(name);
 
-      doFunction({
+      f = doFunction({
         statement: c,
         type: isGenerator ? "generator" : null,
         classExprBinding: c.namedExpr ? c.name : null
       });
+
+      if (getset && getset.value === "get" && f["(metrics)"].arity !== 0) {
+        warning("W076", getset, f["(params)"][0], name.value);
+      } else if (getset && getset.value === "set" && f["(metrics)"].arity !== 1) {
+        warning("W077", getset, name.value);
+      }
     }
 
     checkProperties(props);

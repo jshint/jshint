@@ -2138,6 +2138,38 @@ exports["gh-2838"] = function (test) {
   test.done();
 };
 
+exports["class setters and getters parameter count"] = function (test) {
+
+  var code = [
+    "class A {",
+    "  get zero_params() {}",
+    "  get one_param(a) {}",
+    "  get two_params(a, b) {}",
+    "  set zero_params() {}",
+    "  set one_param(a) {}",
+    "  set two_params(a, b) {}",
+    "  static get static_zero_params() {}",
+    "  static get static_one_param(a) {}",
+    "  static get static_two_params(a, b) {}",
+    "  static set static_zero_params() {}",
+    "  static set static_one_param(a) {}",
+    "  static set static_two_params(a, b) {}",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(3, "Unexpected parameter 'a' in get one_param function.")
+    .addError(4, "Unexpected parameter 'a' in get two_params function.")
+    .addError(5, "Expected a single parameter in set zero_params function.")
+    .addError(7, "Expected a single parameter in set two_params function.")
+    .addError(9, "Unexpected parameter 'a' in get static_one_param function.")
+    .addError(10, "Unexpected parameter 'a' in get static_two_params function.")
+    .addError(11, "Expected a single parameter in set static_zero_params function.")
+    .addError(13, "Expected a single parameter in set static_two_params function.")
+    .test(code, { esversion: 6 });
+
+  test.done();
+};
 exports["destructuring in setter parameter"] = function (test) {
 
   TestRun(test).test([
