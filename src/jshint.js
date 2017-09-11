@@ -1443,11 +1443,8 @@ var JSHINT = (function() {
     return x;
   }
 
-  // fnparam means that this identifier is being defined as a function
-  // argument (see identifier())
   // prop means that this identifier is that of an object property
-
-  function optionalidentifier(fnparam, prop, preserve) {
+  function optionalidentifier(prop, preserve) {
     if (!state.tokens.next.identifier) {
       return;
     }
@@ -1469,19 +1466,13 @@ var JSHINT = (function() {
       }
     }
 
-    if (fnparam && val === "undefined") {
-      return val;
-    }
-
     warning("W024", state.tokens.curr, state.tokens.curr.id);
     return val;
   }
 
-  // fnparam means that this identifier is being defined as a function
-  // argument
   // prop means that this identifier is that of an object property
-  function identifier(fnparam, prop) {
-    var i = optionalidentifier(fnparam, prop, false);
+  function identifier(prop) {
+    var i = optionalidentifier(prop, false);
     if (i) {
       return i;
     }
@@ -1505,7 +1496,7 @@ var JSHINT = (function() {
         return;
       }
 
-      return identifier(fnparam, prop);
+      return identifier(prop);
     } else {
       error("E030", state.tokens.next, state.tokens.next.value);
 
@@ -2334,7 +2325,7 @@ var JSHINT = (function() {
   prefix("void").exps = true;
 
   infix(".", function(left, that) {
-    var m = identifier(false, true);
+    var m = identifier(true);
 
     if (typeof m === "string") {
       countMember(m);
@@ -2743,7 +2734,7 @@ var JSHINT = (function() {
       id = preserveOrToken;
     } else {
       preserve = preserveOrToken;
-      id = optionalidentifier(false, true, preserve);
+      id = optionalidentifier(true, preserve);
     }
 
     if (!id) {
@@ -2826,7 +2817,7 @@ var JSHINT = (function() {
         }
       } else {
         if (checkPunctuator(state.tokens.next, "...")) pastRest = true;
-        ident = identifier(true);
+        ident = identifier();
         if (ident) {
           paramsIds.push(ident);
           currentParams.push([ident, state.tokens.curr]);
