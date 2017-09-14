@@ -74,11 +74,6 @@ var JSHINT = (function() {
 
     declared, // Globals that were declared using /*global ... */ syntax.
 
-    functionicity = [
-      "closure", "exception", "global", "label",
-      "outer", "unused", "var"
-    ],
-
     functions, // All of the functions
 
     inblock,
@@ -5481,7 +5476,7 @@ var JSHINT = (function() {
       options: state.option
     };
 
-    var fu, f, i, j, n, globals;
+    var fu, f, i, n, globals;
 
     if (itself.errors.length) {
       data.errors = itself.errors;
@@ -5508,16 +5503,6 @@ var JSHINT = (function() {
     for (i = 1; i < functions.length; i += 1) {
       f = functions[i];
       fu = {};
-
-      for (j = 0; j < functionicity.length; j += 1) {
-        fu[functionicity[j]] = [];
-      }
-
-      for (j = 0; j < functionicity.length; j += 1) {
-        if (fu[functionicity[j]].length === 0) {
-          delete fu[functionicity[j]];
-        }
-      }
 
       fu.name = f["(name)"];
       fu.param = f["(params)"];
