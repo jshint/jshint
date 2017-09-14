@@ -1895,7 +1895,7 @@ Lexer.prototype = {
           from: this.from,
           value: token.value,
           base: token.base,
-          isMalformed: token.malformed
+          isMalformed: token.isMalformed
         });
 
         return create("(number)", token.value);
