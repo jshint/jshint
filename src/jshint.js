@@ -3549,9 +3549,7 @@ var JSHINT = (function() {
         if (!prefix && value && value.type === "undefined") {
           warning("W080", id, id.value);
         }
-        if (lone) {
-          tokens[0].first = value;
-        } else {
+        if (!lone) {
           destructuringPatternMatch(names, value);
         }
       }
@@ -3661,9 +3659,7 @@ var JSHINT = (function() {
         if (value && !prefix && !state.funct["(loopage)"] && value.type === "undefined") {
           warning("W080", id, id.value);
         }
-        if (lone) {
-          tokens[0].first = value;
-        } else {
+        if (!lone) {
           destructuringPatternMatch(names, value);
         }
       }
