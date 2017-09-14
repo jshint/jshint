@@ -2963,21 +2963,21 @@ var JSHINT = (function() {
 
   /**
    * @param {Object} [options]
-   * @param {token} [options.name] The identifier belonging to the function (if
-   *                               any)
-   * @param {boolean} [options.statement] The statement that triggered creation
-   *                                      of the current function.
+   * @param {string} [options.name] The identifier belonging to the function (if
+   *                                any)
+   * @param {token} [options.statement] The statement that triggered creation
+   *                                    of the current function.
    * @param {string} [options.type] If specified, either "generator" or "arrow"
    * @param {token} [options.loneArg] The argument to the function in cases
    *                                  where it was defined using the
    *                                  single-argument shorthand
    * @param {bool} [options.parsedOpening] Whether the opening parenthesis has
    *                                       already been parsed
-   * @param {token} [options.classExprBinding] Define a function with this
-   *                                           identifier in the new function's
-   *                                           scope, mimicking the bahavior of
-   *                                           class expression names within
-   *                                           the body of member functions.
+   * @param {string} [options.classExprBinding] Define a function with this
+   *                                            identifier in the new function's
+   *                                            scope, mimicking the bahavior of
+   *                                            class expression names within
+   *                                            the body of member functions.
    */
   function doFunction(options) {
     var f, token, name, statement, classExprBinding, isGenerator, isArrow, ignoreLoopFunc;
