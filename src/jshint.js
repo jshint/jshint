@@ -2848,7 +2848,7 @@ var JSHINT = (function() {
       // a possible code smell.
       if (pastDefault) {
         if (state.tokens.next.id !== "=") {
-          error("W138", state.tokens.current);
+          error("W138", state.tokens.curr);
         }
       }
       if (state.tokens.next.id === "=") {

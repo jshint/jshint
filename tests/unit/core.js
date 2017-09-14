@@ -1512,7 +1512,7 @@ exports.testDefaultArguments = function (test) {
     .addError(14, 39, "'bar' is not defined.")
     .addError(14, 32, "'num3' was used before it was declared, which is illegal for 'param' variables.")
     .addError(15, 32, "'num4' was used before it was declared, which is illegal for 'param' variables.")
-    .addError(18, 45, "Regular parameters should not come after default parameters.")
+    .addError(18, 41, "Regular parameters should not come after default parameters.")
     .addError(27, 10, "'c' is not defined.")
     .addError(33, 4, "'d' was used before it was defined.")
     .addError(36, 16, "'e' was used before it was declared, which is illegal for 'param' variables.")
@@ -1521,7 +1521,7 @@ exports.testDefaultArguments = function (test) {
   TestRun(test)
     .addError(14, 32, "'num3' was used before it was declared, which is illegal for 'param' variables.")
     .addError(15, 32, "'num4' was used before it was declared, which is illegal for 'param' variables.")
-    .addError(18, 45, "Regular parameters should not come after default parameters.")
+    .addError(18, 41, "Regular parameters should not come after default parameters.")
     .addError(36, 16, "'e' was used before it was declared, which is illegal for 'param' variables.")
     .test(src, { moz: true });
 
@@ -1536,7 +1536,7 @@ exports.testDefaultArguments = function (test) {
     .addError(15, 37, "'default parameters' is only available in ES6 (use 'esversion: 6').")
     .addError(15, 32, "'num4' was used before it was declared, which is illegal for 'param' variables.")
     .addError(18, 37, "'default parameters' is only available in ES6 (use 'esversion: 6').")
-    .addError(18, 45, "Regular parameters should not come after default parameters.")
+    .addError(18, 41, "Regular parameters should not come after default parameters.")
     .addError(26, 18, "'default parameters' is only available in ES6 (use 'esversion: 6').")
     .addError(31, 18, "'default parameters' is only available in ES6 (use 'esversion: 6').")
     .addError(33, 6, "'default parameters' is only available in ES6 (use 'esversion: 6').")
