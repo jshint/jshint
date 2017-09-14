@@ -5043,7 +5043,7 @@ var JSHINT = (function() {
         unstack: function() {
           _current.variables.filter(function(v) {
             if (v.unused)
-              warning("W098", v.token, v.raw_text || v.value);
+              warning("W098", v.token, v.token.raw_text || v.value);
             if (v.undef)
               state.funct["(scope)"].block.use(v.value, v.token);
           });

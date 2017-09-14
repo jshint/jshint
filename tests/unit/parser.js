@@ -3690,19 +3690,23 @@ exports["array comprehension unused and undefined"] = function (test) {
   var code = [
     "var range = [1, 2];",
     "var a = [for (i of range) if (i % 2 === 0) i];",
-    "var b = [for (j of range) doesnotexist];"
+    "var b = [for (j of range) doesnotexist];",
+    "var c = [for (\\u0024 of range) 1];"
   ];
   TestRun(test)
     .addError(2, 5, "'a' is defined but never used.")
     .addError(3, 15, "'j' is defined but never used.")
     .addError(3, 27, "'doesnotexist' is not defined.")
     .addError(3, 5, "'b' is defined but never used.")
+    .addError(4, 15, "'\\u0024' is defined but never used.")
+    .addError(4, 5, "'c' is defined but never used.")
     .test(code, { esnext: true, unused: true, undef: true });
 
   var unused = JSHINT.data().unused;
   test.deepEqual([
     { name: 'a', line: 2, character: 5 },
-    { name: 'b', line: 3, character: 5 }
+    { name: 'b', line: 3, character: 5 },
+    { name: 'c', line: 4, character: 5 }
     //{ name: 'j', line: 3, character: 15 } // see gh-2440
   ], unused);
 
