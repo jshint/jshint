@@ -3724,7 +3724,7 @@ var JSHINT = (function() {
     state.inClassBody = true;
     advance("{");
     // ClassBody(opt)
-    c.body = classbody(c);
+    classbody(c);
     advance("}");
     state.inClassBody = wasInClassBody;
   }
