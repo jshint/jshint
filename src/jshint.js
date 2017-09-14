@@ -3737,7 +3737,7 @@ var JSHINT = (function() {
     var props = Object.create(null);
     var staticProps = Object.create(null);
     var computed;
-    for (var i = 0; state.tokens.next.id !== "}"; ++i) {
+    while (state.tokens.next.id !== "}") {
       name = state.tokens.next;
       isStatic = false;
       isGenerator = false;
