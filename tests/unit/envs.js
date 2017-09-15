@@ -538,6 +538,7 @@ exports.jasmine = function (test) {
     "setFixtures",
     "loadFixtures",
     "spyOn",
+    "spyOnProperty",
     "expect",
     "runs",
     "waitsFor",
