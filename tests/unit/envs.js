@@ -546,7 +546,9 @@ exports.jasmine = function (test) {
     "afterAll",
     "fail",
     "fdescribe",
-    "fit"
+    "fit",
+    "pending",
+    "spyOnProperty"
   ];
 
   globalsImplied(test, globals);

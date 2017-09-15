@@ -738,5 +738,7 @@ exports.jasmine = {
   fail        : false,
   fdescribe   : false,
   fit         : false,
-  pending     : false
+  pending     : false,
+  // Jasmine 2.6
+  spyOnProperty: false
 };
