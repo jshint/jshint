@@ -658,6 +658,30 @@ exports.group = {
     test.done();
   },
 
+  // See gh-3187
+  testIgnoreWithDot: function (test) {
+    var dir = __dirname + "/../examples/";
+    this.sinon.stub(process, "cwd").returns(dir);
+
+    this.sinon.stub(shjs, "cat")
+      .withArgs(sinon.match(/file\.js$/)).returns("This is not Javascript.")
+      .withArgs(sinon.match(/\.jshintignore$/)).returns("**/ignored-dir/**");
+    this.sinon.stub(shjs, "test")
+      .withArgs("-e", sinon.match(/file\.js$/)).returns(true)
+      .withArgs("-e", sinon.match(/\.jshintignore$/)).returns(true);
+
+    cli.interpret([
+      "node", "jshint", "ignored-dir/.dot-prefixed/file.js",
+      "ignored-dir/not-dot-prefixed/file.js"
+    ]);
+
+    process.cwd.returns(__dirname + "/../");
+
+    test.equal(cli.exit.args[0][0], 0, "All matching files are ignored, regardless of dot-prefixed directories.");
+
+    test.done();
+  },
+
   testExcludePath: function (test) {
     var run = this.sinon.stub(cli, "run");
     var dir = __dirname + "/../examples/";
