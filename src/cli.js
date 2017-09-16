@@ -230,7 +230,7 @@ function loadIgnores(params) {
  */
 function isIgnored(fp, patterns) {
   return patterns.some(function(ip) {
-    if (minimatch(path.resolve(fp), ip, { nocase: true })) {
+    if (minimatch(path.resolve(fp), ip, { nocase: true, dot: true })) {
       return true;
     }
 
