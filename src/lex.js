@@ -435,6 +435,18 @@ Lexer.prototype = {
           body = body.substr(str.length + 1);
         }
 
+        // To handle rarer case when special word is separated from label by
+        // multiple spaces or tabs
+        var strIndex = body.indexOf(str);
+        if (!isSpecial && strIndex >= 0) {
+          var specialRegex = new RegExp('[\s\t]*' + str + '[\s\t]*');
+          if (specialRegex.test(body)) {
+            isSpecial = true;
+            label = label + " " + str;
+            body = body.substr(strIndex + str.length);
+          }
+        }
+
         if (!isSpecial) {
           return;
         }
