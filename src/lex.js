@@ -435,6 +435,17 @@ Lexer.prototype = {
           body = body.substr(str.length + 1);
         }
 
+        // To handle rarer case when special word is separated from label by
+        // multiple spaces or tabs
+        var strIndex = body.indexOf(str);
+        if (!isSpecial && strIndex >= 0 && body.charAt(strIndex + str.length) === " ") {
+          var isAllWhitespace = body.substr(0, strIndex).trim().length === 0;
+          if (isAllWhitespace) {
+            isSpecial = true;
+            body = body.substr(str.length + strIndex);
+          }
+        }
+
         if (!isSpecial) {
           return;
         }
