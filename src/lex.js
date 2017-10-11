@@ -438,12 +438,12 @@ Lexer.prototype = {
         // To handle rarer case when special word is separated from label by
         // multiple spaces or tabs
         var strIndex = body.indexOf(str);
-        if (!isSpecial && strIndex >= 0) {
-          var specialRegex = new RegExp('[\s\t]*' + str + '[\s\t]*');
-          if (specialRegex.test(body)) {
+        if (!isSpecial && strIndex >= 0 && body.charAt(strIndex + str.length + 1) === " ") {
+          var specialSubstr = body.substr(0, strIndex + str.length);
+          var isAllWhitespace = (specialSubstr.length - specialSubstr.trim().length) === strIndex;
+          if (isAllWhitespace) {
             isSpecial = true;
-            label = label + " " + str;
-            body = body.substr(strIndex + str.length);
+            body = body.substr(str.length + strIndex);
           }
         }
 
