@@ -439,8 +439,7 @@ Lexer.prototype = {
         // multiple spaces or tabs
         var strIndex = body.indexOf(str);
         if (!isSpecial && strIndex >= 0 && body.charAt(strIndex + str.length + 1) === " ") {
-          var specialSubstr = body.substr(0, strIndex + str.length);
-          var isAllWhitespace = (specialSubstr.length - specialSubstr.trim().length) === strIndex;
+          var isAllWhitespace = body.substr(0, strIndex).trim().length === 0;
           if (isAllWhitespace) {
             isSpecial = true;
             body = body.substr(str.length + strIndex);
