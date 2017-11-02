@@ -147,17 +147,23 @@ exports.plusplus = function (test) {
 
   run = TestRun(test)
     .addError(1, 9, "Unexpected use of '++'.")
+    .addError(1, 9, "Bad assignment.")
     .addError(2, 9, "Unexpected use of '--'.")
+    .addError(2, 9, "Bad assignment.")
     .addError(3, 12, "Unexpected use of '++'.")
-    .addError(4, 12, "Unexpected use of '--'.");
+    .addError(3, 12, "Bad assignment.")
+    .addError(4, 12, "Unexpected use of '--'.")
+    .addError(4, 12, "Bad assignment.");
   run.test(code, { plusplus: true, es3: true });
   run.test(code, { plusplus: true }); // es5
   run.test(code, { plusplus: true, esnext: true });
   run.test(code, { plusplus: true, moz: true });
 
   run = TestRun(test)
-    .addError(2, 9, "Bad operand.")
-    .addError(4, 12, "Bad operand.");
+    .addError(1, 9, "Bad assignment.")
+    .addError(2, 9, "Bad assignment.")
+    .addError(3, 12, "Bad assignment.")
+    .addError(4, 12, "Bad assignment.");
   run.test(code, { plusplus: false, es3: true });
   run.test(code, { plusplus: false }); // es5
   run.test(code, { plusplus: false, esnext: true });
@@ -3605,14 +3611,47 @@ exports["catch block no curlies"] = function (test) {
   test.done();
 };
 
-exports["strict violation - use of arguments"] = function (test) {
+exports["strict violation - use of arguments and eval"] = function (test) {
   var code = [
     "'use strict';",
-    "arguments[0]();"
+    "var arguments;",
+    "(function() {",
+    "  var eval;",
+    "}());"
   ];
   TestRun(test)
-    .addError(2, 1, "Strict violation.")
+    .addError(2, 5, "Strict violation.")
+    .addError(4, 7, "Strict violation.")
     .test(code, { strict: "global"});
+
+  TestRun(test, "via `catch` clause binding (valid)")
+    .test([
+      "try {} catch (arguments) {}",
+      "try {} catch (eval) {}"
+    ]);
+
+  TestRun(test, "via `catch` clause binding (invalid)")
+    .addError(2, 15, "Strict violation.")
+    .addError(3, 15, "Strict violation.")
+    .test([
+      "'use strict';",
+      "try {} catch (arguments) {}",
+      "try {} catch (eval) {}"
+    ], { strict: "global" });
+
+  TestRun(test, "via parameter (valid)")
+    .test([
+      "function f1(arguments) {}",
+      "function f2(eval) {}"
+    ]);
+
+  TestRun(test, "via parameter - (invalid)")
+    .addError(1, 13, "Strict violation.")
+    .addError(2, 13, "Strict violation.")
+    .test([
+      "function f1(arguments) { 'use strict'; }",
+      "function f2(eval) { 'use strict'; }"
+    ]);
 
   test.done();
 };
@@ -6084,8 +6123,8 @@ exports["class and method naming"] = function (test) {
     "}"
   ];
   var run = TestRun(test)
-    .addError(1, 7, "Expected an identifier and instead saw 'eval' (a reserved word).")
-    .addError(2, 7, "Expected an identifier and instead saw 'arguments' (a reserved word).")
+    .addError(1, 7, "Strict violation.")
+    .addError(2, 7, "Strict violation.")
     .addError(4, 7, "A class getter method cannot be named 'constructor'.")
     .addError(5, 7, "A class setter method cannot be named 'constructor'.")
     .addError(6, 3, "A class method cannot be named 'prototype'.")
@@ -7402,7 +7441,7 @@ exports.testES6BlockImports = function (test) {
 };
 
 exports.testStrictDirectiveASI = function (test) {
-  var options = { strict: true, asi: true, globalstrict: true, predef: ["x"] };
+  var options = { strict: true, asi: true, globalstrict: true };
 
   TestRun(test, 1)
     .test("'use strict'\nfunction fn() {}\nfn();", options);
@@ -7448,28 +7487,28 @@ exports.testStrictDirectiveASI = function (test) {
 
   TestRun(test, 11)
     .addError(2, 2, "Expected an assignment or function call and instead saw an expression.")
-    .test("'use strict'\n!x;", options);
+    .test("'use strict'\n!x;", options, { x: true });
 
   TestRun(test, 12)
     .addError(2, 1, "Misleading line break before '+'; readers may interpret this as an expression boundary.")
     .addError(2, 3, "Missing \"use strict\" statement.")
     .addError(2, 2, "Expected an assignment or function call and instead saw an expression.")
-    .test("'use strict'\n+x;", options);
+    .test("'use strict'\n+x;", options, { x: true });
 
   TestRun(test, 13)
-    .test("'use strict'\n++x;", options);
+    .test("'use strict'\n++x;", options, { x: true });
 
   TestRun(test, 14)
-    .addError(1, 13, "Bad operand.")
+    .addError(1, 13, "Bad assignment.")
     .addError(2, 1, "Missing \"use strict\" statement.")
     .addError(2, 2, "Missing \"use strict\" statement.")
     .addError(2, 1, "Expected an assignment or function call and instead saw an expression.")
-    .test("'use strict'++\nx;", options);
+    .test("'use strict'++\nx;", options, { x: true });
 
   TestRun(test, 15)
-    .addError(1, 13, "Bad operand.")
+    .addError(1, 13, "Bad assignment.")
     .addError(1, 15, "Missing \"use strict\" statement.")
-    .test("'use strict'++;", options);
+    .test("'use strict'++;", options, { x: true });
 
   TestRun(test, 16)
     .addError(1, 9, "Missing \"use strict\" statement.")
@@ -7965,7 +8004,6 @@ exports.instanceOfLiterals = function (test) {
   var warningMessage = "Function expressions should not be used as the second operand to instanceof.";
 
   var run = TestRun(test)
-    .addError(13, 7, "Expected an identifier and instead saw 'undefined' (a reserved word).")
     .addError(16, 20, errorMessage)
     .addError(17, 20, errorMessage)
     .addError(18, 19, errorMessage)
