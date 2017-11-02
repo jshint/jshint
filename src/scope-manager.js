@@ -456,6 +456,10 @@ var scopeManager = function(state, predefined, exported, declared) {
             warning("W002", state.tokens.next, labelName);
           }
         }
+
+        if (state.isStrict() && (labelName === "arguments" || labelName === "eval")) {
+          warning("E008", token);
+        }
       }
 
       // The variable was declared in the current scope
@@ -498,12 +502,16 @@ var scopeManager = function(state, predefined, exported, declared) {
       currentFunctParamScope["(params)"].forEach(function(labelName) {
         var label = currentFunctParamScope["(labels)"][labelName];
 
-        if (label && label.duplicated) {
+        if (label.duplicated) {
           if (isStrict || isArrow) {
             warning("E011", label["(token)"], labelName);
           } else if (state.option.shadow !== true) {
             warning("W004", label["(token)"], labelName);
           }
+        }
+
+        if (isStrict && (labelName === "arguments" || labelName === "eval")) {
+          warning("E008", label["(token)"]);
         }
       });
     },
@@ -632,6 +640,10 @@ var scopeManager = function(state, predefined, exported, declared) {
 
       // outer shadow check (inner is only on non-block scoped)
       _checkOuterShadow(labelName, token);
+
+      if (state.isStrict() && (labelName === "arguments" || labelName === "eval")) {
+        warning("E008", token);
+      }
 
       if (isblockscoped) {
 

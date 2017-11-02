@@ -44,6 +44,18 @@ exports.shadow = function (test) {
   TestRun(test)
     .test(src, { es3: true, shadow: true });
 
+  src = [
+    "function f() {",
+    "  function inner() {}",
+    "}"
+  ];
+  TestRun(test, "nested functions - 'shadowed' `arguments` - true")
+    .test(src, { shadow: true });
+  TestRun(test, "nested functions - 'shadowed' `arguments` - false")
+    .test(src, { shadow: false });
+  TestRun(test, "nested functions - 'shadowed' `arguments` - 'inner'")
+    .test(src, { shadow: "inner" });
+
   test.done();
 };
 
@@ -787,6 +799,73 @@ exports.undef = function (test) {
     .test(['foo.call();',
       '/* exported foo, bar */'],
     {undef: true});
+
+  TestRun(test, "arguments - ES5")
+    .addError(6, 6, "'arguments' is not defined.")
+    .test([
+      "function f() { return arguments; }",
+      "void function() { return arguments; };",
+      "void function f() { return arguments; };",
+      "void { get g() { return arguments; } };",
+      "void { get g() {}, set g(_) { return arguments; } };",
+      "void arguments;"
+    ], { undef: true });
+
+  TestRun(test, "arguments - ES2015")
+    .addError(47, 11, "'arguments' is not defined.")
+    .addError(48, 21, "'arguments' is not defined.")
+    .addError(49, 12, "'arguments' is not defined.")
+    .test([
+      "function f(_ = arguments) {}",
+      "void function (_ = arguments) {};",
+      "void function f(_ = arguments) {};",
+      "function* g(_ = arguments) { yield; }",
+      "void function* (_ = arguments) { yield; };",
+      "void function* g(_ = arguments) { yield; };",
+      "function* g() { yield arguments; }",
+      "void function* () { yield arguments; };",
+      "void function* g() { yield arguments; };",
+      "void { method(_ = arguments) {} };",
+      "void { method() { return arguments; } };",
+      "void { *method(_ = arguments) { yield; } };",
+      "void { *method() { yield arguments; } };",
+      "class C0 { constructor(_ = arguments) {} }",
+      "class C1 { constructor() { return arguments; } }",
+      "class C2 { method(_ = arguments) {} }",
+      "class C3 { method() { return arguments; } }",
+      "class C4 { *method(_ = arguments) { yield; } }",
+      "class C5 { *method() { yield arguments; } }",
+      "class C6 { static method(_ = arguments) {} }",
+      "class C7 { static method() { return arguments; } }",
+      "class C8 { static *method(_ = arguments) { yield; } }",
+      "class C9 { static *method() { yield arguments; } }",
+      "void class { constructor(_ = arguments) {} };",
+      "void class { constructor() { return arguments; } };",
+      "void class { method(_ = arguments) {} };",
+      "void class { method() { return arguments; } };",
+      "void class { *method(_ = arguments) { yield; } };",
+      "void class { *method() { yield arguments; } };",
+      "void class { static method(_ = arguments) {} };",
+      "void class { static method() { return arguments; } };",
+      "void class { static *method(_ = arguments) { yield; } };",
+      "void class { static *method() { yield arguments; } };",
+      "void class C { constructor(_ = arguments) {} };",
+      "void class C { constructor() { return arguments; } };",
+      "void class C { method(_ = arguments) {} };",
+      "void class C { method() { return arguments; } };",
+      "void class C { *method(_ = arguments) { yield; } };",
+      "void class C { *method() { yield arguments; } };",
+      "void class C { static method(_ = arguments) {} };",
+      "void class C { static method() { return arguments; } };",
+      "void class C { static *method(_ = arguments) { yield; } };",
+      "void class C { static *method() { yield arguments; } };",
+      "void function() { void (_ = arguments) => _; };",
+      "void function() { void () => { return arguments; }; };",
+      "void function() { void () => arguments; };",
+      "void (_ = arguments) => _;",
+      "void () => { return arguments; };",
+      "void () => arguments;"
+    ], { undef: true, esversion: 6 });
 
   test.done();
 };

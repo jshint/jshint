@@ -5,8 +5,8 @@
 // Identifiers provided by the ECMAScript standard.
 
 exports.reservedVars = {
-  arguments : false,
-  NaN       : false
+  NaN       : false,
+  undefined : false
 };
 
 exports.ecmaIdentifiers = {
@@ -23,6 +23,7 @@ exports.ecmaIdentifiers = {
     EvalError          : false,
     Function           : false,
     hasOwnProperty     : false,
+    Infinity           : false,
     isFinite           : false,
     isNaN              : false,
     Math               : false,
@@ -442,6 +443,7 @@ exports.couch = {
 exports.node = {
   __filename    : false,
   __dirname     : false,
+  arguments     : false,
   GLOBAL        : false,
   global        : false,
   module        : false,
@@ -504,6 +506,7 @@ exports.qunit = {
 };
 
 exports.rhino = {
+  arguments    : false,
   defineClass  : false,
   deserialize  : false,
   gc           : false,
