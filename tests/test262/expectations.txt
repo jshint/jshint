@@ -288,7 +288,6 @@ language/identifiers/vals-rus-alpha-upper-via-escape-hex.js
 language/rest-parameters/array-pattern.js
 language/rest-parameters/no-alias-arguments.js
 language/rest-parameters/object-pattern.js
-language/white-space/mongolian-vowel-separator.js
 language/arguments-object/10.5-7-b-2-s.js
 language/arguments-object/10.5-7-b-3-s.js
 language/arguments-object/10.6-10-c-ii-2.js
