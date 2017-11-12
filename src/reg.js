@@ -36,3 +36,11 @@ exports.fallsThrough = /^\s*falls?\sthrough\s*$/;
 // very conservative rule (eg: only one space between the start of the comment and the first character)
 // to relax the maxlen option
 exports.maxlenException = /^(?:(?:\/\/|\/\*|\*) ?)?[^ ]+$/;
+
+// Node.js releases prior to version 8 include a version of the V8 engine which
+// incorrectly interprets the character class escape `\s`. The following
+// regular expression may be replaced with `/\s/` when JSHint removes support
+// for Node.js versions prior to 8.
+// Source:
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
+exports.whitespace = /[ \f\n\r\t\v\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff]/;
