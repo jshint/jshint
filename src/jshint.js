@@ -3058,8 +3058,8 @@ var JSHINT = (function() {
       // If the function we just parsed accesses any non-local variables
       // trigger a warning. Otherwise, the function is safe even within
       // a loop.
-      if (f["(isCapturing)"]) {
-        warning("W083", token);
+      if (f["(outerMutables)"]) {
+        warning("W083", token, f["(outerMutables)"].join(", "));
       }
     }
 
