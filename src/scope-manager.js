@@ -315,7 +315,10 @@ var scopeManager = function(state, predefined, exported, declared) {
           isImmutable = labelType === "const" ||
             (labelType === null && _scopeStack[0]["(predefined)"][usedLabelName] === false);
           if (isUnstackingFunctionOuter && !isImmutable) {
-            state.funct["(isCapturing)"] = true;
+            if (!state.funct["(outerMutables)"]) {
+              state.funct["(outerMutables)"] = [];
+            }
+            state.funct["(outerMutables)"].push(usedLabelName);
           }
 
           // not exiting the global scope, so copy the usage down in case its an out of scope usage
