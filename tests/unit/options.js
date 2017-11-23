@@ -1514,6 +1514,17 @@ exports.loopfunc = function (test) {
         "}"
       ], { esversion: 2015 });
 
+  TestRun(test, "W083 lists multiple outer scope variables")
+    .addError(3, 11, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (a, b)")
+    .test([
+        "var a, b;",
+        "for (;;) {",
+        "  var f = function() {",
+        "    return a + b;",
+        "  };",
+        "}"
+      ]);
+
   test.done();
 };
 
