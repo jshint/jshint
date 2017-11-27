@@ -557,6 +557,7 @@ exports.regexp = function (test) {
     "var x = w - /s/;",
     "var y = typeof /[a-z]/;", // GH-657
     "var z = /a/ instanceof /a/.constructor;", // GH-2773
+    "void /./;",
     "var v = /dsdg;"
   ];
 
@@ -576,8 +577,8 @@ exports.regexp = function (test) {
     .addError(17, 9, "Invalid regular expression.")
     .addError(20, 9, "Invalid regular expression.")
     .addError(21, 9, "Invalid regular expression.")
-    .addError(28, 9, "Unclosed regular expression.")
-    .addError(28, 9, "Unrecoverable syntax error. (100% scanned).");
+    .addError(29, 9, "Unclosed regular expression.")
+    .addError(29, 9, "Unrecoverable syntax error. (100% scanned).");
 
   run.test(code, {es3: true});
   run.test(code, {}); // es5
