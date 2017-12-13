@@ -147,6 +147,14 @@ exports.browser = {
   HTMLIFrameElement    : false,
   HTMLImageElement     : false,
   HTMLInputElement     : false,
+/* HTMLIsIndexElement was removed from the WHATWG HTML spec;
+   see https://github.com/whatwg/html/pull/1095.
+   HTMLIsIndexElement has been removed from browsers; see:
+   • Chromium Removal: https://codereview.chromium.org/96653004/
+   • Gecko Removal: https://bugzilla.mozilla.org/show_bug.cgi?id=1266495
+   • WebKit Removal: https://bugs.webkit.org/show_bug.cgi?id=7139.
+   See also the discussion at https://github.com/jshint/jshint/pull/3222. */
+  HTMLIsIndexElement   : false,
   HTMLLabelElement     : false,
   HTMLLayerElement     : false,
   HTMLLegendElement    : false,
