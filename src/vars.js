@@ -5,8 +5,8 @@
 // Identifiers provided by the ECMAScript standard.
 
 exports.reservedVars = {
-  arguments : false,
-  NaN       : false
+  NaN       : false,
+  undefined : false
 };
 
 exports.ecmaIdentifiers = {
@@ -23,6 +23,7 @@ exports.ecmaIdentifiers = {
     EvalError          : false,
     Function           : false,
     hasOwnProperty     : false,
+    Infinity           : false,
     isFinite           : false,
     isNaN              : false,
     Math               : false,
@@ -79,6 +80,17 @@ exports.browser = {
   CanvasPattern        : false,
   CanvasRenderingContext2D: false,
   CSS                  : false,
+  CSSImportRule        : false,
+  CSSGroupingRule      : false,
+  CSSMarginRule        : false,
+  CSSMediaRule         : false,
+  CSSNamespaceRule     : false,
+  CSSPageRule          : false,
+  CSSRule              : false,
+  CSSRuleList          : false,
+  CSSStyleDeclaration  : false,
+  CSSStyleRule         : false,
+  CSSStyleSheet        : false,
   clearInterval        : false,
   clearTimeout         : false,
   close                : false,
@@ -104,8 +116,9 @@ exports.browser = {
   frames               : false,
   getComputedStyle     : false,
   Headers              : false,
-  HTMLElement          : false,
   HTMLAnchorElement    : false,
+  HTMLAreaElement      : false,
+  HTMLAudioElement     : false,
   HTMLBaseElement      : false,
   HTMLBlockquoteElement: false,
   HTMLBodyElement      : false,
@@ -113,9 +126,15 @@ exports.browser = {
   HTMLButtonElement    : false,
   HTMLCanvasElement    : false,
   HTMLCollection       : false,
+  HTMLDataElement      : false,
+  HTMLDataListElement  : false,
+  HTMLDetailsElement   : false,
+  HTMLDialogElement    : false,
   HTMLDirectoryElement : false,
   HTMLDivElement       : false,
   HTMLDListElement     : false,
+  HTMLElement          : false,
+  HTMLEmbedElement     : false,
   HTMLFieldSetElement  : false,
   HTMLFontElement      : false,
   HTMLFormElement      : false,
@@ -128,6 +147,13 @@ exports.browser = {
   HTMLIFrameElement    : false,
   HTMLImageElement     : false,
   HTMLInputElement     : false,
+/* HTMLIsIndexElement was removed from the WHATWG HTML spec;
+   see https://github.com/whatwg/html/pull/1095.
+   HTMLIsIndexElement has been removed from browsers; see:
+   • Chromium Removal: https://codereview.chromium.org/96653004/
+   • Gecko Removal: https://bugzilla.mozilla.org/show_bug.cgi?id=1266495
+   • WebKit Removal: https://bugs.webkit.org/show_bug.cgi?id=7139.
+   See also the discussion at https://github.com/jshint/jshint/pull/3222. */
   HTMLIsIndexElement   : false,
   HTMLLabelElement     : false,
   HTMLLayerElement     : false,
@@ -135,8 +161,11 @@ exports.browser = {
   HTMLLIElement        : false,
   HTMLLinkElement      : false,
   HTMLMapElement       : false,
+  HTMLMarqueeElement   : false,
+  HTMLMediaElement     : false,
   HTMLMenuElement      : false,
   HTMLMetaElement      : false,
+  HTMLMeterElement     : false,
   HTMLModElement       : false,
   HTMLObjectElement    : false,
   HTMLOListElement     : false,
@@ -144,10 +173,14 @@ exports.browser = {
   HTMLOptionElement    : false,
   HTMLParagraphElement : false,
   HTMLParamElement     : false,
+  HTMLPictureElement   : false,
   HTMLPreElement       : false,
+  HTMLProgressElement  : false,
   HTMLQuoteElement     : false,
   HTMLScriptElement    : false,
   HTMLSelectElement    : false,
+  HTMLSlotElement      : false,
+  HTMLSourceElement    : false,
   HTMLStyleElement     : false,
   HTMLTableCaptionElement: false,
   HTMLTableCellElement : false,
@@ -157,7 +190,9 @@ exports.browser = {
   HTMLTableSectionElement: false,
   HTMLTemplateElement  : false,
   HTMLTextAreaElement  : false,
+  HTMLTimeElement      : false,
   HTMLTitleElement     : false,
+  HTMLTrackElement     : false,
   HTMLUListElement     : false,
   HTMLVideoElement     : false,
   history              : false,
@@ -168,6 +203,7 @@ exports.browser = {
   localStorage         : false,
   location             : false,
   matchMedia           : false,
+  MediaList            : false,
   MediaRecorder        : false,
   MessageChannel       : false,
   MessageEvent         : false,
@@ -213,6 +249,7 @@ exports.browser = {
   SharedWorker         : false,
   status               : false,
   Storage              : false,
+  StyleSheet           : false,
   SVGAElement          : false,
   SVGAltGlyphDefElement: false,
   SVGAltGlyphElement   : false,
@@ -390,6 +427,7 @@ exports.browser = {
   Window               : false,
   Worker               : false,
   XDomainRequest       : false,
+  XMLDocument          : false,
   XMLHttpRequest       : false,
   XMLSerializer        : false,
   XPathEvaluator       : false,
@@ -442,6 +480,7 @@ exports.couch = {
 exports.node = {
   __filename    : false,
   __dirname     : false,
+  arguments     : false,
   GLOBAL        : false,
   global        : false,
   module        : false,
@@ -504,6 +543,7 @@ exports.qunit = {
 };
 
 exports.rhino = {
+  arguments    : false,
   defineClass  : false,
   deserialize  : false,
   gc           : false,

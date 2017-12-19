@@ -238,7 +238,7 @@ exports.testUndefinedAsParam = function (test) {
 
   // But it must never tolerate reassigning of undefined
   TestRun(test)
-    .addError(1, 5, "Expected an identifier and instead saw 'undefined' (a reserved word).")
+    .addError(1, 5, "Redefinition of 'undefined'.")
     .test(code1);
 
   test.done();
@@ -1050,7 +1050,7 @@ exports.testConstModification = function (test) {
       .addError(3, 1, "Attempting to override 'a' which is a constant.")
       .addError(4, 1, "Attempting to override 'b' which is a constant.")
       .addError(5, 1, "Attempting to override 'a' which is a constant.")
-      .addError(6, 1, "Attempting to override 'a' which is a constant.")
+      .addError(6, 3, "Attempting to override 'a' which is a constant.")
       .addError(7, 1, "Attempting to override 'a' which is a constant.")
       .addError(8, 9, "Attempting to override 'a' which is a constant.")
       .addError(8, 9, "You might be leaking a variable (a) here.")

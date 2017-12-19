@@ -44,6 +44,18 @@ exports.shadow = function (test) {
   TestRun(test)
     .test(src, { es3: true, shadow: true });
 
+  src = [
+    "function f() {",
+    "  function inner() {}",
+    "}"
+  ];
+  TestRun(test, "nested functions - 'shadowed' `arguments` - true")
+    .test(src, { shadow: true });
+  TestRun(test, "nested functions - 'shadowed' `arguments` - false")
+    .test(src, { shadow: false });
+  TestRun(test, "nested functions - 'shadowed' `arguments` - 'inner'")
+    .test(src, { shadow: "inner" });
+
   test.done();
 };
 
@@ -788,6 +800,73 @@ exports.undef = function (test) {
       '/* exported foo, bar */'],
     {undef: true});
 
+  TestRun(test, "arguments - ES5")
+    .addError(6, 6, "'arguments' is not defined.")
+    .test([
+      "function f() { return arguments; }",
+      "void function() { return arguments; };",
+      "void function f() { return arguments; };",
+      "void { get g() { return arguments; } };",
+      "void { get g() {}, set g(_) { return arguments; } };",
+      "void arguments;"
+    ], { undef: true });
+
+  TestRun(test, "arguments - ES2015")
+    .addError(47, 11, "'arguments' is not defined.")
+    .addError(48, 21, "'arguments' is not defined.")
+    .addError(49, 12, "'arguments' is not defined.")
+    .test([
+      "function f(_ = arguments) {}",
+      "void function (_ = arguments) {};",
+      "void function f(_ = arguments) {};",
+      "function* g(_ = arguments) { yield; }",
+      "void function* (_ = arguments) { yield; };",
+      "void function* g(_ = arguments) { yield; };",
+      "function* g() { yield arguments; }",
+      "void function* () { yield arguments; };",
+      "void function* g() { yield arguments; };",
+      "void { method(_ = arguments) {} };",
+      "void { method() { return arguments; } };",
+      "void { *method(_ = arguments) { yield; } };",
+      "void { *method() { yield arguments; } };",
+      "class C0 { constructor(_ = arguments) {} }",
+      "class C1 { constructor() { return arguments; } }",
+      "class C2 { method(_ = arguments) {} }",
+      "class C3 { method() { return arguments; } }",
+      "class C4 { *method(_ = arguments) { yield; } }",
+      "class C5 { *method() { yield arguments; } }",
+      "class C6 { static method(_ = arguments) {} }",
+      "class C7 { static method() { return arguments; } }",
+      "class C8 { static *method(_ = arguments) { yield; } }",
+      "class C9 { static *method() { yield arguments; } }",
+      "void class { constructor(_ = arguments) {} };",
+      "void class { constructor() { return arguments; } };",
+      "void class { method(_ = arguments) {} };",
+      "void class { method() { return arguments; } };",
+      "void class { *method(_ = arguments) { yield; } };",
+      "void class { *method() { yield arguments; } };",
+      "void class { static method(_ = arguments) {} };",
+      "void class { static method() { return arguments; } };",
+      "void class { static *method(_ = arguments) { yield; } };",
+      "void class { static *method() { yield arguments; } };",
+      "void class C { constructor(_ = arguments) {} };",
+      "void class C { constructor() { return arguments; } };",
+      "void class C { method(_ = arguments) {} };",
+      "void class C { method() { return arguments; } };",
+      "void class C { *method(_ = arguments) { yield; } };",
+      "void class C { *method() { yield arguments; } };",
+      "void class C { static method(_ = arguments) {} };",
+      "void class C { static method() { return arguments; } };",
+      "void class C { static *method(_ = arguments) { yield; } };",
+      "void class C { static *method() { yield arguments; } };",
+      "void function() { void (_ = arguments) => _; };",
+      "void function() { void () => { return arguments; }; };",
+      "void function() { void () => arguments; };",
+      "void (_ = arguments) => _;",
+      "void () => { return arguments; };",
+      "void () => arguments;"
+    ], { undef: true, esversion: 6 });
+
   test.done();
 };
 
@@ -1311,13 +1390,13 @@ exports.loopfunc = function (test) {
 
   // By default, not functions are allowed inside loops
   TestRun(test)
-    .addError(4, 13, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
-    .addError(8, 13, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
-    .addError(20, 11, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
-    .addError(25, 13, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
+    .addError(4, 13, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (v)")
+    .addError(8, 13, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (v)")
+    .addError(20, 11, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (nonExistent)")
+    .addError(25, 13, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (p)")
     .addError(12, 5, "Function declarations should not be placed in blocks. Use a function " +
             "expression or move the statement to the top of the outer function.")
-    .addError(42, 7, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
+    .addError(42, 7, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (i)")
     .test(src, {es3: true});
 
   // When loopfunc is true, only function declaration should fail.
@@ -1348,11 +1427,11 @@ exports.loopfunc = function (test) {
     "}"
   ];
   TestRun(test)
-    .addError(2, 13, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
-    .addError(5, 11, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
-    .addError(11, 9, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
-    .addError(14, 15, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
-    .addError(17, 9, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
+    .addError(2, 13, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (i)")
+    .addError(5, 11, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (i)")
+    .addError(11, 9, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (i)")
+    .addError(14, 15, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (i)")
+    .addError(17, 9, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (i)")
     .test(es6LoopFuncSrc, {esnext: true});
 
   // functions declared in the expressions that loop should warn
@@ -1363,13 +1442,13 @@ exports.loopfunc = function (test) {
     "for(var c = function(){return j;};;){c();}"];
 
   TestRun(test)
-    .addError(1, 25, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
-    .addError(3, 16, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
+    .addError(1, 25, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (i)")
+    .addError(3, 16, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (j)")
     .test(src2, { es3: true, loopfunc: false, boss: true });
 
   TestRun(test, "Allows closing over immutable bindings (ES5)")
-    .addError(6, 8, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
-    .addError(7, 8, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
+    .addError(6, 8, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (outerVar)")
+    .addError(7, 8, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (innerVar)")
     .test([
         "var outerVar;",
         "",
@@ -1384,8 +1463,8 @@ exports.loopfunc = function (test) {
       ]);
 
   TestRun(test, "Allows closing over immutable bindings (globals)")
-    .addError(8, 8, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
-    .addError(15, 10, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
+    .addError(8, 8, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (mutableGlobal)")
+    .addError(15, 10, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (immutableGlobal)")
     .test([
         "/* globals immutableGlobal: false, mutableGlobal: true */",
         "while (false) {",
@@ -1407,10 +1486,10 @@ exports.loopfunc = function (test) {
       ]);
 
   TestRun(test, "Allows closing over immutable bindings (ES2015)")
-    .addError(10, 8, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
-    .addError(11, 8, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
-    .addError(18, 8, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
-    .addError(19, 8, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.")
+    .addError(10, 8, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (outerLet)")
+    .addError(11, 8, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (innerLet)")
+    .addError(18, 8, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (OuterClass)")
+    .addError(19, 8, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (InnerClass)")
     .test([
         "let outerLet;",
         "const outerConst = 0;",
@@ -1434,6 +1513,17 @@ exports.loopfunc = function (test) {
         "  void function() { class LocalClass {} return LocalClass; };",
         "}"
       ], { esversion: 2015 });
+
+  TestRun(test, "W083 lists multiple outer scope variables")
+    .addError(3, 11, "Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (a, b)")
+    .test([
+        "var a, b;",
+        "for (;;) {",
+        "  var f = function() {",
+        "    return a + b;",
+        "  };",
+        "}"
+      ]);
 
   test.done();
 };

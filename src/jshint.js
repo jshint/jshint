@@ -1099,17 +1099,10 @@ var JSHINT = (function() {
       if (this.id === "++" || this.id === "--") {
         if (state.option.plusplus) {
           warning("W016", this, this.id);
-        } else if (this.right && (!this.right.identifier || isReserved(this.right)) &&
-            this.right.id !== "." && this.right.id !== "[") {
-          warning("W017", this);
         }
 
-        if (this.right && this.right.isMetaProperty) {
-          error("E031", this);
-        // detect increment/decrement of a const
-        // in the case of a.b, right will be the "." punctuator
-        } else if (this.right && this.right.identifier) {
-          state.funct["(scope)"].block.modify(this.right.value, this);
+        if (this.right) {
+          checkLeftSideAssign(this.right, this);
         }
       }
 
@@ -1367,7 +1360,8 @@ var JSHINT = (function() {
       }
 
       return true;
-    } else if (left.identifier && !isReserved(left) && !left.isMetaProperty) {
+    } else if (left.identifier && !isReserved(left) && !left.isMetaProperty &&
+      left.value !== "eval" && left.value !== "arguments") {
       if (state.funct["(scope)"].labeltype(left.value) === "exception") {
         warning("W022", left);
       }
@@ -1434,17 +1428,9 @@ var JSHINT = (function() {
       // left = symbol operated e.g. "a" identifier or "a.b" punctuator
       if (state.option.plusplus) {
         warning("W016", this, this.id);
-      } else if ((!left.identifier || isReserved(left)) && left.id !== "." && left.id !== "[") {
-        warning("W017", this);
       }
 
-      if (left.isMetaProperty) {
-        error("E031", this);
-      // detect increment/decrement of a const
-      // in the case of a.b, left will be the "." punctuator
-      } else if (left && left.identifier) {
-        state.funct["(scope)"].block.modify(left.value, left);
-      }
+      checkLeftSideAssign(left, this);
 
       this.left = left;
       return this;
@@ -1452,11 +1438,8 @@ var JSHINT = (function() {
     return x;
   }
 
-  // fnparam means that this identifier is being defined as a function
-  // argument (see identifier())
   // prop means that this identifier is that of an object property
-
-  function optionalidentifier(fnparam, prop, preserve) {
+  function optionalidentifier(prop, preserve) {
     if (!state.tokens.next.identifier) {
       return;
     }
@@ -1478,19 +1461,13 @@ var JSHINT = (function() {
       }
     }
 
-    if (fnparam && val === "undefined") {
-      return val;
-    }
-
     warning("W024", state.tokens.curr, state.tokens.curr.id);
     return val;
   }
 
-  // fnparam means that this identifier is being defined as a function
-  // argument
   // prop means that this identifier is that of an object property
-  function identifier(fnparam, prop) {
-    var i = optionalidentifier(fnparam, prop, false);
+  function identifier(prop) {
+    var i = optionalidentifier(prop, false);
     if (i) {
       return i;
     }
@@ -1514,7 +1491,7 @@ var JSHINT = (function() {
         return;
       }
 
-      return identifier(fnparam, prop);
+      return identifier(prop);
     } else {
       error("E030", state.tokens.next, state.tokens.next.value);
 
@@ -1980,14 +1957,8 @@ var JSHINT = (function() {
   reserve("catch");
   reserve("default").reach = true;
   reserve("finally");
-  reservevar("arguments", function(x) {
-    if (state.isStrict() && state.funct["(global)"]) {
-      warning("E008", x);
-    }
-  });
-  reservevar("eval");
-  reservevar("false");
-  reservevar("Infinity");
+  reserve("true", function() { return this; });
+  reserve("false", function() { return this; });
   reservevar("null");
   reservevar("this", function(x) {
     if (state.isStrict() && !isMethod() &&
@@ -1996,8 +1967,6 @@ var JSHINT = (function() {
       warning("W040", x);
     }
   });
-  reservevar("true");
-  reservevar("undefined");
 
   assignop("=", "assign", 20);
   assignop("+=", "assignadd", 20);
@@ -2351,7 +2320,7 @@ var JSHINT = (function() {
   prefix("void").exps = true;
 
   infix(".", function(left, that) {
-    var m = identifier(false, true);
+    var m = identifier(true);
 
     if (typeof m === "string") {
       countMember(m);
@@ -2584,7 +2553,9 @@ var JSHINT = (function() {
   application("=>");
 
   infix("[", function(left, that) {
-    var e = expression(10), s;
+    var e = expression(10);
+    var s, canUseDot;
+
     if (e && e.type === "(string)") {
       if (!state.option.evil && (e.value === "eval" || e.value === "execScript")) {
         if (isGlobalEval(left, state)) {
@@ -2595,7 +2566,20 @@ var JSHINT = (function() {
       countMember(e.value);
       if (!state.option.sub && reg.identifier.test(e.value)) {
         s = state.syntax[e.value];
-        if (!s || !isReserved(s)) {
+
+        if (s) {
+          canUseDot = !isReserved(s);
+        } else {
+          // This branch exists to preserve legacy behavior with version 2.9.5
+          // and earlier. In those releases, `eval` and `arguments` were
+          // incorrectly interpreted as reserved keywords, so Member
+          // Expressions such as `object["eval"]` did not trigger warning W069.
+          //
+          // TODO: Remove in JSHint 3
+          canUseDot = e.value !== "eval" && e.value !== "arguments";
+        }
+
+        if (canUseDot) {
           warning("W069", state.tokens.prev, e.value);
         }
       }
@@ -2745,7 +2729,7 @@ var JSHINT = (function() {
       id = preserveOrToken;
     } else {
       preserve = preserveOrToken;
-      id = optionalidentifier(false, true, preserve);
+      id = optionalidentifier(true, preserve);
     }
 
     if (!id) {
@@ -2828,7 +2812,7 @@ var JSHINT = (function() {
         }
       } else {
         if (checkPunctuator(state.tokens.next, "...")) pastRest = true;
-        ident = identifier(true);
+        ident = identifier();
         if (ident) {
           paramsIds.push(ident);
           currentParams.push([ident, state.tokens.curr]);
@@ -3021,6 +3005,10 @@ var JSHINT = (function() {
         classExprBinding ? "class" : "function", state.tokens.curr, false);
     }
 
+    if (!isArrow) {
+      state.funct["(scope)"].funct.add("arguments", "var", token, false);
+    }
+
     // create the param scope (params added in functionparams)
     state.funct["(scope)"].stack("functionparams");
 
@@ -3071,8 +3059,8 @@ var JSHINT = (function() {
       // If the function we just parsed accesses any non-local variables
       // trigger a warning. Otherwise, the function is safe even within
       // a loop.
-      if (f["(isCapturing)"]) {
-        warning("W083", token);
+      if (f["(outerMutables)"]) {
+        warning("W083", token, f["(outerMutables)"].join(", "));
       }
     }
 
@@ -3424,7 +3412,7 @@ var JSHINT = (function() {
           }
           id = state.tokens.prev;
           value = expression(10);
-          if (value && value.type === "undefined") {
+          if (value && value.identifier && value.value === "undefined") {
             warning("W080", id, id.value);
           }
         }
@@ -3447,7 +3435,7 @@ var JSHINT = (function() {
           advance("=");
           id = state.tokens.prev;
           value = expression(10);
-          if (value && value.type === "undefined") {
+          if (value && value.identifier && value.value === "undefined") {
             warning("W080", id, id.value);
           }
         }
@@ -3546,7 +3534,7 @@ var JSHINT = (function() {
         var id = state.tokens.prev;
         // don't accept `in` in expression if prefix is used for ForIn/Of loop.
         value = expression(prefix ? 120 : 10);
-        if (!prefix && value && value.type === "undefined") {
+        if (!prefix && value && value.identifier && value.value === "undefined") {
           warning("W080", id, id.value);
         }
         if (!lone) {
@@ -3597,7 +3585,7 @@ var JSHINT = (function() {
   var varstatement = stmt("var", function(context) {
     var prefix = context && context.prefix;
     var inexport = context && context.inexport;
-    var tokens, lone, value;
+    var tokens, lone, value, id;
 
     this.first = [];
     for (;;) {
@@ -3606,7 +3594,13 @@ var JSHINT = (function() {
         tokens = destructuringPattern();
         lone = false;
       } else {
-        tokens = [ { id: identifier(), token: state.tokens.curr } ];
+        tokens = [];
+        id = identifier();
+
+        if (id) {
+          tokens.push({ id: id, token: state.tokens.curr });
+        }
+
         lone = true;
       }
 
@@ -3653,10 +3647,11 @@ var JSHINT = (function() {
             warning("W120", state.tokens.next, state.tokens.next.value);
           }
         }
-        var id = state.tokens.prev;
+        id = state.tokens.prev;
         // don't accept `in` in expression if prefix is used for ForIn/Of loop.
         value = expression(prefix ? 120 : 10);
-        if (value && !prefix && !state.funct["(loopage)"] && value.type === "undefined") {
+        if (value && !prefix && !state.funct["(loopage)"] &&
+          value.identifier && value.value === "undefined") {
           warning("W080", id, id.value);
         }
         if (!lone) {
@@ -3681,6 +3676,9 @@ var JSHINT = (function() {
   function classdef(rbp, isStatement) {
 
     /*jshint validthis:true */
+    var wasInClassBody = state.inClassBody;
+    state.inClassBody = true;
+
     if (!state.inES6()) {
       warning("W104", state.tokens.curr, "class", "6");
     }
@@ -3702,6 +3700,8 @@ var JSHINT = (function() {
 
     classtail(this);
 
+    state.inClassBody = wasInClassBody;
+
     if (isStatement) {
       state.funct["(scope)"].initialize(this.name);
     }
@@ -3710,19 +3710,16 @@ var JSHINT = (function() {
   }
 
   function classtail(c) {
-    var wasInClassBody = state.inClassBody;
     // ClassHeritage(opt)
     if (state.tokens.next.value === "extends") {
       advance("extends");
       expression(10);
     }
 
-    state.inClassBody = true;
     advance("{");
     // ClassBody(opt)
     classbody(c);
     advance("}");
-    state.inClassBody = wasInClassBody;
   }
 
   function classbody(c) {

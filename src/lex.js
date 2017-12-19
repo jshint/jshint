@@ -1525,7 +1525,7 @@ Lexer.prototype = {
     this.from = this.char;
 
     // Move to the next non-space character.
-    while (/\s/.test(this.peek())) {
+    while (reg.whitespace.test(this.peek())) {
       this.from += 1;
       this.skip();
     }
@@ -1714,7 +1714,7 @@ Lexer.prototype = {
 
       if (type === "(identifier)") {
         if (value === "return" || value === "case" || value === "yield" ||
-            value === "typeof" || value === "instanceof") {
+            value === "typeof" || value === "instanceof" || value === "void") {
           this.prereg = true;
         }
 

@@ -168,7 +168,7 @@ var warnings = {
     "Use a function expression or move the statement to the top of " +
     "the outer function.",
   W083: "Functions declared within loops referencing an outer scoped " +
-    "variable may lead to confusing semantics.",
+    "variable may lead to confusing semantics. ({a})",
   W084: "Expected a conditional expression and instead saw an assignment.",
   W085: "Don't use 'with'.",
   W086: "Expected a 'break' statement before '{a}'.",
