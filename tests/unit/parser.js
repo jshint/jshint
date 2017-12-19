@@ -371,6 +371,18 @@ exports["jshint option comments multi line/option, leading and trailing space"] 
   test.done();
 };
 
+exports["jshint option inline comments, leading and trailing tabs and spaces"] = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/inline-tabs-spaces.js", "utf8");
+
+  TestRun(test)
+    .addError(3, 9, "'x' is defined but never used.")
+    .addError(10, 9, "'y' is defined but never used.")
+    .addError(17, 9, "'z' is defined but never used.")
+    .test(src);
+
+  test.done();
+};
+
 exports.shebang = function (test) {
   var code = [
     "#!test",

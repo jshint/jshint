@@ -1,6 +1,18 @@
-/*              jshint 
-    browser: true
-*/
+function a() {
+    //      jshint unused: true     
+    var x;
+}
 
-var dp = new DOMParser();
-console.log(dp);
+function b() {
+    /*      jshint  
+    unused: true
+    */
+    var y;
+}
+
+function c() {
+    /*      jshint      
+        unused: true
+    */
+    var z;
+}
