@@ -8119,3 +8119,25 @@ exports.lookaheadBeyondEnd = function (test) {
 
   test.done();
 };
+
+// In releases prior to 2.9.6, JSHint would not terminate when given the source
+// code in the following tests.
+exports["regression test for GH-3230"] = function (test) {
+  TestRun(test, "as originally reported")
+    .addError(1, 12, "Expected ';' and instead saw ')'.")
+    .addError(1, 13, "Unmatched '{'.")
+    .addError(1, 13, "Unrecoverable syntax error. (100% scanned).")
+    .test("for(var i=1){");
+
+  TestRun(test, "further simplified (unclosed brace)")
+    .addError(1, 5, "Unmatched '{'.")
+    .addError(1, 5, "Unrecoverable syntax error. (100% scanned).")
+    .test("for({");
+
+  TestRun(test, "further simplified (unclosed bracket)")
+    .addError(1, 5, "Unmatched '['.")
+    .addError(1, 5, "Unrecoverable syntax error. (100% scanned).")
+    .test("for([");
+
+  test.done();
+};
