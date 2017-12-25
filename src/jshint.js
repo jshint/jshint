@@ -4208,8 +4208,9 @@ var JSHINT = (function() {
         if (!comma && checkPunctuator(nextop, ",")) comma = nextop;
         else if (!initializer && checkPunctuator(nextop, "=")) initializer = nextop;
       }
-    } while (level > 0 || !_.contains(inof, nextop.value) && nextop.value !== ";" &&
-    nextop.type !== "(end)"); // Is this a JSCS bug? This looks really weird.
+    } while (
+      (level > 0 || !_.contains(inof, nextop.value) && nextop.value !== ";") &&
+      nextop.type !== "(end)");
 
     // if we're in a for (… in|of …) statement
     if (_.contains(inof, nextop.value)) {
