@@ -94,6 +94,7 @@ exports.setup.testRun = function (test, name) {
       var undefinedErrors = errors.filter(function (er) {
         return !definedErrors.some(function (def) {
           var result = def.line === er.line &&
+            def.character === er.character &&
             def.message === er.reason;
 
           if (!result) {
