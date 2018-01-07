@@ -213,11 +213,14 @@ var scopeManager = function(state, predefined, exported, declared) {
   }
 
   function _latedefWarning(type, labelName, token) {
+    var isFunction;
+
     if (state.option.latedef) {
+      isFunction = type === "function" || type === "generator function";
+
       // if either latedef is strict and this is a function
       //    or this is not a function
-      if ((state.option.latedef === true && type === "function") ||
-        type !== "function") {
+      if ((state.option.latedef === true && isFunction) || !isFunction) {
         warning("W003", token, labelName);
       }
     }
@@ -299,7 +302,7 @@ var scopeManager = function(state, predefined, exported, declared) {
           }
 
           // check for re-assigning a function declaration
-          if ((usedLabelType === "function" || usedLabelType === "class") &&
+          if ((usedLabelType === "function" || usedLabelType === "generator function" || usedLabelType === "class") &&
               usage["(reassigned)"]) {
             for (j = 0; j < usage["(reassigned)"].length; j++) {
               if (!usage["(reassigned)"][j].ignoreW021) {
@@ -627,7 +630,7 @@ var scopeManager = function(state, predefined, exported, declared) {
      * adds an indentifier to the relevant current scope and creates warnings/errors as necessary
      * @param {string} labelName
      * @param {Object} opts
-     * @param {String} opts.type - the type of the label e.g. "param", "var", "let, "const", "import", "function"
+     * @param {String} opts.type - the type of the label e.g. "param", "var", "let, "const", "import", "function", "generator function"
      * @param {Token} opts.token - the token pointing at the declaration
      * @param {boolean} opts.initialized - whether the binding should be created in an "initialized" state.
      */
@@ -636,8 +639,9 @@ var scopeManager = function(state, predefined, exported, declared) {
       var type  = opts.type;
       var token = opts.token;
       var isblockscoped = type === "let" || type === "const" ||
-        type === "class" || type === "import";
-      var ishoisted = type === "function" || type === "import";
+        type === "class" || type === "import" || type === "generator function";
+      var ishoisted = type === "function" || type === "generator function" ||
+        type === "import";
       var isexported    = (isblockscoped ? _current : _currentFunctBody)["(type)"] === "global" &&
                           _.has(exported, labelName);
 
@@ -670,8 +674,15 @@ var scopeManager = function(state, predefined, exported, declared) {
           }
         }
 
-        // if this scope has the variable defined, its a re-definition error
-        if (declaredInCurrentScope) {
+        // If this scope has already declared a binding with the same name,
+        // then this represents a redeclaration error if:
+        //
+        // 1. it is a "hoisted" block-scoped binding within a block. For
+        //    instance: generator functions may be redeclared in the global
+        //    scope but not within block statements
+        // 2. this is not a "hoisted" block-scoped binding
+        if (declaredInCurrentScope &&
+          (!ishoisted || (_current["(type)"] !== "global" || type === "import"))) {
           warning("E011", token, labelName);
         }
         else if (state.option.shadow === "outer") {

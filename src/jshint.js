@@ -3853,8 +3853,9 @@ var JSHINT = (function() {
       warning("W025");
     } else {
       state.funct["(scope)"].addlabel(i, {
-        type: "function",
-        token: state.tokens.curr });
+        type: generator ? "generator function" : "function",
+        token: state.tokens.curr,
+        initialized: true });
 
       if (inexport) {
         state.funct["(scope)"].setExported(i, state.tokens.prev);
