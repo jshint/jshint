@@ -271,10 +271,6 @@ language/asi/S7.9_A7_T9.js
 language/global-code/export.js
 language/global-code/import.js
 language/global-code/return.js
-language/global-code/super-call-arrow.js
-language/global-code/super-call.js
-language/global-code/super-prop-arrow.js
-language/global-code/super-prop.js
 language/global-code/yield-non-strict.js
 language/line-terminators/S7.3_A3.3_T1.js
 language/line-terminators/S7.3_A3.4_T1.js
@@ -396,7 +392,6 @@ language/module-code/early-dup-export-id-as.js
 language/module-code/early-dup-export-id.js
 language/module-code/early-export-global.js
 language/module-code/early-export-unresolvable.js
-language/module-code/early-super.js
 language/module-code/instn-named-id-name.js
 language/module-code/instn-resolve-empty-import.js
 language/module-code/instn-resolve-err-reference.js
@@ -480,10 +475,6 @@ language/expressions/function/dstr-dflt-ary-ptrn-rest-ary-empty.js
 language/expressions/function/dstr-dflt-ary-ptrn-rest-init-id.js
 language/expressions/function/dstr-dflt-ary-ptrn-rest-obj-id.js
 language/expressions/function/dstr-dflt-ary-ptrn-rest-obj-prop-id.js
-language/expressions/function/early-body-super-call.js
-language/expressions/function/early-body-super-prop.js
-language/expressions/function/early-params-super-call.js
-language/expressions/function/early-params-super-prop.js
 language/expressions/function/param-dflt-yield-non-strict.js
 language/expressions/function/params-dflt-args-unmapped.js
 language/expressions/function/scope-param-rest-elem-var-close.js
@@ -670,15 +661,11 @@ language/expressions/object/method-definition/early-errors-object-method-NSPL-wi
 language/expressions/object/method-definition/generator-param-init-yield.js
 language/expressions/object/method-definition/generator-prop-name-yield-expr.js
 language/expressions/object/method-definition/generator-prop-name-yield-id.js
-language/expressions/object/method-definition/generator-super-call-body.js
-language/expressions/object/method-definition/generator-super-call-param.js
 language/expressions/object/method-definition/generator-use-strict-with-non-simple-param.js
 language/expressions/object/method-definition/name-param-id-yield.js
 language/expressions/object/method-definition/name-param-init-yield.js
 language/expressions/object/method-definition/name-prop-name-yield-expr.js
 language/expressions/object/method-definition/name-prop-name-yield-id.js
-language/expressions/object/method-definition/name-super-call-body.js
-language/expressions/object/method-definition/name-super-call-param.js
 language/expressions/object/method-definition/object-method-returns-promise.js
 language/expressions/object/method-definition/params-dflt-gen-meth-args-unmapped.js
 language/expressions/object/method-definition/params-dflt-meth-args-unmapped.js
@@ -903,10 +890,6 @@ language/statements/function/dstr-dflt-ary-ptrn-rest-ary-rest.js
 language/statements/function/dstr-dflt-ary-ptrn-rest-init-id.js
 language/statements/function/dstr-dflt-ary-ptrn-rest-obj-id.js
 language/statements/function/dstr-dflt-ary-ptrn-rest-obj-prop-id.js
-language/statements/function/early-body-super-call.js
-language/statements/function/early-body-super-prop.js
-language/statements/function/early-params-super-call.js
-language/statements/function/early-params-super-prop.js
 language/statements/function/param-dflt-yield-non-strict.js
 language/statements/function/params-dflt-args-unmapped.js
 language/statements/function/scope-param-rest-elem-var-close.js
