@@ -2833,6 +2833,11 @@ var JSHINT = (function() {
         if (!state.inES6()) {
           warning("W119", state.tokens.next, "default parameters", "6");
         }
+
+        if (pastRest) {
+          error("E062", state.tokens.next);
+        }
+
         advance("=");
         pastDefault = true;
         expression(10);

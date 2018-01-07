@@ -7679,6 +7679,15 @@ exports.commaAfterRestParameter = function (test) {
 };
 
 
+exports.restParameterWithDefault = function (test) {
+  TestRun(test)
+    .addError(1, 17, "Rest parameter does not a support default value.")
+    .test("function f(...x = 0) {}", { esversion: 6 });
+
+  test.done();
+};
+
+
 exports.extraRestOperator = function (test) {
   TestRun(test)
     .addError(1, 23, "Unexpected '...'.")
