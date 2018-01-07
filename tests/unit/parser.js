@@ -6251,6 +6251,188 @@ exports.classExpression = function (test) {
   test.done();
 };
 
+exports.super = {};
+
+exports.super.invalid = function (test) {
+  TestRun(test, "as identifier")
+    .addError(3, 10, "Unexpected ';'.")
+    .addError(3, 5, "Expected an assignment or function call and instead saw an expression.")
+    .test([
+      "void {",
+      "  m() {",
+      "    super;",
+      "  }",
+      "};"
+    ], { esversion: 6 });
+
+  test.done();
+};
+
+exports.super.superProperty = function (test) {
+  TestRun(test, "bracket notation")
+    .addError(3, 14, "Expected an assignment or function call and instead saw an expression.")
+    .addError(4, 20, "['ab'] is better written in dot notation.")
+    .test([
+      "void {",
+      "  m() {",
+      "    super['4'];",
+      "    void super['a' + 'b'];",
+      "  }",
+      "};"
+    ], { esversion: 6 });
+
+  TestRun(test, "dot operator")
+    .addError(3, 11, "Expected an assignment or function call and instead saw an expression.")
+    .addError(4, 26, "'hasOwnProperty' is a really bad name.")
+    .test([
+      "void {",
+      "  m() {",
+      "    super.x;",
+      "    super.hasOwnProperty = 0;",
+      "  }",
+      "};"
+    ], { esversion: 6 });
+
+  TestRun(test, "within arrow functions")
+    .test([
+      "void {",
+      "  m() {",
+      "    void (() => {",
+      "      void (() => {",
+      "        void super.x;",
+      "      });",
+      "    });",
+      "  },",
+      "  *g() {",
+      "    void (() => {",
+      "      void (() => {",
+      "        void super.x;",
+      "      });",
+      "    });",
+      "    yield;",
+      "  }",
+      "};",
+      "class C {",
+      "  m() {",
+      "    void (() => {",
+      "      void (() => {",
+      "        void super.x;",
+      "      });",
+      "    });",
+      "  }",
+      "  static m() {",
+      "    void (() => {",
+      "      void (() => {",
+      "        void super.x;",
+      "      });",
+      "    });",
+      "  }",
+      "}"
+    ], { esversion: 6 });
+
+  TestRun(test, "outside of method")
+    .addError(5, 14, "Super property may only be used within method bodies.")
+    .addError(6, 14, "Super property may only be used within method bodies.")
+    .addError(12, 8, "Super property may only be used within method bodies.")
+    .addError(13, 8, "Super property may only be used within method bodies.")
+    .addError(15, 6, "Super property may only be used within method bodies.")
+    .addError(16, 6, "Super property may only be used within method bodies.")
+    .test([
+      "void {",
+      "  m() {",
+      "    function f() {",
+      "      void (() => {",
+      "        void super.x;",
+      "        void super[x];",
+      "      });",
+      "    }",
+      "  }",
+      "};",
+      "function f() {",
+      "  void super.x;",
+      "  void super[x];",
+      "}",
+      "void super.x;",
+      "void super[x];"
+    ], { esversion: 6 });
+
+  test.done();
+};
+
+exports.super.superCall = function (test) {
+  TestRun(test)
+    .test([
+      "class C {",
+      "  m() {",
+      "    super();",
+      "    super(1);",
+      "    super(...x);",
+      "  }",
+      "}"
+    ], { esversion: 6 });
+
+  TestRun(test, "within arrow functions")
+    .test([
+      "class C {",
+      "  m() {",
+      "    void (() => {",
+      "      void (() => {",
+      "        super();",
+      "      });",
+      "    });",
+      "  }",
+      "  *g() {",
+      "    void (() => {",
+      "      void (() => {",
+      "        super();",
+      "      });",
+      "    });",
+      "    yield;",
+      "  }",
+      "  static m() {",
+      "    void (() => {",
+      "      void (() => {",
+      "        super();",
+      "      });",
+      "    });",
+      "  }",
+      "}"
+    ], { esversion: 6 });
+
+  TestRun(test, "outside of class method")
+    .addError(5, 9, "Super call may only be used within class method bodies.")
+    .addError(14, 9, "Super call may only be used within class method bodies.")
+    .addError(20, 3, "Super call may only be used within class method bodies.")
+    .addError(22, 1, "Super call may only be used within class method bodies.")
+    .test([
+      "class C {",
+      "  m() {",
+      "    function f() {",
+      "      void (() => {",
+      "        super();",
+      "      });",
+      "    }",
+      "  }",
+      "}",
+      "void {",
+      "  m() {",
+      "    function f() {",
+      "      void (() => {",
+      "        super();",
+      "      });",
+      "    }",
+      "  }",
+      "};",
+      "function f() {",
+      "  super();",
+      "}",
+      "super();"
+    ], { esversion: 6 });
+
+  test.done();
+};
+
+
 exports.functionReassignment = function (test) {
   var src = [
     "function f() {}",
