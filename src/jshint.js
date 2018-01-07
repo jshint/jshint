@@ -4042,6 +4042,7 @@ var JSHINT = (function() {
     advance(")", t);
     t = state.tokens.next;
     advance("{");
+    state.funct["(scope)"].stack();
 
     if (state.tokens.next.from === indent)
       noindent = true;
@@ -4106,6 +4107,7 @@ var JSHINT = (function() {
           indent -= state.option.indent;
 
         advance("}", t);
+        state.funct["(scope)"].unstack();
         state.funct["(breakage)"] -= 1;
         state.funct["(verb)"] = undefined;
         return;
