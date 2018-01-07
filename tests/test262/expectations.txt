@@ -403,12 +403,6 @@ language/module-code/instn-resolve-err-reference.js
 language/module-code/instn-resolve-err-syntax.js
 language/module-code/instn-resolve-order-depth.js
 language/module-code/instn-resolve-order-src.js
-language/module-code/parse-err-decl-pos-export-switch-case-dflt.js
-language/module-code/parse-err-decl-pos-export-switch-case.js
-language/module-code/parse-err-decl-pos-export-switch-dftl.js
-language/module-code/parse-err-decl-pos-import-switch-case-dflt.js
-language/module-code/parse-err-decl-pos-import-switch-case.js
-language/module-code/parse-err-decl-pos-import-switch-dftl.js
 language/module-code/parse-err-hoist-lex-fun.js
 language/module-code/parse-err-hoist-lex-gen.js
 language/module-code/parse-err-invoke-anon-fun-decl.js
@@ -1013,10 +1007,6 @@ language/statements/for-of/head-const-bound-names-fordecl-tdz.js
 language/statements/for-of/head-let-bound-names-fordecl-tdz.js
 language/statements/for-of/head-var-bound-names-let.js
 language/statements/switch/S12.11_A2_T1.js
-language/statements/switch/scope-lex-close-case.js
-language/statements/switch/scope-lex-close-dflt.js
-language/statements/switch/scope-lex-open-case.js
-language/statements/switch/scope-lex-open-dflt.js
 language/statements/while/decl-cls.js
 language/statements/while/decl-fun.js
 language/statements/while/decl-gen.js
