@@ -1198,17 +1198,10 @@ language/expressions/array/spread-sngl-obj-ident.js
 # Redeclaration errors
 language/block-scope/syntax/redeclaration/function-declaration-attempt-to-redeclare-with-function-declaration.js
 language/block-scope/syntax/redeclaration/function-declaration-attempt-to-redeclare-with-var-declaration.js
-language/block-scope/syntax/redeclaration/generator-declaration-attempt-to-redeclare-with-var-declaration.js
 language/block-scope/syntax/redeclaration/var-declaration-attempt-to-redeclare-with-function-declaration.js
-language/block-scope/syntax/redeclaration/var-declaration-attempt-to-redeclare-with-generator-declaration.js
 language/statements/switch/syntax/redeclaration/function-declaration-attempt-to-redeclare-with-function-declaration.js
-language/statements/switch/syntax/redeclaration/function-declaration-attempt-to-redeclare-with-generator-declaration.js
 language/statements/switch/syntax/redeclaration/function-declaration-attempt-to-redeclare-with-var-declaration.js
-language/statements/switch/syntax/redeclaration/generator-declaration-attempt-to-redeclare-with-function-declaration.js
-language/statements/switch/syntax/redeclaration/generator-declaration-attempt-to-redeclare-with-generator-declaration.js
-language/statements/switch/syntax/redeclaration/generator-declaration-attempt-to-redeclare-with-var-declaration.js
 language/statements/switch/syntax/redeclaration/var-declaration-attempt-to-redeclare-with-function-declaration.js
-language/statements/switch/syntax/redeclaration/var-declaration-attempt-to-redeclare-with-generator-declaration.js
 
 # Async functions
 
