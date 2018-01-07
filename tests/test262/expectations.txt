@@ -1147,24 +1147,9 @@ language/statements/class/syntax/early-errors/class-body-static-method-set-conta
 
 
 # Rest parameters
-language/expressions/function/dflt-params-rest.js
-language/expressions/generators/dflt-params-rest.js
-language/expressions/class/gen-meth-dflt-params-rest.js
-language/expressions/class/gen-meth-static-dflt-params-rest.js
-language/expressions/class/meth-dflt-params-rest.js
-language/expressions/class/meth-static-dflt-params-rest.js
 language/expressions/assignment/dstr-obj-rest-not-last-element-invalid.js
-language/expressions/object/method-definition/gen-meth-dflt-params-rest.js
-language/expressions/object/method-definition/meth-dflt-params-rest.js
-language/expressions/arrow-function/dflt-params-rest.js
 language/statements/for-of/dstr-obj-rest-not-last-element-invalid.js
-language/statements/generators/dflt-params-rest.js
-language/statements/function/dflt-params-rest.js
 language/statements/for-in/dstr-obj-rest-not-last-element-invalid.js
-language/statements/class/gen-meth-dflt-params-rest.js
-language/statements/class/gen-meth-static-dflt-params-rest.js
-language/statements/class/meth-dflt-params-rest.js
-language/statements/class/meth-static-dflt-params-rest.js
 
 # Spread operator
 language/expressions/array/spread-err-mult-err-obj-getter-throws.js

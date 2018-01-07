@@ -76,7 +76,8 @@ var errors = {
   E058: "Missing semicolon.",
   E059: "Incompatible values for the '{a}' and '{b}' linting options.",
   E060: "Non-callable values cannot be used as the second operand to instanceof.",
-  E061: "Invalid position for 'yield' expression (consider wrapping in parenthesis)."
+  E061: "Invalid position for 'yield' expression (consider wrapping in parenthesis).",
+  E062: "Rest parameter does not a support default value."
 };
 
 var warnings = {
