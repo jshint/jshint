@@ -302,8 +302,8 @@ var scopeManager = function(state, predefined, exported, declared) {
           }
 
           // check for re-assigning a function declaration
-          if ((usedLabelType === "function" || usedLabelType === "generator function" || usedLabelType === "class") &&
-              usage["(reassigned)"]) {
+          if ((usedLabelType === "function" || usedLabelType === "generator function" ||
+            usedLabelType === "class") && usage["(reassigned)"]) {
             for (j = 0; j < usage["(reassigned)"].length; j++) {
               if (!usage["(reassigned)"][j].ignoreW021) {
                 warning("W021", usage["(reassigned)"][j], usedLabelName, usedLabelType);
