@@ -4850,9 +4850,8 @@ var JSHINT = (function() {
     return false;
   }
 
-  var superNud = function(context) {
+  var superNud = function() {
     var next = state.tokens.next;
-    var type = null;
 
     if (checkPunctuators(next, ["[", "."])) {
       if (!supportsSuper("property", state.funct)) {
