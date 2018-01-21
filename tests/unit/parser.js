@@ -3666,6 +3666,38 @@ exports["strict violation - use of arguments and eval"] = function (test) {
       "function f2(eval) { 'use strict'; }"
     ]);
 
+  TestRun(test, "as function binding (valid)")
+    .test([
+      "function arguments() {}",
+      "function eval() {}",
+      "void function arguments() {};",
+      "void function eval() {};"
+    ]);
+
+  TestRun(test, "as function bindings for expressions with inferred names (valid)")
+    .test([
+      "var arguments = function() {};",
+      "(function() {",
+      "  var eval = function() {};",
+      "}());"
+    ]);
+
+  TestRun(test, "as function declaration binding (invalid)")
+    .addError(1, 10, "Strict violation.")
+    .addError(2, 10, "Strict violation.")
+    .test([
+      "function arguments() { 'use strict'; }",
+      "function eval() { 'use strict'; }"
+    ]);
+
+  TestRun(test, "as function expression binding (invalid)")
+    .addError(1, 15, "Strict violation.")
+    .addError(2, 15, "Strict violation.")
+    .test([
+      "void function arguments() { 'use strict'; };",
+      "void function eval() { 'use strict'; };"
+    ]);
+
   test.done();
 };
 
