@@ -1750,6 +1750,8 @@ var JSHINT = (function() {
           }
           directives();
 
+          state.funct["(isStrict)"] = state.isStrict();
+
           if (state.option.strict && state.funct["(context)"]["(global)"]) {
             if (!m["use strict"] && !state.isStrict()) {
               warning("E007");
@@ -2864,6 +2866,12 @@ var JSHINT = (function() {
       "(name)"      : name,
       "(breakage)"  : 0,
       "(loopage)"   : 0,
+      // The strictness of the function body is tracked via a dedicated
+      // property (as opposed to via the global `state` object) so that the
+      // value can be referenced after the body has been fully parsed (i.e.
+      // when validating the identifier used in function declarations and
+      // function expressions).
+      "(isStrict)"  : "unknown",
 
       "(global)"    : false,
 
@@ -3045,6 +3053,11 @@ var JSHINT = (function() {
     if (!state.option.noyield && isGenerator &&
         state.funct["(generator)"] !== "yielded") {
       warning("W124", state.tokens.curr);
+    }
+
+    if (state.funct["(isStrict)"] === true &&
+      (name === "arguments" || name === "eval")) {
+      error('E008', token);
     }
 
     state.funct["(metrics)"].verifyMaxStatementsPerFunction();
