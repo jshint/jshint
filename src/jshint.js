@@ -3056,7 +3056,7 @@ var JSHINT = (function() {
 
     if (state.funct["(isStrict)"] === true &&
       (name === "arguments" || name === "eval")) {
-      error('E008', token);
+      error("E008", token);
     }
 
     state.funct["(metrics)"].verifyMaxStatementsPerFunction();
