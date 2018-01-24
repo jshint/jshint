@@ -109,7 +109,7 @@ function getHomeDir() {
 
   while (paths.length) {
     homePath = paths.shift();
-    if (fs.existsSync(homePath)) {
+    if (homePath && fs.existsSync(homePath)) {
       return homePath;
     }
   }
