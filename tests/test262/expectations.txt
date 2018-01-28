@@ -8608,3 +8608,6 @@ test/language/statements/class/meth-static-params-trailing-comma-single.js(stric
 test/language/module-code/instn-resolve-empty-export.js(default)
 test/language/module-code/instn-resolve-empty-export.js(strict mode)
 
+# The AUTHORS file is not a test file
+test/built-ins/Simd/AUTHORS(default)
+test/built-ins/Simd/AUTHORS(strict mode)
