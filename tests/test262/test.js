@@ -2,39 +2,6 @@
 var JSHint = require("../../").JSHINT;
 var find = require("lodash").find;
 
-var modulePattern = /^\s*-\s*module\s*$|^\s*flags\s*:.*\bmodule\b/m;
-var noStrictPattern = /^\s*-\s*noStrict\s*$|^\s*flags\s*:.*\bnoStrict\b/m;
-var onlyStrictPattern = /^\s*-\s*onlyStrict\s*$|^\s*flags\s*:.*\bonlyStrict\b/m;
-
-function hasEarlyError(src) {
-  return !!(src.match(/^\s*negative:\s*$/m) && src.match(/^\s+phase: early\s*$/m));
-}
-
-/**
- * Given the source of a Test262 test, invoke the provided callback once for
- * each valid "version" of that program as defined by its meta data.
- */
-function forEachVersion(src, run) {
-  var onlyStrict = onlyStrictPattern.test(src);
-  var noStrict = noStrictPattern.test(src);
-  var results = [];
-  var result;
-
-  if (!onlyStrict) {
-    result = run(src);
-    result.version = "default";
-    results.push(result);
-  }
-
-  if (!noStrict) {
-    result = run("'use strict';\n" + src);
-    result.version = 'strict mode';
-    results.push(result);
-  }
-
-  return results;
-}
-
 /**
  * JSHint "error" messages generally indicate a parsing failure and "warning"
  * messages generally indicate more objective problems with technically-valid
@@ -68,12 +35,8 @@ var incorrectSeverity = {
   W136: true
 };
 
-function isFailure(result) {
-  if (result.exception) {
-    return true;
-  }
-
-  return result.errors && !!find(result.errors, function(msg) {
+function isFailure(errors) {
+  return errors && !!find(errors, function(msg) {
     if (msg.code[0] === "W") {
       return msg.code in incorrectSeverity;
     }
@@ -82,27 +45,14 @@ function isFailure(result) {
   });
 }
 
-module.exports = function test(src) {
-  var isModule = modulePattern.test(src);
-  var expected = hasEarlyError(src);
+module.exports = function(test) {
+  var isModule = !!test.attrs.flags.module;
 
-  return forEachVersion(src, function(src) {
-    var result, exception;
+  try {
+    JSHint(test.contents, { esversion: 6, maxerr: Infinity, module: isModule });
+  } catch (e) {
+    return false;
+  }
 
-    try {
-      JSHint(src, { esversion: 6, maxerr: Infinity, module: isModule });
-    } catch (e) {
-      exception = e;
-    }
-
-    result = {
-      exception: exception,
-      errors: JSHint.data().errors
-    };
-
-    result.parseFailure = isFailure(result);
-    result.expected = expected;
-
-    return result;
-  });
+  return !isFailure(JSHint.data().errors);
 };

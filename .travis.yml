@@ -3,7 +3,7 @@ after_success: npm run coverage && cat ./coverage/lcov.info | coveralls
 script:
   - npm run pretest
   - npm run test-node
-  - npm run test-262
+  - if [[ $(node --version) == v6* ]] ; then npm run test-262; fi
   - if [[ $(node --version) == v6* ]] ; then npm run test-browser; fi
 node_js:
   - "0.10"
