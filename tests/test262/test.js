@@ -18,13 +18,18 @@ function forEachVersion(src, run) {
   var onlyStrict = onlyStrictPattern.test(src);
   var noStrict = noStrictPattern.test(src);
   var results = [];
+  var result;
 
   if (!onlyStrict) {
-    results.push(run(src));
+    result = run(src);
+    result.version = "default";
+    results.push(result);
   }
 
   if (!noStrict) {
-    results.push(run("'use strict';\n" + src));
+    result = run("'use strict';\n" + src);
+    result.version = 'strict mode';
+    results.push(result);
   }
 
   return results;
@@ -80,8 +85,8 @@ function isFailure(result) {
 module.exports = function test(src) {
   var isModule = modulePattern.test(src);
   var expected = hasEarlyError(src);
-  var parseFailure = false;
-  var results = forEachVersion(src, function(src) {
+
+  return forEachVersion(src, function(src) {
     var result, exception;
 
     try {
@@ -96,17 +101,8 @@ module.exports = function test(src) {
     };
 
     result.parseFailure = isFailure(result);
+    result.expected = expected;
 
     return result;
   });
-
-  parseFailure = results.reduce(function(memo, result) {
-      return memo || result.parseFailure;
-    }, false);
-
-  return {
-    expected: expected,
-    parseFailure: parseFailure,
-    results: results
-  };
 };
