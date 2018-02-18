@@ -12,7 +12,8 @@ var report = require("./report");
 var test = require("./test");
 
 var paths = {
-  test262: __dirname + "/test262/test",
+  test262Root: __dirname + "/test262",
+  test262Tests: __dirname + "/test262/test",
   expectations: __dirname + "/expectations.txt"
 };
 var testName = /^(?!.*_FIXTURE).*\.[jJ][sS]/;
@@ -71,8 +72,8 @@ function findTests(directoryName, cb) {
   });
 }
 
-console.log("Indexing test files (searching in " + paths.test262 + ").");
-findTests(paths.test262, function(err, testNames) {
+console.log("Indexing test files (searching in " + paths.test262Tests + ").");
+findTests(paths.test262Tests, function(err, testNames) {
   if (err) {
     console.error(err);
     process.exit(1);
@@ -100,7 +101,7 @@ findTests(paths.test262, function(err, testNames) {
       }
 
       result = test(src);
-      result.name = path.relative(paths.test262, testName);
+      result.name = path.relative(paths.test262Root, testName);
       done(null, result);
     });
   }, function(err, results) {
