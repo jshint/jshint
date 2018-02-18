@@ -86,7 +86,7 @@ findTests(paths.test262Tests, function(err, testNames) {
   var start = new Date().getTime();
   async.mapLimit(testNames, 20, function(testName, done) {
     fs.readFile(testName, { encoding: "utf-8" }, function(err, src) {
-      var result;
+      var results;
 
       count++;
       if (count % 1000 === 0) {
@@ -100,15 +100,26 @@ findTests(paths.test262Tests, function(err, testNames) {
         return;
       }
 
-      result = test(src);
-      result.name = path.relative(paths.test262Root, testName);
-      done(null, result);
+      results = test(src);
+
+      results.forEach(function(result) {
+        result.name = path.relative(paths.test262Root, testName) + "(" +
+          result.version + ")";
+      });
+
+      done(null, results);
     });
-  }, function(err, results) {
+  }, function(err, results2d) {
+    var results;
+
     if (err) {
       console.error(err);
       process.exit(1);
     }
+
+    results = results2d.reduce(function(accumulator, resultsSet) {
+      return accumulator.concat(resultsSet);
+    }, []);
 
     fs.readFile(paths.expectations, { encoding: "utf-8" }, function(err, src) {
       var summary, output;
