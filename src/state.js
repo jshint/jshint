@@ -66,24 +66,36 @@ var state = {
   },
 
   /**
-   * @param {boolean} strict - When `true`, only consider ES6 when in
-   *                           "esversion: 6" code.
+   * Determine if constructs introduced in ECMAScript 7 should be accepted.
+   *
+   * @returns {boolean}
    */
-  inES6: function(strict) {
-    if (strict) {
-      return this.esVersion === 6;
-    }
-    return this.option.moz || this.esVersion >= 6;
+  inES7: function() {
+    return this.esVersion >= 7;
   },
 
   /**
-   * @param {boolean} strict - When `true`, return `true` only when
-   *                           esVersion is exactly 5
+   * Determine if constructs introduced in ECMAScript 6 should be accepted.
+   *
+   * @param {boolean} strict - When `true`, do not interpret the `moz` option
+   *                           as ECMAScript 6
+   *
+   * @returns {boolean}
    */
-  inES5: function(strict) {
-    if (strict) {
-      return (!this.esVersion || this.esVersion === 5) && !this.option.moz;
+  inES6: function(strict) {
+    if (!strict && this.option.moz) {
+      return true;
     }
+
+    return this.esVersion >= 6;
+  },
+
+  /**
+   * Determine if constructs introduced in ECMAScript 5 should be accepted.
+   *
+   * @returns {boolean}
+   */
+  inES5: function() {
     return !this.esVersion || this.esVersion >= 5 || this.option.moz;
   },
 
@@ -134,7 +146,7 @@ var state = {
       curr: null
     };
 
-    this.option = {};
+    this.option = { unstable: {} };
     this.esVersion = 5;
     this.funct = null;
     this.ignored = {};

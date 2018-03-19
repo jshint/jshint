@@ -123,6 +123,21 @@ exports.bool = {
     immed       : true,
 
     /**
+     * This option prohibits unnecessary clauses within `switch` statements,
+     * e.g.
+     *
+     *     switch (x) {
+     *       case 1:
+     *       default:
+     *         z();
+     *     }
+     *
+     * While clauses like these are techincally valid, they do not effect
+     * program behavior and may indicate an erroneous refactoring.
+     */
+    leanswitch  : true,
+
+    /**
      * This option requires you to capitalize names of constructor functions.
      * Capitalizing functions that are intended to be used with `new` operator
      * is just a convention that helps programmers to visually distinguish
@@ -1005,6 +1020,41 @@ exports.val = {
   esversion: 5
 };
 
+/**
+ * Unstable options allow control for parsing and linting of proposed additions
+ * to the JavaScript language. Just like the language features they describe,
+ * the presence and behavior of these options is volatile; JSHint reserves the
+ * right to remove or modify them between major version releases.
+ */
+exports.unstable = {
+  /**
+   * Enable parsing support for rest properties for object destructuring
+   * assignment and spread properties for object literals. From the proposal:
+   *
+   * > Rest Properties
+   * >
+   * > Rest properties collect the remaining own enumerable property keys that
+   * > are not already picked off by the destructuring pattern. Those keys and
+   * > their values are copied onto a new object.
+   * >
+   * >     let { x, y, ...z } = { x: 1, y: 2, a: 3, b: 4 };
+   * >     x; // 1
+   * >     y; // 2
+   * >     z; // { a: 3, b: 4 }
+   * >
+   * > Spread Properties
+   * >
+   * > Spread properties in object initializers copies own enumerable
+   * > properties from a provided object onto the newly created object.
+   * >
+   * >     let n = { x, y, ...z };
+   * >     n; // { x: 1, y: 2, a: 3, b: 4 }
+   *
+   * https://github.com/tc39/proposal-object-rest-spread
+   */
+  objspreadrest: true
+};
+
 // These are JSHint boolean options which are shared with JSLint
 // where the definition in JSHint is opposite JSLint
 exports.inverted = {
@@ -1024,7 +1074,10 @@ exports.validNames = Object.keys(exports.val)
   .concat(Object.keys(exports.bool.relaxing))
   .concat(Object.keys(exports.bool.enforcing))
   .concat(Object.keys(exports.bool.obsolete))
-  .concat(Object.keys(exports.bool.environments));
+  .concat(Object.keys(exports.bool.environments))
+  .concat(["unstable"]);
+
+exports.unstableNames = Object.keys(exports.unstable);
 
 // These are JSHint boolean options which are shared with JSLint
 // where the name has been changed but the effect is unchanged

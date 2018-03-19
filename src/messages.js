@@ -4,7 +4,7 @@ var _ = require("lodash");
 
 var errors = {
   // JSHint options
-  E001: "Bad option: '{a}'.",
+  E001: "Bad {a}option: '{b}'.",
   E002: "Bad option value.",
 
   // JSHint input
@@ -79,7 +79,9 @@ var errors = {
   E061: "Invalid position for 'yield' expression (consider wrapping in parenthesis).",
   E062: "Rest parameter does not a support default value.",
   E063: "Super property may only be used within method bodies.",
-  E064: "Super call may only be used within class method bodies."
+  E064: "Super call may only be used within class method bodies.",
+  E065: "Functions defined outside of strict mode with non-simple parameter lists may not " +
+    "enable strict mode."
 };
 
 var warnings = {
@@ -230,7 +232,9 @@ var warnings = {
   W139: "Function expressions should not be used as the second operand to instanceof.",
   W140: "Missing comma.",
   W141: "Empty {a}: this is unnecessary and can be removed.",
-  W142: "Empty {a}: consider replacing with `import '{b}';`."
+  W142: "Empty {a}: consider replacing with `import '{b}';`.",
+  W143: "'{a}' is a non-standard language feature. Enable it using the '{b}' unstable option.",
+  W144: "Superfluous 'case' clause."
 };
 
 var info = {
