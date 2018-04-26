@@ -389,6 +389,16 @@ exports["jshint option inline comments, leading and trailing tabs and spaces"] =
   test.done();
 };
 
+exports["w117 tabs report correct column numbers"] = function (test) {
+  var src = fs.readFileSync(__dirname + "/fixtures/W117-tabs.js", "utf8");
+
+  TestRun(test)
+    .addError(6, 4, "'fun1' is not defined.")
+    .test(src);
+
+  test.done();
+};
+
 exports.shebang = function (test) {
   var code = [
     "#!test",
