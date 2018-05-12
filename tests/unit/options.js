@@ -3405,7 +3405,7 @@ exports.futureHostile = function (test) {
     "var Uint8Array = function() {};",
     "var Uint16Array = function() {};",
     "var Uint32Array = function() {};",
-    "var Uint8ClampledArray = function() {};",
+    "var Uint8ClampedArray = function() {};",
     "var Float32Array = function() {};",
     "var Float64Array = function() {};"
   ];
@@ -3428,7 +3428,7 @@ exports.futureHostile = function (test) {
     .addError(15, 5, "'Uint8Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .addError(16, 5, "'Uint16Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .addError(17, 5, "'Uint32Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
-    .addError(18, 5, "'Uint8ClampledArray' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(18, 5, "'Uint8ClampedArray' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .addError(19, 5, "'Float32Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .addError(20, 5, "'Float64Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .test(code, { es3: true, es5: false, futurehostile: false });
@@ -3454,7 +3454,7 @@ exports.futureHostile = function (test) {
     .addError(15, 5, "'Uint8Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .addError(16, 5, "'Uint16Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .addError(17, 5, "'Uint32Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
-    .addError(18, 5, "'Uint8ClampledArray' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(18, 5, "'Uint8ClampedArray' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .addError(19, 5, "'Float32Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .addError(20, 5, "'Float64Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .test(code, { futurehostile: false });
@@ -3486,7 +3486,7 @@ exports.futureHostile = function (test) {
     .addError(15, 5, "Redefinition of 'Uint8Array'.")
     .addError(16, 5, "Redefinition of 'Uint16Array'.")
     .addError(17, 5, "Redefinition of 'Uint32Array'.")
-    .addError(18, 5, "Redefinition of 'Uint8ClampledArray'.")
+    .addError(18, 5, "Redefinition of 'Uint8ClampedArray'.")
     .addError(19, 5, "Redefinition of 'Float32Array'.")
     .addError(20, 5, "Redefinition of 'Float64Array'.")
     .test(code, { esnext: true, futurehostile: false });
@@ -3509,7 +3509,7 @@ exports.futureHostile = function (test) {
     .addError(15, 5, "Redefinition of 'Uint8Array'.")
     .addError(16, 5, "Redefinition of 'Uint16Array'.")
     .addError(17, 5, "Redefinition of 'Uint32Array'.")
-    .addError(18, 5, "Redefinition of 'Uint8ClampledArray'.")
+    .addError(18, 5, "Redefinition of 'Uint8ClampedArray'.")
     .addError(19, 5, "Redefinition of 'Float32Array'.")
     .addError(20, 5, "Redefinition of 'Float64Array'.")
     .test(code, { esnext: true });
@@ -3536,7 +3536,7 @@ exports.futureHostile = function (test) {
         "-Uint8Array",
         "-Uint16Array",
         "-Uint32Array",
-        "-Uint8ClampledArray",
+        "-Uint8ClampedArray",
         "-Float32Array",
         "-Float64Array"
       ]
@@ -3560,7 +3560,7 @@ exports.futureHostile = function (test) {
     "let Uint8Array = function() {};",
     "let Uint16Array = function() {};",
     "let Uint32Array = function() {};",
-    "let Uint8ClampledArray = function() {};",
+    "let Uint8ClampedArray = function() {};",
     "let Float32Array = function() {};",
     "let Float64Array = function() {};"
   ];
@@ -3583,7 +3583,7 @@ exports.futureHostile = function (test) {
     .addError(15, 5, "Redefinition of 'Uint8Array'.")
     .addError(16, 5, "Redefinition of 'Uint16Array'.")
     .addError(17, 5, "Redefinition of 'Uint32Array'.")
-    .addError(18, 5, "Redefinition of 'Uint8ClampledArray'.")
+    .addError(18, 5, "Redefinition of 'Uint8ClampedArray'.")
     .addError(19, 5, "Redefinition of 'Float32Array'.")
     .addError(20, 5, "Redefinition of 'Float64Array'.")
     .test(code, { esnext: true });
@@ -3610,7 +3610,7 @@ exports.futureHostile = function (test) {
         "-Uint8Array",
         "-Uint16Array",
         "-Uint32Array",
-        "-Uint8ClampledArray",
+        "-Uint8ClampedArray",
         "-Float32Array",
         "-Float64Array"
       ]
@@ -3634,7 +3634,7 @@ exports.futureHostile = function (test) {
     "const Uint8Array = function() {};",
     "const Uint16Array = function() {};",
     "const Uint32Array = function() {};",
-    "const Uint8ClampledArray = function() {};",
+    "const Uint8ClampedArray = function() {};",
     "const Float32Array = function() {};",
     "const Float64Array = function() {};"
   ];
@@ -3657,7 +3657,7 @@ exports.futureHostile = function (test) {
     .addError(15, 7, "Redefinition of 'Uint8Array'.")
     .addError(16, 7, "Redefinition of 'Uint16Array'.")
     .addError(17, 7, "Redefinition of 'Uint32Array'.")
-    .addError(18, 7, "Redefinition of 'Uint8ClampledArray'.")
+    .addError(18, 7, "Redefinition of 'Uint8ClampedArray'.")
     .addError(19, 7, "Redefinition of 'Float32Array'.")
     .addError(20, 7, "Redefinition of 'Float64Array'.")
     .test(code, { esnext: true });
@@ -3684,7 +3684,7 @@ exports.futureHostile = function (test) {
         "-Uint8Array",
         "-Uint16Array",
         "-Uint32Array",
-        "-Uint8ClampledArray",
+        "-Uint8ClampedArray",
         "-Float32Array",
         "-Float64Array"
       ]
