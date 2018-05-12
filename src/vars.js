@@ -59,7 +59,7 @@ exports.ecmaIdentifiers = {
     Uint8Array         : false,
     Uint16Array        : false,
     Uint32Array        : false,
-    Uint8ClampledArray : false,
+    Uint8ClampedArray  : false,
     WeakMap            : false,
     WeakSet            : false
   }
