@@ -102,7 +102,7 @@ reasons. This license is included as an in-line within the file it concerns.
 JSHint is currently maintained by [Rick Waldron](https://github.com/rwaldron/),
 [Caitlin Potter](https://github.com/caitp/), [Mike
 Pennisi](https://github.com/jugglinmike/), and [Luke
-Page](https://github.com/lukeapage).
+Page](https://github.com/lukeapage). You can reach them via admin@jshint.org.
 
 ## Previous Maintainers
 
