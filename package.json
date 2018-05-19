@@ -53,7 +53,7 @@
     "minimatch":           "~3.0.2",
     "shelljs":             "0.3.x",
     "strip-json-comments": "1.0.x",
-    "lodash":              "3.7.x"
+    "lodash":              "~4.17.10"
   },
 
   "devDependencies": {
