@@ -8367,6 +8367,10 @@ exports["regression test for GH-3230"] = function (test) {
 
 exports.unicode8 = function (test) {
   TestRun(test)
+    .addError(1, 5, "'unicode 8' is only available in ES6 (use 'esversion: 6').")
+    .test("var Ϳ;", {esversion: 5});
+
+  TestRun(test)
     .test("var Ϳ;", {esversion: 6});
 
   test.done();

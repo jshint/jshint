@@ -19,6 +19,18 @@ var ID_Start = get('Binary_Property/ID_Start');
 var ID_Continue = get('Binary_Property/ID_Continue');
 var Other_ID_Start = get('Binary_Property/Other_ID_Start');
 
+// Get the Unicode categories needed to construct the ES5 regex.
+var Lu = get('General_Category/Uppercase_Letter');
+var Ll = get('General_Category/Lowercase_Letter');
+var Lt = get('General_Category/Titlecase_Letter');
+var Lm = get('General_Category/Modifier_Letter');
+var Lo = get('General_Category/Other_Letter');
+var Nl = get('General_Category/Letter_Number');
+var Mn = get('General_Category/Nonspacing_Mark');
+var Mc = get('General_Category/Spacing_Mark');
+var Nd = get('General_Category/Decimal_Number');
+var Pc = get('General_Category/Connector_Punctuation');
+
 var generateData = function() { // ES 5.1
   // http://mathiasbynens.be/notes/javascript-identifiers#valid-identifier-names
   var identifierStart = regenerate(ID_Start)
@@ -40,6 +52,20 @@ var generateData = function() { // ES 5.1
   };
 };
 
+// Adapted from https://gist.github.com/mathiasbynens/6334847
+var generateES5Regex = function() { // ES 5.1
+  // https://mathiasbynens.be/notes/javascript-identifiers#valid-identifier-names
+  var identifierStart = regenerate('$', '_')
+    .add(Lu, Ll, Lt, Lm, Lo, Nl)
+    .removeRange(0x010000, 0x10FFFF); // Remove astral symbols.
+  var identifierPart = identifierStart.clone()
+    .add('\u200C', '\u200D', Mn, Mc, Nd, Pc)
+    .removeRange(0x010000, 0x10FFFF); // Remove astral symbols.
+
+  return '/^(?:' + identifierStart.toString() + ')' +
+    '(?:' + identifierPart.toString() + ')*$/';
+};
+
 var fs = require('fs');
 var writeFile = function(fileName, data) {
   fs.writeFileSync(
@@ -57,3 +83,7 @@ var writeFile = function(fileName, data) {
 var result = generateData();
 writeFile('./data/non-ascii-identifier-start.js', result.nonAsciiIdentifierStart);
 writeFile('./data/non-ascii-identifier-part-only.js', result.nonAsciiIdentifierPart);
+fs.writeFileSync(
+  './data/es5-identifier-names.js',
+  'module.exports = ' + generateES5Regex() + ';'
+);
