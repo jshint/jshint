@@ -6,10 +6,10 @@ script:
   - if [[ $(node --version) == v6* ]] ; then npm run test-262; fi
   - if [[ $(node --version) == v6* ]] ; then npm run test-browser; fi
 node_js:
-  - "0.10"
-  - "0.12"
   - 4
   - 6
+  - 8
+  - 10
 matrix:
   fast_finish: true
 sudo: false
