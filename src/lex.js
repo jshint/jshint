@@ -697,7 +697,7 @@ Lexer.prototype = {
       id += char;
     }
 
-    value = removeEscapeSequences(id)
+    value = removeEscapeSequences(id);
 
     if (!state.inES6(true)) {
       es5IdentifierNames = require("../data/es5-identifier-names.js");
