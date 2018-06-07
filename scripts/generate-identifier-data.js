@@ -8,10 +8,14 @@ var regenerate = require('regenerate');
 var pkg = require('../package.json');
 var dependencies = Object.keys(pkg.devDependencies);
 var unicodeVersion = dependencies.find((name) => /^unicode-\d/.test(name));
+var oldUnicodeVersion = 'unicode-5.2.0';
 
-// Shorthand function
+// Shorthand functions.
 var get = function(what) {
   return require(unicodeVersion + '/' + what + '/code-points.js');
+};
+var getOld = function(what) {
+  return require(oldUnicodeVersion + '/' + what + '/code-points.js');
 };
 
 // Get the Unicode properties needed to construct the ES6 regex.
@@ -20,18 +24,18 @@ var ID_Continue = get('Binary_Property/ID_Continue');
 var Other_ID_Start = get('Binary_Property/Other_ID_Start');
 
 // Get the Unicode categories needed to construct the ES5 regex.
-var Lu = get('General_Category/Uppercase_Letter');
-var Ll = get('General_Category/Lowercase_Letter');
-var Lt = get('General_Category/Titlecase_Letter');
-var Lm = get('General_Category/Modifier_Letter');
-var Lo = get('General_Category/Other_Letter');
-var Nl = get('General_Category/Letter_Number');
-var Mn = get('General_Category/Nonspacing_Mark');
-var Mc = get('General_Category/Spacing_Mark');
-var Nd = get('General_Category/Decimal_Number');
-var Pc = get('General_Category/Connector_Punctuation');
+var Lu = getOld('General_Category/Uppercase_Letter');
+var Ll = getOld('General_Category/Lowercase_Letter');
+var Lt = getOld('General_Category/Titlecase_Letter');
+var Lm = getOld('General_Category/Modifier_Letter');
+var Lo = getOld('General_Category/Other_Letter');
+var Nl = getOld('General_Category/Letter_Number');
+var Mn = getOld('General_Category/Nonspacing_Mark');
+var Mc = getOld('General_Category/Spacing_Mark');
+var Nd = getOld('General_Category/Decimal_Number');
+var Pc = getOld('General_Category/Connector_Punctuation');
 
-var generateData = function() { // ES 5.1
+var generateData = function() { // ES2015+ with latest Unicode
   // http://mathiasbynens.be/notes/javascript-identifiers#valid-identifier-names
   var identifierStart = regenerate(ID_Start)
     .add('$', '_')
@@ -53,7 +57,7 @@ var generateData = function() { // ES 5.1
 };
 
 // Adapted from https://gist.github.com/mathiasbynens/6334847
-var generateES5Regex = function() { // ES 5.1
+var generateES5Regex = function() { // ES 5.1 + Unicode v5.2.0
   // https://mathiasbynens.be/notes/javascript-identifiers#valid-identifier-names
   var identifierStart = regenerate('$', '_')
     .add(Lu, Ll, Lt, Lm, Lo, Nl)

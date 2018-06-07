@@ -43,10 +43,11 @@
     "console-browserify": "1.1.x",
     "exit": "0.1.x",
     "htmlparser2": "3.8.x",
+    "lodash": "3.7.x",
     "minimatch": "~3.0.2",
     "shelljs": "0.3.x",
     "strip-json-comments": "1.0.x",
-    "lodash": "3.7.x"
+    "unicode-5.2.0": "^0.7.5"
   },
   "devDependencies": {
     "async": "~2.1.2",
