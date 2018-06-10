@@ -14,6 +14,8 @@ var asciiIdentifierStartTable = unicodeData.asciiIdentifierStartTable;
 var asciiIdentifierPartTable = unicodeData.asciiIdentifierPartTable;
 var nonAsciiIdentifierStartTable = require("../data/non-ascii-identifier-start.js");
 var nonAsciiIdentifierPartTable = require("../data/non-ascii-identifier-part-only.js");
+// Loading of this module is deferred as an optimization for ES2015 input
+var es5IdentifierNames;
 
 // Some of these token types are from JavaScript Parser API
 // while others are specific to JSHint parser.
@@ -582,10 +584,10 @@ Lexer.prototype = {
    * Extract a JavaScript identifier out of the next sequence of
    * characters or return 'null' if its not possible.
    */
-  scanIdentifier: function() {
+  scanIdentifier: function(checks) {
     var id = "";
     var index = 0;
-    var char;
+    var char, value;
 
     function isNonAsciiIdentifierStart(code) {
       return nonAsciiIdentifierStartTable.indexOf(code) > -1;
@@ -695,9 +697,29 @@ Lexer.prototype = {
       id += char;
     }
 
+    value = removeEscapeSequences(id);
+
+    if (!state.inES6(true)) {
+      es5IdentifierNames = require("../data/es5-identifier-names.js");
+
+      if (!es5IdentifierNames.test(value)) {
+        this.triggerAsync(
+          "warning",
+          {
+            code: "W119",
+            line: this.line,
+            character: this.char,
+            data: ["unicode 8", "6"]
+          },
+          checks,
+          function() { return true; }
+        );
+      }
+    }
+
     return {
       type: Token.Identifier,
-      value: removeEscapeSequences(id),
+      value: value,
       text: id,
       tokenLength: id.length
     };
@@ -1531,7 +1553,7 @@ Lexer.prototype = {
       this.scanRegExp(checks) ||
       this.scanPunctuator() ||
       this.scanKeyword() ||
-      this.scanIdentifier() ||
+      this.scanIdentifier(checks) ||
       this.scanNumericLiteral(checks);
 
     if (match) {
