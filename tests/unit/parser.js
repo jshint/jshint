@@ -9,13 +9,16 @@ var fs    = require('fs');
 var TestRun = require("../helpers/testhelper").setup.testRun;
 var path    = require("path");
 
+/**
+ * The warning for this input was intentionally disabled after research into
+ * its justification produced no results.
+ */
 exports.unsafe = function (test) {
   var code = [
     "var a\u000a = 'Here is a unsafe character';",
   ];
 
   TestRun(test)
-    .addError(1, 5, "This character may get silently deleted by one or more browsers.")
     .test(code, {es3: true});
 
   test.done();
@@ -26,36 +29,30 @@ exports.peekOverDirectives = function (test) {
 
   TestRun(test)
     // Within object literal
-    .addError(18, 15, "This character may get silently deleted by one or more browsers.")
     .addError(18, 14, "Unexpected control character in regular expression.")
     .addError(19, 14, "Unexpected escaped character '<' in regular expression.")
     .addError(20, 81, "Line is too long.")
     .addError(21, 15, "Control character in string: <non-printable>.")
-    .addError(21, 14, "This character may get silently deleted by one or more browsers.")
     .addError(22, 14, "'Octal integer literal' is only available in ES6 (use 'esversion: 6').")
     .addError(23, 14, "'Binary integer literal' is only available in ES6 (use 'esversion: 6').")
     .addError(24, 14, "'template literal syntax' is only available in ES6 (use 'esversion: 6').")
     .addError(25, 14, "'Sticky RegExp flag' is only available in ES6 (use 'esversion: 6').")
 
     // Within array literal:
-    .addError(44, 4, "This character may get silently deleted by one or more browsers.")
     .addError(44, 3, "Unexpected control character in regular expression.")
     .addError(45, 3, "Unexpected escaped character '<' in regular expression.")
     .addError(46, 81, "Line is too long.")
     .addError(47, 4, "Control character in string: <non-printable>.")
-    .addError(47, 3, "This character may get silently deleted by one or more browsers.")
     .addError(48, 3, "'Octal integer literal' is only available in ES6 (use 'esversion: 6').")
     .addError(49, 3, "'Binary integer literal' is only available in ES6 (use 'esversion: 6').")
     .addError(50, 3, "'template literal syntax' is only available in ES6 (use 'esversion: 6').")
     .addError(51, 3, "'Sticky RegExp flag' is only available in ES6 (use 'esversion: 6').")
 
     // Within grouping operator:
-    .addError(70, 4, "This character may get silently deleted by one or more browsers.")
     .addError(70, 3, "Unexpected control character in regular expression.")
     .addError(71, 3, "Unexpected escaped character '<' in regular expression.")
     .addError(72, 81, "Line is too long.")
     .addError(73, 4, "Control character in string: <non-printable>.")
-    .addError(73, 3, "This character may get silently deleted by one or more browsers.")
     .addError(74, 3, "'Octal integer literal' is only available in ES6 (use 'esversion: 6').")
     .addError(75, 3, "'Binary integer literal' is only available in ES6 (use 'esversion: 6').")
     .addError(76, 3, "'template literal syntax' is only available in ES6 (use 'esversion: 6').")
@@ -574,9 +571,7 @@ exports.regexp = function (test) {
   ];
 
   var run = TestRun(test)
-    .addError(1, 11, "This character may get silently deleted by one or more browsers.")
     .addError(1, 10, "Unexpected control character in regular expression.")
-    .addError(2, 12, "This character may get silently deleted by one or more browsers.")
     .addError(2, 10, "Unexpected control character in regular expression.")
     .addError(3, 10, "Unexpected escaped character '<' in regular expression.")
     .addError(4, 10, "Unexpected escaped character '<' in regular expression.")
@@ -723,7 +718,6 @@ exports.strings = function (test) {
 
   var run = TestRun(test)
     .addError(1, 10, "Control character in string: <non-printable>.")
-    .addError(1, 9, "This character may get silently deleted by one or more browsers.")
     .addError(7, 12, "Unclosed string.")
     .addError(7, 12, "Missing semicolon.");
   run.test(code, {es3: true});
