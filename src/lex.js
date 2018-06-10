@@ -1517,13 +1517,6 @@ Lexer.prototype = {
   },
 
   /*
-   * Scan for characters that get silently deleted by one or more browsers.
-   */
-  scanUnsafeChars: function() {
-    return this.input.search(reg.unsafeChars);
-  },
-
-  /*
    * Produce the next raw token or return 'null' if no tokens can be matched.
    * This method skips over all space characters.
    */
@@ -1615,16 +1608,6 @@ Lexer.prototype = {
     }
 
     this.input = this.input.replace(/\t/g, state.tab);
-    char = this.scanUnsafeChars();
-
-    if (char >= 0) {
-      this.triggerAsync(
-        "warning",
-        { code: "W100", line: this.line, character: char },
-        checks,
-        function() { return true; }
-      );
-    }
 
     // If there is a limit on line length, warn when lines get too
     // long.

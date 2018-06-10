@@ -188,7 +188,7 @@ var warnings = {
   W097: "Use the function form of \"use strict\".",
   W098: "'{a}' is defined but never used.",
   W099: null,
-  W100: "This character may get silently deleted by one or more browsers.",
+  W100: null,
   W101: "Line is too long.",
   W102: null,
   W103: "The '{a}' property is deprecated.",
