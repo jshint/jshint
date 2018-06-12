@@ -55,20 +55,20 @@ exports.node = function (test) {
 
   TestRun(test)
     .addError(1, 1, 'Use the function form of "use strict".')
-    .test(globalStrict, { es3: true, strict: true });
+    .test(globalStrict, { esversion: 3, strict: true });
 
   TestRun(test)
-    .test(globalStrict, { es3: true, node: true, strict: true });
+    .test(globalStrict, { esversion: 3, node: true, strict: true });
 
   TestRun(test)
-    .test(globalStrict, { es3: true, browserify: true, strict: true });
+    .test(globalStrict, { esversion: 3, browserify: true, strict: true });
 
   // Don't assume strict:true for Node environments. See bug GH-721.
   TestRun(test)
-    .test("function test() { return; }", { es3: true, node: true });
+    .test("function test() { return; }", { esversion: 3, node: true });
 
   TestRun(test)
-    .test("function test() { return; }", { es3: true, browserify: true });
+    .test("function test() { return; }", { esversion: 3, browserify: true });
 
   // Make sure that we can do fancy Node export
 
@@ -80,11 +80,11 @@ exports.node = function (test) {
 
   TestRun(test)
     .addError(1, 1, "Read only.")
-    .test(overwrites, { es3: true, node: true });
+    .test(overwrites, { esversion: 3, node: true });
 
   TestRun(test)
     .addError(1, 1, "Read only.")
-    .test(overwrites, { es3: true, browserify: true });
+    .test(overwrites, { esversion: 3, browserify: true });
 
   TestRun(test, "gh-2657")
     .test("'use strict';var a;", { node: true });
@@ -160,7 +160,7 @@ exports.es5 = function (test) {
     .addError(75, 13, "get/set are ES5 features.")
     .addError(76, 13, "get/set are ES5 features.")
     .addError(80, 13, "get/set are ES5 features.")
-    .test(src, { es3: true });
+    .test(src, { esversion: 3 });
 
   TestRun(test)
     .addError(36, 13, "Setter is defined without getter.")
@@ -177,7 +177,7 @@ exports.es5 = function (test) {
     .test(src, {  }); // es5
 
   // JSHint should not throw "Missing property name" error on nameless getters/setters
-  // using Method Definition Shorthand if esnext flag is enabled.
+  // using Method Definition Shorthand if esversion flag >= 6.
   TestRun(test)
     .addError(36, 13, "Setter is defined without getter.")
     .addError(43, 10, "Duplicate key 'x'.")
@@ -188,7 +188,7 @@ exports.es5 = function (test) {
     .addError(62, 14, "Expected a single parameter in set x function.")
     .addError(64, 14, "Expected a single parameter in set z function.")
     .addError(80, 13, "Setter is defined without getter.")
-    .test(src, { esnext: true });
+    .test(src, { esversion: 6 });
 
   // Make sure that JSHint parses getters/setters as function expressions
   // (https://github.com/jshint/jshint/issues/96)
@@ -207,10 +207,10 @@ exports.phantom = function (test) {
 
   TestRun(test)
     .addError(1, 1, 'Use the function form of "use strict".')
-    .test(globalStrict, { es3: true, strict: true });
+    .test(globalStrict, { esversion: 3, strict: true });
 
   TestRun(test)
-    .test(globalStrict, { es3: true, phantom: true, strict: true });
+    .test(globalStrict, { esversion: 3, phantom: true, strict: true });
 
 
   test.done();
@@ -360,9 +360,9 @@ exports.browser = function (test) {
     .addError(31, 15, "'document' is not defined.")
     .addError(32, 1, "'fetch' is not defined.")
     .addError(35, 19, "'URL' is not defined.")
-    .test(src, {es3: true, undef: true });
+    .test(src, {esversion: 3, undef: true });
 
-  TestRun(test).test(src, {es3: true, browser: true, undef: true });
+  TestRun(test).test(src, {esversion: 3, browser: true, undef: true });
 
   test.done();
 };

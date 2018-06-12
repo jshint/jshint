@@ -189,16 +189,12 @@ var JSHINT = (function() {
    * Apply all linting options according to the status of the `state` object.
    */
   function applyOptions() {
-    var badESOpt = null;
     processenforceall();
 
     /**
      * TODO: Remove in JSHint 3
      */
-    badESOpt = state.inferEsVersion();
-    if (badESOpt) {
-      quit("E059", state.tokens.next, "esversion", badESOpt);
-    }
+    state.inferEsVersion();
 
     if (state.inES5()) {
       combine(predefined, vars.ecmaIdentifiers[5]);
@@ -683,6 +679,7 @@ var JSHINT = (function() {
 
         var tn;
         if (val === "true" || val === "false") {
+          warnIfDeprecated(key, val);
           if (directiveToken.type === "jslint") {
             tn = options.renamed[key] || key;
             state.option[tn] = (val === "true");
@@ -693,7 +690,6 @@ var JSHINT = (function() {
           } else {
             state.option[key] = (val === "true");
           }
-
           return;
         }
 
@@ -2653,7 +2649,7 @@ var JSHINT = (function() {
   prefix("[", function() {
     var blocktype = lookupBlockType();
     if (blocktype.isCompArray) {
-      if (!state.option.esnext && !state.inMoz()) {
+      if (state.esVersion < 6 && !state.inMoz()) {
         warning("W118", state.tokens.curr, "array comprehension");
       }
       return comprehensiveArrayExpression();
@@ -5279,6 +5275,14 @@ var JSHINT = (function() {
     return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
   };
 
+  function warnIfDeprecated(option, value, optionIndex) {
+    var m;
+    if ((m = /^es(next|3|5)$/.exec(option)) && value && value !== "false") {
+      var t = _.assign({ line: "(option " + (optionIndex + 1) + ")", from: 0 }, state.tokens.curr);
+      warning("W143", t, m[0], "Use 'esversion: " + (m[1].length > 1 ? "6" : m[1]) + "' instead");
+    }
+  }
+
   // The actual JSHINT function itself.
   var itself = function(s, o, g) {
     var x, reIgnoreStr, reIgnore;
@@ -5345,7 +5349,9 @@ var JSHINT = (function() {
           newIgnoredObj[optionKeys[x].slice(1)] = true;
         } else {
           var optionKey = optionKeys[x];
-          newOptionObj[optionKey] = o[optionKey];
+          var optionValue = o[optionKey];
+          warnIfDeprecated(optionKey, optionValue, x);
+          newOptionObj[optionKey] =  optionValue;
         }
       }
     }
