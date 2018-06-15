@@ -20,9 +20,9 @@
   {
     "name": "c",
     "line": 8,
-    "character": 16,
+    "character": 13,
     "last": 10,
-    "lastcharacter": 6
+    "lastcharacter": 3
   },
   {
     "var": [
@@ -41,9 +41,9 @@
       "y"
     ],
     "line": 16,
-    "character": 23,
+    "character": 20,
     "last": 18,
-    "lastcharacter": 6
+    "lastcharacter": 3
   },
   {
     "name": "f",
@@ -55,9 +55,9 @@
   {
     "name": "(empty)",
     "line": 24,
-    "character": 16,
+    "character": 13,
     "last": 26,
-    "lastcharacter": 6
+    "lastcharacter": 3
   },
   {
     "name": "g",
@@ -76,51 +76,51 @@
   {
     "name": "j",
     "line": 34,
-    "character": 19,
+    "character": 16,
     "last": 34,
-    "lastcharacter": 36
+    "lastcharacter": 33
   },
   {
     "name": "k",
     "line": 35,
-    "character": 20,
+    "character": 17,
     "last": 35,
-    "lastcharacter": 24
+    "lastcharacter": 21
   },
   {
     "name": "23",
     "line": 36,
-    "character": 18,
+    "character": 15,
     "last": 36,
-    "lastcharacter": 22
+    "lastcharacter": 19
   },
   {
     "name": "computedStr",
     "line": 37,
-    "character": 32,
+    "character": 29,
     "last": 37,
-    "lastcharacter": 36
+    "lastcharacter": 33
   },
   {
     "name": "(expression)",
     "line": 38,
-    "character": 33,
+    "character": 30,
     "last": 38,
-    "lastcharacter": 37
+    "lastcharacter": 34
   },
   {
     "name": "get getter",
     "line": 39,
-    "character": 16,
+    "character": 13,
     "last": 39,
-    "lastcharacter": 20
+    "lastcharacter": 17
   },
   {
     "name": "set setter",
     "line": 40,
-    "character": 16,
+    "character": 13,
     "last": 40,
-    "lastcharacter": 20
+    "lastcharacter": 17
   },
   {
     "name": "(empty)",
