@@ -2087,9 +2087,9 @@ exports["gh-2761"] = function (test) {
   ];
 
   TestRun(test, "W021")
-    .addError(2, 1, "Reassignment of 'a', which is is a function. " +
+    .addError(2, 1, "Reassignment of 'a', which is a function. " +
               "Use 'var' or 'let' to declare bindings that may change.")
-    .addError(6, 1, "Reassignment of 'a', which is is a function. " +
+    .addError(6, 1, "Reassignment of 'a', which is a function. " +
               "Use 'var' or 'let' to declare bindings that may change.")
     .test(code);
 
