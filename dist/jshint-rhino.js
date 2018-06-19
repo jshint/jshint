@@ -15702,7 +15702,7 @@ var warnings = {
   W018: "Confusing use of '{a}'.",
   W019: "Use the isNaN function to compare with NaN.",
   W020: "Read only.",
-  W021: "Reassignment of '{a}', which is is a {b}. " +
+  W021: "Reassignment of '{a}', which is a {b}. " +
     "Use 'var' or 'let' to declare bindings that may change.",
   W022: "Do not assign to the exception parameter.",
   W023: "Expected an identifier in an assignment and instead saw a function invocation.",

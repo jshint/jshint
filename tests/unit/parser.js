@@ -6094,12 +6094,12 @@ exports.classes = function (test) {
   var run = TestRun(test)
     .addError(cdecl + 4, 15, "Expected an identifier and instead saw 'package' (a reserved word).")
     .addError(cexpr + 4, 15, "Expected an identifier and instead saw 'package' (a reserved word).")
-    .addError(cdeclAssn + 4, 21, "Reassignment of 'Foo15', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
-    .addError(cdeclAssn + 7, 21, "Reassignment of 'Foo18', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
-    .addError(cdeclAssn + 7, 43, "Reassignment of 'Foo17', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
-    .addError(cexprAssn + 4, 27, "Reassignment of 'Foo15', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
-    .addError(cexprAssn + 7, 27, "Reassignment of 'Foo18', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
-    .addError(cexprAssn + 7, 49, "Reassignment of 'Foo17', which is is a class. Use 'var' or 'let' to declare bindings that may change.");
+    .addError(cdeclAssn + 4, 21, "Reassignment of 'Foo15', which is a class. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(cdeclAssn + 7, 21, "Reassignment of 'Foo18', which is a class. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(cdeclAssn + 7, 43, "Reassignment of 'Foo17', which is a class. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(cexprAssn + 4, 27, "Reassignment of 'Foo15', which is a class. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(cexprAssn + 7, 27, "Reassignment of 'Foo18', which is a class. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(cexprAssn + 7, 49, "Reassignment of 'Foo17', which is a class. Use 'var' or 'let' to declare bindings that may change.");
 
   run.test(code, {esnext: true});
   run.test(code, {moz: true});
@@ -6271,12 +6271,12 @@ exports.classExpression = function (test) {
   ];
 
   TestRun(test)
-    .addError(2, 19, "Reassignment of 'MyClass', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
-    .addError(3, 14, "Reassignment of 'MyClass', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
-    .addError(4, 21, "Reassignment of 'MyClass', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
-    .addError(5, 20, "Reassignment of 'MyClass', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
-    .addError(6, 20, "Reassignment of 'MyClass', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
-    .addError(7, 15, "Reassignment of 'MyClass', which is is a class. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(2, 19, "Reassignment of 'MyClass', which is a class. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(3, 14, "Reassignment of 'MyClass', which is a class. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(4, 21, "Reassignment of 'MyClass', which is a class. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(5, 20, "Reassignment of 'MyClass', which is a class. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(6, 20, "Reassignment of 'MyClass', which is a class. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(7, 15, "Reassignment of 'MyClass', which is a class. Use 'var' or 'let' to declare bindings that may change.")
     .addError(9, 6, "'MyClass' is not defined.")
     .test(code, { esnext: true, undef: true });
 
@@ -6481,12 +6481,12 @@ exports.functionReassignment = function (test) {
   ];
 
   TestRun(test)
-    .addError(2, 1, "Reassignment of 'f', which is is a function. Use 'var' or 'let' to declare bindings that may change.")
-    .addError(3, 1, "Reassignment of 'f', which is is a function. Use 'var' or 'let' to declare bindings that may change.")
-    .addError(5, 3, "Reassignment of 'g', which is is a function. Use 'var' or 'let' to declare bindings that may change.")
-    .addError(6, 3, "Reassignment of 'g', which is is a function. Use 'var' or 'let' to declare bindings that may change.")
-    .addError(9, 3, "Reassignment of 'h', which is is a function. Use 'var' or 'let' to declare bindings that may change.")
-    .addError(10, 3, "Reassignment of 'h', which is is a function. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(2, 1, "Reassignment of 'f', which is a function. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(3, 1, "Reassignment of 'f', which is a function. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(5, 3, "Reassignment of 'g', which is a function. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(6, 3, "Reassignment of 'g', which is a function. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(9, 3, "Reassignment of 'h', which is a function. Use 'var' or 'let' to declare bindings that may change.")
+    .addError(10, 3, "Reassignment of 'h', which is a function. Use 'var' or 'let' to declare bindings that may change.")
     .test(src);
 
   test.done();
