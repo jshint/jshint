@@ -238,7 +238,7 @@ function isIgnored(fp, patterns) {
       return true;
     }
 
-    if (shjs.test("-d", fp) && ip.match(/^[^\/\\]*[\/\\]?$/) &&
+    if (shjs.test("-d", fp) && ip.match(/^[^/\\]*[/\\]?$/) &&
       fp.match(new RegExp("^" + ip + ".*"))) {
       return true;
     }
@@ -569,7 +569,7 @@ var exports = {
 
     var reg = new RegExp("\\.(js" +
       (!opts.extensions ? "" : "|" +
-        opts.extensions.replace(/,/g, "|").replace(/[\. ]/g, "")) + ")$");
+        opts.extensions.replace(/,/g, "|").replace(/[. ]/g, "")) + ")$");
 
     var ignores = !opts.ignores ? loadIgnores({ cwd: opts.cwd }) :
                                   opts.ignores.map(function(target) {
