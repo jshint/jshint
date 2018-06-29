@@ -42,11 +42,6 @@ var style        = require("./style.js");
 var options      = require("./options.js");
 var scopeManager = require("./scope-manager.js");
 
-// We need this module here because environments such as IE and Rhino
-// don't necessarilly expose the 'console' API and browserify uses
-// it to log things. It's a sad state of affair, really.
-var console = require("console-browserify");
-
 // We build the application inside a function so that we produce only a singleton
 // variable. That function will be invoked immediately, and its return value is
 // the JSHINT function itself.
@@ -972,7 +967,6 @@ var JSHINT = (function() {
   }
 
   function nolinebreak(t) {
-    t = t;
     if (t.line !== startLine(state.tokens.next)) {
       warning("E022", t, t.value);
     }
@@ -1996,12 +1990,15 @@ var JSHINT = (function() {
     if (!parseComma({ peek: true })) {
       return that;
     }
-    while (true) {
+    var isDone = false;
+    while (!isDone) {
       if (!(expr = expression(10))) {
+        isDone = true;
         break;
       }
       that.exprs.push(expr);
       if (state.tokens.next.value !== "," || !parseComma()) {
+        isDone = true;
         break;
       }
     }
@@ -5276,7 +5273,7 @@ var JSHINT = (function() {
   }
 
   var escapeRegex = function(str) {
-    return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+    return str.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
   };
 
   // The actual JSHINT function itself.

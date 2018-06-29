@@ -1,0 +1,6 @@
+{
+    "rules": {
+        "no-control-regex": 0,
+        "no-console": 0
+    }
+}
