@@ -542,6 +542,15 @@ var scopeManager = function(state, predefined, exported, declared) {
     validateParams: function(isArrow) {
       var isStrict = state.isStrict();
       var currentFunctParamScope = _currentFunctBody["(parent)"];
+      // From ECMAScript 2017:
+      //
+      // > 14.1.2Static Semantics: Early Errors
+      // >
+      // > [...]
+      // > - It is a Syntax Error if IsSimpleParameterList of
+      // >   FormalParameterList is false and BoundNames of FormalParameterList
+      // >   contains any duplicate elements.
+      var isSimple = state.funct['(hasSimpleParams)'];
 
       if (!currentFunctParamScope["(params)"]) {
         return;
@@ -551,7 +560,7 @@ var scopeManager = function(state, predefined, exported, declared) {
         var label = currentFunctParamScope["(labels)"][labelName];
 
         if (label.duplicated) {
-          if (isStrict || isArrow) {
+          if (isStrict || isArrow || !isSimple) {
             warning("E011", label["(token)"], labelName);
           } else if (state.option.shadow !== true) {
             warning("W004", label["(token)"], labelName);
