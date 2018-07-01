@@ -2021,7 +2021,7 @@ var JSHINT = (function() {
       // > [...]
       // > - It is a Syntax Error if ContainsUseStrict of FunctionBody is true
       // >   and IsSimpleParameterList of FormalParameters is false.
-      if (directive === "use strict" && state.inES7() && !state.isStrict() &&
+      if (directive === "use strict" && state.inES7() &&
         !state.funct["(global)"] && state.funct["(hasSimpleParams)"] === false) {
         error("E065", state.tokens.curr);
       }

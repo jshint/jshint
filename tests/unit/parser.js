@@ -3425,9 +3425,13 @@ exports["non-simple parameter list strict transition"] = function (test) {
     .addError(6, 3, "Unnecessary directive \"use strict\".")
     .addError(9, 3, "Unnecessary directive \"use strict\".")
     .addError(12, 3, "Unnecessary directive \"use strict\".")
+    .addError(12, 3, "Functions defined outside of strict mode with non-simple parameter lists may not enable strict mode.")
     .addError(15, 3, "Unnecessary directive \"use strict\".")
+    .addError(15, 3, "Functions defined outside of strict mode with non-simple parameter lists may not enable strict mode.")
     .addError(18, 3, "Unnecessary directive \"use strict\".")
+    .addError(18, 3, "Functions defined outside of strict mode with non-simple parameter lists may not enable strict mode.")
     .addError(21, 3, "Unnecessary directive \"use strict\".")
+    .addError(21, 3, "Functions defined outside of strict mode with non-simple parameter lists may not enable strict mode.")
     .test(noTransitionStrict, { esversion: 7 });
 
   var directTransition = [
