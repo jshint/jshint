@@ -9087,3 +9087,21 @@ exports.letAsIdentifier = function (test) {
 
   test.done();
 };
+
+exports.trailingParameterComma = function(test) {
+  var code = 'function f(x,) {}';
+
+  TestRun(test, 'declaration in ES5')
+    .addError(1, 13, "'Trailing comma in function parameters' is only available in ES8 (use 'esversion: 8').")
+    .test(code, { esversion: 5 });
+  TestRun(test, 'declaration in ES6')
+    .addError(1, 13, "'Trailing comma in function parameters' is only available in ES8 (use 'esversion: 8').")
+    .test(code, { esversion: 6 });
+  TestRun(test, 'declaration in ES7')
+    .addError(1, 13, "'Trailing comma in function parameters' is only available in ES8 (use 'esversion: 8').")
+    .test(code, { esversion: 7 });
+  TestRun(test, 'declaration in ES8')
+    .test(code, { esversion: 8 });
+
+  test.done();
+};
