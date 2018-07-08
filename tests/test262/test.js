@@ -49,7 +49,7 @@ module.exports = function(test) {
   var isModule = !!test.attrs.flags.module;
 
   try {
-    JSHint(test.contents, { esversion: 7, maxerr: Infinity, module: isModule });
+    JSHint(test.contents, { esversion: 8, maxerr: Infinity, module: isModule });
   } catch (e) {
     return false;
   }
