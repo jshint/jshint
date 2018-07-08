@@ -5888,6 +5888,7 @@ exports["fat arrows support"] = function (test) {
 
   run.test(code, { undef: true, esnext: true });
   run.test(code, { undef: true, esversion: 2016 });
+  run.test(code, { undef: true, esversion: 2017 });
 
   run = TestRun(test)
     .addError(1, 14, "'arrow function syntax (=>)' is only available in ES6 (use 'esversion: 6').")
@@ -8524,6 +8525,7 @@ exports["new.target"] = function (test) {
 
   TestRun(test, "only in ES6").test(code, { esnext: true });
   TestRun(test, "ES7").test(code, { esversion: 7 });
+  TestRun(test, "ES8").test(code, { esversion: 8 });
 
   var code2 = [
     "var a = new.target;",
@@ -8560,6 +8562,12 @@ exports["new.target"] = function (test) {
     .addError(4, 15, "'new.target' must be in function scope.")
     .addError(6, 13, "'new.target' must be in function scope.")
     .test(code2, { esversion: 2016 });
+
+  TestRun(test, "must be in function scope")
+    .addError(1, 12, "'new.target' must be in function scope.")
+    .addError(4, 15, "'new.target' must be in function scope.")
+    .addError(6, 13, "'new.target' must be in function scope.")
+    .test(code2, { esversion: 2017 });
 
   var code3 = [
     "var x = new.meta;"
