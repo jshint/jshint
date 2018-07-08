@@ -1071,12 +1071,11 @@ var JSHINT = (function() {
       case "}":
       case "]":
       case ",":
+      case ")":
         if (opts.allowTrailing) {
           return true;
         }
 
-        /* falls through */
-      case ")":
         error("E024", state.tokens.next, state.tokens.next.value);
         return false;
       }
@@ -3211,13 +3210,18 @@ var JSHINT = (function() {
 
       // now we have evaluated the default expression, add the variable to the param scope
       currentParams.forEach(addParam);
-
       if (state.tokens.next.id === ",") {
         if (pastRest) {
           warning("W131", state.tokens.next);
         }
-        parseComma();
-      } else {
+        parseComma({ allowTrailing: true });
+      }
+
+      if (state.tokens.next.id === ")") {
+        if (state.tokens.curr.id === "," && !state.inES8()) {
+          warning("W119", state.tokens.curr, "Trailing comma in function parameters", "8");
+        }
+
         advance(")", next);
         return {
           arity: arity,
