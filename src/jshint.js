@@ -674,11 +674,13 @@ var JSHINT = (function() {
           case "5":
           case "6":
           case "7":
+          case "8":
             state.option.moz = false;
             state.option.esversion = +val;
             break;
           case "2015":
           case "2016":
+          case "2017":
             state.option.moz = false;
             // Translate specification publication year to version number.
             state.option.esversion = +val - 2009;

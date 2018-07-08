@@ -4036,7 +4036,9 @@ exports.esversion = function(test) {
     "// jshint esversion: 6",
     "// jshint esversion: 2015",
     "// jshint esversion: 7",
-    "// jshint esversion: 2016"
+    "// jshint esversion: 2016",
+    "// jshint esversion: 8",
+    "// jshint esversion: 2017"
   ];
 
   TestRun(test, "Value")
@@ -4086,6 +4088,9 @@ exports.esversion = function(test) {
   TestRun(test, "ES6 syntax as ES7")
     .test(es6code, { esversion: 7 });
 
+  TestRun(test, "ES6 syntax as ES8")
+    .test(es6code, { esversion: 8 });
+
 
   // Array comprehensions aren't defined in ECMAScript 6,
   // but they can be enabled using the `esnext` option
@@ -4103,6 +4108,11 @@ exports.esversion = function(test) {
     .addError(2, 9, "'array comprehension' is only available in Mozilla JavaScript extensions " +
                  "(use moz option).")
     .test(arrayComprehension, { esversion: 7 });
+
+  TestRun(test, "array comprehensions - esversion: 8")
+    .addError(2, 9, "'array comprehension' is only available in Mozilla JavaScript extensions " +
+                 "(use moz option).")
+    .test(arrayComprehension, { esversion: 8 });
 
   TestRun(test, "array comprehensions - esnext: true")
     .test(arrayComprehension, { esnext: true });
