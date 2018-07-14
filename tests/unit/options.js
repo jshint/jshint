@@ -631,6 +631,21 @@ exports.safeasi = function (test) {
     .addError(10, 9, "Missing semicolon.")
     .test(src, { asi: true });
 
+  var afterBracket = [
+    'x = []',
+    '[1];',
+    'x[0]',
+    '(2);'
+  ];
+
+  TestRun(test, 'following bracket (asi: false)')
+    .test(afterBracket);
+
+  TestRun(test, 'following bracket (asi: true)')
+    .addError(2, 1, "Misleading line break before '['; readers may interpret this as an expression boundary.")
+    .addError(4, 1, "Misleading line break before '('; readers may interpret this as an expression boundary.")
+    .test(afterBracket, { asi: true });
+
   test.done();
 };
 
