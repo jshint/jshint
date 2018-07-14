@@ -646,6 +646,24 @@ exports.safeasi = function (test) {
     .addError(4, 1, "Misleading line break before '('; readers may interpret this as an expression boundary.")
     .test(afterBracket, { asi: true });
 
+  var asClause = [
+    'if (true)',
+    '  ({x} = {});',
+    'if (true)',
+    '  [x] = [0];',
+    'while (false)',
+    '  ({x} = {});',
+    'while (false)',
+    '  [x] = [0];'
+  ];
+
+  // Regression tests for gh-3304
+  TestRun(test, 'as clause (asi: false)')
+    .test(asClause, { esversion: 6 });
+
+  TestRun(test, 'as clause (asi: true)')
+    .test(asClause, { esversion: 6, asi: true });
+
   test.done();
 };
 
