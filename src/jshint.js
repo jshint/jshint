@@ -884,15 +884,6 @@ var JSHINT = (function() {
     if (state.tokens.next.id === "(end)")
       error("E006", state.tokens.curr);
 
-    var isDangerous =
-      state.option.asi &&
-      state.tokens.prev.line !== startLine(state.tokens.curr) &&
-      _.includes(["]", ")"], state.tokens.prev.id) &&
-      _.includes(["[", "("], state.tokens.curr.id);
-
-    if (isDangerous)
-      warning("W014", state.tokens.curr, state.tokens.curr.id);
-
     advance();
 
     if (initial) {
@@ -2361,6 +2352,11 @@ var JSHINT = (function() {
       warning("W062");
     }
 
+    if (state.option.asi && checkPunctuators(state.tokens.prev, [")", "]"]) &&
+      state.tokens.prev.line !== startLine(state.tokens.curr)) {
+      warning("W014", state.tokens.curr, state.tokens.curr.id);
+    }
+
     var n = 0;
     var p = [];
 
@@ -2557,8 +2553,14 @@ var JSHINT = (function() {
   application("=>");
 
   infix("[", function(left, that) {
-    var e = expression(10);
-    var s, canUseDot;
+    var e, s, canUseDot;
+
+    if (state.option.asi && checkPunctuators(state.tokens.prev, [")", "]"]) &&
+      state.tokens.prev.line !== startLine(state.tokens.curr)) {
+      warning("W014", state.tokens.curr, state.tokens.curr.id);
+    }
+
+    e = expression(10);
 
     if (e && e.type === "(string)") {
       if (!state.option.evil && (e.value === "eval" || e.value === "execScript")) {
