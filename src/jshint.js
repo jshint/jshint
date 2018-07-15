@@ -1764,6 +1764,9 @@ var JSHINT = (function() {
         metrics.statementCount += a.length;
 
         indent -= state.option.indent;
+      } else if (isfunc) {
+        // Ensure property is set for functions with empty bodies.
+        state.funct["(isStrict)"] = state.isStrict();
       }
 
       advance("}", t);
@@ -3055,11 +3058,6 @@ var JSHINT = (function() {
       warning("W124", state.tokens.curr);
     }
 
-    if (state.funct["(isStrict)"] === true &&
-      (name === "arguments" || name === "eval")) {
-      error("E008", token);
-    }
-
     state.funct["(metrics)"].verifyMaxStatementsPerFunction();
     state.funct["(metrics)"].verifyMaxComplexityPerFunction();
     state.funct["(unusedOption)"] = state.option.unused;
@@ -3876,27 +3874,40 @@ var JSHINT = (function() {
     if (inblock) {
       warning("W082", state.tokens.curr);
     }
-    var i = optionalidentifier();
+    var nameToken = optionalidentifier() ? state.tokens.curr : null;
 
-    if (i === undefined) {
+    if (!nameToken) {
       warning("W025");
     } else {
-      state.funct["(scope)"].addlabel(i, {
+      state.funct["(scope)"].addlabel(nameToken.value, {
         type: generator ? "generator function" : "function",
         token: state.tokens.curr,
         initialized: true });
 
       if (inexport) {
-        state.funct["(scope)"].setExported(i, state.tokens.prev);
+        state.funct["(scope)"].setExported(nameToken.value, state.tokens.prev);
       }
     }
 
-    doFunction({
-      name: i,
+    var f = doFunction({
+      name: nameToken && nameToken.value,
       statement: this,
       type: generator ? "generator" : null,
       ignoreLoopFunc: inblock // a declaration may already have warned
     });
+
+    // If the function declaration is strict because the surrounding code is
+    // strict, the invalid name will trigger E008 when the scope manager
+    // attempts to create a binding in the strict environment record. An error
+    // should only be signaled here when the function itself enables strict
+    // mode (the scope manager will not report an error because a declaration
+    // does not introduce a binding into the function's environment record).
+    var enablesStrictMode = f["(isStrict)"] && !state.isStrict();
+    if (nameToken && (f["(name)"] === "arguments" || f["(name)"] === "eval") &&
+      enablesStrictMode) {
+      error("E008", nameToken);
+    }
+
     if (state.tokens.next.id === "(" && state.tokens.next.line === state.tokens.curr.line) {
       error("E039");
     }
@@ -3914,8 +3925,17 @@ var JSHINT = (function() {
       generator = true;
     }
 
-    var i = optionalidentifier();
-    doFunction({ name: i, type: generator ? "generator" : null });
+    var nameToken = optionalidentifier() ? state.tokens.curr : null;
+
+    var f = doFunction({
+      name: nameToken && nameToken.value,
+      type: generator ? "generator" : null
+    });
+
+    if (nameToken && (f["(name)"] === "arguments" || f["(name)"] === "eval") &&
+      f["(isStrict)"]) {
+      error("E008", nameToken);
+    }
     return this;
   });
 

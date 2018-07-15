@@ -3679,17 +3679,49 @@ exports["strict violation - use of arguments and eval"] = function (test) {
   TestRun(test, "as function declaration binding (invalid)")
     .addError(1, 10, "Strict violation.")
     .addError(2, 10, "Strict violation.")
+    .addError(5, 12, "Strict violation.")
+    .addError(6, 12, "Strict violation.")
+    .addError(10, 12, "Strict violation.")
+    .addError(10, 26, "Unnecessary directive \"use strict\".")
+    .addError(11, 12, "Strict violation.")
+    .addError(11, 21, "Unnecessary directive \"use strict\".")
     .test([
       "function arguments() { 'use strict'; }",
-      "function eval() { 'use strict'; }"
+      "function eval() { 'use strict'; }",
+      "(function() {",
+      "  'use strict';",
+      "  function arguments() {}",
+      "  function eval() {}",
+      "}());",
+      "(function() {",
+      "  'use strict';",
+      "  function arguments() { 'use strict'; }",
+      "  function eval() { 'use strict'; }",
+      "}());"
     ]);
 
   TestRun(test, "as function expression binding (invalid)")
     .addError(1, 15, "Strict violation.")
     .addError(2, 15, "Strict violation.")
+    .addError(5, 17, "Strict violation.")
+    .addError(6, 17, "Strict violation.")
+    .addError(10, 17, "Strict violation.")
+    .addError(10, 31, "Unnecessary directive \"use strict\".")
+    .addError(11, 17, "Strict violation.")
+    .addError(11, 26, "Unnecessary directive \"use strict\".")
     .test([
       "void function arguments() { 'use strict'; };",
-      "void function eval() { 'use strict'; };"
+      "void function eval() { 'use strict'; };",
+      "(function() {",
+      "  'use strict';",
+      "  void function arguments() {};",
+      "  void function eval() {};",
+      "}());",
+      "(function() {",
+      "  'use strict';",
+      "  void function arguments() { 'use strict'; };",
+      "  void function eval() { 'use strict'; };",
+      "}());"
     ]);
 
   test.done();
