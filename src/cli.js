@@ -535,25 +535,59 @@ var exports = {
       exports.exit(1);
     }
 
+    var config;
     try {
-      var config = JSON.parse(stripJsonComments(shjs.cat(fp)));
-      config.dirname = path.dirname(fp);
-
-      if (config['extends']) {
-        var baseConfig = exports.loadConfig(path.resolve(config.dirname, config['extends']));
-        config = _.merge({}, baseConfig, config, function(a, b) {
-          if (_.isArray(a)) {
-            return a.concat(b);
-          }
-        });
-        delete config['extends'];
-      }
-
-      return config;
-    } catch (err) {
-      cli.error("Can't parse config file: " + fp + "\nError:" + err);
+      config = JSON.parse(stripJsonComments(shjs.cat(fp)));
+    } catch (e) {
+      cli.error("Can't parse config file: " + fp + "\nError:" + e);
       exports.exit(1);
     }
+
+    config.dirname = path.dirname(fp);
+
+    var extendsOption = config["extends"];
+    delete config["extends"];
+    if (!extendsOption) {
+      return config;
+    }
+
+    // Get the base config path
+    var basePath;
+    switch (typeof extendsOption) {
+      case "string":
+        basePath = path.resolve(config.dirname, extendsOption);
+        break;
+
+      case "boolean":
+        // Look for a config file to extend in parent directory/ies
+        var root = path.resolve('/');
+        var dir = config.dirname;
+        do {
+          dir = path.resolve(dir, "..");
+          if (dir === root) {
+            // We got to the root directory but no config file to extend was found
+            //TODO Should I notify the user ?
+            return config;
+          }
+
+          basePath = path.resolve(dir, ".jshintrc");
+        } while (!shjs.test("-e", basePath));
+        break;
+
+      default:
+        //TODO Should I notify the user ?
+        return config;
+    }
+
+    // Load the base config & extend it
+    var baseConfig = exports.loadConfig(basePath);
+    config = _.merge({}, baseConfig, config, function(a, b) {
+      if (_.isArray(a)) {
+        return a.concat(b);
+      }
+    });
+
+    return config;
   },
 
   /**
