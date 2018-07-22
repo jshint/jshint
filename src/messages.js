@@ -230,7 +230,9 @@ var warnings = {
   W139: "Function expressions should not be used as the second operand to instanceof.",
   W140: "Missing comma.",
   W141: "Empty {a}: this is unnecessary and can be removed.",
-  W142: "Empty {a}: consider replacing with `import '{b}';`."
+  W142: "Empty {a}: consider replacing with `import '{b}';`.",
+  W143: "Assignment to properties of a mapped arguments object may cause " +
+    "unexpected changes to formal parameters."
 };
 
 var info = {

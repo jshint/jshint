@@ -1341,7 +1341,7 @@ var JSHINT = (function() {
 
     if (left.id === ".") {
       if (!left.left || left.left.value === "arguments" && !state.isStrict()) {
-        warning("E031", assignToken);
+        warning("W143", assignToken);
       }
 
       state.nameStack.set(state.tokens.prev);
@@ -1351,7 +1351,7 @@ var JSHINT = (function() {
         if (left.id === "{" || !left.left) {
           warning("E031", assignToken);
         } else if (left.left.value === "arguments" && !state.isStrict()) {
-          warning("E031", assignToken);
+          warning("W143", assignToken);
         }
       }
 

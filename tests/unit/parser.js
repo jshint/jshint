@@ -188,10 +188,10 @@ exports.assignment = function (test) {
   ];
 
   var run = TestRun(test)
-    .addError(2, 20, "Bad assignment.")
-    .addError(3, 16, "Bad assignment.")
-    .addError(4, 20, "Bad assignment.")
-    .addError(5, 16, "Bad assignment.")
+    .addError(2, 20, "Assignment to properties of a mapped arguments object may cause unexpected changes to formal parameters.")
+    .addError(3, 16, "Assignment to properties of a mapped arguments object may cause unexpected changes to formal parameters.")
+    .addError(4, 20, "Assignment to properties of a mapped arguments object may cause unexpected changes to formal parameters.")
+    .addError(5, 16, "Assignment to properties of a mapped arguments object may cause unexpected changes to formal parameters.")
     .addError(14, 5, "Bad assignment.");
 
   run.test(code, { plusplus: true, es3: true });
@@ -2003,7 +2003,7 @@ exports["destructuring globals with syntax error"] = function (test) {
   TestRun(test)
     .addError(1, 19, "Extending prototype of native object: 'Number'.")
     .addError(3, 9, "Bad assignment.")
-    .addError(4, 14, "Bad assignment.")
+    .addError(4, 14, "Assignment to properties of a mapped arguments object may cause unexpected changes to formal parameters.")
     .addError(6, 7, "Do not assign to the exception parameter.")
     .addError(7, 6, "Do not assign to the exception parameter.")
     .addError(9, 9, "Bad assignment.")
