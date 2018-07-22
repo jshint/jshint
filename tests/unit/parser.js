@@ -643,6 +643,8 @@ exports.regexp = function (test) {
   TestRun(test).test("var a = 1; var b = a-- / 10;", {esnext: true});
   TestRun(test).test("var a = 1; var b = a-- / 10;", {moz: true});
 
+  TestRun(test, "gh-3308").test("void (function() {} / 0);");
+
   test.done();
 };
 
