@@ -653,7 +653,7 @@ exports.safeasi = function (test) {
     '  [x] = [0];',
     'while (false)',
     '  ({x} = {});',
-    'while (fale)',
+    'while (false)',
     '  [x] = [0];'
   ];
 
