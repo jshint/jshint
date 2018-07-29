@@ -4369,3 +4369,61 @@ exports.leanswitch = function (test) {
 
   test.done();
 };
+
+exports.noreturnawait = function(test) {
+  var code = [
+    "void function() {",
+    "  return await;",
+    "};",
+    "void function() {",
+    "  return await(null);",
+    "};",
+    "void async function() {",
+    "  return null;",
+    "};",
+    "void async function() {",
+    "  return 'await';",
+    "};",
+    "void async function() {",
+    "  try {",
+    "    return await null;",
+    "  } catch (err) {}",
+    "};",
+    "void async function() {",
+    "  try {",
+    "    void async function() {",
+    "      return await null;",
+    "    };",
+    "  } catch (err) {}",
+    "};",
+    "void async function() {",
+    "  return await null;",
+    "};"
+  ];
+
+  TestRun(test, "function expression (disabled)")
+    .test(code, { esversion: 8 });
+
+  TestRun(test, "function expression (enabled)")
+    .addError(21, 14, "Unnecessary `await` expression.")
+    .addError(26, 10, "Unnecessary `await` expression.")
+    .test(code, { esversion: 8, noreturnawait: true });
+
+  code = [
+    "void (() => await);",
+    "void (() => await(null));",
+    "void (async () => null);",
+    "void (async () => 'await');",
+    "void (async () => await null);",
+    "void (async () => { await null; });"
+  ];
+
+  TestRun(test, "arrow function (disabled)")
+    .test(code, { esversion: 8 });
+
+  TestRun(test, "arrow function (enabled)")
+    .addError(5, 19, "Unnecessary `await` expression.")
+    .test(code, { esversion: 8, noreturnawait: true });
+
+  test.done();
+};

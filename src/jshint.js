@@ -2135,7 +2135,12 @@ var JSHINT = (function() {
           state.funct["(scope)"].validateParams(true);
         }
 
-        expression(10, context);
+        var expr = expression(10, context);
+
+        if (state.option.noreturnawait && context & prodParams.async &&
+            expr.identifier && expr.value === "await") {
+          warning("W146", expr);
+        }
 
         if (state.option.strict && state.funct["(context)"]["(global)"]) {
           if (!state.isStrict()) {
@@ -3641,6 +3646,7 @@ var JSHINT = (function() {
     }
 
     context &= ~prodParams.noin;
+    context &= ~prodParams.tryClause;
 
     if (isAsync) {
       context |= prodParams.async;
@@ -4682,7 +4688,7 @@ var JSHINT = (function() {
       state.funct["(scope)"].unstack();
     }
 
-    block(context, true);
+    block(context | prodParams.tryClause, true);
 
     while (state.tokens.next.id === "catch") {
       increaseComplexityCount();
@@ -5168,6 +5174,12 @@ var JSHINT = (function() {
             this.first.type === "(punctuator)" && this.first.value === "=" &&
             !this.first.paren && !state.option.boss) {
           warningAt("W093", this.first.line, this.first.character);
+        }
+
+        if (state.option.noreturnawait && context & prodParams.async &&
+            !(context & prodParams.tryClause) &&
+            this.first.identifier && this.first.value === "await") {
+          warning("W146", this.first);
         }
       }
     } else {
