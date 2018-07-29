@@ -236,7 +236,8 @@ var warnings = {
   W143: "Assignment to properties of a mapped arguments object may cause " +
     "unexpected changes to formal parameters.",
   W144: "'{a}' is a non-standard language feature. Enable it using the '{b}' unstable option.",
-  W145: "Superfluous 'case' clause."
+  W145: "Superfluous 'case' clause.",
+  W146: "Unnecessary `await` expression."
 };
 
 var info = {
