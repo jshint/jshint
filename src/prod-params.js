@@ -33,5 +33,11 @@ module.exports = {
 
   preAsync: 8,
 
-  async: 16
+  async: 16,
+
+  /**
+   * Enabled when any exception thrown by the expression will be caught by a
+   * TryStatement.
+   */
+  tryClause: 32
 };
