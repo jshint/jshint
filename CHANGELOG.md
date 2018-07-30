@@ -1,3 +1,44 @@
+<a name="2.9.6"></a>
+## [2.9.6](https://github.com/jshint/jshint/compare/2.9.5...v2.9.6) (2018-07-30)
+
+### Bug Fixes
+
+* Add missing global objects for browser env ([badc7a4](https://github.com/jshint/jshint/commit/badc7a4))
+* Add other Fetch spec globals ([07bb596](https://github.com/jshint/jshint/commit/07bb596)), closes [#2582](https://github.com/jshint/jshint/issues/2582)
+* Allow closing over immutable bindings ([7091685](https://github.com/jshint/jshint/commit/7091685))
+* Allow computed method names in obj literal ([a5ff715](https://github.com/jshint/jshint/commit/a5ff715))
+* Allow empty export and trailing comma ([631327e](https://github.com/jshint/jshint/commit/631327e)), closes [#2567](https://github.com/jshint/jshint/issues/2567)
+* Avoid infinite loop on invalid `for` stmt ([56a4379](https://github.com/jshint/jshint/commit/56a4379))
+* Consistently ignore dot-prefixed dirs ([8d4317e](https://github.com/jshint/jshint/commit/8d4317e))
+* Correct impl of built-in bindings ([a11d631](https://github.com/jshint/jshint/commit/a11d631))
+* Correct interpretation of whitespace ([dd06eea](https://github.com/jshint/jshint/commit/dd06eea))
+* Correct location of reported error ([1c434a3](https://github.com/jshint/jshint/commit/1c434a3))
+* Correct location reported for W043 ([1d04868](https://github.com/jshint/jshint/commit/1d04868))
+* Correct reporting of var name in list comprehensions ([0ff6644](https://github.com/jshint/jshint/commit/0ff6644))
+* Correct restriction on function name ([55aa54e](https://github.com/jshint/jshint/commit/55aa54e))
+* Correct spelling of Uint8ClampedArray ([8df4a32](https://github.com/jshint/jshint/commit/8df4a32))
+* Create block scope for `switch` statements ([aa2be10](https://github.com/jshint/jshint/commit/aa2be10))
+* Disallow default values in rest parameters ([b420aed](https://github.com/jshint/jshint/commit/b420aed))
+* Do not create binding for illegal syntax ([9fe8c94](https://github.com/jshint/jshint/commit/9fe8c94))
+* Do not warn about non-ambiguous linebreaks ([ab3ab85](https://github.com/jshint/jshint/commit/ab3ab85))
+* Fix "is is" message typos ([7993101](https://github.com/jshint/jshint/commit/7993101))
+* Preserve functionality in "legacy" Node.js ([2f6ac13](https://github.com/jshint/jshint/commit/2f6ac13))
+* recognize Jasmine global `spyOnProperty` ([827237f](https://github.com/jshint/jshint/commit/827237f)), closes [#3183](https://github.com/jshint/jshint/issues/3183)
+* Relax restriction on asgnmnt to arguments ([0a66710](https://github.com/jshint/jshint/commit/0a66710))
+* Remove warning W100 ([ff71d3c](https://github.com/jshint/jshint/commit/ff71d3c))
+* Report error for duplicate arrow params ([506c7d5](https://github.com/jshint/jshint/commit/506c7d5))
+* Report error for redeclared generator fns ([8896fa3](https://github.com/jshint/jshint/commit/8896fa3))
+* Restrict "name" of strict mode functions ([a554c89](https://github.com/jshint/jshint/commit/a554c89))
+* Restrict `super` usage to valid forms ([8f3f880](https://github.com/jshint/jshint/commit/8f3f880))
+* Restrict IdentifierNames in ES5 code ([5995a9f](https://github.com/jshint/jshint/commit/5995a9f))
+* Tolerate division following closing brace ([3aa02db](https://github.com/jshint/jshint/commit/3aa02db))
+* Tolerate RegExp as `void` operand ([3f920b5](https://github.com/jshint/jshint/commit/3f920b5))
+* Tolerate whitespace in inline directives ([efeb0f8](https://github.com/jshint/jshint/commit/efeb0f8))
+
+### Features
+
+* List outer scoped variables of W083 ([d03662c](https://github.com/jshint/jshint/commit/d03662c)), closes [#3211](https://github.com/jshint/jshint/issues/3211)
+
 <a name="2.9.5"></a>
 ## [2.9.5](https://github.com/jshint/jshint/compare/2.9.4...v2.9.5) (2017-06-22)
 
