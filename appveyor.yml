@@ -12,6 +12,10 @@ environment:
 install:
   - ps: Install-Product node $env:nodejs_version
   - git submodule update --init --recursive
+  # These packages cannot be installed in legacy versions of Node.js. Because
+  # they are only needed to verify correctness in a browser-like environment,
+  # they can be removed (and the tests skipped) without effecting coverage.
+  - if NOT "%nodejs_version%" == "6" node scripts/remove-dev-dependencies.js phantom phantomjs-prebuilt
   - npm install
 
 build: off
