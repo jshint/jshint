@@ -4,10 +4,7 @@
 
 var regenerate = require('regenerate');
 
-// Which Unicode version should be used?
-var pkg = require('../package.json');
-var dependencies = Object.keys(pkg.devDependencies);
-var unicodeVersion = dependencies.find((name) => /^unicode-\d/.test(name));
+var unicodeVersion = 'unicode-11.0.0';
 var oldUnicodeVersion = 'unicode-5.2.0';
 
 // Shorthand functions.

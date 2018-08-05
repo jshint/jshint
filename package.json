@@ -46,8 +46,7 @@
     "lodash": "~4.17.10",
     "minimatch": "~3.0.2",
     "shelljs": "0.3.x",
-    "strip-json-comments": "1.0.x",
-    "unicode-5.2.0": "^0.7.5"
+    "strip-json-comments": "1.0.x"
   },
   "devDependencies": {
     "async": "~2.1.2",
@@ -65,6 +64,7 @@
     "results-interpreter": "~1.0.0",
     "sinon": "1.12.x",
     "test262-stream": "~1.1.0",
+    "unicode-5.2.0": "^0.7.5",
     "unicode-11.0.0": "0.7.x"
   },
   "license": "(MIT AND JSON)",
