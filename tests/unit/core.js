@@ -38,6 +38,33 @@ exports.testCustomGlobals = function (test) {
     .addError(3, 1, "Read only.")
     .test(code, { es3: true, unused: true, predef: { foo: false }});
 
+  JSHINT("x = null;", { undef: true, globals: { x: true } });
+
+  test.ok(!JSHINT.data().errors);
+
+  JSHINT("x = null;", { undef: true, globals: { x: false } });
+
+  test.equal(JSHINT.data().errors.length, 1);
+
+  JSHINT("parseInt('');", { undef: true, globals: { "-parseInt": true } });
+
+  test.equal(JSHINT.data().errors.length, 1);
+
+  JSHINT('x = null;', { undef: true, globals: { x: false } }, { x: true });
+
+  test.ok(
+    !JSHINT.data().errors,
+    "`predef` parameter takes precedence over `globals` option"
+  );
+
+  JSHINT("x = null;", { undef: true, globals: { x: true } }, { x: false });
+
+  test.equal(
+    JSHINT.data().errors.length,
+    1,
+    "`predef` parameter takes precedence over `globals` option"
+  );
+
   test.done();
 };
 
