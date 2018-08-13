@@ -5324,8 +5324,6 @@ var JSHINT = (function() {
     combine(predefined, vars.ecmaIdentifiers[3]);
     combine(predefined, vars.reservedVars);
 
-    combine(predefined, g || {});
-
     declared = Object.create(null);
     var exported = Object.create(null); // Variables that live outside the current file
 
