@@ -5345,18 +5345,21 @@ var JSHINT = (function() {
     }
 
     if (o) {
-      each(o.predef || null, function(item) {
-        var slice, prop;
 
-        if (item[0] === "-") {
-          slice = item.slice(1);
-          JSHINT.blacklist[slice] = slice;
-          // remove from predefined if there
-          delete predefined[slice];
-        } else {
-          prop = Object.getOwnPropertyDescriptor(o.predef, item);
-          predefined[item] = prop ? prop.value : false;
-        }
+      each([o.predef, o.globals], function(dict) {
+        each(dict, function(item) {
+          var slice, prop;
+
+          if (item[0] === "-") {
+            slice = item.slice(1);
+            JSHINT.blacklist[slice] = slice;
+            // remove from predefined if there
+            delete predefined[slice];
+          } else {
+            prop = Object.getOwnPropertyDescriptor(dict, item);
+            predefined[item] = prop ? prop.value : false;
+          }
+        });
       });
 
       each(o.exported || null, function(item) {
