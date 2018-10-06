@@ -1227,7 +1227,7 @@ var JSHINT = (function() {
     "undefined", "boolean", "number", "string", "function", "object",
   ];
   typeofValues.es3 = typeofValues.es3.concat(typeofValues.legacy);
-  typeofValues.es6 = typeofValues.es3.concat("symbol");
+  typeofValues.es6 = typeofValues.es3.concat("symbol", "bigint");
 
   // Checks whether the 'typeof' operator is used with the correct
   // value. For docs on 'typeof' see:

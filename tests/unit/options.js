@@ -311,6 +311,7 @@ exports.notypeof = function (test) {
     .addError(3, 17, "Invalid typeof value 'bool'")
     .addError(4, 11, "Invalid typeof value 'obj'")
     .addError(13, 17, "Invalid typeof value 'symbol'")
+    .addError(14, 17, "Invalid typeof value 'bigint'")
     .test(src);
 
   TestRun(test)
