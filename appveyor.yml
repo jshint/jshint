@@ -20,7 +20,7 @@ test_script:
   - node --version && npm --version
   - npm run test-node
   - if "%nodejs_version%" == "6" npm run test-browser
-  - npm run test-262
+  - if "%nodejs_version%" == "6" npm run test-262
 
 cache:
   - node_modules            # local npm modules

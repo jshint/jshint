@@ -1,37 +1,78 @@
 "use strict";
 
-function list(items, title) {
-  if (items.length === 0) {
-    return null;
-  }
+module.exports = function report(summary) {
+  var goodnews = [
+    summary.allowed.success.length + " valid programs parsed without error",
+    summary.allowed.failure.length +
+    " invalid programs produced a parsing error",
+    summary.allowed.falsePositive.length +
+    " invalid programs did not produce a parsing error" +
+    " (and allowed by the expectations file)",
+    summary.allowed.falseNegative.length +
+    " valid programs produced a parsing error" +
+    " (and allowed by the expectations file)"
+  ];
+  var badnews = [];
+  var badnewsDetails = [];
 
-  return [
-    title.replace("#", items.length),
-    items.map(function(item) { return "- " + item; }).join("\n")
-  ].join("\n");
-}
+  void [
+    {
+      tests: summary.disallowed.success,
+      label:
+      "valid programs parsed without error" +
+      " (in violation of the expectations file)"
+    },
+    {
+      tests: summary.disallowed.failure,
+      label:
+      "invalid programs produced a parsing error" +
+      " (in violation of the expectations file)"
+    },
+    {
+      tests: summary.disallowed.falsePositive,
+      label:
+      "invalid programs did not produce a parsing error" +
+      " (without a corresponding entry in the expectations file)"
+    },
+    {
+      tests: summary.disallowed.falseNegative,
+      label:
+      "valid programs produced a parsing error" +
+      " (without a corresponding entry in the expectations file)"
+    },
+    {
+      tests: summary.unrecognized,
+      label: "non-existent programs specified in the expectations file"
+    }
+  ].forEach(function (entry) {
+    var tests = entry.tests;
+    var label = entry.label;
 
-module.exports = function report(summary, duration) {
-  var seconds = (duration / 1000).toFixed(2);
+    if (!tests.length) {
+      return;
+    }
 
-  var lines = [
-    "Results:",
-    "",
-    summary.totalTests + " total programs parsed in " + seconds + " seconds.",
-    "",
-    summary.expected.success.length + " valid programs parsed successfully",
-    summary.expected.failure.length + " invalid programs produced parsing errors",
-    summary.expected.falsePositive.length + " invalid programs parsed successfully (in accordance with expectations file)",
-    summary.expected.falseNegative.length + " valid programs produced parsing errors (in accordance with expectations file)",
-    "",
-    list(summary.unexpected.success, "# valid programs parsed successfully (in violation of expectations file):"),
-    list(summary.unexpected.failure, "# invalid programs produced parsing errors (in violation of expectations file):"),
-    list(summary.unexpected.falsePositive, "# invalid programs parsed successfully (without a corresponding entry in expectations file):"),
-    list(summary.unexpected.falseNegative, "# valid programs produced parsing errors (without a corresponding entry in expectations file):"),
-    list(summary.unexpected.unrecognized, "# programs were referenced by the expectations file but not parsed in this test run:"),
-  ].filter(function(line) {
-    return typeof line === "string";
+    var desc = tests.length + " " + label;
+
+    badnews.push(desc);
+    badnewsDetails.push(desc + ":");
+    badnewsDetails.push.apply(
+      badnewsDetails,
+      tests.map(function (test) {
+        return test.id || test;
+      })
+    );
   });
 
-  return lines.join("\n");
+  console.log("Testing complete.");
+  console.log("Summary:");
+  console.log(goodnews.join("\n").replace(/^/gm, " ✔ "));
+
+  if (!summary.passed) {
+    console.log("");
+    console.log(badnews.join("\n").replace(/^/gm, " ✘ "));
+    console.log("");
+    console.log("Details:");
+    console.log(badnewsDetails.join("\n").replace(/^/gm, "   "));
+  }
 };

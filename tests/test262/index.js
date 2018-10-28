@@ -2,130 +2,66 @@
 
 "use strict";
 
-var fs = require("fs");
 var path = require("path");
-var async = require("async");
+var Transform = require("stream").Transform;
 
-var parseExpectations = require("./parse-expectations");
-var interpretResults = require("./interpret-results");
+var Test262Stream = require("test262-stream");
+var Interpreter = require("results-interpreter");
+
+var runTest = require("./test");
 var report = require("./report");
-var test = require("./test");
+var expectationsFile = path.join(__dirname, "expectations.txt");
+var shouldUpdate = process.argv.indexOf("--update-expectations") > -1;
+var stream = new Test262Stream(path.join(__dirname, "test262"), {
+  omitRuntime: true
+});
+var count = 0;
 
-var paths = {
-  test262: __dirname + "/test262/test",
-  expectations: __dirname + "/expectations.txt"
-};
-var testName = /^(?!.*_FIXTURE).*\.[jJ][sS]/;
-
-function findTests(directoryName, cb) {
-  fs.readdir(directoryName, function(err, fileNames) {
-    var tests = [];
-    var pending = fileNames.length;
-
-    if (err) {
-      cb(err);
-      return;
-    }
-    if (fileNames.length === 0) {
-      cb(null, tests);
-      return;
-    }
-
-    fileNames.forEach(function(fileName) {
-      var fullName = path.join(directoryName, fileName);
-
-      fs.stat(fullName, function(err, stat) {
-
-        if (err) {
-          cb(err);
-          return;
-        }
-
-        if (stat.isDirectory()) {
-          findTests(fullName, function(err, nested) {
-            if (err) {
-              cb(err);
-              return;
-            }
-
-            tests.push.apply(tests, nested);
-
-            pending--;
-            if (pending === 0) {
-              cb(null, tests);
-            }
-          });
-          return;
-        }
-
-        if (testName.test(fullName)) {
-          tests.push(fullName);
-        }
-
-        pending--;
-        if (pending === 0) {
-          cb(null, tests);
-        }
-      });
-    });
-  });
+function normalizePath(str) {
+  return str.split(path.sep).join(path.posix.sep);
 }
 
-console.log("Indexing test files (searching in " + paths.test262 + ").");
-findTests(paths.test262, function(err, testNames) {
-  if (err) {
-    console.error(err);
-    process.exit(1);
-  }
-
-  console.log("Indexing complete (" + testNames.length + " files found).");
-  console.log("Testing...");
-
-  var count = 0;
-  var start = new Date().getTime();
-  async.mapLimit(testNames, 20, function(testName, done) {
-    fs.readFile(testName, { encoding: "utf-8" }, function(err, src) {
-      var result;
-
-      count++;
-      if (count % 1000 === 0) {
-        console.log(
-          count + "/" + testNames.length + " (" +
-          (100*count/testNames.length).toFixed(2) + "%)"
-        );
-      }
-      if (err) {
-        done(err);
-        return;
-      }
-
-      result = test(src);
-      result.name = path.relative(paths.test262, testName);
-      done(null, result);
-    });
-  }, function(err, results) {
-    if (err) {
-      console.error(err);
-      process.exit(1);
+var results = new Transform({
+  objectMode: true,
+  transform: function(test, encoding, done) {
+    count += 1;
+    if (count % 2000 === 0) {
+      console.log("Completed " + count + " tests.");
     }
 
-    fs.readFile(paths.expectations, { encoding: "utf-8" }, function(err, src) {
-      var summary, output;
-
-      if (err) {
-        console.error(err);
-        process.exit(1);
-      }
-
-      summary = interpretResults(results, parseExpectations(src));
-      output = report(summary, new Date().getTime() - start);
-
-      if (summary.totalUnexpected === 0) {
-        console.log(output);
-      } else {
-        console.error(output);
-        process.exitCode = 1;
-      }
+    done(null, {
+      id: normalizePath(test.file) + "(" + test.scenario + ")",
+      expected: test.attrs.negative && test.attrs.negative.phase === "early"
+        ? "fail" : "pass",
+      actual: runTest(test) ? "pass": "fail"
     });
-  });
+  }
 });
+var interpreter = new Interpreter(expectationsFile, {
+  outputFile: shouldUpdate ? expectationsFile : null
+});
+
+console.log("Now running tests...");
+
+if (shouldUpdate) {
+  console.log(
+    "The expectations file will be updated according to the results of this " +
+    "test run."
+  );
+} else {
+  console.log(
+    "Note: the expectations file may be automatically updated by specifying " +
+    "the `--update-expectations` flag."
+  );
+}
+
+stream.pipe(results)
+  .pipe(interpreter)
+  .on("error", function(error) {
+    console.error(error);
+    process.exitCode = 1;
+  })
+  .on("finish", function () {
+    report(this.summary);
+    process.exitCode = this.summary.passed ? 0 : 1;
+  });
