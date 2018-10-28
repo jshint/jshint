@@ -85,6 +85,7 @@ Engineers from these companies and projects use JSHint:
 * [Apache CouchDB](http://couchdb.apache.org/)
 * [Google](https://www.google.com/)
 * [Codacy](https://www.codacy.com) [ref](https://support.codacy.com/hc/en-us/articles/207995005-Special-Thanks)
+* [Spotify](https://www.spotify.com)
 
 And many more!
 
