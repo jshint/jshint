@@ -1290,6 +1290,42 @@ exports.useStdin = {
     test.done();
   },
 
+  testNoFilename: function(test) {
+    var rep = require("../examples/reporter.js");
+    var errors = [];
+    this.sinon.stub(rep, "reporter", function (res) {
+      errors = errors.concat(res);
+    });
+
+    var dir = __dirname + "/../examples/";
+    this.sinon.stub(process, "cwd").returns(dir);
+
+    cli.interpret([
+      "node", "jshint", "--reporter=reporter.js", "-"
+    ]);
+
+    this.stdin.send("void 0;");
+    this.stdin.end();
+
+    test.equal(errors.length, 0, "should not report errors");
+    test.equal(cli.exit.args[0][0], 0, "status code should be 2 when there is a linting error.");
+
+    errors.length = 0;
+    this.stdin.reset();
+
+    cli.interpret([
+      "node", "jshint", "--reporter=reporter.js", "-"
+    ]);
+
+    this.stdin.send("? This is not JavaScript.");
+    this.stdin.end();
+
+    test.ok(errors.length > 0, "should report some number of errors");
+    test.equal(cli.exit.args[1][0], 2, "status code should be 2 when there is a linting error.");
+
+    test.done();
+  },
+
   testFilenameOverridesOption: function (test) {
     test.expect(4);
     var rep = require("../examples/reporter.js");
