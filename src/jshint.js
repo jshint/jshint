@@ -1725,7 +1725,6 @@ var JSHINT = (function() {
 
       // create a new block scope
       state.funct["(scope)"].stack();
-      state.funct["(noblockscopedvar)"] = false;
 
       if (state.tokens.next.id !== "}") {
         indent += state.option.indent;
@@ -1797,9 +1796,6 @@ var JSHINT = (function() {
       }
     } else {
 
-      // check to avoid let declaration not within a block
-      // though is fine inside for loop initializer section
-      state.funct["(noblockscopedvar)"] = state.tokens.next.id !== "for";
       state.funct["(scope)"].stack();
 
       if (!stmt || state.option.curly) {
@@ -1812,8 +1808,11 @@ var JSHINT = (function() {
       a = [statement()];
       indent -= state.option.indent;
 
+      if (a[0] && a[0].declaration) {
+        error("E048", a[0], a[0].id === "const" ? "Const" : "Let");
+      }
+
       state.funct["(scope)"].unstack();
-      delete state.funct["(noblockscopedvar)"];
     }
 
     // Don't clear and let it propagate out if it is "break", "return" or similar in switch case
@@ -3513,8 +3512,7 @@ var JSHINT = (function() {
       advance("(");
       state.funct["(scope)"].stack();
       letblock = true;
-    } else if (state.funct["(noblockscopedvar)"]) {
-      error("E048", state.tokens.curr, isConst ? "Const" : "Let");
+      statement.declaration = false;
     }
 
     statement.first = [];
@@ -3540,7 +3538,7 @@ var JSHINT = (function() {
               warning("W079", t.token, t.id);
             }
           }
-          if (t.id && !state.funct["(noblockscopedvar)"]) {
+          if (t.id) {
             state.funct["(scope)"].addlabel(t.id, {
               type: type,
               token: t.token });
@@ -3599,11 +3597,13 @@ var JSHINT = (function() {
     return blockVariableStatement("const", this, context);
   });
   conststatement.exps = true;
+  conststatement.declaration = true;
 
   var letstatement = stmt("let", function(context) {
     return blockVariableStatement("let", this, context);
   });
   letstatement.exps = true;
+  letstatement.declaration = true;
 
   var varstatement = stmt("var", function(context) {
     var prefix = context && context.prefix;
