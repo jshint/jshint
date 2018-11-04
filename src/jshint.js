@@ -1802,14 +1802,21 @@ var JSHINT = (function() {
         warning("W116", state.tokens.next, "{", state.tokens.next.value);
       }
 
+      // JSHint observes Annex B of the ECMAScript specification by default,
+      // where function declarations are permitted in the statement positions
+      // of IfStatements.
+      var supportsFnDecl = state.funct["(verb)"] === "if" ||
+        state.tokens.curr.id === "else";
+
       state.tokens.next.inBracelessBlock = true;
       indent += state.option.indent;
       // test indentation only if statement is in new line
       a = [statement()];
       indent -= state.option.indent;
 
-      if (a[0] && a[0].declaration) {
-        error("E048", a[0], a[0].id === "const" ? "Const" : "Let");
+      if (a[0] && a[0].declaration &&
+        !(supportsFnDecl && a[0].id === "function")) {
+        error("E048", a[0], a[0].id[0].toUpperCase() + a[0].id.slice(1));
       }
 
       state.funct["(scope)"].unstack();
@@ -3913,7 +3920,7 @@ var JSHINT = (function() {
       error("E039");
     }
     return this;
-  });
+  }).declaration = true;
 
   prefix("function", function() {
     var generator = false;
