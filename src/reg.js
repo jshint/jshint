@@ -50,3 +50,6 @@ exports.regexpSyntaxChars = /[\^$\\.*+?()[\]{}|]/;
 exports.regexpQuantifiers = /[*+?{]/;
 
 exports.regexpCharClasses = /[dDsSwW]/;
+
+// Identifies the "dot" atom in regular expressions
+exports.regexpDot = /(^|[^\\])(\\\\)*\./;
