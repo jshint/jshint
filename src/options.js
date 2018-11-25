@@ -1027,32 +1027,6 @@ exports.val = {
  * right to remove or modify them between major version releases.
  */
 exports.unstable = {
-  /**
-   * Enable parsing support for rest properties for object destructuring
-   * assignment and spread properties for object literals. From the proposal:
-   *
-   * > Rest Properties
-   * >
-   * > Rest properties collect the remaining own enumerable property keys that
-   * > are not already picked off by the destructuring pattern. Those keys and
-   * > their values are copied onto a new object.
-   * >
-   * >     let { x, y, ...z } = { x: 1, y: 2, a: 3, b: 4 };
-   * >     x; // 1
-   * >     y; // 2
-   * >     z; // { a: 3, b: 4 }
-   * >
-   * > Spread Properties
-   * >
-   * > Spread properties in object initializers copies own enumerable
-   * > properties from a provided object onto the newly created object.
-   * >
-   * >     let n = { x, y, ...z };
-   * >     n; // { x: 1, y: 2, a: 3, b: 4 }
-   *
-   * https://github.com/tc39/proposal-object-rest-spread
-   */
-  objspreadrest: true
 };
 
 // These are JSHint boolean options which are shared with JSLint
