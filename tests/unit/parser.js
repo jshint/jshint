@@ -787,6 +787,57 @@ exports.regexp.yFlag = function (test) {
   test.done();
 };
 
+exports.regexp.dotAll = function (test) {
+  TestRun(test, "flag presence - disallowed in editions prior to 2018")
+    .addError(1, 6, "'DotAll RegExp flag' is only available in ES9 (use 'esversion: 9').")
+    .addError(2, 6, "'DotAll RegExp flag' is only available in ES9 (use 'esversion: 9').")
+    .addError(3, 6, "'DotAll RegExp flag' is only available in ES9 (use 'esversion: 9').")
+    .test([
+      "void /./s;",
+      "void /./gs;",
+      "void /./sg;"
+    ], { esversion: 8 });
+
+  TestRun(test, "flag presence - allowed in 2018")
+    .test([
+      "void /./s;",
+      "void /./gs;",
+      "void /./sg;"
+    ], { esversion: 9 });
+
+  TestRun(test, "duplicate flag")
+    .addError(1, 6, "Invalid regular expression.")
+    .addError(2, 6, "Invalid regular expression.")
+    .test([
+      "void /./ss;",
+      "void /./sgs;"
+    ], { esversion: 9 });
+
+  TestRun(test, "missing dot")
+    .addError(1, 6, "Unnecessary RegExp 's' flag.")
+    .addError(2, 6, "Unnecessary RegExp 's' flag.")
+    .addError(3, 6, "Unnecessary RegExp 's' flag.")
+    .addError(4, 6, "Unnecessary RegExp 's' flag.")
+    .addError(5, 6, "Unnecessary RegExp 's' flag.")
+    .test([
+      "void /dotall flag without dot/s;",
+      "void /literal period \\./s;",
+      "void /\\. literal period/s;",
+      "void /literal period \\\\\\./s;",
+      "void /\\\\\\. literal period/s;"
+    ], { esversion: 9 });
+
+  TestRun(test, "dot following escape")
+    .test([
+      "void /RegExp dot \\\\./s;",
+      "void /\\\\. RegExp dot/s;",
+      "void /RegExp dot \\\\\\\\\./s;",
+      "void /\\\\\\\\\. RegExp dot/s;"
+    ], { esversion: 9 });
+
+  test.done();
+};
+
 exports.regexp.regressions = function (test) {
   // GH-536
   TestRun(test).test("str /= 5;", {es3: true}, { str: true });
