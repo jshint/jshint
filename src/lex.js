@@ -1328,8 +1328,9 @@ Lexer.prototype = {
     var char = this.peek();
     var value = char;
     var body = "";
-    var flags = [];
     var groupReferences = [];
+    var allFlags = "";
+    var es5Flags = "";
     var malformed = false;
     var isCharSet = false;
     var isCharSetRange = false;
@@ -1337,7 +1338,7 @@ Lexer.prototype = {
     var isQuantifiable = false;
     var hasInvalidQuantifier = false;
     var escapedChars = "";
-    var hasUFlag = function() { return flags.indexOf("u") > -1; };
+    var hasUFlag = function() { return allFlags.indexOf("u") > -1; };
     var escapeSequence;
     var groupCount = 0;
     var terminated, malformedDesc;
@@ -1648,7 +1649,7 @@ Lexer.prototype = {
 
     while (index < length) {
       char = this.peek(index);
-      if (!/[gimyu]/.test(char)) {
+      if (!/[gimyus]/.test(char)) {
         break;
       }
       if (char === "y") {
@@ -1706,18 +1707,38 @@ Lexer.prototype = {
         }
 
         body = translateUFlag(body);
+      } else if (char === "s") {
+        if (!state.inES9()) {
+          this.triggerAsync(
+            "warning",
+            {
+              code: "W119",
+              line: this.line,
+              character: this.char,
+              data: [ "DotAll RegExp flag", "9" ]
+            },
+            checks,
+            function() { return true; }
+          );
+        }
+        if (value.indexOf("s") > -1) {
+          malformedDesc = "Duplicate RegExp flag";
+        }
+      } else {
+        es5Flags += char;
       }
 
-      if (flags.indexOf(char) > -1) {
+      if (allFlags.indexOf(char) > -1) {
         malformedDesc = "Duplicate RegExp flag";
       }
-      flags.push(char);
+      allFlags += char;
 
       value += char;
+      allFlags += char;
       index += 1;
     }
 
-    if (flags.indexOf("u") === -1) {
+    if (allFlags.indexOf("u") === -1) {
       this.triggerAsync("warning", {
         code: "W147",
         line: this.line,
@@ -1728,7 +1749,7 @@ Lexer.prototype = {
     // Check regular expression for correctness.
 
     try {
-      new RegExp(body);
+      new RegExp(body, es5Flags);
     } catch (err) {
       /**
        * Because JSHint relies on the current engine's RegExp parser to
@@ -1745,6 +1766,12 @@ Lexer.prototype = {
         line: this.line,
         character: this.char,
         data: [ malformedDesc ]
+      });
+    } else if (allFlags.indexOf("s") > -1 && !reg.regexpDot.test(body)) {
+      this.trigger("warning", {
+        code: "W148",
+        line: this.line,
+        character: this.char
       });
     }
 

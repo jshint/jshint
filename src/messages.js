@@ -239,7 +239,8 @@ var warnings = {
   W144: "'{a}' is a non-standard language feature. Enable it using the '{b}' unstable option.",
   W145: "Superfluous 'case' clause.",
   W146: "Unnecessary `await` expression.",
-  W147: "Regular expressions should include the 'u' flag."
+  W147: "Regular expressions should include the 'u' flag.",
+  W148: "Unnecessary RegExp 's' flag."
 };
 
 var info = {
