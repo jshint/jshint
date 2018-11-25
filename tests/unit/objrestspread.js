@@ -1,15 +1,15 @@
 "use strict";
 
-var TestRun = require("../../helpers/testhelper").setup.testRun;
+var TestRun = require("../helpers/testhelper").setup.testRun;
 
 exports.enabling = function (test) {
   TestRun(test, "Not enabled")
-    .addError(1, 11, "'object spread property' is a non-standard language feature. Enable it using the 'objspreadrest' unstable option.")
-    .test("void { ...x };", { esversion: 6 });
+    .addError(1, 11, "'object spread property' is only available in ES9 (use 'esversion: 9').")
+    .test("void { ...x };", { esversion: 8 });
 
   TestRun(test, "Not enabled")
-    .addError(1, 7, "'object rest property' is a non-standard language feature. Enable it using the 'objspreadrest' unstable option.")
-    .test("({ ...x } = {});", { esversion: 6 });
+    .addError(1, 7, "'object rest property' is only available in ES9 (use 'esversion: 9').")
+    .test("({ ...x } = {});", { esversion: 8 });
 
   test.done();
 };
@@ -24,7 +24,7 @@ exports.spread = function (test) {
   ];
 
   TestRun(test, "identifier")
-    .test(code, { esversion: 6, unstable: { objspreadrest: true } });
+    .test(code, { esversion: 9 });
 
   code = [
     "var o;",
@@ -37,7 +37,7 @@ exports.spread = function (test) {
   ];
 
   TestRun(test, "expression")
-    .test(code, { esversion: 6, unstable: { objspreadrest: true } });
+    .test(code, { esversion: 9 });
 
   test.done();
 };
@@ -52,7 +52,7 @@ exports.rest = function (test) {
   ];
 
   TestRun(test, "identifier, final")
-    .test(code, { esversion: 6, unstable: { objspreadrest: true } });
+    .test(code, { esversion: 9 });
 
   code = [
     "({ ...x, } = {});",
@@ -68,7 +68,7 @@ exports.rest = function (test) {
     .addError(3, 15, "Invalid element after rest element.")
     .addError(4, 14, "Invalid element after rest element.")
     .addError(5, 18, "Invalid element after rest element.")
-    .test(code, { esversion: 6, unstable: { objspreadrest: true } });
+    .test(code, { esversion: 9 });
 
   code = [
     "({ ...[a, b, c] } = {});",
@@ -84,7 +84,7 @@ exports.rest = function (test) {
     .addError(3, 14, "Expected an identifier and instead saw '['.")
     .addError(4, 13, "Expected an identifier and instead saw '['.")
     .addError(5, 17, "Expected an identifier and instead saw '['.")
-    .test(code, { esversion: 6, unstable: { objspreadrest: true } });
+    .test(code, { esversion: 9 });
 
   code = [
     "({ ...[a, b, c], } = {});",
@@ -105,15 +105,15 @@ exports.rest = function (test) {
     .addError(4, 22, "Invalid element after rest element.")
     .addError(5, 17, "Expected an identifier and instead saw '['.")
     .addError(5, 26, "Invalid element after rest element.")
-    .test(code, { esversion: 6, unstable: { objspreadrest: true } });
+    .test(code, { esversion: 9 });
 
   TestRun(test, "nested array pattern, empty")
     .addError(1, 7, "Expected an identifier and instead saw '['.")
-    .test("({ ...[] } = {});", { esversion: 6, unstable: { objspreadrest: true } });
+    .test("({ ...[] } = {});", { esversion: 9 });
 
   TestRun(test, "nested object pattern, empty")
     .addError(1, 7, "Expected an identifier and instead saw '{'.")
-    .test("({ ...{} } = {});", { esversion: 6, unstable: { objspreadrest: true } });
+    .test("({ ...{} } = {});", { esversion: 9 });
 
   test.done();
 };

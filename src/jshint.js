@@ -3877,8 +3877,8 @@ var JSHINT = (function() {
           }
 
         } else if (spreadrest("spread")) {
-          if (!state.option.unstable.objspreadrest) {
-            warning("W144", state.tokens.next, "object spread property", "objspreadrest");
+          if (!state.inES9()) {
+            warning("W119", state.tokens.next, "object spread property", "9");
           }
 
           expression(10, context);
@@ -4024,8 +4024,8 @@ var JSHINT = (function() {
         var isRest = spreadrest("rest");
 
         if (isRest) {
-          if (!state.option.unstable.objspreadrest) {
-            warning("W144", state.tokens.next, "object rest property", "objspreadrest");
+          if (!state.inES9()) {
+            warning("W119", state.tokens.next, "object rest property", "9");
           }
 
           // Due to visual symmetry with the array rest property (and the early
