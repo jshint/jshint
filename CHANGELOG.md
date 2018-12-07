@@ -1,3 +1,8 @@
+<a name="2.9.7"></a>
+## [2.9.7](https://github.com/jshint/jshint/compare/2.9.6...v2.9.7) (2018-12-07)
+
+This release corrects a packaging issue. It is not expected to modify JSHint's behavior.
+
 <a name="2.9.6"></a>
 ## [2.9.6](https://github.com/jshint/jshint/compare/2.9.5...v2.9.6) (2018-07-30)
 
