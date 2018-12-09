@@ -1323,7 +1323,10 @@ Lexer.prototype = {
     var isCharSet = false;
     var terminated, malformedDesc;
 
-    var scanUnexpectedChars = function() {
+    var scanRegexpEscapeSequence = function() {
+      index += 1;
+      char = this.peek(index);
+
       // Unexpected control character
       if (char < " ") {
         malformed = true;
@@ -1354,6 +1357,10 @@ Lexer.prototype = {
           function() { return true; }
         );
       }
+
+      index += 1;
+      body += char;
+      value += char;
     }.bind(this);
 
     // Regular expressions must start with '/'
@@ -1365,7 +1372,7 @@ Lexer.prototype = {
     terminated = false;
 
     // Try to get everything in between slashes. A couple of
-    // cases aside (see scanUnexpectedChars) we don't really
+    // cases aside (see scanRegexpEscapeSequence) we don't really
     // care whether the resulting expression is valid or not.
     // We will check that later using the RegExp object.
 
@@ -1380,37 +1387,12 @@ Lexer.prototype = {
             isCharSet = false;
           }
         }
-
-        if (char === "\\") {
-          index += 1;
-          char = this.peek(index);
-          body += char;
-          value += char;
-
-          scanUnexpectedChars();
-        }
-
-        index += 1;
-        continue;
       }
 
       if (char === "\\") {
-        index += 1;
-        char = this.peek(index);
-        body += char;
-        value += char;
+        scanRegexpEscapeSequence();
 
-        scanUnexpectedChars();
-
-        if (char === "/") {
-          index += 1;
-          continue;
-        }
-
-        if (char === "[") {
-          index += 1;
-          continue;
-        }
+        continue;
       }
 
       if (char === "[") {
