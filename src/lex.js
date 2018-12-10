@@ -1319,11 +1319,72 @@ Lexer.prototype = {
     var value = char;
     var body = "";
     var flags = [];
+    var groupReferences = [];
     var malformed = false;
     var isCharSet = false;
+    var isCharSetRange = false;
+    var isGroup = false;
+    var isQuantifiable = false;
+    var hasInvalidQuantifier = false;
+    var escapedChars = "";
+    var hasUFlag = function() { return flags.indexOf("u") > -1; };
+    var escapeSequence;
+    var groupCount = 0;
     var terminated, malformedDesc;
 
-    var scanUnexpectedChars = function() {
+    var scanRegexpEscapeSequence = function() {
+      var next, sequence;
+      index += 1;
+      char = this.peek(index);
+
+      if (reg.nonzeroDigit.test(char)) {
+        sequence = char;
+        next = this.peek(index + 1);
+        while (reg.nonzeroDigit.test(next) || next === "0") {
+          index += 1;
+          char = next;
+          sequence += char;
+          body += char;
+          value += char;
+          next = this.peek(index + 1);
+        }
+        groupReferences.push(Number(sequence));
+        return sequence;
+      }
+
+      escapedChars += char;
+
+      if (char === "u" && this.peek(index + 1) === "{") {
+        var x = index + 2;
+        sequence = "u{";
+        next = this.peek(x);
+        while (isHex(next)) {
+          sequence += next;
+          x += 1;
+          next = this.peek(x);
+        }
+
+        if (next !== "}") {
+          this.triggerAsync(
+            "error",
+            {
+              code: "E016",
+              line: this.line,
+              character: this.char,
+              data: [ "Invalid Unicode escape sequence" ]
+            },
+            checks,
+            hasUFlag
+          );
+        } else if (sequence.length > 2) {
+          sequence += "}";
+          body += sequence;
+          value += sequence;
+          index = x + 1;
+          return sequence;
+        }
+      }
+
       // Unexpected control character
       if (char < " ") {
         malformed = true;
@@ -1354,6 +1415,107 @@ Lexer.prototype = {
           function() { return true; }
         );
       }
+
+      index += 1;
+      body += char;
+      value += char;
+
+      return char;
+    }.bind(this);
+
+    var checkQuantifier = function() {
+      var lookahead = index;
+      var lowerBound = "";
+      var upperBound = "";
+      var next;
+
+      next = this.peek(lookahead + 1);
+
+      while (reg.decimalDigit.test(next)) {
+        lookahead += 1;
+        lowerBound += next;
+        next = this.peek(lookahead + 1);
+      }
+
+      if (!lowerBound) {
+        return false;
+      }
+
+      if (next === "}") {
+        return true;
+      }
+
+      if (next !== ",") {
+        return false;
+      }
+
+      lookahead += 1;
+      next = this.peek(lookahead + 1);
+
+      while (reg.decimalDigit.test(next)) {
+        lookahead += 1;
+        upperBound += next;
+        next = this.peek(lookahead + 1);
+      }
+
+      if (next !== "}") {
+        return false;
+      }
+
+      if (upperBound) {
+        return Number(lowerBound) <= Number(upperBound);
+      }
+
+      return true;
+    }.bind(this);
+
+    var translateUFlag = function(body) {
+      // The BMP character to use as a replacement for astral symbols when
+      // translating an ES6 "u"-flagged pattern to an ES5-compatible
+      // approximation.
+      // Note: replacing with '\uFFFF' enables false positives in unlikely
+      // scenarios. For example, `[\u{1044f}-\u{10440}]` is an invalid pattern
+      // that would not be detected by this substitution.
+      var astralSubstitute = "\uFFFF";
+
+      return body
+        // Replace every Unicode escape sequence with the equivalent BMP
+        // character or a constant ASCII code point in the case of astral
+        // symbols. (See the above note on `astralSubstitute` for more
+        // information.)
+        .replace(/\\u\{([0-9a-fA-F]+)\}|\\u([a-fA-F0-9]{4})/g, function($0, $1, $2) {
+          var codePoint = parseInt($1 || $2, 16);
+          var literal;
+
+          if (codePoint > 0x10FFFF) {
+            malformed = true;
+            this.trigger("error", {
+              code: "E016",
+              line: this.line,
+              character: this.char,
+              data: [ char ]
+            });
+
+            return;
+          }
+          literal = String.fromCharCode(codePoint);
+
+          if (reg.regexpSyntaxChars.test(literal)) {
+            return $0;
+          }
+
+          if (codePoint <= 0xFFFF) {
+            return String.fromCharCode(codePoint);
+          }
+          return astralSubstitute;
+        }.bind(this))
+        // Replace each paired surrogate with a single ASCII symbol to avoid
+        // throwing on regular expressions that are only valid in combination
+        // with the "u" flag.
+        .replace(
+          /[\uD800-\uDBFF][\uDC00-\uDFFF]/g,
+          astralSubstitute
+        );
     }.bind(this);
 
     // Regular expressions must start with '/'
@@ -1365,11 +1527,15 @@ Lexer.prototype = {
     terminated = false;
 
     // Try to get everything in between slashes. A couple of
-    // cases aside (see scanUnexpectedChars) we don't really
+    // cases aside (see scanRegexpEscapeSequence) we don't really
     // care whether the resulting expression is valid or not.
     // We will check that later using the RegExp object.
 
     while (index < length) {
+      // Because an iteration of this loop may terminate in a number of
+      // distinct locations, `isCharSetRange` is re-set at the onset of
+      // iteration.
+      isCharSetRange &= char === "-";
       char = this.peek(index);
       value += char;
       body += char;
@@ -1379,47 +1545,70 @@ Lexer.prototype = {
           if (this.peek(index - 1) !== "\\" || this.peek(index - 2) === "\\") {
             isCharSet = false;
           }
+        } else if (char === "-") {
+          isCharSetRange = true;
         }
-
-        if (char === "\\") {
-          index += 1;
-          char = this.peek(index);
-          body += char;
-          value += char;
-
-          scanUnexpectedChars();
-        }
-
-        index += 1;
-        continue;
       }
 
       if (char === "\\") {
-        index += 1;
-        char = this.peek(index);
-        body += char;
-        value += char;
+        escapeSequence = scanRegexpEscapeSequence();
 
-        scanUnexpectedChars();
-
-        if (char === "/") {
-          index += 1;
-          continue;
+        if (isCharSet && (this.peek(index) === "-" || isCharSetRange) &&
+          reg.regexpCharClasses.test(escapeSequence)) {
+          this.triggerAsync(
+            "error",
+            {
+              code: "E016",
+              line: this.line,
+              character: this.char,
+              data: [ "Character class used in range" ]
+            },
+            checks,
+            hasUFlag
+          );
         }
 
-        if (char === "[") {
-          index += 1;
-          continue;
-        }
+        continue;
+      }
+
+      if (char === "{" && !hasInvalidQuantifier) {
+        hasInvalidQuantifier = !checkQuantifier();
       }
 
       if (char === "[") {
         isCharSet = true;
         index += 1;
         continue;
-      }
+      } else if (char === "(") {
+        isGroup = true;
 
-      if (char === "/") {
+        if (this.peek(index + 1) === "?" &&
+          (this.peek(index + 2) === "=" || this.peek(index + 2) === "!")) {
+          isQuantifiable = true;
+        }
+      } else if (char === ")") {
+        if (isQuantifiable) {
+          isQuantifiable = false;
+
+          if (reg.regexpQuantifiers.test(this.peek(index + 1))) {
+            this.triggerAsync(
+              "error",
+              {
+                code: "E016",
+                line: this.line,
+                character: this.char,
+                data: [ "Quantified quantifiable" ]
+              },
+              checks,
+              hasUFlag
+            );
+          }
+        } else {
+          groupCount += 1;
+        }
+
+        isGroup = false;
+      } else if (char === "/") {
         body = body.substr(0, body.length - 1);
         terminated = true;
         index += 1;
@@ -1449,7 +1638,7 @@ Lexer.prototype = {
 
     while (index < length) {
       char = this.peek(index);
-      if (!/[gimy]/.test(char)) {
+      if (!/[gimyu]/.test(char)) {
         break;
       }
       if (char === "y") {
@@ -1466,12 +1655,54 @@ Lexer.prototype = {
             function() { return true; }
           );
         }
-        if (value.indexOf("y") > -1) {
-          malformedDesc = "Duplicate RegExp flag";
+      } else if (char === "u") {
+        if (!state.inES6(true)) {
+          this.triggerAsync(
+            "warning",
+            {
+              code: "W119",
+              line: this.line,
+              character: this.char,
+              data: [ "Unicode RegExp flag", "6" ]
+            },
+            checks,
+            function() { return true; }
+          );
         }
-      } else {
-        flags.push(char);
+
+        var hasInvalidEscape = (function(groupReferences, groupCount, escapedChars, reg) {
+          var hasInvalidGroup = groupReferences.some(function(groupReference) {
+            if (groupReference > groupCount) {
+              return true;
+            }
+          });
+
+          if (hasInvalidGroup) {
+            return true;
+          }
+
+          return !escapedChars.split("").every(function(escapedChar) {
+              return escapedChar === "u" ||
+                escapedChar === "/" ||
+                reg.regexpCharClasses.test(escapedChar) ||
+                reg.regexpSyntaxChars.test(escapedChar);
+            });
+        }(groupReferences, groupCount, escapedChars, reg));
+
+        if (hasInvalidEscape) {
+          malformedDesc = "Invalid escape";
+        } else if (hasInvalidQuantifier) {
+          malformedDesc = "Invalid quantifier";
+        }
+
+        body = translateUFlag(body);
       }
+
+      if (flags.indexOf(char) > -1) {
+        malformedDesc = "Duplicate RegExp flag";
+      }
+      flags.push(char);
+
       value += char;
       index += 1;
     }
@@ -1479,7 +1710,7 @@ Lexer.prototype = {
     // Check regular expression for correctness.
 
     try {
-      new RegExp(body, flags.join(""));
+      new RegExp(body);
     } catch (err) {
       /**
        * Because JSHint relies on the current engine's RegExp parser to
