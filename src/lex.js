@@ -1319,13 +1319,71 @@ Lexer.prototype = {
     var value = char;
     var body = "";
     var flags = [];
+    var groupReferences = [];
     var malformed = false;
     var isCharSet = false;
+    var isCharSetRange = false;
+    var isGroup = false;
+    var isQuantifiable = false;
+    var hasInvalidQuantifier = false;
+    var escapedChars = "";
+    var hasUFlag = function() { return flags.indexOf("u") > -1; };
+    var escapeSequence;
+    var groupCount = 0;
     var terminated, malformedDesc;
 
     var scanRegexpEscapeSequence = function() {
+      var next, sequence;
       index += 1;
       char = this.peek(index);
+
+      if (reg.nonzeroDigit.test(char)) {
+        sequence = char;
+        next = this.peek(index + 1);
+        while (reg.nonzeroDigit.test(next) || next === "0") {
+          index += 1;
+          char = next;
+          sequence += char;
+          body += char;
+          value += char;
+          next = this.peek(index + 1);
+        }
+        groupReferences.push(Number(sequence));
+        return sequence;
+      }
+
+      escapedChars += char;
+
+      if (char === "u" && this.peek(index + 1) === "{") {
+        var x = index + 2;
+        sequence = "u{";
+        next = this.peek(x);
+        while (isHex(next)) {
+          sequence += next;
+          x += 1;
+          next = this.peek(x);
+        }
+
+        if (next !== "}") {
+          this.triggerAsync(
+            "error",
+            {
+              code: "E016",
+              line: this.line,
+              character: this.char,
+              data: [ "Invalid Unicode escape sequence" ]
+            },
+            checks,
+            hasUFlag
+          );
+        } else if (sequence.length > 2) {
+          sequence += "}";
+          body += sequence;
+          value += sequence;
+          index = x + 1;
+          return sequence;
+        }
+      }
 
       // Unexpected control character
       if (char < " ") {
@@ -1361,6 +1419,54 @@ Lexer.prototype = {
       index += 1;
       body += char;
       value += char;
+
+      return char;
+    }.bind(this);
+
+    var checkQuantifier = function() {
+      var lookahead = index;
+      var lowerBound = "";
+      var upperBound = "";
+      var next;
+
+      next = this.peek(lookahead + 1);
+
+      while (reg.decimalDigit.test(next)) {
+        lookahead += 1;
+        lowerBound += next;
+        next = this.peek(lookahead + 1);
+      }
+
+      if (!lowerBound) {
+        return false;
+      }
+
+      if (next === "}") {
+        return true;
+      }
+
+      if (next !== ",") {
+        return false;
+      }
+
+      lookahead += 1;
+      next = this.peek(lookahead + 1);
+
+      while (reg.decimalDigit.test(next)) {
+        lookahead += 1;
+        upperBound += next;
+        next = this.peek(lookahead + 1);
+      }
+
+      if (next !== "}") {
+        return false;
+      }
+
+      if (upperBound) {
+        return Number(lowerBound) <= Number(upperBound);
+      }
+
+      return true;
     }.bind(this);
 
     var translateUFlag = function(body) {
@@ -1379,6 +1485,8 @@ Lexer.prototype = {
         // information.)
         .replace(/\\u\{([0-9a-fA-F]+)\}|\\u([a-fA-F0-9]{4})/g, function($0, $1, $2) {
           var codePoint = parseInt($1 || $2, 16);
+          var literal;
+
           if (codePoint > 0x10FFFF) {
             malformed = true;
             this.trigger("error", {
@@ -1390,6 +1498,12 @@ Lexer.prototype = {
 
             return;
           }
+          literal = String.fromCharCode(codePoint);
+
+          if (reg.regexpSyntaxChars.test(literal)) {
+            return $0;
+          }
+
           if (codePoint <= 0xFFFF) {
             return String.fromCharCode(codePoint);
           }
@@ -1418,6 +1532,10 @@ Lexer.prototype = {
     // We will check that later using the RegExp object.
 
     while (index < length) {
+      // Because an iteration of this loop may terminate in a number of
+      // distinct locations, `isCharSetRange` is re-set at the onset of
+      // iteration.
+      isCharSetRange &= char === "-";
       char = this.peek(index);
       value += char;
       body += char;
@@ -1427,22 +1545,70 @@ Lexer.prototype = {
           if (this.peek(index - 1) !== "\\" || this.peek(index - 2) === "\\") {
             isCharSet = false;
           }
+        } else if (char === "-") {
+          isCharSetRange = true;
         }
       }
 
       if (char === "\\") {
-        scanRegexpEscapeSequence();
+        escapeSequence = scanRegexpEscapeSequence();
+
+        if (isCharSet && (this.peek(index) === "-" || isCharSetRange) &&
+          reg.regexpCharClasses.test(escapeSequence)) {
+          this.triggerAsync(
+            "error",
+            {
+              code: "E016",
+              line: this.line,
+              character: this.char,
+              data: [ "Character class used in range" ]
+            },
+            checks,
+            hasUFlag
+          );
+        }
 
         continue;
+      }
+
+      if (char === "{" && !hasInvalidQuantifier) {
+        hasInvalidQuantifier = !checkQuantifier();
       }
 
       if (char === "[") {
         isCharSet = true;
         index += 1;
         continue;
-      }
+      } else if (char === "(") {
+        isGroup = true;
 
-      if (char === "/") {
+        if (this.peek(index + 1) === "?" &&
+          (this.peek(index + 2) === "=" || this.peek(index + 2) === "!")) {
+          isQuantifiable = true;
+        }
+      } else if (char === ")") {
+        if (isQuantifiable) {
+          isQuantifiable = false;
+
+          if (reg.regexpQuantifiers.test(this.peek(index + 1))) {
+            this.triggerAsync(
+              "error",
+              {
+                code: "E016",
+                line: this.line,
+                character: this.char,
+                data: [ "Quantified quantifiable" ]
+              },
+              checks,
+              hasUFlag
+            );
+          }
+        } else {
+          groupCount += 1;
+        }
+
+        isGroup = false;
+      } else if (char === "/") {
         body = body.substr(0, body.length - 1);
         terminated = true;
         index += 1;
@@ -1502,6 +1668,31 @@ Lexer.prototype = {
             checks,
             function() { return true; }
           );
+        }
+
+        var hasInvalidEscape = (function(groupReferences, groupCount, escapedChars, reg) {
+          var hasInvalidGroup = groupReferences.some(function(groupReference) {
+            if (groupReference > groupCount) {
+              return true;
+            }
+          });
+
+          if (hasInvalidGroup) {
+            return true;
+          }
+
+          return !escapedChars.split("").every(function(escapedChar) {
+              return escapedChar === "u" ||
+                escapedChar === "/" ||
+                reg.regexpCharClasses.test(escapedChar) ||
+                reg.regexpSyntaxChars.test(escapedChar);
+            });
+        }(groupReferences, groupCount, escapedChars, reg));
+
+        if (hasInvalidEscape) {
+          malformedDesc = "Invalid escape";
+        } else if (hasInvalidQuantifier) {
+          malformedDesc = "Invalid quantifier";
         }
 
         body = translateUFlag(body);
