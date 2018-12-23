@@ -887,7 +887,7 @@ var JSHINT = (function() {
   /**
    * The `expression` function is the heart of JSHint's parsing behaior. It is
    * based on the Pratt parser, but it extends that model with a `fud` method.
-   * Short for "firtst null denotation," it it similar to the `nud` ("null
+   * Short for "first null denotation," it it similar to the `nud` ("null
    * denotation") function, but it is only used on the first token of a
    * statement. This simplifies usage in statement-oriented languages like
    * JavaScript.
@@ -1263,7 +1263,7 @@ var JSHINT = (function() {
    * Convenience function for defining JSHint symbols for keywords that are
    * only reserved in some circumstances.
    *
-   * @param {string} s - the name of the symbol
+   * @param {string} name - the name of the symbol
    * @param {object} [meta] - a collection of optional arguments
    * @param {function} [meta.nud] -the null denotation function for the symbol;
    *                   see the `expression` function for more detail
@@ -1747,6 +1747,14 @@ var JSHINT = (function() {
       }
     }
 
+    if (val === "undefined") {
+      return val;
+    }
+
+    if (curr.identifier && !isReserved(curr)) {
+      return val;
+    }
+
     warning("W024", state.tokens.curr, state.tokens.curr.id);
     return val;
   }
@@ -1894,10 +1902,10 @@ var JSHINT = (function() {
     var res = isReserved(t);
 
     // We're being more tolerant here: if someone uses
-    // a FutureReservedWord as a label, we warn but proceed
-    // anyway.
+    // a FutureReservedWord (that is not meant to start a statement)
+    // as a label, we warn but proceed anyway.
 
-    if (res && t.meta && t.meta.isFutureReservedWord) {
+    if (res && t.meta && t.meta.isFutureReservedWord && !t.fud) {
       warning("W024", t, t.id);
       res = false;
     }
@@ -2669,6 +2677,97 @@ var JSHINT = (function() {
     return this;
   });
   state.syntax["new"].exps = true;
+
+  var doClassInternals = function(context) {
+    if (!state.inES6()) {
+      warning("W104", state.tokens.curr, "class", "6");
+    }
+    var def_token = state.tokens.next;
+    var declare_within_declare = false;
+    if (state.tokens.prev.value === "=") {
+      declare_within_declare = true;
+      console.log("IT'S DWD")
+    }
+    // Class Declaration
+    if (state.tokens.next.identifier && state.tokens.next.value !== "extends" && state.tokens.prev.value !== "=") {
+      var prev = state.tokens.prev.value;
+      var name = identifier();
+      if (state.tokens.next.value === "extends") {
+        advance("extends");
+        expression(0, state.tokens.next);
+      }
+      advance("{");
+
+    // Class Expression with exteends
+    } else if (state.tokens.next.value === "extends") {
+      advance("extends");
+      expression(0, state.tokens.next);
+      advance("{")
+    // Class Expression without optional identifier
+    } else if (state.tokens.next.value === "{") {
+      advance("{");
+    } else if (state.tokens.prev.value === "=") {
+      expression(0, state.tokens.next);
+      advance("{");
+    } else {  
+      warning("W116", state.tokens.curr, "identifier", state.tokens.next.type);
+      advance();
+    }
+    if (prev !== "default" && !declare_within_declare) {
+      this.name = def_token.value; 
+      state.funct["(scope)"].addlabel(def_token.value, {
+        type: "class",
+        initialized: true,
+        token: def_token
+      });
+    }
+    state.funct["(scope)"].stack();
+    if (declare_within_declare) {
+      state.funct["(scope)"].addlabel(def_token.value, {
+        type: "class",
+        initialized: true,
+        token: def_token
+      })
+    }
+    var is_static = false;
+    var props = {};
+    while (state.tokens.next.value !== "}") {
+      advance();
+      switch (state.tokens.next.value) {
+        case "static":
+          is_static = true;
+          advance();
+          break;
+        case "set":
+        case "get":
+          var type = state.tokens.next.value;
+          advance();
+          if (!state.tokens.next.identifier) { 
+            //quit("W116", state.tokens.curr, "identifier", state.tokens.next.type);
+          } else {
+            advance();
+            //saveAccessor(state.tokens.curr.value, props, state.tokens.next.value, state.tokens.next, true, is_static);
+            is_static = false;
+            advance();
+            state.syntax["function"].nud();
+          }
+          break;
+        default:
+          if (!state.tokens.curr.identifier) {
+            //quit("W116", state.tokens.curr, "identifier", state.tokens.next.type);
+            break;
+          } else {
+            //saveProperty(props, state.tokens.curr.value, state.tokens.curr, true, is_static);
+            is_static = false;
+            state.syntax["function"].nud();
+          }
+
+      } 
+    }
+    advance("}");
+    state.funct["(scope)"].unstack();
+    return this;
+  }
 
   prefix("void").exps = true;
 
@@ -3503,7 +3602,7 @@ var JSHINT = (function() {
       verifyMaxParametersPerFunction: function() {
         if (_.isNumber(state.option.maxparams) &&
           this.arity > state.option.maxparams) {
-          warning("W072", functionStartToken, this.arity);
+         warning("W072", functionStartToken, this.arity);
         }
       },
 
@@ -4312,7 +4411,6 @@ var JSHINT = (function() {
       advance(")");
 
       block(context, false);
-
       state.funct["(scope)"].unstack();
     }
 
@@ -4604,7 +4702,7 @@ var JSHINT = (function() {
 
       //checkLeftSideAssign(target, nextop);
 
-      // In the event of a syntax error, do no issue warnings regarding the
+      // In the event of a syntax error, do not issue warnings regarding the
       // implicit creation of bindings.
       if (!initializer && !comma) {
         targets.forEach(function(token) {
@@ -5015,6 +5113,8 @@ var JSHINT = (function() {
     return this;
   }).exps = true;
 
+  blockstmt("class", doClassInternals).exps = true;
+
   stmt("export", function(context) {
     var ok = true;
     var token;
@@ -5223,6 +5323,8 @@ var JSHINT = (function() {
   FutureReservedWord("synchronized");
   FutureReservedWord("transient");
   FutureReservedWord("volatile");
+
+  prefix("class", doClassInternals);
 
   // this function is used to determine whether a squarebracket or a curlybracket
   // expression is a comprehension array, destructuring assignment or a json value.
