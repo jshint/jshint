@@ -1794,7 +1794,7 @@ var JSHINT = (function() {
     // The token should be consumed after a warning is issued so the parser
     // can continue as though an identifier were found. The semicolon token
     // should not be consumed in this way so that the parser interprets it as
-    // a statement delimeter;
+    // a statement delimiter;
     if (state.tokens.next.id !== ";") {
       advance();
     }
