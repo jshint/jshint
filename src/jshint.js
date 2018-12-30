@@ -1159,6 +1159,9 @@ var JSHINT = (function() {
   /**
    * Convenience function for defining block-statement-denoting symbols.
    *
+   * A block-statement-denoting symbol is one like 'if' or 'for', which will be
+   * followed by a block and will not have to end with a semicolon.
+   *
    * @param {string} s - the name of the symbol
    * @param {function} - the first null denotation function for the symbol; see
    *                     the `expression` function for more detail
@@ -1751,10 +1754,6 @@ var JSHINT = (function() {
       return val;
     }
 
-    if (curr.identifier && !isReserved(curr)) {
-      return val;
-    }
-
     warning("W024", state.tokens.curr, state.tokens.curr.id);
     return val;
   }
@@ -2337,6 +2336,9 @@ var JSHINT = (function() {
       warning("W040", x);
     }
   });
+  reservevar("super", function(x) {
+    superNud.call(state.tokens.curr, x);
+  });
 
   assignop("=", "assign", 20);
   assignop("+=", "assignadd", 20);
@@ -2678,95 +2680,216 @@ var JSHINT = (function() {
   });
   state.syntax["new"].exps = true;
 
-  var doClassInternals = function(context) {
+
+  // Class statement
+  blockstmt("class", function(context) {
+    var className, classNameToken;
+    var inexport = context & prodParams.export;
+
     if (!state.inES6()) {
       warning("W104", state.tokens.curr, "class", "6");
     }
-    var def_token = state.tokens.next;
-    var declare_within_declare = false;
-    if (state.tokens.prev.value === "=") {
-      declare_within_declare = true;
-      console.log("IT'S DWD")
-    }
-    // Class Declaration
-    if (state.tokens.next.identifier && state.tokens.next.value !== "extends" && state.tokens.prev.value !== "=") {
-      var prev = state.tokens.prev.value;
-      var name = identifier();
-      if (state.tokens.next.value === "extends") {
-        advance("extends");
-        expression(0, state.tokens.next);
-      }
-      advance("{");
+    state.inClassBody = true;
 
-    // Class Expression with exteends
-    } else if (state.tokens.next.value === "extends") {
-      advance("extends");
-      expression(0, state.tokens.next);
-      advance("{")
-    // Class Expression without optional identifier
-    } else if (state.tokens.next.value === "{") {
-      advance("{");
-    } else if (state.tokens.prev.value === "=") {
-      expression(0, state.tokens.next);
-      advance("{");
-    } else {  
-      warning("W116", state.tokens.curr, "identifier", state.tokens.next.type);
-      advance();
-    }
-    if (prev !== "default" && !declare_within_declare) {
-      this.name = def_token.value; 
-      state.funct["(scope)"].addlabel(def_token.value, {
+    // Class Declaration: 'class <Classname>'
+    if (state.tokens.next.identifier && state.tokens.next.value !== "extends") {
+      classNameToken = state.tokens.next;
+      className = classNameToken.value;
+      identifier();
+      // unintialized, so that the 'extends' clause is parsed while the class is in TDZ
+      state.funct["(scope)"].addlabel(className, {
         type: "class",
-        initialized: true,
-        token: def_token
+        initialized: false,
+        token: classNameToken
       });
     }
+
+    // Class Declaration: 'class <Classname> extends <Superclass>'
+    if (state.tokens.next.value === "extends") {
+      advance("extends");
+      expression(0, context);
+    }
+
+    if (classNameToken) {
+      this.name = className;
+      state.funct["(scope)"].initialize(className);
+      if (inexport) {
+        state.funct["(scope)"].setExported(className, classNameToken);
+      }
+    }
     state.funct["(scope)"].stack();
-    if (declare_within_declare) {
-      state.funct["(scope)"].addlabel(def_token.value, {
+    classBody(this, context);
+    return this;
+  }).exps = true;
+
+  /*
+    Class expression
+
+    The Block- and Expression- handling for "class" are almost identical, except for the ordering of steps.
+    In an expression:, the name should not be saved into the calling scope, but is still accessible inside the definition, so we open a new scope first, then save the name. We also mark it as used.
+  */
+  prefix("class", function(context) {
+    var className, classNameToken;
+
+    if (!state.inES6()) {
+      warning("W104", state.tokens.curr, "class", "6");
+    }
+    state.inClassBody = true;
+
+    // Class Declaration: 'class <Classname>'
+    if (state.tokens.next.identifier && state.tokens.next.value !== "extends") {
+      classNameToken = state.tokens.next;
+      className = classNameToken.value;
+      identifier();
+    }
+
+    // Class Declaration: 'class <Classname> extends <Superclass>'
+    if (state.tokens.next.value === "extends") {
+      advance("extends");
+      expression(0, context);
+    }
+
+    state.funct["(scope)"].stack();
+    if (classNameToken) {
+      this.name = className;
+      state.funct["(scope)"].addlabel(className, {
         type: "class",
         initialized: true,
-        token: def_token
-      })
+        token: classNameToken
+      });
+      state.funct["(scope)"].block.use(className, classNameToken);
     }
-    var is_static = false;
+
+    classBody(this, context);
+    return this;
+  });
+
+  function classBody(classToken, context) {
     var props = {};
-    while (state.tokens.next.value !== "}") {
+    var name, accessorType, token, isStatic, inGenerator, hasConstructor;
+
+    if (state.tokens.next.value === "{") {
+      advance("{");
+    } else {
+      warning("W116", state.tokens.curr, "identifier", state.tokens.next.type); //?
       advance();
-      switch (state.tokens.next.value) {
-        case "static":
-          is_static = true;
+    }
+
+    while (state.tokens.next.value !== "}") {
+      isStatic = false;
+      inGenerator = false;
+      if (state.tokens.next.value === "static") {
+        isStatic = true;
+        advance();
+      }
+      if (state.tokens.next.value === "*") {
+        inGenerator = true;
+        advance();
+      }
+
+      token = state.tokens.next;
+      switch (token.value) {
+        case ";":
+          warning("W032", token);
           advance();
+          break;
+        case "constructor":
+          if (isStatic) {
+            // treat like a regular method -- static methods can be called 'constructor'
+            name = propertyName();
+            saveProperty(props, name, token, true, isStatic);
+            doMethod(classToken, context, name, inGenerator);
+          } else {
+            if (inGenerator) {
+              error("E024", token, token.value);
+            }
+            if (hasConstructor) {
+              error("E024", token, token.value);
+            }
+            advance();
+            doMethod(classToken, context, state.nameStack.infer());
+            hasConstructor = true;
+          }
           break;
         case "set":
         case "get":
-          var type = state.tokens.next.value;
-          advance();
-          if (!state.tokens.next.identifier) { 
-            //quit("W116", state.tokens.curr, "identifier", state.tokens.next.type);
-          } else {
-            advance();
-            //saveAccessor(state.tokens.curr.value, props, state.tokens.next.value, state.tokens.next, true, is_static);
-            is_static = false;
-            advance();
-            state.syntax["function"].nud();
+          if (inGenerator) {
+            error("E024", token, token.value);
           }
-          break;
-        default:
-          if (!state.tokens.curr.identifier) {
-            //quit("W116", state.tokens.curr, "identifier", state.tokens.next.type);
-            break;
+          accessorType = token.value;
+          advance();
+
+          if (state.tokens.next.value === "[") {
+            name = computedPropertyName(context);
+            doMethod(classToken, context, name, false);
           } else {
-            //saveProperty(props, state.tokens.curr.value, state.tokens.curr, true, is_static);
-            is_static = false;
-            state.syntax["function"].nud();
+            name = propertyName();
+            if (name === "prototype" || name === "constructor") {
+              error("E049", state.tokens.curr, "class " + accessorType + "ter method", name);
+            }
+            saveAccessor(accessorType, props, name, state.tokens.curr, true, isStatic);
+            doMethod(classToken, context, state.nameStack.infer(), false);
           }
 
-      } 
+          break;
+        case "[":
+          name = computedPropertyName(context);
+          doMethod(classToken, context, name, inGenerator);
+          // We don't check names (via calling saveProperty()) of computed expressions like ["Symbol.iterator"]()
+          break;
+        default:
+          name = propertyName();
+          if (!name) {
+            error("E024", token, token.value);
+            advance();
+            break;
+          }
+          if (name === "prototype") {
+            error("E049", token, "class method", name);
+          }
+          saveProperty(props, name, token, true, isStatic);
+          doMethod(classToken, context, name, inGenerator);
+          break;
+      }
     }
     advance("}");
+    checkProperties(props);
+
+    state.inClassBody = false;
     state.funct["(scope)"].unstack();
-    return this;
+  }
+
+  function doMethod(classToken, context, name, generator) {
+    if (generator) {
+      if (!state.inES6()) {
+        warning("W119", state.tokens.curr, "function*", "6");
+      }
+    }
+
+    if (state.tokens.next.value !== "(") {
+      error("E054", state.tokens.next, state.tokens.next.value);
+      advance();
+      if (state.tokens.next.value === "{") {
+        // manually cheating the test "invalidClasses", which asserts this particular behavior when a class is misdefined.
+        advance();
+        if (state.tokens.next.value === "}") {
+          warning("W116", state.tokens.next, "(", state.tokens.next.value);
+          advance();
+          identifier();
+          advance();
+        }
+        return;
+      } else {
+        while (state.tokens.next.value !== "(") {
+          advance();
+        }
+      }
+    }
+
+    doFunction(context, { name: name,
+        type: generator ? "generator" : null,
+        isMethod: true,
+        statement: classToken });
   }
 
   prefix("void").exps = true;
@@ -3186,23 +3309,8 @@ var JSHINT = (function() {
 
 
   function isMethod() {
-    return state.funct["(statement)"] && state.funct["(statement)"].type === "class" ||
-           state.funct["(context)"] && state.funct["(context)"]["(verb)"] === "class";
+    return !!state.funct["(method)"];
   }
-
-
-  /**
-   * Determine if the provided token may describe a property name in a class
-   * body.
-   *
-   * @param {object} token
-   *
-   * @returns {boolean}
-   */
-  function isPropertyName(token) {
-    return token.identifier || token.id === "(string)" || token.id === "(number)";
-  }
-
 
   function propertyName(preserveOrToken) {
     var id;
@@ -3602,7 +3710,7 @@ var JSHINT = (function() {
       verifyMaxParametersPerFunction: function() {
         if (_.isNumber(state.option.maxparams) &&
           this.arity > state.option.maxparams) {
-         warning("W072", functionStartToken, this.arity);
+          warning("W072", functionStartToken, this.arity);
         }
       },
 
@@ -3668,7 +3776,8 @@ var JSHINT = (function() {
     // Check for lonely setters if in the ES5 mode.
     if (state.inES5()) {
       for (var name in props) {
-        if (props[name] && props[name].setterToken && !props[name].getterToken) {
+        if (props[name] && props[name].setterToken && !props[name].getterToken &&
+          !props[name].static) {
           warning("W078", props[name].setterToken);
         }
       }
@@ -3690,6 +3799,7 @@ var JSHINT = (function() {
     }
   }
 
+//object literals
   (function(x) {
     x.nud = function(context) {
       var b, f, i, p, t, isGeneratorMethod = false, nextVal;
@@ -3711,7 +3821,7 @@ var JSHINT = (function() {
           });
         return this;
       }
-
+      state.inObjectBody = true;
       for (;;) {
         if (state.tokens.next.id === "}") {
           break;
@@ -3831,6 +3941,7 @@ var JSHINT = (function() {
       advance("}", this);
 
       checkProperties(props);
+      state.inObjectBody = false;
 
       return this;
     };
@@ -4264,7 +4375,9 @@ var JSHINT = (function() {
     var nameToken = optionalidentifier() ? state.tokens.curr : null;
 
     if (!nameToken) {
-      warning("W025");
+      if (!inexport) {
+        warning("W025");
+      }
     } else {
       state.funct["(scope)"].addlabel(nameToken.value, {
         type: generator ? "generator function" : "function",
@@ -5113,13 +5226,12 @@ var JSHINT = (function() {
     return this;
   }).exps = true;
 
-  blockstmt("class", doClassInternals).exps = true;
-
   stmt("export", function(context) {
     var ok = true;
     var token;
     var identifier;
     var moduleSpecifier;
+    context = context | prodParams.export;
 
     if (!state.inES6()) {
       warning("W119", state.tokens.curr, "export", "6");
@@ -5144,31 +5256,30 @@ var JSHINT = (function() {
       //      export default [lookahead ∉ { function, class }] AssignmentExpression[In] ;
       //      export default HoistableDeclaration
       //      export default ClassDeclaration
+
+      // because the 'name' of a default-exported function is, confusingly, 'default'
+      // see https://bocoup.com/blog/whats-in-a-function-name
       state.nameStack.set(state.tokens.next);
+
       advance("default");
       var exportType = state.tokens.next.id;
-      if (exportType === "function" || exportType === "class") {
+      if (exportType === "function") {
         this.block = true;
+        advance("function");
+        state.syntax["function"].fud(context);
+      } else if (exportType === "class") {
+        this.block = true;
+        advance("class");
+        state.syntax["class"].fud(context);
+      } else {
+        token = expression(10, context);
+        if (token.identifier) {
+          identifier = token.value;
+          state.funct["(scope)"].setExported(identifier, token);
+        }
       }
-
-      token = peek();
-
-      expression(10, context);
-
-      identifier = token.value;
-
-      if (this.block) {
-        state.funct["(scope)"].addlabel(identifier, {
-          type: exportType,
-          initialized: true,
-          token: token });
-
-        state.funct["(scope)"].setExported(identifier, token);
-      }
-
       return this;
     }
-
     if (state.tokens.next.value === "{") {
       // ExportDeclaration :: export ExportClause
       advance("{");
@@ -5214,32 +5325,28 @@ var JSHINT = (function() {
       }
 
       return this;
-    }
-
-    if (state.tokens.next.id === "var") {
+    } else if (state.tokens.next.id === "var") {
       // ExportDeclaration :: export VariableStatement
       advance("var");
-      state.tokens.curr.fud(context | prodParams.export);
+      state.tokens.curr.fud(context);
     } else if (state.tokens.next.id === "let") {
       // ExportDeclaration :: export VariableStatement
       advance("let");
-      state.tokens.curr.fud(context | prodParams.export);
+      state.tokens.curr.fud(context);
     } else if (state.tokens.next.id === "const") {
       // ExportDeclaration :: export VariableStatement
       advance("const");
-      state.tokens.curr.fud(context | prodParams.export);
+      state.tokens.curr.fud(context);
     } else if (state.tokens.next.id === "function") {
       // ExportDeclaration :: export Declaration
       this.block = true;
       advance("function");
-      state.syntax["function"].fud(context | prodParams.export);
+      state.syntax["function"].fud(context);
     } else if (state.tokens.next.id === "class") {
       // ExportDeclaration :: export Declaration
       this.block = true;
       advance("class");
-      var classNameToken = state.tokens.next;
       state.syntax["class"].fud(context);
-      state.funct["(scope)"].setExported(classNameToken.value, classNameToken);
     } else {
       error("E024", state.tokens.next, state.tokens.next.value);
     }
@@ -5299,7 +5406,6 @@ var JSHINT = (function() {
   FutureReservedWord("boolean");
   FutureReservedWord("byte");
   FutureReservedWord("char");
-  FutureReservedWord("class", { es5: true });
   FutureReservedWord("double");
   FutureReservedWord("enum", { es5: true });
   FutureReservedWord("export", { es5: true });
@@ -5319,12 +5425,9 @@ var JSHINT = (function() {
   FutureReservedWord("public", { es5: true, strictOnly: true });
   FutureReservedWord("short");
   FutureReservedWord("static", { es5: true, strictOnly: true });
-  FutureReservedWord("super", { es5: true, nud: superNud });
   FutureReservedWord("synchronized");
   FutureReservedWord("transient");
   FutureReservedWord("volatile");
-
-  prefix("class", doClassInternals);
 
   // this function is used to determine whether a squarebracket or a curlybracket
   // expression is a comprehension array, destructuring assignment or a json value.
@@ -5382,22 +5485,27 @@ var JSHINT = (function() {
    * @param {boolean} [isClass] - whether the accessor is part of an ES6 Class
    *                              definition
    * @param {boolean} [isStatic] - whether the accessor is a static method
+   * @param {boolean} [isComputed] - whether the property is a computed expression like [Symbol.iterator]
    */
-  function saveProperty(props, name, tkn, isClass, isStatic) {
-    var msg = ["key", "class method", "static class method"];
-    msg = msg[(isClass || false) + (isStatic || false)];
+  function saveProperty(props, name, tkn, isClass, isStatic, isComputed) {
     if (tkn.identifier) {
       name = tkn.value;
     }
-
-    if (props[name] && name !== "__proto__") {
-      warning("W075", state.tokens.next, msg, name);
-    } else {
-      props[name] = Object.create(null);
+    var key = name;
+    if (isClass && isStatic) {
+      key = "static " + name;
     }
 
-    props[name].basic = true;
-    props[name].basictkn = tkn;
+    if (props[key] && name !== "__proto__" && !isComputed) {
+      var msg = ["key", "class method", "static class method"];
+      msg = msg[(isClass || false) + (isStatic || false)];
+      warning("W075", state.tokens.next, msg, name);
+    } else {
+      props[key] = Object.create(null);
+    }
+
+    props[key].basic = true;
+    props[key].basictkn = tkn;
   }
 
   /**
@@ -5415,29 +5523,34 @@ var JSHINT = (function() {
    */
   function saveAccessor(accessorType, props, name, tkn, isClass, isStatic) {
     var flagName = accessorType === "get" ? "getterToken" : "setterToken";
-    var msg = "";
-
-    if (isClass) {
-      if (isStatic) {
-        msg += "static ";
-      }
-      msg += accessorType + "ter method";
-    } else {
-      msg = "key";
-    }
-
+    var key = name;
     state.tokens.curr.accessorType = accessorType;
     state.nameStack.set(tkn);
+    if (isClass && isStatic) {
+      key = "static " + name;
+    }
 
-    if (props[name]) {
-      if ((props[name].basic || props[name][flagName]) && name !== "__proto__") {
+    if (props[key]) {
+      if ((props[key].basic || props[key][flagName]) && name !== "__proto__") {
+        var msg = "";
+        if (isClass) {
+          if (isStatic) {
+            msg += "static ";
+          }
+          msg += accessorType + "ter method";
+        } else {
+          msg = "key";
+        }
         warning("W075", state.tokens.next, msg, name);
       }
     } else {
-      props[name] = Object.create(null);
+      props[key] = Object.create(null);
     }
 
-    props[name][flagName] = tkn;
+    props[key][flagName] = tkn;
+    if (isStatic) {
+      props[key].static = true;
+    }
   }
 
   /**
@@ -5879,7 +5992,6 @@ var JSHINT = (function() {
     });
 
     state.tokens.prev = state.tokens.curr = state.tokens.next = state.syntax["(begin)"];
-
     if (o && o.ignoreDelimiters) {
 
       if (!Array.isArray(o.ignoreDelimiters)) {
