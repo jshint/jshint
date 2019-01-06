@@ -193,7 +193,7 @@ var warnings = {
   W102: null,
   W103: "The '{a}' property is deprecated.",
   W104: "'{a}' is available in ES{b} (use 'esversion: {b}') or Mozilla JS extensions (use moz).",
-  W105: "Unexpected {a} in '{b}'.",
+  W105: null,
   W106: "Identifier '{a}' is not in camel case.",
   W107: "Script URL.",
   W108: "Strings must use doublequote.",
