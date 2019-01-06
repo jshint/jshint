@@ -121,7 +121,7 @@ var warnings = {
   W036: "Unexpected /*member '{a}'.",
   W037: "'{a}' is a statement label.",
   W038: "'{a}' used out of scope.",
-  W039: "'{a}' is not allowed.",
+  W039: null,
   W040: "If a strict mode function is executed using function invocation, " +
     "its 'this' value will be undefined.",
   W041: null,
