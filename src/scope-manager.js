@@ -551,6 +551,10 @@ var scopeManager = function(state, predefined, exported, declared) {
       // >   FormalParameterList is false and BoundNames of FormalParameterList
       // >   contains any duplicate elements.
       var isSimple = state.funct['(hasSimpleParams)'];
+      // Method definitions are defined in terms of UniqueFormalParameters, so
+      // they cannot support duplicate parameter names regardless of strict
+      // mode.
+      var isMethod = state.funct["(method)"];
 
       if (!currentFunctParamScope["(params)"]) {
         return;
@@ -560,7 +564,7 @@ var scopeManager = function(state, predefined, exported, declared) {
         var label = currentFunctParamScope["(labels)"][labelName];
 
         if (label.duplicated) {
-          if (isStrict || isArrow || !isSimple) {
+          if (isStrict || isArrow || isMethod || !isSimple) {
             warning("E011", label["(token)"], labelName);
           } else if (state.option.shadow !== true) {
             warning("W004", label["(token)"], labelName);
