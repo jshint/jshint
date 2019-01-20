@@ -3781,6 +3781,18 @@ exports["esnext generator"] = function (test) {
   TestRun(test)
     .test(code, {esnext: true, unused: true, undef: true, predef: ["print"]});
 
+  TestRun(test, "YieldExpression in parameters - declaration")
+    .addError(1, 18, "Unexpected 'yield'.")
+    .test("function * g(x = yield) { yield; }", { esversion: 6 });
+
+  TestRun(test, "YieldExpression in parameters - expression")
+    .addError(1, 22, "Unexpected 'yield'.")
+    .test("void function * (x = yield) { yield; };", { esversion: 6 });
+
+  TestRun(test, "YieldExpression in parameters - method")
+    .addError(1, 16, "Unexpected 'yield'.")
+    .test("void { * g(x = yield) { yield; } };", { esversion: 6 });
+
   test.done();
 };
 
