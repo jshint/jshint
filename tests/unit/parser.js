@@ -6105,6 +6105,18 @@ conciseMethods.nameIsNotLocalVar = function (test) {
   test.done();
 };
 
+conciseMethods.uniqueFormalParameters = function (test) {
+  TestRun(test, "adjacent")
+    .addError(1, 15, "'a' has already been declared.")
+    .test("void { method(a, a) {} };", { esversion: 6 });
+
+  TestRun(test, "separated")
+    .addError(1, 15, "'b' has already been declared.")
+    .test("void { method(b, c, b) {} };", { esversion: 6 });
+
+  test.done();
+};
+
 exports["object short notation: basic"] = function (test) {
   var code = [
     "var foo = 42;",
@@ -6608,6 +6620,18 @@ exports["computed class methods aren't duplicate"] = function (test) {
   // JSHint shouldn't throw a "Duplicate class method" warning with computed method names
   // GH-2350
   TestRun(test).test(code, { esnext: true });
+
+  test.done();
+};
+
+exports["class method UniqueFormalParameters"] = function (test) {
+  TestRun(test, "adjacent")
+    .addError(1, 18, "'a' has already been declared.")
+    .test("class C { method(a, a) {} }", { esversion: 6 });
+
+  TestRun(test, "separated")
+    .addError(1, 18, "'b' has already been declared.")
+    .test("class C { method(b, c, b) {} }", { esversion: 6 });
 
   test.done();
 };
