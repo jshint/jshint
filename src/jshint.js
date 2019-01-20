@@ -3644,6 +3644,7 @@ var JSHINT = (function() {
       state.funct["(metrics)"].arity = paramsInfo.arity;
       state.funct["(metrics)"].verifyMaxParametersPerFunction();
     } else {
+      state.funct["(params)"] = [];
       state.funct["(metrics)"].arity = 0;
       state.funct["(hasSimpleParams)"] = true;
     }
@@ -3802,7 +3803,7 @@ var JSHINT = (function() {
 //object literals
   (function(x) {
     x.nud = function(context) {
-      var b, f, i, p, t, isGeneratorMethod = false, nextVal;
+      var b, f, i, params, t, isGeneratorMethod = false, nextVal;
       var props = Object.create(null); // All properties, including accessors
 
       b = state.tokens.curr.line !== startLine(state.tokens.next);
@@ -3866,11 +3867,11 @@ var JSHINT = (function() {
 
           t = state.tokens.next;
           f = doFunction(context, { isMethod: true });
-          p = f["(params)"];
+          params = f["(params)"];
 
           // Don't warn about getter/setter pairs if this is an ES6 concise method
-          if (nextVal === "get" && i && p) {
-            warning("W076", t, p[0], i);
+          if (nextVal === "get" && i && params.length) {
+            warning("W076", t, params[0], i);
           } else if (nextVal === "set" && i && f["(metrics)"].arity !== 1) {
             warning("W077", t, i);
           }
@@ -5103,6 +5104,13 @@ var JSHINT = (function() {
       return mozYield.call(this, context);
     }
     var prev = state.tokens.prev;
+
+    // If the parameters of the current function scope have not been defined,
+    // it is because the current expression is contained within the parameter
+    // list.
+    if (!state.funct["(params)"]) {
+      error("E024", this, "yield");
+    }
 
     if (!this.beginsStmt && prev.lbp > 30 && !checkPunctuators(prev, ["("])) {
       error("E061", this);
