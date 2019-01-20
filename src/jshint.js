@@ -5651,6 +5651,12 @@ var JSHINT = (function() {
    */
   function computedPropertyName(context) {
     advance("[");
+
+    // Explicitly reclassify token as a delimeter to prevent its later
+    // interpretation as an "infix" operator.
+    state.tokens.curr.delim = true;
+    state.tokens.curr.lbp = 0;
+
     if (!state.inES6()) {
       warning("W119", state.tokens.curr, "computed property names", "6");
     }
