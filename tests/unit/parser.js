@@ -9105,3 +9105,35 @@ exports.trailingParameterComma = function(test) {
 
   test.done();
 };
+
+exports.trailingArgumentsComma = function(test) {
+  TestRun(test, "valid - not supported in ES7")
+    .addError(1, 4, "'Trailing comma in arguments lists' is only available in ES8 (use 'esversion: 8').")
+    .test("f(0,);", { esversion: 7 })
+
+  TestRun(test, "valid - supported in ES8")
+    .test([
+      "f(0,);",
+      "f(0, 0,);",
+    ], { esversion: 8 })
+
+  TestRun(test, "invalid - zero expressions")
+    .addError(1, 3, "Expected an identifier and instead saw ','.")
+    .test([
+      "f(,);",
+    ], { esversion: 8 })
+
+  TestRun(test, "invalid - zero expressions, multiple commas")
+    .addError(1, 3, "Expected an identifier and instead saw ','.")
+    .test([
+      "f(,,);",
+    ], { esversion: 8 })
+
+  TestRun(test, "invalid - multiple commas")
+    .addError(1, 5, "Expected an identifier and instead saw ','.")
+    .test([
+      "f(0,,);",
+    ], { esversion: 8 })
+
+  test.done();
+};

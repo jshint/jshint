@@ -2951,7 +2951,15 @@ var JSHINT = (function() {
         if (state.tokens.next.id !== ",") {
           break;
         }
-        parseComma();
+        parseComma({ allowTrailing: true });
+
+        if (state.tokens.next.id === ")") {
+          if (!state.inES8()) {
+            warning("W119", state.tokens.curr, "Trailing comma in arguments lists", "8");
+          }
+
+          break;
+        }
       }
     }
 
