@@ -81,7 +81,8 @@ var errors = {
   E063: "Super property may only be used within method bodies.",
   E064: "Super call may only be used within class method bodies.",
   E065: "Functions defined outside of strict mode with non-simple parameter lists may not " +
-    "enable strict mode."
+    "enable strict mode.",
+  E066: "Asynchronous iteration is only available with for-of loops."
 };
 
 var warnings = {

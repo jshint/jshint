@@ -4897,6 +4897,7 @@ var JSHINT = (function() {
   blockstmt("for", function(context) {
     var s, t = state.tokens.next;
     var letscope = false;
+    var isAsync = false;
     var foreachtok = null;
 
     if (t.value === "each") {
@@ -4904,6 +4905,17 @@ var JSHINT = (function() {
       advance("each");
       if (!state.inMoz()) {
         warning("W118", state.tokens.curr, "for each");
+      }
+    }
+
+    if (state.tokens.next.identifier && state.tokens.next.value === "await") {
+      advance("await");
+      isAsync = true;
+
+      if (!(context & prodParams.async)) {
+        error("E024", state.tokens.curr, "await");
+      } else if (!state.inES9()) {
+        warning("W119", state.tokens.curr, "asynchronous iteration", "9");
       }
     }
 
@@ -4994,6 +5006,10 @@ var JSHINT = (function() {
     }
 
     nextop = state.tokens.next;
+
+    if (isAsync && nextop.value !== "of") {
+      error("E066", nextop);
+    }
 
     // if we're in a for (… in|of …) statement
     if (_.includes(["in", "of"], nextop.value)) {
