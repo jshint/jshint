@@ -9625,3 +9625,55 @@ exports.asyncGenerators.classMethod = function (test) {
 
   test.done();
 };
+
+exports.asyncIteration = function (test) {
+  TestRun(test, "inavailability in prior editions")
+    .addError(2, 7, "'asynchronous iteration' is only available in ES9 (use 'esversion: 9').")
+    .addError(3, 7, "'asynchronous iteration' is only available in ES9 (use 'esversion: 9').")
+    .addError(4, 7, "'asynchronous iteration' is only available in ES9 (use 'esversion: 9').")
+    .addError(5, 7, "'asynchronous iteration' is only available in ES9 (use 'esversion: 9').")
+    .test([
+      "async function f() {",
+      "  for await (var x of []) {}",
+      "  for await (let x of []) {}",
+      "  for await (const x of []) {}",
+      "  for await (x of []) {}",
+      "}"
+    ], { esversion: 8 });
+
+  TestRun(test, "typical usage")
+    .test([
+      "async function f() {",
+      "  for await (var x of []) {}",
+      "  for await (let x of []) {}",
+      "  for await (const x of []) {}",
+      "  for await (x of []) {}",
+      "}"
+    ], { esversion: 9 });
+
+  TestRun(test, "inavailability in synchronous contexts")
+    .addError(2, 7, "Unexpected 'await'.")
+    .test([
+      "function f() {",
+      "  for await (var x of []) {}",
+      "}"
+    ], { esversion: 9 });
+
+  TestRun(test, "inavailability with for-in statements")
+    .addError(2, 20, "Asynchronous iteration is only available with for-of loops.")
+    .test([
+      "async function f() {",
+      "  for await (var x in []) {}",
+      "}"
+    ], { esversion: 9 });
+
+  TestRun(test, "inavailability with C-style for statements")
+    .addError(2, 20, "Asynchronous iteration is only available with for-of loops.")
+    .test([
+      "async function f() {",
+      "  for await (var x ; ;) {}",
+      "}"
+    ], { esversion: 9 });
+
+  test.done();
+};
