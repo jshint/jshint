@@ -70,7 +70,7 @@ exports.ecmaIdentifiers = {
 exports.browser = {
   Audio                : false,
   Blob                 : false,
-  addEventListener     : false,
+  addEventListener     : false, // EventTarget
   applicationCache     : false,
   atob                 : false,
   blur                 : false,
@@ -100,6 +100,7 @@ exports.browser = {
   CustomEvent          : false,
   DOMParser            : false,
   defaultStatus        : false,
+  dispatchEvent        : false, // EventTarget
   Document             : false,
   document             : false,
   DocumentFragment     : false,
@@ -234,7 +235,7 @@ exports.browser = {
   print                : false,
   Range                : false,
   requestAnimationFrame : false,
-  removeEventListener  : false,
+  removeEventListener  : false, // EventTarget
   Request              : false,
   resizeBy             : false,
   resizeTo             : false,
@@ -448,11 +449,14 @@ exports.devel = {
 };
 
 exports.worker = {
-  importScripts  : true,
-  onmessage      : true,
-  postMessage    : true,
-  self           : true,
-  FileReaderSync : true
+  addEventListener    : true, // EventTarget
+  dispatchEvent       : true, // EventTarget
+  importScripts       : true,
+  onmessage           : true,
+  postMessage         : true,
+  removeEventListener : true, // EventTarget
+  self                : true,
+  FileReaderSync      : true
 };
 
 // Widely adopted global names that are not part of ECMAScript standard
