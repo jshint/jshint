@@ -1717,6 +1717,14 @@ Lexer.prototype = {
       index += 1;
     }
 
+    if (flags.indexOf("u") === -1) {
+      this.triggerAsync("warning", {
+        code: "W147",
+        line: this.line,
+        character: this.char
+      }, checks, function() { return state.option.regexpu; });
+    }
+
     // Check regular expression for correctness.
 
     try {

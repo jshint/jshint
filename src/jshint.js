@@ -234,6 +234,15 @@ var JSHINT = (function() {
       }
     }
 
+    if (state.option.regexpu) {
+      /**
+       * TODO: Extend this restriction to *all* ES6-specific options.
+       */
+      if (!state.inES6()) {
+        warning("W134", state.tokens.next, "regexpu", 6);
+      }
+    }
+
     if (state.option.couch) {
       combine(predefined, vars.couch);
     }
