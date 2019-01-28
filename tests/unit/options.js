@@ -2788,6 +2788,9 @@ exports.enforceall = function (test) {
   TestRun(test)
     .test(src, { enforceall: true, nonbsp: false, bitwise: false, sub: true, undef: false, unused: false, asi:true });
 
+  TestRun(test, "Does not enable 'regexpu'.")
+    .test('void /./;', { enforceall: true });
+
   test.done();
 };
 
@@ -4358,6 +4361,50 @@ exports.leanswitch = function (test) {
   TestRun(test, "non-empty default clause followed by case")
     .addError(3, 11, "Expected a 'break' statement before 'case'.")
     .test(code, { leanswitch: true });
+
+  test.done();
+};
+
+exports.regexpu = function (test) {
+  TestRun(test, "restricted outside of ES6 - via API")
+    .addError(0, 0, "The 'regexpu' option is only available when linting ECMAScript 6 code.")
+    .test("void 0;", { regexpu: true })
+
+  TestRun(test, "restricted outside of ES6 - via directive")
+    .addError(1, 1, "The 'regexpu' option is only available when linting ECMAScript 6 code.")
+    .test([
+      "// jshint regexpu: true",
+      "void 0;"
+    ]);
+
+  TestRun(test, "missing")
+    .addError(1, 6, "Regular expressions should include the 'u' flag.")
+    .addError(2, 6, "Regular expressions should include the 'u' flag.")
+    .addError(3, 6, "Regular expressions should include the 'u' flag.")
+    .test([
+      "void /./;",
+      "void /./g;",
+      "void /./giym;",
+    ], { regexpu: true, esversion: 6 });
+
+  TestRun(test, "in use")
+    .test([
+      "void /./u;",
+      "void /./ugiym;",
+      "void /./guiym;",
+      "void /./giuym;",
+      "void /./giyum;",
+      "void /./giymu;"
+    ], { esversion: 6 });
+
+  TestRun(test, "missing - option set when parsing precedes option enablement")
+    .addError(3, 8, "Regular expressions should include the 'u' flag.")
+    .test([
+      "(function() {",
+      "  // jshint regexpu: true",
+      "  void /./;",
+      "}());"
+    ], { esversion: 6 });
 
   test.done();
 };
