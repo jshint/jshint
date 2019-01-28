@@ -221,6 +221,15 @@ exports.bool = {
     noreturnawait: true,
 
     /**
+     * This option enables warnings for regular expressions which do not
+     * include the "u" flag. The "u" flag extends support for Unicode and also
+     * enables more strict parsing rules. JSHint will enforce these rules even
+     * if it is executed in a JavaScript engine which does not support the "u"
+     * flag.
+     */
+    regexpu     : true,
+
+    /**
      * This option prohibits the use of explicitly undeclared variables. This
      * option is very useful for spotting leaking and mistyped variables.
      *
@@ -1088,5 +1097,6 @@ exports.removed = {
 // `enforceall`.
 exports.noenforceall = {
   varstmt: true,
-  strict: true
+  strict: true,
+  regexpu: true
 };

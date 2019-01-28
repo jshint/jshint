@@ -238,7 +238,8 @@ var warnings = {
     "unexpected changes to formal parameters.",
   W144: "'{a}' is a non-standard language feature. Enable it using the '{b}' unstable option.",
   W145: "Superfluous 'case' clause.",
-  W146: "Unnecessary `await` expression."
+  W146: "Unnecessary `await` expression.",
+  W147: "Regular expressions should include the 'u' flag."
 };
 
 var info = {
