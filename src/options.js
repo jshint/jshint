@@ -1038,6 +1038,16 @@ exports.val = {
    *  - `6` - To tell JSHint that your code uses [ECMAScript
    *    6](http://www.ecma-international.org/ecma-262/6.0/index.html) specific
    *    syntax. Note that not all browsers implement them.
+   *  - `7` - To enable language features introduced by [ECMAScript
+   *    7](https://www.ecma-international.org/ecma-262/7.0/index.html). Notable
+   *    additions: the exponentiation operator.
+   *  - `8` - To enable language features introduced by [ECMAScript
+   *    8](https://www.ecma-international.org/ecma-262/8.0/index.html). Notable
+   *    additions: async functions, shared memory, and atomics
+   *  - `9` - To enable language features introduced by [ECMAScript
+   *    9](https://www.ecma-international.org/ecma-262/9.0/index.html). Notable
+   *    additions: asynchronous iteration, rest/spread properties, and various
+   *    RegExp extensions
    */
   esversion: 5
 };
