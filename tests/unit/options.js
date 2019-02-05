@@ -1107,6 +1107,73 @@ exports.unused.crossBlocks = function (test) {
   test.done();
 };
 
+// Regression test for gh-3354
+exports.unused.methodNames = function (test) {
+  TestRun(test, "object methods - ES5")
+    .test([
+      "var p;",
+      "void {",
+      "  get p() { void p; },",
+      "  set p(_) { void p; void _; }",
+      "};"
+    ], { unused: true, esversion: 5 });
+
+  TestRun(test, "object methods - ES6")
+    .test([
+      "var m, g;",
+      "void {",
+      "  m() { void m; },",
+      "  *g() { yield g; }",
+      "};"
+    ], { unused: true, esversion: 6 });
+
+  TestRun(test, "object methods - ES8")
+    .test([
+      "var m;",
+      "void {",
+      "  async m() { void m; }",
+      "};"
+    ], { unused: true, esversion: 8 });
+
+  TestRun(test, "object methods - ES9")
+    .test([
+      "var m;",
+      "void {",
+      "  async * m() { yield m; }",
+      "};"
+    ], { unused: true, esversion: 9 });
+
+  TestRun(test, "class methods - ES6")
+    .test([
+      "var m, g, p, s;",
+      "void class {",
+      "  m() { void m; }",
+      "  *g() { yield g; }",
+      "  get p() { void p; }",
+      "  set p() { void p; }",
+      "  static s() { void s; }",
+      "};"
+    ], { unused: true, esversion: 6 });
+
+  TestRun(test, "class methods - ES8")
+    .test([
+      "var m;",
+      "void class {",
+      "  async m() { void m; }",
+      "};"
+    ], { unused: true, esversion: 8 });
+
+  TestRun(test, "class methods - ES9")
+    .test([
+      "var m;",
+      "void class {",
+      "  async * m() { yield m; }",
+      "};"
+    ], { unused: true, esversion: 9 });
+
+  test.done();
+};
+
 exports['param overrides function name expression'] = function (test) {
   TestRun(test)
     .test([
