@@ -123,6 +123,21 @@ exports.bool = {
     immed       : true,
 
     /**
+     * This option prohibits unnecessary clauses within `switch` statements,
+     * e.g.
+     *
+     *     switch (x) {
+     *       case 1:
+     *       default:
+     *         z();
+     *     }
+     *
+     * While clauses like these are techincally valid, they do not effect
+     * program behavior and may indicate an erroneous refactoring.
+     */
+    leanswitch  : true,
+
+    /**
      * This option requires you to capitalize names of constructor functions.
      * Capitalizing functions that are intended to be used with `new` operator
      * is just a convention that helps programmers to visually distinguish
@@ -191,6 +206,28 @@ exports.bool = {
      * used anywhere so you should generally avoid constructors like this one.
      */
     nonew       : true,
+
+
+    /**
+     * Async functions resolve on their return value. In most cases, this makes
+     * returning the result of an AwaitExpression (which is itself a Promise
+     * instance) unnecessary. For clarity, it's often preferable to return the
+     * result of the asynchronous operation directly. The notable exception is
+     * within the `try` clause of a TryStatement--for more, see "await vs
+     * return vs return await":
+     *
+     * https://jakearchibald.com/2017/await-vs-return-vs-return-await/
+     */
+    noreturnawait: true,
+
+    /**
+     * This option enables warnings for regular expressions which do not
+     * include the "u" flag. The "u" flag extends support for Unicode and also
+     * enables more strict parsing rules. JSHint will enforce these rules even
+     * if it is executed in a JavaScript engine which does not support the "u"
+     * flag.
+     */
+    regexpu     : true,
 
     /**
      * This option prohibits the use of explicitly undeclared variables. This
@@ -1001,8 +1038,27 @@ exports.val = {
    *  - `6` - To tell JSHint that your code uses [ECMAScript
    *    6](http://www.ecma-international.org/ecma-262/6.0/index.html) specific
    *    syntax. Note that not all browsers implement them.
+   *  - `7` - To enable language features introduced by [ECMAScript
+   *    7](https://www.ecma-international.org/ecma-262/7.0/index.html). Notable
+   *    additions: the exponentiation operator.
+   *  - `8` - To enable language features introduced by [ECMAScript
+   *    8](https://www.ecma-international.org/ecma-262/8.0/index.html). Notable
+   *    additions: async functions, shared memory, and atomics
+   *  - `9` - To enable language features introduced by [ECMAScript
+   *    9](https://www.ecma-international.org/ecma-262/9.0/index.html). Notable
+   *    additions: asynchronous iteration, rest/spread properties, and various
+   *    RegExp extensions
    */
   esversion: 5
+};
+
+/**
+ * Unstable options allow control for parsing and linting of proposed additions
+ * to the JavaScript language. Just like the language features they describe,
+ * the presence and behavior of these options is volatile; JSHint reserves the
+ * right to remove or modify them between major version releases.
+ */
+exports.unstable = {
 };
 
 // These are JSHint boolean options which are shared with JSLint
@@ -1024,7 +1080,10 @@ exports.validNames = Object.keys(exports.val)
   .concat(Object.keys(exports.bool.relaxing))
   .concat(Object.keys(exports.bool.enforcing))
   .concat(Object.keys(exports.bool.obsolete))
-  .concat(Object.keys(exports.bool.environments));
+  .concat(Object.keys(exports.bool.environments))
+  .concat(["unstable"]);
+
+exports.unstableNames = Object.keys(exports.unstable);
 
 // These are JSHint boolean options which are shared with JSLint
 // where the name has been changed but the effect is unchanged
@@ -1048,5 +1107,6 @@ exports.removed = {
 // `enforceall`.
 exports.noenforceall = {
   varstmt: true,
-  strict: true
+  strict: true,
+  regexpu: true
 };
