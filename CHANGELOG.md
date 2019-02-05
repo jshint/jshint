@@ -1,3 +1,62 @@
+<a name="2.10.0"></a>
+# [2.10.0](https://github.com/jshint/jshint/compare/2.9.7...v2.10.0) (2019-02-05)
+
+This release introduces support for the three most recent editions of
+JavaScript: ES7, ES8, and ES9. Users can enable support for any one of these
+via the `esversion` linting option.
+
+Perhaps most notably, this includes "async functions." Since their
+standardization in ES2017, no feature has been more requested. We're happy to
+add support for this powerful new language feature. If the delay is any
+indication, extending JSHint's parser was no small task, and we were able to
+make many seemingly-unrelated corrections along the way.
+
+That progress is easiest to see in JSHint's performance on Test262 (the
+official test suite for the JavaScript programming language). Version 2.9.6
+passed 84% of those tests. Version 2.10.0 passes 96%. We're excited to push
+that number higher, especially considering that new language features and new
+tests are being added every day. If you're curious about what needs to be done,
+we maintain an "expectations file" describing every test JSHint is known to
+fail today.
+
+This release also includes brand-new parsing logic for classes. We thank Ethan
+Dorta and Alex Kritchevsky, the two first-time contributors who made this
+possible!
+
+### Bug Fixes
+
+* Accept new RegExp flag introduced by ES6 ([26b9e53](https://github.com/jshint/jshint/commit/26b9e53))
+* Add global variables introduced in ES2017 ([aded551](https://github.com/jshint/jshint/commit/aded551))
+* Add globals for EventTarget interface ([b78083a](https://github.com/jshint/jshint/commit/b78083a))
+* Add globals for WindowOrWorkerGlobalScope ([e0aac94](https://github.com/jshint/jshint/commit/e0aac94))
+* Allow YieldExpression as computed property ([40dca82](https://github.com/jshint/jshint/commit/40dca82))
+* Correct implementation of spread/rest ([bd0ae0d](https://github.com/jshint/jshint/commit/bd0ae0d))
+* Correct invalid function invocation ([cda02ae](https://github.com/jshint/jshint/commit/cda02ae))
+* Correct parsing of `let` token ([030d6b4](https://github.com/jshint/jshint/commit/030d6b4))
+* Correct parsing of arrow function ([8fa6e39](https://github.com/jshint/jshint/commit/8fa6e39))
+* Correct parsing of InExpression ([06f54d0](https://github.com/jshint/jshint/commit/06f54d0))
+* Disallow dups in non-simple parameter list ([4a5a4a5](https://github.com/jshint/jshint/commit/4a5a4a5))
+* Disallow fn declarations in stmt positions ([a0e0305](https://github.com/jshint/jshint/commit/a0e0305))
+* Disallow YieldExpression in gnrtr params ([17ca4e4](https://github.com/jshint/jshint/commit/17ca4e4))
+* Enforce UniqueFormalParameters for methods ([280d36b](https://github.com/jshint/jshint/commit/280d36b))
+* Honor `globals` config in JavaScript API ([0278731](https://github.com/jshint/jshint/commit/0278731))
+* Report invalid syntax as error ([5ca8b1a](https://github.com/jshint/jshint/commit/5ca8b1a))
+* Update parsing of object "rest" property ([58967ea](https://github.com/jshint/jshint/commit/58967ea))
+
+### Features
+
+* Enable object rest/spread via esversion ([3fc9c19](https://github.com/jshint/jshint/commit/3fc9c19))
+* Enforce ES2016 restriction on USD ([2c2025b](https://github.com/jshint/jshint/commit/2c2025b))
+* Implement `noreturnawait` ([70ab03d](https://github.com/jshint/jshint/commit/70ab03d))
+* Implement `regexpu` option ([962dced](https://github.com/jshint/jshint/commit/962dced))
+* Implement ES2019 RegExp "dotall" ([457d732](https://github.com/jshint/jshint/commit/457d732))
+* Implement support for async iteration ([1af5930](https://github.com/jshint/jshint/commit/1af5930))
+* Implement support for ES8 trailing commas ([29cab1f](https://github.com/jshint/jshint/commit/29cab1f))
+* Implement support for object spread/rest ([35e1b17](https://github.com/jshint/jshint/commit/35e1b17))
+* Introduce exponentiation operator ([21b8731](https://github.com/jshint/jshint/commit/21b8731))
+* Introduce linting option `leanswitch` ([1f008f2](https://github.com/jshint/jshint/commit/1f008f2))
+* Introduce support for async functions ([bc4ae9f](https://github.com/jshint/jshint/commit/bc4ae9f))
+
 <a name="2.9.7"></a>
 ## [2.9.7](https://github.com/jshint/jshint/compare/2.9.6...v2.9.7) (2018-12-07)
 
