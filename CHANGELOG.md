@@ -1,3 +1,10 @@
+<a name="2.10.1"></a>
+## [2.10.1](https://github.com/jshint/jshint/compare/2.10.0...v2.10.1) (2019-02-05)
+
+### Bug Fixes
+
+* Do not add cls method names to env. record ([036f085](https://github.com/jshint/jshint/commit/036f085))
+
 <a name="2.10.0"></a>
 # [2.10.0](https://github.com/jshint/jshint/compare/2.9.7...v2.10.0) (2019-02-05)
 
