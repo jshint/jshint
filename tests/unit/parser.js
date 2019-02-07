@@ -866,6 +866,12 @@ exports.regexp.regressions = function (test) {
   TestRun(test).test("var exp = /\\[\\]/;", {esnext: true});
   TestRun(test).test("var exp = /\\[\\]/;", {moz: true});
 
+  // GH-3356
+  TestRun(test).test("void /[/]/;");
+  TestRun(test).test("void /[{]/u;", {esversion: 6});
+  TestRun(test).test("void /[(?=)*]/u;", {esversion: 6});
+  TestRun(test).test("void /[(?!)+]/u;", {esversion: 6});
+
   test.done();
 };
 
