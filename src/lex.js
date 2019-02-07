@@ -1582,6 +1582,11 @@ Lexer.prototype = {
         continue;
       }
 
+      if (isCharSet) {
+        index += 1;
+        continue;
+      }
+
       if (char === "{" && !hasInvalidQuantifier) {
         hasInvalidQuantifier = !checkQuantifier();
       }
