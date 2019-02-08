@@ -2775,7 +2775,7 @@ var JSHINT = (function() {
   });
 
   function classBody(classToken, context) {
-    var props = {};
+    var props = Object.create(null);
     var name, accessorType, token, isStatic, inGenerator, hasConstructor;
 
     if (state.tokens.next.value === "{") {

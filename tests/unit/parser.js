@@ -6679,6 +6679,87 @@ exports["class and method naming"] = function (test) {
 
   run.test(code, {esnext: true});
 
+  TestRun(test, "hazardous method names (see gh-3358)")
+    .addError(3, 17, "'hasOwnProperty' is a really bad name.")
+    .test([
+      "void class {",
+      "  constructor() {}",
+      "  hasOwnProperty() {}",
+      "  toString() {}",
+      "  toLocaleString() {}",
+      "  valueOf() {}",
+      "  isPrototypeOf() {}",
+      "  propertyIsEnumerable() {}",
+      "};"
+   ], {esversion: 6});
+
+  TestRun(test, "hazardous method names -- true duplicate (see gh-3358)")
+    .addError(4, 11, "Duplicate class method 'toString'.")
+    .test([
+      "void class {",
+      "  toString() {}",
+      "  x() {}",
+      "  toString() {}",
+      "};"
+   ], {esversion: 6});
+
+  TestRun(test, "hazardous static method names (see gh-3358)")
+    .addError(3, 24, "'hasOwnProperty' is a really bad name.")
+    .test([
+      "void class {",
+      "  static constructor() {}",
+      "  static hasOwnProperty() {}",
+      "  static toString() {}",
+      "  static toLocaleString() {}",
+      "  static valueOf() {}",
+      "  static isPrototypeOf() {}",
+      "  static propertyIsEnumerable() {}",
+      "};"
+   ], {esversion: 6});
+
+  TestRun(test, "hazardous static method names -- true duplicate (see gh-3358)")
+    .addError(4, 18, "Duplicate static class method 'toString'.")
+    .test([
+      "void class {",
+      "  static toString() {}",
+      "  static x() {}",
+      "  static toString() {}",
+      "};"
+   ], {esversion: 6});
+
+  TestRun(test, "hazardous accessor method names (see gh-3358)")
+    .addError(2, 21, "'hasOwnProperty' is a really bad name.")
+    .addError(3, 21, "'hasOwnProperty' is a really bad name.")
+    .test([
+      "void class {",
+      "  get hasOwnProperty() {}",
+      "  set hasOwnProperty(_) {}",
+      "  get toString() {}",
+      "  set toString(_) {}",
+      "  get toLocaleString() {}",
+      "  set toLocaleString(_) {}",
+      "  get valueOf() {}",
+      "  set valueOf(_) {}",
+      "  get isPrototypeOf() {}",
+      "  set isPrototypeOf(_) {}",
+      "  get propertyIsEnumerable() {}",
+      "  set propertyIsEnumerable(_) {}",
+      "};"
+   ], {esversion: 6});
+
+  TestRun(test, "hazardous accessor method names -- true duplicate (see gh-3358)")
+    .addError(5, 15, "Duplicate getter method 'toString'.")
+    .addError(6, 15, "Duplicate setter method 'toString'.")
+    .test([
+      "void class {",
+      "  get toString() {}",
+      "  set toString(_) {}",
+      "  static x() {}",
+      "  get toString() {}",
+      "  set toString(_) {}",
+      "};"
+   ], {esversion: 6});
+
   test.done();
 };
 
