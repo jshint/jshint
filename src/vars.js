@@ -62,6 +62,10 @@ exports.ecmaIdentifiers = {
     Uint8ClampedArray  : false,
     WeakMap            : false,
     WeakSet            : false
+  },
+  8: {
+    Atomics            : false,
+    SharedArrayBuffer  : false
   }
 };
 

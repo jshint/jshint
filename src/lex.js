@@ -345,15 +345,22 @@ Lexer.prototype = {
       };
     }
 
-    // 2-character punctuators: <= >= == != ++ -- << >> && ||
-    // += -= *= %= &= |= ^= /=
-    if (ch1 === ch2 && ("+-<>&|".indexOf(ch1) >= 0)) {
+    // 2-character punctuators: ++ -- << >> && || **
+    if (ch1 === ch2 && ("+-<>&|*".indexOf(ch1) >= 0)) {
+      if (ch1 === "*" && ch3 === "=") {
+        return {
+          type: Token.Punctuator,
+          value: ch1 + ch2 + ch3
+        };
+      }
+
       return {
         type: Token.Punctuator,
         value: ch1 + ch2
       };
     }
 
+    // <= >= != += -= *= %= &= |= ^= /=
     if ("<>=!+-*%&|^/".indexOf(ch1) >= 0) {
       if (ch2 === "=") {
         return {
@@ -394,7 +401,10 @@ Lexer.prototype = {
     // comments.
 
     function commentToken(label, body, opt) {
-      var special = ["jshint", "jslint", "members", "member", "globals", "global", "exported"];
+      var special = [
+        "jshint", "jshint.unstable", "jslint", "members", "member", "globals",
+        "global", "exported"
+      ];
       var isSpecial = false;
       var value = label + body;
       var commentType = "plain";
@@ -418,7 +428,7 @@ Lexer.prototype = {
 
         // Don't recognize any special comments other than jshint for single-line
         // comments. This introduced many problems with legit comments.
-        if (label === "//" && str !== "jshint") {
+        if (label === "//" && str !== "jshint" && str !== "jshint.unstable") {
           return;
         }
 
@@ -567,7 +577,7 @@ Lexer.prototype = {
       "super", "return", "typeof", "delete",
       "switch", "export", "import", "default",
       "finally", "extends", "function", "continue",
-      "debugger", "instanceof", "true", "false", "null"
+      "debugger", "instanceof", "true", "false", "null", "async", "await"
     ];
 
     if (result && keywords.indexOf(result[0]) >= 0) {
@@ -1318,8 +1328,9 @@ Lexer.prototype = {
     var char = this.peek();
     var value = char;
     var body = "";
-    var flags = [];
     var groupReferences = [];
+    var allFlags = "";
+    var es5Flags = "";
     var malformed = false;
     var isCharSet = false;
     var isCharSetRange = false;
@@ -1327,7 +1338,7 @@ Lexer.prototype = {
     var isQuantifiable = false;
     var hasInvalidQuantifier = false;
     var escapedChars = "";
-    var hasUFlag = function() { return flags.indexOf("u") > -1; };
+    var hasUFlag = function() { return allFlags.indexOf("u") > -1; };
     var escapeSequence;
     var groupCount = 0;
     var terminated, malformedDesc;
@@ -1638,7 +1649,7 @@ Lexer.prototype = {
 
     while (index < length) {
       char = this.peek(index);
-      if (!/[gimyu]/.test(char)) {
+      if (!/[gimyus]/.test(char)) {
         break;
       }
       if (char === "y") {
@@ -1696,21 +1707,49 @@ Lexer.prototype = {
         }
 
         body = translateUFlag(body);
+      } else if (char === "s") {
+        if (!state.inES9()) {
+          this.triggerAsync(
+            "warning",
+            {
+              code: "W119",
+              line: this.line,
+              character: this.char,
+              data: [ "DotAll RegExp flag", "9" ]
+            },
+            checks,
+            function() { return true; }
+          );
+        }
+        if (value.indexOf("s") > -1) {
+          malformedDesc = "Duplicate RegExp flag";
+        }
+      } else {
+        es5Flags += char;
       }
 
-      if (flags.indexOf(char) > -1) {
+      if (allFlags.indexOf(char) > -1) {
         malformedDesc = "Duplicate RegExp flag";
       }
-      flags.push(char);
+      allFlags += char;
 
       value += char;
+      allFlags += char;
       index += 1;
+    }
+
+    if (allFlags.indexOf("u") === -1) {
+      this.triggerAsync("warning", {
+        code: "W147",
+        line: this.line,
+        character: this.char
+      }, checks, function() { return state.option.regexpu; });
     }
 
     // Check regular expression for correctness.
 
     try {
-      new RegExp(body);
+      new RegExp(body, es5Flags);
     } catch (err) {
       /**
        * Because JSHint relies on the current engine's RegExp parser to
@@ -1727,6 +1766,12 @@ Lexer.prototype = {
         line: this.line,
         character: this.char,
         data: [ malformedDesc ]
+      });
+    } else if (allFlags.indexOf("s") > -1 && !reg.regexpDot.test(body)) {
+      this.trigger("warning", {
+        code: "W148",
+        line: this.line,
+        character: this.char
       });
     }
 
@@ -1873,38 +1918,6 @@ Lexer.prototype = {
     var checks = asyncTrigger();
     var token;
 
-
-    function isReserved(token, isProperty) {
-      // At present all current identifiers have reserved set.
-      // Preserving check anyway, for future-proofing.
-      /* istanbul ignore if */
-      if (!token.reserved) {
-        return false;
-      }
-      var meta = token.meta;
-
-      if (meta && meta.isFutureReservedWord && state.inES5()) {
-        // ES3 FutureReservedWord in an ES5 environment.
-        if (!meta.es5) {
-          return false;
-        }
-
-        // Some ES5 FutureReservedWord identifiers are active only
-        // within a strict mode environment.
-        if (meta.strictOnly) {
-          if (!state.option.strict && !state.isStrict()) {
-            return false;
-          }
-        }
-
-        if (isProperty) {
-          return false;
-        }
-      }
-
-      return true;
-    }
-
     // Produce a token object.
     var create = function(type, value, isProperty, token) {
       /*jshint validthis:true */
@@ -1935,16 +1948,13 @@ Lexer.prototype = {
 
       if (type === "(identifier)") {
         if (value === "return" || value === "case" || value === "yield" ||
-            value === "typeof" || value === "instanceof" || value === "void") {
+            value === "typeof" || value === "instanceof" || value === "void" ||
+            value === "await") {
           this.prereg = true;
         }
 
         if (_.has(state.syntax, value)) {
-          obj = Object.create(state.syntax[value]);
-          // If this can't be a reserved keyword, reset the object.
-          if (!isReserved(obj, isProperty && type === "(identifier)")) {
-            obj = null;
-          }
+          obj = Object.create(state.syntax[value] || state.syntax["(error)"]);
         }
       }
 

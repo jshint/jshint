@@ -297,7 +297,6 @@ exports.switchFallThrough = function (test) {
   var src = fs.readFileSync(__dirname + '/fixtures/switchFallThrough.js', 'utf8');
   TestRun(test)
     .addError(3, 18, "Expected a 'break' statement before 'case'.")
-    .addError(18, 7, "Expected a 'break' statement before 'default'.")
     .addError(40, 12, "Unexpected ':'.")
     .test(src);
 
@@ -633,7 +632,6 @@ exports.testReserved = function (test) {
     .test(src, {es3: true});
 
   TestRun(test)
-    .addError(5, 5, "Expected an identifier and instead saw 'let' (a reserved word).")
     .addError(10, 7, "Expected an identifier and instead saw 'let' (a reserved word).")
     .test(src, {}); // es5
 
@@ -746,8 +744,8 @@ exports.testForIn = function (test) {
 
   TestRun(test, "bad lhs errors")
     .addError(2, 7, "Invalid for-in loop left-hand-side: more than one ForBinding.")
-    .addError(3, 11, "Invalid for-in loop left-hand-side: more than one ForBinding.")
-    .addError(4, 6, "Invalid for-in loop left-hand-side: initializer is forbidden.")
+    .addError(3, 6, "Invalid for-in loop left-hand-side: more than one ForBinding.")
+    .addError(4, 8, "Invalid for-in loop left-hand-side: initializer is forbidden.")
     .addError(5, 6, "Invalid for-in loop left-hand-side: initializer is forbidden.")
     .test(src);
 
@@ -761,8 +759,8 @@ exports.testForIn = function (test) {
   ];
 
   TestRun(test, "bad lhs errors (lexical)")
-    .addError(2, 11, "Invalid for-in loop left-hand-side: more than one ForBinding.")
-    .addError(3, 13, "Invalid for-in loop left-hand-side: more than one ForBinding.")
+    .addError(2, 6, "Invalid for-in loop left-hand-side: more than one ForBinding.")
+    .addError(3, 6, "Invalid for-in loop left-hand-side: more than one ForBinding.")
     .addError(4, 6, "Invalid for-in loop left-hand-side: initializer is forbidden.")
     .addError(5, 6, "Invalid for-in loop left-hand-side: initializer is forbidden.")
     .test(src, { esnext: true });
@@ -780,6 +778,21 @@ exports.testForIn = function (test) {
       "for (x+y in {}) {}",
       "for ((this) in {}) {}"
     ]);
+
+  TestRun(test, "expression context")
+    .test([
+      "for (0 ? 0 in {} : 0 ; false; false ) {}",
+      "for (x[0 in {}] ; false; false ) {}",
+      "for (x = function() { return 0 in {}; } ; false; false ) {}"
+    ]);
+
+  TestRun(test, "expression context (ES2015 forms)")
+    .test([
+      "for (({ [x in {}]: null }); false; false ) {}",
+      "for (var { prop = 'x' in {} } of [{}]) {}",
+      "for (x = () => { return 0 in {}; } ; false; false ) {}",
+      "for (x = function(x = 0 in {}) {} ; false; false ) {}"
+    ], { esversion: 2015 });
 
   test.done();
 };
