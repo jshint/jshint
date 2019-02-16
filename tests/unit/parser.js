@@ -6992,6 +6992,20 @@ exports.functionReassignment = function (test) {
     .addError(10, 3, "Reassignment of 'h', which is a function. Use 'var' or 'let' to declare bindings that may change.")
     .test(src);
 
+  TestRun(test, "generator functions")
+    .addError(2, 1, "Reassignment of 'g', which is a generator function. Use 'var' or 'let' to declare bindings that may change.")
+    .test([
+      "function * g () { yield; }",
+      "g = null;"
+    ], { esversion: 6 });
+
+  TestRun(test, "async functions")
+    .addError(2, 1, "Reassignment of 'a', which is a async function. Use 'var' or 'let' to declare bindings that may change.")
+    .test([
+      "async function a () {}",
+      "a = null;"
+    ], { esversion: 8 });
+
   test.done();
 };
 
