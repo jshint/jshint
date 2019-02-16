@@ -345,7 +345,7 @@ var scopeManager = function(state, predefined, exported, declared) {
 
           isFunction = usedLabelType === "function" ||
             usedLabelType === "generator function" ||
-            usedLabelType === "async fuction";
+            usedLabelType === "async function";
 
           // check for re-assigning a function declaration
           if ((isFunction || usedLabelType === "class") && usage["(reassigned)"]) {
