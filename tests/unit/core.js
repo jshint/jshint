@@ -624,8 +624,6 @@ exports.testReserved = function (test) {
 
   TestRun(test)
     .addError(1, 1, "Expected an identifier and instead saw 'volatile' (a reserved word).")
-    .addError(5, 5, "Expected an identifier and instead saw 'let' (a reserved word).")
-    .addError(10, 7, "Expected an identifier and instead saw 'let' (a reserved word).")
     .addError(13, 13, "Expected an identifier and instead saw 'class' (a reserved word).")
     .addError(14, 5, "Expected an identifier and instead saw 'else' (a reserved word).")
     .addError(15, 5, "Expected an identifier and instead saw 'protected' (a reserved word).")
