@@ -1020,6 +1020,40 @@ exports.unused.basic = function (test) {
   test.done();
 };
 
+// Regression test for gh-3362
+exports.unused.es3Reserved = function (test) {
+  TestRun(test)
+    .addError(1, 5, "'abstract' is defined but never used.")
+    .addError(1, 15, "'boolean' is defined but never used.")
+    .addError(1, 24, "'byte' is defined but never used.")
+    .addError(1, 30, "'char' is defined but never used.")
+    .addError(1, 36, "'double' is defined but never used.")
+    .addError(1, 44, "'final' is defined but never used.")
+    .addError(1, 51, "'float' is defined but never used.")
+    .addError(1, 58, "'goto' is defined but never used.")
+    .addError(1, 64, "'int' is defined but never used.")
+    .addError(2, 5, "'long' is defined but never used.")
+    .addError(2, 11, "'native' is defined but never used.")
+    .addError(2, 19, "'short' is defined but never used.")
+    .addError(2, 26, "'synchronized' is defined but never used.")
+    .addError(2, 40, "'transient' is defined but never used.")
+    .addError(2, 51, "'volatile' is defined but never used.")
+    .test([
+      "var abstract, boolean, byte, char, double, final, float, goto, int;",
+      "var long, native, short, synchronized, transient, volatile;",
+    ], {unused: true});
+
+  TestRun(test)
+    .test([
+      "var abstract, boolean, byte, char, double, final, float, goto, int;",
+      "var long, native, short, synchronized, transient, volatile;",
+      "void (abstract + boolean + byte + char + double + final + float + loat + goto + int);",
+      "void (long + native + short + synchronized + transient + volatile);"
+    ], {unused: true});
+
+  test.done();
+};
+
 // Regression test for gh-2784
 exports.unused.usedThroughShadowedDeclaration = function (test) {
   var code = [
@@ -4087,6 +4121,7 @@ exports.module.await = function(test) {
 
   TestRun(test)
     .addError(1, 1, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, 1, "Expected an identifier and instead saw 'await' (a reserved word).")
     .addError(1, 6, "Missing semicolon.")
     .addError(1, 1, "Unrecoverable syntax error. (100% scanned).")
     .test("await: while (false) {}", { esversion: 6, module: true });

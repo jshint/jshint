@@ -132,6 +132,23 @@ var JSHINT = (function() {
     return true;
   }
 
+  /**
+   * ES3 defined a set of "FutureReservedWords" in order "to allow for the
+   * possibility of future adoption of [proposed] extensions."
+   *
+   * ES5 reduced the set of FutureReservedWords, in some cases by using them to
+   * define new syntactic forms (e.g. `class` and `const`) and in other cases
+   * by simply allowing their use as Identifiers (e.g. `int` and `goto`).
+   * Separately, ES5 introduced new restrictions on certain tokens, but limited
+   * the restriction to strict mode code (e.g. `let` and `yield`).
+   *
+   * This function determines if a given token describes a reserved word
+   * according to the current state of the parser.
+   *
+   * @param {number} context - the parsing context; see `prod-params.js` for
+   *                           more information
+   * @param {Token} token
+   */
   function isReserved(context, token) {
     if (!token.reserved) {
       return false;
@@ -145,19 +162,21 @@ var JSHINT = (function() {
           return false;
         }
 
-        // Some ES5 FutureReservedWord identifiers are active only
-        // within a strict mode environment.
-        if (meta.strictOnly) {
-          if (!state.option.strict && !state.isStrict()) {
-            return false;
-          }
-        }
-
         if (token.isProperty) {
           return false;
         }
       }
+    } else if (meta && meta.es5 && !state.inES5()) {
+      return false;
     }
+
+    // Some identifiers are reserved only within a strict mode environment.
+    if (meta && meta.strictOnly && state.inES5()) {
+      if (!state.option.strict && !state.isStrict()) {
+        return false;
+      }
+    }
+
     if (token.id === "await" && (!(context & prodParams.async) && !state.option.module)) {
       return false;
     }
@@ -1281,9 +1300,7 @@ var JSHINT = (function() {
    *                     support cases where further refinement is necessary)
    */
   function FutureReservedWord(name, meta) {
-    var x = type(name, (meta && meta.nud) || function() {
-      return this;
-    });
+    var x = type(name, (meta && meta.nud) || state.syntax["(identifier)"].nud);
 
     meta = meta || {};
     meta.isFutureReservedWord = true;
@@ -2251,7 +2268,7 @@ var JSHINT = (function() {
     lbp: 0,
     identifier: true,
 
-    nud: function() {
+    nud: function(context) {
       var v = this.value;
 
       // If this identifier is the lone parameter to a shorthand "fat arrow"
@@ -2266,7 +2283,9 @@ var JSHINT = (function() {
         return this;
       }
 
-      if (!state.funct["(comparray)"].check(v)) {
+      if (isReserved(context, this)) {
+        warning("W024", this, v);
+      } else if (!state.funct["(comparray)"].check(v)) {
         state.funct["(scope)"].block.use(v, state.tokens.curr);
       }
       return this;
@@ -4394,7 +4413,7 @@ var JSHINT = (function() {
       return state.syntax["(identifier)"].nud.apply(this, arguments);
     }
   };
-  letstatement.meta = { es5: true, isFutureReservedWord: true, strictOnly: true };
+  letstatement.meta = { es5: true, isFutureReservedWord: false, strictOnly: true };
   letstatement.exps = true;
   letstatement.declaration = true;
   letstatement.useFud = function(context) {

@@ -6577,6 +6577,8 @@ exports.classes = function (test) {
     .addError(cexpr + 3, 20, "Expected an identifier and instead saw 'protected' (a reserved word).")
     .addError(cdecl + 4, 15, "Expected an identifier and instead saw 'package' (a reserved word).")
     .addError(cexpr + 4, 15, "Expected an identifier and instead saw 'package' (a reserved word).")
+    .addError(cdecl + 6, 20, "Expected an identifier and instead saw 'interface' (a reserved word).")
+    .addError(cexpr + 6, 27, "Expected an identifier and instead saw 'interface' (a reserved word).")
     .addError(cdeclAssn + 4, 21, "Reassignment of 'Foo15', which is a class. Use 'var' or 'let' to declare bindings that may change.")
     .addError(cdeclAssn + 7, 21, "Reassignment of 'Foo18', which is a class. Use 'var' or 'let' to declare bindings that may change.")
     .addError(cdeclAssn + 7, 43, "Reassignment of 'Foo17', which is a class. Use 'var' or 'let' to declare bindings that may change.")
