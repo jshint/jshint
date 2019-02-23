@@ -3069,7 +3069,7 @@ var JSHINT = (function() {
       }
       if (!left.identifier && left.id !== "." && left.id !== "[" && left.id !== "=>" &&
           left.id !== "(" && left.id !== "&&" && left.id !== "||" && left.id !== "?" &&
-          !(state.inES6() && left["(name)"])) {
+          left.id !== "async" && !(state.inES6() && left["(name)"])) {
         warning("W067", that);
       }
     }
@@ -5308,6 +5308,7 @@ var JSHINT = (function() {
 
       context |= prodParams.preAsync;
       this.func = expression(context, rbp);
+      this.identifier = false;
       return this;
     }
 
@@ -5569,6 +5570,11 @@ var JSHINT = (function() {
         this.block = true;
         advance("function");
         state.syntax["function"].fud(context);
+      } else if (exportType === "async" && peek().id === "function") {
+        this.block = true;
+        advance("async");
+        advance("function");
+        state.syntax["function"].fud(context | prodParams.preAsync);
       } else if (exportType === "class") {
         this.block = true;
         advance("class");
@@ -5644,6 +5650,12 @@ var JSHINT = (function() {
       this.block = true;
       advance("function");
       state.syntax["function"].fud(context);
+    } else if (state.tokens.next.id === "async" && peek().id === "function") {
+      // ExportDeclaration :: export Declaration
+      this.block = true;
+      advance("async");
+      advance("function");
+      state.syntax["function"].fud(context | prodParams.preAsync);
     } else if (state.tokens.next.id === "class") {
       // ExportDeclaration :: export Declaration
       this.block = true;

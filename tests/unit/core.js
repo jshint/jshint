@@ -928,6 +928,46 @@ exports.testES6Modules = function (test) {
       "import afterLabelImported from 'elsewhere';"
     ], { esversion: 6 });
 
+  TestRun(test, "async as Identifier")
+    .test([
+      "var async;",
+      "export default async;"
+    ], { esversion: 6, module: true });
+
+  TestRun(test, "async in CallExpression")
+    .test([
+      "var async, x, y, z;",
+      "export default async(x, y, z);"
+    ], { esversion: 6, module: true });
+
+  TestRun(test, "async functions")
+    .test([
+      "export async function f() { await 0; }",
+      "export default async function() { await 0; }",
+    ], { esversion: 8, module: true });
+
+  TestRun(test, "async arrow function - zero arguments")
+    .test([
+      "export default async () => {};"
+    ], { esversion: 8, module: true });
+
+  TestRun(test, "async arrow function - concise argument")
+    .test([
+      "export default async _ => {};"
+    ], { esversion: 8, module: true });
+
+  TestRun(test, "async arrow function - many arguments")
+    .test([
+      "export default async (x, y, z) => {};"
+    ], { esversion: 8, module: true });
+
+
+  TestRun(test, "async generator functions")
+    .test([
+      "export async function * f() { yield 0; await 0; }",
+      "export default async function * () { yield 0; await 0; }",
+    ], { esversion: 9, module: true });
+
   test.done();
 };
 
