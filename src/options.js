@@ -110,6 +110,13 @@ exports.bool = {
     forin       : true,
 
     /**
+     * This option prohibits the use of HTML-like comments (`<!--`) and
+     * forces the characters to be lexed as other symbols and not start a
+     * comment.
+     */
+    htmlcomments: true,
+
+    /**
      * This option prohibits the use of immediate function invocations without
      * wrapping them in parentheses. Wrapping parentheses assists readers of
      * your code in understanding that the expression is the result of a
