@@ -31,7 +31,7 @@ var results = new Transform({
 
     done(null, {
       id: normalizePath(test.file) + "(" + test.scenario + ")",
-      expected: test.attrs.negative && test.attrs.negative.phase === "early"
+      expected: test.attrs.negative && test.attrs.negative.phase === "parse"
         ? "fail" : "pass",
       actual: runTest(test) ? "pass": "fail"
     });
