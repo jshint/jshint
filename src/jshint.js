@@ -4333,7 +4333,7 @@ var JSHINT = (function() {
       // Bindings are not immediately initialized in for-in and for-of
       // statements. As with `const` initializers (described above), the `for`
       // statement parsing logic includes
-      if (!noin) {
+      if (state.tokens.next.value !== "in" && state.tokens.next.value !== "of") {
         for (t in tokens) {
           if (tokens.hasOwnProperty(t)) {
             t = tokens[t];
