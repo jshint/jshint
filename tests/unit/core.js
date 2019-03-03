@@ -2327,3 +2327,14 @@ exports["TDZ within for in/of head"] = function(test) {
 
   test.done();
 };
+
+// regression test for gh-3370
+exports.initializeCStyle = function(test) {
+  TestRun(test)
+    .test([
+      "for (let x, y = x; ;) {}",
+      "for (const x = 0, y = x; ;) {}"
+    ], { esversion: 6 });
+
+  test.done();
+};
