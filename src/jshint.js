@@ -4283,8 +4283,9 @@ var JSHINT = (function() {
       // head of for-in and for-of statements. If this binding list is being
       // parsed as part of a `for` statement of any kind, allow the initializer
       // to be omitted. Although this may erroneously allow such forms from
-      // "C-style" `for` statements (i.e. `for (;;) {}`, the `for` statement
-      // logic includes dedicated logic to issue the error for such cases.
+      // "C-style" `for` statements (i.e. `for (const x;;) {}`, the `for`
+      // statement logic includes dedicated logic to issue the error for such
+      // cases.
       if (!noin && isConst && state.tokens.next.id !== "=") {
         warning("E012", state.tokens.curr, state.tokens.curr.value);
       }
@@ -5122,6 +5123,10 @@ var JSHINT = (function() {
       nolinebreak(state.tokens.curr);
       advance(";");
       if (decl) {
+        if (decl.value === "const"  && !decl.hasInitializer) {
+          warning("E012", decl, decl.first[0].value);
+        }
+
         decl.first.forEach(function(token) {
           state.funct["(scope)"].initialize(token.value);
         });

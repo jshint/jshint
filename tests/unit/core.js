@@ -2338,3 +2338,23 @@ exports.initializeCStyle = function(test) {
 
   test.done();
 };
+
+exports.constWithoutInit = function(test) {
+  TestRun(test, "single binding")
+    .addError(1, 6, "const 'x' is initialized to 'undefined'.")
+    .test([
+      "for (const x; ;) {",
+      "  void x;",
+      "}"
+    ], { esversion: 6 });
+
+  TestRun(test, "multiple bindings")
+    .addError(1, 6, "const 'y' is initialized to 'undefined'.")
+    .test([
+      "for (const y, z; ;) {",
+      "  void (y, z);",
+      "}"
+    ], { esversion: 6 });
+
+  test.done();
+};
