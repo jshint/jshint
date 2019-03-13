@@ -1,3 +1,16 @@
+<a name="2.10.2"></a>
+## [2.10.2](https://github.com/jshint/jshint/compare/2.10.1...v2.10.2) (2019-03-13)
+
+### Bug Fixes
+
+* Allow built-in method names in classes ([b0c224b](https://github.com/jshint/jshint/commit/b0c224b))
+* Correct parsing of exported async fns ([64b9dce](https://github.com/jshint/jshint/commit/64b9dce))
+* Correct parsing of RegExp character sets ([668c4a3](https://github.com/jshint/jshint/commit/668c4a3))
+* Init block bindings in C-style for loop ([404c9a0](https://github.com/jshint/jshint/commit/404c9a0))
+* Require const intlzr in C-style for loop ([307e9fc](https://github.com/jshint/jshint/commit/307e9fc))
+* Track FutureReservedWords as idnts in ES5+ ([d697ff4](https://github.com/jshint/jshint/commit/d697ff4))
+* Warn on reassignment of async functions ([14384d3](https://github.com/jshint/jshint/commit/14384d3))
+
 <a name="2.10.1"></a>
 ## [2.10.1](https://github.com/jshint/jshint/compare/2.10.0...v2.10.1) (2019-02-05)
 
