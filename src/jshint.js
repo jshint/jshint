@@ -4135,12 +4135,13 @@ var JSHINT = (function() {
 
           // Due to visual symmetry with the array rest property (and the early
           // design of the language feature), developers may mistakenly assume
-          // any expression is valid in this position.  Parse an expression and
-          // issue an error in order to recover more gracefully from this
-          // condition.
-          expr = expression(context, 10);
-
-          if (expr.type !== "(identifier)") {
+          // any expression is valid in this position. If the next token is not
+          // an identifier, attempt to parse an expression and issue an error.
+          // order to recover more gracefully from this condition.
+          if (state.tokens.next.type === "(identifier)") {
+            id = identifier(context);
+          } else {
+            expr = expression(context, 10);
             error("E030", expr, expr.value);
           }
         } else {
