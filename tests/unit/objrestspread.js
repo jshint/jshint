@@ -115,5 +115,9 @@ exports.rest = function (test) {
     .addError(1, 7, "Expected an identifier and instead saw '{'.")
     .test("({ ...{} } = {});", { esversion: 9 });
 
+  TestRun(test, "gh-3377 - identifier interpreted as new binding, not reference")
+    .addError(1, 10, "'x' is defined but never used.")
+    .test("var { ...x } = {};", { esversion: 9, unused: true, undef: true });
+
   test.done();
 };
