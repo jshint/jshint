@@ -8,6 +8,8 @@ environment:
     - nodejs_version: 0.12
     - nodejs_version: 4
     - nodejs_version: 6
+    - nodejs_version: 8
+    - nodejs_version: 10
 
 install:
   - ps: Install-Product node $env:nodejs_version
@@ -15,7 +17,7 @@ install:
   # These packages cannot be installed in legacy versions of Node.js. Because
   # they are only needed to verify correctness in a browser-like environment,
   # they can be removed (and the tests skipped) without effecting coverage.
-  - if NOT "%nodejs_version%" == "6" node scripts/remove-dev-dependencies.js phantom phantomjs-prebuilt
+  - if NOT "%nodejs_version%" == "10" node scripts/remove-dev-dependencies.js phantom phantomjs-prebuilt
   - npm install
 
 build: off
@@ -23,8 +25,8 @@ build: off
 test_script:
   - node --version && npm --version
   - npm run test-node
-  - if "%nodejs_version%" == "6" npm run test-browser
-  - if "%nodejs_version%" == "6" npm run test-262
+  - if "%nodejs_version%" == "10" npm run test-browser
+  - if "%nodejs_version%" == "10" npm run test-262
 
 cache:
   - node_modules            # local npm modules
