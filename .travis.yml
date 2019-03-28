@@ -4,19 +4,21 @@ before_install:
   # These packages cannot be installed in legacy versions of Node.js. Because
   # they are only needed to verify correctness in a browser-like environment,
   # they can be removed (and the tests skipped) without effecting coverage.
-  - if [[ $(node --version) != v6* ]] ; then
+  - if [[ $(node --version) != v10* ]] ; then
       node scripts/remove-dev-dependencies.js phantom phantomjs-prebuilt;
     fi
 script:
   - npm run pretest
   - npm run test-node
-  - if [[ $(node --version) == v6* ]] ; then npm run test-262; fi
-  - if [[ $(node --version) == v6* ]] ; then npm run test-browser; fi
+  - if [[ $(node --version) == v10* ]] ; then npm run test-262; fi
+  - if [[ $(node --version) == v10* ]] ; then npm run test-browser; fi
 node_js:
   - "0.10"
   - "0.12"
   - 4
   - 6
+  - 8
+  - 10
 matrix:
   fast_finish: true
 sudo: false
