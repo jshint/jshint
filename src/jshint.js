@@ -2878,8 +2878,10 @@ var JSHINT = (function() {
             doMethod(classToken, context, name, false);
           } else {
             name = propertyName(context);
-            if (name === "prototype" || name === "constructor") {
+            if (!isStatic && name === "constructor") {
               error("E049", state.tokens.curr, "class " + accessorType + "ter method", name);
+            } else if (isStatic && name === "prototype") {
+              error("E049", state.tokens.curr, "static class " + accessorType + "ter method", name);
             }
             saveAccessor(accessorType, props, name, state.tokens.curr, true, isStatic);
             doMethod(classToken, context, state.nameStack.infer(), false);
@@ -2898,8 +2900,8 @@ var JSHINT = (function() {
             advance();
             break;
           }
-          if (name === "prototype") {
-            error("E049", token, "class method", name);
+          if (isStatic && name === "prototype") {
+            error("E049", token, "static class method", name);
           }
           saveProperty(props, name, token, true, isStatic);
           doMethod(classToken, context, name, inGenerator);

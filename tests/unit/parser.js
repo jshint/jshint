@@ -6661,7 +6661,6 @@ exports["class and method naming"] = function (test) {
     .addError(2, 7, "Strict violation.")
     .addError(4, 7, "A class getter method cannot be named 'constructor'.")
     .addError(5, 7, "A class setter method cannot be named 'constructor'.")
-    .addError(6, 3, "A class method cannot be named 'prototype'.")
     .addError(7, 6, "Class properties must be methods. Expected '(' but instead saw 'extra'.")
     .addError(8, 11, "Class properties must be methods. Expected '(' but instead saw 'extraIdent1'.")
     .addError(9, 11, "Class properties must be methods. Expected '(' but instead saw 'extraIdent2'.")
@@ -6680,6 +6679,46 @@ exports["class and method naming"] = function (test) {
     .addError(31, 7, "Setter is defined without getter.");
 
   run.test(code, {esnext: true});
+
+  TestRun(test, "valid uses of name `constructor`")
+    .test([
+      "void class {",
+      "  constructor() {}",
+      "};",
+      "void class {",
+      "  static constructor() {}",
+      "};",
+      "void class {",
+      "  static get constructor() {}",
+      "};"
+    ], {esversion: 6});
+
+  TestRun(test, "valid uses of name `prototype`")
+    .test([
+      "void class {",
+      "  get prototype() {}",
+      "};",
+      "void class {",
+      "  get prototype() {}",
+      "  set prototype(x) {}",
+      "};"
+    ], {esversion: 6});
+
+  TestRun(test, "invalid use of name `prototype`: static method")
+    .addError(2, 10, "A static class method cannot be named 'prototype'.")
+    .test([
+      "void class {",
+      "  static prototype() {}",
+      "};"
+    ], {esversion: 6});
+
+  TestRun(test, "invalid use of name `prototype`: static accessor method")
+    .addError(2, 14, "A static class getter method cannot be named 'prototype'.")
+    .test([
+      "void class {",
+      "  static get prototype() {}",
+      "};"
+    ], {esversion: 6});
 
   TestRun(test, "hazardous method names (see gh-3358)")
     .addError(3, 17, "'hasOwnProperty' is a really bad name.")
