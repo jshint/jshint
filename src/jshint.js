@@ -2843,6 +2843,24 @@ var JSHINT = (function() {
       }
 
       token = state.tokens.next;
+
+      if ((token.value === "set" || token.value === "get") && !checkPunctuator(peek(), "(")) {
+        if (inGenerator) {
+          error("E024", token, token.value);
+        }
+        accessorType = token.value;
+        advance();
+        token = state.tokens.next;
+
+        if (!isStatic && token.value === "constructor") {
+          error("E049", token, "class " + accessorType + "ter method", token.value);
+        } else if (isStatic && token.value === "prototype") {
+          error("E049", token, "static class " + accessorType + "ter method", token.value);
+        }
+      } else {
+        accessorType = null;
+      }
+
       switch (token.value) {
         case ";":
           warning("W032", token);
@@ -2857,37 +2875,14 @@ var JSHINT = (function() {
           } else {
             if (inGenerator || context & prodParams.preAsync) {
               error("E024", token, token.value);
-            }
-            if (hasConstructor) {
+            } else if (hasConstructor) {
               error("E024", token, token.value);
+            } else {
+              hasConstructor = !accessorType && !isStatic;
             }
             advance();
             doMethod(classToken, context, state.nameStack.infer());
-            hasConstructor = true;
           }
-          break;
-        case "set":
-        case "get":
-          if (inGenerator) {
-            error("E024", token, token.value);
-          }
-          accessorType = token.value;
-          advance();
-
-          if (state.tokens.next.value === "[") {
-            name = computedPropertyName(context);
-            doMethod(classToken, context, name, false);
-          } else {
-            name = propertyName(context);
-            if (!isStatic && name === "constructor") {
-              error("E049", state.tokens.curr, "class " + accessorType + "ter method", name);
-            } else if (isStatic && name === "prototype") {
-              error("E049", state.tokens.curr, "static class " + accessorType + "ter method", name);
-            }
-            saveAccessor(accessorType, props, name, state.tokens.curr, true, isStatic);
-            doMethod(classToken, context, state.nameStack.infer(), false);
-          }
-
           break;
         case "[":
           name = computedPropertyName(context);
@@ -2896,15 +2891,23 @@ var JSHINT = (function() {
           break;
         default:
           name = propertyName(context);
-          if (!name) {
+          if (name === undefined) {
             error("E024", token, token.value);
             advance();
             break;
           }
-          if (isStatic && name === "prototype") {
-            error("E049", token, "static class method", name);
+
+          if (accessorType) {
+            saveAccessor(accessorType, props, name, token, true, isStatic);
+            name = state.nameStack.infer();
+          } else {
+            if (isStatic && name === "prototype") {
+              error("E049", token, "static class method", name);
+            }
+
+            saveProperty(props, name, token, true, isStatic);
           }
-          saveProperty(props, name, token, true, isStatic);
+
           doMethod(classToken, context, name, inGenerator);
           break;
       }

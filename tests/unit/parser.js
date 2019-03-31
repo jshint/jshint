@@ -6256,6 +6256,13 @@ exports["object ComputedPropertyName"] = function (test) {
     .addError(19, 17, "Setter is defined without getter.")
     .test(code, { esnext: true });
 
+  TestRun(test, "regression test for gh-3381")
+    .test([
+      "void {",
+      "  set() {}",
+      "};"
+    ], {esversion: 6});
+
   TestRun(test)
     .addError(6, 1, "'computed property names' is only available in ES6 (use 'esversion: 6').")
     .addError(7, 8, "'computed property names' is only available in ES6 (use 'esversion: 6').")
@@ -6717,6 +6724,13 @@ exports["class and method naming"] = function (test) {
     .test([
       "void class {",
       "  static get prototype() {}",
+      "};"
+    ], {esversion: 6});
+
+  TestRun(test, "regression test for gh-3381")
+    .test([
+      "void class {",
+      "  set() {}",
       "};"
     ], {esversion: 6});
 
