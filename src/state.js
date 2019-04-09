@@ -66,7 +66,7 @@ var state = {
   },
 
   /**
-   * Determine if constructs introduced in ECMAScript 8 should be accepted.
+   * Determine if constructs introduced in ECMAScript 9 should be accepted.
    *
    * @returns {boolean}
    */
