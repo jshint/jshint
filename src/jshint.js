@@ -1295,26 +1295,6 @@ var JSHINT = (function() {
   }
 
   /**
-   * Convenience function for defining JSHint symbols for reserved
-   * binding identifiers.
-   *
-   * @param {string} s - the name of the symbol
-   * @param {function} v - the first null denotation function for the symbol;
-   *                       see the `expression` function for more detail
-   *
-   * @returns {object} - the object describing the JSHint symbol (provided to
-   *                     support cases where further refinement is necessary)
-   */
-  function reservevar(s, v) {
-    return reserve(s, function() {
-      if (typeof v === "function") {
-        v(this);
-      }
-      return this;
-    });
-  }
-
-  /**
    * Convenience function for defining "infix" symbols--operators that require
    * operands as both "land-hand side" and "right-hand side".
    *
@@ -2343,16 +2323,20 @@ var JSHINT = (function() {
   reserve("finally");
   reserve("true", function() { return this; });
   reserve("false", function() { return this; });
-  reservevar("null");
-  reservevar("this", function(x) {
+  reserve("null", function() { return this; });
+  reserve("this", function() {
     if (state.isStrict() && !isMethod() &&
         !state.option.validthis && ((state.funct["(statement)"] &&
         state.funct["(name)"].charAt(0) > "Z") || state.funct["(global)"])) {
-      warning("W040", x);
+      warning("W040", this);
     }
+
+    return this;
   });
-  reservevar("super", function(x) {
-    superNud.call(state.tokens.curr, x);
+  reserve("super", function() {
+    superNud.call(state.tokens.curr, this);
+
+    return this;
   });
 
   assignop("=", "assign", 20);
