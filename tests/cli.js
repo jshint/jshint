@@ -1473,5 +1473,145 @@ exports.useStdin = {
     test.equal(cli.exit.args[1][0], 0, "The input is not linted because the specified file name is ignored.");
 
     test.done();
+  },
+
+  // Overrides should work when the passed stdin filename is in the current directoy
+  testOverridesFromStdin: function (test) {
+    var dir = __dirname + "/../examples/";
+    var rep = require("../examples/reporter.js");
+    var config = {
+      "asi": true,
+      "overrides": {
+        "bar.js": {
+          "asi": false
+        }
+      }
+    };
+
+    this.sinon.stub(process, "cwd").returns(dir);
+    this.sinon.stub(rep, "reporter");
+    this.sinon.stub(shjs, "cat")
+      .withArgs(sinon.match(/config\.json$/))
+        .returns(JSON.stringify(config));
+
+    this.sinon.stub(shjs, "test")
+      .withArgs("-e", sinon.match(/config\.json$/)).returns(true);
+
+    cli.exit.withArgs(0).returns(true)
+      .withArgs(1).throws("ProcessExit");
+
+    // Test successful file
+    cli.interpret([
+      "node", "jshint", "--filename", "foo.js", "--config", "config.json", "--reporter", "reporter.js", "-"
+    ]);
+    this.stdin.send("a()");
+    this.stdin.end();
+    this.stdin.reset(true);
+    test.ok(rep.reporter.args[0][0].length === 0);
+
+    // Test overriden, failed file
+    cli.interpret([
+      "node", "jshint", "--filename", "bar.js", "--config", "config.json", "--reporter", "reporter.js", "-"
+    ]);
+    this.stdin.send("a()");
+    this.stdin.end();
+    test.ok(rep.reporter.args[1][0].length > 0, "Error was expected but not thrown");
+    test.equal(rep.reporter.args[1][0][0].error.code, "W033");
+
+    test.done();
+   },
+
+  // Override behaviour for implicit relative paths (without a leading ./) should be the same
+  // for stdin as for file
+  testOverridesMatchesImplicitRelativePathsFromStdin: function (test) {
+    var dir = __dirname + "/../examples/";
+    var rep = require("../examples/reporter.js");
+    var config = {
+      "asi": true,
+      "overrides": {
+        "src/bar.js": {
+          "asi": false
+        }
+      }
+    };
+
+    this.sinon.stub(process, "cwd").returns(dir);
+    this.sinon.stub(rep, "reporter");
+    this.sinon.stub(shjs, "cat")
+      .withArgs(sinon.match(/config\.json$/))
+        .returns(JSON.stringify(config));
+
+    this.sinon.stub(shjs, "test")
+      .withArgs("-e", sinon.match(/config\.json$/)).returns(true);
+
+    cli.exit.withArgs(0).returns(true)
+      .withArgs(1).throws("ProcessExit");
+
+    // Test successful file
+    cli.interpret([
+      "node", "jshint", "--filename", "src/foo.js", "--config", "config.json", "--reporter", "reporter.js", "-"
+    ]);
+    this.stdin.send("a()");
+    this.stdin.end();
+    this.stdin.reset(true);
+    test.ok(rep.reporter.args[0][0].length === 0);
+
+    // Test overriden, failed file
+    cli.interpret([
+      "node", "jshint", "--filename", "src/bar.js", "--config", "config.json", "--reporter", "reporter.js", "-"
+    ]);
+    this.stdin.send("a()");
+    this.stdin.end();
+    test.ok(rep.reporter.args[1][0].length > 0, "Error was expected but not thrown");
+    test.equal(rep.reporter.args[1][0][0].error.code, "W033");
+
+    test.done();
+  },
+
+  // Override behaviour for explicit relative paths (with a leading ./) should be the same
+  // for stdin as for file
+  testOverridesMatchesExplicitRelativePathsFromStdin: function (test) {
+    var dir = __dirname + "/../examples/";
+    var rep = require("../examples/reporter.js");
+    var config = {
+      "asi": true,
+      "overrides": {
+        "src/bar.js": {
+          "asi": false
+        }
+      }
+    };
+
+    this.sinon.stub(process, "cwd").returns(dir);
+    this.sinon.stub(rep, "reporter");
+    this.sinon.stub(shjs, "cat")
+      .withArgs(sinon.match(/config\.json$/))
+        .returns(JSON.stringify(config));
+
+    this.sinon.stub(shjs, "test")
+      .withArgs("-e", sinon.match(/config\.json$/)).returns(true);
+
+    cli.exit.withArgs(0).returns(true)
+      .withArgs(1).throws("ProcessExit");
+
+    // Test successful file
+    cli.interpret([
+      "node", "jshint", "--filename", "./src/foo.js", "--config", "config.json", "--reporter", "reporter.js", "-"
+    ]);
+    this.stdin.send("a()");
+    this.stdin.end();
+    this.stdin.reset(true);
+    test.ok(rep.reporter.args[0][0].length === 0);
+
+    // Test overriden, failed file
+    cli.interpret([
+      "node", "jshint", "--filename", "./src/bar.js", "--config", "config.json", "--reporter", "reporter.js", "-"
+    ]);
+    this.stdin.send("a()");
+    this.stdin.end();
+    test.ok(rep.reporter.args[1][0].length > 0, "Error was expected but not thrown");
+    test.equal(rep.reporter.args[1][0][0].error.code, "W033");
+
+    test.done();
   }
 };
