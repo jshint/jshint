@@ -323,21 +323,31 @@ exports.group = {
     this.sinon.stub(process, "cwd").returns(dir);
     this.sinon.stub(rep, "reporter");
     this.sinon.stub(shjs, "cat")
+      .withArgs(sinon.match(/foo\.js$/)).returns("a()")
       .withArgs(sinon.match(/bar\.js$/)).returns("a()")
       .withArgs(sinon.match(/config\.json$/))
         .returns(JSON.stringify(config));
 
     this.sinon.stub(shjs, "test")
+      .withArgs("-e", sinon.match(/foo\.js$/)).returns(true)
       .withArgs("-e", sinon.match(/bar\.js$/)).returns(true)
       .withArgs("-e", sinon.match(/config\.json$/)).returns(true);
 
     cli.exit.withArgs(0).returns(true)
       .withArgs(1).throws("ProcessExit");
 
+    // Test successful file
+    cli.interpret([
+      "node", "jshint", "./src/foo.js", "--config", "config.json", "--reporter", "reporter.js"
+    ]);
+    test.ok(rep.reporter.args[0][0].length === 0);
+
+    // Test overriden, failed file
     cli.interpret([
       "node", "jshint", "./src/bar.js", "--config", "config.json", "--reporter", "reporter.js"
     ]);
-    test.ok(rep.reporter.args[0][0].length === 1);
+    test.ok(rep.reporter.args[1][0].length > 0, "Error was expected but not thrown");
+    test.equal(rep.reporter.args[1][0][0].error.code, "W033");
 
     test.done();
   },
