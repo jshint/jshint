@@ -1265,7 +1265,7 @@ var JSHINT = (function() {
 
   /**
    * Convenience function for defining JSHint symbols for reserved
-   * keywords--those that are restricted from use as bindings (and as propery
+   * keywords--those that are restricted from use as bindings (and as property
    * names in ECMAScript 3 environments).
    *
    * @param {string} s - the name of the symbol
