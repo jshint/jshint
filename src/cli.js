@@ -611,15 +611,24 @@ var exports = {
     }
 
     var filename;
+    var lintStdinFile;
 
     // There is an if(filename) check in the lint() function called below.
     // passing a filename of undefined is the same as calling the function
     // without a filename.  If there is no opts.filename, filename remains
     // undefined and lint() is effectively called with 4 parameters.
     if (opts.filename) {
-      filename = path.resolve(opts.filename);
+      filename = opts.filename;
+      var ignores = !opts.ignores ? loadIgnores({ cwd: opts.cwd }) :
+                                  opts.ignores.map(function(target) {
+                                    return path.resolve(target);
+                                  });
+      lintStdinFile = (opts.useStdin && !isIgnored(filename, ignores));
+    } else {
+      lintStdinFile = opts.useStdin;
     }
-    if (opts.useStdin && opts.ignores.indexOf(filename) === -1) {
+
+    if (lintStdinFile) {
       cli.withStdin(function(code) {
         var config = opts.config;
 
