@@ -2705,12 +2705,10 @@ var JSHINT = (function() {
         case "this":
           break;
         default:
-          if (c.id !== "function") {
-            i = c.value.substr(0, 1);
-            if (state.option.newcap && (i < "A" || i > "Z") &&
-              !state.funct["(scope)"].isPredefined(c.value)) {
-              warning("W055", state.tokens.curr);
-            }
+          i = c.value.substr(0, 1);
+          if (state.option.newcap && (i < "A" || i > "Z") &&
+            !state.funct["(scope)"].isPredefined(c.value)) {
+            warning("W055", state.tokens.curr);
           }
         }
       } else {
