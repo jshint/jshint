@@ -1282,7 +1282,7 @@ var JSHINT = (function() {
    *                     support cases where further refinement is necessary)
    */
   function FutureReservedWord(name, meta) {
-    var x = type(name, (meta && meta.nud) || state.syntax["(identifier)"].nud);
+    var x = type(name, state.syntax["(identifier)"].nud);
 
     meta = meta || {};
     meta.isFutureReservedWord = true;
