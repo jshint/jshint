@@ -831,24 +831,6 @@ var JSHINT = (function() {
   function advance(expected, relatedToken) {
     var nextToken = state.tokens.next;
 
-    switch (state.tokens.curr.id) {
-    case "(number)":
-      if (nextToken.id === ".") {
-        warning("W005", state.tokens.curr);
-      }
-      break;
-    case "-":
-      if (nextToken.id === "-" || nextToken.id === "--") {
-        warning("W006");
-      }
-      break;
-    case "+":
-      if (nextToken.id === "+" || nextToken.id === "++") {
-        warning("W007");
-      }
-      break;
-    }
-
     if (expected && nextToken.id !== expected) {
       if (relatedToken) {
         if (nextToken.id === "(end)") {
@@ -2255,6 +2237,10 @@ var JSHINT = (function() {
   // Build the syntax table by declaring the syntactic elements of the language.
 
   type("(number)", function() {
+    if (state.tokens.next.id === ".") {
+      warning("W005", this);
+    }
+
     return this;
   });
 
@@ -2548,6 +2534,7 @@ var JSHINT = (function() {
     return token;
   }, 120);
   infix("+", function(context, left, that) {
+    var next = state.tokens.next;
     var right;
     that.left = left;
     that.right = right = expression(context, 130);
@@ -2561,11 +2548,45 @@ var JSHINT = (function() {
       return left;
     }
 
+    if (next.id === "+" || next.id === "++") {
+      warning("W007", that.right);
+    }
+
     return that;
   }, 130);
-  prefix("+", "num");
-  infix("-", "sub", 130);
-  prefix("-", "neg");
+  prefix("+", function(context) {
+    var next = state.tokens.next;
+    this.arity = "unary";
+    this.right = expression(context, 150);
+
+    if (next.id === "+" || next.id === "++") {
+      warning("W007", this.right);
+    }
+
+    return this;
+  });
+  infix("-", function(context, left, that) {
+    var next = state.tokens.next;
+    that.left = left;
+    that.right = expression(context, 130);
+
+    if (next.id === "-" || next.id === "--") {
+      warning("W006", that.right);
+    }
+
+    return that;
+  }, 130);
+  prefix("-", function(context) {
+    var next = state.tokens.next;
+    this.arity = "unary";
+    this.right = expression(context, 150);
+
+    if (next.id === "-" || next.id === "--") {
+      warning("W006", this.right);
+    }
+
+    return this;
+  });
   infix("*", "mult", 140);
   infix("/", "div", 140);
   infix("%", "mod", 140);
