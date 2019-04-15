@@ -103,7 +103,7 @@ exports.confusingOps = function (test) {
     "a = a++ + 3;", // this is not confusing?!
   ];
 
-  var run = TestRun(test)
+  var run = TestRun(test, "AdditiveExpressions")
     .addError(1, 13, "Confusing minuses.")
     .addError(2, 13, "Confusing plusses.")
     .addError(3, 9, "Confusing minuses.")
@@ -112,6 +112,18 @@ exports.confusingOps = function (test) {
   run.test(code, {}); // es5
   run.test(code, {esnext: true});
   run.test(code, {moz: true});
+
+  TestRun(test, "UnaryExpressions")
+    .addError(1, 8, "Confusing minuses.")
+    .addError(2, 8, "Confusing minuses.")
+    .addError(3, 8, "Confusing plusses.")
+    .addError(4, 8, "Confusing plusses.")
+    .test([
+      "void - -x;",
+      "void - --x;",
+      "void + +x;",
+      "void + ++x;"
+    ]);
 
   test.done();
 };
