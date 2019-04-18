@@ -744,6 +744,7 @@ var JSHINT = (function() {
               state.option[tn] = !state.option[tn];
             }
           } else if (directiveToken.type === "jshint.unstable") {
+            /* istanbul ignore next */
             state.option.unstable[key] = (val === "true");
           } else {
             state.option[key] = (val === "true");
@@ -1549,6 +1550,7 @@ var JSHINT = (function() {
         warning("W121", left, nativeObject);
     }
     if (checkPunctuator(left, "...")) {
+      /* istanbul ignore next */
       left = left.right;
     }
 
@@ -1734,6 +1736,7 @@ var JSHINT = (function() {
     }
 
     if (val === "undefined") {
+      /* istanbul ignore next */
       return val;
     }
 
@@ -2258,6 +2261,7 @@ var JSHINT = (function() {
     },
 
     led: function() {
+      /* istanbul ignore next */
       error("E033", state.tokens.next, state.tokens.next.value);
     }
   };
@@ -2345,6 +2349,7 @@ var JSHINT = (function() {
   assignop("-=", "assignsub", 20);
   assignop("*=", "assignmult", 20);
   assignop("/=", "assigndiv", 20).nud = function() {
+    /* istanbul ignore next */
     error("E014");
   };
   assignop("%=", "assignmod", 20);
@@ -2381,6 +2386,7 @@ var JSHINT = (function() {
     }
     while (true) {
       if (!(expr = expression(context, 10))) {
+        /* istanbul ignore next */
         break;
       }
       that.exprs.push(expr);
@@ -2440,6 +2446,7 @@ var JSHINT = (function() {
         this.from = this.character;
         warning("W116", this, "===", "==");
         break;
+      /* istanbul ignore next */
       case isTypoTypeof(right, left, state):
         warning("W122", this, right.value);
         break;
@@ -2454,6 +2461,7 @@ var JSHINT = (function() {
     if (isTypoTypeof(right, left, state)) {
       warning("W122", this, right.value);
     } else if (isTypoTypeof(left, right, state)) {
+      /* istanbul ignore next */
       warning("W122", this, left.value);
     }
     return this;
@@ -2466,6 +2474,7 @@ var JSHINT = (function() {
       this.from = this.character;
       warning("W116", this, "!==", "!=");
     } else if (isTypoTypeof(right, left, state)) {
+      /* istanbul ignore next */
       warning("W122", this, right.value);
     } else if (isTypoTypeof(left, right, state)) {
       warning("W122", this, left.value);
@@ -2476,6 +2485,7 @@ var JSHINT = (function() {
     if (isTypoTypeof(right, left, state)) {
       warning("W122", this, right.value);
     } else if (isTypoTypeof(left, right, state)) {
+      /* istanbul ignore next */
       warning("W122", this, left.value);
     }
     return this;
@@ -2622,10 +2632,12 @@ var JSHINT = (function() {
     this.right = expression(context, 150);
 
     if (!this.right) { // '!' followed by nothing? Give up.
+      /* istanbul ignore next */
       quit("E041", this);
     }
 
     if (bang[this.right.id] === true) {
+      /* istanbul ignore next */
       warning("W018", this, "!");
     }
     return this;
@@ -2698,6 +2710,7 @@ var JSHINT = (function() {
         }
       } else {
         if (c.id !== "." && c.id !== "[" && c.id !== "(") {
+          /* istanbul ignore next */
           warning("W056", state.tokens.curr);
         }
       }
@@ -2801,6 +2814,7 @@ var JSHINT = (function() {
     var props = Object.create(null);
     var name, accessorType, token, isStatic, inGenerator, hasConstructor;
 
+    /* istanbul ignore else */
     if (state.tokens.next.value === "{") {
       advance("{");
     } else {
@@ -2849,6 +2863,7 @@ var JSHINT = (function() {
 
       if ((token.value === "set" || token.value === "get") && !checkPunctuator(peek(), "(")) {
         if (inGenerator) {
+          /* istanbul ignore next */
           error("E024", token, token.value);
         }
         accessorType = token.value;
@@ -2879,6 +2894,7 @@ var JSHINT = (function() {
             if (inGenerator || context & prodParams.preAsync) {
               error("E024", token, token.value);
             } else if (hasConstructor) {
+              /* istanbul ignore next */
               error("E024", token, token.value);
             } else {
               hasConstructor = !accessorType && !isStatic;
@@ -2941,6 +2957,7 @@ var JSHINT = (function() {
           identifier(context);
           advance();
         }
+        /* istanbul ignore next */
         return;
       } else {
         while (state.tokens.next.value !== "(") {
@@ -3008,6 +3025,7 @@ var JSHINT = (function() {
         if (left.value.match(/^[A-Z]([A-Z0-9_$]*[a-z][A-Za-z0-9_$]*)?$/)) {
           if ("Array Number String Boolean Date Object Error Symbol".indexOf(left.value) === -1) {
             if (left.value === "Math") {
+              /* istanbul ignore next */
               warning("W063", left);
             } else if (state.option.newcap) {
               warning("W064", left);
@@ -3294,6 +3312,7 @@ var JSHINT = (function() {
     if (_.includes(["in", "of"], state.tokens.next.value)) {
       advance();
     } else {
+      /* istanbul ignore next */
       error("E045", state.tokens.curr);
     }
     state.funct["(comparray)"].setState("generate");
@@ -3337,6 +3356,7 @@ var JSHINT = (function() {
     if (b) {
       indent += state.option.indent;
       if (state.tokens.next.from === indent + state.option.indent) {
+        /* istanbul ignore next */
         indent += state.option.indent;
       }
     }
@@ -3394,6 +3414,7 @@ var JSHINT = (function() {
     var id;
     var preserve = true;
     if (typeof preserveOrToken === "object") {
+      /* istanbul ignore next */
       id = preserveOrToken;
     } else {
       preserve = preserveOrToken;
@@ -3412,6 +3433,7 @@ var JSHINT = (function() {
           advance();
         }
       }
+    /* istanbul ignore next */
     } else if (typeof id === "object") {
       if (id.id === "(string)" || id.id === "(identifier)") id = id.value;
       else if (id.id === "(number)") id = id.value.toString();
@@ -3639,7 +3661,10 @@ var JSHINT = (function() {
 
     function end() {
       if (state.tokens.curr.template && state.tokens.curr.tail &&
-          state.tokens.curr.context === ctx) return true;
+          state.tokens.curr.context === ctx) {
+        /* istanbul ignore next */
+        return true;
+      }
       var complete = (state.tokens.next.template && state.tokens.next.tail &&
                       state.tokens.next.context === ctx);
       if (complete) advance();
@@ -3906,6 +3931,7 @@ var JSHINT = (function() {
       if (b) {
         indent += state.option.indent;
         if (state.tokens.next.from === indent + state.option.indent) {
+          /* istanbul ignore next */
           indent += state.option.indent;
         }
       }
@@ -4038,6 +4064,7 @@ var JSHINT = (function() {
         if (state.tokens.next.id === ",") {
           parseComma({ allowTrailing: true, property: true });
           if (state.tokens.next.id === ",") {
+            /* istanbul ignore next */
             warning("W070", state.tokens.curr);
           } else if (state.tokens.next.id === "}" && !state.inES5()) {
             warning("W070", state.tokens.curr);
@@ -4060,6 +4087,7 @@ var JSHINT = (function() {
       return this;
     };
     x.fud = function() {
+      /* istanbul ignore next */
       error("E036", state.tokens.curr);
     };
   }(delim("{")));
@@ -4194,6 +4222,7 @@ var JSHINT = (function() {
         }
         if (!isRest && checkPunctuator(state.tokens.next, "=")) {
           if (checkPunctuator(state.tokens.prev, "...")) {
+            /* istanbul ignore next */
             advance("]");
           } else {
             advance("=");
@@ -4254,6 +4283,7 @@ var JSHINT = (function() {
       if (token && value)
         token.first = value;
       else if (token && token.first && !value)
+        /* istanbul ignore next */
         warning("W080", token.first, token.first.value);
     });
   }
@@ -4307,6 +4337,7 @@ var JSHINT = (function() {
           // It is a Syntax Error if the BoundNames of BindingList contains
           // "let".
           if (t.id === "let") {
+            /* istanbul ignore next */
             warning("W024", t.token, t.id);
           }
 
@@ -4605,6 +4636,7 @@ var JSHINT = (function() {
     }
 
     if (state.tokens.next.id === "(" && state.tokens.next.line === state.tokens.curr.line) {
+      /* istanbul ignore next */
       error("E039");
     }
     return this;
@@ -4877,6 +4909,7 @@ var JSHINT = (function() {
         state.funct["(breakage)"] -= 1;
         state.funct["(verb)"] = undefined;
         return;
+      /* istanbul ignore next */
       case "(end)":
         error("E023", state.tokens.next, "}");
         return;
@@ -4884,6 +4917,7 @@ var JSHINT = (function() {
         indent += state.option.indent;
         if (g) {
           switch (state.tokens.curr.id) {
+          /* istanbul ignore next */
           case ",":
             error("E040");
             return;
@@ -4891,11 +4925,13 @@ var JSHINT = (function() {
             g = false;
             statements(context);
             break;
+          /* istanbul ignore next */
           default:
             error("E025", state.tokens.curr);
             return;
           }
         } else {
+          /* istanbul ignore else */
           if (state.tokens.curr.id === ":") {
             advance(":");
             error("E024", state.tokens.curr, ":");
@@ -5522,7 +5558,9 @@ var JSHINT = (function() {
           advance("}");
           break;
         } else {
+          /* istanbul ignore next */
           error("E024", state.tokens.next, state.tokens.next.value);
+          /* istanbul ignore next */
           break;
         }
       }
@@ -5608,6 +5646,7 @@ var JSHINT = (function() {
       var exportedTokens = [];
       while (!checkPunctuator(state.tokens.next, "}")) {
         if (!state.tokens.next.identifier) {
+          /* istanbul ignore next */
           error("E030", state.tokens.next, state.tokens.next.value);
         }
         advance();
@@ -5617,6 +5656,7 @@ var JSHINT = (function() {
         if (state.tokens.next.value === "as") {
           advance("as");
           if (!state.tokens.next.identifier) {
+            /* istanbul ignore next */
             error("E030", state.tokens.next, state.tokens.next.value);
           }
           advance();
@@ -5676,6 +5716,7 @@ var JSHINT = (function() {
       advance("class");
       state.syntax["class"].fud(context);
     } else {
+      /* istanbul ignore next */
       error("E024", state.tokens.next, state.tokens.next.value);
     }
 
@@ -5955,6 +5996,7 @@ var JSHINT = (function() {
     var block = lookupBlockType();
     if (block.notJson) {
       if (!state.inES6() && block.isDestAssign) {
+        /* istanbul ignore next */
         warning("W104", state.tokens.curr, "destructuring assignment", "6");
       }
       statements(context);
@@ -6061,10 +6103,12 @@ var JSHINT = (function() {
             // we check whether current variable has been declared
             if (use(v)) {
               // if not we warn about it
+              /* istanbul ignore next */
               state.funct["(scope)"].block.use(v, state.tokens.curr);
             }
             return true;
           }
+          /* istanbul ignore next */
           return false;
         }
         };
@@ -6274,6 +6318,7 @@ var JSHINT = (function() {
     });
 
     scopeManagerInst.on("error", function(ev) {
+      /* istanbul ignore next */
       error.apply(null, [ ev.code, ev.token ].concat(ev.data));
     });
 
@@ -6298,6 +6343,7 @@ var JSHINT = (function() {
 
     api = {
       get isJSON() {
+        /* istanbul ignore next */
         return state.jsonMode;
       },
 
@@ -6333,6 +6379,7 @@ var JSHINT = (function() {
     if (o && o.ignoreDelimiters) {
 
       if (!Array.isArray(o.ignoreDelimiters)) {
+        /* istanbul ignore next */
         o.ignoreDelimiters = [o.ignoreDelimiters];
       }
 
@@ -6438,6 +6485,7 @@ var JSHINT = (function() {
           character : err.character || nt.from
         });
       } else {
+        /* istanbul ignore next */
         throw err;
       }
     }
@@ -6471,6 +6519,7 @@ var JSHINT = (function() {
     }
 
     if (state.jsonMode) {
+      /* istanbul ignore next */
       data.json = true;
     }
 
@@ -6480,6 +6529,7 @@ var JSHINT = (function() {
     }
 
     if (urls.length > 0) {
+      /* istanbul ignore next */
       data.urls = urls;
     }
 
