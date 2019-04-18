@@ -151,6 +151,7 @@ var scopeManager = function(state, predefined, exported, declared) {
     var params = _current["(params)"];
 
     if (!params) {
+      /* istanbul ignore next */
       return;
     }
 
@@ -561,6 +562,7 @@ var scopeManager = function(state, predefined, exported, declared) {
       var isMethod = state.funct["(method)"];
 
       if (!currentFunctParamScope["(params)"]) {
+        /* istanbul ignore next */
         return;
       }
 
@@ -684,6 +686,7 @@ var scopeManager = function(state, predefined, exported, declared) {
               return;
             }
           } else {
+            /* istanbul ignore next */
             break;
           }
         }
@@ -1038,3 +1041,4 @@ var scopeManager = function(state, predefined, exported, declared) {
 };
 
 module.exports = scopeManager;
+
