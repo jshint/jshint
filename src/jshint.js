@@ -2446,10 +2446,9 @@ var JSHINT = (function() {
         this.from = this.character;
         warning("W116", this, "===", "==");
         break;
+      /* istanbul ignore next */
       case isTypoTypeof(right, left, state):
-        /* istanbul ignore next */
         warning("W122", this, right.value);
-        /* istanbul ignore next */
         break;
       case isTypoTypeof(left, right, state):
         warning("W122", this, left.value);
@@ -2815,12 +2814,11 @@ var JSHINT = (function() {
     var props = Object.create(null);
     var name, accessorType, token, isStatic, inGenerator, hasConstructor;
 
+    /* istanbul ignore else */
     if (state.tokens.next.value === "{") {
       advance("{");
     } else {
-      /* istanbul ignore next */
       warning("W116", state.tokens.curr, "identifier", state.tokens.next.type); //?
-      /* istanbul ignore next */
       advance();
     }
 
@@ -3435,10 +3433,9 @@ var JSHINT = (function() {
           advance();
         }
       }
+    /* istanbul ignore next */
     } else if (typeof id === "object") {
-      /* istanbul ignore next */
       if (id.id === "(string)" || id.id === "(identifier)") id = id.value;
-      /* istanbul ignore next */
       else if (id.id === "(number)") id = id.value.toString();
     }
 
@@ -4912,39 +4909,35 @@ var JSHINT = (function() {
         state.funct["(breakage)"] -= 1;
         state.funct["(verb)"] = undefined;
         return;
+      /* istanbul ignore next */
       case "(end)":
-        /* istanbul ignore next */
         error("E023", state.tokens.next, "}");
-        /* istanbul ignore next */
         return;
       default:
         indent += state.option.indent;
         if (g) {
           switch (state.tokens.curr.id) {
+          /* istanbul ignore next */
           case ",":
-            /* istanbul ignore next */
             error("E040");
-            /* istanbul ignore next */
             return;
           case ":":
             g = false;
             statements(context);
             break;
+          /* istanbul ignore next */
           default:
-            /* istanbul ignore next */
             error("E025", state.tokens.curr);
-            /* istanbul ignore next */
             return;
           }
         } else {
+          /* istanbul ignore else */
           if (state.tokens.curr.id === ":") {
             advance(":");
             error("E024", state.tokens.curr, ":");
             statements(context);
           } else {
-            /* istanbul ignore next */
             error("E021", state.tokens.next, "case", state.tokens.next.value);
-            /* istanbul ignore next */
             return;
           }
         }
