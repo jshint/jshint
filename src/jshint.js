@@ -3664,8 +3664,10 @@ var JSHINT = (function() {
 
     function end() {
       if (state.tokens.curr.template && state.tokens.curr.tail &&
-          /* istanbul ignore next */
-          state.tokens.curr.context === ctx) return true;
+          state.tokens.curr.context === ctx) {
+        /* istanbul ignore next */
+        return true;
+      }
       var complete = (state.tokens.next.template && state.tokens.next.tail &&
                       state.tokens.next.context === ctx);
       if (complete) advance();
