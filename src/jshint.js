@@ -6582,4 +6582,3 @@ var JSHINT = (function() {
 if (typeof exports === "object" && exports) {
   exports.JSHINT = JSHINT;
 }
-

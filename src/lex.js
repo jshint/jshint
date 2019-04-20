@@ -2180,4 +2180,3 @@ Lexer.prototype = {
 
 exports.Lexer = Lexer;
 exports.Context = Context;
-

@@ -1041,4 +1041,3 @@ var scopeManager = function(state, predefined, exported, declared) {
 };
 
 module.exports = scopeManager;
-
