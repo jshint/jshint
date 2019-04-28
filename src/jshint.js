@@ -3170,9 +3170,11 @@ var JSHINT = (function() {
     if (!exprs.length) {
       return;
     }
+
+    exprs[exprs.length - 1].parent = true;
+
     if (exprs.length > 1) {
-      ret = Object.create(state.syntax[","]);
-      ret.exprs = exprs;
+      ret = Object.create(state.syntax[","], { exprs: { value: exprs } });
 
       first = exprs[0];
       last = exprs[exprs.length - 1];
@@ -3229,8 +3231,6 @@ var JSHINT = (function() {
       if (!isNecessary) {
         warning("W126", opening);
       }
-
-      ret.paren = true;
     }
 
     return ret;
@@ -3865,14 +3865,10 @@ var JSHINT = (function() {
   // For example: if (a = 1) { ... }
 
   function checkCondAssignment(expr) {
-    var id, paren;
-    if (expr) {
+    var id = expr.id;
+    if (id === ",") {
+      expr = expr.exprs[expr.exprs.length - 1];
       id = expr.id;
-      paren = expr.paren;
-      if (id === "," && (expr = expr.exprs[expr.exprs.length - 1])) {
-        id = expr.id;
-        paren = paren || expr.paren;
-      }
     }
     switch (id) {
     case "=":
@@ -3884,7 +3880,7 @@ var JSHINT = (function() {
     case "|=":
     case "^=":
     case "/=":
-      if (!paren && !state.option.boss) {
+      if (!expr.paren && !state.option.boss) {
         warning("W084");
       }
     }
@@ -5225,7 +5221,7 @@ var JSHINT = (function() {
     if (!state.option.asi)
       nolinebreak(this);
 
-    if (state.tokens.next.id !== ";" && !state.tokens.next.reach &&
+    if (state.tokens.next.id !== ";" &&
         state.tokens.curr.line === startLine(state.tokens.next)) {
       if (!state.funct["(scope)"].funct.hasLabel(v)) {
         warning("W090", state.tokens.next, v);
@@ -5253,7 +5249,7 @@ var JSHINT = (function() {
     if (!state.option.asi)
       nolinebreak(this);
 
-    if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
+    if (state.tokens.next.id !== ";") {
       if (state.tokens.curr.line === startLine(state.tokens.next)) {
         if (!state.funct["(scope)"].funct.hasLabel(v)) {
           warning("W090", state.tokens.next, v);
