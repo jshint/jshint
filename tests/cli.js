@@ -1637,5 +1637,73 @@ exports.useStdin = {
 
       test.done();
     }
+  },
+
+  // We should only lint stdin when the special `-` or `/dev/stdin` values are passed, even
+  // if the `--filename` parameter is set
+  testStdinInputCorrectlyIgnored: {
+    setUp: function(done) {
+      var dir = __dirname + "/../examples/";
+      this.rep = require("../examples/reporter.js");
+      var config = {
+        "asi": false,
+        "overrides": {
+          "src/foo.js": {
+            "asi": true
+          }
+        }
+      };
+
+      this.sinon.stub(process, "cwd").returns(dir);
+      this.sinon.stub(this.rep, "reporter");
+      this.sinon.stub(shjs, "cat")
+        .withArgs(sinon.match(/foo\.js$/)).returns("a()")
+        .withArgs(sinon.match(/config\.json$/))
+          .returns(JSON.stringify(config));
+
+      this.sinon.stub(shjs, "test")
+        .withArgs("-e", sinon.match(/config\.json$/)).returns(true)
+        .withArgs("-e", sinon.match(/foo\.js$/)).returns(true);
+
+      cli.exit.withArgs(0).returns(true)
+        .withArgs(1).throws("ProcessExit");
+
+      done();
+    },
+
+    // Check that the stdin that is used in this test group actually triggers an error
+    stdinUsed: function(test) {
+      cli.interpret([
+        "node", "jshint", "--config", "config.json", "--reporter", "reporter.js", "-"
+      ]);
+      this.stdin.send("a()");
+      this.stdin.end();
+      test.ok(this.rep.reporter.args[0][0].length === 1, "Error was expected but not thrown");
+      test.equal(this.rep.reporter.args[0][0][0].error.code, "W033");
+
+      test.done();
+    },
+
+    // If the filename is set to something other than stdin, then sending stdin should be ignored
+    withoutFilename: function(test) {
+      cli.interpret([
+        "node", "jshint", "--config", "config.json", "--reporter", "reporter.js", "./src/foo.js"
+      ]);
+      this.stdin.send("a()");
+      this.stdin.end();
+      test.ok(this.rep.reporter.args[0][0].length === 0);
+      test.done();
+    },
+
+    // Passing the filename parameter should make no difference
+    withFilename: function(test) {
+      cli.interpret([
+        "node", "jshint", "--filename", "./src/bar.js", "--config", "config.json", "--reporter", "reporter.js", "./src/foo.js"
+      ]);
+      this.stdin.send("a()");
+      this.stdin.end();
+      test.ok(this.rep.reporter.args[0][0].length === 0);
+      test.done();
+    }
   }
 };
