@@ -891,14 +891,6 @@ var JSHINT = (function() {
     if (next.id === "in" && context & prodParams.noin) {
       return true;
     }
-    if (next.id === ";" || next.id === "}" || next.id === ":") {
-      return true;
-    }
-    if (next.infix === curr.infix || curr.ltBoundary === "after" ||
-      next.ltBoundary === "before") {
-      return curr.line !== startLine(next);
-    }
-    return false;
   }
 
   /**
@@ -956,7 +948,12 @@ var JSHINT = (function() {
         error("E030", state.tokens.curr, state.tokens.curr.id);
       }
 
-      while (rbp < state.tokens.next.lbp && !isEndOfExpr(context)) {
+      var end_of_expr = state.tokens.next.identifier &&
+                                                      !state.tokens.curr.led &&
+                                                      state.tokens.curr.line !== state.tokens.next.line;
+
+
+      while (rbp < state.tokens.next.lbp && !end_of_expr) {
         isArray = state.tokens.curr.value === "Array";
         isObject = state.tokens.curr.value === "Object";
 
@@ -1010,7 +1007,7 @@ var JSHINT = (function() {
 
   function nobreaknonadjacent(left, right) {
     if (!state.option.laxbreak && left.line !== startLine(right)) {
-      warning("W014", right, right.value);
+      warning("W014", right, right.id);
     }
   }
 
@@ -1021,26 +1018,25 @@ var JSHINT = (function() {
     }
   }
 
-  function nobreakcomma(left, right) {
-    if (left.line !== startLine(right)) {
-      if (!state.option.laxcomma) {
-        if (parseComma.first) {
-          warning("I001");
-          parseComma.first = false;
-        }
-        warning("W014", left, right.value);
-      }
-    }
-  }
-
   function parseComma(opts) {
     opts = opts || {};
 
     if (!opts.peek) {
-      nobreakcomma(state.tokens.curr, state.tokens.next);
+      if (state.tokens.curr.line !== startLine(state.tokens.next)) {
+        if (!state.option.laxcomma) {
+          if (parseComma.first) {
+            warning("I001");
+            parseComma.first = false;
+          }
+          warning("W014", state.tokens.curr, state.tokens.next.value);
+        }
+      } else if (!state.tokens.curr.comment &&
+                state.tokens.curr.character !== state.tokens.next.from && state.option.white) {
+        state.tokens.curr.from += (state.tokens.curr.character - state.tokens.curr.from);
+        warning("W011", state.tokens.curr, state.tokens.curr.value);
+      }
+
       advance(",");
-    } else {
-      nobreakcomma(state.tokens.prev, state.tokens.curr);
     }
 
     if (state.tokens.next.identifier && !(opts.property && state.inES5())) {
@@ -1059,6 +1055,7 @@ var JSHINT = (function() {
       case "in":
       case "instanceof":
       case "return":
+      case "yield":
       case "switch":
       case "throw":
       case "try":
@@ -1311,7 +1308,6 @@ var JSHINT = (function() {
   function infix(s, f, p, w) {
     var x = symbol(s, p);
     reserveName(x);
-    x.infix = true;
     x.led = function(context, left) {
       if (!w) {
         nobreaknonadjacent(state.tokens.prev, state.tokens.curr);
@@ -1623,7 +1619,8 @@ var JSHINT = (function() {
    *                     support cases where further refinement is necessary)
    */
   function assignop(s, f, p) {
-    var x = infix(s, typeof f === "function" ? f : function(context, left, that) {
+    symbol(s, 20).exps = true;
+    return infix(s, function(context, left, that) {
       that.left = left;
 
       checkLeftSideAssign(context, left, that, { allowDestructuring: true });
@@ -1631,11 +1628,7 @@ var JSHINT = (function() {
       that.right = expression(context, 10);
 
       return that;
-    }, p);
-
-    x.exps = true;
-    x.assign = true;
-    return x;
+    }, 20);
   }
 
   /**
@@ -1675,7 +1668,8 @@ var JSHINT = (function() {
    *                     support cases where further refinement is necessary)
    */
   function bitwiseassignop(s) {
-    return assignop(s, function(context, left, that) {
+    symbol(s, 20).exps = true;
+    return infix(s, function(context, left, that) {
       if (state.option.bitwise) {
         warning("W016", that, that.id);
       }
@@ -5405,11 +5399,7 @@ var JSHINT = (function() {
     return state.syntax["(identifier)"].nud.apply(this, arguments);
   })));
 
-  (function(x) {
-    x.exps = true;
-    x.lbp = x.rbp = 25;
-    x.ltBoundary = "after";
-  }(prefix("yield", function(context) {
+  stmt("yield", function(context) {
     if (state.inMoz()) {
       return mozYield.call(this, context);
     }
@@ -5426,7 +5416,7 @@ var JSHINT = (function() {
       error("E061", this);
     }
 
-    if (state.inES6(true) && !state.funct["(generator)"]) {
+    if (state.inES6(true) && state.funct["(generator)"] !== true) {
       // If it's a yield within a catch clause inside a generator then that's ok
       if (!("(catch)" === state.funct["(name)"] && state.funct["(context)"]["(generator)"])) {
         error("E046", state.tokens.curr, "yield");
@@ -5445,7 +5435,7 @@ var JSHINT = (function() {
       if (state.tokens.next.nud) {
 
         nobreaknonadjacent(state.tokens.curr, state.tokens.next);
-        this.first = expression(context, 10);
+        this.first = expression(context, 0);
 
         if (this.first.type === "(punctuator)" && this.first.value === "=" &&
             !this.first.paren && !state.option.boss) {
@@ -5459,7 +5449,7 @@ var JSHINT = (function() {
     }
 
     return this;
-  })));
+  }).exps = true;
 
   /**
    * Parsing logic for non-standard Mozilla implementation of `yield`
@@ -5467,7 +5457,7 @@ var JSHINT = (function() {
    */
   var mozYield = function(context) {
     var prev = state.tokens.prev;
-    if (state.inES6(true) && !state.funct["(generator)"]) {
+    if (state.inES6(true) && state.funct["(generator)"] !== true) {
       // If it's a yield within a catch clause inside a generator then that's ok
       if (!("(catch)" === state.funct["(name)"] && state.funct["(context)"]["(generator)"])) {
         error("E046", state.tokens.curr, "yield");
@@ -5484,20 +5474,15 @@ var JSHINT = (function() {
     if (this.line === startLine(state.tokens.next)) {
       if (delegatingYield ||
           (state.tokens.next.id !== ";" && !state.option.asi &&
-           !state.tokens.next.reach && state.tokens.next.nud)) {
+           !state.tokens.next.reach)) {
 
         nobreaknonadjacent(state.tokens.curr, state.tokens.next);
-        this.first = expression(context, 10);
+        this.first = expression(context, 0);
 
         if (this.first.type === "(punctuator)" && this.first.value === "=" &&
             !this.first.paren && !state.option.boss) {
           warningAt("W093", this.first.line, this.first.character);
         }
-      }
-
-      if (state.tokens.next.id !== ")" &&
-          (prev.lbp > 30 || (!prev.assign && !isEndOfExpr()) || prev.id === "yield")) {
-        error("E050", this);
       }
     } else if (!state.option.asi) {
       nolinebreak(this); // always warn (Line breaking error)
