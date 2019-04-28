@@ -1031,21 +1031,10 @@ var JSHINT = (function() {
   function parseComma(opts) {
     opts = opts || {};
 
-    if (!opts.peek) {
-      if (state.tokens.curr.line !== startLine(state.tokens.next)) {
-        if (!state.option.laxcomma) {
-          if (parseComma.first) {
-            warning("I001");
-            parseComma.first = false;
-          }
-          warning("W014", state.tokens.curr, state.tokens.next.value);
-        }
-      }
+    nobreakcomma(state.tokens.curr, state.tokens.next);
+    advance(",");
 
-      advance(",");
-    }
-
-    if (state.tokens.next.identifier && !(opts.property && state.inES5())) {
+    if (state.tokens.next.identifier && !state.inES5()) {
       // Keywords that cannot follow a comma operator.
       switch (state.tokens.next.value) {
       case "break":
@@ -1963,6 +1952,15 @@ var JSHINT = (function() {
       } else if (state.option.nonew && r && r.left && r.id === "(" && r.left.id === "new") {
         warning("W031", t);
       }
+
+      while (state.tokens.next.id === ",") {
+        if (parseComma()) {
+          r = expression(0, true);
+        } else {
+          return;
+        }
+      }
+
       parseFinalSemicolon(t);
     }
 
@@ -2328,6 +2326,7 @@ var JSHINT = (function() {
   delim("'").reach = true;
   delim(";");
   delim(":").reach = true;
+  delim(",");
   delim("#");
 
   reserve("else");
@@ -2382,29 +2381,6 @@ var JSHINT = (function() {
   bitwiseassignop("<<=");
   bitwiseassignop(">>=");
   bitwiseassignop(">>>=");
-  infix(",", function(context, left, that) {
-    var expr;
-    that.exprs = [left];
-
-    if (state.option.nocomma) {
-      warning("W127");
-    }
-
-    if (!parseComma({ peek: true })) {
-      return that;
-    }
-    while (true) {
-      if (!(expr = expression(context, 10))) {
-        /* istanbul ignore next */
-        break;
-      }
-      that.exprs.push(expr);
-      if (state.tokens.next.value !== "," || !parseComma()) {
-        break;
-      }
-    }
-    return that;
-  }, 10, true);
 
   infix("?", function(context, left, that) {
     increaseComplexityCount();
@@ -3177,13 +3153,8 @@ var JSHINT = (function() {
       }
     }
 
-    if (!exprs.length) {
-      return;
-    }
-
     if (exprs.length > 1) {
-      ret = Object.create(state.syntax[","]);
-      ret.exprs = exprs;
+      ret = exprs[0];
 
       first = exprs[0];
       last = exprs[exprs.length - 1];
@@ -3878,38 +3849,11 @@ var JSHINT = (function() {
     state.funct["(metrics)"].ComplexityCount += 1;
   }
 
-  /**
-   * Detect and warn about assignment that occurs within conditional clauses,
-   * e.g.
-   *
-   *     if (a = 1) { ... }
-   *
-   * This check is disabled in response to parenthesized expressions so that
-   * users may opt out of the warning on a case-by-case bases, e.g.
-   *
-   *     if ((a = 1)) { ... }
-   *
-   * @param {object} expr - the parsed expression within the conditional clause
-   */
-  function checkCondAssignment(expr) {
-    if (!expr || expr.paren || state.option.boss) {
-      return;
-    }
+  // Parse assignments that were found instead of conditionals.
+  // For example: if (a = 1) { ... }
 
-    var id = expr.id;
-
-    // If the expression is composed of multiple sub-expressions via a comma
-    // operator, then check the final sub-expression.
-    if (id === ",") {
-      expr = expr.exprs[expr.exprs.length - 1];
-      id = expr.id;
-
-      if (expr.paren) {
-        return;
-      }
-    }
-
-    switch (id) {
+  function parseCondAssignment(context) {
+    switch (state.tokens.next.id) {
     case "=":
     case "+=":
     case "-=":
@@ -3919,7 +3863,12 @@ var JSHINT = (function() {
     case "|=":
     case "^=":
     case "/=":
-      warning("W084");
+      if (!state.option.boss) {
+        warning("W084");
+      }
+
+      advance(state.tokens.next.id);
+      expression(20, context);
     }
   }
 
@@ -4099,7 +4048,7 @@ var JSHINT = (function() {
         countMember(i);
 
         if (state.tokens.next.id === ",") {
-          parseComma({ allowTrailing: true, property: true });
+          parseComma({ allowTrailing: true });
           if (state.tokens.next.id === ",") {
             /* istanbul ignore next */
             warning("W070", state.tokens.curr);
@@ -4723,7 +4672,6 @@ var JSHINT = (function() {
   blockstmt("if", function(context) {
     var t = state.tokens.next;
     increaseComplexityCount();
-    state.condition = true;
     advance("(");
     var expr = expression(context, 0);
 
@@ -4731,7 +4679,7 @@ var JSHINT = (function() {
       quit("E041", this);
     }
 
-    checkCondAssignment(expr);
+    parseCondAssignment(context);
 
     // When the if is within a for-in loop, check if the condition
     // starts with a negation operator
@@ -4747,7 +4695,6 @@ var JSHINT = (function() {
     }
 
     advance(")", t);
-    state.condition = false;
     var s = block(context, true, true);
 
     // When the if is within a for-in loop and the condition has a negative form,
@@ -4845,7 +4792,8 @@ var JSHINT = (function() {
     state.funct["(loopage)"] += 1;
     increaseComplexityCount();
     advance("(");
-    checkCondAssignment(expression(context, 0));
+    expression(context, 0);
+    parseCondAssignment(context);
     advance(")", t);
     block(context, true, true);
     state.funct["(breakage)"] -= 1;
@@ -4877,7 +4825,7 @@ var JSHINT = (function() {
 
     state.funct["(breakage)"] += 1;
     advance("(");
-    checkCondAssignment(expression(context, 0));
+    this.condition = expression(context, 0);
     advance(")", t);
     t = state.tokens.next;
     advance("{");
@@ -5014,7 +4962,8 @@ var JSHINT = (function() {
       advance("while");
       var t = state.tokens.next;
       advance("(");
-      checkCondAssignment(expression(context, 0));
+      expression(context, 0);
+      parseCondAssignment(context);
       advance(")", t);
       state.funct["(breakage)"] -= 1;
       state.funct["(loopage)"] -= 1;
@@ -5233,7 +5182,8 @@ var JSHINT = (function() {
       // on every loop
       state.funct["(loopage)"] += 1;
       if (state.tokens.next.id !== ";") {
-        checkCondAssignment(expression(context, 0));
+        expression(context, 0);
+        parseCondAssignment(context);
       }
       nolinebreak(state.tokens.curr);
       advance(";");
