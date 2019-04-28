@@ -303,7 +303,7 @@ exports.group = {
     cli.interpret([
       "node", "jshint", "bar.js", "--config", "config.json", "--reporter", "reporter.js"
     ]);
-    test.ok(rep.reporter.args[1][0].length > 0, "Error was expected but not thrown");
+    test.ok(rep.reporter.args[1][0].length === 1, "Error was expected but not thrown");
     test.equal(rep.reporter.args[1][0][0].error.code, "W033");
 
     test.done();
@@ -348,7 +348,7 @@ exports.group = {
     cli.interpret([
       "node", "jshint", "src/bar.js", "--config", "config.json", "--reporter", "reporter.js"
     ]);
-    test.ok(rep.reporter.args[1][0].length > 0, "Error was expected but not thrown");
+    test.ok(rep.reporter.args[1][0].length === 1, "Error was expected but not thrown");
     test.equal(rep.reporter.args[1][0][0].error.code, "W033");
 
     test.done();
@@ -393,7 +393,7 @@ exports.group = {
     cli.interpret([
       "node", "jshint", "./src/bar.js", "--config", "config.json", "--reporter", "reporter.js"
     ]);
-    test.ok(rep.reporter.args[1][0].length > 0, "Error was expected but not thrown");
+    test.ok(rep.reporter.args[1][0].length === 1, "Error was expected but not thrown");
     test.equal(rep.reporter.args[1][0][0].error.code, "W033");
 
     test.done();
@@ -1522,7 +1522,7 @@ exports.useStdin = {
       ]);
       this.stdin.send("a()");
       this.stdin.end();
-      test.ok(this.rep.reporter.args[0][0].length > 0, "Error was expected but not thrown");
+      test.ok(this.rep.reporter.args[0][0].length === 1, "Error was expected but not thrown");
       test.equal(this.rep.reporter.args[0][0][0].error.code, "W033");
 
       test.done();
@@ -1577,7 +1577,7 @@ exports.useStdin = {
       ]);
       this.stdin.send("a()");
       this.stdin.end();
-      test.ok(this.rep.reporter.args[0][0].length > 0, "Error was expected but not thrown");
+      test.ok(this.rep.reporter.args[0][0].length === 1, "Error was expected but not thrown");
       test.equal(this.rep.reporter.args[0][0][0].error.code, "W033");
 
       test.done();
@@ -1632,7 +1632,7 @@ exports.useStdin = {
       ]);
       this.stdin.send("a()");
       this.stdin.end();
-      test.ok(this.rep.reporter.args[0][0].length > 0, "Error was expected but not thrown");
+      test.ok(this.rep.reporter.args[0][0].length === 1, "Error was expected but not thrown");
       test.equal(this.rep.reporter.args[0][0][0].error.code, "W033");
 
       test.done();
