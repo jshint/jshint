@@ -1062,7 +1062,8 @@ exports.unstable = {
   /**
    * [The BigInt proposal](https://github.com/tc39/proposal-bigint) extends the
    * language's grammer for numeric literals to support integer values of
-   * arbitrary precision.
+   * arbitrary precision. It also introduces a new value of the `typeof`
+   * operator, "bigint".
    *
    * Mathematical operations which use both BigInt and traditional ECMAScript
    * Number values may not have the intended effect. Due to the weakly-typed
