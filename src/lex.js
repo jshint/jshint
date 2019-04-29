@@ -868,8 +868,27 @@ Lexer.prototype = {
         index += 1;
       }
 
-      if (isAllowedDigit !== isDecimalDigit) {
-        if (!isLegacy && value.length <= 2) { // 0x
+      var isBigInt = this.peek(index) === 'n';
+
+      if (isAllowedDigit !== isDecimalDigit || isBigInt) {
+        if (isBigInt) {
+          if (!state.option.unstable.bigint) {
+            this.triggerAsync(
+              "warning",
+              {
+                code: "W144",
+                line: this.line,
+                character: this.char,
+                data: [ "BigInt", "bigint" ]
+              },
+              checks,
+              function() { return true; }
+            );
+          }
+
+          value += char;
+          index += 1;
+        } else if (!isLegacy && value.length <= 2) { // 0x
           return {
             type: Token.NumericLiteral,
             value: value,
