@@ -1548,10 +1548,6 @@ var JSHINT = (function() {
       if (nativeObject)
         warning("W121", left, nativeObject);
     }
-    if (checkPunctuator(left, "...")) {
-      /* istanbul ignore next */
-      left = left.right;
-    }
 
     if (left.identifier && !left.isMetaProperty) {
       // The `reassign` method also calls `modify`, but we are specific in
