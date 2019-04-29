@@ -1448,8 +1448,17 @@ var JSHINT = (function() {
 
     values = state.inES6() ? typeofValues.es6 : typeofValues.es3;
 
-    if (right.type === "(identifier)" && right.value === "typeof" && left.type === "(string)")
+    if (right.type === "(identifier)" && right.value === "typeof" && left.type === "(string)") {
+      if (left.value === "bigint") {
+        if (!state.option.unstable.bigint) {
+          warning("W144", left, "BigInt", "bigint");
+        }
+
+        return false;
+      }
+
       return !_.includes(values, left.value);
+    }
 
     return false;
   }
