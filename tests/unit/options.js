@@ -311,7 +311,7 @@ exports.notypeof = function (test) {
     .addError(3, 17, "Invalid typeof value 'bool'")
     .addError(4, 11, "Invalid typeof value 'obj'")
     .addError(13, 17, "Invalid typeof value 'symbol'")
-    .addError(14, 17, "Invalid typeof value 'bigint'")
+    .addError(14, 21, "'BigInt' is a non-standard language feature. Enable it using the 'bigint' unstable option.")
     .test(src);
 
   TestRun(test)
@@ -319,7 +319,15 @@ exports.notypeof = function (test) {
     .addError(2, 14, "Invalid typeof value 'double'")
     .addError(3, 17, "Invalid typeof value 'bool'")
     .addError(4, 11, "Invalid typeof value 'obj'")
+    .addError(14, 21, "'BigInt' is a non-standard language feature. Enable it using the 'bigint' unstable option.")
     .test(src, { esnext: true });
+
+  TestRun(test)
+    .addError(1, 17, "Invalid typeof value 'funtion'")
+    .addError(2, 14, "Invalid typeof value 'double'")
+    .addError(3, 17, "Invalid typeof value 'bool'")
+    .addError(4, 11, "Invalid typeof value 'obj'")
+    .test(src, { esnext: true, unstable: { bigint: true } });
 
   TestRun(test)
     .test(src, { notypeof: true });
