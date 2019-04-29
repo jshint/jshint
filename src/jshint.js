@@ -1731,11 +1731,6 @@ var JSHINT = (function() {
       }
     }
 
-    if (val === "undefined") {
-      /* istanbul ignore next */
-      return val;
-    }
-
     warning("W024", state.tokens.curr, state.tokens.curr.id);
     return val;
   }
