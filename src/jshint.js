@@ -744,7 +744,6 @@ var JSHINT = (function() {
               state.option[tn] = !state.option[tn];
             }
           } else if (directiveToken.type === "jshint.unstable") {
-            /* istanbul ignore next */
             state.option.unstable[key] = (val === "true");
           } else {
             state.option[key] = (val === "true");
