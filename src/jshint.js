@@ -3172,6 +3172,12 @@ var JSHINT = (function() {
       ret = first = last = exprs[0];
 
       if (!isNecessary) {
+        // async functions are identified after parsing due to the complexity
+        // of disambiguating the `async` keyword.
+        if (!triggerFnExpr) {
+          triggerFnExpr = ret.id === "async";
+        }
+
         isNecessary =
           // Used to distinguish from an ExpressionStatement which may not
           // begin with the `{` and `function` tokens
