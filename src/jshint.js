@@ -5307,7 +5307,7 @@ var JSHINT = (function() {
         error("E024", this, "await");
       }
 
-      expression(context, 0);
+      expression(context, 10);
       return this;
     } else {
       this.exps = false;
