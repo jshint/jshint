@@ -9591,6 +9591,16 @@ exports.asyncFunctions.awaitOperator = function (test) {
       "};",
     ], { esversion: 8 });
 
+  // Regression test for gh-3395
+  TestRun(test, "within object initializer")
+    .test([
+      "void async function() {",
+      "  void {",
+      "    x: await 0,",
+      "  };",
+      "};"
+    ], { esversion: 8 });
+
   test.done();
 };
 
