@@ -3425,6 +3425,37 @@ singleGroups.exponentiation = function (test) {
   test.done();
 };
 
+singleGroups.asyncFunction = function (test) {
+  TestRun(test, "Async Function Expression")
+    .test([
+      "(async function() {})();",
+      "(async function a() {})();"
+    ], { singleGroups: true, esversion: 8 });
+
+  TestRun(test, "Async Generator Function Expression")
+    .test([
+      "(async function * () { yield; })();",
+      "(async function * a() { yield; })();"
+    ], { singleGroups: true, esversion: 9 });
+
+
+  TestRun(test, "Async Arrow Function")
+    .test([
+      "(async () => {})();",
+      "(async x => x)();"
+    ], { singleGroups: true, esversion: 8 });
+
+  TestRun(test, "async identifier")
+    .addError(1, 1, "Unnecessary grouping operator.")
+    .addError(2, 1, "Unnecessary grouping operator.")
+    .test([
+      "(async());",
+      "(async(x, y, z));"
+    ], { singleGroups: true, esversion: 8 });
+
+  test.done();
+};
+
 singleGroups.objectLiterals = function (test) {
   var code = [
     "({}).method();",
