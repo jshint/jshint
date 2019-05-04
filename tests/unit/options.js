@@ -3456,6 +3456,55 @@ singleGroups.asyncFunction = function (test) {
   test.done();
 };
 
+singleGroups.await = function (test) {
+  TestRun(test, "MultiplicativeExpression")
+    .addError(2, 3, "Unnecessary grouping operator.")
+    .test([
+      "(async function() {",
+      "  (await 2) * 3;",
+      "})();"
+    ], { singleGroups: true, expr: true, esversion: 8 });
+
+  TestRun(test, "ExponentiationExpression")
+    .addError(2, 3, "Unnecessary grouping operator.")
+    .test([
+      "(async function() {",
+      "  (await 2) ** 3;",
+      "})();"
+    ], { singleGroups: true, expr: true, esversion: 8 });
+
+  TestRun(test, "CallExpression")
+    .test([
+      "(async function() {",
+      "  (await 2)();",
+      "})();"
+    ], { singleGroups: true, expr: true, esversion: 8 });
+
+  TestRun(test, "EqualityExpression")
+    .addError(2, 3, "Unnecessary grouping operator.")
+    .addError(3, 3, "Unnecessary grouping operator.")
+    .addError(4, 3, "Unnecessary grouping operator.")
+    .addError(5, 3, "Unnecessary grouping operator.")
+    .test([
+      "(async function() {",
+      "  (await 2) == 2;",
+      "  (await 2) != 2;",
+      "  (await 2) === 2;",
+      "  (await 2) !== 2;",
+      "})();"
+    ], { singleGroups: true, expr: true, esversion: 8 });
+
+  TestRun(test, "Expression")
+    .addError(2, 3, "Unnecessary grouping operator.")
+    .test([
+      "(async function() {",
+      "  (await 0), 0;",
+      "})();"
+    ], { singleGroups: true, expr: true, esversion: 8 });
+
+  test.done();
+};
+
 singleGroups.objectLiterals = function (test) {
   var code = [
     "({}).method();",
