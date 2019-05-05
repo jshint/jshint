@@ -5555,9 +5555,7 @@ var JSHINT = (function() {
           advance("}");
           break;
         } else {
-          /* istanbul ignore next */
           error("E024", state.tokens.next, state.tokens.next.value);
-          /* istanbul ignore next */
           break;
         }
       }

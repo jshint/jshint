@@ -928,6 +928,19 @@ exports.testES6Modules = function (test) {
       "import afterLabelImported from 'elsewhere';"
     ], { esversion: 6 });
 
+  TestRun(test, "invalid ImportsList")
+    .addError(1, 12, "Unexpected 'y'.")
+    .addError(1, 12, "Expected 'from' and instead saw 'y'.")
+    .addError(1, 14, "Expected '(string)' and instead saw '}'.")
+    .addError(1, 15, "Missing semicolon.")
+    .addError(1, 16, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, 20, "Missing semicolon.")
+    .addError(1, 21, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, 16, "'from' is not defined.")
+    .test([
+      "import { x y } from 'elsewhere';"
+    ], { esversion: 6, module: true });
+
   TestRun(test, "async as Identifier")
     .test([
       "var async;",
