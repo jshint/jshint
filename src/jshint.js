@@ -1579,7 +1579,7 @@ var JSHINT = (function() {
       return true;
     } else if (left.identifier && !isReserved(context, left) && !left.isMetaProperty &&
       left.value !== "eval" && left.value !== "arguments") {
-      if (state.funct["(scope)"].labeltype(left.value) === "exception") {
+      if (state.funct["(scope)"].bindingtype(left.value) === "exception") {
         warning("W022", left);
       }
       state.nameStack.set(left);
@@ -1894,7 +1894,7 @@ var JSHINT = (function() {
 
       hasOwnScope = true;
       state.funct["(scope)"].stack();
-      state.funct["(scope)"].block.addBreakLabel(t.value, { token: state.tokens.curr });
+      state.funct["(scope)"].block.addLabel(t.value, { token: state.tokens.curr });
 
       if (!state.tokens.next.labelled && state.tokens.next.value !== "{") {
         warning("W028", state.tokens.next, t.value, state.tokens.next.value);
@@ -2734,7 +2734,7 @@ var JSHINT = (function() {
       className = classNameToken.value;
       identifier(context);
       // unintialized, so that the 'extends' clause is parsed while the class is in TDZ
-      state.funct["(scope)"].addlabel(className, {
+      state.funct["(scope)"].addbinding(className, {
         type: "class",
         initialized: false,
         token: classNameToken
@@ -2789,7 +2789,7 @@ var JSHINT = (function() {
     state.funct["(scope)"].stack();
     if (classNameToken) {
       this.name = className;
-      state.funct["(scope)"].addlabel(className, {
+      state.funct["(scope)"].addbinding(className, {
         type: "class",
         initialized: true,
         token: classNameToken
@@ -4338,7 +4338,7 @@ var JSHINT = (function() {
             }
           }
           if (t.id) {
-            state.funct["(scope)"].addlabel(t.id, {
+            state.funct["(scope)"].addbinding(t.id, {
               type: type,
               token: t.token });
             names.push(t.token);
@@ -4514,7 +4514,7 @@ var JSHINT = (function() {
             }
           }
           if (t.id) {
-            state.funct["(scope)"].addlabel(t.id, {
+            state.funct["(scope)"].addbinding(t.id, {
               type: "var",
               token: t.token });
 
@@ -4597,7 +4597,7 @@ var JSHINT = (function() {
         warning("W025");
       }
     } else {
-      state.funct["(scope)"].addlabel(nameToken.value, {
+      state.funct["(scope)"].addbinding(nameToken.value, {
         type: labelType,
         token: state.tokens.curr,
         initialized: true });
@@ -5212,7 +5212,7 @@ var JSHINT = (function() {
 
     if (state.tokens.next.id !== ";" && !state.tokens.next.reach &&
         state.tokens.curr.line === startLine(state.tokens.next)) {
-      if (!state.funct["(scope)"].funct.hasBreakLabel(v)) {
+      if (!state.funct["(scope)"].funct.hasLabel(v)) {
         warning("W090", state.tokens.next, v);
       }
       this.first = state.tokens.next;
@@ -5240,7 +5240,7 @@ var JSHINT = (function() {
 
     if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
       if (state.tokens.curr.line === startLine(state.tokens.next)) {
-        if (!state.funct["(scope)"].funct.hasBreakLabel(v)) {
+        if (!state.funct["(scope)"].funct.hasLabel(v)) {
           warning("W090", state.tokens.next, v);
         }
         this.first = state.tokens.next;
@@ -5485,7 +5485,7 @@ var JSHINT = (function() {
       // ImportClause :: ImportedDefaultBinding
       this.name = identifier(context);
       // Import bindings are immutable (see ES6 8.1.1.5.5)
-      state.funct["(scope)"].addlabel(this.name, {
+      state.funct["(scope)"].addbinding(this.name, {
         type: "import",
         initialized: true,
         token: state.tokens.curr });
@@ -5512,7 +5512,7 @@ var JSHINT = (function() {
       if (state.tokens.next.identifier) {
         this.name = identifier(context);
         // Import bindings are immutable (see ES6 8.1.1.5.5)
-        state.funct["(scope)"].addlabel(this.name, {
+        state.funct["(scope)"].addbinding(this.name, {
           type: "import",
           initialized: true,
           token: state.tokens.curr });
@@ -5538,7 +5538,7 @@ var JSHINT = (function() {
         }
 
         // Import bindings are immutable (see ES6 8.1.1.5.5)
-        state.funct["(scope)"].addlabel(importName, {
+        state.funct["(scope)"].addbinding(importName, {
           type: "import",
           initialized: true,
           token: state.tokens.curr });
