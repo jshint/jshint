@@ -437,7 +437,8 @@ var scopeManager = function(state, predefined, exported, declared) {
 
       // If this is not a function boundary, transfer function-scoped labels to
       // the parent block (a rough simulation of variable hoisting). Previously
-      // existing labels in the parent block should take precedence so that things and stuff.
+      // existing labels in the parent block should take precedence so that
+      // prior usages are not discarded.
       if (subScope && !isUnstackingFunctionBody &&
         !isUnstackingFunctionParams && !isUnstackingFunctionOuter) {
         var labelNames = Object.keys(currentLabels);
