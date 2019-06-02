@@ -21,7 +21,6 @@ var incorrectSeverity = {
   W024: true,
   W025: true,
   W052: true,
-  W067: true,
   W076: true,
   W077: true,
   W090: true,
