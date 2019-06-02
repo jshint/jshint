@@ -38,6 +38,8 @@ function isFailure(errors) {
   return errors && !!find(errors, function(msg) {
     if (msg.code[0] === "W") {
       return msg.code in incorrectSeverity;
+    } else if (msg.code[0] === "I") {
+      return false;
     }
 
     return !(msg.code in incorrectSeverity);
