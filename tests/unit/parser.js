@@ -211,6 +211,42 @@ exports.assignment = function (test) {
   run.test(code, { plusplus: true, esnext: true });
   run.test(code, { plusplus: true, moz: true });
 
+  TestRun(test, "assignment to `eval` outside of strict mode code")
+    .test([
+      "(function() {",
+      "  var eval = 3;",
+      "}());"
+    ]);
+
+  TestRun(test, "assignment to `eval` within strict mode code")
+    .addError(5, 10, "Bad assignment.")
+    .test([
+      "(function() {",
+      "  var eval;",
+      "  (function() {",
+      "    'use strict';",
+      "    eval = 3;",
+      "  }());",
+      "}());"
+    ]);
+
+  TestRun(test, "assignment to `arguments` outside of strict mode code")
+    .addError(2, 13, "Assignment to properties of a mapped arguments object may cause unexpected changes to formal parameters.")
+    .test([
+      "(function() {",
+      "  arguments = 3;",
+      "}());"
+    ]);
+
+  TestRun(test, "assignment to `arguments` within strict mode code")
+    .addError(3, 13, "Bad assignment.")
+    .test([
+      "(function() {",
+      "  'use strict';",
+      "  arguments = 3;",
+      "}());"
+    ]);
+
   test.done();
 };
 

@@ -1576,10 +1576,21 @@ var JSHINT = (function() {
       }
 
       return true;
-    } else if (left.identifier && !isReserved(context, left) && !left.isMetaProperty &&
-      left.value !== "eval" && left.value !== "arguments") {
+    } else if (left.identifier && !isReserved(context, left) && !left.isMetaProperty) {
       if (state.funct["(scope)"].bindingtype(left.value) === "exception") {
         warning("W022", left);
+      }
+
+      if (left.value === "eval" && state.isStrict()) {
+        error("E031", assignToken);
+        return false;
+      } else if (left.value === "arguments") {
+        if (!state.isStrict()) {
+          warning("W143", assignToken);
+        } else {
+          error("E031", assignToken);
+          return false;
+        }
       }
       state.nameStack.set(left);
       return true;
