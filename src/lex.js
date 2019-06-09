@@ -1352,17 +1352,11 @@ Lexer.prototype = {
         sequence = char;
         next = this.peek(index + 1);
         while (reg.nonzeroDigit.test(next) || next === "0") {
-          /* istanbul ignore next */
           index += 1;
-          /* istanbul ignore next */
           char = next;
-          /* istanbul ignore next */
           sequence += char;
-          /* istanbul ignore next */
           body += char;
-          /* istanbul ignore next */
           value += char;
-          /* istanbul ignore next */
           next = this.peek(index + 1);
         }
         groupReferences.push(Number(sequence));
@@ -1471,7 +1465,6 @@ Lexer.prototype = {
       }
 
       if (next === "}") {
-        /* istanbul ignore next */
         return true;
       }
 
