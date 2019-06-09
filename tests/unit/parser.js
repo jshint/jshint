@@ -743,6 +743,16 @@ exports.regexp.uFlag = function (test) {
     .test("void /.{}/u;", { esversion: 6 });
 
   TestRun(test)
+    .test([
+      "void /.{0}/;",
+      "void /.{0}/u;",
+      "void /.{9}/;",
+      "void /.{9}/u;",
+      "void /.{23}/;",
+      "void /.{23}/u;"
+    ], { esversion: 6 });
+
+  TestRun(test)
     .addError(1, 6, "Invalid regular expression.")
     .test("void /.{,2}/u;", { esversion: 6 });
 
@@ -753,6 +763,25 @@ exports.regexp.uFlag = function (test) {
   TestRun(test, "Invalid group reference")
     .addError(1, 6, "Invalid regular expression.")
     .test("void /(.)(.)\\3/u;", { esversion: 6 });
+
+  TestRun(test, "Valid group reference - multiple digits")
+    .test([
+      "void /(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)\\10/u;",
+      "void /(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)\\10a/u;",
+      "void /(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)\\11/u;",
+      "void /(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)\\11a/u;"
+    ], { esversion: 6 });
+
+  // A negative syntax test is the only way to verify JSHint is interpeting the
+  // adjacent digits as one reference as opposed to a reference followed by a
+  // literal digit.
+  TestRun(test, "Invalid group reference - two digits")
+    .addError(1, 6, "Invalid regular expression.")
+    .test("void /(.)\\10/u;", { esversion: 6 });
+
+  TestRun(test, "Invalid group reference - three digits")
+    .addError(1, 6, "Invalid regular expression.")
+    .test("void /(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)\\100/u;", { esversion: 6 });
 
   TestRun(test, "Invalid group reference (permitted without flag)")
     .test("void /(.)(.)\\3/;", { esversion: 6 });
