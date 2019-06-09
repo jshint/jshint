@@ -700,6 +700,20 @@ exports.regexp.basic = function (test) {
     .addError(1, 9, "Invalid regular expression.")
     .test("var a = /.*/ii;");
 
+  TestRun(test, "Invalid Decimal Escape Sequence tolerated without `u` flag")
+    .test([
+      "void /\\00/;",
+      "void /\\01/;",
+      "void /\\02/;",
+      "void /\\03/;",
+      "void /\\04/;",
+      "void /\\05/;",
+      "void /\\06/;",
+      "void /\\07/;",
+      "void /\\08/;",
+      "void /\\09/;"
+    ]);
+
   test.done();
 };
 
@@ -815,6 +829,29 @@ exports.regexp.uFlag = function (test) {
 
   TestRun(test)
     .test('void /[\\s0-1\\s2-3\\s]/u;', { esversion: 6 });
+
+  TestRun(test, "Null CharacterEscape")
+    .test([
+      "void /\\0/u;",
+      "void /\\0a/u;"
+    ], { esversion: 6 });
+
+  TestRun(test)
+    .addError(1, 6, "Invalid regular expression.")
+    .test("void /\\00/u;", { esversion: 6 });
+
+  TestRun(test)
+    .addError(1, 6, "Invalid regular expression.")
+    .test("void /\\01/u;", { esversion: 6 });
+
+  TestRun(test, "ControlEscape")
+    .test([
+      "void /\\f/u;",
+      "void /\\n/u;",
+      "void /\\r/u;",
+      "void /\\t/u;",
+      "void /\\v/u;"
+    ], { esversion: 6 });
 
   test.done();
 };

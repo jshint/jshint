@@ -1431,6 +1431,18 @@ Lexer.prototype = {
           checks,
           function() { return true; }
         );
+      } else if (char === "0" && reg.decimalDigit.test(this.peek(index + 1))) {
+        this.triggerAsync(
+          "error",
+          {
+            code: "E016",
+            line: this.line,
+            character: this.char,
+            data: [ "Invalid decimal escape sequence" ]
+          },
+          checks,
+          hasUFlag
+        );
       }
 
       index += 1;
@@ -1707,6 +1719,8 @@ Lexer.prototype = {
           return !escapedChars.split("").every(function(escapedChar) {
               return escapedChar === "u" ||
                 escapedChar === "/" ||
+                escapedChar === "0" ||
+                reg.regexpControlEscapes.test(escapedChar) ||
                 reg.regexpCharClasses.test(escapedChar) ||
                 reg.regexpSyntaxChars.test(escapedChar);
             });
