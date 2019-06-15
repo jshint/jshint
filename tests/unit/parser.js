@@ -7508,10 +7508,20 @@ exports["test for GH-1105"] = function (test) {
     "}"
   ];
 
-  var run = TestRun(test)
-    .addError(2, 22, "Missing semicolon.");
+  TestRun(test)
+    .addError(2, 22, "Missing semicolon.")
+    .test(code);
 
-  run.test(code);
+  code = [
+    "while (true) {",
+    "    if (true) { continue }",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(2, 25, "Missing semicolon.")
+    .test(code);
+
   test.done();
 };
 
