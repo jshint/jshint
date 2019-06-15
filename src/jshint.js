@@ -3171,10 +3171,9 @@ var JSHINT = (function() {
       return;
     }
 
-    exprs[exprs.length - 1].parent = true;
-
     if (exprs.length > 1) {
-      ret = Object.create(state.syntax[","], { exprs: { value: exprs } });
+      ret = Object.create(state.syntax[","]);
+      ret.exprs = exprs;
 
       first = exprs[0];
       last = exprs[exprs.length - 1];
@@ -3218,6 +3217,8 @@ var JSHINT = (function() {
     }
 
     if (ret) {
+      ret.paren = true;
+
       // The operator may be necessary to override the default binding power of
       // neighboring operators (whenever there is an operator in use within the
       // first expression *or* the current group contains multiple expressions)
@@ -3861,15 +3862,37 @@ var JSHINT = (function() {
     state.funct["(metrics)"].ComplexityCount += 1;
   }
 
-  // Parse assignments that were found instead of conditionals.
-  // For example: if (a = 1) { ... }
-
+  /**
+   * Detect and warn about assignment that occurs within conditional clauses,
+   * e.g.
+   *
+   *     if (a = 1) { ... }
+   *
+   * This check is disabled in response to parenthesized expressions so that
+   * users may opt out of the warning on a case-by-case bases, e.g.
+   *
+   *     if ((a = 1)) { ... }
+   *
+   * @param {object} expr - the parsed expression within the conditional clause
+   */
   function checkCondAssignment(expr) {
+    if (!expr || expr.paren || state.option.boss) {
+      return;
+    }
+
     var id = expr.id;
+
+    // If the expression is composed of multiple sub-expressions via a comma
+    // operator, then check the final sub-expression.
     if (id === ",") {
       expr = expr.exprs[expr.exprs.length - 1];
       id = expr.id;
+
+      if (expr.paren) {
+        return;
+      }
     }
+
     switch (id) {
     case "=":
     case "+=":
@@ -3880,9 +3903,7 @@ var JSHINT = (function() {
     case "|=":
     case "^=":
     case "/=":
-      if (!expr.paren && !state.option.boss) {
-        warning("W084");
-      }
+      warning("W084");
     }
   }
 
@@ -5221,7 +5242,7 @@ var JSHINT = (function() {
     if (!state.option.asi)
       nolinebreak(this);
 
-    if (state.tokens.next.id !== ";" &&
+    if (state.tokens.next.identifier &&
         state.tokens.curr.line === startLine(state.tokens.next)) {
       if (!state.funct["(scope)"].funct.hasLabel(v)) {
         warning("W090", state.tokens.next, v);
@@ -5249,7 +5270,7 @@ var JSHINT = (function() {
     if (!state.option.asi)
       nolinebreak(this);
 
-    if (state.tokens.next.id !== ";") {
+    if (state.tokens.next.identifier) {
       if (state.tokens.curr.line === startLine(state.tokens.next)) {
         if (!state.funct["(scope)"].funct.hasLabel(v)) {
           warning("W090", state.tokens.next, v);
