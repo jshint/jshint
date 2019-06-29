@@ -2828,7 +2828,8 @@ var JSHINT = (function() {
       inGenerator = false;
       context &= ~prodParams.preAsync;
 
-      if (state.tokens.next.value === "static") {
+      if (state.tokens.next.value === "static" &&
+        !checkPunctuator(peek(), "(")) {
         isStatic = true;
         advance();
       }

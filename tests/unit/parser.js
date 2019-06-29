@@ -6844,6 +6844,28 @@ exports["class and method naming"] = function (test) {
       "};"
     ], {esversion: 6});
 
+  TestRun(test, "valid uses of name `static`")
+    .test([
+      "void class {",
+      "  static() {}",
+      "  static static() {}",
+      "  static ['static']() {}",
+      "};",
+      "void class {",
+      "  * static() { yield; }",
+      "  static * static() { yield; }",
+      "  static * ['static']() { yield; }",
+      "};",
+      "void class {",
+      "  get static() {}",
+      "  set static(x) {}",
+      "  static get static() {}",
+      "  static set static(x) {}",
+      "  static get ['static']() {}",
+      "  static set ['static'](x) {}",
+      "};"
+    ], {esversion: 6});
+
   TestRun(test, "invalid use of name `prototype`: static method")
     .addError(2, 10, "A static class method cannot be named 'prototype'.")
     .test([
