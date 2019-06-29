@@ -2493,6 +2493,25 @@ exports["destructuring assignment of valid simple assignment targets"] = functio
   test.done();
 };
 
+exports["regression test for GH-3408"] = function (test) {
+  TestRun(test, "var statement")
+    .addError(1, 9, "Expected an identifier and instead saw ';'.")
+    .addError(1, 10, "Missing semicolon.")
+    .test("var [x]=;", { esversion: 6 });
+
+  TestRun(test, "let statement")
+    .addError(1, 9, "Expected an identifier and instead saw ';'.")
+    .addError(1, 10, "Missing semicolon.")
+    .test("let [x]=;", { esversion: 6 });
+
+  TestRun(test, "const statement")
+    .addError(1, 11, "Expected an identifier and instead saw ';'.")
+    .addError(1, 12, "Missing semicolon.")
+    .test("const [x]=;", { esversion: 6 });
+
+  test.done();
+};
+
 exports["non-identifier PropertyNames in object destructuring"] = function (test) {
   var code = [
     "var { ['x' + 2]: a = 3, 0: b } = { x2: 1, 0: 2 };",

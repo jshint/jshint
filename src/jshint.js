@@ -4372,11 +4372,13 @@ var JSHINT = (function() {
         }
         var id = state.tokens.prev;
         value = expression(context, 10);
-        if (value && value.identifier && value.value === "undefined") {
-          warning("W080", id, id.value);
-        }
-        if (!lone) {
-          destructuringPatternMatch(names, value);
+        if (value) {
+          if (value.identifier && value.value === "undefined") {
+            warning("W080", id, id.value);
+          }
+          if (!lone) {
+            destructuringPatternMatch(names, value);
+          }
         }
       }
 
@@ -4558,12 +4560,14 @@ var JSHINT = (function() {
         }
         id = state.tokens.prev;
         value = expression(context, 10);
-        if (value && !state.funct["(loopage)"] && value.identifier &&
-          value.value === "undefined") {
-          warning("W080", id, id.value);
-        }
-        if (!lone) {
-          destructuringPatternMatch(names, value);
+        if (value) {
+          if (!state.funct["(loopage)"] && value.identifier &&
+            value.value === "undefined") {
+            warning("W080", id, id.value);
+          }
+          if (!lone) {
+            destructuringPatternMatch(names, value);
+          }
         }
       }
 
