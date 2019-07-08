@@ -4828,6 +4828,7 @@ var JSHINT = (function() {
     var t = state.tokens.next;
     var g = false;
     var noindent = false;
+    var seenCase = false;
 
     state.funct["(breakage)"] += 1;
     advance("(");
@@ -4842,8 +4843,6 @@ var JSHINT = (function() {
 
     if (!noindent)
       indent += state.option.indent;
-
-    this.cases = [];
 
     for (;;) {
       switch (state.tokens.next.id) {
@@ -4873,7 +4872,8 @@ var JSHINT = (function() {
         }
 
         advance("case");
-        this.cases.push(expression(context, 0));
+        expression(context, 0);
+        seenCase = true;
         increaseComplexityCount();
         g = true;
         advance(":");
@@ -4896,10 +4896,8 @@ var JSHINT = (function() {
         default:
           // Do not display a warning if 'default' is the first statement or if
           // there is a special /* falls through */ comment.
-          if (this.cases.length) {
-            if (!state.tokens.curr.caseFallsThrough) {
-              warning("W086", state.tokens.curr, "default");
-            }
+          if (seenCase && !state.tokens.curr.caseFallsThrough) {
+            warning("W086", state.tokens.curr, "default");
           }
         }
 
