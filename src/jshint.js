@@ -86,8 +86,6 @@ var JSHINT = (function() {
     membersOnly,
     predefined,    // Global variables defined by option
 
-    urls,
-
     extraModules = [],
     emitter = new events.EventEmitter();
 
@@ -6336,7 +6334,6 @@ var JSHINT = (function() {
     });
 
     functions = [state.funct];
-    urls = [];
     member = {};
     membersOnly = null;
     inblock = false;
@@ -6532,11 +6529,6 @@ var JSHINT = (function() {
     var impliedGlobals = state.funct["(scope)"].getImpliedGlobals();
     if (impliedGlobals.length > 0) {
       data.implieds = impliedGlobals;
-    }
-
-    if (urls.length > 0) {
-      /* istanbul ignore next */
-      data.urls = urls;
     }
 
     globals = state.funct["(scope)"].getUsedOrDefinedGlobals();
