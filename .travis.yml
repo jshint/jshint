@@ -12,6 +12,8 @@ script:
   - echo $PATH
   - ls -lah node_modules/.bin
   - npm run $CMD
+cache:
+  npm: false
 matrix:
   include:
     - node_js: "0.10"
