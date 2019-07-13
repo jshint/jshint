@@ -9,6 +9,8 @@ before_install:
     fi
 script:
   - npm run pretest
+  - echo $PATH
+  - ls -lah node_modules/.bin
   - npm run $CMD
 matrix:
   include:
@@ -20,13 +22,5 @@ matrix:
       env: CMD=test-node
     - node_js: 6
       env: CMD=test-node
-    - node_js: 8
-      env: CMD=test-node
-    - node_js: 10
-      env: CMD=test-node
-    - node_js: 10
-      env: CMD=test-262
-    - node_js: 10
-      env: CMD=test-browser
   fast_finish: true
 sudo: false
