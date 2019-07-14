@@ -280,6 +280,53 @@ exports.relations = function (test) {
   run.test(code, {esnext: true});
   run.test(code, {moz: true});
 
+  TestRun(test, "No suitable expression following logical NOT.")
+    .addError(1, 7, "Expected an identifier and instead saw ';'.")
+    .addError(1, 6, "Unrecoverable syntax error. (100% scanned).")
+    .test("void !;");
+
+  TestRun(test, "Logical NOT in combination with 'infix' operators.")
+    .addError(3, 6, "Confusing use of '!'.")
+    .addError(4, 6, "Confusing use of '!'.")
+    .addError(5, 6, "Confusing use of '!'.")
+    .addError(6, 6, "Confusing use of '!'.")
+    .addError(7, 6, "Confusing use of '!'.")
+    .addError(8, 6, "Confusing use of '!'.")
+    .addError(9, 6, "Confusing use of '!'.")
+    .addError(10, 6, "Confusing use of '!'.")
+    .addError(11, 6, "Confusing use of '!'.")
+    .addError(12, 6, "Confusing use of '!'.")
+    .addError(13, 6, "Confusing use of '!'.")
+    .addError(14, 6, "Confusing use of '!'.")
+    .addError(15, 6, "Confusing use of '!'.")
+    .test([
+      "void !'-';",
+      "void !'+';",
+      "void !(0 < 0);",
+      "void !(0 <= 0);",
+      "void !(0 == 0);",
+      "void !(0 === 0);",
+      "void !(0 !== 0);",
+      "void !(0 != 0);",
+      "void !(0 > 0);",
+      "void !(0 >= 0);",
+      "void !(0 + 0);",
+      "void !(0 - 0);",
+      "void !(0 * 0);",
+      "void !(0 / 0);",
+      "void !(0 % 0);",
+    ]);
+
+  TestRun(test, "Logical NOT in combination with other unary operators.")
+    .addError(3, 6, "Confusing use of '!'.")
+    .addError(4, 6, "Confusing use of '!'.")
+    .test([
+      "void !'-';",
+      "void !'+';",
+      "void !+0;",
+      "void !-0;"
+    ]);
+
   test.done();
 };
 
