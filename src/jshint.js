@@ -2634,12 +2634,10 @@ var JSHINT = (function() {
     this.right = expression(context, 150);
 
     if (!this.right) { // '!' followed by nothing? Give up.
-      /* istanbul ignore next */
       quit("E041", this);
     }
 
     if (bang[this.right.id] === true) {
-      /* istanbul ignore next */
       warning("W018", this, "!");
     }
     return this;
