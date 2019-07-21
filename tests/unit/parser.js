@@ -4193,8 +4193,10 @@ exports["mozilla generator as esnext"] = function (test) {
     "  print(g.next());"
   ];
   TestRun(test)
-    .addError(4, 5,
-     "Yield expressions may only occur within generator functions.")
+    .addError(4, 5, "Expected an assignment or function call and instead saw an expression.")
+    .addError(4, 10, "Missing semicolon.")
+    .addError(4, 11, "Expected an assignment or function call and instead saw an expression.")
+    .addError(4, 5, "'yield' is not defined.")
     .test(code, {esnext: true, unused: true, undef: true, predef: ["print", "Iterator"]});
 
   TestRun(test)
@@ -4373,7 +4375,10 @@ exports["mozilla generator as es5"] = function (test) {
     "  print(g.next());"
   ];
   TestRun(test)
-    .addError(4, 5, "'yield' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .addError(4, 5, "Expected an assignment or function call and instead saw an expression.")
+    .addError(4, 10, "Missing semicolon.")
+    .addError(4, 11, "Expected an assignment or function call and instead saw an expression.")
+    .addError(4, 5, "'yield' is not defined.")
     .addError(5, 5, "'destructuring assignment' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(9, 6, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .test(code, {unused: true, undef: true, predef: ["print", "Iterator"]}); // es5
@@ -4396,7 +4401,10 @@ exports["mozilla generator as legacy JS"] = function (test) {
     "  print(g.next());"
   ];
   TestRun(test)
-    .addError(4, 5, "'yield' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .addError(4, 5, "Expected an assignment or function call and instead saw an expression.")
+    .addError(4, 10, "Missing semicolon.")
+    .addError(4, 11, "Expected an assignment or function call and instead saw an expression.")
+    .addError(4, 5, "'yield' is not defined.")
     .addError(5, 5, "'destructuring assignment' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(9, 6, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .test(code, {es3: true, unused: true, undef: true, predef: ["print", "Iterator"]});
@@ -4583,7 +4591,10 @@ exports["moz-style array comprehension as esnext"] = function (test) {
     "print('evens:', evens);"
   ];
   TestRun(test)
-    .addError(3, 5, "Yield expressions may only occur within generator functions.")
+    .addError(3, 5, "Expected an assignment or function call and instead saw an expression.")
+    .addError(3, 10, "Missing semicolon.")
+    .addError(3, 11, "Expected an assignment or function call and instead saw an expression.")
+    .addError(3, 5, "'yield' is not defined.")
     .addError(6, 20, "Expected 'for' and instead saw 'i'.")
     .addError(6, 30, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
     .addError(7, 14, "Expected 'for' and instead saw 'i'.")
@@ -4636,7 +4647,10 @@ exports["moz-style array comprehension as es5"] = function (test) {
   ];
   TestRun(test)
     .addError(2, 8, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(3, 5, "'yield' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .addError(3, 5, "Expected an assignment or function call and instead saw an expression.")
+    .addError(3, 10, "Missing semicolon.")
+    .addError(3, 11, "Expected an assignment or function call and instead saw an expression.")
+    .addError(3, 5, "'yield' is not defined.")
     .addError(6, 19, "'array comprehension' is only available in Mozilla JavaScript extensions (use moz option).")
     .addError(6, 20, "Expected 'for' and instead saw 'i'.")
     .addError(6, 30, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
@@ -4663,7 +4677,10 @@ exports["array comprehension as legacy JS"] = function (test) {
   ];
   TestRun(test)
     .addError(2, 8, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(3, 5, "'yield' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .addError(3, 5, "Expected an assignment or function call and instead saw an expression.")
+    .addError(3, 10, "Missing semicolon.")
+    .addError(3, 11, "Expected an assignment or function call and instead saw an expression.")
+    .addError(3, 5, "'yield' is not defined.")
     .addError(6, 19, "'array comprehension' is only available in Mozilla JavaScript extensions (use moz option).")
     .addError(7, 13, "'array comprehension' is only available in Mozilla JavaScript extensions (use moz option).")
     .test(code, {es3: true, unused: true, undef: true, predef: ["print"]});
@@ -4686,7 +4703,11 @@ exports["moz-style array comprehension as legacy JS"] = function (test) {
   ];
   TestRun(test)
     .addError(2, 8, "'let' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(3, 5, "'yield' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
+    .addError(3, 5, "Expected an assignment or function call and instead saw an expression.")
+    .addError(3, 10, "Missing semicolon.")
+    .addError(3, 11, "Expected an assignment or function call and instead saw an expression.")
+    .addError(3, 5, "'yield' is not defined.")
+
     .addError(6, 19, "'array comprehension' is only available in Mozilla JavaScript extensions (use moz option).")
     .addError(6, 20, "Expected 'for' and instead saw 'i'.")
     .addError(6, 30, "'for each' is only available in Mozilla JavaScript extensions (use moz option).")
@@ -5994,7 +6015,7 @@ exports["regression test for crash from GH-964"] = function (test) {
 
   TestRun(test)
     .addError(2, 23, "Bad assignment.")
-    .addError(2, 24, "Did you mean to return a conditional instead of an assignment?")
+    .addError(2, 23, "Did you mean to return a conditional instead of an assignment?")
     .test(code);
 
   test.done();
@@ -7580,9 +7601,9 @@ exports["test 'yield' in compound expressions."] = function (test) {
   var run = TestRun(test);
 
   run
-    .addError(22, 15, "Did you mean to return a conditional instead of an assignment?")
+    .addError(22, 14, "Did you mean to return a conditional instead of an assignment?")
     .addError(23, 22, "Invalid position for 'yield' expression (consider wrapping in parenthesis).")
-    .addError(31, 15, "Did you mean to return a conditional instead of an assignment?")
+    .addError(31, 14, "Did you mean to return a conditional instead of an assignment?")
     .addError(32, 20, "Invalid position for 'yield' expression (consider wrapping in parenthesis).")
     .addError(32, 17, "Bad operand.")
     .addError(51, 10, "Invalid position for 'yield' expression (consider wrapping in parenthesis).")
@@ -7615,17 +7636,17 @@ exports["test 'yield' in compound expressions."] = function (test) {
     .test(code, {maxerr: 1000, expr: true, esnext: true});
 
   run = TestRun(test)
-    .addError(22, 15, "Did you mean to return a conditional instead of an assignment?")
-    .addError(31, 15, "Did you mean to return a conditional instead of an assignment?");
+    .addError(22, 14, "Did you mean to return a conditional instead of an assignment?")
+    .addError(31, 14, "Did you mean to return a conditional instead of an assignment?");
 
   // These are line-column pairs for the Mozilla paren errors.
   var needparen = [
     // comma
     [ 5,  5], [ 6,  8], [ 7,  5], [11,  5], [12,  8], [13,  5],
     // yield in yield
-    [18, 11], [19, 17], [19, 11], [20, 11], [20,  5], [21, 11], [21,  5], [21, 26], [22, 22],
-    [23, 22], [23, 11], [27, 11], [28, 17], [28, 11], [29, 11], [29,  5], [30, 11], [30,  5],
-    [30, 24], [31, 22], [32, 11], [32, 20],
+    [20, 11], [20,  5], [21, 11], [21,  5],
+    [23, 22], [29, 11], [29,  5], [30, 11], [30,  5],
+    [32, 11], [32, 20],
     // infix
     [51, 10], [53, 10], [54, 16], [57, 10], [58,  5], [59, 10], [60,  5], [60, 14],
     // prefix
@@ -9810,6 +9831,9 @@ exports.asyncFunctions.awaitOperator = function (test) {
       "void async function() {",
       "  void {",
       "    x: await 0,",
+      "    [await 0]: 0,",
+      "    get [await 0]() {},",
+      "    set [await 0](_) {},",
       "  };",
       "};"
     ], { esversion: 8 });
@@ -10062,7 +10086,10 @@ exports.asyncGenerators.classMethod = function (test) {
 
   TestRun(test, "Illegal constructor")
     .addError(1, 19, "Unexpected 'constructor'.")
-    .addError(1,44, "Yield expressions may only occur within generator functions.")
+    .addError(1, 44, "Expected an identifier and instead saw 'yield' (a reserved word).")
+    .addError(1, 44, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, 49, "Missing semicolon.")
+    .addError(1, 50, "Expected an assignment or function call and instead saw an expression.")
     .test("class C { async * constructor() { await 0; yield 0; } }", { esversion: 9 });
 
   test.done();
