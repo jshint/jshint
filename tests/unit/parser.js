@@ -4236,6 +4236,19 @@ exports["catch block no curlies"] = function (test) {
   test.done();
 };
 
+exports.optionalCatch = function (test) {
+  var code = "try {} catch {}";
+
+  TestRun(test)
+    .addError(1, 8, "'optional catch binding' is only available in ES10 (use 'esversion: 10').")
+    .test(code);
+
+  TestRun(test)
+    .test(code, {esversion: 10});
+
+  test.done();
+};
+
 exports["strict violation - use of arguments and eval"] = function (test) {
   var code = [
     "'use strict';",
