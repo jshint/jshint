@@ -704,6 +704,7 @@ var JSHINT = (function() {
           case "7":
           case "8":
           case "9":
+          case "10":
             state.option.moz = false;
             state.option.esversion = +val;
             break;
@@ -711,6 +712,7 @@ var JSHINT = (function() {
           case "2016":
           case "2017":
           case "2018":
+          case "2019":
             state.option.moz = false;
             // Translate specification publication year to version number.
             state.option.esversion = +val - 2009;
@@ -4757,12 +4759,10 @@ var JSHINT = (function() {
 
   blockstmt("try", function(context) {
     var b;
+    var hasParameter = false;
 
-    function doCatch() {
-      advance("catch");
+    function catchParameter() {
       advance("(");
-
-      state.funct["(scope)"].stack("catchparams");
 
       if (checkPunctuators(state.tokens.next, ["[", "{"])) {
         var tokens = destructuringPattern(context);
@@ -4788,9 +4788,6 @@ var JSHINT = (function() {
       }
 
       advance(")");
-
-      block(context, false);
-      state.funct["(scope)"].unstack();
     }
 
     block(context | prodParams.tryClause, true);
@@ -4800,7 +4797,20 @@ var JSHINT = (function() {
       if (b && (!state.inMoz())) {
         warning("W118", state.tokens.next, "multiple catch blocks");
       }
-      doCatch();
+      advance("catch");
+      if (state.tokens.next.id !== "{") {
+        state.funct["(scope)"].stack("catchparams");
+        hasParameter = true;
+        catchParameter();
+      } else if (!state.inES10()) {
+        warning("W119", state.tokens.curr, "optional catch binding", "10");
+      }
+      block(context, false);
+
+      if (hasParameter) {
+        state.funct["(scope)"].unstack();
+        hasParameter = false;
+      }
       b = true;
     }
 
