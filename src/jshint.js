@@ -2241,7 +2241,6 @@ var JSHINT = (function() {
 
     nud: function(context) {
       var v = this.value;
-
       // If this identifier is the lone parameter to a shorthand "fat arrow"
       // function definition, i.e.
       //
@@ -2250,15 +2249,14 @@ var JSHINT = (function() {
       // ...it should not be considered as a variable in the current scope. It
       // will be added to the scope of the new function when the next token is
       // parsed, so it can be safely ignored for now.
-      if (state.tokens.next.id === "=>") {
-        return this;
-      }
+      var isLoneArrowParam = state.tokens.next.id !== "=>";
 
       if (isReserved(context, this)) {
         warning("W024", this, v);
-      } else if (!state.funct["(comparray)"].check(v)) {
+      } else if (isLoneArrowParam && !state.funct["(comparray)"].check(v)) {
         state.funct["(scope)"].block.use(v, state.tokens.curr);
       }
+
       return this;
     },
 
