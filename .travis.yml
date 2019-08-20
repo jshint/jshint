@@ -9,16 +9,26 @@ before_install:
     fi
 script:
   - npm run pretest
-  - npm run test-node
-  - if [[ $(node --version) == v10* ]] ; then npm run test-262; fi
-  - if [[ $(node --version) == v10* ]] ; then npm run test-browser; fi
-node_js:
-  - "0.10"
-  - "0.12"
-  - 4
-  - 6
-  - 8
-  - 10
+  - npm run $CMD
+cache:
+  npm: false
 matrix:
+  include:
+    - node_js: "0.10"
+      env: CMD=test-node
+    - node_js: "0.12"
+      env: CMD=test-node
+    - node_js: 4
+      env: CMD=test-node
+    - node_js: 6
+      env: CMD=test-node
+    - node_js: 8
+      env: CMD=test-node
+    - node_js: 10
+      env: CMD=test-node
+    - node_js: 10
+      env: CMD=test-262
+    - node_js: 10
+      env: CMD=test-browser
   fast_finish: true
 sudo: false
