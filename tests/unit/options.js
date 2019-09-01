@@ -1677,16 +1677,16 @@ exports.boss = function (test) {
 
   // By default, warn about suspicious assignments
   TestRun(test)
-    .addError(1, 10, 'Expected a conditional expression and instead saw an assignment.')
-    .addError(4, 24, 'Expected a conditional expression and instead saw an assignment.')
-    .addError(7, 27, 'Expected a conditional expression and instead saw an assignment.')
-    .addError(12, 24, 'Expected a conditional expression and instead saw an assignment.')
+    .addError(1, 7, 'Expected a conditional expression and instead saw an assignment.')
+    .addError(4, 12, 'Expected a conditional expression and instead saw an assignment.')
+    .addError(7, 15, 'Expected a conditional expression and instead saw an assignment.')
+    .addError(12, 12, 'Expected a conditional expression and instead saw an assignment.')
 
     // GH-657
-    .addError(14, 11, 'Expected a conditional expression and instead saw an assignment.')
-    .addError(17, 25, 'Expected a conditional expression and instead saw an assignment.')
-    .addError(20, 28, 'Expected a conditional expression and instead saw an assignment.')
-    .addError(25, 25, 'Expected a conditional expression and instead saw an assignment.')
+    .addError(14, 7, 'Expected a conditional expression and instead saw an assignment.')
+    .addError(17, 12, 'Expected a conditional expression and instead saw an assignment.')
+    .addError(20, 15, 'Expected a conditional expression and instead saw an assignment.')
+    .addError(25, 12, 'Expected a conditional expression and instead saw an assignment.')
 
     // GH-670
     .addError(28, 12, "Did you mean to return a conditional instead of an assignment?")
@@ -2855,7 +2855,7 @@ exports.nocomma = function (test) {
     .test("return 2, 5;", {});
 
   TestRun(test, "nocomma main case")
-    .addError(1, 11, "Unexpected use of a comma operator.")
+    .addError(1, 9, "Unexpected use of a comma operator.")
     .test("return 2, 5;", { nocomma: true });
 
   TestRun(test, "nocomma in an expression")
