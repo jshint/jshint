@@ -903,7 +903,7 @@ var JSHINT = (function() {
 
     if (next.infix === curr.infix || curr.ltBoundary === "after" ||
       next.ltBoundary === "before") {
-      return curr.line !== startLine(next);
+      return !sameLine(curr, next);
     }
     return false;
   }
@@ -1011,19 +1011,19 @@ var JSHINT = (function() {
 
   // Functions for conformance of style.
 
-  function startLine(token) {
-    return token.startLine || token.line;
+  function sameLine(first, second) {
+    return first.line === (second.startLine || second.line);
   }
 
   function nobreaknonadjacent(left, right) {
-    if (!state.option.laxbreak && left.line !== startLine(right)) {
+    if (!state.option.laxbreak && !sameLine(left, right)) {
       warning("W014", right, right.value);
     }
   }
 
   function nolinebreak(t) {
     t = t;
-    if (t.line !== startLine(state.tokens.next)) {
+    if (!sameLine(t, state.tokens.next)) {
       warning("E022", t, t.value);
     }
   }
@@ -1858,18 +1858,18 @@ var JSHINT = (function() {
       // don't complain about unclosed templates / strings
       if (state.tokens.next.isUnclosed) return advance();
 
-      var sameLine = startLine(state.tokens.next) === state.tokens.curr.line &&
-                     state.tokens.next.id !== "(end)";
+      var isSameLine = sameLine(state.tokens.curr, state.tokens.next) &&
+                       state.tokens.next.id !== "(end)";
       var blockEnd = checkPunctuator(state.tokens.next, "}");
 
-      if (sameLine && !blockEnd && !(stmt.id === "do" && state.inES6(true))) {
+      if (isSameLine && !blockEnd && !(stmt.id === "do" && state.inES6(true))) {
         errorAt("E058", state.tokens.curr.line, state.tokens.curr.character);
       } else if (!state.option.asi) {
 
         // If this is the last statement in a block that ends on the same line
         // *and* option lastsemic is on, ignore the warning.  Otherwise, issue
         // a warning about missing semicolon.
-        if (!(blockEnd && sameLine && state.option.lastsemic)) {
+        if (!(blockEnd && isSameLine && state.option.lastsemic)) {
           warningAt("W033", state.tokens.curr.line, state.tokens.curr.character);
         }
       }
@@ -3021,7 +3021,7 @@ var JSHINT = (function() {
     }
 
     if (state.option.asi && checkPunctuators(state.tokens.prev, [")", "]"]) &&
-      state.tokens.prev.line !== startLine(state.tokens.curr)) {
+      !sameLine(state.tokens.prev, state.tokens.curr)) {
       warning("W014", state.tokens.curr, state.tokens.curr.id);
     }
 
@@ -3253,7 +3253,7 @@ var JSHINT = (function() {
     var e, s, canUseDot;
 
     if (state.option.asi && checkPunctuators(state.tokens.prev, [")", "]"]) &&
-      state.tokens.prev.line !== startLine(state.tokens.curr)) {
+      !sameLine(state.tokens.prev, state.tokens.curr)) {
       warning("W014", state.tokens.curr, state.tokens.curr.id);
     }
 
@@ -3366,7 +3366,7 @@ var JSHINT = (function() {
         });
       return this;
     }
-    var b = state.tokens.curr.line !== startLine(state.tokens.next);
+    var b = !sameLine(state.tokens.curr, state.tokens.next);
     this.first = [];
     if (b) {
       indent += state.option.indent;
@@ -3964,7 +3964,7 @@ var JSHINT = (function() {
       var props = Object.create(null); // All properties, including accessors
       var isAsyncMethod = false;
 
-      b = state.tokens.curr.line !== startLine(state.tokens.next);
+      b = !sameLine(state.tokens.curr, state.tokens.next);
       if (b) {
         indent += state.option.indent;
         if (state.tokens.next.from === indent + state.option.indent) {
@@ -5271,7 +5271,7 @@ var JSHINT = (function() {
       nolinebreak(this);
 
     if (state.tokens.next.identifier &&
-        state.tokens.curr.line === startLine(state.tokens.next)) {
+        sameLine(state.tokens.curr, state.tokens.next)) {
       if (!state.funct["(scope)"].funct.hasLabel(v)) {
         warning("W090", state.tokens.next, v);
       }
@@ -5299,7 +5299,7 @@ var JSHINT = (function() {
       nolinebreak(this);
 
     if (state.tokens.next.identifier) {
-      if (state.tokens.curr.line === startLine(state.tokens.next)) {
+      if (sameLine(state.tokens.curr, state.tokens.next)) {
         if (!state.funct["(scope)"].funct.hasLabel(v)) {
           warning("W090", state.tokens.next, v);
         }
@@ -5315,7 +5315,7 @@ var JSHINT = (function() {
 
 
   stmt("return", function(context) {
-    if (this.line === startLine(state.tokens.next)) {
+    if (sameLine(this, state.tokens.next)) {
       if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
         this.first = expression(context, 0);
 
@@ -5491,7 +5491,7 @@ var JSHINT = (function() {
       advance("*");
     }
 
-    if (this.line === startLine(state.tokens.next)) {
+    if (sameLine(this, state.tokens.next)) {
       if (delegatingYield ||
           (state.tokens.next.id !== ";" && !state.option.asi &&
            !state.tokens.next.reach && state.tokens.next.nud)) {
