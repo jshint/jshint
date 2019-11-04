@@ -1,3 +1,20 @@
+<a name="2.10.3"></a>
+## [2.10.3](https://github.com/jshint/jshint/compare/2.10.2...v2.10.3) (2019-11-04)
+
+### Bug Fixes
+
+* Allow more escapes with RegExp `u` flag ([5ac5c46](https://github.com/jshint/jshint/commit/5ac5c46))
+* Correct binding power of AwaitExpression ([af04b1e](https://github.com/jshint/jshint/commit/af04b1e))
+* Correct interpretation of commas ([691dbdc](https://github.com/jshint/jshint/commit/691dbdc))
+* Correct restrictions on class method names ([f670aeb](https://github.com/jshint/jshint/commit/f670aeb))
+* Correctly interpret class method names ([82b49c4](https://github.com/jshint/jshint/commit/82b49c4))
+* Do not crash on invalid program code ([b14acca](https://github.com/jshint/jshint/commit/b14acca))
+* Interpret "object rest" ident as a binding ([c0e9a5b](https://github.com/jshint/jshint/commit/c0e9a5b))
+* Relax `singleGroups` for async functions ([c5dcd90](https://github.com/jshint/jshint/commit/c5dcd90))
+* Tolerate `static` as class method name ([9cb3b20](https://github.com/jshint/jshint/commit/9cb3b20))
+* Tolerate valid assignments ([0a60c9e](https://github.com/jshint/jshint/commit/0a60c9e))
+* Validate lone arrow function parameter ([38285cd](https://github.com/jshint/jshint/commit/38285cd))
+
 <a name="2.10.2"></a>
 ## [2.10.2](https://github.com/jshint/jshint/compare/2.10.1...v2.10.2) (2019-03-13)
 
