@@ -1040,10 +1040,6 @@ var JSHINT = (function() {
           }
           warning("W014", state.tokens.curr, state.tokens.next.value);
         }
-      } else if (!state.tokens.curr.comment &&
-                state.tokens.curr.character !== state.tokens.next.from && state.option.white) {
-        state.tokens.curr.from += (state.tokens.curr.character - state.tokens.curr.from);
-        warning("W011", state.tokens.curr, state.tokens.curr.value);
       }
 
       advance(",");
