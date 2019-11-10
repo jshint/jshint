@@ -7787,6 +7787,14 @@ exports["test 'yield' in invalid positions"] = function (test) {
   TestRun(test, "asi (ignoring warnings)")
     .test(code, { esversion: 6, expr: true, asi: true });
 
+  TestRun(test, "name of a generator expression")
+    .addError(1, 13, "Unexpected 'yield'.")
+    .test([
+      "(function * yield() {",
+      "  yield;",
+      "})();"
+    ], { esversion: 6 });
+
   test.done();
 };
 
