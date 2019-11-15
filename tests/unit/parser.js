@@ -10106,3 +10106,19 @@ exports.asyncIteration = function (test) {
 
   test.done();
 };
+
+exports["':' instead of ';'"] = function (test) {
+
+  var code = [
+    "var a = 1:",
+    "for (var b = 0: b < 3: b++) {}"
+  ];
+
+  TestRun(test)
+    .addError(1, "Expected ';' and instead saw ':'.", { character: 10 })
+    .addError(2, "Expected ';' and instead saw ':'.", { character: 15 })
+    .addError(2, "Expected ';' and instead saw ':'.", { character: 22 })
+    .test(code);
+
+  test.done();
+};

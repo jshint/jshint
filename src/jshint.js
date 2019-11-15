@@ -1847,6 +1847,12 @@ var JSHINT = (function() {
       // don't complain about unclosed templates / strings
       if (state.tokens.next.isUnclosed) return advance();
 
+      // if there is a colon instead of a semicolon,
+      // it is probably just a typing error.
+      if (checkPunctuator(state.tokens.next, ":")) {
+        return advance(";");
+      }
+
       var sameLine = startLine(state.tokens.next) === state.tokens.curr.line &&
                      state.tokens.next.id !== "(end)";
       var blockEnd = checkPunctuator(state.tokens.next, "}");
