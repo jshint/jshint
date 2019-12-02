@@ -2418,7 +2418,6 @@ var JSHINT = (function() {
   }, 10, true);
 
   infix("?", function(context, left, that) {
-    increaseComplexityCount();
     that.left = left;
     that.right = expression(context & ~prodParams.noin, 10);
     advance(":");
@@ -2426,13 +2425,7 @@ var JSHINT = (function() {
     return that;
   }, 30);
 
-  var orPrecendence = 40;
-  infix("||", function(context, left, that) {
-    increaseComplexityCount();
-    that.left = left;
-    that.right = expression(context, orPrecendence);
-    return that;
-  }, orPrecendence);
+  infix("||", "or", 40);
 
   var andPrecedence = 50;
   infix("&&", function(context, left, that) {
