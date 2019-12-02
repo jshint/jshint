@@ -477,8 +477,8 @@ var JSHINT = (function() {
     if (directiveToken.type === "globals") {
       body.forEach(function(g, idx) {
         g = g.split(":");
-        var key = g[0].trim();
-        var val = (g[1] || "").trim();
+        var key = g[0];
+        var val = g[1];
 
         if (key === "-" || !key.length) {
           // Ignore trailing comma
