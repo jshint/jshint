@@ -7479,12 +7479,12 @@ exports["test for GH-1018"] = function (test) {
   run.test(code, {boss: true});
 
   run
-    .addError(1, 11, "Expected a conditional expression and instead saw an assignment.")
-    .addError(2, 16, "Expected a conditional expression and instead saw an assignment.")
-    .addError(3, 14, "Expected a conditional expression and instead saw an assignment.")
-    .addError(4, 20, "Expected a conditional expression and instead saw an assignment.")
-    .addError(5, 20, "Expected a conditional expression and instead saw an assignment.")
-    .addError(6, 15, "Expected a conditional expression and instead saw an assignment.")
+    .addError(1, 7, "Expected a conditional expression and instead saw an assignment.")
+    .addError(2, 12, "Expected a conditional expression and instead saw an assignment.")
+    .addError(3, 10, "Expected a conditional expression and instead saw an assignment.")
+    .addError(4, 16, "Expected a conditional expression and instead saw an assignment.")
+    .addError(5, 16, "Expected a conditional expression and instead saw an assignment.")
+    .addError(6, 11, "Expected a conditional expression and instead saw an assignment.")
     .test(code);
 
   test.done();
@@ -7501,8 +7501,8 @@ exports["test warnings for assignments in conditionals"] = function (test) {
   ];
 
   var run = TestRun(test)
-    .addError(1, 10, "Expected a conditional expression and instead saw an assignment.")
-    .addError(4, 17, "Expected a conditional expression and instead saw an assignment.");
+    .addError(1, 7, "Expected a conditional expression and instead saw an assignment.")
+    .addError(4, 14, "Expected a conditional expression and instead saw an assignment.");
 
   run.test(code); // es5
 
@@ -7584,8 +7584,6 @@ exports["test for crash with invalid condition"] = function (test) {
     .addError(4, 16, "Missing semicolon.")
     .addError(6, 15, "Expected an identifier and instead saw ','.")
     .addError(7, 17, "Unexpected ')'.")
-    .addError(7, 17, "Expected an identifier and instead saw ')'.")
-    .addError(7, 19, "Expected ')' to match '(' from line 7 and instead saw ';'.")
     .addError(8, 15, "Expected an identifier and instead saw ','.")
     .addError(8, 16, "Expected ')' to match '(' from line 8 and instead saw 'b'.")
     .addError(8, 18, "Expected an identifier and instead saw ')'.")
