@@ -475,10 +475,9 @@ var JSHINT = (function() {
     }
 
     if (directiveToken.type === "globals") {
-      body.forEach(function(g, idx) {
-        g = g.split(":");
-        var key = g[0].trim();
-        var val = (g[1] || "").trim();
+      body.forEach(function(item, idx) {
+        var parts = item.split(":");
+        var key = parts[0].trim();
 
         if (key === "-" || !key.length) {
           // Ignore trailing comma
@@ -491,12 +490,11 @@ var JSHINT = (function() {
 
         if (key.charAt(0) === "-") {
           key = key.slice(1);
-          val = false;
 
           JSHINT.blacklist[key] = key;
           delete predefined[key];
         } else {
-          predef[key] = (val === "true");
+          predef[key] = parts.length > 1 && parts[1].trim() === "true";
         }
       });
 
@@ -553,10 +551,11 @@ var JSHINT = (function() {
 
     if (directiveToken.type === "jshint" || directiveToken.type === "jslint" ||
       directiveToken.type === "jshint.unstable") {
-      body.forEach(function(g) {
-        g = g.split(":");
-        var key = g[0].trim();
-        var val = (g[1] || "").trim();
+      body.forEach(function(item) {
+        var parts = item.split(":");
+        var key = parts[0].trim();
+        var val = parts.length > 1 ? parts[1].trim() : "";
+        var numberVal;
 
         if (!checkOption(key, directiveToken.type !== "jshint.unstable", directiveToken)) {
           return;
@@ -565,14 +564,15 @@ var JSHINT = (function() {
         if (numvals.indexOf(key) >= 0) {
           // GH988 - numeric options can be disabled by setting them to `false`
           if (val !== "false") {
-            val = +val;
+            numberVal = +val;
 
-            if (typeof val !== "number" || !isFinite(val) || val <= 0 || Math.floor(val) !== val) {
-              error("E032", directiveToken, g[1].trim());
+            if (typeof numberVal !== "number" || !isFinite(numberVal) ||
+              numberVal <= 0 || Math.floor(numberVal) !== numberVal) {
+              error("E032", directiveToken, val);
               return;
             }
 
-            state.option[key] = val;
+            state.option[key] = numberVal;
           } else {
             state.option[key] = key === "indent" ? 4 : false;
           }
