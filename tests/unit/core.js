@@ -415,7 +415,9 @@ exports.argsInCatchReused = function (test) {
 exports.testRawOnError = function (test) {
   JSHINT(';', { maxerr: 1 });
   test.equal(JSHINT.errors[0].raw, 'Unnecessary semicolon.');
+  test.equal(JSHINT.errors[0].code, 'W032');
   test.equal(JSHINT.errors[1].raw, 'Too many errors.');
+  test.equal(JSHINT.errors[1].code, 'E043');
   test.equal(JSHINT.errors[2], null);
 
   test.done();
