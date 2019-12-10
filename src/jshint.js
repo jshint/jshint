@@ -2417,6 +2417,7 @@ var JSHINT = (function() {
   }, 10, true);
 
   infix("?", function(context, left, that) {
+    increaseComplexityCount();
     that.left = left;
     that.right = expression(context & ~prodParams.noin, 10);
     advance(":");
