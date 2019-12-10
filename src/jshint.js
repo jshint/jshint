@@ -2425,7 +2425,12 @@ var JSHINT = (function() {
     return that;
   }, 30);
 
-  infix("||", "or", 40);
+  infix("||", function(context, left, that) {
+    increaseComplexityCount();
+    that.left = left;
+    that.right = expression(context, 40);
+    return that;
+  }, 40);
 
   var andPrecedence = 50;
   infix("&&", function(context, left, that) {
