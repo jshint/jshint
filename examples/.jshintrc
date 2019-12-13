@@ -76,7 +76,7 @@
     "mootools"      : false,    // MooTools
     "node"          : false,    // Node.js
     "nonstandard"   : false,    // Widely adopted globals (escape, unescape, etc)
-    "phantom"       : false,    // PhantomJS
+    "chrome"        : false,    // Chrome
     "prototypejs"   : false,    // Prototype and Scriptaculous
     "qunit"         : false,    // QUnit
     "rhino"         : false,    // Rhino

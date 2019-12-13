@@ -198,7 +198,7 @@ exports.es5 = function (test) {
   test.done();
 };
 
-exports.phantom = function (test) {
+exports.chrome = function (test) {
   // Phantom environment assumes `globalstrict`
   var globalStrict = [
     '"use strict";',
@@ -210,7 +210,7 @@ exports.phantom = function (test) {
     .test(globalStrict, { es3: true, strict: true });
 
   TestRun(test)
-    .test(globalStrict, { es3: true, phantom: true, strict: true });
+    .test(globalStrict, { es3: true, chrome: true, strict: true });
 
 
   test.done();
@@ -230,7 +230,7 @@ exports.globals = function (test) {
   TestRun(test)
     .test(src, { node: true });
   TestRun(test)
-    .test(src, { phantom: true });
+    .test(src, { chrome: true });
 
   TestRun(test, "Late configuration of `browserify`")
     .test([
@@ -276,17 +276,17 @@ exports.globals = function (test) {
       "var first;"
     ]);
 
-  TestRun(test, "Late configuration of `phantom`")
+  TestRun(test, "Late configuration of `chrome`")
     .test([
       "/* global first */",
       "void 0;",
-      "// jshint phantom: true",
+      "// jshint chrome: true",
       "var first;"
     ]);
 
   TestRun(test)
     .test([
-      "// jshint phantom: true",
+      "// jshint chrome: true",
       "/* global first */",
       "var first;"
     ]);
@@ -294,7 +294,7 @@ exports.globals = function (test) {
   TestRun(test)
     .test([
       "/* global first */",
-      "// jshint phantom: true",
+      "// jshint chrome: true",
       "var first;"
     ]);
 
