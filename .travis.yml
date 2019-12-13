@@ -5,7 +5,7 @@ before_install:
   # they are only needed to verify correctness in a browser-like environment,
   # they can be removed (and the tests skipped) without effecting coverage.
   - if [[ $(node --version) != v10* ]] ; then
-      node scripts/remove-dev-dependencies.js phantom phantomjs-prebuilt;
+      node scripts/remove-dev-dependencies.js puppeteer;
     fi
 script:
   - npm run pretest

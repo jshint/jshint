@@ -56,7 +56,7 @@ var state = {
    * @returns {boolean}
    */
   impliedClosure: function() {
-    return this.option.node || this.option.phantom || this.option.browserify;
+    return this.option.node || this.option.chrome || this.option.browserify;
   },
 
   // Assumption: chronologically ES3 < ES5 < ES6 < Moz

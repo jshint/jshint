@@ -1,57 +1,24 @@
 "use strict";
 
-var phantom, phantomJsPrebuilt;
-try {
-  phantom = require("phantom");
-  phantomJsPrebuilt = require("phantomjs-prebuilt");
-} catch (err) {
-  throw new Error(
-    "Unable to run tests in PhantomJS because the required dependencies are " +
-    "not available. Please note that JSHint does not support development " +
-    "using versions of Node.js which are no longer maintained."
-  );
-}
-
+const puppeteer = require('puppeteer');
 var createTestServer = require("./helpers/browser/server");
-var options = {
-  /**
-   * The `phantom` module provides a Node.js API for the PhantomJS binary,
-   * while the `phantomjs` module includes the binary itself.
-   */
-  phantomPath: phantomJsPrebuilt.path
-};
 var port = process.env.NODE_PORT || 8045;
-var ph;
-
-phantom.create([], options)
-  .then(function(_ph) {
-      ph = _ph;
-      return ph.createPage();
-    })
-  .then(function(page) {
-      createTestServer(port, function(server) {
-        page.on("onConsoleMessage", function(str) {
-          console.log(str);
-        });
-
-        page.on("onCallback", function(err) {
-          ph.exit();
-          server.close();
-          if (err) {
-            process.exit(1);
-          }
+const browser = puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] }).then(async browser => {
+        const page = await browser.newPage();
+        createTestServer(port, function(server) {
+        page.on('console', msg => console.log("", msg.text()));
+        page.exposeFunction('callChrome', text=> {
+                browser.close();
+                process.exit();
         });
 
         page.on("onError", function(msg, trace) {
           console.error(msg);
           console.error(trace);
-          process.exit(1);
+          process.exit();
         });
-
-        return page.open("http://localhost:" + port);
+        return page.goto("http://localhost:" + port, {
+                        waitUntil: 'load'
+        });
       });
-    })
-  .then(null, function(err) {
-      console.error(err);
-      process.exit(1);
-    });
+});

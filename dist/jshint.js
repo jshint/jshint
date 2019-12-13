@@ -21944,12 +21944,12 @@ exports.bool = {
 
     /**
      * This option defines globals available when your core is running inside
-     * of the PhantomJS runtime environment. [PhantomJS](http://phantomjs.org/)
+     * of the Chrome runtime environment. [Chrome](http://chromium.org/)
      * is a headless WebKit scriptable with a JavaScript API. It has fast and
      * native support for various web standards: DOM handling, CSS selector,
      * JSON, Canvas, and SVG.
      */
-    phantom     : true
+    chrome     : true
   },
 
   // Obsolete options
@@ -23478,7 +23478,7 @@ var state = {
    * @returns {boolean}
    */
   impliedClosure: function() {
-    return this.option.node || this.option.phantom || this.option.browserify;
+    return this.option.node || this.option.chrome || this.option.browserify;
   },
 
   // Assumption: chronologically ES3 < ES5 < ES6 < Moz
@@ -24285,8 +24285,8 @@ exports.browserify = {
   process       : true
 };
 
-exports.phantom = {
-  phantom      : true,
+exports.chrome = {
+  chrome      : true,
   require      : true,
   WebPage      : true,
   console      : true, // in examples, but undocumented
@@ -24845,8 +24845,8 @@ var JSHINT = (function() {
       combine(predefined, vars.typed);
     }
 
-    if (state.option.phantom) {
-      combine(predefined, vars.phantom);
+    if (state.option.chrome) {
+      combine(predefined, vars.chrome);
     }
 
     if (state.option.prototypejs) {
