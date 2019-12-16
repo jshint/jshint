@@ -284,8 +284,8 @@ var JSHINT = (function() {
       combine(predefined, vars.typed);
     }
 
-    if (state.option.chrome) {
-      combine(predefined, vars.chrome);
+    if (state.option.phantom) {
+      combine(predefined, vars.phantom);
     }
 
     if (state.option.prototypejs) {

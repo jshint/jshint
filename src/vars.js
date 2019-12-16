@@ -532,8 +532,8 @@ exports.browserify = {
   process       : true
 };
 
-exports.chrome = {
-  chrome       : true,
+exports.phantom = {
+  phantom       : true,
   require      : true,
   WebPage      : true,
   console      : true, // in examples, but undocumented
