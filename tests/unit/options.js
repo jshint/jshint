@@ -2047,7 +2047,7 @@ exports.strict = function (test) {
 /**
  * This test asserts sub-optimal behavior.
  *
- * In the "browserify", "node" and "chrome" environments, user code is not
+ * In the "browserify", "node" and "phantomjs" environments, user code is not
  * executed in the global scope directly. This means that top-level `use
  * strict` directives, although seemingly global, do *not* enable ES5 strict
  * mode for other scripts executed in the same environment. Because of this,
@@ -2075,7 +2075,7 @@ exports.strictEnvs = function (test) {
     .test(partialStrict, { strict: true, node: true });
   TestRun(test, "")
     .addError(2, 15, "Missing \"use strict\" statement.")
-    .test(partialStrict, { strict: true, chrome: true });
+    .test(partialStrict, { strict: true, phantom: true });
 
   partialStrict = [
     '(() =>',
@@ -2091,7 +2091,7 @@ exports.strictEnvs = function (test) {
     .test(partialStrict, { esversion: 6, strict: true, node: true });
   TestRun(test, "Block-less arrow function in the PhantomJS environment")
     .addError(3, 1, "Missing \"use strict\" statement.")
-    .test(partialStrict, { esversion: 6, strict: true, chrome: true });
+    .test(partialStrict, { esversion: 6, strict: true, phantom: true });
 
   test.done();
 };
@@ -2204,7 +2204,7 @@ exports.globalstrict = function (test) {
     .test(code, { strict: true, globalstrict: false, node: true });
 
   TestRun(test, "co-occurence with internally-set 'strict: gobal' (Phantom.js code)")
-    .test(code, { strict: true, globalstrict: false, chrome: true });
+    .test(code, { strict: true, globalstrict: false, phantom: true });
 
   TestRun(test, "co-occurence with internally-set 'strict: gobal' (Browserify code)")
     .test(code, { strict: true, globalstrict: false, browserify: true });

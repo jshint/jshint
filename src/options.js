@@ -780,12 +780,12 @@ exports.bool = {
 
     /**
      * This option defines globals available when your core is running inside
-     * of the Chrome runtime environment. [Chrome](http://chromium.org/)
+     * of the PhantomJS runtime environment. [PhantomJS](http://phantomjs.org/)
      * is a headless WebKit scriptable with a JavaScript API. It has fast and
      * native support for various web standards: DOM handling, CSS selector,
      * JSON, Canvas, and SVG.
      */
-    chrome     : true
+    phantom     : true
   },
 
   // Obsolete options
