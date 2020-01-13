@@ -1,3 +1,13 @@
+<a name="2.11.0"></a>
+# [2.11.0](https://github.com/jshint/jshint/compare/2.11.0-rc1...v2.11.0) (2020-01-13)
+
+This release was previously published using the "release candidate" pattern. No
+regressions were reported in the four weeks that followed, so the change set is
+being promoted to a true "minor" release.
+
+The release notes for version 2.11.0-rc1 completely describes the changes
+included in this version.
+
 <a name="2.11.0-rc1"></a>
 # [2.11.0-rc1](https://github.com/jshint/jshint/compare/2.10.3...v2.11.0-rc1) (2019-12-11)
 

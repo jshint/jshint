@@ -1,4 +1,4 @@
-/*! 2.11.0-rc1 */
+/*! 2.11.0 */
 var JSHINT;
 if (typeof window === 'undefined') window = {};
 (function () {
