@@ -391,7 +391,7 @@ exports.returnStatement = function (test) {
   var src = fs.readFileSync(__dirname + '/fixtures/return.js', 'utf8');
 
   TestRun(test)
-    .addError(3, 15, "Did you mean to return a conditional instead of an assignment?")
+    .addError(3, 14, "Did you mean to return a conditional instead of an assignment?")
     .addError(38, 5, "Line breaking error 'return'.")
     .addError(38, 11, "Missing semicolon.")
     .addError(39, 7, "Unnecessary semicolon.")

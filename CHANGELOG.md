@@ -1,3 +1,32 @@
+<a name="2.11.0"></a>
+# [2.11.0](https://github.com/jshint/jshint/compare/2.11.0-rc1...v2.11.0) (2020-01-13)
+
+This release was previously published using the "release candidate" pattern. No
+regressions were reported in the four weeks that followed, so the change set is
+being promoted to a true "minor" release.
+
+The release notes for version 2.11.0-rc1 completely describes the changes
+included in this version.
+
+<a name="2.11.0-rc1"></a>
+# [2.11.0-rc1](https://github.com/jshint/jshint/compare/2.10.3...v2.11.0-rc1) (2019-12-11)
+
+In addition to bug fixes and new features, this release candidate includes a
+few refactorings which are not expected to influence JSHint's behavior.
+
+### Bug Fixes
+
+* Expose new `typeof` value experimentally ([dcef79a](https://github.com/jshint/jshint/commit/dcef79a))
+* Improve parsing of `yield` ([6fdb4f6](https://github.com/jshint/jshint/commit/6fdb4f6))
+* Improve parsing of comma operator ([897e035](https://github.com/jshint/jshint/commit/897e035))
+* Support spaces in /*global ... */ ([e542f67](https://github.com/jshint/jshint/commit/e542f67))
+
+### Features
+
+* Add support for "bigint" typeof value ([ce0b7b3](https://github.com/jshint/jshint/commit/ce0b7b3))
+* Add support for BigInt literals ([c340e55](https://github.com/jshint/jshint/commit/c340e55))
+* Add support for ES2019 opt. catch param ([43b6354](https://github.com/jshint/jshint/commit/43b6354))
+
 <a name="2.10.3"></a>
 ## [2.10.3](https://github.com/jshint/jshint/compare/2.10.2...v2.10.3) (2019-11-04)
 
