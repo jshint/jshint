@@ -533,7 +533,7 @@ exports.browserify = {
 };
 
 exports.phantom = {
-  phantom       : true,
+  phantom      : true,
   require      : true,
   WebPage      : true,
   console      : true, // in examples, but undocumented
