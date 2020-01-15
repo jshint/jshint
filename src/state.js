@@ -66,6 +66,15 @@ var state = {
   },
 
   /**
+   * Determine if constructs introduced in ECMAScript 10 should be accepted.
+   *
+   * @returns {boolean}
+   */
+  inES10: function() {
+    return this.esVersion >= 10;
+  },
+
+  /**
    * Determine if constructs introduced in ECMAScript 9 should be accepted.
    *
    * @returns {boolean}

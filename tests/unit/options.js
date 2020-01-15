@@ -311,6 +311,7 @@ exports.notypeof = function (test) {
     .addError(3, 17, "Invalid typeof value 'bool'")
     .addError(4, 11, "Invalid typeof value 'obj'")
     .addError(13, 17, "Invalid typeof value 'symbol'")
+    .addError(14, 21, "'BigInt' is a non-standard language feature. Enable it using the 'bigint' unstable option.")
     .test(src);
 
   TestRun(test)
@@ -318,7 +319,15 @@ exports.notypeof = function (test) {
     .addError(2, 14, "Invalid typeof value 'double'")
     .addError(3, 17, "Invalid typeof value 'bool'")
     .addError(4, 11, "Invalid typeof value 'obj'")
+    .addError(14, 21, "'BigInt' is a non-standard language feature. Enable it using the 'bigint' unstable option.")
     .test(src, { esnext: true });
+
+  TestRun(test)
+    .addError(1, 17, "Invalid typeof value 'funtion'")
+    .addError(2, 14, "Invalid typeof value 'double'")
+    .addError(3, 17, "Invalid typeof value 'bool'")
+    .addError(4, 11, "Invalid typeof value 'obj'")
+    .test(src, { esnext: true, unstable: { bigint: true } });
 
   TestRun(test)
     .test(src, { notypeof: true });
@@ -1668,20 +1677,20 @@ exports.boss = function (test) {
 
   // By default, warn about suspicious assignments
   TestRun(test)
-    .addError(1, 10, 'Expected a conditional expression and instead saw an assignment.')
-    .addError(4, 24, 'Expected a conditional expression and instead saw an assignment.')
-    .addError(7, 27, 'Expected a conditional expression and instead saw an assignment.')
-    .addError(12, 24, 'Expected a conditional expression and instead saw an assignment.')
+    .addError(1, 7, 'Expected a conditional expression and instead saw an assignment.')
+    .addError(4, 12, 'Expected a conditional expression and instead saw an assignment.')
+    .addError(7, 15, 'Expected a conditional expression and instead saw an assignment.')
+    .addError(12, 12, 'Expected a conditional expression and instead saw an assignment.')
 
     // GH-657
-    .addError(14, 11, 'Expected a conditional expression and instead saw an assignment.')
-    .addError(17, 25, 'Expected a conditional expression and instead saw an assignment.')
-    .addError(20, 28, 'Expected a conditional expression and instead saw an assignment.')
-    .addError(25, 25, 'Expected a conditional expression and instead saw an assignment.')
+    .addError(14, 7, 'Expected a conditional expression and instead saw an assignment.')
+    .addError(17, 12, 'Expected a conditional expression and instead saw an assignment.')
+    .addError(20, 15, 'Expected a conditional expression and instead saw an assignment.')
+    .addError(25, 12, 'Expected a conditional expression and instead saw an assignment.')
 
     // GH-670
-    .addError(28, 13, "Did you mean to return a conditional instead of an assignment?")
-    .addError(32, 15, "Did you mean to return a conditional instead of an assignment?")
+    .addError(28, 12, "Did you mean to return a conditional instead of an assignment?")
+    .addError(32, 14, "Did you mean to return a conditional instead of an assignment?")
     .test(src, {es3: true});
 
   // But if you are the boss, all is good
@@ -2846,7 +2855,7 @@ exports.nocomma = function (test) {
     .test("return 2, 5;", {});
 
   TestRun(test, "nocomma main case")
-    .addError(1, 11, "Unexpected use of a comma operator.")
+    .addError(1, 9, "Unexpected use of a comma operator.")
     .test("return 2, 5;", { nocomma: true });
 
   TestRun(test, "nocomma in an expression")
@@ -4229,13 +4238,15 @@ exports.esversion = function(test) {
     "// jshint esversion: 9",
     "// jshint esversion: 2018",
     "// jshint esversion: 10",
-    "// jshint esversion: 2019"
+    "// jshint esversion: 2019",
+    "// jshint esversion: 11",
+    "// jshint esversion: 2020"
   ];
 
   TestRun(test, "Value")
     .addError(2, 1, "Bad option value.")
-    .addError(12, 1, "Bad option value.")
-    .addError(13, 1, "Bad option value.")
+    .addError(14, 1, "Bad option value.")
+    .addError(15, 1, "Bad option value.")
     .test(code);
 
   var es5code = [

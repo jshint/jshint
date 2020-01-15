@@ -39,5 +39,10 @@ module.exports = {
    * Enabled when any exception thrown by the expression will be caught by a
    * TryStatement.
    */
-  tryClause: 32
+  tryClause: 32,
+
+  /**
+   * Enabled when parsing the body of a generator function.
+   */
+  yield: 64
 };
