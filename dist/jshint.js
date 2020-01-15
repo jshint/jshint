@@ -16172,7 +16172,7 @@ function now() {
      * [lodash's custom builds documentation](https://lodash.com/custom-builds).
      *
      * For more information on Chrome extension sandboxes see
-     * [Chrome's extensions documentation](https://developer.phantom.com/extensions/sandboxingEval).
+     * [Chrome's extensions documentation](https://developer.chrome.com/extensions/sandboxingEval).
      *
      * @static
      * @since 0.1.0

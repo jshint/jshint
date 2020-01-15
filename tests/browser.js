@@ -5,8 +5,8 @@ try {
   puppeteer = require('puppeteer');
 } catch (err) {
   throw new Error(
-    "Unable to run tests in Chrome because the required dependencies are " + 
-    "not available. Please note that JSHint does not support development " + 
+    "Unable to run tests in Chrome because the required dependencies are " +
+    "not available. Please note that JSHint does not support development " +
     "using versions of Node.js which are no longer maintained."
   );
 }
