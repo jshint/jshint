@@ -1,20 +1,13 @@
 (function() {
   "use strict";
   var nodeunit = require("nodeunit");
-  var callPhantom = window.callPhantom;
+  var callChrome = window.callChrome;
   var tests;
-
-  /**
-   * `window.callPhantom` is used as the control flow communication channel
-   * between the document and the PhantomJS context (where available). Because
-   * of this, it should not be available to other scripts on the page.
-   */
-  window.callPhantom = null;
 
   /**
    * Nodeunit's "browser" reporter expects Nodeunit to be available on the
    * global scope. Expose it in all cases to promote consistency between the
-   * PhantomJS and "true" browser execution contexts.
+   * Chrome and "true" browser execution contexts.
    */
   window.nodeunit = nodeunit;
 
@@ -38,7 +31,7 @@
       assertion_suffix: "\u001B[39m"
     };
     nodeunit.reporters.default.run(tests, colors, function(err) {
-      callPhantom(err ? err : null);
+      callChrome();
     });
   }
 
@@ -48,7 +41,7 @@
     reporter.run(tests);
   }
 
-  if (/PhantomJS/.test(navigator.userAgent)) {
+  if (/Chrome/.test(navigator.userAgent)) {
     runHeadless();
   } else {
     runHeadful();
