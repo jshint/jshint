@@ -900,10 +900,16 @@ var JSHINT = (function() {
       return true;
     }
 
-    if (next.infix === curr.infix || curr.ltBoundary === "after" ||
-      next.ltBoundary === "before") {
-      return curr.line !== startLine(next);
+    if (next.infix === curr.infix ||
+      // Infix operators which follow `yield` should only be consumed as part
+      // of the current expression if allowed by the syntactic grammar. In
+      // effect, this prevents automatic semicolon insertion when `yield` is
+      // followed by a newline and a comma operator (without enabling it when
+      // `yield` is followed by a newline and a `[` token).
+      (curr.id === "yield" && curr.rbp < next.rbp)) {
+      return !sameLine(curr, next);
     }
+
     return false;
   }
 
@@ -1010,38 +1016,51 @@ var JSHINT = (function() {
 
   // Functions for conformance of style.
 
-  function startLine(token) {
-    return token.startLine || token.line;
+  function sameLine(first, second) {
+    return first.line === (second.startLine || second.line);
   }
 
   function nobreaknonadjacent(left, right) {
-    if (!state.option.laxbreak && left.line !== startLine(right)) {
+    if (!state.option.laxbreak && !sameLine(left, right)) {
       warning("W014", right, right.value);
     }
   }
 
   function nolinebreak(t) {
     t = t;
-    if (t.line !== startLine(state.tokens.next)) {
+    if (!sameLine(t, state.tokens.next)) {
       warning("E022", t, t.value);
     }
   }
 
-  function parseComma(opts) {
+  /**
+   * Validate the comma token in the "current" position of the token stream.
+   *
+   * @param {object} [opts]
+   * @param {boolean} [opts.property] - flag indicating whether the current
+   *                                    comma token is situated directly within
+   *                                    an object initializer
+   * @param {boolean} [opts.allowTrailing] - flag indicating whether the
+   *                                         current comma token may appear
+   *                                         directly before a delimiter
+   *
+   * @returns {boolean} flag indicating the validity of the current comma
+   *                    token; `false` if the token directly causes a syntax
+   *                    error, `true` otherwise
+   */
+  function checkComma(opts) {
+    var prev = state.tokens.prev;
+    var curr = state.tokens.curr;
     opts = opts || {};
 
-    if (!opts.peek) {
-      if (state.tokens.curr.line !== startLine(state.tokens.next)) {
-        if (!state.option.laxcomma) {
-          if (parseComma.first) {
-            warning("I001");
-            parseComma.first = false;
-          }
-          warning("W014", state.tokens.curr, state.tokens.next.value);
+    if (!sameLine(prev, curr)) {
+      if (!state.option.laxcomma) {
+        if (checkComma.first) {
+          warning("I001", curr);
+          checkComma.first = false;
         }
+        warning("W014", prev, curr.value);
       }
-
-      advance(",");
     }
 
     if (state.tokens.next.identifier && !(opts.property && state.inES5())) {
@@ -1857,18 +1876,18 @@ var JSHINT = (function() {
       // don't complain about unclosed templates / strings
       if (state.tokens.next.isUnclosed) return advance();
 
-      var sameLine = startLine(state.tokens.next) === state.tokens.curr.line &&
-                     state.tokens.next.id !== "(end)";
+      var isSameLine = sameLine(state.tokens.curr, state.tokens.next) &&
+                       state.tokens.next.id !== "(end)";
       var blockEnd = checkPunctuator(state.tokens.next, "}");
 
-      if (sameLine && !blockEnd && !(stmt.id === "do" && state.inES6(true))) {
+      if (isSameLine && !blockEnd && !(stmt.id === "do" && state.inES6(true))) {
         errorAt("E058", state.tokens.curr.line, state.tokens.curr.character);
       } else if (!state.option.asi) {
 
         // If this is the last statement in a block that ends on the same line
         // *and* option lastsemic is on, ignore the warning.  Otherwise, issue
         // a warning about missing semicolon.
-        if (!(blockEnd && sameLine && state.option.lastsemic)) {
+        if (!(blockEnd && isSameLine && state.option.lastsemic)) {
           warningAt("W033", state.tokens.curr.line, state.tokens.curr.character);
         }
       }
@@ -1962,6 +1981,7 @@ var JSHINT = (function() {
       } else if (state.option.nonew && r && r.left && r.id === "(" && r.left.id === "new") {
         warning("W031", t);
       }
+
       parseFinalSemicolon(t);
     }
 
@@ -2382,26 +2402,18 @@ var JSHINT = (function() {
   bitwiseassignop(">>=");
   bitwiseassignop(">>>=");
   infix(",", function(context, left, that) {
-    var expr;
-    that.exprs = [left];
-
     if (state.option.nocomma) {
-      warning("W127");
+      warning("W127", that);
     }
 
-    if (!parseComma({ peek: true })) {
-      return that;
+    that.left = left;
+
+    if (checkComma()) {
+      that.right = expression(context, 10);
+    } else {
+      that.right = null;
     }
-    while (true) {
-      if (!(expr = expression(context, 10))) {
-        /* istanbul ignore next */
-        break;
-      }
-      that.exprs.push(expr);
-      if (state.tokens.next.value !== "," || !parseComma()) {
-        break;
-      }
-    }
+
     return that;
   }, 10, true);
 
@@ -2597,12 +2609,10 @@ var JSHINT = (function() {
   suffix("++");
   prefix("++", "preinc");
   state.syntax["++"].exps = true;
-  state.syntax["++"].ltBoundary = "before";
 
   suffix("--");
   prefix("--", "predec");
   state.syntax["--"].exps = true;
-  state.syntax["--"].ltBoundary = "before";
 
   prefix("delete", function(context) {
     this.arity = "unary";
@@ -3020,7 +3030,7 @@ var JSHINT = (function() {
     }
 
     if (state.option.asi && checkPunctuators(state.tokens.prev, [")", "]"]) &&
-      state.tokens.prev.line !== startLine(state.tokens.curr)) {
+      !sameLine(state.tokens.prev, state.tokens.curr)) {
       warning("W014", state.tokens.curr, state.tokens.curr.id);
     }
 
@@ -3051,7 +3061,8 @@ var JSHINT = (function() {
         if (state.tokens.next.id !== ",") {
           break;
         }
-        parseComma({ allowTrailing: true });
+        advance(",");
+        checkComma({ allowTrailing: true });
 
         if (state.tokens.next.id === ")") {
           if (!state.inES8()) {
@@ -3150,44 +3161,50 @@ var JSHINT = (function() {
       return pn;
     }
 
-    var exprs = [];
-
-    if (state.tokens.next.id !== ")") {
-      for (;;) {
-        exprs.push(expression(context, 10));
-
-        if (state.tokens.next.id !== ",") {
-          break;
-        }
-
-        if (state.option.nocomma) {
-          warning("W127");
-        }
-
-        parseComma();
-      }
+    // The ECMA262 grammar requires an expression between the "opening
+    // parenthesis" and "close parenthesis" tokens of the grouping operator.
+    // However, the "ignore" directive is commonly used to inject values that
+    // are not included in the token stream. For example:
+    //
+    //     return (
+    //       /*jshint ignore:start */
+    //       <div></div>
+    //       /*jshint ignore:end */
+    //     );
+    //
+    // The "empty" grouping operator is permitted in order to tolerate this
+    // pattern.
+    if (state.tokens.next.id === ")") {
+      advance(")");
+      return;
     }
 
+    ret = expression(context, 0);
+
     advance(")", this);
-    if (state.option.immed && exprs[0] && exprs[0].id === "function") {
+
+    if (!ret) {
+      return;
+    }
+
+    ret.paren = true;
+
+    if (state.option.immed && ret && ret.id === "function") {
       if (state.tokens.next.id !== "(" &&
         state.tokens.next.id !== "." && state.tokens.next.id !== "[") {
         warning("W068", this);
       }
     }
 
-    if (!exprs.length) {
-      return;
-    }
+    if (ret.id === ",") {
+      first = ret.left;
+      while (first.id === ",") {
+        first = first.left;
+      }
 
-    if (exprs.length > 1) {
-      ret = Object.create(state.syntax[","]);
-      ret.exprs = exprs;
-
-      first = exprs[0];
-      last = exprs[exprs.length - 1];
+      last = ret.right;
     } else {
-      ret = first = last = exprs[0];
+      first = last = ret;
 
       if (!isNecessary) {
         // async functions are identified after parsing due to the complexity
@@ -3225,22 +3242,18 @@ var JSHINT = (function() {
       }
     }
 
-    if (ret) {
-      ret.paren = true;
+    // The operator may be necessary to override the default binding power of
+    // neighboring operators (whenever there is an operator in use within the
+    // first expression *or* the current group contains multiple expressions)
+    if (!isNecessary && (isOperator(first) || first !== last)) {
+      isNecessary =
+        (rbp > first.lbp) ||
+        (rbp > 0 && rbp === first.lbp) ||
+        (!isEndOfExpr() && last.rbp < state.tokens.next.lbp);
+    }
 
-      // The operator may be necessary to override the default binding power of
-      // neighboring operators (whenever there is an operator in use within the
-      // first expression *or* the current group contains multiple expressions)
-      if (!isNecessary && (isOperator(first) || ret.exprs)) {
-        isNecessary =
-          (rbp > first.lbp) ||
-          (rbp > 0 && rbp === first.lbp) ||
-          (!isEndOfExpr() && last.rbp < state.tokens.next.lbp);
-      }
-
-      if (!isNecessary) {
-        warning("W126", opening);
-      }
+    if (!isNecessary) {
+      warning("W126", opening);
     }
 
     return ret;
@@ -3252,7 +3265,7 @@ var JSHINT = (function() {
     var e, s, canUseDot;
 
     if (state.option.asi && checkPunctuators(state.tokens.prev, [")", "]"]) &&
-      state.tokens.prev.line !== startLine(state.tokens.curr)) {
+      !sameLine(state.tokens.prev, state.tokens.curr)) {
       warning("W014", state.tokens.curr, state.tokens.curr.id);
     }
 
@@ -3365,7 +3378,7 @@ var JSHINT = (function() {
         });
       return this;
     }
-    var b = state.tokens.curr.line !== startLine(state.tokens.next);
+    var b = !sameLine(state.tokens.curr, state.tokens.next);
     this.first = [];
     if (b) {
       indent += state.option.indent;
@@ -3400,7 +3413,8 @@ var JSHINT = (function() {
 
       this.first.push(expression(context, 10));
       if (state.tokens.next.id === ",") {
-        parseComma({ allowTrailing: true });
+        advance(",");
+        checkComma({ allowTrailing: true });
         if (state.tokens.next.id === "]" && !state.inES5()) {
           warning("W070", state.tokens.curr);
           break;
@@ -3559,7 +3573,8 @@ var JSHINT = (function() {
         if (pastRest) {
           warning("W131", state.tokens.next);
         }
-        parseComma({ allowTrailing: true });
+        advance(",");
+        checkComma({ allowTrailing: true });
       }
 
       if (state.tokens.next.id === ")") {
@@ -3877,38 +3892,20 @@ var JSHINT = (function() {
     state.funct["(metrics)"].ComplexityCount += 1;
   }
 
-  /**
-   * Detect and warn about assignment that occurs within conditional clauses,
-   * e.g.
-   *
-   *     if (a = 1) { ... }
-   *
-   * This check is disabled in response to parenthesized expressions so that
-   * users may opt out of the warning on a case-by-case bases, e.g.
-   *
-   *     if ((a = 1)) { ... }
-   *
-   * @param {object} expr - the parsed expression within the conditional clause
-   */
-  function checkCondAssignment(expr) {
-    if (!expr || expr.paren || state.option.boss) {
+  // Parse assignments that were found instead of conditionals.
+  // For example: if (a = 1) { ... }
+
+  function checkCondAssignment(token) {
+    if (!token || token.paren) {
       return;
     }
 
-    var id = expr.id;
-
-    // If the expression is composed of multiple sub-expressions via a comma
-    // operator, then check the final sub-expression.
-    if (id === ",") {
-      expr = expr.exprs[expr.exprs.length - 1];
-      id = expr.id;
-
-      if (expr.paren) {
-        return;
-      }
+    if (token.id === ",") {
+      checkCondAssignment(token.right);
+      return;
     }
 
-    switch (id) {
+    switch (token.id) {
     case "=":
     case "+=":
     case "-=":
@@ -3918,7 +3915,9 @@ var JSHINT = (function() {
     case "|=":
     case "^=":
     case "/=":
-      warning("W084");
+      if (!state.option.boss) {
+        warning("W084", token);
+      }
     }
   }
 
@@ -3963,7 +3962,7 @@ var JSHINT = (function() {
       var props = Object.create(null); // All properties, including accessors
       var isAsyncMethod = false;
 
-      b = state.tokens.curr.line !== startLine(state.tokens.next);
+      b = !sameLine(state.tokens.curr, state.tokens.next);
       if (b) {
         indent += state.option.indent;
         if (state.tokens.next.from === indent + state.option.indent) {
@@ -4098,7 +4097,8 @@ var JSHINT = (function() {
         countMember(i);
 
         if (state.tokens.next.id === ",") {
-          parseComma({ allowTrailing: true, property: true });
+          advance(",");
+          checkComma({ allowTrailing: true, property: true });
           if (state.tokens.next.id === ",") {
             /* istanbul ignore next */
             warning("W070", state.tokens.curr);
@@ -4433,7 +4433,8 @@ var JSHINT = (function() {
       }
 
       statement.hasComma = true;
-      parseComma();
+      advance(",");
+      checkComma();
     }
     if (letblock) {
       advance(")");
@@ -4605,7 +4606,8 @@ var JSHINT = (function() {
         break;
       }
       this.hasComma = true;
-      parseComma();
+      advance(",");
+      checkComma();
     }
 
     return this;
@@ -4722,7 +4724,6 @@ var JSHINT = (function() {
   blockstmt("if", function(context) {
     var t = state.tokens.next;
     increaseComplexityCount();
-    state.condition = true;
     advance("(");
     var expr = expression(context, 0);
 
@@ -4746,7 +4747,6 @@ var JSHINT = (function() {
     }
 
     advance(")", t);
-    state.condition = false;
     var s = block(context, true, true);
 
     // When the if is within a for-in loop and the condition has a negative form,
@@ -5245,7 +5245,8 @@ var JSHINT = (function() {
           if (state.tokens.next.id !== ",") {
             break;
           }
-          parseComma();
+          advance(",");
+          checkComma();
         }
       }
       advance(")", t);
@@ -5270,7 +5271,7 @@ var JSHINT = (function() {
       nolinebreak(this);
 
     if (state.tokens.next.identifier &&
-        state.tokens.curr.line === startLine(state.tokens.next)) {
+        sameLine(state.tokens.curr, state.tokens.next)) {
       if (!state.funct["(scope)"].funct.hasLabel(v)) {
         warning("W090", state.tokens.next, v);
       }
@@ -5298,7 +5299,7 @@ var JSHINT = (function() {
       nolinebreak(this);
 
     if (state.tokens.next.identifier) {
-      if (state.tokens.curr.line === startLine(state.tokens.next)) {
+      if (sameLine(state.tokens.curr, state.tokens.next)) {
         if (!state.funct["(scope)"].funct.hasLabel(v)) {
           warning("W090", state.tokens.next, v);
         }
@@ -5314,7 +5315,7 @@ var JSHINT = (function() {
 
 
   stmt("return", function(context) {
-    if (this.line === startLine(state.tokens.next)) {
+    if (sameLine(this, state.tokens.next)) {
       if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
         this.first = expression(context, 0);
 
@@ -5419,7 +5420,6 @@ var JSHINT = (function() {
   (function(yieldSymbol) {
     yieldSymbol.rbp = yieldSymbol.lbp = 25;
     yieldSymbol.exps = true;
-    yieldSymbol.ltBoundary = "after";
   })(prefix("yield", function(context) {
     if (state.inMoz()) {
       return mozYield.call(this, context);
@@ -5453,7 +5453,7 @@ var JSHINT = (function() {
     }
 
     // Parse operand
-    if (!isEndOfExpr() && state.tokens.next.id !== ",") {
+    if (state.tokens.curr.value === "*" || sameLine(state.tokens.curr, state.tokens.next)) {
       if (state.tokens.next.nud) {
 
         nobreaknonadjacent(state.tokens.curr, state.tokens.next);
@@ -5490,7 +5490,7 @@ var JSHINT = (function() {
       advance("*");
     }
 
-    if (this.line === startLine(state.tokens.next)) {
+    if (sameLine(this, state.tokens.next)) {
       if (delegatingYield ||
           (state.tokens.next.id !== ";" && !state.option.asi &&
            !state.tokens.next.reach && state.tokens.next.nud)) {
@@ -6491,7 +6491,7 @@ var JSHINT = (function() {
       combine(predefined, g || {});
 
       //reset values
-      parseComma.first = true;
+      checkComma.first = true;
 
       advance();
       switch (state.tokens.next.id) {
