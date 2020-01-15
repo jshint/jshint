@@ -741,7 +741,6 @@ var JSHINT = (function() {
               state.option[tn] = !state.option[tn];
             }
           } else if (directiveToken.type === "jshint.unstable") {
-            /* istanbul ignore next */
             state.option.unstable[key] = (val === "true");
           } else {
             state.option[key] = (val === "true");
@@ -1422,7 +1421,7 @@ var JSHINT = (function() {
     "undefined", "boolean", "number", "string", "function", "object",
   ];
   typeofValues.es3 = typeofValues.es3.concat(typeofValues.legacy);
-  typeofValues.es6 = typeofValues.es3.concat("symbol");
+  typeofValues.es6 = typeofValues.es3.concat("symbol", "bigint");
 
   /**
    * Validate comparisons between the result of a `typeof` expression and a
@@ -1448,8 +1447,17 @@ var JSHINT = (function() {
 
     values = state.inES6() ? typeofValues.es6 : typeofValues.es3;
 
-    if (right.type === "(identifier)" && right.value === "typeof" && left.type === "(string)")
+    if (right.type === "(identifier)" && right.value === "typeof" && left.type === "(string)") {
+      if (left.value === "bigint") {
+        if (!state.option.unstable.bigint) {
+          warning("W144", left, "BigInt", "bigint");
+        }
+
+        return false;
+      }
+
       return !_.includes(values, left.value);
+    }
 
     return false;
   }
