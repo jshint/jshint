@@ -35,6 +35,7 @@
     "test-node": "npm run test-unit && npm run test-cli && npm run test-regression",
     "test-regression": "nodeunit tests/regression",
     "test-unit": "nodeunit tests/unit tests/unit/unstable",
+    "test-website": "node tests/website.js",
     "test": "npm run test-node && npm run test-browser"
   },
   "main": "./src/jshint.js",
