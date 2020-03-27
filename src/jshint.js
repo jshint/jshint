@@ -5219,7 +5219,7 @@ var JSHINT = (function() {
       }
       nolinebreak(state.tokens.curr);
       advance(";");
-      if (decl) {
+      if (decl && decl.first && decl.first[0]) {
         if (decl.value === "const"  && !decl.hasInitializer) {
           warning("E012", decl, decl.first[0].value);
         }
