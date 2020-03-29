@@ -2354,6 +2354,20 @@ exports.initializeCStyle = function(test) {
   test.done();
 };
 
+// regression test for gh-3455
+exports.constWithoutVar = function(test) {
+  TestRun(test)
+    .addError(1, 11, "Expected an identifier and instead saw ';'.")
+    .addError(1, 12, "Expected an identifier and instead saw ')'.")
+    .addError(1, 12, "Expected ';' and instead saw ''.")
+    .addError(1, 12, "Unrecoverable syntax error. (100% scanned).")
+    .test([
+      "for (const;)"
+    ], { esversion: 6 });
+
+  test.done();
+};
+
 exports.constWithoutInit = function(test) {
   TestRun(test, "single binding")
     .addError(1, 6, "const 'x' is initialized to 'undefined'.")
