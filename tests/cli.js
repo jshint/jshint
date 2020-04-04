@@ -299,7 +299,7 @@ exports.group = {
     ]);
     test.ok(rep.reporter.args[0][0].length === 0);
 
-    // Test overriden, failed file
+    // Test overridden, failed file
     cli.interpret([
       "node", "jshint", "bar.js", "--config", "config.json", "--reporter", "reporter.js"
     ]);
@@ -344,7 +344,7 @@ exports.group = {
     ]);
     test.ok(rep.reporter.args[0][0].length === 0);
 
-    // Test overriden, failed file
+    // Test overridden, failed file
     cli.interpret([
       "node", "jshint", "src/bar.js", "--config", "config.json", "--reporter", "reporter.js"
     ]);
@@ -389,7 +389,7 @@ exports.group = {
     ]);
     test.ok(rep.reporter.args[0][0].length === 0);
 
-    // Test overriden, failed file
+    // Test overridden, failed file
     cli.interpret([
       "node", "jshint", "./src/bar.js", "--config", "config.json", "--reporter", "reporter.js"
     ]);
@@ -1515,7 +1515,7 @@ exports.useStdin = {
       test.done();
     },
 
-    // Test overriden, failed file
+    // Test overridden, failed file
     failure: function(test) {
       cli.interpret([
         "node", "jshint", "--filename", "bar.js", "--config", "config.json", "--reporter", "reporter.js", "-"
@@ -1570,7 +1570,7 @@ exports.useStdin = {
       test.done();
     },
 
-    // Test overriden, failed file
+    // Test overridden, failed file
     failure: function(test) {
       cli.interpret([
         "node", "jshint", "--filename", "src/bar.js", "--config", "config.json", "--reporter", "reporter.js", "-"
@@ -1625,7 +1625,7 @@ exports.useStdin = {
       test.done();
     },
 
-    // Test overriden, failed file
+    // Test overridden, failed file
     failure: function(test) {
       cli.interpret([
         "node", "jshint", "--filename", "./src/bar.js", "--config", "config.json", "--reporter", "reporter.js", "-"
