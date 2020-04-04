@@ -155,7 +155,7 @@ var warnings = {
   W064: "Missing 'new' prefix when invoking a constructor.",
   W065: "Missing radix parameter.",
   W066: "Implied eval. Consider passing a function instead of a string.",
-  W067: "Bad invocation.",
+  W067: "Unorthodox function invocation.",
   W068: "Wrapping non-IIFE function literals in parens is unnecessary.",
   W069: "['{a}'] is better written in dot notation.",
   W070: "Extra comma. (it breaks older versions of IE)",
