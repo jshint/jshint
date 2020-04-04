@@ -8591,7 +8591,7 @@ exports.testStrictDirectiveASI = function (test) {
     .test("'use strict';function fn() {} fn();", options);
 
   TestRun(test, 4)
-    .addError(2, 1, "Bad invocation.")
+    .addError(2, 1, "Unorthodox function invocation.")
     .addError(2, 21, "Missing \"use strict\" statement.")
     .test("'use strict'\n(function fn() {})();", options);
 
