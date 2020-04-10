@@ -146,7 +146,7 @@ function loadNpmConfig(file) {
  */
 function loadReporter(fp) {
   try {
-    return require(require.resolve(fp, { paths: [process.cwd(),], })).reporter;
+    return require(require.resolve(fp)).reporter;
   } catch (err) {
     return null;
   }
@@ -737,7 +737,8 @@ var exports = {
 
     var reporter;
     if (options.reporter) {
-      reporter = loadReporter(options.reporter) || loadReporter(path.resolve(process.cwd(), options.reporter));
+      reporter = loadReporter(options.reporter) ||
+        loadReporter(path.resolve(process.cwd(), options.reporter));
 
       if (reporter === null) {
         cli.error("Can't load reporter file: " + options.reporter);
