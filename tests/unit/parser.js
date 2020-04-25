@@ -1629,6 +1629,15 @@ exports.exported = function (test) {
     .addError(5, 19, "'h' is defined but never used.")
     .test(code, {esversion: 6, unused: true});
 
+  TestRun(test, "Does not export bindings which are not accessible on the top level.")
+    .addError(2, 7, "'Moo' is defined but never used.")
+    .test([
+      "(function() {",
+      "  var Moo;",
+      "  /* exported Moo */",
+      "})();"
+    ], {unused: true});
+
   test.done();
 };
 
