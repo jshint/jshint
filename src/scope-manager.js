@@ -1,4 +1,20 @@
 "use strict";
+/**
+ * A note on `__proto__`:
+ *
+ * This file uses ordinary objects to track identifiers that are observed in
+ * the input source code. It creates these objects using `Object.create` so
+ * that the tracking objects have no prototype, allowing the `__proto__`
+ * property to be used to store a value *without* triggering the invocation of
+ * the built-in `Object.prototype.__proto__` accessor method. Some environments
+ * (e.g. PhantomJS) do not implement the correct semantics for property
+ * enumeration. In those environments, methods like `Object.keys` and Lodash's
+ * `values` do not include the property name. This file includes a number of
+ * branches which ensure that JSHint behaves consistently in those
+ * environments. The branches must be ignored by the test coverage verification
+ * system because the workaround is not necessary in the environment where
+ * coverage is verified (i.e. Node.js).
+ */
 
 var _      = require("lodash");
 var events = require("events");
@@ -304,6 +320,7 @@ var scopeManager = function(state, predefined, exported, declared) {
       var currentBindings = _current["(bindings)"];
       var usedBindingNameList = Object.keys(currentUsages);
 
+      // See comment, "A note on `__proto__`"
       /* istanbul ignore if */
       if (currentUsages.__proto__ && usedBindingNameList.indexOf("__proto__") === -1) {
         usedBindingNameList.push("__proto__");
@@ -582,9 +599,7 @@ var scopeManager = function(state, predefined, exported, declared) {
       // jshint proto: true
       var list = Object.keys(usedPredefinedAndGlobals);
 
-      // If `__proto__` is used as a global variable name, its entry in the
-      // lookup table may not be enumerated by `Object.keys` (depending on the
-      // environment).
+      // See comment, "A note on `__proto__`"
       /* istanbul ignore if */
       if (usedPredefinedAndGlobals.__proto__ === marker &&
         list.indexOf("__proto__") === -1) {
@@ -604,9 +619,7 @@ var scopeManager = function(state, predefined, exported, declared) {
       var values = _.values(impliedGlobals);
       var hasProto = false;
 
-      // If `__proto__` is an implied global variable, its entry in the lookup
-      // table may not be enumerated by `_.values` (depending on the
-      // environment).
+      // See comment, "A note on `__proto__`"
       if (impliedGlobals.__proto__) {
         hasProto = values.some(function(value) {
           return value.name === "__proto__";
