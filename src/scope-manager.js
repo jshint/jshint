@@ -137,33 +137,20 @@ var scopeManager = function(state, predefined, exported, declared) {
    * Check the current scope for unused identifiers
    */
   function _checkForUnused() {
-    // function parameters are validated by a dedicated function
-    // assume that parameters are the only thing declared in the param scope
-    if (_current["(type)"] === "functionparams") {
-      _checkParams();
-      return;
-    }
-    var currentBindings = _current["(bindings)"];
-    for (var bindingName in currentBindings) {
-      if (currentBindings[bindingName]["(type)"] !== "exception" &&
-        currentBindings[bindingName]["(unused)"]) {
-        _warnUnused(bindingName, currentBindings[bindingName]["(token)"], "var");
+    if (_current["(type)"] !== "functionparams") {
+      var currentBindings = _current["(bindings)"];
+      for (var bindingName in currentBindings) {
+        if (currentBindings[bindingName]["(type)"] !== "exception" &&
+          currentBindings[bindingName]["(unused)"]) {
+          _warnUnused(bindingName, currentBindings[bindingName]["(token)"], "var");
+        }
       }
-    }
-  }
-
-  /**
-   * Check the current scope for unused parameters and issue warnings as
-   * necessary. This function may only be invoked when the current scope is a
-   * "function parameter" scope.
-   */
-  function _checkParams() {
-    var params = _current["(params)"];
-
-    if (!params) {
-      /* istanbul ignore next */
       return;
     }
+
+    // Check the current scope for unused parameters and issue warnings as
+    // necessary.
+    var params = _current["(params)"];
 
     var param = params.pop();
     var unused_opt;
