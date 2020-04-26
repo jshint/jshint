@@ -681,7 +681,6 @@ var scopeManager = function(state, predefined, exported, declared) {
               return;
             }
           } else {
-            /* istanbul ignore next */
             break;
           }
         }
