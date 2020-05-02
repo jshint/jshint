@@ -5267,9 +5267,6 @@ var JSHINT = (function() {
   stmt("break", function() {
     var v = state.tokens.next.value;
 
-    if (!state.option.asi)
-      nolinebreak(this);
-
     if (state.tokens.next.identifier &&
         sameLine(state.tokens.curr, state.tokens.next)) {
       if (!state.funct["(scope)"].funct.hasLabel(v)) {
@@ -5294,9 +5291,6 @@ var JSHINT = (function() {
     if (state.funct["(breakage)"] === 0 || !state.funct["(loopage)"]) {
       warning("W052", state.tokens.next, this.value);
     }
-
-    if (!state.option.asi)
-      nolinebreak(this);
 
     if (state.tokens.next.identifier) {
       if (sameLine(state.tokens.curr, state.tokens.next)) {
