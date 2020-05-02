@@ -761,6 +761,21 @@ exports.regexp.basic = function (test) {
       "void /\\09/;"
     ]);
 
+  TestRun(test, "following `new`")
+    .addError(1, 5, "Bad constructor.")
+    .addError(1, 5, "Missing '()' invoking a constructor.")
+    .test("new /./;");
+
+  TestRun(test, "following `delete`")
+    .addError(1, 11, "Variables should not be deleted.")
+    .test("delete /./;");
+
+  TestRun(test, "following `extends`")
+    .test("class R extends /./ {}", {esversion: 6});
+
+  TestRun(test, "following `default`")
+    .test("export default /./;", {esversion: 6, module: true});
+
   test.done();
 };
 
