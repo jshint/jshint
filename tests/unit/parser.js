@@ -6124,6 +6124,40 @@ exports.ASI.followingPostfix = function (test) {
   test.done();
 };
 
+exports.ASI.followingContinue = function (test) {
+  var code = [
+    "while (false) {",
+    "  continue",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(2, 11, "Missing semicolon.")
+    .test(code);
+
+  TestRun(test)
+    .test(code, { asi: true });
+
+  test.done();
+};
+
+exports.ASI.followingBreak = function (test) {
+  var code = [
+    "while (false) {",
+    "  break",
+    "}"
+  ];
+
+  TestRun(test)
+    .addError(2, 8, "Missing semicolon.")
+    .test(code);
+
+  TestRun(test)
+    .test(code, { asi: true });
+
+  test.done();
+};
+
 exports["fat arrows support"] = function (test) {
   var code = [
     "let empty = () => {};",
