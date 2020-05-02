@@ -5215,7 +5215,7 @@ var JSHINT = (function() {
       if (foreachtok) {
         error("E045", foreachtok);
       }
-      nolinebreak(state.tokens.curr);
+
       advance(";");
       if (decl && decl.first && decl.first[0]) {
         if (decl.value === "const"  && !decl.hasInitializer) {
@@ -5233,7 +5233,7 @@ var JSHINT = (function() {
       if (state.tokens.next.id !== ";") {
         checkCondAssignment(expression(context, 0));
       }
-      nolinebreak(state.tokens.curr);
+
       advance(";");
       if (state.tokens.next.id === ";") {
         error("E021", state.tokens.next, ")", ";");
