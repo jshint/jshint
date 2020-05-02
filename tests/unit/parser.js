@@ -6158,6 +6158,22 @@ exports.ASI.followingBreak = function (test) {
   test.done();
 };
 
+exports.ASI.cStyleFor = function (test) {
+  TestRun(test, "following first expression")
+    .test([
+      "for (false",
+      ";;){}"
+    ]);
+
+  TestRun(test, "following second expression")
+    .test([
+      "for (false;",
+      ";){}"
+    ]);
+
+  test.done();
+};
+
 exports["fat arrows support"] = function (test) {
   var code = [
     "let empty = () => {};",
