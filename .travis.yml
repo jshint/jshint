@@ -30,5 +30,7 @@ matrix:
       env: CMD=test-262
     - node_js: 10
       env: CMD=test-browser
+    - node_js: 10
+      env: CMD=test-website
   fast_finish: true
 sudo: false

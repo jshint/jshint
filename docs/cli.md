@@ -1,7 +1,7 @@
 # Command-line Interface
 
-The JSHint CLI can be installed via npm (see [the Installation page](/install)
-for instructions).
+The JSHint CLI can be installed via npm (see [the Installation
+page](https://jshint.com/install/) for instructions).
 
 Contents: [Specifying Input](#specifying-input) · [Specifying Linting
 Options](#specifying-linting-options) · [Special Options](#special-options) ·
@@ -45,9 +45,9 @@ If a file path is a dash (`-`) then JSHint will read from standard input.
 
 ### Specifying Linting Options
 
-The `jshint` executable is capable of applying [linting options](/docs/options)
-specified in an external [JSON](http://json.org/)-formatted file. Such a file
-might look like this:
+The `jshint` executable is capable of applying [linting
+options](https://jshint.com/docs/options) specified in an external
+[JSON](http://json.org/)-formatted file. Such a file might look like this:
 
     {
       "curly": true,
@@ -71,7 +71,8 @@ If this search yields no results, `jshint` will lint the input code as if no
 linting rules had been enabled.
 
 The command-line interface offers some [special options](#special-options) in
-addition to [the ones available in other contexts](/docs/options)
+addition to [the ones available in other
+contexts](https://jshint.com/docs/options)
 
 <a name="special-options"></a>
 
@@ -88,7 +89,7 @@ the current file.
 
 For example, you might define a `.jshintrc` file in the top-level directory of
 your project (say, `./.jshintrc') to specify the [linting
-options](/docs/options) you would like to use in your entire project:
+options](https://jshint.com/docs/options) you would like to use in your entire project:
 
     {
       "undef": true,
@@ -116,8 +117,9 @@ Specify options that should only be applied to files matching a given path
 pattern.
 
 The following configuration file [disallows variable
-shadowing](/docs/options#shadow) for *all* files and [allows expressions as
-statements](/docs/options#expr) for only those files ending in `-test.js`:
+shadowing](https://jshint.com/docs/options#shadow) for *all* files and [allows
+expressions as statements](https://jshint.com/docs/options#expr) for only those
+files ending in `-test.js`:
 
     {
       "shadow": false,
@@ -182,7 +184,8 @@ CheckStyle XML.
       </file>
     </checkstyle>
 
-See also: [Writing your own JSHint reporter](/docs/reporters/).
+See also: [Writing your own JSHint
+reporter](https://jshint.com/docs/reporters/).
 
 #### `--verbose`
 
