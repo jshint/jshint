@@ -15,8 +15,8 @@
 
 JSHint is a community-driven tool that detects errors and potential problems in
 JavaScript code. Since JSHint is so flexible, you can easily adjust it in 
-the environment you expect your code to execute. JSHint is open source and
-will always stay this way.
+the environment you expect your code to execute. JSHint is publicly available
+and will always stay this way.
 
 ## Our goal
 
