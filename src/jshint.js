@@ -1028,7 +1028,6 @@ var JSHINT = (function() {
   }
 
   function nolinebreak(t) {
-    t = t;
     if (!sameLine(t, state.tokens.next)) {
       warning("E022", t, t.value);
     }
