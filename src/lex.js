@@ -1987,7 +1987,8 @@ Lexer.prototype = {
       if (type === "(identifier)") {
         if (value === "return" || value === "case" || value === "yield" ||
             value === "typeof" || value === "instanceof" || value === "void" ||
-            value === "await") {
+            value === "await" || value === "new" || value === "delete" ||
+            value === "default" || value === "extends") {
           this.prereg = true;
         }
 
