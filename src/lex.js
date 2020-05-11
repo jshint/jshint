@@ -966,11 +966,19 @@ Lexer.prototype = {
       }
     }
 
+    // TODO: Extend this check to other numeric literals
+    this.triggerAsync("warning", {
+      code: "W045",
+      line: this.line,
+      character: this.char + value.length,
+      data: [ value ]
+    }, checks, function() { return !isFinite(value); });
+
     return {
       type: Token.NumericLiteral,
       value: value,
       base: base,
-      isMalformed: !isFinite(value)
+      isMalformed: false
     };
   },
 
@@ -2143,10 +2151,8 @@ Lexer.prototype = {
 
       case Token.NumericLiteral:
         if (token.isMalformed) {
-          // This condition unequivocally describes a syntax error.
-          // TODO: Re-factor as an "error" (not a "warning").
-          this.trigger("warning", {
-            code: "W045",
+          this.trigger("error", {
+            code: "E067",
             line: this.line,
             character: this.char,
             data: [ token.value ]
