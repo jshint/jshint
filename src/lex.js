@@ -966,6 +966,14 @@ Lexer.prototype = {
       }
     }
 
+    // TODO: Extend this check to other numeric literals
+    this.triggerAsync("warning", {
+      code: "W045",
+      line: this.line,
+      character: this.char + value.length,
+      data: [ value ]
+    }, checks, function() { return !isFinite(value); });
+
     return {
       type: Token.NumericLiteral,
       value: value,
@@ -2150,16 +2158,6 @@ Lexer.prototype = {
             data: [ token.value ]
           });
         }
-
-        this.triggerAsync("warning", {
-          code: "W045",
-          line: this.line,
-          character: this.char,
-          data: [ token.value ]
-        }, checks, function() {
-          return !token.isMalformed && token.value.substr(-1) !== "n" &&
-            !isFinite(token.value);
-        });
 
         this.triggerAsync("warning", {
           code: "W114",
