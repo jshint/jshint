@@ -537,7 +537,7 @@ exports.numbers = function (test) {
   ];
 
   TestRun(test)
-    .addError(2, 15, "Bad number '10e308'.")
+    .addError(2, 15, "Value described by numeric literal cannot be accurately represented with a number value: '10e308'.")
     .addError(5, 11, "A leading decimal point can be confused with a dot: '.3'.")
     .addError(6, 9, "Unexpected '0'.")
     .addError(7, 1, "Expected an identifier and instead saw 'var'.")
@@ -547,7 +547,7 @@ exports.numbers = function (test) {
     .addError(9, 9, "A dot following a number can be confused with a decimal point.")
     .addError(11, 9, "'Octal integer literal' is only available in ES6 (use 'esversion: 6').")
     .addError(12, 9, "'Binary integer literal' is only available in ES6 (use 'esversion: 6').")
-    .addError(13, 11, "Bad number '0x'.")
+    .addError(13, 11, "Malformed numeric literal: '0x'.")
     .addError(15, 9, "Unexpected '1'.")
     .addError(16, 11, "Expected an identifier and instead saw ';'.")
     .addError(16, 1, "Expected an identifier and instead saw 'var'.")

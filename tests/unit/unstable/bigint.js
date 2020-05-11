@@ -75,19 +75,19 @@ exports.invalid = function (test) {
     .test("void 1e3n;", {esversion: 6, unstable: {bigint: true}});
 
   TestRun(test, "invalid hex digit")
-    .addError(1, 8, "Bad number '0x'.")
+    .addError(1, 8, "Malformed numeric literal: '0x'.")
     .addError(1, 8, "Missing semicolon.")
     .addError(1, 8, "Expected an assignment or function call and instead saw an expression.")
     .test("void 0xgn;", {esversion: 6, unstable: {bigint: true}});
 
   TestRun(test, "invalid binary digit")
-    .addError(1, 8, "Bad number '0b'.")
+    .addError(1, 8, "Malformed numeric literal: '0b'.")
     .addError(1, 8, "Missing semicolon.")
     .addError(1, 8, "Expected an assignment or function call and instead saw an expression.")
     .test("void 0b2n;", {esversion: 6, unstable: {bigint: true}});
 
   TestRun(test, "invalid octal digit")
-    .addError(1, 8, "Bad number '0o'.")
+    .addError(1, 8, "Malformed numeric literal: '0o'.")
     .addError(1, 8, "Missing semicolon.")
     .addError(1, 8, "Expected an assignment or function call and instead saw an expression.")
     .test("void 0o8n;", {esversion: 6, unstable: {bigint: true}});
