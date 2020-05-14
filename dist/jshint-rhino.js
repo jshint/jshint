@@ -1,6 +1,6 @@
 #!/usr/bin/env rhino
 var window = {};
-/*! 2.11.0 */
+/*! 2.11.1 */
 var JSHINT;
 if (typeof window === 'undefined') window = {};
 (function () {
@@ -20593,7 +20593,8 @@ Lexer.prototype = {
       if (type === "(identifier)") {
         if (value === "return" || value === "case" || value === "yield" ||
             value === "typeof" || value === "instanceof" || value === "void" ||
-            value === "await") {
+            value === "await" || value === "new" || value === "delete" ||
+            value === "default" || value === "extends") {
           this.prereg = true;
         }
 
@@ -20971,7 +20972,7 @@ var warnings = {
   W064: "Missing 'new' prefix when invoking a constructor.",
   W065: "Missing radix parameter.",
   W066: "Implied eval. Consider passing a function instead of a string.",
-  W067: "Bad invocation.",
+  W067: "Unorthodox function invocation.",
   W068: "Wrapping non-IIFE function literals in parens is unnecessary.",
   W069: "['{a}'] is better written in dot notation.",
   W070: "Extra comma. (it breaks older versions of IE)",
@@ -22416,6 +22417,22 @@ exports.regexpDot = /(^|[^\\])(\\\\)*\./;
 
 },{}],23:[function(require,module,exports){
 "use strict";
+/**
+ * A note on `__proto__`:
+ *
+ * This file uses ordinary objects to track identifiers that are observed in
+ * the input source code. It creates these objects using `Object.create` so
+ * that the tracking objects have no prototype, allowing the `__proto__`
+ * property to be used to store a value *without* triggering the invocation of
+ * the built-in `Object.prototype.__proto__` accessor method. Some environments
+ * (e.g. PhantomJS) do not implement the correct semantics for property
+ * enumeration. In those environments, methods like `Object.keys` and Lodash's
+ * `values` do not include the property name. This file includes a number of
+ * branches which ensure that JSHint behaves consistently in those
+ * environments. The branches must be ignored by the test coverage verification
+ * system because the workaround is not necessary in the environment where
+ * coverage is verified (i.e. Node.js).
+ */
 
 var _      = require("lodash");
 var events = require("events");
@@ -22538,33 +22555,20 @@ var scopeManager = function(state, predefined, exported, declared) {
    * Check the current scope for unused identifiers
    */
   function _checkForUnused() {
-    // function parameters are validated by a dedicated function
-    // assume that parameters are the only thing declared in the param scope
-    if (_current["(type)"] === "functionparams") {
-      _checkParams();
-      return;
-    }
-    var currentBindings = _current["(bindings)"];
-    for (var bindingName in currentBindings) {
-      if (currentBindings[bindingName]["(type)"] !== "exception" &&
-        currentBindings[bindingName]["(unused)"]) {
-        _warnUnused(bindingName, currentBindings[bindingName]["(token)"], "var");
+    if (_current["(type)"] !== "functionparams") {
+      var currentBindings = _current["(bindings)"];
+      for (var bindingName in currentBindings) {
+        if (currentBindings[bindingName]["(type)"] !== "exception" &&
+          currentBindings[bindingName]["(unused)"]) {
+          _warnUnused(bindingName, currentBindings[bindingName]["(token)"], "var");
+        }
       }
-    }
-  }
-
-  /**
-   * Check the current scope for unused parameters and issue warnings as
-   * necessary. This function may only be invoked when the current scope is a
-   * "function parameter" scope.
-   */
-  function _checkParams() {
-    var params = _current["(params)"];
-
-    if (!params) {
-      /* istanbul ignore next */
       return;
     }
+
+    // Check the current scope for unused parameters and issue warnings as
+    // necessary.
+    var params = _current["(params)"];
 
     var param = params.pop();
     var unused_opt;
@@ -22721,6 +22725,7 @@ var scopeManager = function(state, predefined, exported, declared) {
       var currentBindings = _current["(bindings)"];
       var usedBindingNameList = Object.keys(currentUsages);
 
+      // See comment, "A note on `__proto__`"
       /* istanbul ignore if */
       if (currentUsages.__proto__ && usedBindingNameList.indexOf("__proto__") === -1) {
         usedBindingNameList.push("__proto__");
@@ -22999,9 +23004,7 @@ var scopeManager = function(state, predefined, exported, declared) {
       // jshint proto: true
       var list = Object.keys(usedPredefinedAndGlobals);
 
-      // If `__proto__` is used as a global variable name, its entry in the
-      // lookup table may not be enumerated by `Object.keys` (depending on the
-      // environment).
+      // See comment, "A note on `__proto__`"
       /* istanbul ignore if */
       if (usedPredefinedAndGlobals.__proto__ === marker &&
         list.indexOf("__proto__") === -1) {
@@ -23021,9 +23024,7 @@ var scopeManager = function(state, predefined, exported, declared) {
       var values = _.values(impliedGlobals);
       var hasProto = false;
 
-      // If `__proto__` is an implied global variable, its entry in the lookup
-      // table may not be enumerated by `_.values` (depending on the
-      // environment).
+      // See comment, "A note on `__proto__`"
       if (impliedGlobals.__proto__) {
         hasProto = values.some(function(value) {
           return value.name === "__proto__";
@@ -23098,7 +23099,6 @@ var scopeManager = function(state, predefined, exported, declared) {
               return;
             }
           } else {
-            /* istanbul ignore next */
             break;
           }
         }
@@ -25632,7 +25632,6 @@ var JSHINT = (function() {
   }
 
   function nolinebreak(t) {
-    t = t;
     if (!sameLine(t, state.tokens.next)) {
       warning("E022", t, t.value);
     }
@@ -29821,9 +29820,9 @@ var JSHINT = (function() {
       if (foreachtok) {
         error("E045", foreachtok);
       }
-      nolinebreak(state.tokens.curr);
+
       advance(";");
-      if (decl) {
+      if (decl && decl.first && decl.first[0]) {
         if (decl.value === "const"  && !decl.hasInitializer) {
           warning("E012", decl, decl.first[0].value);
         }
@@ -29839,7 +29838,7 @@ var JSHINT = (function() {
       if (state.tokens.next.id !== ";") {
         checkCondAssignment(expression(context, 0));
       }
-      nolinebreak(state.tokens.curr);
+
       advance(";");
       if (state.tokens.next.id === ";") {
         error("E021", state.tokens.next, ")", ";");
@@ -29872,9 +29871,6 @@ var JSHINT = (function() {
   stmt("break", function() {
     var v = state.tokens.next.value;
 
-    if (!state.option.asi)
-      nolinebreak(this);
-
     if (state.tokens.next.identifier &&
         sameLine(state.tokens.curr, state.tokens.next)) {
       if (!state.funct["(scope)"].funct.hasLabel(v)) {
@@ -29899,9 +29895,6 @@ var JSHINT = (function() {
     if (state.funct["(breakage)"] === 0 || !state.funct["(loopage)"]) {
       warning("W052", state.tokens.next, this.value);
     }
-
-    if (!state.option.asi)
-      nolinebreak(this);
 
     if (state.tokens.next.identifier) {
       if (sameLine(state.tokens.curr, state.tokens.next)) {

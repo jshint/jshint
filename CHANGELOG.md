@@ -1,3 +1,22 @@
+<a name="2.11.1"></a>
+## [2.11.1](https://github.com/jshint/jshint/compare/2.11.0...v2.11.1) (2020-05-14)
+
+This release includes patches from a number of first-time contributors. James
+Owen, Tim Gates, ossdev, stvcisco, and thetric helped to make this the best
+JSHint release yet. Thank you all!
+
+### Bug Fixes
+
+* Correct ASI for `break` and `continue` ([3eb1b02](https://github.com/jshint/jshint/commit/3eb1b02))
+* Correct ASI for C-style `for` loops ([ac232a5](https://github.com/jshint/jshint/commit/ac232a5))
+* Improve tokenization of RegExp literals (#3471) ([f786002](https://github.com/jshint/jshint/commit/f786002))
+* TypeError accessing 'value' of undefined ([8884eb9](https://github.com/jshint/jshint/commit/8884eb9)), closes [#3455](https://github.com/jshint/jshint/issues/3455)
+* Use relative paths with `--filename` when recieving from stdin ([c1b5c2b](https://github.com/jshint/jshint/commit/c1b5c2b))
+
+### Features
+
+* Replacing PhantomJS with Puppeteer ([51963a3](https://github.com/jshint/jshint/commit/51963a3))
+
 <a name="2.11.0"></a>
 # [2.11.0](https://github.com/jshint/jshint/compare/2.11.0-rc1...v2.11.0) (2020-01-13)
 
