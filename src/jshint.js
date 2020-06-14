@@ -3521,6 +3521,8 @@ var JSHINT = (function() {
       // are added to the param scope
       var currentParams = [];
 
+      pastRest = spreadrest("rest");
+
       if (_.includes(["{", "["], state.tokens.next.id)) {
         hasDestructuring = true;
         tokens = destructuringPattern(context);
@@ -3532,7 +3534,6 @@ var JSHINT = (function() {
           }
         }
       } else {
-        pastRest = spreadrest("rest");
         ident = identifier(context);
 
         if (ident) {
