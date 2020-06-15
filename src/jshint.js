@@ -2742,8 +2742,7 @@ var JSHINT = (function() {
   state.syntax["new"].exps = true;
 
 
-  // Class statement
-  blockstmt("class", function(context) {
+  var classDeclaration = blockstmt("class", function(context) {
     var className, classNameToken;
     var inexport = context & prodParams.export;
 
@@ -2781,7 +2780,9 @@ var JSHINT = (function() {
     state.funct["(scope)"].stack();
     classBody(this, context);
     return this;
-  }).exps = true;
+  });
+  classDeclaration.exps = true;
+  classDeclaration.declaration = true;
 
   /*
     Class expression
