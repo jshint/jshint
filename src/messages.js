@@ -83,7 +83,8 @@ var errors = {
   E065: "Functions defined outside of strict mode with non-simple parameter lists may not " +
     "enable strict mode.",
   E066: "Asynchronous iteration is only available with for-of loops.",
-  E067: "Malformed numeric literal: '{a}'."
+  E067: "Malformed numeric literal: '{a}'.",
+  E068: "Decimals with leading zeros are not allowed in strict mode."
 };
 
 var warnings = {
