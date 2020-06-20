@@ -80,3 +80,11 @@ function functionWithCyclomaticComplexityDueToTernaryStatements_2(a) {
 function functionWithCyclomaticComplexityDueToOrOperators_2(a) {
   var b = a || {};
 }
+
+function functionWithCyclomaticComplexityDueToAndOperators_2(a) {
+    var b = a && {};
+}
+
+function functionWithCyclomaticComplexityDueToAndOperatorsWithNot_2(a) {
+    var b = !(!a && {});
+}

@@ -2433,7 +2433,15 @@ var JSHINT = (function() {
     that.right = expression(context, orPrecendence);
     return that;
   }, orPrecendence);
-  infix("&&", "and", 50);
+
+  var andPrecedence = 50;
+  infix("&&", function(context, left, that) {
+    increaseComplexityCount();
+    that.left = left;
+    that.right = expression(context, andPrecedence);
+    return that;
+  }, andPrecedence);
+
   // The Exponentiation operator, introduced in ECMAScript 2016
   //
   // ExponentiationExpression[Yield] :

@@ -2725,6 +2725,8 @@ exports.maxcomplexity = function (test) {
     .addError(47, 44, "This function's cyclomatic complexity is too high. (8)")
     .addError(76, 66, "This function's cyclomatic complexity is too high. (2)")
     .addError(80, 60, "This function's cyclomatic complexity is too high. (2)")
+    .addError(84, 61, "This function's cyclomatic complexity is too high. (2)")
+    .addError(88, 68, "This function's cyclomatic complexity is too high. (2)")
     .test(src, { es3: true, maxcomplexity: 1 });
 
   TestRun(test)
