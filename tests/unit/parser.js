@@ -568,6 +568,30 @@ exports.numbers = function (test) {
       "}());"
     ]);
 
+  TestRun(test)
+    .test([
+      "void 08;",
+      "void 0181;"
+    ]);
+
+  TestRun(test)
+    .addError(3, 10, "Decimals with leading zeros are not allowed in strict mode.")
+    .test([
+      "(function () {",
+      "'use strict';",
+      "return 08;",
+      "}());"
+    ]);
+
+  TestRun(test)
+    .addError(3, 12, "Decimals with leading zeros are not allowed in strict mode.")
+    .test([
+      "(function () {",
+      "'use strict';",
+      "return 0181;",
+      "}());"
+    ]);
+
   // GitHub #751 - an expression containing a number with a leading decimal point should be parsed in its entirety
   TestRun(test)
     .addError(1, 11, "A leading decimal point can be confused with a dot: '.3'.")
