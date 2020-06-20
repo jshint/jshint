@@ -872,19 +872,17 @@ Lexer.prototype = {
 
       if (isAllowedDigit !== isDecimalDigit || isBigInt) {
         if (isBigInt) {
-          if (!state.option.unstable.bigint) {
-            this.triggerAsync(
-              "warning",
-              {
-                code: "W144",
-                line: this.line,
-                character: this.char,
-                data: [ "BigInt", "bigint" ]
-              },
-              checks,
-              function() { return true; }
-            );
-          }
+          this.triggerAsync(
+            "warning",
+            {
+              code: "W119",
+              line: this.line,
+              character: this.char,
+              data: [ "BigInt", "11" ]
+            },
+            checks,
+            function() { return !state.inES11(); }
+          );
 
           value += char;
           index += 1;

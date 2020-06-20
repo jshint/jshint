@@ -1473,8 +1473,8 @@ var JSHINT = (function() {
 
     if (right.type === "(identifier)" && right.value === "typeof" && left.type === "(string)") {
       if (left.value === "bigint") {
-        if (!state.option.unstable.bigint) {
-          warning("W144", left, "BigInt", "bigint");
+        if (!state.inES11()) {
+          warning("W119", left, "BigInt", "11");
         }
 
         return false;
