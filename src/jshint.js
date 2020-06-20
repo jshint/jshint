@@ -709,6 +709,7 @@ var JSHINT = (function() {
           case "8":
           case "9":
           case "10":
+          case "11":
             state.option.moz = false;
             state.option.esversion = +val;
             break;
@@ -717,6 +718,7 @@ var JSHINT = (function() {
           case "2017":
           case "2018":
           case "2019":
+          case "2020":
             state.option.moz = false;
             // Translate specification publication year to version number.
             state.option.esversion = +val - 2009;
