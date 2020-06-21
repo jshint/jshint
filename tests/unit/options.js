@@ -3737,7 +3737,8 @@ exports.futureHostile = function (test) {
     "var Uint32Array = function() {};",
     "var Uint8ClampedArray = function() {};",
     "var Float32Array = function() {};",
-    "var Float64Array = function() {};"
+    "var Float64Array = function() {};",
+    "var globalThis = function() {};"
   ];
 
   TestRun(test, "ES3 without option")
@@ -3761,6 +3762,7 @@ exports.futureHostile = function (test) {
     .addError(18, 5, "'Uint8ClampedArray' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .addError(19, 5, "'Float32Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .addError(20, 5, "'Float64Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(21, 5, "'globalThis' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .test(code, { es3: true, es5: false, futurehostile: false });
 
   TestRun(test, "ES3 with option")
@@ -3787,6 +3789,7 @@ exports.futureHostile = function (test) {
     .addError(18, 5, "'Uint8ClampedArray' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .addError(19, 5, "'Float32Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .addError(20, 5, "'Float64Array' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
+    .addError(21, 5, "'globalThis' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .test(code, { futurehostile: false });
 
   TestRun(test, "ES5 with option")
@@ -3819,6 +3822,7 @@ exports.futureHostile = function (test) {
     .addError(18, 5, "Redefinition of 'Uint8ClampedArray'.")
     .addError(19, 5, "Redefinition of 'Float32Array'.")
     .addError(20, 5, "Redefinition of 'Float64Array'.")
+    .addError(21, 5, "'globalThis' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .test(code, { esnext: true, futurehostile: false });
 
   TestRun(test, "ESNext with option")
@@ -3845,6 +3849,7 @@ exports.futureHostile = function (test) {
     .test(code, { esnext: true });
 
   TestRun(test, "ESNext with opt-out")
+    .addError(21, 5, "'globalThis' is defined in a future version of JavaScript. Use a different variable name to avoid migration issues.")
     .test(code, {
       esnext: true,
       futurehostile: false,
@@ -3892,7 +3897,8 @@ exports.futureHostile = function (test) {
     "let Uint32Array = function() {};",
     "let Uint8ClampedArray = function() {};",
     "let Float32Array = function() {};",
-    "let Float64Array = function() {};"
+    "let Float64Array = function() {};",
+    "let globalThis = function() {};"
   ];
 
   TestRun(test, "ESNext with option")
@@ -3966,7 +3972,8 @@ exports.futureHostile = function (test) {
     "const Uint32Array = function() {};",
     "const Uint8ClampedArray = function() {};",
     "const Float32Array = function() {};",
-    "const Float64Array = function() {};"
+    "const Float64Array = function() {};",
+    "const globalThis = function() {};"
   ];
 
   TestRun(test, "ESNext with option")

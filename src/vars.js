@@ -66,6 +66,9 @@ exports.ecmaIdentifiers = {
   8: {
     Atomics            : false,
     SharedArrayBuffer  : false
+  },
+  11: {
+    globalThis         : false
   }
 };
 

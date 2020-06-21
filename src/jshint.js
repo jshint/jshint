@@ -243,6 +243,10 @@ var JSHINT = (function() {
       combine(predefined, vars.ecmaIdentifiers[8]);
     }
 
+    if (state.inES11()) {
+      combine(predefined, vars.ecmaIdentifiers[11]);
+    }
+
     /**
      * Use `in` to check for the presence of any explicitly-specified value for
      * `globalstrict` because both `true` and `false` should trigger an error.
@@ -4568,7 +4572,8 @@ var JSHINT = (function() {
               warning("W079", t.token, t.id);
             } else if (state.option.futurehostile === false) {
               if ((!state.inES5() && vars.ecmaIdentifiers[5][t.id] === false) ||
-                (!state.inES6() && vars.ecmaIdentifiers[6][t.id] === false)) {
+                (!state.inES6() && vars.ecmaIdentifiers[6][t.id] === false) ||
+                (!state.inES11() && vars.ecmaIdentifiers[11][t.id] === false)) {
                 warning("W129", t.token, t.id);
               }
             }
