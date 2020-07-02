@@ -5502,7 +5502,23 @@ var JSHINT = (function() {
     return this;
   }).exps = true;
 
-  stmt("import", function(context) {
+  prefix("import", function(context) {
+    var mp = metaProperty(context, "meta", function() {
+      if (!state.inES11(true)) {
+        warning("W119", state.tokens.prev, "import.meta", "11");
+      }
+      if (!state.option.module) {
+        error("E070", state.tokens.prev);
+      }
+    });
+
+    if (!mp) {
+      return state.syntax["(identifier)"].nud.call(this, context);
+    }
+    return mp;
+  });
+
+  var importSymbol = stmt("import", function(context) {
     if (!state.funct["(scope)"].block.isGlobal()) {
       error("E053", state.tokens.curr, "Import");
     }
@@ -5601,7 +5617,13 @@ var JSHINT = (function() {
     // }
 
     return this;
-  }).exps = true;
+  });
+  importSymbol.exps = true;
+  importSymbol.reserved = true;
+  importSymbol.meta = { isFutureReservedWord: true, es5: true };
+  importSymbol.useFud = function() {
+    return !(checkPunctuator(state.tokens.next, ".") && peek().identifier);
+  };
 
   stmt("export", function(context) {
     var ok = true;
@@ -5838,7 +5860,6 @@ var JSHINT = (function() {
   FutureReservedWord("float");
   FutureReservedWord("goto");
   FutureReservedWord("implements", { es5: true, strictOnly: true });
-  FutureReservedWord("import", { es5: true });
   FutureReservedWord("int");
   FutureReservedWord("interface", { es5: true, strictOnly: true });
   FutureReservedWord("long");
