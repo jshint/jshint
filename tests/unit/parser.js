@@ -10280,3 +10280,61 @@ exports.parensAfterDeclaration = function (test) {
 
   test.done();
 };
+
+exports.importMeta = function (test) {
+  TestRun(test)
+    .addError(1, 6, "Expected an identifier and instead saw 'import' (a reserved word).")
+    .test("void import;");
+
+  TestRun(test)
+    .addError(1, 6, "Expected an identifier and instead saw 'import' (a reserved word).")
+    .test(
+      "void import;",
+      { esversion: 11 }
+    );
+
+  TestRun(test)
+    .addError(1, 12, "'import.meta' is only available in ES11 (use 'esversion: 11').")
+    .addError(1, 12, "import.meta may only be used in module code.")
+    .test(
+      "void import.meta;",
+      { esversion: 10 }
+    );
+
+  TestRun(test)
+    .addError(1, 12, "import.meta may only be used in module code.")
+    .test(
+      "void import.meta;",
+      { esversion: 11 }
+    );
+
+  TestRun(test, "valid usage (expression position)")
+    .test(
+      "void import.meta;",
+      { esversion: 11, module: true }
+    );
+
+  TestRun(test, "valid usage (statement position)")
+    .addError(1, 8, "Expected an assignment or function call and instead saw an expression.")
+    .test(
+      "import.meta;",
+      { esversion: 11, module: true }
+    );
+
+  TestRun(test, "Other property name (expression position)")
+    .addError(1, 12, "Invalid meta property: 'import.target'.")
+    .test(
+      "void import.target;",
+      { esversion: 11, module: true }
+    );
+
+  TestRun(test, "Other property name (statement position)")
+    .addError(1, 7, "Invalid meta property: 'import.target'.")
+    .addError(1, 8, "Expected an assignment or function call and instead saw an expression.")
+    .test(
+      "import.target;",
+      { esversion: 11, module: true }
+    );
+
+  test.done();
+};
