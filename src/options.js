@@ -1051,7 +1051,8 @@ exports.val = {
    *  - `10` - To enable language features introduced by ECMAScript
    *    10](https://www.ecma-international.org/ecma-262/10.0/index.html).
    *    Notable additions: optional catch bindings.
-   *  - `11` - To enable language features introduced by ECMAScript 11.
+   *  - `11` - To enable language features introduced by ECMAScript 11. Notable
+   *    additions: `import.meta`.
    */
   esversion: 5
 };
