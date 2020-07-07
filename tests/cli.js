@@ -1034,11 +1034,16 @@ exports.extract = {
         "<script>",
           "var b = 1;",
         "</script>",
+        "<script type='module'>",
+          "let c = 1;",
+        "</script>",
       "</html>" ].join("\n");
 
-    js = ["\n", "var a = 1;", "\n\n\n\n\n", "var b = 1;\n" ].join("\n");
+    var js5 = ["\n", "var a = 1;", "\n\n\n\n\n", "var b = 1;\n" ].join("\n");
+    var js6 = ["\n", "var a = 1;", "\n\n\n\n\n", "var b = 1;", "\n", "let c = 1;\n" ].join("\n");
 
-    test.equal(cli.extract(html, "auto"), js);
+    test.equal(cli.extract(html, "auto"), js5);
+    test.equal(cli.extract(html, "auto", 6), js6);
     test.done();
   },
 

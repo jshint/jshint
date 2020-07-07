@@ -254,10 +254,12 @@ function isIgnored(fp, patterns) {
  * @param {string} when 'always' will extract the JS code, no matter what.
  * 'never' won't do anything. 'auto' will check if the code looks like HTML
  * before extracting it.
+ * @param {number} esversion (optional) minimum ECMA version being supported;
+ * helps determine valid script types to extract.  Defaults to 5
  *
  * @return {string} the extracted code
  */
-function extract(code, when) {
+function extract(code, when, esversion) {
   // A JS file won't start with a less-than character, whereas a HTML file
   // should always start with that.
   if (when !== "always" && (when !== "auto" || !/^\s*</.test(code)))
@@ -274,7 +276,8 @@ function extract(code, when) {
       return;
 
     if (attrs.type && !/text\/javascript/.test(attrs.type.toLowerCase()))
-      return;
+      if (attrs.type !== "module" || (esversion || 5) < 6)
+        return;
 
     // Mark that we're inside a <script> a tag and push all new lines
     // in between the last </script> tag and this <script> tag to preserve
@@ -334,10 +337,12 @@ function extract(code, when) {
  * @param {string} when 'always' will extract the JS code, no matter what.
  * 'never' won't do anything. 'auto' will check if the code looks like HTML
  * before extracting it.
+ * @param {number} esversion (optional) minimum ECMA version being supported;
+ * helps determine valid script types to extract.  Defaults to 5
  *
  * @return {Array} extracted offsets
  */
-function extractOffsets(code, when) {
+function extractOffsets(code, when, esversion) {
   // A JS file won't start with a less-than character, whereas a HTML file
   // should always start with that.
   if (when !== "always" && (when !== "auto" || !/^\s*</.test(code)))
@@ -355,7 +360,8 @@ function extractOffsets(code, when) {
       return;
 
     if (attrs.type && !/text\/javascript/.test(attrs.type.toLowerCase()))
-      return;
+      if (attrs.type !== "module" || (esversion || 5) < 6)
+        return;
 
     // Mark that we're inside a <script> a tag and push all new lines
     // in between the last </script> tag and this <script> tag to preserve
@@ -640,7 +646,7 @@ var exports = {
 
         mergeCLIPrereq(config);
 
-        lint(extract(code, opts.extract), results, config, data, filename);
+        lint(extract(code, opts.extract, config.esversion), results, config, data, filename);
         (opts.reporter || defReporter)(results, data, { verbose: opts.verbose });
         cb(results.length === 0);
 
@@ -662,10 +668,10 @@ var exports = {
 
       mergeCLIPrereq(config);
 
-      lint(extract(code, opts.extract), errors, config, data, file);
+      lint(extract(code, opts.extract, config.esversion), errors, config, data, file);
 
       if (errors.length) {
-        var offsets = extractOffsets(code, opts.extract);
+        var offsets = extractOffsets(code, opts.extract, config.esversion);
         if (offsets && offsets.length) {
           errors.forEach(function(errorInfo) {
             var line = errorInfo.error.line;
