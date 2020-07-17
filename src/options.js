@@ -839,7 +839,7 @@ exports.val = {
   predef       : false,
 
   /**
-   * This option can be used to specify a white list of global variables that
+   * This option can be used to specify an allow list of global variables that
    * are not formally defined in the source code. This is most useful when
    * combined with the `undef` option in order to suppress warnings for
    * project-specific global variables.

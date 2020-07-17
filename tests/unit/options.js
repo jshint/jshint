@@ -2582,7 +2582,7 @@ exports.unnecessarysemicolon = function (test) {
   test.done();
 };
 
-exports.blacklist = function (test) {
+exports.denylist = function (test) {
   var src = fs.readFileSync(__dirname + '/fixtures/browser.js', 'utf8');
   var code = [
     '/*jshint browser: true */',
@@ -2650,12 +2650,12 @@ exports.maxdepth = function (test) {
   var src = fs.readFileSync(__dirname + fixture, 'utf8');
 
   TestRun(test)
-    .addError(5, 27, "Blocks are nested too deeply. (2)")
-    .addError(14, 26, "Blocks are nested too deeply. (2)")
+    .addError(5, 33, "Blocks are nested too deeply. (2)")
+    .addError(14, 32, "Blocks are nested too deeply. (2)")
     .test(src, { es3: true, maxdepth: 1 });
 
   TestRun(test)
-    .addError(9, 28, "Blocks are nested too deeply. (3)")
+    .addError(9, 34, "Blocks are nested too deeply. (3)")
     .test(src, { es3: true, maxdepth: 2 });
 
   TestRun(test)

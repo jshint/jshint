@@ -195,7 +195,7 @@ var JSHINT = (function() {
 
   function combine(dest, src) {
     Object.keys(src).forEach(function(name) {
-      if (_.has(JSHINT.blacklist, name)) return;
+      if (_.has(JSHINT.denylist, name)) return;
       dest[name] = src[name];
     });
   }
@@ -491,7 +491,7 @@ var JSHINT = (function() {
         if (key.charAt(0) === "-") {
           key = key.slice(1);
 
-          JSHINT.blacklist[key] = key;
+          JSHINT.denylist[key] = key;
           delete predefined[key];
         } else {
           predef[key] = parts.length > 1 && parts[1].trim() === "true";
@@ -6296,7 +6296,7 @@ var JSHINT = (function() {
     } else {
       JSHINT.errors = [];
       JSHINT.internals = [];
-      JSHINT.blacklist = {};
+      JSHINT.denylist = {};
       JSHINT.scope = "(main)";
     }
 
@@ -6325,7 +6325,7 @@ var JSHINT = (function() {
 
           if (item[0] === "-") {
             slice = item.slice(1);
-            JSHINT.blacklist[slice] = slice;
+            JSHINT.denylist[slice] = slice;
             // remove from predefined if there
             delete predefined[slice];
           } else {

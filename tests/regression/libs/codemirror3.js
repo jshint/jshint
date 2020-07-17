@@ -1556,7 +1556,7 @@ window.CodeMirror = (function() {
     var txt = cm.getSelection();
     e.dataTransfer.setData("Text", txt);
 
-    // Use dummy image instead of default browsers image.
+    // Use place holder image instead of default browsers image.
     // Recent Safari (~6.0.2) have a tendency to segfault when this happens, so we don't do it there.
     if (e.dataTransfer.setDragImage && !safari)
       e.dataTransfer.setDragImage(elt('img'), 0, 0);
