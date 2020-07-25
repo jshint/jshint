@@ -1024,7 +1024,104 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":7,"_process":11,"inherits":6}],9:[function(require,module,exports){
+},{"./support/isBuffer":7,"_process":13,"inherits":6}],9:[function(require,module,exports){
+(function (global){
+/*global window, global*/
+var util = require("util")
+var assert = require("assert")
+var now = require("date-now")
+
+var slice = Array.prototype.slice
+var console
+var times = {}
+
+if (typeof global !== "undefined" && global.console) {
+    console = global.console
+} else if (typeof window !== "undefined" && window.console) {
+    console = window.console
+} else {
+    console = {}
+}
+
+var functions = [
+    [log, "log"],
+    [info, "info"],
+    [warn, "warn"],
+    [error, "error"],
+    [time, "time"],
+    [timeEnd, "timeEnd"],
+    [trace, "trace"],
+    [dir, "dir"],
+    [consoleAssert, "assert"]
+]
+
+for (var i = 0; i < functions.length; i++) {
+    var tuple = functions[i]
+    var f = tuple[0]
+    var name = tuple[1]
+
+    if (!console[name]) {
+        console[name] = f
+    }
+}
+
+module.exports = console
+
+function log() {}
+
+function info() {
+    console.log.apply(console, arguments)
+}
+
+function warn() {
+    console.log.apply(console, arguments)
+}
+
+function error() {
+    console.warn.apply(console, arguments)
+}
+
+function time(label) {
+    times[label] = now()
+}
+
+function timeEnd(label) {
+    var time = times[label]
+    if (!time) {
+        throw new Error("No such label: " + label)
+    }
+
+    var duration = now() - time
+    console.log(label + ": " + duration + "ms")
+}
+
+function trace() {
+    var err = new Error()
+    err.name = "Trace"
+    err.message = util.format.apply(null, arguments)
+    console.error(err.stack)
+}
+
+function dir(object) {
+    console.log(util.inspect(object) + "\n")
+}
+
+function consoleAssert(expression) {
+    if (!expression) {
+        var arr = slice.call(arguments, 1)
+        assert.ok(false, util.format.apply(null, arr))
+    }
+}
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"assert":5,"date-now":10,"util":16}],10:[function(require,module,exports){
+module.exports = now
+
+function now() {
+    return new Date().getTime()
+}
+
+},{}],11:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1327,175 +1424,12 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],10:[function(require,module,exports){
-arguments[4][6][0].apply(exports,arguments)
-},{"dup":6}],11:[function(require,module,exports){
-// shim for using process in browser
-
-var process = module.exports = {};
-var queue = [];
-var draining = false;
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    draining = true;
-    var currentQueue;
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        var i = -1;
-        while (++i < len) {
-            currentQueue[i]();
-        }
-        len = queue.length;
-    }
-    draining = false;
-}
-process.nextTick = function (fun) {
-    queue.push(fun);
-    if (!draining) {
-        setTimeout(drainQueue, 0);
-    }
-};
-
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-// TODO(shtylman)
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
 },{}],12:[function(require,module,exports){
-arguments[4][7][0].apply(exports,arguments)
-},{"dup":7}],13:[function(require,module,exports){
-arguments[4][8][0].apply(exports,arguments)
-},{"./support/isBuffer":12,"_process":11,"dup":8,"inherits":10}],14:[function(require,module,exports){
-(function (global){
-/*global window, global*/
-var util = require("util")
-var assert = require("assert")
-var now = require("date-now")
-
-var slice = Array.prototype.slice
-var console
-var times = {}
-
-if (typeof global !== "undefined" && global.console) {
-    console = global.console
-} else if (typeof window !== "undefined" && window.console) {
-    console = window.console
-} else {
-    console = {}
-}
-
-var functions = [
-    [log, "log"],
-    [info, "info"],
-    [warn, "warn"],
-    [error, "error"],
-    [time, "time"],
-    [timeEnd, "timeEnd"],
-    [trace, "trace"],
-    [dir, "dir"],
-    [consoleAssert, "assert"]
-]
-
-for (var i = 0; i < functions.length; i++) {
-    var tuple = functions[i]
-    var f = tuple[0]
-    var name = tuple[1]
-
-    if (!console[name]) {
-        console[name] = f
-    }
-}
-
-module.exports = console
-
-function log() {}
-
-function info() {
-    console.log.apply(console, arguments)
-}
-
-function warn() {
-    console.log.apply(console, arguments)
-}
-
-function error() {
-    console.warn.apply(console, arguments)
-}
-
-function time(label) {
-    times[label] = now()
-}
-
-function timeEnd(label) {
-    var time = times[label]
-    if (!time) {
-        throw new Error("No such label: " + label)
-    }
-
-    var duration = now() - time
-    console.log(label + ": " + duration + "ms")
-}
-
-function trace() {
-    var err = new Error()
-    err.name = "Trace"
-    err.message = util.format.apply(null, arguments)
-    console.error(err.stack)
-}
-
-function dir(object) {
-    console.log(util.inspect(object) + "\n")
-}
-
-function consoleAssert(expression) {
-    if (!expression) {
-        var arr = slice.call(arguments, 1)
-        assert.ok(false, util.format.apply(null, arr))
-    }
-}
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"assert":5,"date-now":15,"util":13}],15:[function(require,module,exports){
-module.exports = now
-
-function now() {
-    return new Date().getTime()
-}
-
-},{}],16:[function(require,module,exports){
 (function (global){
 /**
  * @license
  * Lodash <https://lodash.com/>
- * Copyright JS Foundation and other contributors <https://js.foundation/>
+ * Copyright OpenJS Foundation and other contributors <https://openjsf.org/>
  * Released under MIT license <https://lodash.com/license>
  * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
  * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -1506,7 +1440,7 @@ function now() {
   var undefined;
 
   /** Used as the semantic version number. */
-  var VERSION = '4.17.11';
+  var VERSION = '4.17.15';
 
   /** Used as the size to enable large array optimizations. */
   var LARGE_ARRAY_SIZE = 200;
@@ -4165,16 +4099,10 @@ function now() {
         value.forEach(function(subValue) {
           result.add(baseClone(subValue, bitmask, customizer, subValue, value, stack));
         });
-
-        return result;
-      }
-
-      if (isMap(value)) {
+      } else if (isMap(value)) {
         value.forEach(function(subValue, key) {
           result.set(key, baseClone(subValue, bitmask, customizer, key, value, stack));
         });
-
-        return result;
       }
 
       var keysFunc = isFull
@@ -5098,8 +5026,8 @@ function now() {
         return;
       }
       baseFor(source, function(srcValue, key) {
+        stack || (stack = new Stack);
         if (isObject(srcValue)) {
-          stack || (stack = new Stack);
           baseMergeDeep(object, source, key, srcIndex, baseMerge, customizer, stack);
         }
         else {
@@ -6916,7 +6844,7 @@ function now() {
       return function(number, precision) {
         number = toNumber(number);
         precision = precision == null ? 0 : nativeMin(toInteger(precision), 292);
-        if (precision) {
+        if (precision && nativeIsFinite(number)) {
           // Shift with exponential notation to avoid floating-point issues.
           // See [MDN](https://mdn.io/round#Examples) for more details.
           var pair = (toString(number) + 'e').split('e'),
@@ -8099,7 +8027,7 @@ function now() {
     }
 
     /**
-     * Gets the value at `key`, unless `key` is "__proto__".
+     * Gets the value at `key`, unless `key` is "__proto__" or "constructor".
      *
      * @private
      * @param {Object} object The object to query.
@@ -8107,6 +8035,10 @@ function now() {
      * @returns {*} Returns the property value.
      */
     function safeGet(object, key) {
+      if (key === 'constructor' && typeof object[key] === 'function') {
+        return;
+      }
+
       if (key == '__proto__') {
         return;
       }
@@ -11907,6 +11839,7 @@ function now() {
           }
           if (maxing) {
             // Handle invocations in a tight loop.
+            clearTimeout(timerId);
             timerId = setTimeout(timerExpired, wait);
             return invokeFunc(lastCallTime);
           }
@@ -16293,9 +16226,12 @@ function now() {
       , 'g');
 
       // Use a sourceURL for easier debugging.
+      // The sourceURL gets injected into the source that's eval-ed, so be careful
+      // with lookup (in case of e.g. prototype pollution), and strip newlines if any.
+      // A newline wouldn't be a valid sourceURL anyway, and it'd enable code injection.
       var sourceURL = '//# sourceURL=' +
-        ('sourceURL' in options
-          ? options.sourceURL
+        (hasOwnProperty.call(options, 'sourceURL')
+          ? (options.sourceURL + '').replace(/[\r\n]/g, ' ')
           : ('lodash.templateSources[' + (++templateCounter) + ']')
         ) + '\n';
 
@@ -16328,7 +16264,9 @@ function now() {
 
       // If `variable` is not specified wrap a with-statement around the generated
       // code to add the data object to the top of the scope chain.
-      var variable = options.variable;
+      // Like with sourceURL, we take care to not check the option's prototype,
+      // as this configuration is a code injection vector.
+      var variable = hasOwnProperty.call(options, 'variable') && options.variable;
       if (!variable) {
         source = 'with (obj) {\n' + source + '\n}\n';
       }
@@ -18533,10 +18471,11 @@ function now() {
     baseForOwn(LazyWrapper.prototype, function(func, methodName) {
       var lodashFunc = lodash[methodName];
       if (lodashFunc) {
-        var key = (lodashFunc.name + ''),
-            names = realNames[key] || (realNames[key] = []);
-
-        names.push({ 'name': methodName, 'func': lodashFunc });
+        var key = lodashFunc.name + '';
+        if (!hasOwnProperty.call(realNames, key)) {
+          realNames[key] = [];
+        }
+        realNames[key].push({ 'name': methodName, 'func': lodashFunc });
       }
     });
 
@@ -18601,7 +18540,73 @@ function now() {
 }.call(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],17:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+var queue = [];
+var draining = false;
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    draining = true;
+    var currentQueue;
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        var i = -1;
+        while (++i < len) {
+            currentQueue[i]();
+        }
+        len = queue.length;
+    }
+    draining = false;
+}
+process.nextTick = function (fun) {
+    queue.push(fun);
+    if (!draining) {
+        setTimeout(drainQueue, 0);
+    }
+};
+
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+// TODO(shtylman)
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],14:[function(require,module,exports){
+arguments[4][6][0].apply(exports,arguments)
+},{"dup":6}],15:[function(require,module,exports){
+arguments[4][7][0].apply(exports,arguments)
+},{"dup":7}],16:[function(require,module,exports){
+arguments[4][8][0].apply(exports,arguments)
+},{"./support/isBuffer":15,"_process":13,"dup":8,"inherits":14}],17:[function(require,module,exports){
 /*
  * Lexical analysis and token construction.
  */
@@ -19570,11 +19575,19 @@ Lexer.prototype = {
       }
     }
 
+    // TODO: Extend this check to other numeric literals
+    this.triggerAsync("warning", {
+      code: "W045",
+      line: this.line,
+      character: this.char + value.length,
+      data: [ value ]
+    }, checks, function() { return !isFinite(value); });
+
     return {
       type: Token.NumericLiteral,
       value: value,
       base: base,
-      isMalformed: !isFinite(value)
+      isMalformed: false
     };
   },
 
@@ -20747,10 +20760,8 @@ Lexer.prototype = {
 
       case Token.NumericLiteral:
         if (token.isMalformed) {
-          // This condition unequivocally describes a syntax error.
-          // TODO: Re-factor as an "error" (not a "warning").
-          this.trigger("warning", {
-            code: "W045",
+          this.trigger("error", {
+            code: "E067",
             line: this.line,
             character: this.char,
             data: [ token.value ]
@@ -20812,7 +20823,7 @@ Lexer.prototype = {
 exports.Lexer = Lexer;
 exports.Context = Context;
 
-},{"../data/ascii-identifier-data.js":1,"../data/es5-identifier-names.js":2,"../data/non-ascii-identifier-part-only.js":3,"../data/non-ascii-identifier-start.js":4,"./reg.js":22,"./state.js":24,"events":9,"lodash":16}],18:[function(require,module,exports){
+},{"../data/ascii-identifier-data.js":1,"../data/es5-identifier-names.js":2,"../data/non-ascii-identifier-part-only.js":3,"../data/non-ascii-identifier-start.js":4,"./reg.js":22,"./state.js":24,"events":11,"lodash":12}],18:[function(require,module,exports){
 "use strict";
 
 var _ = require("lodash");
@@ -20897,7 +20908,8 @@ var errors = {
   E064: "Super call may only be used within class method bodies.",
   E065: "Functions defined outside of strict mode with non-simple parameter lists may not " +
     "enable strict mode.",
-  E066: "Asynchronous iteration is only available with for-of loops."
+  E066: "Asynchronous iteration is only available with for-of loops.",
+  E067: "Malformed numeric literal: '{a}'."
 };
 
 var warnings = {
@@ -20946,7 +20958,8 @@ var warnings = {
   W042: "Avoid EOL escaping.",
   W043: "Bad escaping of EOL. Use option multistr if needed.",
   W044: "Bad or unnecessary escaping.", /* TODO(caitp): remove W044 */
-  W045: "Bad number '{a}'.",
+  W045: "Value described by numeric literal cannot be accurately " +
+    "represented with a number value: '{a}'.",
   W046: "Don't use extra leading zeros '{a}'.",
   W047: "A trailing decimal point can be confused with a dot: '{a}'.",
   W048: "Unexpected control character in regular expression.",
@@ -21080,7 +21093,7 @@ _.each(info, function(desc, code) {
   exports.info[code] = { code: code, desc: desc };
 });
 
-},{"lodash":16}],19:[function(require,module,exports){
+},{"lodash":12}],19:[function(require,module,exports){
 /**
  * The NameStack class is used to approximate function name inference as
  * introduced by ECMAScript 2015. In that edition, the `name` property of
@@ -23452,7 +23465,7 @@ var scopeManager = function(state, predefined, exported, declared) {
 
 module.exports = scopeManager;
 
-},{"events":9,"lodash":16}],24:[function(require,module,exports){
+},{"events":11,"lodash":12}],24:[function(require,module,exports){
 "use strict";
 var NameStack = require("./name-stack.js");
 
@@ -27035,7 +27048,15 @@ var JSHINT = (function() {
     that.right = expression(context, orPrecendence);
     return that;
   }, orPrecendence);
-  infix("&&", "and", 50);
+
+  var andPrecedence = 50;
+  infix("&&", function(context, left, that) {
+    increaseComplexityCount();
+    that.left = left;
+    that.right = expression(context, andPrecedence);
+    return that;
+  }, andPrecedence);
+
   // The Exponentiation operator, introduced in ECMAScript 2016
   //
   // ExponentiationExpression[Yield] :
@@ -27345,8 +27366,7 @@ var JSHINT = (function() {
   state.syntax["new"].exps = true;
 
 
-  // Class statement
-  blockstmt("class", function(context) {
+  var classDeclaration = blockstmt("class", function(context) {
     var className, classNameToken;
     var inexport = context & prodParams.export;
 
@@ -27384,7 +27404,9 @@ var JSHINT = (function() {
     state.funct["(scope)"].stack();
     classBody(this, context);
     return this;
-  }).exps = true;
+  });
+  classDeclaration.exps = true;
+  classDeclaration.declaration = true;
 
   /*
     Class expression
@@ -28124,6 +28146,8 @@ var JSHINT = (function() {
       // are added to the param scope
       var currentParams = [];
 
+      pastRest = spreadrest("rest");
+
       if (_.includes(["{", "["], state.tokens.next.id)) {
         hasDestructuring = true;
         tokens = destructuringPattern(context);
@@ -28135,7 +28159,6 @@ var JSHINT = (function() {
           }
         }
       } else {
-        pastRest = spreadrest("rest");
         ident = identifier(context);
 
         if (ident) {
@@ -31218,7 +31241,7 @@ if (typeof exports === "object" && exports) {
   exports.JSHINT = JSHINT;
 }
 
-},{"./lex.js":17,"./messages.js":18,"./options.js":20,"./prod-params.js":21,"./reg.js":22,"./scope-manager.js":23,"./state.js":24,"./style.js":25,"./vars.js":26,"console-browserify":14,"events":9,"lodash":16}]},{},[]);
+},{"./lex.js":17,"./messages.js":18,"./options.js":20,"./prod-params.js":21,"./reg.js":22,"./scope-manager.js":23,"./state.js":24,"./style.js":25,"./vars.js":26,"console-browserify":9,"events":11,"lodash":12}]},{},[]);
 
 JSHINT = require('jshint').JSHINT;
 if (typeof exports === 'object' && exports) exports.JSHINT = JSHINT;
