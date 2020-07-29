@@ -74,6 +74,14 @@ exports.invalid = function (test) {
     .addError(1, 6, "Unrecoverable syntax error. (100% scanned).")
     .test("void 1e3n;", {esversion: 6, unstable: {bigint: true}});
 
+  TestRun(test, "invalid legacy octal")
+    .addError(1, 6, "Malformed numeric literal: '01n'.")
+    .test("void 01n;", {esversion: 6, unstable: {bigint: true}});
+
+  TestRun(test, "invalid leading 0")
+    .addError(1, 6, "Malformed numeric literal: '08n'.")
+    .test("void 08n;", {esversion: 6, unstable: {bigint: true}});
+
   TestRun(test, "invalid hex digit")
     .addError(1, 8, "Malformed numeric literal: '0x'.")
     .addError(1, 8, "Missing semicolon.")
