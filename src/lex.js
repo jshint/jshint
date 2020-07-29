@@ -888,6 +888,20 @@ Lexer.prototype = {
             );
           }
 
+          if (isLegacy || isNonOctal) {
+            this.triggerAsync(
+              "error",
+              {
+                code: "E067",
+                line: this.line,
+                character: this.char,
+                data: [value + char]
+              },
+              checks,
+              function() { return true; }
+            );
+          }
+
           value += char;
           index += 1;
         } else if (!isLegacy && value.length <= 2) { // 0x
