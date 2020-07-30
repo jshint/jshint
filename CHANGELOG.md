@@ -1,3 +1,16 @@
+<a name="2.11.2"></a>
+## [2.11.2](https://github.com/jshint/jshint/compare/2.11.1...v2.11.2) (2020-07-30)
+
+### Bug Fixes
+
+* Allow "rest" operator in param dstrctrng ([c45d1b2](https://github.com/jshint/jshint/commit/c45d1b2))
+* Disallow invalid numeric literals ([b02a025](https://github.com/jshint/jshint/commit/b02a025))
+* Disallow leading zeros in BigInts ([3b2c8cf](https://github.com/jshint/jshint/commit/3b2c8cf))
+* Improve numeric literal warnings/errors ([370e159](https://github.com/jshint/jshint/commit/370e159))
+* Limit positions for class declarations ([0f0acd8](https://github.com/jshint/jshint/commit/0f0acd8))
+* maxcomplexity doesn't take into account `&&` ([047d5af](https://github.com/jshint/jshint/commit/047d5af)), closes [#840](https://github.com/jshint/jshint/issues/840)
+* Update Lodash to latest 4.17.19 (#3494) ([17d8f5a](https://github.com/jshint/jshint/commit/17d8f5a))
+
 <a name="2.11.1"></a>
 ## [2.11.1](https://github.com/jshint/jshint/compare/2.11.0...v2.11.1) (2020-05-14)
 

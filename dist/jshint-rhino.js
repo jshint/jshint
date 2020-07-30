@@ -1,6 +1,6 @@
 #!/usr/bin/env rhino
 var window = {};
-/*! 2.11.1 */
+/*! 2.11.2 */
 var JSHINT;
 if (typeof window === 'undefined') window = {};
 (function () {
@@ -1497,7 +1497,7 @@ function now() {
 /**
  * @license
  * Lodash <https://lodash.com/>
- * Copyright JS Foundation and other contributors <https://js.foundation/>
+ * Copyright OpenJS Foundation and other contributors <https://openjsf.org/>
  * Released under MIT license <https://lodash.com/license>
  * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
  * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -1508,7 +1508,7 @@ function now() {
   var undefined;
 
   /** Used as the semantic version number. */
-  var VERSION = '4.17.11';
+  var VERSION = '4.17.19';
 
   /** Used as the size to enable large array optimizations. */
   var LARGE_ARRAY_SIZE = 200;
@@ -4167,16 +4167,10 @@ function now() {
         value.forEach(function(subValue) {
           result.add(baseClone(subValue, bitmask, customizer, subValue, value, stack));
         });
-
-        return result;
-      }
-
-      if (isMap(value)) {
+      } else if (isMap(value)) {
         value.forEach(function(subValue, key) {
           result.set(key, baseClone(subValue, bitmask, customizer, key, value, stack));
         });
-
-        return result;
       }
 
       var keysFunc = isFull
@@ -5100,8 +5094,8 @@ function now() {
         return;
       }
       baseFor(source, function(srcValue, key) {
+        stack || (stack = new Stack);
         if (isObject(srcValue)) {
-          stack || (stack = new Stack);
           baseMergeDeep(object, source, key, srcIndex, baseMerge, customizer, stack);
         }
         else {
@@ -5221,8 +5215,21 @@ function now() {
      * @returns {Array} Returns the new sorted array.
      */
     function baseOrderBy(collection, iteratees, orders) {
+      if (iteratees.length) {
+        iteratees = arrayMap(iteratees, function(iteratee) {
+          if (isArray(iteratee)) {
+            return function(value) {
+              return baseGet(value, iteratee.length === 1 ? iteratee[0] : iteratee);
+            }
+          }
+          return iteratee;
+        });
+      } else {
+        iteratees = [identity];
+      }
+
       var index = -1;
-      iteratees = arrayMap(iteratees.length ? iteratees : [identity], baseUnary(getIteratee()));
+      iteratees = arrayMap(iteratees, baseUnary(getIteratee()));
 
       var result = baseMap(collection, function(value, key, collection) {
         var criteria = arrayMap(iteratees, function(iteratee) {
@@ -5479,6 +5486,10 @@ function now() {
         var key = toKey(path[index]),
             newValue = value;
 
+        if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+          return object;
+        }
+
         if (index != lastIndex) {
           var objValue = nested[key];
           newValue = customizer ? customizer(objValue, key, nested) : undefined;
@@ -5631,11 +5642,14 @@ function now() {
      *  into `array`.
      */
     function baseSortedIndexBy(array, value, iteratee, retHighest) {
-      value = iteratee(value);
-
       var low = 0,
-          high = array == null ? 0 : array.length,
-          valIsNaN = value !== value,
+          high = array == null ? 0 : array.length;
+      if (high === 0) {
+        return 0;
+      }
+
+      value = iteratee(value);
+      var valIsNaN = value !== value,
           valIsNull = value === null,
           valIsSymbol = isSymbol(value),
           valIsUndefined = value === undefined;
@@ -6918,7 +6932,7 @@ function now() {
       return function(number, precision) {
         number = toNumber(number);
         precision = precision == null ? 0 : nativeMin(toInteger(precision), 292);
-        if (precision) {
+        if (precision && nativeIsFinite(number)) {
           // Shift with exponential notation to avoid floating-point issues.
           // See [MDN](https://mdn.io/round#Examples) for more details.
           var pair = (toString(number) + 'e').split('e'),
@@ -7120,10 +7134,11 @@ function now() {
       if (arrLength != othLength && !(isPartial && othLength > arrLength)) {
         return false;
       }
-      // Assume cyclic values are equal.
-      var stacked = stack.get(array);
-      if (stacked && stack.get(other)) {
-        return stacked == other;
+      // Check that cyclic values are equal.
+      var arrStacked = stack.get(array);
+      var othStacked = stack.get(other);
+      if (arrStacked && othStacked) {
+        return arrStacked == other && othStacked == array;
       }
       var index = -1,
           result = true,
@@ -7285,10 +7300,11 @@ function now() {
           return false;
         }
       }
-      // Assume cyclic values are equal.
-      var stacked = stack.get(object);
-      if (stacked && stack.get(other)) {
-        return stacked == other;
+      // Check that cyclic values are equal.
+      var objStacked = stack.get(object);
+      var othStacked = stack.get(other);
+      if (objStacked && othStacked) {
+        return objStacked == other && othStacked == object;
       }
       var result = true;
       stack.set(object, other);
@@ -8101,7 +8117,7 @@ function now() {
     }
 
     /**
-     * Gets the value at `key`, unless `key` is "__proto__".
+     * Gets the value at `key`, unless `key` is "__proto__" or "constructor".
      *
      * @private
      * @param {Object} object The object to query.
@@ -8109,6 +8125,10 @@ function now() {
      * @returns {*} Returns the property value.
      */
     function safeGet(object, key) {
+      if (key === 'constructor' && typeof object[key] === 'function') {
+        return;
+      }
+
       if (key == '__proto__') {
         return;
       }
@@ -10665,6 +10685,10 @@ function now() {
      * // The `_.property` iteratee shorthand.
      * _.filter(users, 'active');
      * // => objects for ['barney']
+     *
+     * // Combining several predicates using `_.overEvery` or `_.overSome`.
+     * _.filter(users, _.overSome([{ 'age': 36 }, ['age', 40]]));
+     * // => objects for ['fred', 'barney']
      */
     function filter(collection, predicate) {
       var func = isArray(collection) ? arrayFilter : baseFilter;
@@ -11414,15 +11438,15 @@ function now() {
      * var users = [
      *   { 'user': 'fred',   'age': 48 },
      *   { 'user': 'barney', 'age': 36 },
-     *   { 'user': 'fred',   'age': 40 },
+     *   { 'user': 'fred',   'age': 30 },
      *   { 'user': 'barney', 'age': 34 }
      * ];
      *
      * _.sortBy(users, [function(o) { return o.user; }]);
-     * // => objects for [['barney', 36], ['barney', 34], ['fred', 48], ['fred', 40]]
+     * // => objects for [['barney', 36], ['barney', 34], ['fred', 48], ['fred', 30]]
      *
      * _.sortBy(users, ['user', 'age']);
-     * // => objects for [['barney', 34], ['barney', 36], ['fred', 40], ['fred', 48]]
+     * // => objects for [['barney', 34], ['barney', 36], ['fred', 30], ['fred', 48]]
      */
     var sortBy = baseRest(function(collection, iteratees) {
       if (collection == null) {
@@ -11909,6 +11933,7 @@ function now() {
           }
           if (maxing) {
             // Handle invocations in a tight loop.
+            clearTimeout(timerId);
             timerId = setTimeout(timerExpired, wait);
             return invokeFunc(lastCallTime);
           }
@@ -16295,9 +16320,12 @@ function now() {
       , 'g');
 
       // Use a sourceURL for easier debugging.
+      // The sourceURL gets injected into the source that's eval-ed, so be careful
+      // to normalize all kinds of whitespace, so e.g. newlines (and unicode versions of it) can't sneak in
+      // and escape the comment, thus injecting code that gets evaled.
       var sourceURL = '//# sourceURL=' +
-        ('sourceURL' in options
-          ? options.sourceURL
+        (hasOwnProperty.call(options, 'sourceURL')
+          ? (options.sourceURL + '').replace(/\s/g, ' ')
           : ('lodash.templateSources[' + (++templateCounter) + ']')
         ) + '\n';
 
@@ -16330,7 +16358,7 @@ function now() {
 
       // If `variable` is not specified wrap a with-statement around the generated
       // code to add the data object to the top of the scope chain.
-      var variable = options.variable;
+      var variable = hasOwnProperty.call(options, 'variable') && options.variable;
       if (!variable) {
         source = 'with (obj) {\n' + source + '\n}\n';
       }
@@ -17036,6 +17064,9 @@ function now() {
      * values against any array or object value, respectively. See `_.isEqual`
      * for a list of supported value comparisons.
      *
+     * **Note:** Multiple values can be checked by combining several matchers
+     * using `_.overSome`
+     *
      * @static
      * @memberOf _
      * @since 3.0.0
@@ -17051,6 +17082,10 @@ function now() {
      *
      * _.filter(objects, _.matches({ 'a': 4, 'c': 6 }));
      * // => [{ 'a': 4, 'b': 5, 'c': 6 }]
+     *
+     * // Checking for several possible values
+     * _.filter(users, _.overSome([_.matches({ 'a': 1 }), _.matches({ 'a': 4 })]));
+     * // => [{ 'a': 1, 'b': 2, 'c': 3 }, { 'a': 4, 'b': 5, 'c': 6 }]
      */
     function matches(source) {
       return baseMatches(baseClone(source, CLONE_DEEP_FLAG));
@@ -17064,6 +17099,9 @@ function now() {
      * **Note:** Partial comparisons will match empty array and empty object
      * `srcValue` values against any array or object value, respectively. See
      * `_.isEqual` for a list of supported value comparisons.
+     *
+     * **Note:** Multiple values can be checked by combining several matchers
+     * using `_.overSome`
      *
      * @static
      * @memberOf _
@@ -17081,6 +17119,10 @@ function now() {
      *
      * _.find(objects, _.matchesProperty('a', 4));
      * // => { 'a': 4, 'b': 5, 'c': 6 }
+     *
+     * // Checking for several possible values
+     * _.filter(users, _.overSome([_.matchesProperty('a', 1), _.matchesProperty('a', 4)]));
+     * // => [{ 'a': 1, 'b': 2, 'c': 3 }, { 'a': 4, 'b': 5, 'c': 6 }]
      */
     function matchesProperty(path, srcValue) {
       return baseMatchesProperty(path, baseClone(srcValue, CLONE_DEEP_FLAG));
@@ -17304,6 +17346,10 @@ function now() {
      * Creates a function that checks if **all** of the `predicates` return
      * truthy when invoked with the arguments it receives.
      *
+     * Following shorthands are possible for providing predicates.
+     * Pass an `Object` and it will be used as an parameter for `_.matches` to create the predicate.
+     * Pass an `Array` of parameters for `_.matchesProperty` and the predicate will be created using them.
+     *
      * @static
      * @memberOf _
      * @since 4.0.0
@@ -17330,6 +17376,10 @@ function now() {
      * Creates a function that checks if **any** of the `predicates` return
      * truthy when invoked with the arguments it receives.
      *
+     * Following shorthands are possible for providing predicates.
+     * Pass an `Object` and it will be used as an parameter for `_.matches` to create the predicate.
+     * Pass an `Array` of parameters for `_.matchesProperty` and the predicate will be created using them.
+     *
      * @static
      * @memberOf _
      * @since 4.0.0
@@ -17349,6 +17399,9 @@ function now() {
      *
      * func(NaN);
      * // => false
+     *
+     * var matchesFunc = _.overSome([{ 'a': 1 }, { 'a': 2 }])
+     * var matchesPropertyFunc = _.overSome([['a', 1], ['a', 2]])
      */
     var overSome = createOver(arraySome);
 
@@ -18535,10 +18588,11 @@ function now() {
     baseForOwn(LazyWrapper.prototype, function(func, methodName) {
       var lodashFunc = lodash[methodName];
       if (lodashFunc) {
-        var key = (lodashFunc.name + ''),
-            names = realNames[key] || (realNames[key] = []);
-
-        names.push({ 'name': methodName, 'func': lodashFunc });
+        var key = lodashFunc.name + '';
+        if (!hasOwnProperty.call(realNames, key)) {
+          realNames[key] = [];
+        }
+        realNames[key].push({ 'name': methodName, 'func': lodashFunc });
       }
     });
 
@@ -19358,6 +19412,7 @@ Lexer.prototype = {
     var isAllowedDigit = isDecimalDigit;
     var base = 10;
     var isLegacy = false;
+    var isNonOctal = false;
 
     function isDecimalDigit(str) {
       return (/^[0-9]$/).test(str);
@@ -19365,6 +19420,10 @@ Lexer.prototype = {
 
     function isOctalDigit(str) {
       return (/^[0-7]$/).test(str);
+    }
+
+    function isNonOctalDigit(str) {
+      return str === "8" || str === "9";
     }
 
     function isBinaryDigit(str) {
@@ -19449,25 +19508,22 @@ Lexer.prototype = {
           base = 8;
           isLegacy = true;
 
-          index += 1;
-          value += char;
-        }
-
-        // Decimal numbers that start with '0' such as '09' are illegal
-        // but we still parse them and return as malformed.
-
-        if (!isOctalDigit(char) && isDecimalDigit(char)) {
-          index += 1;
-          value += char;
+        } else if (isDecimalDigit(char)) {
+          isNonOctal = true;
         }
       }
 
       while (index < length) {
         char = this.peek(index);
 
-        // Numbers like '019' (note the 9) are not valid octals
-        // but we still parse them and mark as malformed.
-        if (!(isLegacy && isDecimalDigit(char)) && !isAllowedDigit(char)) {
+        if (isLegacy && isNonOctalDigit(char)) {
+          base = 10;
+          isLegacy = false;
+          isNonOctal = true;
+          isAllowedDigit = isDecimalDigit;
+        }
+
+        if (!isAllowedDigit(char)) {
           break;
         }
         value += char;
@@ -19486,6 +19542,20 @@ Lexer.prototype = {
                 line: this.line,
                 character: this.char,
                 data: [ "BigInt", "bigint" ]
+              },
+              checks,
+              function() { return true; }
+            );
+          }
+
+          if (isLegacy || isNonOctal) {
+            this.triggerAsync(
+              "error",
+              {
+                code: "E067",
+                line: this.line,
+                character: this.char,
+                data: [value + char]
               },
               checks,
               function() { return true; }
@@ -19572,11 +19642,20 @@ Lexer.prototype = {
       }
     }
 
+    // TODO: Extend this check to other numeric literals
+    this.triggerAsync("warning", {
+      code: "W045",
+      line: this.line,
+      character: this.char + value.length,
+      data: [ value ]
+    }, checks, function() { return !isFinite(value); });
+
     return {
       type: Token.NumericLiteral,
       value: value,
       base: base,
-      isMalformed: !isFinite(value)
+      isNonOctal: isNonOctal,
+      isMalformed: false
     };
   },
 
@@ -20749,10 +20828,8 @@ Lexer.prototype = {
 
       case Token.NumericLiteral:
         if (token.isMalformed) {
-          // This condition unequivocally describes a syntax error.
-          // TODO: Re-factor as an "error" (not a "warning").
-          this.trigger("warning", {
-            code: "W045",
+          this.trigger("error", {
+            code: "E067",
             line: this.line,
             character: this.char,
             data: [ token.value ]
@@ -20772,6 +20849,14 @@ Lexer.prototype = {
           character: this.char
         }, checks, function() {
           return state.isStrict() && token.base === 8 && token.isLegacy;
+        });
+
+        this.triggerAsync("error", {
+          code: "E068",
+          line: this.line,
+          character: this.char
+        }, checks, function() {
+          return state.isStrict() && token.isNonOctal;
         });
 
         this.trigger("Number", {
@@ -20899,7 +20984,9 @@ var errors = {
   E064: "Super call may only be used within class method bodies.",
   E065: "Functions defined outside of strict mode with non-simple parameter lists may not " +
     "enable strict mode.",
-  E066: "Asynchronous iteration is only available with for-of loops."
+  E066: "Asynchronous iteration is only available with for-of loops.",
+  E067: "Malformed numeric literal: '{a}'.",
+  E068: "Decimals with leading zeros are not allowed in strict mode."
 };
 
 var warnings = {
@@ -20948,7 +21035,8 @@ var warnings = {
   W042: "Avoid EOL escaping.",
   W043: "Bad escaping of EOL. Use option multistr if needed.",
   W044: "Bad or unnecessary escaping.", /* TODO(caitp): remove W044 */
-  W045: "Bad number '{a}'.",
+  W045: "Value described by numeric literal cannot be accurately " +
+    "represented with a number value: '{a}'.",
   W046: "Don't use extra leading zeros '{a}'.",
   W047: "A trailing decimal point can be confused with a dot: '{a}'.",
   W048: "Unexpected control character in regular expression.",
@@ -27037,7 +27125,15 @@ var JSHINT = (function() {
     that.right = expression(context, orPrecendence);
     return that;
   }, orPrecendence);
-  infix("&&", "and", 50);
+
+  var andPrecedence = 50;
+  infix("&&", function(context, left, that) {
+    increaseComplexityCount();
+    that.left = left;
+    that.right = expression(context, andPrecedence);
+    return that;
+  }, andPrecedence);
+
   // The Exponentiation operator, introduced in ECMAScript 2016
   //
   // ExponentiationExpression[Yield] :
@@ -27347,8 +27443,7 @@ var JSHINT = (function() {
   state.syntax["new"].exps = true;
 
 
-  // Class statement
-  blockstmt("class", function(context) {
+  var classDeclaration = blockstmt("class", function(context) {
     var className, classNameToken;
     var inexport = context & prodParams.export;
 
@@ -27386,7 +27481,9 @@ var JSHINT = (function() {
     state.funct["(scope)"].stack();
     classBody(this, context);
     return this;
-  }).exps = true;
+  });
+  classDeclaration.exps = true;
+  classDeclaration.declaration = true;
 
   /*
     Class expression
@@ -28126,6 +28223,8 @@ var JSHINT = (function() {
       // are added to the param scope
       var currentParams = [];
 
+      pastRest = spreadrest("rest");
+
       if (_.includes(["{", "["], state.tokens.next.id)) {
         hasDestructuring = true;
         tokens = destructuringPattern(context);
@@ -28137,7 +28236,6 @@ var JSHINT = (function() {
           }
         }
       } else {
-        pastRest = spreadrest("rest");
         ident = identifier(context);
 
         if (ident) {
