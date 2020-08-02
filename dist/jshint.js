@@ -1,4 +1,4 @@
-/*! 2.11.2 */
+/*! 2.12.0 */
 var JSHINT;
 if (typeof window === 'undefined') window = {};
 (function () {
@@ -24691,8 +24691,9 @@ exports.jasmine = {
 /*!
  * JSHint, by JSHint Community.
  *
- * This file (and this file only) is licensed under the same slightly modified
- * MIT license that JSLint is. It stops evil-doers everywhere:
+ * Licensed under the MIT license.
+ *
+ * JSHint is a derivative work of JSLint:
  *
  *   Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
  *
@@ -24705,8 +24706,6 @@ exports.jasmine = {
  *
  *   The above copyright notice and this permission notice shall be included
  *   in all copies or substantial portions of the Software.
- *
- *   The Software shall be used for Good, not Evil.
  *
  *   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -27116,13 +27115,12 @@ var JSHINT = (function() {
     return that;
   }, 30);
 
-  var orPrecendence = 40;
   infix("||", function(context, left, that) {
     increaseComplexityCount();
     that.left = left;
-    that.right = expression(context, orPrecendence);
+    that.right = expression(context, 40);
     return that;
-  }, orPrecendence);
+  }, 40);
 
   var andPrecedence = 50;
   infix("&&", function(context, left, that) {

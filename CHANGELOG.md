@@ -1,3 +1,10 @@
+<a name="2.12.0"></a>
+# [2.12.0](https://github.com/jshint/jshint/compare/2.11.2...v2.12.0) (2020-08-02)
+
+### Features
+
+* Update project license ([2445143](https://github.com/jshint/jshint/commit/2445143))
+
 <a name="2.11.2"></a>
 ## [2.11.2](https://github.com/jshint/jshint/compare/2.11.1...v2.11.2) (2020-07-30)
 
