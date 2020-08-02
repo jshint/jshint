@@ -67,7 +67,7 @@
     "unicode-5.2.0": "^0.7.5",
     "unicode-11.0.0": "0.7.x"
   },
-  "license": "(MIT AND JSON)",
+  "license": "MIT",
   "preferGlobal": true,
   "files": [
     "bin",

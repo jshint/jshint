@@ -87,12 +87,14 @@ And many more!
 
 ## License
 
-Most files are published using [the standard MIT Expat
-license](https://www.gnu.org/licenses/license-list.html#Expat). One file,
-however, is provided under a slightly modified version of that license. The
-so-called [JSON license](https://www.gnu.org/licenses/license-list.html#JSON)
-is a non-free license, and unfortunately, we can't change it due to historical
-reasons. This license is included as an in-line within the file it concerns.
+JSHint is licensed under [the MIT Expat
+license](https://www.gnu.org/licenses/license-list.html#Expat).
+
+Prior to version 2.12.0 (release in August 2020), JSHint was partially licensed
+under the non-free [JSON
+license](https://www.gnu.org/licenses/license-list.html#JSON). [The 2020
+Relicensing document](http://jshint.com/relicensing-2020/) details the process
+maintainers followed to change the license.
 
 ## The JSHint Team
 

@@ -1,0 +1,86 @@
+8accbaed,LMLB@users.noreply.github.com,DOCS-Replace-Private-Use-Area-character,Non-substantive
+862f00b0,artem@artnez.com,Do-not-assume-JSON-block-when-mapping-array,"(signed, just erroneously switched e-mail address and name in form)"
+e8137dfa,oleg.grenrus@iki.fi,Issue-350-Make-shadow-check-for-outer-scopes-as-well,granted permission via a GPG-signed e-mail sent to project maintainers
+e2c876d5,oleg.grenrus@iki.fi,Fixed-1243-Detect-comparisons-with-typeof-x-and-check-the-other-operand,granted permission via a GPG-signed e-mail sent to project maintainers
+6038e4e2,artem@artnez.com,Fixed-1253-Limit-parseInt-radix-check-to-ES3-only,"(signed, just erroneously switched e-mail address and name in form)"
+dd0effc7,will.lawrence@gmail.com,Fixed-1221-Add-globals-to-the-valOptions-list,Non-substantive
+a17ae9ed,lapo@lapo.it,Fixed-1189-Support-spaces-in-global,Rewritten via e542f67722430318e9d4804d9f4089b84507b45a
+537dcbd4,code@frantsev.ru,Fixed-1164-Add-codes-to-errors-generated-by-quit,Rewritten via 94d7f239da4b2ae300b2342af0b777a489f63765
+87e3e6cc,timruffles@googlemail.com,Fixed-1138-Count-ternary-and-or-operators-for-complexity,Rewritten via 7a5948c64b5b3937e422843c0234f7a4685bba68 and 8a205a808582579592d5301bba587894e3a824c8
+66f3e4c1,smath23@gmail.com,Fixed-1133-Make-shelljs-imply-node,Non-substantive
+88c862df,usrbincc@yahoo.com,Fixed-1109-Parse-yield-expressions,Rewritten via 6fdb4f60586fce156d62633845ca5a19417379c3
+b3d054e0,usrbincc@yahoo.com,Fixed-1105-two-unrelated-bugs-with-a-parser.-See-1106-for-more-info,Rewritten via 691dbdc1970bc1f1406a0d0ab68e184a0f20ece2
+88644e3d,smath23@gmail.com,Fixes-1124-Add-shelljs-option,Non-substantive
+813de6cb,usrbincc@yahoo.com,Don-t-try-to-parse-expression-closure-bodies-as-comma-expressions,Non-substantive
+807db5e3,usrbincc@yahoo.com,Try-directly-setting-x.paren-from-nud-of-prefix,Rewritten via 9b8cec9a2afc5d53adb965824b42e626607d44fc
+72f5f371,usrbincc@yahoo.com,An-attempt-to-ignore-assigns-in-conditionals-when-in-parens,Rewritten via 9b8cec9a2afc5d53adb965824b42e626607d44fc
+6de20a3b,usrbincc@yahoo.com,Break-out-of-comma-expression-parsing-when-a-reserved-word-is-seen,Rewritten via 9b8cec9a2afc5d53adb965824b42e626607d44fc
+21b77a5e,usrbincc@yahoo.com,Update-precedence-for-expression-calls-that-cannot-include-commas,Rewritten via 9b8cec9a2afc5d53adb965824b42e626607d44fc
+48a0ae6a,usrbincc@yahoo.com,Use-the-new-comma-parsing-code-in-if-conditions,Rewritten via 9b8cec9a2afc5d53adb965824b42e626607d44fc
+2865994b,usrbincc@yahoo.com,Make-comma-an-infix-operator,Rewritten via 9b8cec9a2afc5d53adb965824b42e626607d44fc
+2ea9d842,usrbincc@yahoo.com,Handle-assignments-in-switch-conditions,Rewritten via 9b8cec9a2afc5d53adb965824b42e626607d44fc
+abbbad5e,usrbincc@yahoo.com,Slightly-cleaner-solution,Non-substantive
+8ccd8275,usrbincc@yahoo.com,Fix-read-of-property-use-strict-of-undefined,Non-substantive
+cd03a564,usrbincc@yahoo.com,Always-do-the-unstack-and-after-the-last-advance-for-good-measure,Rewritten via 08eb4e25962eb71f94c09f79b3b08288b91a7bce
+b4e146e2,usrbincc@yahoo.com,Add-spec-comment-for-strictness-of-ClassBody,Non-substantive
+6b99d1d0,usrbincc@yahoo.com,Remove-explicit-check-for-class-names-eval-or-arguments,Rewritten via 6759ac902928c32e0c798134abe1fbd1353ad3a3
+dfeaebec,usrbincc@yahoo.com,Code-cleanup-reduce-diff-with-master,Rewritten via 6759ac902928c32e0c798134abe1fbd1353ad3a3
+19aa8a10,usrbincc@yahoo.com,expression-should-only-warn-about-future-reserved-words-in-labels,Rewritten via 6759ac902928c32e0c798134abe1fbd1353ad3a3
+9d3abc80,usrbincc@yahoo.com,Remove-unnecessary-esnextReserved-meta-tag,Rewritten via 6759ac902928c32e0c798134abe1fbd1353ad3a3
+9b992412,usrbincc@yahoo.com,Mark-interface-as-an-es5-strictOnly-keyword,Rewritten via 6759ac902928c32e0c798134abe1fbd1353ad3a3
+4d6f9540,usrbincc@yahoo.com,Make-only-class-bodies-strict-by-default-not-the-entire-declaration,Rewritten via 6759ac902928c32e0c798134abe1fbd1353ad3a3
+75b06d7e,usrbincc@yahoo.com,Accept-class-C-extends-AssignmentExpression,Rewritten via 6759ac902928c32e0c798134abe1fbd1353ad3a3
+b6190c8e,usrbincc@yahoo.com,Use-function-param-isclassdef-not-function-classdef-in-conditional,Rewritten via 6759ac902928c32e0c798134abe1fbd1353ad3a3
+bbfa15d1,usrbincc@yahoo.com,Simpler-to-do-one-unstack-here-blockscope-already-has-one-stack,Rewritten via 08eb4e25962eb71f94c09f79b3b08288b91a7bce
+5ac92c2f,usrbincc@yahoo.com,Recognize-unused-let-at-the-global-scope,Rewritten via 08eb4e25962eb71f94c09f79b3b08288b91a7bce
+181f1c80,usrbincc@yahoo.com,Update-class-getter-setter-naming-error-messages-to-be-more-specific,Rewritten via 6759ac902928c32e0c798134abe1fbd1353ad3a3
+c658a4c0,usrbincc@yahoo.com,Fix-error-message-calls,Rewritten via 6759ac902928c32e0c798134abe1fbd1353ad3a3
+ab3a40ba,usrbincc@yahoo.com,Fix-indentation,Rewritten via 6759ac902928c32e0c798134abe1fbd1353ad3a3
+955da17d,usrbincc@yahoo.com,Comments-reformat-and-add-some-more-relevant-quotes-from-the-ES6-spec,Rewritten via 6759ac902928c32e0c798134abe1fbd1353ad3a3
+0235f38d,usrbincc@yahoo.com,Limit-constructor-getter-setter-checks-to-class-definitions,Rewritten via 6759ac902928c32e0c798134abe1fbd1353ad3a3
+cd04ea7b,usrbincc@yahoo.com,Check-for-methods-named-prototype,Rewritten via 6759ac902928c32e0c798134abe1fbd1353ad3a3
+adc4ffe6,usrbincc@yahoo.com,Require-that-constructors-be-regular-methods,Rewritten via 6759ac902928c32e0c798134abe1fbd1353ad3a3
+3c5acdc7,usrbincc@yahoo.com,Treat-methods-and-static-methods-separately-in-checking-for-duplicates,Rewritten via 6759ac902928c32e0c798134abe1fbd1353ad3a3
+df6e0337,usrbincc@yahoo.com,Formatting-only-add-newline,Rewritten via 6759ac902928c32e0c798134abe1fbd1353ad3a3
+0ffccb97,usrbincc@yahoo.com,Remove-unused-vars,Rewritten via 6759ac902928c32e0c798134abe1fbd1353ad3a3
+eacc3bd9,usrbincc@yahoo.com,Extend-strictness-to-cover-the-entire-class-definition,Rewritten via 6759ac902928c32e0c798134abe1fbd1353ad3a3
+8dfa1b64,usrbincc@yahoo.com,Factor-out-common-code-for-class-statements-and-class-expressions,Rewritten via 6759ac902928c32e0c798134abe1fbd1353ad3a3
+93a5120e,usrbincc@yahoo.com,Rename-function-param-classdef-to-isclassdef,Rewritten via 6759ac902928c32e0c798134abe1fbd1353ad3a3
+f8869f14,usrbincc@yahoo.com,Forgot-to-make-class-bodies-strict,Rewritten via 6759ac902928c32e0c798134abe1fbd1353ad3a3
+2fb046e5,usrbincc@yahoo.com,Add-classexpression-handling,Rewritten via 6759ac902928c32e0c798134abe1fbd1353ad3a3
+db6bcc9d,usrbincc@yahoo.com,Handle-class-statements.-Reuses-the-code-for-handling-object-literals,Rewritten via 6759ac902928c32e0c798134abe1fbd1353ad3a3
+fec1bf88,usrbincc@yahoo.com,Treat-class-extends-import-export-as-reserved-when-inESNext,Rewritten via 6759ac902928c32e0c798134abe1fbd1353ad3a3
+ebe8156a,code@frantsev.ru,Don-t-warn-about-uncapitalized-global-functions-used-as-constructors,Rewritten via 08eb4e25962eb71f94c09f79b3b08288b91a7bce
+b0f3198b,Jason.More@gmail.com,Added-broken-test-for-Node-and-NodeFilter,Non-substantive
+e82c83b4,code@frantsev.ru,Add-DOMParser-global-to-browser,Non-substantive
+56b998a9,code@frantsev.ru,Add-XMLSerializer-global-to-browser,Non-substantive
+2a2c9461,code@frantsev.ru,Add-atob-and-btoa-globals-to-browser,Non-substantive
+e2dc30a6,dominic@dbarnes.info,adding-provides-to-couch-env,Non-substantive
+fc83cf97,hello@rondevera.com,Add-missing-comma-in-members-list,Non-substantive
+6dd6052f,dionyziz@kamibu.com,Adding-HTML-canvas-and-video-tags-for-HTML5,Non-substantive
+09c1982c,dionyziz@kamibu.com,Added-predefined-browser-classes-for-various-HTML-object-types,Non-substantive
+f9a2dfee,dionyziz@kamibu.com,Added-predefined-browser-classes-for-various-HTML-object-types,Non-substantive
+b30bfa89,tom@rixth.org,Separate-check-for-trailing-whitespace-in-to-its-own-function-along-with-tests,removed via 0c0e19319b276b019d285bdfd2cfc49126abd814
+38ccb0fb,cmcculloh@gmail.com,Corrected-misspelled-specigic,Non-substantive
+6c238084,sky@skyb.us,new-Array-expression-is-valid,Rewritten via 9c07e4c5764a564073433265edcaa3b823fbf41d
+7c327bf6,douglas@crockford.com,Tolerate-stupid-blockless-blocks,relicensed via Eclipse
+5675d2c6,douglas@crockford.com,http-tech.groups.yahoo.com-group-jslint_com-message-1730,relicensed via Eclipse
+73c2fe36,douglas@crockford.com,indent,relicensed via Eclipse
+d7896b2c,douglas@crockford.com,step_in-step_out,relicensed via Eclipse
+85c95acb,douglas@crockford.com,for-var,relicensed via Eclipse
+caa8885a,douglas@crockford.com,use-strict,relicensed via Eclipse
+1da55dd6,douglas@crockford.com,http-www.yuiblog.com-blog-2010-12-14-strict-mode-is-coming-to-town,relicensed via Eclipse
+b6d8b251,douglas@crockford.com,use-strict,relicensed via Eclipse
+dc4a0133,douglas@crockford.com,JSON-escape-v,relicensed via Eclipse
+80a22526,douglas@crockford.com,JSON-escape-single-quote,relicensed via Eclipse
+bdd35767,douglas@crockford.com,k,relicensed via Eclipse
+6735394d,douglas@crockford.com,Cleanup,relicensed via Eclipse
+6af839a6,douglas@crockford.com,option.predef,relicensed via Eclipse
+c9332068,douglas@crockford.com,Warn-on-new-Array-NUMBER,relicensed via Eclipse
+523956b6,douglas@crockford.com,Removing-rhino.js-and-wsh.js.-Other-projects-are-providing-better-alternatives,relicensed via Eclipse
+d98f7530,douglas@crockford.com,dangerous-comments,relicensed via Eclipse
+35ec4a53,douglas@crockford.com,groove,relicensed via Eclipse
+d4a0702b,douglas@crockford.com,More-css-colors,relicensed via Eclipse
+eb939e7f,douglas@crockford.com,Use-charAt-instead-of-in-line-1786,relicensed via Eclipse
+af040fb1,douglas@crockford.com,Use-.charAt-instead-of-in-line-1786,relicensed via Eclipse
+ca120a73,douglas@crockford.com,first-commit,relicensed via Eclipse
