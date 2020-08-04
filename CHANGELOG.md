@@ -3,7 +3,7 @@
 
 ### Features
 
-* Update project license ([2445143](https://github.com/jshint/jshint/commit/2445143))
+* Update project license ([d65513c](https://github.com/jshint/jshint/commit/d65513c))
 
 <a name="2.11.2"></a>
 ## [2.11.2](https://github.com/jshint/jshint/compare/2.11.1...v2.11.2) (2020-07-30)
