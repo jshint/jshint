@@ -52,7 +52,6 @@ with a link to a snippet, etc.
 However, before sending a patch, please make sure that the following applies:
 
 * Your commit message follows the [Commit Message Guidelines](#commit-message-guidelines).
-* You have signed the [Contributor's License Agreement](https://www.clahub.com/agreements/jshint/jshint).
 * Your patch doesn't have useless merge commits.
 * Your coding style is similar to ours (see below).
 * Your patch is 100% tested. We don't accept any test regressions.
