@@ -11,7 +11,7 @@ curl.stdout.on('data', (data) => {
 });
 
 curl.stderr.on('data', (data) => {
-  console.error(`curl stderr: ${data}`);
+//  console.error(`curl stderr: ${data}`);
 });
 
 curl.on('close', (code) => {
