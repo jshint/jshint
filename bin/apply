@@ -1,6 +1,36 @@
 #!/usr/bin/env node
 
-var shjs = require("shelljs");
+const { spawn } = require('child_process');
 var url  = "https://github.com/jshint/jshint/pull/" + process.argv[2] + ".diff";
 
-shjs.exec('curl "' + url + '" | git apply');
+const curl = spawn('curl', ['-L', url]);
+const git = spawn('git', ['apply']);
+
+curl.stdout.on('data', (data) => {
+  git.stdin.write(data);
+});
+
+curl.stderr.on('data', (data) => {
+//  console.error(`curl stderr: ${data}`);
+});
+
+curl.on('close', (code) => {
+  if (code !== 0) {
+    console.log(`curl process exited with code ${code}`);
+  }
+  git.stdin.end();
+});
+
+git.stdout.on('data', (data) => {
+  console.log(data.toString());
+});
+
+git.stderr.on('data', (data) => {
+  console.error(`git stderr: ${data}`);
+});
+
+git.on('close', (code) => {
+  if (code !== 0) {
+    console.log(`git process exited with code ${code}`);
+  }
+});
