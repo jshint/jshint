@@ -73,6 +73,7 @@ Engineers from these companies and projects use JSHint:
 * [SoundCloud](http://soundcloud.com/)
 * [Nodejitsu](http://nodejitsu.com/)
 * [Yelp](https://yelp.com/)
+* [Find My Electric](https://www.findmyelectric.com/)
 * [Voxer](http://voxer.com/)
 * [EnyoJS](http://enyojs.com/)
 * [QuickenLoans](http://quickenloans.com/)
