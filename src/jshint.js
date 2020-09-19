@@ -1743,13 +1743,13 @@ var JSHINT = (function() {
    *
    * @param {number} context - the parsing context; see `prod-params.js` for
    *                           more information
-   * @param {boolean} [prop] -`true` if this identifier is that of an object
-   *                           property
+   * @param {boolean} [isName] - `true` if an IdentifierName should be consumed
+   *                             (e.g. object properties)
    * @param {boolean} [preserve] - `true` if the token should not be consumed
    *
    * @returns {string|undefined} - the value of the identifier, if present
    */
-  function optionalidentifier(context, prop, preserve) {
+  function optionalidentifier(context, isName, preserve) {
     if (!state.tokens.next.identifier) {
       return;
     }
@@ -1765,7 +1765,7 @@ var JSHINT = (function() {
       return val;
     }
 
-    if (prop) {
+    if (isName) {
       if (state.inES5()) {
         return val;
       }
@@ -1810,13 +1810,13 @@ var JSHINT = (function() {
    *
    * @param {number} context - the parsing context; see `prod-params.js` for
    *                           more information
-   * @param {boolean} [prop] -`true` if this identifier is that of an object
-   *                           property
+   * @param {boolean} [isName] - `true` if an IdentifierName should be consumed
+   *                             (e.g. object properties)
    *
    * @returns {string|undefined} - the value of the identifier, if present
    */
-  function identifier(context, prop) {
-    var i = optionalidentifier(context, prop, false);
+  function identifier(context, isName) {
+    var i = optionalidentifier(context, isName, false);
     if (i) {
       return i;
     }
