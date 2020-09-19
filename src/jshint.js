@@ -5571,14 +5571,11 @@ var JSHINT = (function() {
           break;
         }
         var importName;
-        if (state.tokens.next.type === "default") {
-          importName = "default";
-          advance("default");
-        } else {
-          importName = identifier(context);
-        }
-        if (state.tokens.next.value === "as") {
+        if (peek().value === "as") {
+          identifier(context, true);
           advance("as");
+          importName = identifier(context);
+        } else {
           importName = identifier(context);
         }
 
