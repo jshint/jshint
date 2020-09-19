@@ -981,6 +981,12 @@ exports.testES6Modules = function (test) {
       "export default async function * () { yield 0; await 0; }",
     ], { esversion: 9, module: true });
 
+  TestRun(test, "IdentifierName in renamed import/export")
+    .test([
+      "import { if as x } from '.';",
+      "export { x as if } from '.';"
+    ], { esversion: 6, module: true });
+
   test.done();
 };
 
