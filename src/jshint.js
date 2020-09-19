@@ -1759,20 +1759,12 @@ var JSHINT = (function() {
     }
 
     var curr = state.tokens.curr;
-    var val  = state.tokens.curr.value;
 
-    if (!isReserved(context, curr)) {
-      return val;
+    if (isReserved(context, curr) && !(isName && state.inES5())) {
+      warning("W024", state.tokens.curr, state.tokens.curr.id);
     }
 
-    if (isName) {
-      if (state.inES5()) {
-        return val;
-      }
-    }
-
-    warning("W024", state.tokens.curr, state.tokens.curr.id);
-    return val;
+    return curr.value;
   }
 
   /**
