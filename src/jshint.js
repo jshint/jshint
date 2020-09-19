@@ -3456,24 +3456,19 @@ var JSHINT = (function() {
    *
    * @param {number} context - the parsing context; see `prod-params.js` for
    *                           more information
-   * @param {boolean} [preserve] - `true` if the token should not be consumed
    *
    * @returns {string|undefined} - the value of the identifier, if present
    */
-  function propertyName(context, preserve) {
-    var id = optionalidentifier(context, true, preserve);
+  function propertyName(context) {
+    var id = optionalidentifier(context, true);
 
     if (!id) {
       if (state.tokens.next.id === "(string)") {
         id = state.tokens.next.value;
-        if (!preserve) {
-          advance();
-        }
+        advance();
       } else if (state.tokens.next.id === "(number)") {
         id = state.tokens.next.value.toString();
-        if (!preserve) {
-          advance();
-        }
+        advance();
       }
     }
 
@@ -4002,10 +3997,9 @@ var JSHINT = (function() {
           if (!state.inES6()) {
             warning("W104", state.tokens.next, "object short notation", "6");
           }
-          i = propertyName(context, true);
-          saveProperty(props, i, state.tokens.next);
-
-          expression(context, 10);
+          t = expression(context, 10);
+          i = t.value;
+          saveProperty(props, i, t);
 
         } else if (peek().id !== ":" && (nextVal === "get" || nextVal === "set")) {
           advance(nextVal);
