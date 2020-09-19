@@ -3448,6 +3448,16 @@ var JSHINT = (function() {
     return !!state.funct["(method)"];
   }
 
+  /**
+   * Retrieve the value of the next token if it is a valid LiteralPropertyName
+   * and optionally advance the parser.
+   *
+   * @param {number} context - the parsing context; see `prod-params.js` for
+   *                           more information
+   * @param {boolean} [preserve] - `true` if the token should not be consumed
+   *
+   * @returns {string|undefined} - the value of the identifier, if present
+   */
   function propertyName(context, preserve) {
     var id = optionalidentifier(context, true, preserve);
 
