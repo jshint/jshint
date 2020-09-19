@@ -1738,8 +1738,8 @@ var JSHINT = (function() {
   }
 
   /**
-   * Retrieve the value of the current token if it is an identifier and
-   * optionally advance the parser.
+   * Retrieve the value of the next token if it is an identifier and optionally
+   * advance the parser.
    *
    * @param {number} context - the parsing context; see `prod-params.js` for
    *                           more information
