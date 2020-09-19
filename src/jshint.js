@@ -3458,16 +3458,8 @@ var JSHINT = (function() {
     return !!state.funct["(method)"];
   }
 
-  function propertyName(context, preserveOrToken) {
-    var id;
-    var preserve = true;
-    if (typeof preserveOrToken === "object") {
-      /* istanbul ignore next */
-      id = preserveOrToken;
-    } else {
-      preserve = preserveOrToken;
-      id = optionalidentifier(context, true, preserve);
-    }
+  function propertyName(context, preserve) {
+    var id = optionalidentifier(context, true, preserve);
 
     if (!id) {
       if (state.tokens.next.id === "(string)") {
@@ -3481,10 +3473,6 @@ var JSHINT = (function() {
           advance();
         }
       }
-    /* istanbul ignore next */
-    } else if (typeof id === "object") {
-      if (id.id === "(string)" || id.id === "(identifier)") id = id.value;
-      else if (id.id === "(number)") id = id.value.toString();
     }
 
     if (id === "hasOwnProperty") {
