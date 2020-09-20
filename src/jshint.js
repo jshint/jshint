@@ -2753,7 +2753,6 @@ var JSHINT = (function() {
 
   var classDeclaration = blockstmt("class", function(context) {
     var className, classNameToken;
-    var inexport = context & prodParams.export;
 
     if (!state.inES6()) {
       warning("W104", state.tokens.curr, "class", "6");
@@ -2780,12 +2779,12 @@ var JSHINT = (function() {
     }
 
     if (classNameToken) {
-      this.name = className;
+      this.name = classNameToken;
       state.funct["(scope)"].initialize(className);
-      if (inexport) {
-        state.funct["(scope)"].setExported(className, classNameToken);
-      }
+    } else {
+      this.name = null;
     }
+
     state.funct["(scope)"].stack();
     classBody(this, context);
     return this;
@@ -2822,13 +2821,15 @@ var JSHINT = (function() {
 
     state.funct["(scope)"].stack();
     if (classNameToken) {
-      this.name = className;
+      this.name = classNameToken;
       state.funct["(scope)"].addbinding(className, {
         type: "class",
         initialized: true,
         token: classNameToken
       });
       state.funct["(scope)"].block.use(className, classNameToken);
+    } else {
+      this.name = null;
     }
 
     classBody(this, context);
@@ -4333,7 +4334,6 @@ var JSHINT = (function() {
     // used for both let and const statements
 
     var noin = context & prodParams.noin;
-    var inexport = context & prodParams.export;
     var isLet = type === "let";
     var isConst = type === "const";
     var tokens, lone, value, letblock;
@@ -4423,10 +4423,6 @@ var JSHINT = (function() {
           if (tokens.hasOwnProperty(t)) {
             t = tokens[t];
             state.funct["(scope)"].initialize(t.id);
-
-            if (inexport) {
-              state.funct["(scope)"].setExported(t.token.value, t.token);
-            }
           }
         }
       }
@@ -4528,7 +4524,6 @@ var JSHINT = (function() {
 
   var varstatement = stmt("var", function(context) {
     var noin = context & prodParams.noin;
-    var inexport = context & prodParams.export;
     var tokens, lone, value, id;
 
     this.first = [];
@@ -4571,9 +4566,6 @@ var JSHINT = (function() {
               type: "var",
               token: t.token });
 
-            if (inexport) {
-              state.funct["(scope)"].setExported(t.id, t.token);
-            }
             names.push(t.token);
           }
         }
@@ -4646,25 +4638,21 @@ var JSHINT = (function() {
     if (inblock) {
       warning("W082", state.tokens.curr);
     }
-    var nameToken = optionalidentifier(context) ? state.tokens.curr : null;
+    this.name = optionalidentifier(context) ? state.tokens.curr : null;
 
-    if (!nameToken) {
+    if (!this.name) {
       if (!inexport) {
         warning("W025");
       }
     } else {
-      state.funct["(scope)"].addbinding(nameToken.value, {
+      state.funct["(scope)"].addbinding(this.name.value, {
         type: labelType,
         token: state.tokens.curr,
         initialized: true });
-
-      if (inexport) {
-        state.funct["(scope)"].setExported(nameToken.value, state.tokens.prev);
-      }
     }
 
     var f = doFunction(context, {
-      name: nameToken && nameToken.value,
+      name: this.name && this.name.value,
       statement: this,
       type: generator ? "generator" : null,
       ignoreLoopFunc: inblock // a declaration may already have warned
@@ -4677,9 +4665,9 @@ var JSHINT = (function() {
     // mode (the scope manager will not report an error because a declaration
     // does not introduce a binding into the function's environment record).
     var enablesStrictMode = f["(isStrict)"] && !state.isStrict();
-    if (nameToken && (f["(name)"] === "arguments" || f["(name)"] === "eval") &&
+    if (this.name && (f["(name)"] === "arguments" || f["(name)"] === "eval") &&
       enablesStrictMode) {
-      error("E008", nameToken);
+      error("E008", this.name);
     }
 
     if (state.tokens.next.id === "(" && state.tokens.next.line === state.tokens.curr.line) {
@@ -4706,21 +4694,21 @@ var JSHINT = (function() {
 
     // This context modification restricts the use of `await` as the optional
     // BindingIdentifier in async function expressions.
-    var nameToken = optionalidentifier(isAsync ? context | prodParams.async : context) ?
+    this.name = optionalidentifier(isAsync ? context | prodParams.async : context) ?
       state.tokens.curr : null;
 
     var f = doFunction(context, {
-      name: nameToken && nameToken.value,
+      name: this.name && this.name.value,
       type: generator ? "generator" : null
     });
 
-    if (generator && nameToken && nameToken.value === "yield") {
-      error("E024", nameToken, "yield");
+    if (generator && this.name && this.name.value === "yield") {
+      error("E024", this.name, "yield");
     }
 
-    if (nameToken && (f["(name)"] === "arguments" || f["(name)"] === "eval") &&
+    if (this.name && (f["(name)"] === "arguments" || f["(name)"] === "eval") &&
       f["(isStrict)"]) {
-      error("E008", nameToken);
+      error("E008", this.name);
     }
 
     return this;
@@ -5624,6 +5612,7 @@ var JSHINT = (function() {
 
   stmt("export", function(context) {
     var ok = true;
+    var token;
     var moduleSpecifier;
     context = context | prodParams.export;
 
@@ -5656,22 +5645,27 @@ var JSHINT = (function() {
       state.nameStack.set(state.tokens.next);
 
       advance("default");
+      var def = state.tokens.curr;
       var exportType = state.tokens.next.id;
       if (exportType === "function") {
         this.block = true;
         advance("function");
-        state.syntax["function"].fud(context);
+        token = state.syntax["function"].fud(context);
+        state.funct["(scope)"].setExported(token.name, def);
       } else if (exportType === "async" && peek().id === "function") {
         this.block = true;
         advance("async");
         advance("function");
-        state.syntax["function"].fud(context | prodParams.preAsync);
+        token = state.syntax["function"].fud(context | prodParams.preAsync);
+        state.funct["(scope)"].setExported(token.name, def);
       } else if (exportType === "class") {
         this.block = true;
         advance("class");
-        state.syntax["class"].fud(context);
+        token = state.syntax["class"].fud(context);
+        state.funct["(scope)"].setExported(token.name, def);
       } else {
         expression(context, 10);
+        state.funct["(scope)"].setExported(null, def);
       }
       return this;
     }
@@ -5686,15 +5680,22 @@ var JSHINT = (function() {
         }
         advance();
 
-        exportedTokens.push(state.tokens.curr);
-
         if (state.tokens.next.value === "as") {
           advance("as");
           if (!state.tokens.next.identifier) {
             /* istanbul ignore next */
             error("E030", state.tokens.next, state.tokens.next.value);
           }
+          exportedTokens.push({
+            local: state.tokens.prev,
+            export: state.tokens.next
+          });
           advance();
+        } else {
+          exportedTokens.push({
+            local: state.tokens.curr,
+            export: state.tokens.curr
+          });
         }
 
         if (!checkPunctuator(state.tokens.next, "}")) {
@@ -5708,8 +5709,8 @@ var JSHINT = (function() {
         moduleSpecifier = state.tokens.next;
         advance("(string)");
       } else if (ok) {
-        exportedTokens.forEach(function(token) {
-          state.funct["(scope)"].setExported(token.value, token);
+        exportedTokens.forEach(function(x) {
+          state.funct["(scope)"].setExported(x.local, x.export);
         });
       }
 
@@ -5725,31 +5726,43 @@ var JSHINT = (function() {
     } else if (state.tokens.next.id === "var") {
       // ExportDeclaration :: export VariableStatement
       advance("var");
-      state.tokens.curr.fud(context);
+      token = state.tokens.curr.fud(context);
+      token.first.forEach(function(binding) {
+        state.funct["(scope)"].setExported(binding, binding);
+      });
     } else if (state.tokens.next.id === "let") {
       // ExportDeclaration :: export VariableStatement
       advance("let");
-      state.tokens.curr.fud(context);
+      token = state.tokens.curr.fud(context);
+      token.first.forEach(function(binding) {
+        state.funct["(scope)"].setExported(binding, binding);
+      });
     } else if (state.tokens.next.id === "const") {
       // ExportDeclaration :: export VariableStatement
       advance("const");
-      state.tokens.curr.fud(context);
+      token = state.tokens.curr.fud(context);
+      token.first.forEach(function(binding) {
+        state.funct["(scope)"].setExported(binding, binding);
+      });
     } else if (state.tokens.next.id === "function") {
       // ExportDeclaration :: export Declaration
       this.block = true;
       advance("function");
-      state.syntax["function"].fud(context);
+      token = state.syntax["function"].fud(context);
+      state.funct["(scope)"].setExported(token.name, token.name);
     } else if (state.tokens.next.id === "async" && peek().id === "function") {
       // ExportDeclaration :: export Declaration
       this.block = true;
       advance("async");
       advance("function");
-      state.syntax["function"].fud(context | prodParams.preAsync);
+      token = state.syntax["function"].fud(context | prodParams.preAsync);
+      state.funct["(scope)"].setExported(token.name, token.name);
     } else if (state.tokens.next.id === "class") {
       // ExportDeclaration :: export Declaration
       this.block = true;
       advance("class");
-      state.syntax["class"].fud(context);
+      token = state.syntax["class"].fud(context);
+      state.funct["(scope)"].setExported(token.name, token.name);
     } else {
       /* istanbul ignore next */
       error("E024", state.tokens.next, state.tokens.next.value);
