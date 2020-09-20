@@ -5631,7 +5631,18 @@ var JSHINT = (function() {
 
     if (state.tokens.next.value === "*") {
       // ExportDeclaration :: export * FromClause
+      // ExportDeclaration :: export * as IdentifierName FromClause
       advance("*");
+
+      if (state.tokens.next.value === "as") {
+        if (!state.inES11()) {
+          warning("W119", state.tokens.curr, "export * as ns from", "11");
+        }
+        advance("as");
+        identifier(context, true);
+        state.funct["(scope)"].setExported(null, state.tokens.curr);
+      }
+
       advance("from");
       advance("(string)");
       return this;
