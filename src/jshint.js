@@ -4414,7 +4414,7 @@ var JSHINT = (function() {
             t = tokens[t];
             state.funct["(scope)"].initialize(t.id);
 
-            if (lone && inexport) {
+            if (inexport) {
               state.funct["(scope)"].setExported(t.token.value, t.token);
             }
           }
@@ -4561,7 +4561,7 @@ var JSHINT = (function() {
               type: "var",
               token: t.token });
 
-            if (lone && inexport) {
+            if (inexport) {
               state.funct["(scope)"].setExported(t.id, t.token);
             }
             names.push(t.token);

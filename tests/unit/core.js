@@ -1012,7 +1012,10 @@ exports.testES6ModulesNamedExportsAffectUnused = function (test) {
     "export var v1u, v2u;",
     "export let l1u, l2u;",
     "export const c1u, c2u;",
-    "export function* gen() { yield 1; }"
+    "export function* gen() { yield 1; }",
+    "export var { varX } = 0;",
+    "export let { letX } = 0;",
+    "export const { constX } = 0;"
   ];
 
   TestRun(test)
