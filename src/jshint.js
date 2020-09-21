@@ -5633,8 +5633,6 @@ var JSHINT = (function() {
 
   stmt("export", function(context) {
     var ok = true;
-    var token;
-    var identifier;
     var moduleSpecifier;
     context = context | prodParams.export;
 
@@ -5682,11 +5680,7 @@ var JSHINT = (function() {
         advance("class");
         state.syntax["class"].fud(context);
       } else {
-        token = expression(context, 10);
-        if (token.identifier) {
-          identifier = token.value;
-          state.funct["(scope)"].setExported(identifier, token);
-        }
+        expression(context, 10);
       }
       return this;
     }
