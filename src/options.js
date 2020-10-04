@@ -1048,7 +1048,7 @@ exports.val = {
    *    9](https://www.ecma-international.org/ecma-262/9.0/index.html). Notable
    *    additions: asynchronous iteration, rest/spread properties, and various
    *    RegExp extensions
-   *  - `10` - To enable language features introduced by ECMAScript
+   *  - `10` - To enable language features introduced by [ECMAScript
    *    10](https://www.ecma-international.org/ecma-262/10.0/index.html).
    *    Notable additions: optional catch bindings.
    */
