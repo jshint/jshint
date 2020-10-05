@@ -4762,7 +4762,7 @@ var JSHINT = (function() {
         var tokens = destructuringPattern(context);
         _.each(tokens, function(token) {
           if (token.id) {
-            state.funct["(scope)"].addParam(token.id, token, "exception");
+            state.funct["(scope)"].addParam(token.id, token.token, "exception");
           }
         });
       } else if (state.tokens.next.type !== "(identifier)") {
