@@ -84,7 +84,7 @@ JSHint).
 JSLint and JSHint).
 * [Web Essentials](http://vswebessentials.com) (Runs JSHint automatically).
 
-### Visual Studio Code
+#### Visual Studio Code
 * [VS Code JSHint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.jshint), integrates JSHint into VS Code.
 
 #### Brackets
