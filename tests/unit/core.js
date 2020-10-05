@@ -1737,19 +1737,19 @@ exports.testDefaultArguments = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/default-arguments.js", "utf8");
   TestRun(test)
     .addError(14, 39, "'bar' is not defined.")
-    .addError(14, 32, "'num3' was used before it was declared, which is illegal for 'param' variables.")
-    .addError(15, 32, "'num4' was used before it was declared, which is illegal for 'param' variables.")
+    .addError(14, 32, "'num3' was used before it was defined.")
+    .addError(15, 32, "'num4' was used before it was defined.")
     .addError(18, 41, "Regular parameters should not come after default parameters.")
     .addError(27, 10, "'c' is not defined.")
     .addError(33, 4, "'d' was used before it was defined.")
-    .addError(36, 16, "'e' was used before it was declared, which is illegal for 'param' variables.")
+    .addError(36, 16, "'e' was used before it was defined.")
     .test(src, { esnext: true, undef: true, latedef: true });
 
   TestRun(test)
-    .addError(14, 32, "'num3' was used before it was declared, which is illegal for 'param' variables.")
-    .addError(15, 32, "'num4' was used before it was declared, which is illegal for 'param' variables.")
+    .addError(14, 32, "'num3' was used before it was defined.")
+    .addError(15, 32, "'num4' was used before it was defined.")
     .addError(18, 41, "Regular parameters should not come after default parameters.")
-    .addError(36, 16, "'e' was used before it was declared, which is illegal for 'param' variables.")
+    .addError(36, 16, "'e' was used before it was defined.")
     .test(src, { moz: true });
 
   TestRun(test)
@@ -1759,9 +1759,9 @@ exports.testDefaultArguments = function (test) {
     .addError(12, 37, "'default parameters' is only available in ES6 (use 'esversion: 6').")
     .addError(13, 37, "'default parameters' is only available in ES6 (use 'esversion: 6').")
     .addError(14, 37, "'default parameters' is only available in ES6 (use 'esversion: 6').")
-    .addError(14, 32, "'num3' was used before it was declared, which is illegal for 'param' variables.")
+    .addError(14, 32, "'num3' was used before it was defined.")
     .addError(15, 37, "'default parameters' is only available in ES6 (use 'esversion: 6').")
-    .addError(15, 32, "'num4' was used before it was declared, which is illegal for 'param' variables.")
+    .addError(15, 32, "'num4' was used before it was defined.")
     .addError(18, 37, "'default parameters' is only available in ES6 (use 'esversion: 6').")
     .addError(18, 41, "Regular parameters should not come after default parameters.")
     .addError(26, 18, "'default parameters' is only available in ES6 (use 'esversion: 6').")
@@ -1769,7 +1769,7 @@ exports.testDefaultArguments = function (test) {
     .addError(33, 6, "'default parameters' is only available in ES6 (use 'esversion: 6').")
     .addError(35, 18, "'default parameters' is only available in ES6 (use 'esversion: 6').")
     .addError(36, 18, "'default parameters' is only available in ES6 (use 'esversion: 6').")
-    .addError(36, 16, "'e' was used before it was declared, which is illegal for 'param' variables.")
+    .addError(36, 16, "'e' was used before it was defined.")
     .test(src, {  });
 
   test.done();
@@ -1777,7 +1777,7 @@ exports.testDefaultArguments = function (test) {
 
 exports.testEarlyCatchParam = function (test) {
   TestRun(test)
-    .addError(2, 18, "'y' was used before it was declared, which is illegal for 'exception' variables.")
+    .addError(2, 18, "'y' was used before it was defined.")
     .test([
       "try {",
       "} catch ([x = y, y]) {",
