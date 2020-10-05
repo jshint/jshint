@@ -538,8 +538,9 @@ var scopeManager = function(state, predefined, exported, declared) {
         if (usage["(onlyUsedSubFunction)"]) {
           _latedefWarning(type, bindingName, token);
         } else {
-          // this is a clear illegal usage for block scoped variables
-          warning("E056", token, bindingName, type);
+          // this is a clear illegal usage, but not a syntax error, so emit a
+          // warning and not an error
+          warning("W003", token, bindingName);
         }
       }
     },
