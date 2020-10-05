@@ -1775,6 +1775,18 @@ exports.testDefaultArguments = function (test) {
   test.done();
 };
 
+exports.testEarlyCatchParam = function (test) {
+  TestRun(test)
+    .addError(2, 18, "'y' was used before it was declared, which is illegal for 'exception' variables.")
+    .test([
+      "try {",
+      "} catch ([x = y, y]) {",
+      "}"
+    ], { esversion: 6 });
+
+  test.done();
+};
+
 exports.testDuplicateParamNames = function (test) {
   var src = [
   "(function() {",
