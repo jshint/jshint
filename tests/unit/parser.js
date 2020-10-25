@@ -10250,3 +10250,20 @@ exports.asyncIteration = function (test) {
 
   test.done();
 };
+
+exports.parensAfterDeclaration = function (test) {
+  TestRun(test)
+    .addError(1, 17, "Function declarations are not invocable. Wrap the whole function invocation in parens.")
+    .addError(1, 18, "Expected an assignment or function call and instead saw an expression.")
+    .test("function f () {}();");
+
+  TestRun(test)
+    .addError(1, 19, "Expected an assignment or function call and instead saw an expression.")
+    .test("function f () {}(0);");
+
+  TestRun(test)
+    .addError(1, 24, "Expected an assignment or function call and instead saw an expression.")
+    .test("function f () {}() => {};", {esversion: 6});
+
+  test.done();
+};
