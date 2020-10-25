@@ -4670,8 +4670,11 @@ var JSHINT = (function() {
       error("E008", this.name);
     }
 
-    if (state.tokens.next.id === "(" && state.tokens.next.line === state.tokens.curr.line) {
-      /* istanbul ignore next */
+    // Although the parser correctly recognizes the statement boundary in this
+    // condition, it's support for the invalid "empty grouping" expression
+    // makes it tolerant of productions such as `function f() {}();`.
+    if (state.tokens.next.id === "(" && peek().id === ")" && peek(1).id !== "=>" &&
+      state.tokens.next.line === state.tokens.curr.line) {
       error("E039");
     }
     return this;
