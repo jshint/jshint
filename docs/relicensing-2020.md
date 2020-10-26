@@ -9,10 +9,10 @@ demonstrates the legitimacy of the change.
 ## Origin: JSLint
 
 The JSLint project was first made publicly available in 2002. It was
-distributed free-of-charge, but it was licensed with the so-called [JSON
-License][1]. Code published under this license is not recognized as "free
-software" by [the Free Software Foundation][2], nor is it recognized as "open
-source" by [the Open Source Initiative][3] due to the following clause:
+distributed free-of-charge, but it was licensed with the so-called "JSON
+License" [1]. Code published under this license is not recognized as "free
+software" by the Free Software Foundation [2], nor is it recognized as "open
+source" by the Open Source Initiative [3] due to the following clause:
 
 > The Software shall be used for Good, not Evil.
 
@@ -23,7 +23,7 @@ the owner was the sole contributor to the project.
 ## The fork
 
 In 2011, another developer made improvements of their own and published the
-result as a new project named [JSHint][4]. This was permissible under the
+result as a new project named "JSHint" [4]. This was permissible under the
 terms of JSLint's license provided that the new project used the same license
 for the code it inherited.
 
@@ -31,18 +31,18 @@ The second developer continued to modify JSHint and also accepted contributions
 from others. To promote the maintainability of the source code, new features
 were occasionally introduced in distinct files that were designed to be
 included at runtime. Referred to as "modules," these files were made available
-under the terms of [the MIT "Expat" license][5]. As automated tests were written
+under the terms of the MIT "Expat" license [5]. As automated tests were written
 and included in the project, they too were licensed under MIT "Expat."
 
 In the years that followed, the JSHint project accepted direct code
 contributions from hundreds of developers. Many of these patches modified the
 original JSON-licensed file. Meanwhile, the author of JSLint permitted the
 Eclipse Foundation to relicense a version of JSLint using the MIT Expat license
-so that it could be included in their project named [Orion][6].
+so that it could be included in their project named Orion [6].
 
 ## Injecting a FOSS starting point
 
-In 2013, a user of [JSHint requested][7] that the project be relicensed. The
+In 2013, a user of JSHint requested that the project be relicensed [7]. The
 JSHint maintainers obliged via the following procedure:
 
 1. Using the git version control software, they reverted all of the changes
@@ -102,10 +102,10 @@ permitted by its contributor to be licensed using the MIT "Expat" license. The
 
 As of version 2.12.0, JSHint is a free software project.
 
-[1]: https://www.gnu.org/licenses/license-list.en.html#JSON
-[2]: https://www.fsf.org/
-[3]: https://opensource.org/licenses/alphabetical
-[4]: https://web.archive.org/web/20110224022052/http://anton.kovalyov.net/2011/02/20/why-i-forked-jslint-to-jshint/
-[5]: https://www.gnu.org/licenses/license-list.en.html#Expat
-[6]: http://git.eclipse.org/c/orion/org.eclipse.orion.client.git/tree/lib/jslint/jslint-2011-01-09.js
-[7]: https://github.com/jshint/jshint/issues/1234
+[1] https://www.gnu.org/licenses/license-list.en.html#JSON
+[2] *Ibid.*
+[3] https://opensource.org/licenses/alphabetical
+[4] https://web.archive.org/web/20110224022052/http://anton.kovalyov.net/2011/02/20/why-i-forked-jslint-to-jshint/
+[5] https://www.gnu.org/licenses/license-list.en.html#Expat
+[6] http://git.eclipse.org/c/orion/org.eclipse.orion.client.git/tree/lib/jslint/jslint-2011-01-09.js
+[7] https://github.com/jshint/jshint/issues/1234
