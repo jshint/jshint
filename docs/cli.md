@@ -88,7 +88,7 @@ a file path to another configuration file, and the path should be relative to
 the current file.
 
 For example, you might define a `.jshintrc` file in the top-level directory of
-your project (say, `./.jshintrc') to specify the [linting
+your project (say, `./.jshintrc`) to specify the [linting
 options](https://jshint.com/docs/options) you would like to use in your entire project:
 
     {
