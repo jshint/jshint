@@ -1052,7 +1052,8 @@ exports.val = {
    *    10](https://www.ecma-international.org/ecma-262/10.0/index.html).
    *    Notable additions: optional catch bindings.
    *  - `11` - To enable language features introduced by ECMAScript 11. Notable
-   *    additions: "export * as ns from 'module'".
+   *    additions: "export * as ns from 'module'" and the nullish coalescing
+   *    operator.
    */
   esversion: 5
 };

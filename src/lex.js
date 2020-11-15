@@ -249,7 +249,6 @@ Lexer.prototype = {
     case "]":
     case ":":
     case "~":
-    case "?":
       return {
         type: Token.Punctuator,
         value: ch1
@@ -288,6 +287,14 @@ Lexer.prototype = {
     // Peek more characters
 
     ch2 = this.peek(1);
+
+    if (ch1 === "?") {
+      return {
+        type: Token.Punctuator,
+        value: ch2 === "?" ? "??" : "?"
+      };
+    }
+
     ch3 = this.peek(2);
     ch4 = this.peek(3);
 
