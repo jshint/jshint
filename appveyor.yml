@@ -18,6 +18,11 @@ install:
   # they are only needed to verify correctness in a browser-like environment,
   # they can be removed (and the tests skipped) without effecting coverage.
   - if NOT "%nodejs_version%" == "10" node scripts/remove-dev-dependencies.js puppeteer
+  # This package is a transitive dependency which discontinued support for
+  # legacy Node.js versions in a patch release. Explicitly installing the
+  # compatible version as a dependency induces npm to use that version when
+  # installing modules.
+  - if NOT "%nodejs_version%" == "10" npm install --no-package-lock --save-dev cli-table@0.3.1
   - npm install
 
 build: off

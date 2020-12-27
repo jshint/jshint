@@ -7,6 +7,13 @@ before_install:
   - if [[ $(node --version) != v10* ]] ; then
       node scripts/remove-dev-dependencies.js puppeteer;
     fi
+  # This package is a transitive dependency which discontinued support for
+  # legacy Node.js versions in a patch release. Explicitly installing the
+  # compatible version as a dependency induces npm to use that version when
+  # installing modules.
+  - if [[ $(node --version) != v10* ]] ; then
+      npm install --no-package-lock --save-dev cli-table@0.3.1;
+    fi
 script:
   - npm run pretest
   - npm run $CMD
