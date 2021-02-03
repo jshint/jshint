@@ -19,8 +19,13 @@ bat = myAnimal();
 
 // Make sure we don't warn on Error, Number, etc.
 Array();
+Boolean();
+Date();
 Error();
 Number();
+/*jshint -W010 */
+Object();
+/*jshint +W010 */
+RegExp();
 String();
-Boolean();
 Symbol();
