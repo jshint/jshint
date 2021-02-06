@@ -2046,6 +2046,19 @@ exports.strict = function (test) {
     .addError(1, 6, "Missing \"use strict\" statement.")
     .test("a = 2;", { strict: "global" });
 
+  TestRun(test, "Warning location, missing semicolon (gh-3528)")
+    .addError(1, 1, "Use the function form of \"use strict\".")
+    .addError(1, 13, "Missing semicolon.")
+    .test("'use strict'\n");
+
+  TestRun(test, "Warning location among other directives")
+    .addError(2, 1, "Use the function form of \"use strict\".")
+    .test([
+      "'use another-directive';",
+      "'use strict';",
+      "'use a-third-directive';"
+    ]);
+
   test.done();
 };
 

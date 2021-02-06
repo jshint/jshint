@@ -10,7 +10,7 @@ var state = {
    * @returns {boolean}
    */
   isStrict: function() {
-    return this.directive["use strict"] || this.inClassBody ||
+    return !!this.directive["use strict"] || this.inClassBody ||
       this.option.module || this.option.strict === "implied";
   },
 
@@ -177,6 +177,10 @@ var state = {
     this.esVersion = 5;
     this.funct = null;
     this.ignored = {};
+    /**
+     * A lookup table for active directives whose keys are the value of the
+     * directives and whose values are the tokens which enabled the directives.
+     */
     this.directive = Object.create(null);
     this.jsonMode = false;
     this.lines = [];
