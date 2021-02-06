@@ -2054,8 +2054,7 @@ var JSHINT = (function() {
         error("E065", state.tokens.curr);
       }
 
-      // there's no directive negation, so always set to true
-      state.directive[directive] = true;
+      state.directive[directive] = state.tokens.curr;
 
       parseFinalSemicolon(current);
     }
@@ -6509,7 +6508,7 @@ var JSHINT = (function() {
 
         if (state.directive["use strict"]) {
           if (!state.allowsGlobalUsd()) {
-            warning("W097", state.tokens.prev);
+            warning("W097", state.directive["use strict"]);
           }
         }
 
