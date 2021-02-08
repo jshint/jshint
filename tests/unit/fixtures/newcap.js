@@ -22,6 +22,9 @@ Array();
 Boolean();
 Date();
 Error();
+/*jshint -W061 */
+Function();
+/*jshint +W061 */
 Number();
 /*jshint -W010 */
 Object();

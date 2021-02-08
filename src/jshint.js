@@ -3048,7 +3048,7 @@ var JSHINT = (function() {
       if (left.type === "(identifier)") {
         var newcapRe = /^[A-Z]([A-Z0-9_$]*[a-z][A-Za-z0-9_$]*)?$/;
         var newcapIgnore = [
-          "Array", "Boolean", "Date", "Error", "Number",
+          "Array", "Boolean", "Date", "Error", "Function", "Number",
           "Object", "RegExp", "String", "Symbol"
         ];
         if (newcapRe.test(left.value) && newcapIgnore.indexOf(left.value) === -1) {
