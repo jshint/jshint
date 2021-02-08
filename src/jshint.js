@@ -2435,6 +2435,26 @@ var JSHINT = (function() {
     return that;
   }, andPrecedence);
 
+  infix("??", function(context, left, that) {
+    if (!left.paren && (left.id === "||" || left.id === "&&")) {
+      error("E024", that, "??");
+    }
+
+    if (!state.inES11()) {
+      warning("W119", that, "nullish coalescing", "11");
+    }
+
+    increaseComplexityCount();
+    that.left = left;
+    var right = that.right = expression(context, 39);
+
+    if (!right.paren && (right.id === "||" || right.id === "&&")) {
+      error("E024", that.right, that.right.id);
+    }
+
+    return that;
+  }, 39);
+
   // The Exponentiation operator, introduced in ECMAScript 2016
   //
   // ExponentiationExpression[Yield] :
@@ -3236,6 +3256,9 @@ var JSHINT = (function() {
           // Used to cover a unary expression as the left-hand side of the
           // exponentiation operator
           (beginsUnaryExpression(ret) && state.tokens.next.id === "**") ||
+          // Used to cover a logical operator as the right-hand side of the
+          // nullish coalescing operator
+          (preceeding.id === "??" && (ret.id === "&&" || ret.id === "||")) ||
           // Used to delineate an integer number literal from a dereferencing
           // punctuator (otherwise interpreted as a decimal point)
           (ret.type === "(number)" &&
