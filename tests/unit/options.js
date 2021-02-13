@@ -3695,6 +3695,30 @@ singleGroups.nullishCoalescing = function (test) {
   test.done();
 };
 
+singleGroups.optionalChaining = function (test) {
+  var code = [
+    "new ({}?.constructor)();",
+    "({}?.toString)``;",
+    // Invalid forms:
+    "([])?.x;",
+    "([]?.x).x;",
+    "([]?.x)?.x;"
+  ];
+
+  TestRun(test)
+    .addError(1, 21, "Bad constructor.")
+    .addError(2, 15, "Expected an assignment or function call and instead saw an expression.")
+    .addError(3, 1, "Unnecessary grouping operator.")
+    .addError(3, 7, "Expected an assignment or function call and instead saw an expression.")
+    .addError(4, 1, "Unnecessary grouping operator.")
+    .addError(4, 9, "Expected an assignment or function call and instead saw an expression.")
+    .addError(5, 1, "Unnecessary grouping operator.")
+    .addError(5, 10, "Expected an assignment or function call and instead saw an expression.")
+    .test(code, { singleGroups: true, esversion: 11 });
+
+  test.done();
+};
+
 exports.elision = function (test) {
   var code = [
     "var a = [1,,2];",

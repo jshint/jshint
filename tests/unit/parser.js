@@ -10398,3 +10398,80 @@ exports.nullishCoalescing.negative = function(test) {
 
   test.done();
 };
+
+exports.optionalChaining = function (test) {
+  TestRun(test, "prior language editions")
+    .addError(1, 5, "'Optional chaining' is only available in ES11 (use 'esversion: 11').")
+    .addError(1, 7, "Expected an assignment or function call and instead saw an expression.")
+    .test(
+      "true?.x;",
+      { esversion: 10 }
+    );
+
+  TestRun(test, "literal property name")
+    .addError(1, 7, "Expected an assignment or function call and instead saw an expression.")
+    .addError(2, 5, "Expected an assignment or function call and instead saw an expression.")
+    .addError(3, 7, "Expected an assignment or function call and instead saw an expression.")
+    .test([
+        "true?.x;",
+        "[]?.x;",
+        "({}?.x);"
+      ], { esversion: 11 }
+    );
+
+  TestRun(test, "dynamic property name")
+    .addError(1, 14, "Expected an assignment or function call and instead saw an expression.")
+    .addError(2, 11, "Expected an assignment or function call and instead saw an expression.")
+    .addError(2, 7, "['x'] is better written in dot notation.")
+    .test([
+        "true?.[void 0];",
+        "true?.['x'];"
+      ], { esversion: 11 }
+    );
+
+  TestRun(test, "arguments")
+    .addError(1, 10, "Expected an assignment or function call and instead saw an expression.")
+    .addError(2, 14, "Expected an assignment or function call and instead saw an expression.")
+    .addError(3, 20, "Expected an assignment or function call and instead saw an expression.")
+    .addError(4, 15, "Expected an assignment or function call and instead saw an expression.")
+    .test([
+        "true.x?.();",
+        "true.x?.(true);",
+        "true.x?.(true, true);",
+        "true.x?.(...[]);"
+      ], { esversion: 11 }
+    );
+
+  TestRun(test, "new")
+    .addError(1, 7, "Unexpected '?.'.")
+    .test(
+      "new {}?.constructor();",
+      { esversion: 11 }
+    );
+
+  TestRun(test, "template invocation - literal property name")
+    .addError(1, 15, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, 15, "Unexpected '`'.")
+    .test(
+      "true?.toString``;",
+      { esversion: 11 }
+    );
+
+  TestRun(test, "template invocation - dynamic property name")
+    .addError(1, 15, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, 15, "Unexpected '`'.")
+    .test(
+      "true?.[void 0]``;",
+      { esversion: 11 }
+    );
+
+  TestRun(test, "ternary")
+    .addError(1, 8, "A leading decimal point can be confused with a dot: '.1'.")
+    .addError(1, 11, "Expected an assignment or function call and instead saw an expression.")
+    .test(
+      "true?.1 : null;",
+      { esversion: 11 }
+    );
+
+  test.done();
+};
