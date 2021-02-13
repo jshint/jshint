@@ -287,15 +287,23 @@ Lexer.prototype = {
     // Peek more characters
 
     ch2 = this.peek(1);
+    ch3 = this.peek(2);
 
     if (ch1 === "?") {
+      // Optional chaining
+      if (ch2 === "." && !reg.decimalDigit.test(ch3)) {
+        return {
+          type: Token.Punctuator,
+          value: "?."
+        };
+      }
+
       return {
         type: Token.Punctuator,
         value: ch2 === "?" ? "??" : "?"
       };
     }
 
-    ch3 = this.peek(2);
     ch4 = this.peek(3);
 
     // 4-character punctuator: >>>=

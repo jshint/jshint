@@ -2753,7 +2753,9 @@ var JSHINT = (function() {
           }
         }
       } else {
-        if (c.id !== "." && c.id !== "[" && c.id !== "(") {
+        if (c.id === "?." && !c.paren) {
+          error("E024", c, "?.");
+        } else if (c.id !== "." && c.id !== "[" && c.id !== "(") {
           /* istanbul ignore next */
           warning("W056", state.tokens.curr);
         }
@@ -3054,6 +3056,31 @@ var JSHINT = (function() {
     return that;
   }, 160, true);
 
+  infix("?.", function(context, left, that) {
+    if (!state.inES11()) {
+      warning("W119", state.tokens.curr, "Optional chaining", "11");
+    }
+
+
+    if (checkPunctuator(state.tokens.next, "[")) {
+      that.left = left;
+      advance();
+      that.right = state.tokens.curr.led(context, left);
+    } else if (checkPunctuator(state.tokens.next, "(")) {
+      that.left = left;
+      advance();
+      that.right = state.tokens.curr.led(context, left);
+    } else {
+      state.syntax["."].led.call(that, context, left);
+    }
+
+    if (state.tokens.next.type === "(template)") {
+      error("E024", state.tokens.next, "`");
+    }
+
+    return that;
+  }, 160, true);
+
   infix("(", function(context, left, that) {
     if (state.option.immed && left && !left.immed && left.id === "function") {
       warning("W062");
@@ -3274,7 +3301,11 @@ var JSHINT = (function() {
           (ret.type === "(number)" &&
             checkPunctuator(pn, ".") && /^\d+$/.test(ret.value)) ||
           // Used to wrap object destructuring assignment
-          (opening.beginsStmt && ret.id === "=" && ret.left.id === "{");
+          (opening.beginsStmt && ret.id === "=" && ret.left.id === "{") ||
+          // Used to allow optional chaining with other language features which
+          // are otherwise restricted.
+          (ret.id === "?." &&
+              (preceeding.id === "new" || state.tokens.next.type === "(template)"));
       }
     }
 
