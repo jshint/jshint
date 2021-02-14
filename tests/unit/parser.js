@@ -10419,6 +10419,14 @@ exports.optionalChaining = function (test) {
       ], { esversion: 11 }
     );
 
+  TestRun(test, "literal property name restriction")
+    .addError(1, 40, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, 46, "Strict violation.")
+    .test(
+      "(function() { 'use strict'; arguments?.callee; })();",
+      { esversion: 11 }
+    );
+
   TestRun(test, "dynamic property name")
     .addError(1, 14, "Expected an assignment or function call and instead saw an expression.")
     .addError(2, 11, "Expected an assignment or function call and instead saw an expression.")

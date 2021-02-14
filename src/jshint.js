@@ -3054,16 +3054,17 @@ var JSHINT = (function() {
       warning("W119", state.tokens.curr, "Optional chaining", "11");
     }
 
-    that.left = left;
 
     if (checkPunctuator(state.tokens.next, "[")) {
+      that.left = left;
       advance();
       that.right = state.tokens.curr.led(context, left);
     } else if (checkPunctuator(state.tokens.next, "(")) {
+      that.left = left;
       advance();
       that.right = state.tokens.curr.led(context, left);
     } else {
-      that.right = identifier(context, true);
+      state.syntax["."].led.call(that, context, left);
     }
 
     if (state.tokens.next.type === "(template)") {
