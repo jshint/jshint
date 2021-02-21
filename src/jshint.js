@@ -5576,10 +5576,22 @@ var JSHINT = (function() {
       }
     });
 
-    if (!mp) {
+    if (mp) {
+      return mp;
+    }
+
+    if (!checkPunctuator(state.tokens.next, "(")) {
       return state.syntax["(identifier)"].nud.call(this, context);
     }
-    return mp;
+
+    if (!state.inES11()) {
+      warning("W119", state.tokens.curr, "dynamic import", "11");
+    }
+
+    advance("(");
+    expression(context, 10);
+    advance(")");
+    return this;
   });
 
   var importSymbol = stmt("import", function(context) {
@@ -5686,8 +5698,9 @@ var JSHINT = (function() {
   importSymbol.reserved = true;
   importSymbol.meta = { isFutureReservedWord: true, es5: true };
   importSymbol.useFud = function() {
-    return !(checkPunctuator(state.tokens.next, ".") && peek().identifier);
+    return !(checkPunctuators(state.tokens.next, [".", "("]));
   };
+  importSymbol.rbp = 161;
 
   stmt("export", function(context) {
     var ok = true;
