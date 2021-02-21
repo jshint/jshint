@@ -3278,7 +3278,7 @@ var JSHINT = (function() {
       warning("W014", state.tokens.curr, state.tokens.curr.id);
     }
 
-    e = expression(context & ~prodParams.noin, 10);
+    e = expression(context & ~prodParams.noin, 0);
 
     if (e && e.type === "(string)") {
       if (!state.option.evil && (e.value === "eval" || e.value === "execScript")) {
