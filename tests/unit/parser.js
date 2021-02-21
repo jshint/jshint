@@ -1457,6 +1457,9 @@ exports.comma = function (test) {
       "}"
     ], { });
 
+  TestRun(test, "within MemberExpression")
+    .test("void [][0, 0];")
+
   test.done();
 };
 
