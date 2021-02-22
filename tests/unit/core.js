@@ -249,6 +249,15 @@ exports.testNewNonNativeObject = function (test) {
   test.done();
 };
 
+exports.testNewArrowFn = function (test) {
+  TestRun(test)
+    .addError(1, 5, "Unexpected '('.")
+    .addError(1, 12, "Bad constructor.")
+    .addError(1, 12, "Missing '()' invoking a constructor.")
+    .test("new () => {};", {esversion: 6});
+
+  test.done();
+};
 
 /**
  * Test that JSHint allows `undefined` to be a function parameter.

@@ -2364,11 +2364,14 @@ var JSHINT = (function() {
 
     return this;
   });
-  reserve("super", function() {
+
+  (function(superSymbol) {
+    superSymbol.rbp = 161;
+  })(reserve("super", function() {
     superNud.call(state.tokens.curr, this);
 
     return this;
-  });
+  }));
 
   assignop("=", "assign");
   assignop("+=", "assignadd");
@@ -2697,7 +2700,12 @@ var JSHINT = (function() {
     });
     if (mp) { return mp; }
 
+    var opening = state.tokens.next;
     var c = expression(context, 155), i;
+    if (!c.paren && c.rbp > 160) {
+      error("E024", opening, opening.value);
+    }
+
     if (c && c.id !== "function") {
       if (c.identifier) {
         switch (c.value) {
@@ -3268,7 +3276,7 @@ var JSHINT = (function() {
     return ret;
   });
 
-  application("=>");
+  application("=>").rbp = 161;
 
   infix("[", function(context, left, that) {
     var e, s, canUseDot;
