@@ -7440,6 +7440,16 @@ exports.super.superCall = function (test) {
       "}"
     ], { esversion: 8 });
 
+  TestRun(test, "as operand to `new`")
+    .addError(3, 9, "Unexpected 'super'.")
+    .test([
+      "class C {",
+      "  constructor() {",
+      "    new super();",
+      "  }",
+      "}"
+    ], { esversion: 6 });
+
   test.done();
 };
 
