@@ -2748,6 +2748,12 @@ exports.maxcomplexity = function (test) {
   TestRun(test)
     .test(src, { es3: true });
 
+  TestRun(test, "nullish coalescing operator")
+    .addError(1, 11, "This function's cyclomatic complexity is too high. (2)")
+    .test([
+      "function f() { 0 ?? 0; }"
+    ], { esversion: 11, expr: true, maxcomplexity: 1 });
+
   test.done();
 };
 
@@ -3678,6 +3684,26 @@ singleGroups.destructuringAssign = function (test) {
     .addError(5, 6, "Unnecessary grouping operator.")
     .addError(6, 9, "Unnecessary grouping operator.")
     .test(code, { esversion: 6, singleGroups: true, expr: true });
+
+  test.done();
+};
+
+singleGroups.nullishCoalescing = function (test) {
+  TestRun(test)
+    .addError(1, 1, "Unnecessary grouping operator.")
+    .addError(2, 6, "Unnecessary grouping operator.")
+    .test([
+      "(0) ?? 0;",
+      "0 ?? (0);"
+    ], { singleGroups: true, expr: true, esversion: 11 });
+
+  TestRun(test)
+    .test([
+      "0 ?? (0 || 0);",
+      "(0 ?? 0) || 0;",
+      "0 ?? (0 && 0);",
+      "(0 ?? 0) && 0;"
+    ], { singleGroups: true, expr: true, esversion: 11 });
 
   test.done();
 };

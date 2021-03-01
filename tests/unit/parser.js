@@ -10338,3 +10338,76 @@ exports.importMeta = function (test) {
 
   test.done();
 };
+
+exports.nullishCoalescing = {};
+
+exports.nullishCoalescing.positive = function(test) {
+  TestRun(test, "requires esversion: 11")
+    .addError(1, 3, "'nullish coalescing' is only available in ES11 (use 'esversion: 11').")
+    .test([
+      "0 ?? 0;"
+    ], { esversion: 10, expr: true });
+
+  TestRun(test, "does not stand alone")
+    .addError(1, 6, "Expected an assignment or function call and instead saw an expression.")
+    .test([
+      "0 ?? 0;"
+    ], { esversion: 11 });
+
+  TestRun(test, "precedence with bitwise OR")
+    .test([
+      "0 | 0 ?? 0;"
+    ], { esversion: 11, expr: true });
+
+  TestRun(test, "precedence with conditional expression")
+    .test([
+      "0 ?? 0 ? 0 ?? 0 : 0 ?? 0;"
+    ], { esversion: 11, expr: true });
+
+  TestRun(test, "precedence with expression")
+    .test([
+      "0 ?? 0, 0 ?? 0;"
+    ], { esversion: 11, expr: true });
+
+  TestRun(test, "covered")
+    .test([
+      "0 || (0 ?? 0);",
+      "(0 || 0) ?? 0;",
+      "(0 ?? 0) || 0;",
+      "0 ?? (0 || 0);",
+      "0 && (0 ?? 0);",
+      "(0 && 0) ?? 0;",
+      "(0 ?? 0) && 0;",
+      "0 ?? (0 && 0);"
+    ], { esversion: 11, expr: true });
+
+  test.done();
+};
+
+exports.nullishCoalescing.negative = function(test) {
+  TestRun(test, "precedence with logical OR")
+    .addError(1, 8, "Unexpected '??'.")
+    .test([
+      "0 || 0 ?? 0;"
+    ], { esversion: 11, expr: true });
+
+  TestRun(test, "precedence with logical OR")
+    .addError(1, 8, "Unexpected '||'.")
+    .test([
+      "0 ?? 0 || 0;"
+    ], { esversion: 11, expr: true });
+
+  TestRun(test, "precedence with logical AND")
+    .addError(1, 8, "Unexpected '??'.")
+    .test([
+      "0 && 0 ?? 0;"
+    ], { esversion: 11, expr: true });
+
+  TestRun(test, "precedence with logical AND")
+    .addError(1, 8, "Unexpected '&&'.")
+    .test([
+      "0 ?? 0 && 0;"
+    ], { esversion: 11, expr: true });
+
+  test.done();
+};
