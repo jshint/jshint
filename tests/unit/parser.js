@@ -1038,6 +1038,102 @@ exports.regexp.dotAll = function (test) {
   test.done();
 };
 
+exports.regexp.unicodePropertyEscape = function (test) {
+  TestRun(test, "requires `esversion: 9`")
+    .addError(1, 6, "'Unicode property escape' is only available in ES9 (use 'esversion: 9').")
+    .test("void /\\p{Any}/u;", { esversion: 8 });
+
+  TestRun(test, "restricted in character class ranges")
+    .addError(1, 6, "Invalid regular expression.")
+    .test("void /[--\\p{Any}]/u;", { esversion: 9 });
+
+  TestRun(test, "rejects missing delimiter")
+    .addError(1, 6, "Invalid regular expression.")
+    .test("void /\\p /u;", { esversion: 9 });
+
+  TestRun(test, "rejects omitted sequence")
+    .addError(1, 6, "Unclosed regular expression.")
+    .addError(1, 6, "Unrecoverable syntax error. (100% scanned).")
+    .test("void /\\p{Any/u;", { esversion: 9 });
+
+  TestRun(test, "rejects unterminated sequence")
+    .addError(1, 6, "Unclosed regular expression.")
+    .addError(1, 6, "Unrecoverable syntax error. (100% scanned).")
+    .test("void /\\p{Any/u;", { esversion: 9 });
+
+  TestRun(test, "rejects invalid General_Category values")
+    .addError(1, 6, "Invalid regular expression.")
+    .test("void /\\p{General_Category=Adlam}/u;", { esversion: 9 });
+
+  TestRun(test, "rejects invalid Script values")
+    .addError(1, 6, "Invalid regular expression.")
+    .test("void /\\p{Script=Cased_Letter}/u;", { esversion: 9 });
+
+  TestRun(test, "rejects invalid Script_Extensions values")
+    .addError(1, 6, "Invalid regular expression.")
+    .test("void /\\p{Script_Extensions=Cased_Letter}/u;", { esversion: 9 });
+
+  TestRun(test, "rejects Script values as shorthand")
+    .addError(1, 6, "Invalid regular expression.")
+    .test("void /\\p{Adlam}/u;", { esversion: 9 });
+
+  TestRun(test, "rejects invalid names")
+    .addError(1, 6, "Invalid regular expression.")
+    .test("void /\\p{hasOwnProperty=Cased_Letter}/u;", { esversion: 9 });
+
+  TestRun(test, "rejects invalid values")
+    .addError(1, 6, "Invalid regular expression.")
+    .test("void /\\p{hasOwnProperty}/u;", { esversion: 9 });
+
+  TestRun(test, "rejects invalid values")
+    .addError(1, 6, "Invalid regular expression.")
+    .test("void /\\p{General_Category=hasOwnProperty}/u;", { esversion: 9 });
+
+  TestRun(test, "tolerates errors without `u` flag")
+    .test([
+      "void /\\p/;",
+      "void /\\p{}/;"
+    ], { esversion: 9 });
+
+  TestRun(test, "accepts valid binary aliases")
+    .test([
+      "void /\\p{ASCII}/u;",
+      "void /\\P{ASCII}/u;",
+    ], { esversion: 9 });
+
+  TestRun(test, "accepts valid General_Category values")
+    .test([
+      "void /\\p{General_Category=Cased_Letter}/u;",
+      "void /\\p{gc=Cased_Letter}/u;",
+      "void /\\P{General_Category=Cased_Letter}/u;",
+      "void /\\P{gc=Cased_Letter}/u;"
+    ], { esversion: 9 });
+
+  TestRun(test, "accepts General_Category values shorthand")
+    .test([
+      "void /\\p{Cased_Letter}/u;",
+      "void /\\P{Cased_Letter}/u;"
+    ], { esversion: 9 });
+
+  TestRun(test, "accepts valid Script values")
+    .test([
+      "void /\\p{Script=Adlam}/u;",
+      "void /\\p{sc=Adlam}/u;",
+      "void /\\P{Script=Adlam}/u;",
+      "void /\\P{sc=Adlam}/u;"
+    ], { esversion: 9 });
+
+  TestRun(test, "accepts valid Script_Extensions values")
+    .test([
+      "void /\\p{Script_Extensions=Adlam}/u;",
+      "void /\\p{scx=Adlam}/u;",
+      "void /\\P{Script_Extensions=Adlam}/u;",
+      "void /\\P{scx=Adlam}/u;"
+    ], { esversion: 9 });
+
+  test.done();
+};
+
 exports.regexp.regressions = function (test) {
   // GH-536
   TestRun(test).test("str /= 5;", {es3: true}, { str: true });
