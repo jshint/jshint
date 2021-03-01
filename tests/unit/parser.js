@@ -1081,6 +1081,10 @@ exports.regexp.unicodePropertyEscape = function (test) {
     .addError(1, 6, "Invalid regular expression.")
     .test("void /\\p{hasOwnProperty}/u;", { esversion: 9 });
 
+  TestRun(test, "rejects invalid values")
+    .addError(1, 6, "Invalid regular expression.")
+    .test("void /\\p{General_Category=hasOwnProperty}/u;", { esversion: 9 });
+
   TestRun(test, "tolerates errors without `u` flag")
     .test([
       "void /\\p/;",
