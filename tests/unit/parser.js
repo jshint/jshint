@@ -1077,6 +1077,10 @@ exports.regexp.unicodePropertyEscape = function (test) {
     .addError(1, 6, "Invalid regular expression.")
     .test("void /\\p{Adlam}/u;", { esversion: 9 });
 
+  TestRun(test, "rejects invalid names")
+    .addError(1, 6, "Invalid regular expression.")
+    .test("void /\\p{hasOwnProperty=Cased_Letter}/u;", { esversion: 9 });
+
   TestRun(test, "rejects invalid values")
     .addError(1, 6, "Invalid regular expression.")
     .test("void /\\p{hasOwnProperty}/u;", { esversion: 9 });
