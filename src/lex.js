@@ -1440,6 +1440,60 @@ Lexer.prototype = {
         }
       }
 
+      if (char === "p" || char === "P") {
+        var y = index + 2;
+        sequence = "";
+        next = "";
+
+        if (this.peek(index + 1) === "{") {
+          next = this.peek(y);
+          while (next && next !== "}") {
+            sequence += next;
+            y += 1;
+            next = this.peek(y);
+          }
+        }
+
+        // Module loading is intentionally deferred as an optimization for
+        // Node.js users who do not use Unicode escape sequences.
+        if (!sequence || !require("./validate-unicode-escape-sequence")(sequence)) {
+          this.triggerAsync(
+            "error",
+            {
+              code: "E016",
+              line: this.line,
+              character: this.char,
+              data: [ "Invalid Unicode property escape sequence" ]
+            },
+            checks,
+            hasUFlag
+          );
+        }
+
+        if (sequence) {
+          sequence = char + "{" + sequence + "}";
+          body += sequence;
+          value += sequence;
+          index = y + 1;
+
+          if (!state.inES9()) {
+            this.triggerAsync(
+              "warning",
+              {
+                code: "W119",
+                line: this.line,
+                character: this.char,
+                data: [ "Unicode property escape", "9" ]
+              },
+              checks,
+              hasUFlag
+            );
+          }
+
+          return sequence;
+        }
+      }
+
       // Unexpected control character
       if (char < " ") {
         malformed = true;

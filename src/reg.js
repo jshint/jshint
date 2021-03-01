@@ -51,7 +51,7 @@ exports.regexpQuantifiers = /[*+?{]/;
 
 exports.regexpControlEscapes = /[fnrtv]/;
 
-exports.regexpCharClasses = /[dDsSwW]/;
+exports.regexpCharClasses = /[dDsSwWpP]/;
 
 // Identifies the "dot" atom in regular expressions
 exports.regexpDot = /(^|[^\\])(\\\\)*\./;
