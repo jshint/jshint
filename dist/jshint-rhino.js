@@ -1,6 +1,6 @@
 #!/usr/bin/env rhino
 var window = {};
-/*! 2.12.0 */
+/*! 2.13.0 */
 var JSHINT;
 if (typeof window === 'undefined') window = {};
 (function () {
@@ -1026,7 +1026,104 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":7,"_process":11,"inherits":6}],9:[function(require,module,exports){
+},{"./support/isBuffer":7,"_process":13,"inherits":6}],9:[function(require,module,exports){
+(function (global){
+/*global window, global*/
+var util = require("util")
+var assert = require("assert")
+var now = require("date-now")
+
+var slice = Array.prototype.slice
+var console
+var times = {}
+
+if (typeof global !== "undefined" && global.console) {
+    console = global.console
+} else if (typeof window !== "undefined" && window.console) {
+    console = window.console
+} else {
+    console = {}
+}
+
+var functions = [
+    [log, "log"],
+    [info, "info"],
+    [warn, "warn"],
+    [error, "error"],
+    [time, "time"],
+    [timeEnd, "timeEnd"],
+    [trace, "trace"],
+    [dir, "dir"],
+    [consoleAssert, "assert"]
+]
+
+for (var i = 0; i < functions.length; i++) {
+    var tuple = functions[i]
+    var f = tuple[0]
+    var name = tuple[1]
+
+    if (!console[name]) {
+        console[name] = f
+    }
+}
+
+module.exports = console
+
+function log() {}
+
+function info() {
+    console.log.apply(console, arguments)
+}
+
+function warn() {
+    console.log.apply(console, arguments)
+}
+
+function error() {
+    console.warn.apply(console, arguments)
+}
+
+function time(label) {
+    times[label] = now()
+}
+
+function timeEnd(label) {
+    var time = times[label]
+    if (!time) {
+        throw new Error("No such label: " + label)
+    }
+
+    var duration = now() - time
+    console.log(label + ": " + duration + "ms")
+}
+
+function trace() {
+    var err = new Error()
+    err.name = "Trace"
+    err.message = util.format.apply(null, arguments)
+    console.error(err.stack)
+}
+
+function dir(object) {
+    console.log(util.inspect(object) + "\n")
+}
+
+function consoleAssert(expression) {
+    if (!expression) {
+        var arr = slice.call(arguments, 1)
+        assert.ok(false, util.format.apply(null, arr))
+    }
+}
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"assert":5,"date-now":10,"util":16}],10:[function(require,module,exports){
+module.exports = now
+
+function now() {
+    return new Date().getTime()
+}
+
+},{}],11:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1329,170 +1426,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],10:[function(require,module,exports){
-arguments[4][6][0].apply(exports,arguments)
-},{"dup":6}],11:[function(require,module,exports){
-// shim for using process in browser
-
-var process = module.exports = {};
-var queue = [];
-var draining = false;
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    draining = true;
-    var currentQueue;
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        var i = -1;
-        while (++i < len) {
-            currentQueue[i]();
-        }
-        len = queue.length;
-    }
-    draining = false;
-}
-process.nextTick = function (fun) {
-    queue.push(fun);
-    if (!draining) {
-        setTimeout(drainQueue, 0);
-    }
-};
-
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-// TODO(shtylman)
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
 },{}],12:[function(require,module,exports){
-arguments[4][7][0].apply(exports,arguments)
-},{"dup":7}],13:[function(require,module,exports){
-arguments[4][8][0].apply(exports,arguments)
-},{"./support/isBuffer":12,"_process":11,"dup":8,"inherits":10}],14:[function(require,module,exports){
-(function (global){
-/*global window, global*/
-var util = require("util")
-var assert = require("assert")
-var now = require("date-now")
-
-var slice = Array.prototype.slice
-var console
-var times = {}
-
-if (typeof global !== "undefined" && global.console) {
-    console = global.console
-} else if (typeof window !== "undefined" && window.console) {
-    console = window.console
-} else {
-    console = {}
-}
-
-var functions = [
-    [log, "log"],
-    [info, "info"],
-    [warn, "warn"],
-    [error, "error"],
-    [time, "time"],
-    [timeEnd, "timeEnd"],
-    [trace, "trace"],
-    [dir, "dir"],
-    [consoleAssert, "assert"]
-]
-
-for (var i = 0; i < functions.length; i++) {
-    var tuple = functions[i]
-    var f = tuple[0]
-    var name = tuple[1]
-
-    if (!console[name]) {
-        console[name] = f
-    }
-}
-
-module.exports = console
-
-function log() {}
-
-function info() {
-    console.log.apply(console, arguments)
-}
-
-function warn() {
-    console.log.apply(console, arguments)
-}
-
-function error() {
-    console.warn.apply(console, arguments)
-}
-
-function time(label) {
-    times[label] = now()
-}
-
-function timeEnd(label) {
-    var time = times[label]
-    if (!time) {
-        throw new Error("No such label: " + label)
-    }
-
-    var duration = now() - time
-    console.log(label + ": " + duration + "ms")
-}
-
-function trace() {
-    var err = new Error()
-    err.name = "Trace"
-    err.message = util.format.apply(null, arguments)
-    console.error(err.stack)
-}
-
-function dir(object) {
-    console.log(util.inspect(object) + "\n")
-}
-
-function consoleAssert(expression) {
-    if (!expression) {
-        var arr = slice.call(arguments, 1)
-        assert.ok(false, util.format.apply(null, arr))
-    }
-}
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"assert":5,"date-now":15,"util":13}],15:[function(require,module,exports){
-module.exports = now
-
-function now() {
-    return new Date().getTime()
-}
-
-},{}],16:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -1508,7 +1442,7 @@ function now() {
   var undefined;
 
   /** Used as the semantic version number. */
-  var VERSION = '4.17.19';
+  var VERSION = '4.17.20';
 
   /** Used as the size to enable large array optimizations. */
   var LARGE_ARRAY_SIZE = 200;
@@ -17084,7 +17018,7 @@ function now() {
      * // => [{ 'a': 4, 'b': 5, 'c': 6 }]
      *
      * // Checking for several possible values
-     * _.filter(users, _.overSome([_.matches({ 'a': 1 }), _.matches({ 'a': 4 })]));
+     * _.filter(objects, _.overSome([_.matches({ 'a': 1 }), _.matches({ 'a': 4 })]));
      * // => [{ 'a': 1, 'b': 2, 'c': 3 }, { 'a': 4, 'b': 5, 'c': 6 }]
      */
     function matches(source) {
@@ -17121,7 +17055,7 @@ function now() {
      * // => { 'a': 4, 'b': 5, 'c': 6 }
      *
      * // Checking for several possible values
-     * _.filter(users, _.overSome([_.matchesProperty('a', 1), _.matchesProperty('a', 4)]));
+     * _.filter(objects, _.overSome([_.matchesProperty('a', 1), _.matchesProperty('a', 4)]));
      * // => [{ 'a': 1, 'b': 2, 'c': 3 }, { 'a': 4, 'b': 5, 'c': 6 }]
      */
     function matchesProperty(path, srcValue) {
@@ -18657,7 +18591,73 @@ function now() {
 }.call(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],17:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+var queue = [];
+var draining = false;
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    draining = true;
+    var currentQueue;
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        var i = -1;
+        while (++i < len) {
+            currentQueue[i]();
+        }
+        len = queue.length;
+    }
+    draining = false;
+}
+process.nextTick = function (fun) {
+    queue.push(fun);
+    if (!draining) {
+        setTimeout(drainQueue, 0);
+    }
+};
+
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+// TODO(shtylman)
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],14:[function(require,module,exports){
+arguments[4][6][0].apply(exports,arguments)
+},{"dup":6}],15:[function(require,module,exports){
+arguments[4][7][0].apply(exports,arguments)
+},{"dup":7}],16:[function(require,module,exports){
+arguments[4][8][0].apply(exports,arguments)
+},{"./support/isBuffer":15,"_process":13,"dup":8,"inherits":14}],17:[function(require,module,exports){
 /*
  * Lexical analysis and token construction.
  */
@@ -18909,7 +18909,6 @@ Lexer.prototype = {
     case "]":
     case ":":
     case "~":
-    case "?":
       return {
         type: Token.Punctuator,
         value: ch1
@@ -18949,6 +18948,22 @@ Lexer.prototype = {
 
     ch2 = this.peek(1);
     ch3 = this.peek(2);
+
+    if (ch1 === "?") {
+      // Optional chaining
+      if (ch2 === "." && !reg.decimalDigit.test(ch3)) {
+        return {
+          type: Token.Punctuator,
+          value: "?."
+        };
+      }
+
+      return {
+        type: Token.Punctuator,
+        value: ch2 === "?" ? "??" : "?"
+      };
+    }
+
     ch4 = this.peek(3);
 
     // 4-character punctuator: >>>=
@@ -19534,19 +19549,17 @@ Lexer.prototype = {
 
       if (isAllowedDigit !== isDecimalDigit || isBigInt) {
         if (isBigInt) {
-          if (!state.option.unstable.bigint) {
-            this.triggerAsync(
-              "warning",
-              {
-                code: "W144",
-                line: this.line,
-                character: this.char,
-                data: [ "BigInt", "bigint" ]
-              },
-              checks,
-              function() { return true; }
-            );
-          }
+          this.triggerAsync(
+            "warning",
+            {
+              code: "W119",
+              line: this.line,
+              character: this.char,
+              data: [ "BigInt", "11" ]
+            },
+            checks,
+            function() { return !state.inES11(); }
+          );
 
           if (isLegacy || isNonOctal) {
             this.triggerAsync(
@@ -20096,6 +20109,60 @@ Lexer.prototype = {
           body += sequence;
           value += sequence;
           index = x + 1;
+          return sequence;
+        }
+      }
+
+      if (char === "p" || char === "P") {
+        var y = index + 2;
+        sequence = "";
+        next = "";
+
+        if (this.peek(index + 1) === "{") {
+          next = this.peek(y);
+          while (next && next !== "}") {
+            sequence += next;
+            y += 1;
+            next = this.peek(y);
+          }
+        }
+
+        // Module loading is intentionally deferred as an optimization for
+        // Node.js users who do not use Unicode escape sequences.
+        if (!sequence || !require("./validate-unicode-escape-sequence")(sequence)) {
+          this.triggerAsync(
+            "error",
+            {
+              code: "E016",
+              line: this.line,
+              character: this.char,
+              data: [ "Invalid Unicode property escape sequence" ]
+            },
+            checks,
+            hasUFlag
+          );
+        }
+
+        if (sequence) {
+          sequence = char + "{" + sequence + "}";
+          body += sequence;
+          value += sequence;
+          index = y + 1;
+
+          if (!state.inES9()) {
+            this.triggerAsync(
+              "warning",
+              {
+                code: "W119",
+                line: this.line,
+                character: this.char,
+                data: [ "Unicode property escape", "9" ]
+              },
+              checks,
+              hasUFlag
+            );
+          }
+
           return sequence;
         }
       }
@@ -20899,7 +20966,7 @@ Lexer.prototype = {
 exports.Lexer = Lexer;
 exports.Context = Context;
 
-},{"../data/ascii-identifier-data.js":1,"../data/es5-identifier-names.js":2,"../data/non-ascii-identifier-part-only.js":3,"../data/non-ascii-identifier-start.js":4,"./reg.js":22,"./state.js":24,"events":9,"lodash":16}],18:[function(require,module,exports){
+},{"../data/ascii-identifier-data.js":1,"../data/es5-identifier-names.js":2,"../data/non-ascii-identifier-part-only.js":3,"../data/non-ascii-identifier-start.js":4,"./reg.js":22,"./state.js":24,"./validate-unicode-escape-sequence":26,"events":11,"lodash":12}],18:[function(require,module,exports){
 "use strict";
 
 var _ = require("lodash");
@@ -20986,7 +21053,9 @@ var errors = {
     "enable strict mode.",
   E066: "Asynchronous iteration is only available with for-of loops.",
   E067: "Malformed numeric literal: '{a}'.",
-  E068: "Decimals with leading zeros are not allowed in strict mode."
+  E068: "Decimals with leading zeros are not allowed in strict mode.",
+  E069: "Duplicate exported binding: '{a}'.",
+  E070: "import.meta may only be used in module code."
 };
 
 var warnings = {
@@ -21170,7 +21239,7 @@ _.each(info, function(desc, code) {
   exports.info[code] = { code: code, desc: desc };
 });
 
-},{"lodash":16}],19:[function(require,module,exports){
+},{"lodash":12}],19:[function(require,module,exports){
 /**
  * The NameStack class is used to approximate function name inference as
  * introduced by ECMAScript 2015. In that edition, the `name` property of
@@ -22317,9 +22386,12 @@ exports.val = {
    *    9](https://www.ecma-international.org/ecma-262/9.0/index.html). Notable
    *    additions: asynchronous iteration, rest/spread properties, and various
    *    RegExp extensions
-   *  - `10` - To enable language features introduced by ECMAScript
+   *  - `10` - To enable language features introduced by [ECMAScript
    *    10](https://www.ecma-international.org/ecma-262/10.0/index.html).
    *    Notable additions: optional catch bindings.
+   *  - `11` - To enable language features introduced by ECMAScript 11. Notable
+   *    additions: "export * as ns from 'module'", `import.meta`, the nullish
+   *    coalescing operator, and optional chaining, and dynamic import.
    */
   esversion: 5
 };
@@ -22331,17 +22403,6 @@ exports.val = {
  * right to remove or modify them between major version releases.
  */
 exports.unstable = {
-  /**
-   * [The BigInt proposal](https://github.com/tc39/proposal-bigint) extends the
-   * language's grammer for numeric literals to support integer values of
-   * arbitrary precision. It also introduces a new value of the `typeof`
-   * operator, "bigint".
-   *
-   * Mathematical operations which use both BigInt and traditional ECMAScript
-   * Number values may not have the intended effect. Due to the weakly-typed
-   * nature of the language, JSHint is unable to identify such cases.
-   */
-  bigint: true
 };
 
 // These are JSHint boolean options which are shared with JSLint
@@ -22498,7 +22559,7 @@ exports.regexpQuantifiers = /[*+?{]/;
 
 exports.regexpControlEscapes = /[fnrtv]/;
 
-exports.regexpCharClasses = /[dDsSwW]/;
+exports.regexpCharClasses = /[dDsSwWpP]/;
 
 // Identifies the "dot" atom in regular expressions
 exports.regexpDot = /(^|[^\\])(\\\\)*\./;
@@ -22570,6 +22631,7 @@ var scopeManager = function(state, predefined, exported, declared) {
   var usedPredefinedAndGlobals = Object.create(null);
   var impliedGlobals = Object.create(null);
   var unuseds = [];
+  var esModuleExports = [];
   var emitter = new events.EventEmitter();
 
   function warning(code, token) {
@@ -23043,8 +23105,9 @@ var scopeManager = function(state, predefined, exported, declared) {
         if (usage["(onlyUsedSubFunction)"]) {
           _latedefWarning(type, bindingName, token);
         } else {
-          // this is a clear illegal usage for block scoped variables
-          warning("E056", token, bindingName, type);
+          // this is a clear illegal usage, but not a syntax error, so emit a
+          // warning and not an error
+          warning("W003", token, bindingName);
         }
       }
     },
@@ -23200,8 +23263,18 @@ var scopeManager = function(state, predefined, exported, declared) {
      * @param {string} bindingName - the value of the identifier
      * @param {object} token
      */
-    setExported: function(bindingName, token) {
-      this.block.use(bindingName, token);
+    setExported: function(localName, exportName) {
+      if (exportName) {
+        if (esModuleExports.indexOf(exportName.value) > -1) {
+          error("E069", exportName, exportName.value);
+        }
+
+        esModuleExports.push(exportName.value);
+      }
+
+      if (localName) {
+        this.block.use(localName.value, localName);
+      }
     },
 
     /**
@@ -23542,7 +23615,7 @@ var scopeManager = function(state, predefined, exported, declared) {
 
 module.exports = scopeManager;
 
-},{"events":9,"lodash":16}],24:[function(require,module,exports){
+},{"events":11,"lodash":12}],24:[function(require,module,exports){
 "use strict";
 var NameStack = require("./name-stack.js");
 
@@ -23555,7 +23628,7 @@ var state = {
    * @returns {boolean}
    */
   isStrict: function() {
-    return this.directive["use strict"] || this.inClassBody ||
+    return !!this.directive["use strict"] || this.inClassBody ||
       this.option.module || this.option.strict === "implied";
   },
 
@@ -23608,6 +23681,15 @@ var state = {
 
   inMoz: function() {
     return this.option.moz;
+  },
+
+  /**
+   * Determine if constructs introduced in ECMAScript 11 should be accepted.
+   *
+   * @returns {boolean}
+   */
+  inES11: function() {
+    return this.esVersion >= 11;
   },
 
   /**
@@ -23722,6 +23804,10 @@ var state = {
     this.esVersion = 5;
     this.funct = null;
     this.ignored = {};
+    /**
+     * A lookup table for active directives whose keys are the value of the
+     * directives and whose values are the tokens which enabled the directives.
+     */
     this.directive = Object.create(null);
     this.jsonMode = false;
     this.lines = [];
@@ -23883,6 +23969,542 @@ exports.register = function(linter) {
 };
 
 },{}],26:[function(require,module,exports){
+/*
+ * Determine whether a given string is a valid UnicodePropertyValueExpression.
+ */
+
+"use strict";
+
+module.exports = function validate(sequence) {
+  var equalSignIndex = sequence.indexOf("=");
+
+  if (equalSignIndex === -1) {
+    return sequence in names.binary || sequence in values.general;
+  }
+
+  var name = sequence.substr(0, equalSignIndex);
+  var value = sequence.substr(equalSignIndex + 1);
+
+  if (name === "General_Category" || name === "gc") {
+    return value in values.general;
+  } if (name === "Script" || name === "sc" || name === "Script_Extensions" || name === "scx") {
+    return value in values.script;
+  }
+
+  return false;
+};
+
+
+var names = {
+  nonBinary: Object.create(null),
+  binary: Object.create(null)
+};
+var values = {
+  general: Object.create(null),
+  script: Object.create(null)
+};
+
+var nb = names.nonBinary;
+nb.General_Category = true;
+nb.gc = true;
+nb.Script = true;
+nb.sc = true;
+nb.Script_Extensions = true;
+nb.scx = true;
+
+var b = names.binary;
+b.ASCII = true;
+b.ASCII_Hex_Digit = true;
+b.AHex = true;
+b.Alphabetic = true;
+b.Alpha = true;
+b.Any = true;
+b.Assigned = true;
+b.Bidi_Control = true;
+b.Bidi_C = true;
+b.Bidi_Mirrored = true;
+b.Bidi_M = true;
+b.Case_Ignorable = true;
+b.CI = true;
+b.Cased = true;
+b.Changes_When_Casefolded = true;
+b.CWCF = true;
+b.Changes_When_Casemapped = true;
+b.CWCM = true;
+b.Changes_When_Lowercased = true;
+b.CWL = true;
+b.Changes_When_NFKC_Casefolded = true;
+b.CWKCF = true;
+b.Changes_When_Titlecased = true;
+b.CWT = true;
+b.Changes_When_Uppercased = true;
+b.CWU = true;
+b.Dash = true;
+b.Default_Ignorable_Code_Point = true;
+b.DI = true;
+b.Deprecated = true;
+b.Dep = true;
+b.Diacritic = true;
+b.Dia = true;
+b.Emoji = true;
+b.Emoji_Component = true;
+b.EComp = true;
+b.Emoji_Modifier = true;
+b.EMod = true;
+b.Emoji_Modifier_Base = true;
+b.EBase = true;
+b.Emoji_Presentation = true;
+b.EPres = true;
+b.Extended_Pictographic = true;
+b.ExtPict = true;
+b.Extender = true;
+b.Ext = true;
+b.Grapheme_Base = true;
+b.Gr_Base = true;
+b.Grapheme_Extend = true;
+b.Gr_Ext = true;
+b.Hex_Digit = true;
+b.Hex = true;
+b.IDS_Binary_Operator = true;
+b.IDSB = true;
+b.IDS_Trinary_Operator = true;
+b.IDST = true;
+b.ID_Continue = true;
+b.IDC = true;
+b.ID_Start = true;
+b.IDS = true;
+b.Ideographic = true;
+b.Ideo = true;
+b.Join_Control = true;
+b.Join_C = true;
+b.Logical_Order_Exception = true;
+b.LOE = true;
+b.Lowercase = true;
+b.Lower = true;
+b.Math = true;
+b.Noncharacter_Code_Point = true;
+b.NChar = true;
+b.Pattern_Syntax = true;
+b.Pat_Syn = true;
+b.Pattern_White_Space = true;
+b.Pat_WS = true;
+b.Quotation_Mark = true;
+b.QMark = true;
+b.Radical = true;
+b.Regional_Indicator = true;
+b.RI = true;
+b.Sentence_Terminal = true;
+b.STerm = true;
+b.Soft_Dotted = true;
+b.SD = true;
+b.Terminal_Punctuation = true;
+b.Term = true;
+b.Unified_Ideograph = true;
+b.UIdeo = true;
+b.Uppercase = true;
+b.Upper = true;
+b.Variation_Selector = true;
+b.VS = true;
+b.White_Space = true;
+b.space = true;
+b.XID_Continue = true;
+b.XIDC = true;
+b.XID_Start = true;
+b.XIDS = true;
+
+var g = values.general;
+g.Cased_Letter = true;
+g.LC = true;
+g.Close_Punctuation = true;
+g.Pe = true;
+g.Connector_Punctuation = true;
+g.Pc = true;
+g.Control = true;
+g.Cc = true;
+g.cntrl = true;
+g.Currency_Symbol = true;
+g.Sc = true;
+g.Dash_Punctuation = true;
+g.Pd = true;
+g.Decimal_Number = true;
+g.Nd = true;
+g.digit = true;
+g.Enclosing_Mark = true;
+g.Me = true;
+g.Final_Punctuation = true;
+g.Pf = true;
+g.Format = true;
+g.Cf = true;
+g.Initial_Punctuation = true;
+g.Pi = true;
+g.Letter = true;
+g.L = true;
+g.Letter_Number = true;
+g.Nl = true;
+g.Line_Separator = true;
+g.Zl = true;
+g.Lowercase_Letter = true;
+g.Ll = true;
+g.Mark = true;
+g.M = true;
+g.Combining_Mark = true;
+g.Math_Symbol = true;
+g.Sm = true;
+g.Modifier_Letter = true;
+g.Lm = true;
+g.Modifier_Symbol = true;
+g.Sk = true;
+g.Nonspacing_Mark = true;
+g.Mn = true;
+g.Number = true;
+g.N = true;
+g.Open_Punctuation = true;
+g.Ps = true;
+g.Other = true;
+g.C = true;
+g.Other_Letter = true;
+g.Lo = true;
+g.Other_Number = true;
+g.No = true;
+g.Other_Punctuation = true;
+g.Po = true;
+g.Other_Symbol = true;
+g.So = true;
+g.Paragraph_Separator = true;
+g.Zp = true;
+g.Private_Use = true;
+g.Co = true;
+g.Punctuation = true;
+g.P = true;
+g.punct = true;
+g.Separator = true;
+g.Z = true;
+g.Space_Separator = true;
+g.Zs = true;
+g.Spacing_Mark = true;
+g.Mc = true;
+g.Surrogate = true;
+g.Cs = true;
+g.Symbol = true;
+g.S = true;
+g.Titlecase_Letter = true;
+g.Lt = true;
+g.Unassigned = true;
+g.Cn = true;
+g.Uppercase_Letter = true;
+g.Lu = true;
+
+var s = values.script;
+s.Adlam = true;
+s.Adlm = true;
+s.Ahom = true;
+s.Anatolian_Hieroglyphs = true;
+s.Hluw = true;
+s.Arabic = true;
+s.Arab = true;
+s.Armenian = true;
+s.Armn = true;
+s.Avestan = true;
+s.Avst = true;
+s.Balinese = true;
+s.Bali = true;
+s.Bamum = true;
+s.Bamu = true;
+s.Bassa_Vah = true;
+s.Bass = true;
+s.Batak = true;
+s.Batk = true;
+s.Bengali = true;
+s.Beng = true;
+s.Bhaiksuki = true;
+s.Bhks = true;
+s.Bopomofo = true;
+s.Bopo = true;
+s.Brahmi = true;
+s.Brah = true;
+s.Braille = true;
+s.Brai = true;
+s.Buginese = true;
+s.Bugi = true;
+s.Buhid = true;
+s.Buhd = true;
+s.Canadian_Aboriginal = true;
+s.Cans = true;
+s.Carian = true;
+s.Cari = true;
+s.Caucasian_Albanian = true;
+s.Aghb = true;
+s.Chakma = true;
+s.Cakm = true;
+s.Cham = true;
+s.Chorasmian = true;
+s.Chrs = true;
+s.Cherokee = true;
+s.Cher = true;
+s.Common = true;
+s.Zyyy = true;
+s.Coptic = true;
+s.Copt = true;
+s.Qaac = true;
+s.Cuneiform = true;
+s.Xsux = true;
+s.Cypriot = true;
+s.Cprt = true;
+s.Cyrillic = true;
+s.Cyrl = true;
+s.Deseret = true;
+s.Dsrt = true;
+s.Devanagari = true;
+s.Deva = true;
+s.Dives_Akuru = true;
+s.Diak = true;
+s.Dogra = true;
+s.Dogr = true;
+s.Duployan = true;
+s.Dupl = true;
+s.Egyptian_Hieroglyphs = true;
+s.Egyp = true;
+s.Elbasan = true;
+s.Elba = true;
+s.Elymaic = true;
+s.Elym = true;
+s.Ethiopic = true;
+s.Ethi = true;
+s.Georgian = true;
+s.Geor = true;
+s.Glagolitic = true;
+s.Glag = true;
+s.Gothic = true;
+s.Goth = true;
+s.Grantha = true;
+s.Gran = true;
+s.Greek = true;
+s.Grek = true;
+s.Gujarati = true;
+s.Gujr = true;
+s.Gunjala_Gondi = true;
+s.Gong = true;
+s.Gurmukhi = true;
+s.Guru = true;
+s.Han = true;
+s.Hani = true;
+s.Hangul = true;
+s.Hang = true;
+s.Hanifi_Rohingya = true;
+s.Rohg = true;
+s.Hanunoo = true;
+s.Hano = true;
+s.Hatran = true;
+s.Hatr = true;
+s.Hebrew = true;
+s.Hebr = true;
+s.Hiragana = true;
+s.Hira = true;
+s.Imperial_Aramaic = true;
+s.Armi = true;
+s.Inherited = true;
+s.Zinh = true;
+s.Qaai = true;
+s.Inscriptional_Pahlavi = true;
+s.Phli = true;
+s.Inscriptional_Parthian = true;
+s.Prti = true;
+s.Javanese = true;
+s.Java = true;
+s.Kaithi = true;
+s.Kthi = true;
+s.Kannada = true;
+s.Knda = true;
+s.Katakana = true;
+s.Kana = true;
+s.Kayah_Li = true;
+s.Kali = true;
+s.Kharoshthi = true;
+s.Khar = true;
+s.Khitan_Small_Script = true;
+s.Kits = true;
+s.Khmer = true;
+s.Khmr = true;
+s.Khojki = true;
+s.Khoj = true;
+s.Khudawadi = true;
+s.Sind = true;
+s.Lao = true;
+s.Laoo = true;
+s.Latin = true;
+s.Latn = true;
+s.Lepcha = true;
+s.Lepc = true;
+s.Limbu = true;
+s.Limb = true;
+s.Linear_A = true;
+s.Lina = true;
+s.Linear_B = true;
+s.Linb = true;
+s.Lisu = true;
+s.Lycian = true;
+s.Lyci = true;
+s.Lydian = true;
+s.Lydi = true;
+s.Mahajani = true;
+s.Mahj = true;
+s.Makasar = true;
+s.Maka = true;
+s.Malayalam = true;
+s.Mlym = true;
+s.Mandaic = true;
+s.Mand = true;
+s.Manichaean = true;
+s.Mani = true;
+s.Marchen = true;
+s.Marc = true;
+s.Medefaidrin = true;
+s.Medf = true;
+s.Masaram_Gondi = true;
+s.Gonm = true;
+s.Meetei_Mayek = true;
+s.Mtei = true;
+s.Mende_Kikakui = true;
+s.Mend = true;
+s.Meroitic_Cursive = true;
+s.Merc = true;
+s.Meroitic_Hieroglyphs = true;
+s.Mero = true;
+s.Miao = true;
+s.Plrd = true;
+s.Modi = true;
+s.Mongolian = true;
+s.Mong = true;
+s.Mro = true;
+s.Mroo = true;
+s.Multani = true;
+s.Mult = true;
+s.Myanmar = true;
+s.Mymr = true;
+s.Nabataean = true;
+s.Nbat = true;
+s.Nandinagari = true;
+s.Nand = true;
+s.New_Tai_Lue = true;
+s.Talu = true;
+s.Newa = true;
+s.Nko = true;
+s.Nkoo = true;
+s.Nushu = true;
+s.Nshu = true;
+s.Nyiakeng_Puachue_Hmong = true;
+s.Hmnp = true;
+s.Ogham = true;
+s.Ogam = true;
+s.Ol_Chiki = true;
+s.Olck = true;
+s.Old_Hungarian = true;
+s.Hung = true;
+s.Old_Italic = true;
+s.Ital = true;
+s.Old_North_Arabian = true;
+s.Narb = true;
+s.Old_Permic = true;
+s.Perm = true;
+s.Old_Persian = true;
+s.Xpeo = true;
+s.Old_Sogdian = true;
+s.Sogo = true;
+s.Old_South_Arabian = true;
+s.Sarb = true;
+s.Old_Turkic = true;
+s.Orkh = true;
+s.Oriya = true;
+s.Orya = true;
+s.Osage = true;
+s.Osge = true;
+s.Osmanya = true;
+s.Osma = true;
+s.Pahawh_Hmong = true;
+s.Hmng = true;
+s.Palmyrene = true;
+s.Palm = true;
+s.Pau_Cin_Hau = true;
+s.Pauc = true;
+s.Phags_Pa = true;
+s.Phag = true;
+s.Phoenician = true;
+s.Phnx = true;
+s.Psalter_Pahlavi = true;
+s.Phlp = true;
+s.Rejang = true;
+s.Rjng = true;
+s.Runic = true;
+s.Runr = true;
+s.Samaritan = true;
+s.Samr = true;
+s.Saurashtra = true;
+s.Saur = true;
+s.Sharada = true;
+s.Shrd = true;
+s.Shavian = true;
+s.Shaw = true;
+s.Siddham = true;
+s.Sidd = true;
+s.SignWriting = true;
+s.Sgnw = true;
+s.Sinhala = true;
+s.Sinh = true;
+s.Sogdian = true;
+s.Sogd = true;
+s.Sora_Sompeng = true;
+s.Sora = true;
+s.Soyombo = true;
+s.Soyo = true;
+s.Sundanese = true;
+s.Sund = true;
+s.Syloti_Nagri = true;
+s.Sylo = true;
+s.Syriac = true;
+s.Syrc = true;
+s.Tagalog = true;
+s.Tglg = true;
+s.Tagbanwa = true;
+s.Tagb = true;
+s.Tai_Le = true;
+s.Tale = true;
+s.Tai_Tham = true;
+s.Lana = true;
+s.Tai_Viet = true;
+s.Tavt = true;
+s.Takri = true;
+s.Takr = true;
+s.Tamil = true;
+s.Taml = true;
+s.Tangut = true;
+s.Tang = true;
+s.Telugu = true;
+s.Telu = true;
+s.Thaana = true;
+s.Thaa = true;
+s.Thai = true;
+s.Tibetan = true;
+s.Tibt = true;
+s.Tifinagh = true;
+s.Tfng = true;
+s.Tirhuta = true;
+s.Tirh = true;
+s.Ugaritic = true;
+s.Ugar = true;
+s.Vai = true;
+s.Vaii = true;
+s.Wancho = true;
+s.Wcho = true;
+s.Warang_Citi = true;
+s.Wara = true;
+s.Yezidi = true;
+s.Yezi = true;
+s.Yi = true;
+s.Yiii = true;
+s.Zanabazar_Square = true;
+s.Zanb = true;
+
+},{}],27:[function(require,module,exports){
 // jshint -W001
 
 "use strict";
@@ -25401,6 +26023,7 @@ var JSHINT = (function() {
           case "8":
           case "9":
           case "10":
+          case "11":
             state.option.moz = false;
             state.option.esversion = +val;
             break;
@@ -25409,6 +26032,7 @@ var JSHINT = (function() {
           case "2017":
           case "2018":
           case "2019":
+          case "2020":
             state.option.moz = false;
             // Translate specification publication year to version number.
             state.option.esversion = +val - 2009;
@@ -25439,6 +26063,7 @@ var JSHINT = (function() {
               state.option[tn] = !state.option[tn];
             }
           } else if (directiveToken.type === "jshint.unstable") {
+            /* istanbul ignore next */
             state.option.unstable[key] = (val === "true");
           } else {
             state.option[key] = (val === "true");
@@ -26162,8 +26787,8 @@ var JSHINT = (function() {
 
     if (right.type === "(identifier)" && right.value === "typeof" && left.type === "(string)") {
       if (left.value === "bigint") {
-        if (!state.option.unstable.bigint) {
-          warning("W144", left, "BigInt", "bigint");
+        if (!state.inES11()) {
+          warning("W119", left, "BigInt", "11");
         }
 
         return false;
@@ -26427,18 +27052,18 @@ var JSHINT = (function() {
   }
 
   /**
-   * Retrieve the value of the current token if it is an identifier and
-   * optionally advance the parser.
+   * Retrieve the value of the next token if it is an identifier and optionally
+   * advance the parser.
    *
    * @param {number} context - the parsing context; see `prod-params.js` for
    *                           more information
-   * @param {boolean} [prop] -`true` if this identifier is that of an object
-   *                           property
+   * @param {boolean} [isName] - `true` if an IdentifierName should be consumed
+   *                             (e.g. object properties)
    * @param {boolean} [preserve] - `true` if the token should not be consumed
    *
    * @returns {string|undefined} - the value of the identifier, if present
    */
-  function optionalidentifier(context, prop, preserve) {
+  function optionalidentifier(context, isName, preserve) {
     if (!state.tokens.next.identifier) {
       return;
     }
@@ -26448,20 +27073,12 @@ var JSHINT = (function() {
     }
 
     var curr = state.tokens.curr;
-    var val  = state.tokens.curr.value;
 
-    if (!isReserved(context, curr)) {
-      return val;
+    if (isReserved(context, curr) && !(isName && state.inES5())) {
+      warning("W024", state.tokens.curr, state.tokens.curr.id);
     }
 
-    if (prop) {
-      if (state.inES5()) {
-        return val;
-      }
-    }
-
-    warning("W024", state.tokens.curr, state.tokens.curr.id);
-    return val;
+    return curr.value;
   }
 
   /**
@@ -26499,13 +27116,13 @@ var JSHINT = (function() {
    *
    * @param {number} context - the parsing context; see `prod-params.js` for
    *                           more information
-   * @param {boolean} [prop] -`true` if this identifier is that of an object
-   *                           property
+   * @param {boolean} [isName] - `true` if an IdentifierName should be consumed
+   *                             (e.g. object properties)
    *
    * @returns {string|undefined} - the value of the identifier, if present
    */
-  function identifier(context, prop) {
-    var i = optionalidentifier(context, prop, false);
+  function identifier(context, isName) {
+    var i = optionalidentifier(context, isName, false);
     if (i) {
       return i;
     }
@@ -26746,8 +27363,7 @@ var JSHINT = (function() {
         error("E065", state.tokens.curr);
       }
 
-      // there's no directive negation, so always set to true
-      state.directive[directive] = true;
+      state.directive[directive] = state.tokens.curr;
 
       parseFinalSemicolon(current);
     }
@@ -27057,11 +27673,14 @@ var JSHINT = (function() {
 
     return this;
   });
-  reserve("super", function() {
+
+  (function(superSymbol) {
+    superSymbol.rbp = 161;
+  })(reserve("super", function() {
     superNud.call(state.tokens.curr, this);
 
     return this;
-  });
+  }));
 
   assignop("=", "assign");
   assignop("+=", "assignadd");
@@ -27131,6 +27750,26 @@ var JSHINT = (function() {
     that.right = expression(context, andPrecedence);
     return that;
   }, andPrecedence);
+
+  infix("??", function(context, left, that) {
+    if (!left.paren && (left.id === "||" || left.id === "&&")) {
+      error("E024", that, "??");
+    }
+
+    if (!state.inES11()) {
+      warning("W119", that, "nullish coalescing", "11");
+    }
+
+    increaseComplexityCount();
+    that.left = left;
+    var right = that.right = expression(context, 39);
+
+    if (!right.paren && (right.id === "||" || right.id === "&&")) {
+      error("E024", that.right, that.right.id);
+    }
+
+    return that;
+  }, 39);
 
   // The Exponentiation operator, introduced in ECMAScript 2016
   //
@@ -27390,7 +28029,12 @@ var JSHINT = (function() {
     });
     if (mp) { return mp; }
 
+    var opening = state.tokens.next;
     var c = expression(context, 155), i;
+    if (!c.paren && c.rbp > 160) {
+      error("E024", opening, opening.value);
+    }
+
     if (c && c.id !== "function") {
       if (c.identifier) {
         switch (c.value) {
@@ -27423,7 +28067,9 @@ var JSHINT = (function() {
           }
         }
       } else {
-        if (c.id !== "." && c.id !== "[" && c.id !== "(") {
+        if (c.id === "?." && !c.paren) {
+          error("E024", c, "?.");
+        } else if (c.id !== "." && c.id !== "[" && c.id !== "(") {
           /* istanbul ignore next */
           warning("W056", state.tokens.curr);
         }
@@ -27443,7 +28089,6 @@ var JSHINT = (function() {
 
   var classDeclaration = blockstmt("class", function(context) {
     var className, classNameToken;
-    var inexport = context & prodParams.export;
 
     if (!state.inES6()) {
       warning("W104", state.tokens.curr, "class", "6");
@@ -27470,12 +28115,12 @@ var JSHINT = (function() {
     }
 
     if (classNameToken) {
-      this.name = className;
+      this.name = classNameToken;
       state.funct["(scope)"].initialize(className);
-      if (inexport) {
-        state.funct["(scope)"].setExported(className, classNameToken);
-      }
+    } else {
+      this.name = null;
     }
+
     state.funct["(scope)"].stack();
     classBody(this, context);
     return this;
@@ -27512,13 +28157,15 @@ var JSHINT = (function() {
 
     state.funct["(scope)"].stack();
     if (classNameToken) {
-      this.name = className;
+      this.name = classNameToken;
       state.funct["(scope)"].addbinding(className, {
         type: "class",
         initialized: true,
         token: classNameToken
       });
       state.funct["(scope)"].block.use(className, classNameToken);
+    } else {
+      this.name = null;
     }
 
     classBody(this, context);
@@ -27723,6 +28370,31 @@ var JSHINT = (function() {
     return that;
   }, 160, true);
 
+  infix("?.", function(context, left, that) {
+    if (!state.inES11()) {
+      warning("W119", state.tokens.curr, "Optional chaining", "11");
+    }
+
+
+    if (checkPunctuator(state.tokens.next, "[")) {
+      that.left = left;
+      advance();
+      that.right = state.tokens.curr.led(context, left);
+    } else if (checkPunctuator(state.tokens.next, "(")) {
+      that.left = left;
+      advance();
+      that.right = state.tokens.curr.led(context, left);
+    } else {
+      state.syntax["."].led.call(that, context, left);
+    }
+
+    if (state.tokens.next.type === "(template)") {
+      error("E024", state.tokens.next, "`");
+    }
+
+    return that;
+  }, 160, true);
+
   infix("(", function(context, left, that) {
     if (state.option.immed && left && !left.immed && left.id === "function") {
       warning("W062");
@@ -27738,14 +28410,17 @@ var JSHINT = (function() {
 
     if (left) {
       if (left.type === "(identifier)") {
-        if (left.value.match(/^[A-Z]([A-Z0-9_$]*[a-z][A-Za-z0-9_$]*)?$/)) {
-          if ("Array Number String Boolean Date Object Error Symbol".indexOf(left.value) === -1) {
-            if (left.value === "Math") {
-              /* istanbul ignore next */
-              warning("W063", left);
-            } else if (state.option.newcap) {
-              warning("W064", left);
-            }
+        var newcapRe = /^[A-Z]([A-Z0-9_$]*[a-z][A-Za-z0-9_$]*)?$/;
+        var newcapIgnore = [
+          "Array", "Boolean", "Date", "Error", "Function", "Number",
+          "Object", "RegExp", "String", "Symbol"
+        ];
+        if (newcapRe.test(left.value) && newcapIgnore.indexOf(left.value) === -1) {
+          if (left.value === "Math") {
+            /* istanbul ignore next */
+            warning("W063", left);
+          } else if (state.option.newcap) {
+            warning("W064", left);
           }
         }
       }
@@ -27932,12 +28607,19 @@ var JSHINT = (function() {
           // Used to cover a unary expression as the left-hand side of the
           // exponentiation operator
           (beginsUnaryExpression(ret) && state.tokens.next.id === "**") ||
+          // Used to cover a logical operator as the right-hand side of the
+          // nullish coalescing operator
+          (preceeding.id === "??" && (ret.id === "&&" || ret.id === "||")) ||
           // Used to delineate an integer number literal from a dereferencing
           // punctuator (otherwise interpreted as a decimal point)
           (ret.type === "(number)" &&
             checkPunctuator(pn, ".") && /^\d+$/.test(ret.value)) ||
           // Used to wrap object destructuring assignment
-          (opening.beginsStmt && ret.id === "=" && ret.left.id === "{");
+          (opening.beginsStmt && ret.id === "=" && ret.left.id === "{") ||
+          // Used to allow optional chaining with other language features which
+          // are otherwise restricted.
+          (ret.id === "?." &&
+              (preceeding.id === "new" || state.tokens.next.type === "(template)"));
       }
     }
 
@@ -27958,7 +28640,7 @@ var JSHINT = (function() {
     return ret;
   });
 
-  application("=>");
+  application("=>").rbp = 161;
 
   infix("[", function(context, left, that) {
     var e, s, canUseDot;
@@ -27968,7 +28650,7 @@ var JSHINT = (function() {
       warning("W014", state.tokens.curr, state.tokens.curr.id);
     }
 
-    e = expression(context & ~prodParams.noin, 10);
+    e = expression(context & ~prodParams.noin, 0);
 
     if (e && e.type === "(string)") {
       if (!state.option.evil && (e.value === "eval" || e.value === "execScript")) {
@@ -28137,33 +28819,26 @@ var JSHINT = (function() {
     return !!state.funct["(method)"];
   }
 
-  function propertyName(context, preserveOrToken) {
-    var id;
-    var preserve = true;
-    if (typeof preserveOrToken === "object") {
-      /* istanbul ignore next */
-      id = preserveOrToken;
-    } else {
-      preserve = preserveOrToken;
-      id = optionalidentifier(context, true, preserve);
-    }
+  /**
+   * Retrieve the value of the next token if it is a valid LiteralPropertyName
+   * and optionally advance the parser.
+   *
+   * @param {number} context - the parsing context; see `prod-params.js` for
+   *                           more information
+   *
+   * @returns {string|undefined} - the value of the identifier, if present
+   */
+  function propertyName(context) {
+    var id = optionalidentifier(context, true);
 
     if (!id) {
       if (state.tokens.next.id === "(string)") {
         id = state.tokens.next.value;
-        if (!preserve) {
-          advance();
-        }
+        advance();
       } else if (state.tokens.next.id === "(number)") {
         id = state.tokens.next.value.toString();
-        if (!preserve) {
-          advance();
-        }
+        advance();
       }
-    /* istanbul ignore next */
-    } else if (typeof id === "object") {
-      if (id.id === "(string)" || id.id === "(identifier)") id = id.value;
-      else if (id.id === "(number)") id = id.value.toString();
     }
 
     if (id === "hasOwnProperty") {
@@ -28691,10 +29366,9 @@ var JSHINT = (function() {
           if (!state.inES6()) {
             warning("W104", state.tokens.next, "object short notation", "6");
           }
-          i = propertyName(context, true);
-          saveProperty(props, i, state.tokens.next);
-
-          expression(context, 10);
+          t = expression(context, 10);
+          i = t.value;
+          saveProperty(props, i, t);
 
         } else if (peek().id !== ":" && (nextVal === "get" || nextVal === "set")) {
           advance(nextVal);
@@ -29028,7 +29702,6 @@ var JSHINT = (function() {
     // used for both let and const statements
 
     var noin = context & prodParams.noin;
-    var inexport = context & prodParams.export;
     var isLet = type === "let";
     var isConst = type === "const";
     var tokens, lone, value, letblock;
@@ -29118,10 +29791,6 @@ var JSHINT = (function() {
           if (tokens.hasOwnProperty(t)) {
             t = tokens[t];
             state.funct["(scope)"].initialize(t.id);
-
-            if (lone && inexport) {
-              state.funct["(scope)"].setExported(t.token.value, t.token);
-            }
           }
         }
       }
@@ -29223,7 +29892,6 @@ var JSHINT = (function() {
 
   var varstatement = stmt("var", function(context) {
     var noin = context & prodParams.noin;
-    var inexport = context & prodParams.export;
     var tokens, lone, value, id;
 
     this.first = [];
@@ -29266,9 +29934,6 @@ var JSHINT = (function() {
               type: "var",
               token: t.token });
 
-            if (lone && inexport) {
-              state.funct["(scope)"].setExported(t.id, t.token);
-            }
             names.push(t.token);
           }
         }
@@ -29341,25 +30006,21 @@ var JSHINT = (function() {
     if (inblock) {
       warning("W082", state.tokens.curr);
     }
-    var nameToken = optionalidentifier(context) ? state.tokens.curr : null;
+    this.name = optionalidentifier(context) ? state.tokens.curr : null;
 
-    if (!nameToken) {
+    if (!this.name) {
       if (!inexport) {
         warning("W025");
       }
     } else {
-      state.funct["(scope)"].addbinding(nameToken.value, {
+      state.funct["(scope)"].addbinding(this.name.value, {
         type: labelType,
         token: state.tokens.curr,
         initialized: true });
-
-      if (inexport) {
-        state.funct["(scope)"].setExported(nameToken.value, state.tokens.prev);
-      }
     }
 
     var f = doFunction(context, {
-      name: nameToken && nameToken.value,
+      name: this.name && this.name.value,
       statement: this,
       type: generator ? "generator" : null,
       ignoreLoopFunc: inblock // a declaration may already have warned
@@ -29372,13 +30033,16 @@ var JSHINT = (function() {
     // mode (the scope manager will not report an error because a declaration
     // does not introduce a binding into the function's environment record).
     var enablesStrictMode = f["(isStrict)"] && !state.isStrict();
-    if (nameToken && (f["(name)"] === "arguments" || f["(name)"] === "eval") &&
+    if (this.name && (f["(name)"] === "arguments" || f["(name)"] === "eval") &&
       enablesStrictMode) {
-      error("E008", nameToken);
+      error("E008", this.name);
     }
 
-    if (state.tokens.next.id === "(" && state.tokens.next.line === state.tokens.curr.line) {
-      /* istanbul ignore next */
+    // Although the parser correctly recognizes the statement boundary in this
+    // condition, it's support for the invalid "empty grouping" expression
+    // makes it tolerant of productions such as `function f() {}();`.
+    if (state.tokens.next.id === "(" && peek().id === ")" && peek(1).id !== "=>" &&
+      state.tokens.next.line === state.tokens.curr.line) {
       error("E039");
     }
     return this;
@@ -29401,21 +30065,21 @@ var JSHINT = (function() {
 
     // This context modification restricts the use of `await` as the optional
     // BindingIdentifier in async function expressions.
-    var nameToken = optionalidentifier(isAsync ? context | prodParams.async : context) ?
+    this.name = optionalidentifier(isAsync ? context | prodParams.async : context) ?
       state.tokens.curr : null;
 
     var f = doFunction(context, {
-      name: nameToken && nameToken.value,
+      name: this.name && this.name.value,
       type: generator ? "generator" : null
     });
 
-    if (generator && nameToken && nameToken.value === "yield") {
-      error("E024", nameToken, "yield");
+    if (generator && this.name && this.name.value === "yield") {
+      error("E024", this.name, "yield");
     }
 
-    if (nameToken && (f["(name)"] === "arguments" || f["(name)"] === "eval") &&
+    if (this.name && (f["(name)"] === "arguments" || f["(name)"] === "eval") &&
       f["(isStrict)"]) {
-      error("E008", nameToken);
+      error("E008", this.name);
     }
 
     return this;
@@ -29479,7 +30143,7 @@ var JSHINT = (function() {
         var tokens = destructuringPattern(context);
         _.each(tokens, function(token) {
           if (token.id) {
-            state.funct["(scope)"].addParam(token.id, token, "exception");
+            state.funct["(scope)"].addParam(token.id, token.token, "exception");
           }
         });
       } else if (state.tokens.next.type !== "(identifier)") {
@@ -30216,7 +30880,35 @@ var JSHINT = (function() {
     return this;
   }).exps = true;
 
-  stmt("import", function(context) {
+  prefix("import", function(context) {
+    var mp = metaProperty(context, "meta", function() {
+      if (!state.inES11(true)) {
+        warning("W119", state.tokens.prev, "import.meta", "11");
+      }
+      if (!state.option.module) {
+        error("E070", state.tokens.prev);
+      }
+    });
+
+    if (mp) {
+      return mp;
+    }
+
+    if (!checkPunctuator(state.tokens.next, "(")) {
+      return state.syntax["(identifier)"].nud.call(this, context);
+    }
+
+    if (!state.inES11()) {
+      warning("W119", state.tokens.curr, "dynamic import", "11");
+    }
+
+    advance("(");
+    expression(context, 10);
+    advance(")");
+    return this;
+  });
+
+  var importSymbol = stmt("import", function(context) {
     if (!state.funct["(scope)"].block.isGlobal()) {
       error("E053", state.tokens.curr, "Import");
     }
@@ -30276,14 +30968,11 @@ var JSHINT = (function() {
           break;
         }
         var importName;
-        if (state.tokens.next.type === "default") {
-          importName = "default";
-          advance("default");
-        } else {
-          importName = identifier(context);
-        }
-        if (state.tokens.next.value === "as") {
+        if (peek().value === "as") {
+          identifier(context, true);
           advance("as");
+          importName = identifier(context);
+        } else {
           importName = identifier(context);
         }
 
@@ -30318,12 +31007,18 @@ var JSHINT = (function() {
     // }
 
     return this;
-  }).exps = true;
+  });
+  importSymbol.exps = true;
+  importSymbol.reserved = true;
+  importSymbol.meta = { isFutureReservedWord: true, es5: true };
+  importSymbol.useFud = function() {
+    return !(checkPunctuators(state.tokens.next, [".", "("]));
+  };
+  importSymbol.rbp = 161;
 
   stmt("export", function(context) {
     var ok = true;
     var token;
-    var identifier;
     var moduleSpecifier;
     context = context | prodParams.export;
 
@@ -30339,7 +31034,18 @@ var JSHINT = (function() {
 
     if (state.tokens.next.value === "*") {
       // ExportDeclaration :: export * FromClause
+      // ExportDeclaration :: export * as IdentifierName FromClause
       advance("*");
+
+      if (state.tokens.next.value === "as") {
+        if (!state.inES11()) {
+          warning("W119", state.tokens.curr, "export * as ns from", "11");
+        }
+        advance("as");
+        identifier(context, true);
+        state.funct["(scope)"].setExported(null, state.tokens.curr);
+      }
+
       advance("from");
       advance("(string)");
       return this;
@@ -30356,26 +31062,27 @@ var JSHINT = (function() {
       state.nameStack.set(state.tokens.next);
 
       advance("default");
+      var def = state.tokens.curr;
       var exportType = state.tokens.next.id;
       if (exportType === "function") {
         this.block = true;
         advance("function");
-        state.syntax["function"].fud(context);
+        token = state.syntax["function"].fud(context);
+        state.funct["(scope)"].setExported(token.name, def);
       } else if (exportType === "async" && peek().id === "function") {
         this.block = true;
         advance("async");
         advance("function");
-        state.syntax["function"].fud(context | prodParams.preAsync);
+        token = state.syntax["function"].fud(context | prodParams.preAsync);
+        state.funct["(scope)"].setExported(token.name, def);
       } else if (exportType === "class") {
         this.block = true;
         advance("class");
-        state.syntax["class"].fud(context);
+        token = state.syntax["class"].fud(context);
+        state.funct["(scope)"].setExported(token.name, def);
       } else {
-        token = expression(context, 10);
-        if (token.identifier) {
-          identifier = token.value;
-          state.funct["(scope)"].setExported(identifier, token);
-        }
+        expression(context, 10);
+        state.funct["(scope)"].setExported(null, def);
       }
       return this;
     }
@@ -30390,15 +31097,22 @@ var JSHINT = (function() {
         }
         advance();
 
-        exportedTokens.push(state.tokens.curr);
-
         if (state.tokens.next.value === "as") {
           advance("as");
           if (!state.tokens.next.identifier) {
             /* istanbul ignore next */
             error("E030", state.tokens.next, state.tokens.next.value);
           }
+          exportedTokens.push({
+            local: state.tokens.prev,
+            export: state.tokens.next
+          });
           advance();
+        } else {
+          exportedTokens.push({
+            local: state.tokens.curr,
+            export: state.tokens.curr
+          });
         }
 
         if (!checkPunctuator(state.tokens.next, "}")) {
@@ -30412,8 +31126,8 @@ var JSHINT = (function() {
         moduleSpecifier = state.tokens.next;
         advance("(string)");
       } else if (ok) {
-        exportedTokens.forEach(function(token) {
-          state.funct["(scope)"].setExported(token.value, token);
+        exportedTokens.forEach(function(x) {
+          state.funct["(scope)"].setExported(x.local, x.export);
         });
       }
 
@@ -30429,31 +31143,43 @@ var JSHINT = (function() {
     } else if (state.tokens.next.id === "var") {
       // ExportDeclaration :: export VariableStatement
       advance("var");
-      state.tokens.curr.fud(context);
+      token = state.tokens.curr.fud(context);
+      token.first.forEach(function(binding) {
+        state.funct["(scope)"].setExported(binding, binding);
+      });
     } else if (state.tokens.next.id === "let") {
       // ExportDeclaration :: export VariableStatement
       advance("let");
-      state.tokens.curr.fud(context);
+      token = state.tokens.curr.fud(context);
+      token.first.forEach(function(binding) {
+        state.funct["(scope)"].setExported(binding, binding);
+      });
     } else if (state.tokens.next.id === "const") {
       // ExportDeclaration :: export VariableStatement
       advance("const");
-      state.tokens.curr.fud(context);
+      token = state.tokens.curr.fud(context);
+      token.first.forEach(function(binding) {
+        state.funct["(scope)"].setExported(binding, binding);
+      });
     } else if (state.tokens.next.id === "function") {
       // ExportDeclaration :: export Declaration
       this.block = true;
       advance("function");
-      state.syntax["function"].fud(context);
+      token = state.syntax["function"].fud(context);
+      state.funct["(scope)"].setExported(token.name, token.name);
     } else if (state.tokens.next.id === "async" && peek().id === "function") {
       // ExportDeclaration :: export Declaration
       this.block = true;
       advance("async");
       advance("function");
-      state.syntax["function"].fud(context | prodParams.preAsync);
+      token = state.syntax["function"].fud(context | prodParams.preAsync);
+      state.funct["(scope)"].setExported(token.name, token.name);
     } else if (state.tokens.next.id === "class") {
       // ExportDeclaration :: export Declaration
       this.block = true;
       advance("class");
-      state.syntax["class"].fud(context);
+      token = state.syntax["class"].fud(context);
+      state.funct["(scope)"].setExported(token.name, token.name);
     } else {
       /* istanbul ignore next */
       error("E024", state.tokens.next, state.tokens.next.value);
@@ -30525,7 +31251,6 @@ var JSHINT = (function() {
   FutureReservedWord("float");
   FutureReservedWord("goto");
   FutureReservedWord("implements", { es5: true, strictOnly: true });
-  FutureReservedWord("import", { es5: true });
   FutureReservedWord("int");
   FutureReservedWord("interface", { es5: true, strictOnly: true });
   FutureReservedWord("long");
@@ -31198,7 +31923,7 @@ var JSHINT = (function() {
 
         if (state.directive["use strict"]) {
           if (!state.allowsGlobalUsd()) {
-            warning("W097", state.tokens.prev);
+            warning("W097", state.directive["use strict"]);
           }
         }
 
@@ -31316,7 +32041,7 @@ if (typeof exports === "object" && exports) {
   exports.JSHINT = JSHINT;
 }
 
-},{"./lex.js":17,"./messages.js":18,"./options.js":20,"./prod-params.js":21,"./reg.js":22,"./scope-manager.js":23,"./state.js":24,"./style.js":25,"./vars.js":26,"console-browserify":14,"events":9,"lodash":16}]},{},[]);
+},{"./lex.js":17,"./messages.js":18,"./options.js":20,"./prod-params.js":21,"./reg.js":22,"./scope-manager.js":23,"./state.js":24,"./style.js":25,"./vars.js":27,"console-browserify":9,"events":11,"lodash":12}]},{},[]);
 
 JSHINT = require('jshint').JSHINT;
 if (typeof exports === 'object' && exports) exports.JSHINT = JSHINT;

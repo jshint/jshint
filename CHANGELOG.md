@@ -1,3 +1,30 @@
+<a name="2.13.0"></a>
+# [2.13.0](https://github.com/jshint/jshint/compare/2.12.0...v2.13.0) (2021-05-30)
+
+### Bug Fixes
+
+* Allow comma expression in MemberExpression ([f05c8d1](https://github.com/jshint/jshint/commit/f05c8d1))
+* Consider all exported bindings "used" ([90228b7](https://github.com/jshint/jshint/commit/90228b7))
+* Correct interpretation of ImportSpecifier ([72a8102](https://github.com/jshint/jshint/commit/72a8102))
+* Correct location for error ([e831188](https://github.com/jshint/jshint/commit/e831188))
+* Correct location reported for directive ([ee6aa68](https://github.com/jshint/jshint/commit/ee6aa68))
+* Detect duplicate exported bindings ([916c230](https://github.com/jshint/jshint/commit/916c230))
+* Don't warn when Function() is used without 'new'. (#3531) ([c13c5cc](https://github.com/jshint/jshint/commit/c13c5cc))
+* Don't warn when RegExp() is used without 'new'. (#3529) ([c18a6e4](https://github.com/jshint/jshint/commit/c18a6e4))
+* Enforce restrictions on `new` operand ([c2719eb](https://github.com/jshint/jshint/commit/c2719eb))
+* Graduate BigInt support to `esversion: 11` ([553f816](https://github.com/jshint/jshint/commit/553f816))
+* Improve declaration parsing ([a9bdc93](https://github.com/jshint/jshint/commit/a9bdc93))
+* Report early reference with warning ([2c1a5f8](https://github.com/jshint/jshint/commit/2c1a5f8))
+* Support RegExp Unicode property escapes ([e7fa785](https://github.com/jshint/jshint/commit/e7fa785))
+
+### Features
+
+* Add support for "export * as ns from" ([c46f464](https://github.com/jshint/jshint/commit/c46f464))
+* Add support for `import.meta` ([73d7e0d](https://github.com/jshint/jshint/commit/73d7e0d))
+* Add support for dynamic import ([6bfcaed](https://github.com/jshint/jshint/commit/6bfcaed))
+* Add support for optional chaining ([b125dbe](https://github.com/jshint/jshint/commit/b125dbe))
+* Implement support for nullish coalescing ([f50b14d](https://github.com/jshint/jshint/commit/f50b14d))
+
 <a name="2.12.0"></a>
 # [2.12.0](https://github.com/jshint/jshint/compare/2.11.2...v2.12.0) (2020-08-02)
 
