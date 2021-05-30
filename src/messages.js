@@ -84,7 +84,9 @@ var errors = {
     "enable strict mode.",
   E066: "Asynchronous iteration is only available with for-of loops.",
   E067: "Malformed numeric literal: '{a}'.",
-  E068: "Decimals with leading zeros are not allowed in strict mode."
+  E068: "Decimals with leading zeros are not allowed in strict mode.",
+  E069: "Duplicate exported binding: '{a}'.",
+  E070: "import.meta may only be used in module code."
 };
 
 var warnings = {

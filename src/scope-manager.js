@@ -64,6 +64,7 @@ var scopeManager = function(state, predefined, exported, declared) {
   var usedPredefinedAndGlobals = Object.create(null);
   var impliedGlobals = Object.create(null);
   var unuseds = [];
+  var esModuleExports = [];
   var emitter = new events.EventEmitter();
 
   function warning(code, token) {
@@ -537,8 +538,9 @@ var scopeManager = function(state, predefined, exported, declared) {
         if (usage["(onlyUsedSubFunction)"]) {
           _latedefWarning(type, bindingName, token);
         } else {
-          // this is a clear illegal usage for block scoped variables
-          warning("E056", token, bindingName, type);
+          // this is a clear illegal usage, but not a syntax error, so emit a
+          // warning and not an error
+          warning("W003", token, bindingName);
         }
       }
     },
@@ -694,8 +696,18 @@ var scopeManager = function(state, predefined, exported, declared) {
      * @param {string} bindingName - the value of the identifier
      * @param {object} token
      */
-    setExported: function(bindingName, token) {
-      this.block.use(bindingName, token);
+    setExported: function(localName, exportName) {
+      if (exportName) {
+        if (esModuleExports.indexOf(exportName.value) > -1) {
+          error("E069", exportName, exportName.value);
+        }
+
+        esModuleExports.push(exportName.value);
+      }
+
+      if (localName) {
+        this.block.use(localName.value, localName);
+      }
     },
 
     /**

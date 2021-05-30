@@ -1051,6 +1051,9 @@ exports.val = {
    *  - `10` - To enable language features introduced by [ECMAScript
    *    10](https://www.ecma-international.org/ecma-262/10.0/index.html).
    *    Notable additions: optional catch bindings.
+   *  - `11` - To enable language features introduced by ECMAScript 11. Notable
+   *    additions: "export * as ns from 'module'", `import.meta`, the nullish
+   *    coalescing operator, and optional chaining, and dynamic import.
    */
   esversion: 5
 };
@@ -1062,17 +1065,6 @@ exports.val = {
  * right to remove or modify them between major version releases.
  */
 exports.unstable = {
-  /**
-   * [The BigInt proposal](https://github.com/tc39/proposal-bigint) extends the
-   * language's grammer for numeric literals to support integer values of
-   * arbitrary precision. It also introduces a new value of the `typeof`
-   * operator, "bigint".
-   *
-   * Mathematical operations which use both BigInt and traditional ECMAScript
-   * Number values may not have the intended effect. Due to the weakly-typed
-   * nature of the language, JSHint is unable to identify such cases.
-   */
-  bigint: true
 };
 
 // These are JSHint boolean options which are shared with JSLint

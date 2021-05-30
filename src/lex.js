@@ -249,7 +249,6 @@ Lexer.prototype = {
     case "]":
     case ":":
     case "~":
-    case "?":
       return {
         type: Token.Punctuator,
         value: ch1
@@ -289,6 +288,22 @@ Lexer.prototype = {
 
     ch2 = this.peek(1);
     ch3 = this.peek(2);
+
+    if (ch1 === "?") {
+      // Optional chaining
+      if (ch2 === "." && !reg.decimalDigit.test(ch3)) {
+        return {
+          type: Token.Punctuator,
+          value: "?."
+        };
+      }
+
+      return {
+        type: Token.Punctuator,
+        value: ch2 === "?" ? "??" : "?"
+      };
+    }
+
     ch4 = this.peek(3);
 
     // 4-character punctuator: >>>=
@@ -874,19 +889,17 @@ Lexer.prototype = {
 
       if (isAllowedDigit !== isDecimalDigit || isBigInt) {
         if (isBigInt) {
-          if (!state.option.unstable.bigint) {
-            this.triggerAsync(
-              "warning",
-              {
-                code: "W144",
-                line: this.line,
-                character: this.char,
-                data: [ "BigInt", "bigint" ]
-              },
-              checks,
-              function() { return true; }
-            );
-          }
+          this.triggerAsync(
+            "warning",
+            {
+              code: "W119",
+              line: this.line,
+              character: this.char,
+              data: [ "BigInt", "11" ]
+            },
+            checks,
+            function() { return !state.inES11(); }
+          );
 
           if (isLegacy || isNonOctal) {
             this.triggerAsync(

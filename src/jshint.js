@@ -709,6 +709,7 @@ var JSHINT = (function() {
           case "8":
           case "9":
           case "10":
+          case "11":
             state.option.moz = false;
             state.option.esversion = +val;
             break;
@@ -717,6 +718,7 @@ var JSHINT = (function() {
           case "2017":
           case "2018":
           case "2019":
+          case "2020":
             state.option.moz = false;
             // Translate specification publication year to version number.
             state.option.esversion = +val - 2009;
@@ -747,6 +749,7 @@ var JSHINT = (function() {
               state.option[tn] = !state.option[tn];
             }
           } else if (directiveToken.type === "jshint.unstable") {
+            /* istanbul ignore next */
             state.option.unstable[key] = (val === "true");
           } else {
             state.option[key] = (val === "true");
@@ -1470,8 +1473,8 @@ var JSHINT = (function() {
 
     if (right.type === "(identifier)" && right.value === "typeof" && left.type === "(string)") {
       if (left.value === "bigint") {
-        if (!state.option.unstable.bigint) {
-          warning("W144", left, "BigInt", "bigint");
+        if (!state.inES11()) {
+          warning("W119", left, "BigInt", "11");
         }
 
         return false;
@@ -1735,18 +1738,18 @@ var JSHINT = (function() {
   }
 
   /**
-   * Retrieve the value of the current token if it is an identifier and
-   * optionally advance the parser.
+   * Retrieve the value of the next token if it is an identifier and optionally
+   * advance the parser.
    *
    * @param {number} context - the parsing context; see `prod-params.js` for
    *                           more information
-   * @param {boolean} [prop] -`true` if this identifier is that of an object
-   *                           property
+   * @param {boolean} [isName] - `true` if an IdentifierName should be consumed
+   *                             (e.g. object properties)
    * @param {boolean} [preserve] - `true` if the token should not be consumed
    *
    * @returns {string|undefined} - the value of the identifier, if present
    */
-  function optionalidentifier(context, prop, preserve) {
+  function optionalidentifier(context, isName, preserve) {
     if (!state.tokens.next.identifier) {
       return;
     }
@@ -1756,20 +1759,12 @@ var JSHINT = (function() {
     }
 
     var curr = state.tokens.curr;
-    var val  = state.tokens.curr.value;
 
-    if (!isReserved(context, curr)) {
-      return val;
+    if (isReserved(context, curr) && !(isName && state.inES5())) {
+      warning("W024", state.tokens.curr, state.tokens.curr.id);
     }
 
-    if (prop) {
-      if (state.inES5()) {
-        return val;
-      }
-    }
-
-    warning("W024", state.tokens.curr, state.tokens.curr.id);
-    return val;
+    return curr.value;
   }
 
   /**
@@ -1807,13 +1802,13 @@ var JSHINT = (function() {
    *
    * @param {number} context - the parsing context; see `prod-params.js` for
    *                           more information
-   * @param {boolean} [prop] -`true` if this identifier is that of an object
-   *                           property
+   * @param {boolean} [isName] - `true` if an IdentifierName should be consumed
+   *                             (e.g. object properties)
    *
    * @returns {string|undefined} - the value of the identifier, if present
    */
-  function identifier(context, prop) {
-    var i = optionalidentifier(context, prop, false);
+  function identifier(context, isName) {
+    var i = optionalidentifier(context, isName, false);
     if (i) {
       return i;
     }
@@ -2442,6 +2437,26 @@ var JSHINT = (function() {
     return that;
   }, andPrecedence);
 
+  infix("??", function(context, left, that) {
+    if (!left.paren && (left.id === "||" || left.id === "&&")) {
+      error("E024", that, "??");
+    }
+
+    if (!state.inES11()) {
+      warning("W119", that, "nullish coalescing", "11");
+    }
+
+    increaseComplexityCount();
+    that.left = left;
+    var right = that.right = expression(context, 39);
+
+    if (!right.paren && (right.id === "||" || right.id === "&&")) {
+      error("E024", that.right, that.right.id);
+    }
+
+    return that;
+  }, 39);
+
   // The Exponentiation operator, introduced in ECMAScript 2016
   //
   // ExponentiationExpression[Yield] :
@@ -2738,7 +2753,9 @@ var JSHINT = (function() {
           }
         }
       } else {
-        if (c.id !== "." && c.id !== "[" && c.id !== "(") {
+        if (c.id === "?." && !c.paren) {
+          error("E024", c, "?.");
+        } else if (c.id !== "." && c.id !== "[" && c.id !== "(") {
           /* istanbul ignore next */
           warning("W056", state.tokens.curr);
         }
@@ -2758,7 +2775,6 @@ var JSHINT = (function() {
 
   var classDeclaration = blockstmt("class", function(context) {
     var className, classNameToken;
-    var inexport = context & prodParams.export;
 
     if (!state.inES6()) {
       warning("W104", state.tokens.curr, "class", "6");
@@ -2785,12 +2801,12 @@ var JSHINT = (function() {
     }
 
     if (classNameToken) {
-      this.name = className;
+      this.name = classNameToken;
       state.funct["(scope)"].initialize(className);
-      if (inexport) {
-        state.funct["(scope)"].setExported(className, classNameToken);
-      }
+    } else {
+      this.name = null;
     }
+
     state.funct["(scope)"].stack();
     classBody(this, context);
     return this;
@@ -2827,13 +2843,15 @@ var JSHINT = (function() {
 
     state.funct["(scope)"].stack();
     if (classNameToken) {
-      this.name = className;
+      this.name = classNameToken;
       state.funct["(scope)"].addbinding(className, {
         type: "class",
         initialized: true,
         token: classNameToken
       });
       state.funct["(scope)"].block.use(className, classNameToken);
+    } else {
+      this.name = null;
     }
 
     classBody(this, context);
@@ -3033,6 +3051,31 @@ var JSHINT = (function() {
       if (isGlobalEval(left, state)) {
         warning("W061");
       }
+    }
+
+    return that;
+  }, 160, true);
+
+  infix("?.", function(context, left, that) {
+    if (!state.inES11()) {
+      warning("W119", state.tokens.curr, "Optional chaining", "11");
+    }
+
+
+    if (checkPunctuator(state.tokens.next, "[")) {
+      that.left = left;
+      advance();
+      that.right = state.tokens.curr.led(context, left);
+    } else if (checkPunctuator(state.tokens.next, "(")) {
+      that.left = left;
+      advance();
+      that.right = state.tokens.curr.led(context, left);
+    } else {
+      state.syntax["."].led.call(that, context, left);
+    }
+
+    if (state.tokens.next.type === "(template)") {
+      error("E024", state.tokens.next, "`");
     }
 
     return that;
@@ -3250,12 +3293,19 @@ var JSHINT = (function() {
           // Used to cover a unary expression as the left-hand side of the
           // exponentiation operator
           (beginsUnaryExpression(ret) && state.tokens.next.id === "**") ||
+          // Used to cover a logical operator as the right-hand side of the
+          // nullish coalescing operator
+          (preceeding.id === "??" && (ret.id === "&&" || ret.id === "||")) ||
           // Used to delineate an integer number literal from a dereferencing
           // punctuator (otherwise interpreted as a decimal point)
           (ret.type === "(number)" &&
             checkPunctuator(pn, ".") && /^\d+$/.test(ret.value)) ||
           // Used to wrap object destructuring assignment
-          (opening.beginsStmt && ret.id === "=" && ret.left.id === "{");
+          (opening.beginsStmt && ret.id === "=" && ret.left.id === "{") ||
+          // Used to allow optional chaining with other language features which
+          // are otherwise restricted.
+          (ret.id === "?." &&
+              (preceeding.id === "new" || state.tokens.next.type === "(template)"));
       }
     }
 
@@ -3455,33 +3505,26 @@ var JSHINT = (function() {
     return !!state.funct["(method)"];
   }
 
-  function propertyName(context, preserveOrToken) {
-    var id;
-    var preserve = true;
-    if (typeof preserveOrToken === "object") {
-      /* istanbul ignore next */
-      id = preserveOrToken;
-    } else {
-      preserve = preserveOrToken;
-      id = optionalidentifier(context, true, preserve);
-    }
+  /**
+   * Retrieve the value of the next token if it is a valid LiteralPropertyName
+   * and optionally advance the parser.
+   *
+   * @param {number} context - the parsing context; see `prod-params.js` for
+   *                           more information
+   *
+   * @returns {string|undefined} - the value of the identifier, if present
+   */
+  function propertyName(context) {
+    var id = optionalidentifier(context, true);
 
     if (!id) {
       if (state.tokens.next.id === "(string)") {
         id = state.tokens.next.value;
-        if (!preserve) {
-          advance();
-        }
+        advance();
       } else if (state.tokens.next.id === "(number)") {
         id = state.tokens.next.value.toString();
-        if (!preserve) {
-          advance();
-        }
+        advance();
       }
-    /* istanbul ignore next */
-    } else if (typeof id === "object") {
-      if (id.id === "(string)" || id.id === "(identifier)") id = id.value;
-      else if (id.id === "(number)") id = id.value.toString();
     }
 
     if (id === "hasOwnProperty") {
@@ -4009,10 +4052,9 @@ var JSHINT = (function() {
           if (!state.inES6()) {
             warning("W104", state.tokens.next, "object short notation", "6");
           }
-          i = propertyName(context, true);
-          saveProperty(props, i, state.tokens.next);
-
-          expression(context, 10);
+          t = expression(context, 10);
+          i = t.value;
+          saveProperty(props, i, t);
 
         } else if (peek().id !== ":" && (nextVal === "get" || nextVal === "set")) {
           advance(nextVal);
@@ -4346,7 +4388,6 @@ var JSHINT = (function() {
     // used for both let and const statements
 
     var noin = context & prodParams.noin;
-    var inexport = context & prodParams.export;
     var isLet = type === "let";
     var isConst = type === "const";
     var tokens, lone, value, letblock;
@@ -4436,10 +4477,6 @@ var JSHINT = (function() {
           if (tokens.hasOwnProperty(t)) {
             t = tokens[t];
             state.funct["(scope)"].initialize(t.id);
-
-            if (lone && inexport) {
-              state.funct["(scope)"].setExported(t.token.value, t.token);
-            }
           }
         }
       }
@@ -4541,7 +4578,6 @@ var JSHINT = (function() {
 
   var varstatement = stmt("var", function(context) {
     var noin = context & prodParams.noin;
-    var inexport = context & prodParams.export;
     var tokens, lone, value, id;
 
     this.first = [];
@@ -4584,9 +4620,6 @@ var JSHINT = (function() {
               type: "var",
               token: t.token });
 
-            if (lone && inexport) {
-              state.funct["(scope)"].setExported(t.id, t.token);
-            }
             names.push(t.token);
           }
         }
@@ -4659,25 +4692,21 @@ var JSHINT = (function() {
     if (inblock) {
       warning("W082", state.tokens.curr);
     }
-    var nameToken = optionalidentifier(context) ? state.tokens.curr : null;
+    this.name = optionalidentifier(context) ? state.tokens.curr : null;
 
-    if (!nameToken) {
+    if (!this.name) {
       if (!inexport) {
         warning("W025");
       }
     } else {
-      state.funct["(scope)"].addbinding(nameToken.value, {
+      state.funct["(scope)"].addbinding(this.name.value, {
         type: labelType,
         token: state.tokens.curr,
         initialized: true });
-
-      if (inexport) {
-        state.funct["(scope)"].setExported(nameToken.value, state.tokens.prev);
-      }
     }
 
     var f = doFunction(context, {
-      name: nameToken && nameToken.value,
+      name: this.name && this.name.value,
       statement: this,
       type: generator ? "generator" : null,
       ignoreLoopFunc: inblock // a declaration may already have warned
@@ -4690,13 +4719,16 @@ var JSHINT = (function() {
     // mode (the scope manager will not report an error because a declaration
     // does not introduce a binding into the function's environment record).
     var enablesStrictMode = f["(isStrict)"] && !state.isStrict();
-    if (nameToken && (f["(name)"] === "arguments" || f["(name)"] === "eval") &&
+    if (this.name && (f["(name)"] === "arguments" || f["(name)"] === "eval") &&
       enablesStrictMode) {
-      error("E008", nameToken);
+      error("E008", this.name);
     }
 
-    if (state.tokens.next.id === "(" && state.tokens.next.line === state.tokens.curr.line) {
-      /* istanbul ignore next */
+    // Although the parser correctly recognizes the statement boundary in this
+    // condition, it's support for the invalid "empty grouping" expression
+    // makes it tolerant of productions such as `function f() {}();`.
+    if (state.tokens.next.id === "(" && peek().id === ")" && peek(1).id !== "=>" &&
+      state.tokens.next.line === state.tokens.curr.line) {
       error("E039");
     }
     return this;
@@ -4719,21 +4751,21 @@ var JSHINT = (function() {
 
     // This context modification restricts the use of `await` as the optional
     // BindingIdentifier in async function expressions.
-    var nameToken = optionalidentifier(isAsync ? context | prodParams.async : context) ?
+    this.name = optionalidentifier(isAsync ? context | prodParams.async : context) ?
       state.tokens.curr : null;
 
     var f = doFunction(context, {
-      name: nameToken && nameToken.value,
+      name: this.name && this.name.value,
       type: generator ? "generator" : null
     });
 
-    if (generator && nameToken && nameToken.value === "yield") {
-      error("E024", nameToken, "yield");
+    if (generator && this.name && this.name.value === "yield") {
+      error("E024", this.name, "yield");
     }
 
-    if (nameToken && (f["(name)"] === "arguments" || f["(name)"] === "eval") &&
+    if (this.name && (f["(name)"] === "arguments" || f["(name)"] === "eval") &&
       f["(isStrict)"]) {
-      error("E008", nameToken);
+      error("E008", this.name);
     }
 
     return this;
@@ -4797,7 +4829,7 @@ var JSHINT = (function() {
         var tokens = destructuringPattern(context);
         _.each(tokens, function(token) {
           if (token.id) {
-            state.funct["(scope)"].addParam(token.id, token, "exception");
+            state.funct["(scope)"].addParam(token.id, token.token, "exception");
           }
         });
       } else if (state.tokens.next.type !== "(identifier)") {
@@ -5534,7 +5566,35 @@ var JSHINT = (function() {
     return this;
   }).exps = true;
 
-  stmt("import", function(context) {
+  prefix("import", function(context) {
+    var mp = metaProperty(context, "meta", function() {
+      if (!state.inES11(true)) {
+        warning("W119", state.tokens.prev, "import.meta", "11");
+      }
+      if (!state.option.module) {
+        error("E070", state.tokens.prev);
+      }
+    });
+
+    if (mp) {
+      return mp;
+    }
+
+    if (!checkPunctuator(state.tokens.next, "(")) {
+      return state.syntax["(identifier)"].nud.call(this, context);
+    }
+
+    if (!state.inES11()) {
+      warning("W119", state.tokens.curr, "dynamic import", "11");
+    }
+
+    advance("(");
+    expression(context, 10);
+    advance(")");
+    return this;
+  });
+
+  var importSymbol = stmt("import", function(context) {
     if (!state.funct["(scope)"].block.isGlobal()) {
       error("E053", state.tokens.curr, "Import");
     }
@@ -5594,14 +5654,11 @@ var JSHINT = (function() {
           break;
         }
         var importName;
-        if (state.tokens.next.type === "default") {
-          importName = "default";
-          advance("default");
-        } else {
-          importName = identifier(context);
-        }
-        if (state.tokens.next.value === "as") {
+        if (peek().value === "as") {
+          identifier(context, true);
           advance("as");
+          importName = identifier(context);
+        } else {
           importName = identifier(context);
         }
 
@@ -5636,12 +5693,18 @@ var JSHINT = (function() {
     // }
 
     return this;
-  }).exps = true;
+  });
+  importSymbol.exps = true;
+  importSymbol.reserved = true;
+  importSymbol.meta = { isFutureReservedWord: true, es5: true };
+  importSymbol.useFud = function() {
+    return !(checkPunctuators(state.tokens.next, [".", "("]));
+  };
+  importSymbol.rbp = 161;
 
   stmt("export", function(context) {
     var ok = true;
     var token;
-    var identifier;
     var moduleSpecifier;
     context = context | prodParams.export;
 
@@ -5657,7 +5720,18 @@ var JSHINT = (function() {
 
     if (state.tokens.next.value === "*") {
       // ExportDeclaration :: export * FromClause
+      // ExportDeclaration :: export * as IdentifierName FromClause
       advance("*");
+
+      if (state.tokens.next.value === "as") {
+        if (!state.inES11()) {
+          warning("W119", state.tokens.curr, "export * as ns from", "11");
+        }
+        advance("as");
+        identifier(context, true);
+        state.funct["(scope)"].setExported(null, state.tokens.curr);
+      }
+
       advance("from");
       advance("(string)");
       return this;
@@ -5674,26 +5748,27 @@ var JSHINT = (function() {
       state.nameStack.set(state.tokens.next);
 
       advance("default");
+      var def = state.tokens.curr;
       var exportType = state.tokens.next.id;
       if (exportType === "function") {
         this.block = true;
         advance("function");
-        state.syntax["function"].fud(context);
+        token = state.syntax["function"].fud(context);
+        state.funct["(scope)"].setExported(token.name, def);
       } else if (exportType === "async" && peek().id === "function") {
         this.block = true;
         advance("async");
         advance("function");
-        state.syntax["function"].fud(context | prodParams.preAsync);
+        token = state.syntax["function"].fud(context | prodParams.preAsync);
+        state.funct["(scope)"].setExported(token.name, def);
       } else if (exportType === "class") {
         this.block = true;
         advance("class");
-        state.syntax["class"].fud(context);
+        token = state.syntax["class"].fud(context);
+        state.funct["(scope)"].setExported(token.name, def);
       } else {
-        token = expression(context, 10);
-        if (token.identifier) {
-          identifier = token.value;
-          state.funct["(scope)"].setExported(identifier, token);
-        }
+        expression(context, 10);
+        state.funct["(scope)"].setExported(null, def);
       }
       return this;
     }
@@ -5708,15 +5783,22 @@ var JSHINT = (function() {
         }
         advance();
 
-        exportedTokens.push(state.tokens.curr);
-
         if (state.tokens.next.value === "as") {
           advance("as");
           if (!state.tokens.next.identifier) {
             /* istanbul ignore next */
             error("E030", state.tokens.next, state.tokens.next.value);
           }
+          exportedTokens.push({
+            local: state.tokens.prev,
+            export: state.tokens.next
+          });
           advance();
+        } else {
+          exportedTokens.push({
+            local: state.tokens.curr,
+            export: state.tokens.curr
+          });
         }
 
         if (!checkPunctuator(state.tokens.next, "}")) {
@@ -5730,8 +5812,8 @@ var JSHINT = (function() {
         moduleSpecifier = state.tokens.next;
         advance("(string)");
       } else if (ok) {
-        exportedTokens.forEach(function(token) {
-          state.funct["(scope)"].setExported(token.value, token);
+        exportedTokens.forEach(function(x) {
+          state.funct["(scope)"].setExported(x.local, x.export);
         });
       }
 
@@ -5747,31 +5829,43 @@ var JSHINT = (function() {
     } else if (state.tokens.next.id === "var") {
       // ExportDeclaration :: export VariableStatement
       advance("var");
-      state.tokens.curr.fud(context);
+      token = state.tokens.curr.fud(context);
+      token.first.forEach(function(binding) {
+        state.funct["(scope)"].setExported(binding, binding);
+      });
     } else if (state.tokens.next.id === "let") {
       // ExportDeclaration :: export VariableStatement
       advance("let");
-      state.tokens.curr.fud(context);
+      token = state.tokens.curr.fud(context);
+      token.first.forEach(function(binding) {
+        state.funct["(scope)"].setExported(binding, binding);
+      });
     } else if (state.tokens.next.id === "const") {
       // ExportDeclaration :: export VariableStatement
       advance("const");
-      state.tokens.curr.fud(context);
+      token = state.tokens.curr.fud(context);
+      token.first.forEach(function(binding) {
+        state.funct["(scope)"].setExported(binding, binding);
+      });
     } else if (state.tokens.next.id === "function") {
       // ExportDeclaration :: export Declaration
       this.block = true;
       advance("function");
-      state.syntax["function"].fud(context);
+      token = state.syntax["function"].fud(context);
+      state.funct["(scope)"].setExported(token.name, token.name);
     } else if (state.tokens.next.id === "async" && peek().id === "function") {
       // ExportDeclaration :: export Declaration
       this.block = true;
       advance("async");
       advance("function");
-      state.syntax["function"].fud(context | prodParams.preAsync);
+      token = state.syntax["function"].fud(context | prodParams.preAsync);
+      state.funct["(scope)"].setExported(token.name, token.name);
     } else if (state.tokens.next.id === "class") {
       // ExportDeclaration :: export Declaration
       this.block = true;
       advance("class");
-      state.syntax["class"].fud(context);
+      token = state.syntax["class"].fud(context);
+      state.funct["(scope)"].setExported(token.name, token.name);
     } else {
       /* istanbul ignore next */
       error("E024", state.tokens.next, state.tokens.next.value);
@@ -5843,7 +5937,6 @@ var JSHINT = (function() {
   FutureReservedWord("float");
   FutureReservedWord("goto");
   FutureReservedWord("implements", { es5: true, strictOnly: true });
-  FutureReservedWord("import", { es5: true });
   FutureReservedWord("int");
   FutureReservedWord("interface", { es5: true, strictOnly: true });
   FutureReservedWord("long");

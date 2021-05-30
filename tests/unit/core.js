@@ -875,8 +875,8 @@ exports.testES6Modules = function (test) {
   ];
 
   var testRun = TestRun(test)
-    .addError(74, 1, "Empty export: this is unnecessary and can be removed.")
-    .addError(75, 1, "Empty export: consider replacing with `import 'source';`.");
+    .addError(75, 1, "Empty export: this is unnecessary and can be removed.")
+    .addError(76, 1, "Empty export: consider replacing with `import 'source';`.");
   importConstErrors.forEach(function(error) { testRun.addError.apply(testRun, error); });
   testRun.test(src, {esnext: true});
 
@@ -891,7 +891,6 @@ exports.testES6Modules = function (test) {
     .addError(10, 1, "'import' is only available in ES6 (use 'esversion: 6').")
     .addError(11, 1, "'import' is only available in ES6 (use 'esversion: 6').")
     .addError(22, 1, "'export' is only available in ES6 (use 'esversion: 6').")
-    .addError(26, 1, "'export' is only available in ES6 (use 'esversion: 6').")
     .addError(30, 1, "'export' is only available in ES6 (use 'esversion: 6').")
     .addError(31, 1, "'export' is only available in ES6 (use 'esversion: 6').")
     .addError(32, 1, "'export' is only available in ES6 (use 'esversion: 6').")
@@ -900,8 +899,6 @@ exports.testES6Modules = function (test) {
     .addError(44, 1, "'export' is only available in ES6 (use 'esversion: 6').")
     .addError(46, 1, "'export' is only available in ES6 (use 'esversion: 6').")
     .addError(47, 8, "'class' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(48, 1, "'export' is only available in ES6 (use 'esversion: 6').")
-    .addError(48, 16, "'class' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(47, 1, "'export' is only available in ES6 (use 'esversion: 6').")
     .addError(46, 8, "'class' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
     .addError(57, 1, "'import' is only available in ES6 (use 'esversion: 6').")
@@ -912,11 +909,11 @@ exports.testES6Modules = function (test) {
     .addError(67, 1, "'export' is only available in ES6 (use 'esversion: 6').")
     .addError(67, 16, "'function*' is only available in ES6 (use 'esversion: 6').")
     .addError(67, 26, "'yield' is available in ES6 (use 'esversion: 6') or Mozilla JS extensions (use moz).")
-    .addError(70, 1, "'export' is only available in ES6 (use 'esversion: 6').")
-    .addError(71, 1, "'import' is only available in ES6 (use 'esversion: 6').")
-    .addError(74, 1, "'export' is only available in ES6 (use 'esversion: 6').")
+    .addError(71, 1, "'export' is only available in ES6 (use 'esversion: 6').")
+    .addError(72, 1, "'import' is only available in ES6 (use 'esversion: 6').")
     .addError(75, 1, "'export' is only available in ES6 (use 'esversion: 6').")
-    .addError(76, 1, "'import' is only available in ES6 (use 'esversion: 6').")
+    .addError(76, 1, "'export' is only available in ES6 (use 'esversion: 6').")
+    .addError(77, 1, "'import' is only available in ES6 (use 'esversion: 6').")
     .test(src);
 
   var src2 = [
@@ -928,6 +925,18 @@ exports.testES6Modules = function (test) {
 
   TestRun(test)
     .test(src2, {});
+
+  TestRun(test)
+    .test([
+      "export default function() {",
+      "  return 'foobar';",
+      "}"
+    ], {esversion: 6});
+
+  TestRun(test)
+    .test([
+      "export default class Bar {}"
+    ], {esversion: 6});
 
   // See gh-3055 "Labels Break JSHint"
   TestRun(test, "following labeled block")
@@ -990,6 +999,138 @@ exports.testES6Modules = function (test) {
       "export default async function * () { yield 0; await 0; }",
     ], { esversion: 9, module: true });
 
+  TestRun(test, "IdentifierName in renamed import/export")
+    .test([
+      "import { if as x } from '.';",
+      "export { x as if } from '.';"
+    ], { esversion: 6, module: true });
+
+  test.done();
+};
+
+exports.testES6ModuleDuplicateExport = function (test) {
+  TestRun(test, "Same declaration, adjacent")
+    .addError(2, 13, "Duplicate exported binding: 'x'.")
+    .test([
+      "var x;",
+      "export { x, x };"
+    ], { esversion: 6, module: true });
+
+  TestRun(test, "Same declaration, removed")
+    .addError(2, 16, "Duplicate exported binding: 'y'.")
+    .test([
+      "var y, z;",
+      "export { y, z, y };"
+    ], { esversion: 6, module: true });
+
+  TestRun(test, "Same declaration, renamed")
+    .addError(2, 18, "Duplicate exported binding: 'y'.")
+    .test([
+      "var y, z;",
+      "export { y, z as y };"
+    ], { esversion: 6, module: true });
+
+  TestRun(test, "Distinct declarations, by reference")
+    .addError(3, 10, "Duplicate exported binding: 'z'.")
+    .test([
+      "var z;",
+      "export { z };",
+      "export { z };"
+    ], { esversion: 6, module: true });
+
+  TestRun(test, "Distinct declarations, by reference, renamed")
+    .addError(3, 15, "Duplicate exported binding: 'y'.")
+    .test([
+      "var y, z;",
+      "export { y };",
+      "export { z as y };"
+    ], { esversion: 6, module: true });
+
+  TestRun(test, "Distinct declarations, default")
+    .addError(2, 8, "Duplicate exported binding: 'default'.")
+    .test([
+      "export default 0;",
+      "export default 0;"
+    ], { esversion: 6, module: true });
+
+  TestRun(test, "Distinct declarations, by reference, default/renamed")
+    .addError(3, 15, "Duplicate exported binding: 'default'.")
+    .test([
+      "var x;",
+      "export default 0;",
+      "export { x as default };"
+    ], { esversion: 6, module: true });
+
+  TestRun(test, "Distinct declarations, by reference, renamed/default")
+    .addError(3, 8, "Duplicate exported binding: 'default'.")
+    .test([
+      "var x;",
+      "export { x as default };",
+      "export default 0;"
+    ], { esversion: 6, module: true });
+
+  TestRun(test, "Distinct declarations, by statement - var")
+    .addError(2, 10, "Duplicate exported binding: 'a'.")
+    .test([
+      "export var a;",
+      "export { a };"
+    ], { esversion: 6, module: true });
+
+  TestRun(test, "Distinct declarations, by statement - let")
+    .addError(2, 10, "Duplicate exported binding: 'b'.")
+    .test([
+      "export let b;",
+      "export { b };"
+    ], { esversion: 6, module: true });
+
+  TestRun(test, "Distinct declarations, by statement - const")
+    .addError(2, 10, "Duplicate exported binding: 'c'.")
+    .test([
+      "export const c = null;",
+      "export { c };"
+    ], { esversion: 6, module: true });
+
+  TestRun(test, "Distinct declarations, by statement - function")
+    .addError(2, 10, "Duplicate exported binding: 'd'.")
+    .test([
+      "export function d() {}",
+      "export { d };"
+    ], { esversion: 6, module: true });
+
+  TestRun(test, "Distinct declarations, by statement - class")
+    .addError(2, 10, "Duplicate exported binding: 'e'.")
+    .test([
+      "export class e {}",
+      "export { e };"
+    ], { esversion: 6, module: true });
+
+  test.done();
+};
+
+exports.testExportStar = function (test) {
+  TestRun(test, "rejects earlier language editions")
+    .addError(1, 8, "'export * as ns from' is only available in ES11 (use 'esversion: 11').")
+    .test([
+      "export * as x from '.';"
+    ], { esversion: 10, module: true });
+
+  TestRun(test, "minimal esversion")
+    .test([
+      "export * as x from '.';"
+    ], { esversion: 11, module: true });
+
+  TestRun(test, "tolerates any IdentifierName")
+    .test([
+      "export * as if from '.';"
+    ], { esversion: 11, module: true });
+
+  TestRun(test, "detects duplicate bindings")
+    .addError(2, 13, "Duplicate exported binding: 'x'.")
+    .test([
+      "export * as x from '.';",
+      "export * as x from '.';"
+    ], { esversion: 11, module: true });
+
   test.done();
 };
 
@@ -1015,7 +1156,10 @@ exports.testES6ModulesNamedExportsAffectUnused = function (test) {
     "export var v1u, v2u;",
     "export let l1u, l2u;",
     "export const c1u, c2u;",
-    "export function* gen() { yield 1; }"
+    "export function* gen() { yield 1; }",
+    "export var { varX } = 0;",
+    "export let { letX } = 0;",
+    "export const { constX } = 0;"
   ];
 
   TestRun(test)
@@ -1292,14 +1436,33 @@ exports.testES6ModulesDefaultExportsAffectUnused = function (test) {
     "  bar: 'bar'",
     "};",
     "var x = 23;",
-    "var z = 42;",
-    "export default { a: a, x: x };",
-    "export default function boo() { return x + z; }",
-    "export default class MyClass { }"
+    "export default { a: a, x: x };"
   ];
 
   TestRun(test)
     .test(src1, {
+      esnext: true,
+      unused: true
+    });
+
+  TestRun(test)
+    .test([
+      "var x = 23;",
+      "var z = 42;",
+      "export default function boo() { return x + z; }"
+    ], {
+      esnext: true,
+      unused: true
+    });
+
+  TestRun(test)
+    .test("export default class MyClass { }", {
+      esnext: true,
+      unused: true
+    });
+
+  TestRun(test)
+    .test("export default class {}", {
       esnext: true,
       unused: true
     });
@@ -1610,19 +1773,19 @@ exports.testDefaultArguments = function (test) {
   var src = fs.readFileSync(__dirname + "/fixtures/default-arguments.js", "utf8");
   TestRun(test)
     .addError(14, 39, "'bar' is not defined.")
-    .addError(14, 32, "'num3' was used before it was declared, which is illegal for 'param' variables.")
-    .addError(15, 32, "'num4' was used before it was declared, which is illegal for 'param' variables.")
+    .addError(14, 32, "'num3' was used before it was defined.")
+    .addError(15, 32, "'num4' was used before it was defined.")
     .addError(18, 41, "Regular parameters should not come after default parameters.")
     .addError(27, 10, "'c' is not defined.")
     .addError(33, 4, "'d' was used before it was defined.")
-    .addError(36, 16, "'e' was used before it was declared, which is illegal for 'param' variables.")
+    .addError(36, 16, "'e' was used before it was defined.")
     .test(src, { esnext: true, undef: true, latedef: true });
 
   TestRun(test)
-    .addError(14, 32, "'num3' was used before it was declared, which is illegal for 'param' variables.")
-    .addError(15, 32, "'num4' was used before it was declared, which is illegal for 'param' variables.")
+    .addError(14, 32, "'num3' was used before it was defined.")
+    .addError(15, 32, "'num4' was used before it was defined.")
     .addError(18, 41, "Regular parameters should not come after default parameters.")
-    .addError(36, 16, "'e' was used before it was declared, which is illegal for 'param' variables.")
+    .addError(36, 16, "'e' was used before it was defined.")
     .test(src, { moz: true });
 
   TestRun(test)
@@ -1632,9 +1795,9 @@ exports.testDefaultArguments = function (test) {
     .addError(12, 37, "'default parameters' is only available in ES6 (use 'esversion: 6').")
     .addError(13, 37, "'default parameters' is only available in ES6 (use 'esversion: 6').")
     .addError(14, 37, "'default parameters' is only available in ES6 (use 'esversion: 6').")
-    .addError(14, 32, "'num3' was used before it was declared, which is illegal for 'param' variables.")
+    .addError(14, 32, "'num3' was used before it was defined.")
     .addError(15, 37, "'default parameters' is only available in ES6 (use 'esversion: 6').")
-    .addError(15, 32, "'num4' was used before it was declared, which is illegal for 'param' variables.")
+    .addError(15, 32, "'num4' was used before it was defined.")
     .addError(18, 37, "'default parameters' is only available in ES6 (use 'esversion: 6').")
     .addError(18, 41, "Regular parameters should not come after default parameters.")
     .addError(26, 18, "'default parameters' is only available in ES6 (use 'esversion: 6').")
@@ -1642,8 +1805,20 @@ exports.testDefaultArguments = function (test) {
     .addError(33, 6, "'default parameters' is only available in ES6 (use 'esversion: 6').")
     .addError(35, 18, "'default parameters' is only available in ES6 (use 'esversion: 6').")
     .addError(36, 18, "'default parameters' is only available in ES6 (use 'esversion: 6').")
-    .addError(36, 16, "'e' was used before it was declared, which is illegal for 'param' variables.")
+    .addError(36, 16, "'e' was used before it was defined.")
     .test(src, {  });
+
+  test.done();
+};
+
+exports.testEarlyCatchParam = function (test) {
+  TestRun(test)
+    .addError(2, 18, "'y' was used before it was defined.")
+    .test([
+      "try {",
+      "} catch ([x = y, y]) {",
+      "}"
+    ], { esversion: 6 });
 
   test.done();
 };

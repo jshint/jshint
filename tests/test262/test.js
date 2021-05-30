@@ -51,12 +51,9 @@ module.exports = function(test) {
 
   try {
     JSHint(test.contents, {
-      esversion: 10,
+      esversion: 11,
       maxerr: Infinity,
-      module: isModule,
-      unstable: {
-        bigint: true
-      }
+      module: isModule
     });
   } catch (e) {
     return false;

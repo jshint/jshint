@@ -311,7 +311,7 @@ exports.notypeof = function (test) {
     .addError(3, 17, "Invalid typeof value 'bool'")
     .addError(4, 11, "Invalid typeof value 'obj'")
     .addError(13, 17, "Invalid typeof value 'symbol'")
-    .addError(14, 21, "'BigInt' is a non-standard language feature. Enable it using the 'bigint' unstable option.")
+    .addError(14, 21, "'BigInt' is only available in ES11 (use 'esversion: 11').")
     .test(src);
 
   TestRun(test)
@@ -319,7 +319,7 @@ exports.notypeof = function (test) {
     .addError(2, 14, "Invalid typeof value 'double'")
     .addError(3, 17, "Invalid typeof value 'bool'")
     .addError(4, 11, "Invalid typeof value 'obj'")
-    .addError(14, 21, "'BigInt' is a non-standard language feature. Enable it using the 'bigint' unstable option.")
+    .addError(14, 21, "'BigInt' is only available in ES11 (use 'esversion: 11').")
     .test(src, { esnext: true });
 
   TestRun(test)
@@ -327,7 +327,7 @@ exports.notypeof = function (test) {
     .addError(2, 14, "Invalid typeof value 'double'")
     .addError(3, 17, "Invalid typeof value 'bool'")
     .addError(4, 11, "Invalid typeof value 'obj'")
-    .test(src, { esnext: true, unstable: { bigint: true } });
+    .test(src, { esversion: 11 });
 
   TestRun(test)
     .test(src, { notypeof: true });
@@ -2748,6 +2748,12 @@ exports.maxcomplexity = function (test) {
   TestRun(test)
     .test(src, { es3: true });
 
+  TestRun(test, "nullish coalescing operator")
+    .addError(1, 11, "This function's cyclomatic complexity is too high. (2)")
+    .test([
+      "function f() { 0 ?? 0; }"
+    ], { esversion: 11, expr: true, maxcomplexity: 1 });
+
   test.done();
 };
 
@@ -3682,6 +3688,50 @@ singleGroups.destructuringAssign = function (test) {
   test.done();
 };
 
+singleGroups.nullishCoalescing = function (test) {
+  TestRun(test)
+    .addError(1, 1, "Unnecessary grouping operator.")
+    .addError(2, 6, "Unnecessary grouping operator.")
+    .test([
+      "(0) ?? 0;",
+      "0 ?? (0);"
+    ], { singleGroups: true, expr: true, esversion: 11 });
+
+  TestRun(test)
+    .test([
+      "0 ?? (0 || 0);",
+      "(0 ?? 0) || 0;",
+      "0 ?? (0 && 0);",
+      "(0 ?? 0) && 0;"
+    ], { singleGroups: true, expr: true, esversion: 11 });
+
+  test.done();
+};
+
+singleGroups.optionalChaining = function (test) {
+  var code = [
+    "new ({}?.constructor)();",
+    "({}?.toString)``;",
+    // Invalid forms:
+    "([])?.x;",
+    "([]?.x).x;",
+    "([]?.x)?.x;"
+  ];
+
+  TestRun(test)
+    .addError(1, 21, "Bad constructor.")
+    .addError(2, 15, "Expected an assignment or function call and instead saw an expression.")
+    .addError(3, 1, "Unnecessary grouping operator.")
+    .addError(3, 7, "Expected an assignment or function call and instead saw an expression.")
+    .addError(4, 1, "Unnecessary grouping operator.")
+    .addError(4, 9, "Expected an assignment or function call and instead saw an expression.")
+    .addError(5, 1, "Unnecessary grouping operator.")
+    .addError(5, 10, "Expected an assignment or function call and instead saw an expression.")
+    .test(code, { singleGroups: true, esversion: 11 });
+
+  test.done();
+};
+
 exports.elision = function (test) {
   var code = [
     "var a = [1,,2];",
@@ -4251,13 +4301,15 @@ exports.esversion = function(test) {
     "// jshint esversion: 10",
     "// jshint esversion: 2019",
     "// jshint esversion: 11",
-    "// jshint esversion: 2020"
+    "// jshint esversion: 2020",
+    "// jshint esversion: 12",
+    "// jshint esversion: 2021"
   ];
 
   TestRun(test, "Value")
     .addError(2, 1, "Bad option value.")
-    .addError(14, 1, "Bad option value.")
-    .addError(15, 1, "Bad option value.")
+    .addError(16, 1, "Bad option value.")
+    .addError(17, 1, "Bad option value.")
     .test(code);
 
   var es5code = [

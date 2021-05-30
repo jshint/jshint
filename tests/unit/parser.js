@@ -10359,3 +10359,236 @@ exports.asyncIteration = function (test) {
 
   test.done();
 };
+
+exports.parensAfterDeclaration = function (test) {
+  TestRun(test)
+    .addError(1, 17, "Function declarations are not invocable. Wrap the whole function invocation in parens.")
+    .addError(1, 18, "Expected an assignment or function call and instead saw an expression.")
+    .test("function f () {}();");
+
+  TestRun(test)
+    .addError(1, 19, "Expected an assignment or function call and instead saw an expression.")
+    .test("function f () {}(0);");
+
+  TestRun(test)
+    .addError(1, 24, "Expected an assignment or function call and instead saw an expression.")
+    .test("function f () {}() => {};", {esversion: 6});
+
+  test.done();
+};
+
+exports.importMeta = function (test) {
+  TestRun(test)
+    .addError(1, 6, "Expected an identifier and instead saw 'import' (a reserved word).")
+    .test("void import;");
+
+  TestRun(test)
+    .addError(1, 6, "Expected an identifier and instead saw 'import' (a reserved word).")
+    .test(
+      "void import;",
+      { esversion: 11 }
+    );
+
+  TestRun(test)
+    .addError(1, 12, "'import.meta' is only available in ES11 (use 'esversion: 11').")
+    .addError(1, 12, "import.meta may only be used in module code.")
+    .test(
+      "void import.meta;",
+      { esversion: 10 }
+    );
+
+  TestRun(test)
+    .addError(1, 12, "import.meta may only be used in module code.")
+    .test(
+      "void import.meta;",
+      { esversion: 11 }
+    );
+
+  TestRun(test, "valid usage (expression position)")
+    .test(
+      "void import.meta;",
+      { esversion: 11, module: true }
+    );
+
+  TestRun(test, "valid usage (statement position)")
+    .addError(1, 8, "Expected an assignment or function call and instead saw an expression.")
+    .test(
+      "import.meta;",
+      { esversion: 11, module: true }
+    );
+
+  TestRun(test, "Other property name (expression position)")
+    .addError(1, 12, "Invalid meta property: 'import.target'.")
+    .test(
+      "void import.target;",
+      { esversion: 11, module: true }
+    );
+
+  TestRun(test, "Other property name (statement position)")
+    .addError(1, 7, "Invalid meta property: 'import.target'.")
+    .addError(1, 8, "Expected an assignment or function call and instead saw an expression.")
+    .test(
+      "import.target;",
+      { esversion: 11, module: true }
+    );
+
+  test.done();
+};
+
+exports.nullishCoalescing = {};
+
+exports.nullishCoalescing.positive = function(test) {
+  TestRun(test, "requires esversion: 11")
+    .addError(1, 3, "'nullish coalescing' is only available in ES11 (use 'esversion: 11').")
+    .test([
+      "0 ?? 0;"
+    ], { esversion: 10, expr: true });
+
+  TestRun(test, "does not stand alone")
+    .addError(1, 6, "Expected an assignment or function call and instead saw an expression.")
+    .test([
+      "0 ?? 0;"
+    ], { esversion: 11 });
+
+  TestRun(test, "precedence with bitwise OR")
+    .test([
+      "0 | 0 ?? 0;"
+    ], { esversion: 11, expr: true });
+
+  TestRun(test, "precedence with conditional expression")
+    .test([
+      "0 ?? 0 ? 0 ?? 0 : 0 ?? 0;"
+    ], { esversion: 11, expr: true });
+
+  TestRun(test, "precedence with expression")
+    .test([
+      "0 ?? 0, 0 ?? 0;"
+    ], { esversion: 11, expr: true });
+
+  TestRun(test, "covered")
+    .test([
+      "0 || (0 ?? 0);",
+      "(0 || 0) ?? 0;",
+      "(0 ?? 0) || 0;",
+      "0 ?? (0 || 0);",
+      "0 && (0 ?? 0);",
+      "(0 && 0) ?? 0;",
+      "(0 ?? 0) && 0;",
+      "0 ?? (0 && 0);"
+    ], { esversion: 11, expr: true });
+
+  test.done();
+};
+
+exports.nullishCoalescing.negative = function(test) {
+  TestRun(test, "precedence with logical OR")
+    .addError(1, 8, "Unexpected '??'.")
+    .test([
+      "0 || 0 ?? 0;"
+    ], { esversion: 11, expr: true });
+
+  TestRun(test, "precedence with logical OR")
+    .addError(1, 8, "Unexpected '||'.")
+    .test([
+      "0 ?? 0 || 0;"
+    ], { esversion: 11, expr: true });
+
+  TestRun(test, "precedence with logical AND")
+    .addError(1, 8, "Unexpected '??'.")
+    .test([
+      "0 && 0 ?? 0;"
+    ], { esversion: 11, expr: true });
+
+  TestRun(test, "precedence with logical AND")
+    .addError(1, 8, "Unexpected '&&'.")
+    .test([
+      "0 ?? 0 && 0;"
+    ], { esversion: 11, expr: true });
+
+  test.done();
+};
+
+exports.optionalChaining = function (test) {
+  TestRun(test, "prior language editions")
+    .addError(1, 5, "'Optional chaining' is only available in ES11 (use 'esversion: 11').")
+    .addError(1, 7, "Expected an assignment or function call and instead saw an expression.")
+    .test(
+      "true?.x;",
+      { esversion: 10 }
+    );
+
+  TestRun(test, "literal property name")
+    .addError(1, 7, "Expected an assignment or function call and instead saw an expression.")
+    .addError(2, 5, "Expected an assignment or function call and instead saw an expression.")
+    .addError(3, 7, "Expected an assignment or function call and instead saw an expression.")
+    .test([
+        "true?.x;",
+        "[]?.x;",
+        "({}?.x);"
+      ], { esversion: 11 }
+    );
+
+  TestRun(test, "literal property name restriction")
+    .addError(1, 40, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, 46, "Strict violation.")
+    .test(
+      "(function() { 'use strict'; arguments?.callee; })();",
+      { esversion: 11 }
+    );
+
+  TestRun(test, "dynamic property name")
+    .addError(1, 14, "Expected an assignment or function call and instead saw an expression.")
+    .addError(2, 11, "Expected an assignment or function call and instead saw an expression.")
+    .addError(2, 7, "['x'] is better written in dot notation.")
+    .test([
+        "true?.[void 0];",
+        "true?.['x'];"
+      ], { esversion: 11 }
+    );
+
+  TestRun(test, "arguments")
+    .addError(1, 10, "Expected an assignment or function call and instead saw an expression.")
+    .addError(2, 14, "Expected an assignment or function call and instead saw an expression.")
+    .addError(3, 20, "Expected an assignment or function call and instead saw an expression.")
+    .addError(4, 15, "Expected an assignment or function call and instead saw an expression.")
+    .test([
+        "true.x?.();",
+        "true.x?.(true);",
+        "true.x?.(true, true);",
+        "true.x?.(...[]);"
+      ], { esversion: 11 }
+    );
+
+  TestRun(test, "new")
+    .addError(1, 7, "Unexpected '?.'.")
+    .test(
+      "new {}?.constructor();",
+      { esversion: 11 }
+    );
+
+  TestRun(test, "template invocation - literal property name")
+    .addError(1, 15, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, 15, "Unexpected '`'.")
+    .test(
+      "true?.toString``;",
+      { esversion: 11 }
+    );
+
+  TestRun(test, "template invocation - dynamic property name")
+    .addError(1, 15, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, 15, "Unexpected '`'.")
+    .test(
+      "true?.[void 0]``;",
+      { esversion: 11 }
+    );
+
+  TestRun(test, "ternary")
+    .addError(1, 8, "A leading decimal point can be confused with a dot: '.1'.")
+    .addError(1, 11, "Expected an assignment or function call and instead saw an expression.")
+    .test(
+      "true?.1 : null;",
+      { esversion: 11 }
+    );
+
+  test.done();
+};
