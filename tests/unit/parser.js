@@ -10590,5 +10590,11 @@ exports.optionalChaining = function (test) {
       { esversion: 11 }
     );
 
+  TestRun(test, "CallExpression")
+    .test(
+      "true?.false();",
+      { esversion: 11 }
+    );
+
   test.done();
 };

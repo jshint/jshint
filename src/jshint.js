@@ -3081,6 +3081,21 @@ var JSHINT = (function() {
     return that;
   }, 160, true);
 
+
+  /**
+   * Determine if a CallExpression's "base" is a type of expression commonly
+   * used in this position.
+   *
+   * @param {token} token - token describing the "base" of the CallExpression
+   * @returns {boolean}
+   */
+  function isTypicalCallExpression(token) {
+    return token.identifier || token.id === "." || token.id === "[" ||
+      token.id === "=>" || token.id === "(" || token.id === "&&" ||
+      token.id === "||" || token.id === "?" || token.id === "async" ||
+      token.id === "?." || (state.inES6() && token["(name)"]);
+  }
+
   infix("(", function(context, left, that) {
     if (state.option.immed && left && !left.immed && left.id === "function") {
       warning("W062");
@@ -3171,9 +3186,7 @@ var JSHINT = (function() {
           addEvalCode(left, p[0]);
         }
       }
-      if (!left.identifier && left.id !== "." && left.id !== "[" && left.id !== "=>" &&
-          left.id !== "(" && left.id !== "&&" && left.id !== "||" && left.id !== "?" &&
-          left.id !== "async" && !(state.inES6() && left["(name)"])) {
+      if (!isTypicalCallExpression(left)) {
         warning("W067", that);
       }
     }
