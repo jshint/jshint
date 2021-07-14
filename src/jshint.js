@@ -115,10 +115,6 @@ var JSHINT = (function() {
     return true;
   }
 
-  function isString(obj) {
-    return Object.prototype.toString.call(obj) === "[object String]";
-  }
-
   function isIdentifier(tkn, value) {
     if (!tkn)
       return false;
@@ -6498,7 +6494,7 @@ var JSHINT = (function() {
     inblock = false;
     lookahead = [];
 
-    if (!isString(s) && !Array.isArray(s)) {
+    if (!Array.isArray(s) && typeof s !== "string") {
       errorAt("E004", 0);
       return false;
     }
