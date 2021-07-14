@@ -188,7 +188,9 @@ function findFile(name, cwd) {
     return null;
   }
 
-  return findFile(name, parent);
+  var result = findFile(name, parent);
+  findFileResults[filename] = result;
+  return result;
 }
 
 /**
@@ -429,7 +431,8 @@ function collect(fp, files, ignores, ext) {
     shjs.ls(fp).forEach(function(item) {
       var itempath = path.join(fp, item);
       if (shjs.test("-d", itempath) || item.match(ext)) {
-        collect(itempath, files, ignores, ext);
+        var dirIgnores = loadIgnores({ cwd: path.resolve(itempath) });
+        collect(itempath, files, ignores.concat(dirIgnores), ext);
       }
     });
 
@@ -561,7 +564,8 @@ var exports = {
    *
    * @param {object} post-processed options from 'interpret':
    *                   args     - CLI arguments
-   *                   ignores  - A list of files/dirs to ignore (defaults to .jshintignores)
+   *                   ignores  - A list of files/dirs to ignore (defaults to
+   *                     the contents of .jshintignore)
    *                   extensions - A list of non-dot-js extensions to check
    */
   gather: function(opts) {
@@ -571,13 +575,13 @@ var exports = {
       (!opts.extensions ? "" : "|" +
         opts.extensions.replace(/,/g, "|").replace(/[\. ]/g, "")) + ")$");
 
-    var ignores = !opts.ignores ? loadIgnores({ cwd: opts.cwd }) :
-                                  opts.ignores.map(function(target) {
-                                    return path.resolve(target);
-                                  });
+    var ignores = (opts.ignores || []).map(function(target) {
+      return path.resolve(target);
+    });
 
     opts.args.forEach(function(target) {
-      collect(target, files, ignores, reg);
+      var dirIgnores = loadIgnores({ cwd: path.resolve(target) });
+      collect(target, files, ignores.concat(dirIgnores), reg);
     });
 
     return files;
@@ -636,11 +640,15 @@ var exports = {
           config = exports.getConfig(filename);
         }
 
+        var ignores = !filename ? [] : loadIgnores({ cwd: filename });
+
         config = config || {};
 
         mergeCLIPrereq(config);
 
-        lint(extract(code, opts.extract), results, config, data, filename);
+        if (!isIgnored(filename, ignores)) {
+          lint(extract(code, opts.extract), results, config, data, filename);
+        }
         (opts.reporter || defReporter)(results, data, { verbose: opts.verbose });
         cb(results.length === 0);
 
