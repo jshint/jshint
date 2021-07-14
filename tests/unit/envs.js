@@ -98,7 +98,6 @@ exports.node = function (test) {
 exports.typed = function (test) {
   var globals = [
     "ArrayBuffer",
-    "ArrayBufferView",
     "DataView",
     "Float32Array",
     "Float64Array",
