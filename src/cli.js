@@ -523,15 +523,16 @@ var exports = {
    * Loads and parses a configuration file.
    *
    * @param {string} fp a path to the config file
+   * @param {string} [source] a path to the config file with `extends` field
    * @returns {object} config object
    */
-  loadConfig: function(fp) {
+  loadConfig: function(fp, source) {
     if (!fp) {
       return {};
     }
 
     if (!shjs.test("-e", fp)) {
-      cli.error("Can't find config file: " + fp);
+      cli.error("Can't find config file: " + fp + (source ? " (source: " + source + ")" : ""));
       exports.exit(1);
     }
 
@@ -540,7 +541,7 @@ var exports = {
       config.dirname = path.dirname(fp);
 
       if (config['extends']) {
-        var baseConfig = exports.loadConfig(path.resolve(config.dirname, config['extends']));
+        var baseConfig = exports.loadConfig(path.resolve(config.dirname, config['extends']), {source: fp});
         config = _.merge({}, baseConfig, config, function(a, b) {
           if (_.isArray(a)) {
             return a.concat(b);
