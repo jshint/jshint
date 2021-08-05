@@ -3070,6 +3070,7 @@ var JSHINT = (function() {
       that.left = left;
       advance();
       that.right = state.tokens.curr.led(context, left);
+      that.exps = true;
     } else {
       state.syntax["."].led.call(that, context, left);
     }
