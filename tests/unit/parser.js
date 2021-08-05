@@ -10547,10 +10547,6 @@ exports.optionalChaining = function (test) {
     );
 
   TestRun(test, "arguments")
-    .addError(1, 10, "Expected an assignment or function call and instead saw an expression.")
-    .addError(2, 14, "Expected an assignment or function call and instead saw an expression.")
-    .addError(3, 20, "Expected an assignment or function call and instead saw an expression.")
-    .addError(4, 15, "Expected an assignment or function call and instead saw an expression.")
     .test([
         "true.x?.();",
         "true.x?.(true);",
