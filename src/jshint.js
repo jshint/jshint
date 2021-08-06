@@ -2717,11 +2717,16 @@ var JSHINT = (function() {
 
     var opening = state.tokens.next;
     var c = expression(context, 155), i;
+
+    if (!c) {
+      return this;
+    }
+
     if (!c.paren && c.rbp > 160) {
       error("E024", opening, opening.value);
     }
 
-    if (c && c.id !== "function") {
+    if (c.id !== "function") {
       if (c.identifier) {
         switch (c.value) {
         case "Number":

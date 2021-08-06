@@ -10598,3 +10598,26 @@ exports.optionalChaining = function (test) {
 
   test.done();
 };
+
+// gh-3556: "Crash parsing: throw new"
+exports.loneNew = function (test) {
+  TestRun(test, "as reported")
+    .addError(4, 3, "Expected an identifier and instead saw '}'.")
+    .addError(4, 4, "Missing semicolon.")
+    .addError(1, 21, "Unmatched '{'.")
+    .addError(5, 1, "Unrecoverable syntax error. (100% scanned).")
+    .test([
+      "function code(data) {",
+      "  if (data.request === 'foo') {",
+      "    throw new ",
+      "  }",
+      "}"
+    ]);
+
+  TestRun(test, "simplified")
+    .addError(1, 4, "Expected an identifier and instead saw ';'.")
+    .addError(1, 5, "Missing semicolon.")
+    .test("new;");
+
+  test.done();
+};
