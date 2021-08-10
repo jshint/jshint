@@ -1,3 +1,12 @@
+<a name="2.13.1"></a>
+## [2.13.1](https://github.com/jshint/jshint/compare/2.13.0...v2.13.1) (2021-08-10)
+
+### Bug Fixes
+
+* Allow invoking result of optional chaining ([71ec395](https://github.com/jshint/jshint/commit/71ec395))
+* Allow optional chaining call as satement ([11dc0a6](https://github.com/jshint/jshint/commit/11dc0a6))
+* Tolerate dangling NewExpression ([7c890aa](https://github.com/jshint/jshint/commit/7c890aa))
+
 <a name="2.13.0"></a>
 # [2.13.0](https://github.com/jshint/jshint/compare/2.12.0...v2.13.0) (2021-05-30)
 

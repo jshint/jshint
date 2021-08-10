@@ -1,6 +1,6 @@
 #!/usr/bin/env rhino
 var window = {};
-/*! 2.13.0 */
+/*! 2.13.1 */
 var JSHINT;
 if (typeof window === 'undefined') window = {};
 (function () {
@@ -28031,11 +28031,16 @@ var JSHINT = (function() {
 
     var opening = state.tokens.next;
     var c = expression(context, 155), i;
+
+    if (!c) {
+      return this;
+    }
+
     if (!c.paren && c.rbp > 160) {
       error("E024", opening, opening.value);
     }
 
-    if (c && c.id !== "function") {
+    if (c.id !== "function") {
       if (c.identifier) {
         switch (c.value) {
         case "Number":
@@ -28384,6 +28389,7 @@ var JSHINT = (function() {
       that.left = left;
       advance();
       that.right = state.tokens.curr.led(context, left);
+      that.exps = true;
     } else {
       state.syntax["."].led.call(that, context, left);
     }
@@ -28394,6 +28400,21 @@ var JSHINT = (function() {
 
     return that;
   }, 160, true);
+
+
+  /**
+   * Determine if a CallExpression's "base" is a type of expression commonly
+   * used in this position.
+   *
+   * @param {token} token - token describing the "base" of the CallExpression
+   * @returns {boolean}
+   */
+  function isTypicalCallExpression(token) {
+    return token.identifier || token.id === "." || token.id === "[" ||
+      token.id === "=>" || token.id === "(" || token.id === "&&" ||
+      token.id === "||" || token.id === "?" || token.id === "async" ||
+      token.id === "?." || (state.inES6() && token["(name)"]);
+  }
 
   infix("(", function(context, left, that) {
     if (state.option.immed && left && !left.immed && left.id === "function") {
@@ -28485,9 +28506,7 @@ var JSHINT = (function() {
           addEvalCode(left, p[0]);
         }
       }
-      if (!left.identifier && left.id !== "." && left.id !== "[" && left.id !== "=>" &&
-          left.id !== "(" && left.id !== "&&" && left.id !== "||" && left.id !== "?" &&
-          left.id !== "async" && !(state.inES6() && left["(name)"])) {
+      if (!isTypicalCallExpression(left)) {
         warning("W067", that);
       }
     }
