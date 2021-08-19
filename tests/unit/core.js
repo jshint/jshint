@@ -421,10 +421,19 @@ exports.argsInCatchReused = function (test) {
   test.done();
 };
 
-exports.testRawOnError = function (test) {
+exports.testRawOnWarning = function (test) {
   JSHINT(';', { maxerr: 1 });
   test.equal(JSHINT.errors[0].raw, 'Unnecessary semicolon.');
   test.equal(JSHINT.errors[1], null);
+
+  test.done();
+};
+
+exports.testRawOnError = function (test) {
+  JSHINT('@', { maxerr: 1 });
+  test.equal(JSHINT.errors[0].raw, 'Unexpected \'{a}\'.');
+  test.equal(JSHINT.errors[1].raw, 'Too many errors.');
+  test.equal(JSHINT.errors[2], null);
 
   test.done();
 };
