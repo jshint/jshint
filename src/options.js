@@ -820,7 +820,7 @@ exports.val = {
   indent       : false,
 
   /**
-   * This options allows you to set the maximum amount of warnings JSHint will
+   * This options allows you to set the maximum amount of errors JSHint will
    * produce before giving up. Default is 50.
    */
   maxerr       : false,

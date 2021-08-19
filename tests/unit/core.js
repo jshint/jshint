@@ -421,9 +421,17 @@ exports.argsInCatchReused = function (test) {
   test.done();
 };
 
-exports.testRawOnError = function (test) {
+exports.testRawOnWarning = function (test) {
   JSHINT(';', { maxerr: 1 });
   test.equal(JSHINT.errors[0].raw, 'Unnecessary semicolon.');
+  test.equal(JSHINT.errors[1], null);
+
+  test.done();
+};
+
+exports.testRawOnError = function (test) {
+  JSHINT('@', { maxerr: 1 });
+  test.equal(JSHINT.errors[0].raw, 'Unexpected \'{a}\'.');
   test.equal(JSHINT.errors[1].raw, 'Too many errors.');
   test.equal(JSHINT.errors[2], null);
 
@@ -471,12 +479,6 @@ exports.insideEval = function (test) {
     .addError(17, 17, "Unrecoverable syntax error. (100% scanned).")
 
     .test(src, { es3: true, evil: false });
-
-  // Regression test for bug GH-714.
-  JSHINT(src, { evil: false, maxerr: 1 });
-  var err = JSHINT.data().errors[1];
-  test.equal(err.raw, "Too many errors.");
-  test.equal(err.scope, "(main)");
 
   test.done();
 };

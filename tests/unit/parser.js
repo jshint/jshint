@@ -9142,7 +9142,14 @@ exports.restOperatorWithoutIdentifier = function (test) {
     .addError(8, 24, "Expected an identifier and instead saw ')'.")
     .addError(8, 26, "Expected ',' and instead saw '=>'.")
     .addError(8, 30, "Expected ',' and instead saw ';'.")
-    .addError(8, 30, "Too many errors. (44% scanned).")
+    .addError(9, 1, "Expected an identifier and instead saw 'var' (a reserved word).")
+    .addError(9, 5, "Expected ',' and instead saw 'arrow3'.")
+    .addError(9, 12, "Expected an identifier and instead saw '='.")
+    .addError(9, 14, "Expected ',' and instead saw '('.")
+    .addError(9, 19, "Expected an identifier and instead saw ']'.")
+    .addError(9, 20, "Expected ',' and instead saw ')'.")
+    .addError(9, 22, "Expected an identifier and instead saw '=>'.")
+    .addError(9, 22, "Too many errors. (50% scanned).")
     .test(code, { esnext: true });
 
   test.done();

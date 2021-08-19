@@ -423,9 +423,10 @@ var JSHINT = (function() {
 
     removeIgnoredMessages();
 
-    if (JSHINT.errors.length >= state.option.maxerr)
+    var errors = JSHINT.errors.filter(function(e) { return /E\d{3}/.test(e.code); });
+    if (errors.length >= state.option.maxerr) {
       quit("E043", t);
-
+    }
     return w;
   }
 
