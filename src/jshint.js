@@ -2450,7 +2450,9 @@ var JSHINT = (function() {
     that.left = left;
     var right = that.right = expression(context, 39);
 
-    if (!right.paren && (right.id === "||" || right.id === "&&")) {
+    if (!right) {
+      error("E024", state.tokens.next, state.tokens.next.id);
+    } else if (!right.paren && (right.id === "||" || right.id === "&&")) {
       error("E024", that.right, that.right.id);
     }
 

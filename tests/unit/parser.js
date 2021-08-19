@@ -10617,3 +10617,26 @@ exports.loneNew = function (test) {
 
   test.done();
 };
+
+// gh-3560: "Logical nullish assignment (??=) throwing error"
+exports.loneNullishCoalescing = function (test) {
+  TestRun(test, "as reported")
+    .addError(2, 8, "Expected an identifier and instead saw '='.")
+    .addError(2, 10, "Unexpected '(number)'.")
+    .addError(2, 8, "Expected an assignment or function call and instead saw an expression.")
+    .addError(2, 9, "Missing semicolon.")
+    .addError(2, 10, "Expected an assignment or function call and instead saw an expression.")
+    .test([
+      "let a = [1,2];",
+      "a[0] ??= 0;"
+    ], {esversion: 11});
+
+  TestRun(test, "simplified")
+    .addError(1, 4, "Expected an identifier and instead saw ';'.")
+    .addError(1, 4, "Unexpected '(end)'.")
+    .addError(1, 4, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, 5, "Missing semicolon.")
+    .test("0??;", {esversion: 11});
+
+  test.done();
+};
