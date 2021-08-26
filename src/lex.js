@@ -1115,7 +1115,6 @@ Lexer.prototype = {
       char = "\\\\";
       break;
     case "\"":
-      char = "\\\"";
       break;
     case "/":
       break;
