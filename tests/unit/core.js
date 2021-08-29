@@ -2319,7 +2319,7 @@ exports.duplicateProto = function (test) {
     "};"
   ];
 
-  TestRun(test, "Duplicate keys (data)")
+  TestRun(test, "Duplicate keys (backslash)")
     .addError(3, 7, "Duplicate key '\"'.")
     .test(src);
 
