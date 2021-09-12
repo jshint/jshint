@@ -518,7 +518,7 @@ exports.node = {
   setInterval   : true,
   clearInterval : true,
   setImmediate  : true, // v0.9.1+
-  clearImmediate: true  // v0.9.1+
+  clearImmediate: true, // v0.9.1+
   URL           : true  // v6.13.0+
 };
 
