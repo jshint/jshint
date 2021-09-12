@@ -2314,6 +2314,17 @@ exports.duplicateProto = function (test) {
 
   src = [
     "void {",
+    "  '\"': null,",
+    "  \"\\\"\": null",
+    "};"
+  ];
+
+  TestRun(test, "Duplicate keys (backslash)")
+    .addError(3, 7, "Duplicate key '\"'.")
+    .test(src);
+
+  src = [
+    "void {",
     "  __proto__: null,",
     "  get __proto__() {}",
     "};"
