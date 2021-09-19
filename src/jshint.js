@@ -4072,8 +4072,10 @@ var JSHINT = (function() {
             warning("W104", state.tokens.next, "object short notation", "6");
           }
           t = expression(context, 10);
-          i = t.value;
-          saveProperty(props, i, t);
+          i = t && t.value;
+          if (t) {
+            saveProperty(props, i, t);
+          }
 
         } else if (peek().id !== ":" && (nextVal === "get" || nextVal === "set")) {
           advance(nextVal);
