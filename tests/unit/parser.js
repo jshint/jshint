@@ -10647,3 +10647,21 @@ exports.loneNullishCoalescing = function (test) {
 
   test.done();
 };
+
+// gh-3571: "Cannot read properties of undefined at Object.e.nud"
+exports.keywordAsShorthandObjectProperty = function (test) {
+  TestRun(test, "as reported")
+    .addError(1, 12, "Expected an identifier and instead saw 'do'.")
+    .addError(1, 15, "Missing semicolon.")
+    .test("const a = {do}", {esversion: 6});
+
+  TestRun(test, "simplified")
+    .addError(1, 7, "Expected an identifier and instead saw 'do'.")
+    .test("void {do};", {esversion: 6});
+
+  TestRun(test, "alternate - penultimate member")
+    .addError(1, 7, "Expected an identifier and instead saw 'for'.")
+    .test("void {for, baz};", {esversion: 6});
+
+  test.done();
+};
