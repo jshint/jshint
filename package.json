@@ -42,7 +42,6 @@
   "dependencies": {
     "cli": "~1.0.0",
     "console-browserify": "1.1.x",
-    "exit": "0.1.x",
     "htmlparser2": "3.8.x",
     "lodash": "~4.17.21",
     "minimatch": "~3.0.2",
