@@ -422,6 +422,7 @@ exports.browser = {
   TimeEvent            : false,
   top                  : false,
   URL                  : false,
+  URLSearchParams      : false,
   WebGLActiveInfo      : false,
   WebGLBuffer          : false,
   WebGLContextEvent    : false,
@@ -513,17 +514,18 @@ exports.node = {
   // These globals are writeable because Node allows the following
   // usage pattern: var Buffer = require("buffer").Buffer;
 
-  Buffer        : true,
-  console       : true,
-  exports       : true,
-  process       : true,
-  setTimeout    : true,
-  clearTimeout  : true,
-  setInterval   : true,
-  clearInterval : true,
-  setImmediate  : true, // v0.9.1+
-  clearImmediate: true, // v0.9.1+
-  URL           : true  // v6.13.0+
+  Buffer         : true,
+  console        : true,
+  exports        : true,
+  process        : true,
+  setTimeout     : true,
+  clearTimeout   : true,
+  setInterval    : true,
+  clearInterval  : true,
+  setImmediate   : true, // v0.9.1+
+  clearImmediate : true, // v0.9.1+
+  URL            : true,  // v6.13.0+
+  URLSearchParams: true  // v6.13.0+
 };
 
 exports.browserify = {
