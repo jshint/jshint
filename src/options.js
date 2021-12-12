@@ -1054,6 +1054,7 @@ exports.val = {
    *  - `11` - To enable language features introduced by ECMAScript 11. Notable
    *    additions: "export * as ns from 'module'", `import.meta`, the nullish
    *    coalescing operator, and optional chaining, and dynamic import.
+   *  - `12` - To enable language features introduced by ECMAScript 12.
    */
   esversion: 5
 };
