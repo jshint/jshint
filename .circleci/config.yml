@@ -55,11 +55,20 @@ jobs:
       - run:
           name: run tests
           command: npm run test-node
+  build-container:
+    machine:
+      image: ubuntu-2004:202111-02
+    steps:
+      - checkout
+      - run:
+          name: Build container
+          command: docker build --file 'Containerfile' --rm --tag 'jshint:latest' .
 
 workflows:
   orb-free-workflow:
     jobs:
       - install
+      - build-container
       - test-with-latest-nodejs:
           name: Unit tests in latest release of Node.js
           requires: [install]
