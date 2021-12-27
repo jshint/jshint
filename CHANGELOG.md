@@ -1,3 +1,15 @@
+<a name="2.13.2"></a>
+## [2.13.2](https://github.com/jshint/jshint/compare/2.13.1...v2.13.2) (2021-12-27)
+
+### Bug Fixes
+
+* Add missing well-known globals (#3582) ([cc1adf6](https://github.com/jshint/jshint/commit/cc1adf6))
+* add URL for node in src/vars.js (#3570) ([ca06e6a](https://github.com/jshint/jshint/commit/ca06e6a))
+* change escape-sequence handler for double quotes (\") (#3566) ([75e48b7](https://github.com/jshint/jshint/commit/75e48b7))
+* Limit "Too many Errors" (E043) to errors only (#3562) ([4a681b9](https://github.com/jshint/jshint/commit/4a681b9))
+* Tolerate keyword in object shorthand ([057b1c6](https://github.com/jshint/jshint/commit/057b1c6))
+* Tolerate unterminated nullish coalescing ([ecae54a](https://github.com/jshint/jshint/commit/ecae54a))
+
 <a name="2.13.1"></a>
 ## [2.13.1](https://github.com/jshint/jshint/compare/2.13.0...v2.13.1) (2021-08-10)
 

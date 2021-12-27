@@ -1,6 +1,6 @@
 #!/usr/bin/env rhino
 var window = {};
-/*! 2.13.1 */
+/*! 2.13.2 */
 var JSHINT;
 if (typeof window === 'undefined') window = {};
 (function () {
@@ -19774,9 +19774,6 @@ Lexer.prototype = {
     case "\\":
       char = "\\\\";
       break;
-    case "\"":
-      char = "\\\"";
-      break;
     case "/":
       break;
     case "":
@@ -22158,7 +22155,7 @@ exports.val = {
   indent       : false,
 
   /**
-   * This options allows you to set the maximum amount of warnings JSHint will
+   * This options allows you to set the maximum amount of errors JSHint will
    * produce before giving up. Default is 50.
    */
   maxerr       : false,
@@ -24573,6 +24570,9 @@ exports.ecmaIdentifiers = {
   8: {
     Atomics            : false,
     SharedArrayBuffer  : false
+  },
+  11: {
+    BigInt             : false
   }
 };
 
@@ -24926,6 +24926,7 @@ exports.browser = {
   TimeEvent            : false,
   top                  : false,
   URL                  : false,
+  URLSearchParams      : false,
   WebGLActiveInfo      : false,
   WebGLBuffer          : false,
   WebGLContextEvent    : false,
@@ -25012,20 +25013,23 @@ exports.node = {
   global        : false,
   module        : false,
   require       : false,
+  Intl          : false,
 
   // These globals are writeable because Node allows the following
   // usage pattern: var Buffer = require("buffer").Buffer;
 
-  Buffer        : true,
-  console       : true,
-  exports       : true,
-  process       : true,
-  setTimeout    : true,
-  clearTimeout  : true,
-  setInterval   : true,
-  clearInterval : true,
-  setImmediate  : true, // v0.9.1+
-  clearImmediate: true  // v0.9.1+
+  Buffer         : true,
+  console        : true,
+  exports        : true,
+  process        : true,
+  setTimeout     : true,
+  clearTimeout   : true,
+  setInterval    : true,
+  clearInterval  : true,
+  setImmediate   : true, // v0.9.1+
+  clearImmediate : true, // v0.9.1+
+  URL            : true,  // v6.13.0+
+  URLSearchParams: true  // v6.13.0+
 };
 
 exports.browserify = {
@@ -25267,10 +25271,12 @@ exports.mocha = {
   // BDD
   describe    : false,
   xdescribe   : false,
-  it          : false,
-  xit         : false,
   context     : false,
   xcontext    : false,
+  it          : false,
+  xit         : false,
+  specify     : false,
+  xspecify    : false,
   before      : false,
   after       : false,
   beforeEach  : false,
@@ -25737,9 +25743,10 @@ var JSHINT = (function() {
 
     removeIgnoredMessages();
 
-    if (JSHINT.errors.length >= state.option.maxerr)
+    var errors = JSHINT.errors.filter(function(e) { return /E\d{3}/.test(e.code); });
+    if (errors.length >= state.option.maxerr) {
       quit("E043", t);
-
+    }
     return w;
   }
 
@@ -27764,7 +27771,9 @@ var JSHINT = (function() {
     that.left = left;
     var right = that.right = expression(context, 39);
 
-    if (!right.paren && (right.id === "||" || right.id === "&&")) {
+    if (!right) {
+      error("E024", state.tokens.next, state.tokens.next.id);
+    } else if (!right.paren && (right.id === "||" || right.id === "&&")) {
       error("E024", that.right, that.right.id);
     }
 
@@ -29386,8 +29395,10 @@ var JSHINT = (function() {
             warning("W104", state.tokens.next, "object short notation", "6");
           }
           t = expression(context, 10);
-          i = t.value;
-          saveProperty(props, i, t);
+          i = t && t.value;
+          if (t) {
+            saveProperty(props, i, t);
+          }
 
         } else if (peek().id !== ":" && (nextVal === "get" || nextVal === "set")) {
           advance(nextVal);
