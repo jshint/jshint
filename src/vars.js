@@ -66,6 +66,9 @@ exports.ecmaIdentifiers = {
   8: {
     Atomics            : false,
     SharedArrayBuffer  : false
+  },
+  11: {
+    BigInt             : false
   }
 };
 
@@ -419,6 +422,7 @@ exports.browser = {
   TimeEvent            : false,
   top                  : false,
   URL                  : false,
+  URLSearchParams      : false,
   WebGLActiveInfo      : false,
   WebGLBuffer          : false,
   WebGLContextEvent    : false,
@@ -505,21 +509,23 @@ exports.node = {
   global        : false,
   module        : false,
   require       : false,
+  Intl          : false,
 
   // These globals are writeable because Node allows the following
   // usage pattern: var Buffer = require("buffer").Buffer;
 
-  Buffer        : true,
-  console       : true,
-  exports       : true,
-  process       : true,
-  setTimeout    : true,
-  clearTimeout  : true,
-  setInterval   : true,
-  clearInterval : true,
-  setImmediate  : true, // v0.9.1+
-  clearImmediate: true, // v0.9.1+
-  URL           : true  // v6.13.0+
+  Buffer         : true,
+  console        : true,
+  exports        : true,
+  process        : true,
+  setTimeout     : true,
+  clearTimeout   : true,
+  setInterval    : true,
+  clearInterval  : true,
+  setImmediate   : true, // v0.9.1+
+  clearImmediate : true, // v0.9.1+
+  URL            : true,  // v6.13.0+
+  URLSearchParams: true  // v6.13.0+
 };
 
 exports.browserify = {
@@ -761,10 +767,12 @@ exports.mocha = {
   // BDD
   describe    : false,
   xdescribe   : false,
-  it          : false,
-  xit         : false,
   context     : false,
   xcontext    : false,
+  it          : false,
+  xit         : false,
+  specify     : false,
+  xspecify    : false,
   before      : false,
   after       : false,
   beforeEach  : false,
