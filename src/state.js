@@ -66,6 +66,15 @@ var state = {
   },
 
   /**
+   * Determine if constructs introduced in ECMAScript 12 should be accepted.
+   *
+   * @returns {boolean}
+   */
+  inES12: function() {
+    return this.esVersion >= 12;
+  },
+
+  /**
    * Determine if constructs introduced in ECMAScript 11 should be accepted.
    *
    * @returns {boolean}

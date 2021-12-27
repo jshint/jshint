@@ -4303,13 +4303,15 @@ exports.esversion = function(test) {
     "// jshint esversion: 11",
     "// jshint esversion: 2020",
     "// jshint esversion: 12",
-    "// jshint esversion: 2021"
+    "// jshint esversion: 2021",
+    "// jshint esversion: 13",
+    "// jshint esversion: 2022"
   ];
 
   TestRun(test, "Value")
     .addError(2, 1, "Bad option value.")
-    .addError(16, 1, "Bad option value.")
-    .addError(17, 1, "Bad option value.")
+    .addError(18, 1, "Bad option value.")
+    .addError(19, 1, "Bad option value.")
     .test(code);
 
   var es5code = [
