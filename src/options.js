@@ -1053,7 +1053,8 @@ exports.val = {
    *    Notable additions: optional catch bindings.
    *  - `11` - To enable language features introduced by ECMAScript 11. Notable
    *    additions: "export * as ns from 'module'", `import.meta`, the nullish
-   *    coalescing operator, and optional chaining, and dynamic import.
+   *    coalescing operator, the BigInt type, the `globalThis` binding,
+   *    optional chaining, and dynamic import.
    */
   esversion: 5
 };

@@ -2582,3 +2582,26 @@ exports.constWithoutInit = function(test) {
 
   test.done();
 };
+
+// regression test for gh-3595
+exports.bigIntCtor = function(test) {
+  var code = [
+    "void BigInt;",
+    "void globalThis;"
+  ];
+
+  TestRun(test)
+    .addError(1, 6, "'BigInt' is not defined.")
+    .addError(2, 6, "'globalThis' is not defined.")
+    .test(code, { undef: true });
+
+  TestRun(test)
+    .addError(1, 6, "'BigInt' is not defined.")
+    .addError(2, 6, "'globalThis' is not defined.")
+    .test(code, { undef: true, esversion: 10 });
+
+  TestRun(test)
+    .test(code, { undef: true, esversion: 11 });
+
+  test.done();
+};
