@@ -68,7 +68,8 @@ exports.ecmaIdentifiers = {
     SharedArrayBuffer  : false
   },
   11: {
-    BigInt             : false
+    BigInt             : false,
+    globalThis         : false
   }
 };
 

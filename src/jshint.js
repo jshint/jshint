@@ -242,6 +242,10 @@ var JSHINT = (function() {
       combine(predefined, vars.ecmaIdentifiers[8]);
     }
 
+    if (state.inES11()) {
+      combine(predefined, vars.ecmaIdentifiers[11]);
+    }
+
     /**
      * Use `in` to check for the presence of any explicitly-specified value for
      * `globalstrict` because both `true` and `false` should trigger an error.
