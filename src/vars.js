@@ -525,8 +525,8 @@ exports.node = {
   clearInterval  : true,
   setImmediate   : true, // v0.9.1+
   clearImmediate : true, // v0.9.1+
-  URL            : true,  // v6.13.0+
-  URLSearchParams: true  // v6.13.0+
+  URL            : true, // v10.0.0+
+  URLSearchParams: true  // v10.0.0+
 };
 
 exports.browserify = {
