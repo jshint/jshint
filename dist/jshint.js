@@ -1,4 +1,4 @@
-/*! 2.13.2 */
+/*! 2.13.3 */
 var JSHINT;
 if (typeof window === 'undefined') window = {};
 (function () {
@@ -22386,7 +22386,8 @@ exports.val = {
    *    Notable additions: optional catch bindings.
    *  - `11` - To enable language features introduced by ECMAScript 11. Notable
    *    additions: "export * as ns from 'module'", `import.meta`, the nullish
-   *    coalescing operator, and optional chaining, and dynamic import.
+   *    coalescing operator, the BigInt type, the `globalThis` binding,
+   *    optional chaining, and dynamic import.
    */
   esversion: 5
 };
@@ -24570,7 +24571,8 @@ exports.ecmaIdentifiers = {
     SharedArrayBuffer  : false
   },
   11: {
-    BigInt             : false
+    BigInt             : false,
+    globalThis         : false
   }
 };
 
@@ -25026,8 +25028,8 @@ exports.node = {
   clearInterval  : true,
   setImmediate   : true, // v0.9.1+
   clearImmediate : true, // v0.9.1+
-  URL            : true,  // v6.13.0+
-  URLSearchParams: true  // v6.13.0+
+  URL            : true, // v10.0.0+
+  URLSearchParams: true  // v10.0.0+
 };
 
 exports.browserify = {
@@ -25558,6 +25560,10 @@ var JSHINT = (function() {
 
     if (state.inES8()) {
       combine(predefined, vars.ecmaIdentifiers[8]);
+    }
+
+    if (state.inES11()) {
+      combine(predefined, vars.ecmaIdentifiers[11]);
     }
 
     /**

@@ -1,3 +1,10 @@
+<a name="2.13.3"></a>
+## [2.13.3](https://github.com/jshint/jshint/compare/2.13.2...v2.13.3) (2022-01-05)
+
+### Bug Fixes
+
+* Recognize ES2020 globals ([b1426f1](https://github.com/jshint/jshint/commit/b1426f1))
+
 <a name="2.13.2"></a>
 ## [2.13.2](https://github.com/jshint/jshint/compare/2.13.1...v2.13.2) (2021-12-27)
 
