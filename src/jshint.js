@@ -3458,7 +3458,7 @@ var JSHINT = (function() {
   }
 
   prefix("[", function(context) {
-    var blocktype = lookupBlockType();
+    var blocktype = lookupBlockType(true);
     if (blocktype === "array comprehension") {
       if (!state.option.esnext && !state.inMoz()) {
         warning("W118", state.tokens.curr, "array comprehension");
@@ -4058,7 +4058,7 @@ var JSHINT = (function() {
         }
       }
 
-      if (lookupBlockType() === "destructuring pattern") {
+      if (lookupBlockType(true) === "destructuring pattern") {
         this.destructAssign = destructuringPattern(context, {
             openingParsed: true,
             assignment: true
@@ -5982,16 +5982,16 @@ var JSHINT = (function() {
    * Determine whether a bracket or brace denotes a Mozilla comprehension
    * array, a destructuring pattern, a property reference, a JSON-serializable
    * literal value, or a non-JSON-serializable literal value.
+   *
+   * @param {bool} parsedOpening Whether the opening delimiter has already been
+   *                             parsed.
    */
-  var lookupBlockType = function() {
+  var lookupBlockType = function(parsedOpening) {
     var pn, pn1, prev;
     var i = -1;
-    var bracketStack = 0;
+    var bracketStack = parsedOpening ? 1 : 0;
     var serializable = true;
 
-    if (checkPunctuators(state.tokens.curr, ["[", "{"])) {
-      bracketStack += 1;
-    }
     do {
       prev = i === -1 ? state.tokens.curr : pn;
       pn = i === -1 ? state.tokens.next : peek(i);
@@ -6169,7 +6169,7 @@ var JSHINT = (function() {
     // if it has semicolons, it is a block, so go parse it as a block
     // or it's not a block, but there are assignments, check for undeclared variables
 
-    var block = lookupBlockType();
+    var block = lookupBlockType(false);
     if (block === "JSON serializable") {
       state.option.laxbreak = true;
       state.jsonMode = true;
