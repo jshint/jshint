@@ -560,9 +560,13 @@ exports.group = {
   },
 
   testHomeRcFile: function (test) {
-    var homeRc = path.join(process.env.HOME || process.env.HOMEPATH, ".jshintrc");
+    var home = process.env.HOME || process.env.HOMEPATH;
+    var homeRc = path.join(home, ".jshintrc");
     var testStub = this.sinon.stub(shjs, "test");
     var catStub = this.sinon.stub(shjs, "cat");
+
+    // stub home directory
+    testStub.withArgs("-e", home).returns(true);
 
     // stub rc file
     testStub.withArgs("-e", homeRc).returns(true);

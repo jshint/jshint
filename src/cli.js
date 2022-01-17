@@ -1,7 +1,6 @@
 "use strict";
 
 var _                 = require("lodash");
-var fs                = require("fs");
 var cli               = require("cli");
 var path              = require("path");
 var shjs              = require("shelljs");
@@ -109,7 +108,7 @@ function getHomeDir() {
 
   while (paths.length) {
     homePath = paths.shift();
-    if (fs.existsSync(homePath)) {
+    if (homePath && shjs.test("-e", homePath)) {
       return homePath;
     }
   }
