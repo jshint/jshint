@@ -1,8 +1,8 @@
 "use strict";
 
 var path  = require("path");
-var shjs  = require("shelljs");
 var sinon = require("sinon");
+var fsUtils = require("../src/fs-utils");
 
 var cliPath = path.resolve(__dirname, "../src/cli.js");
 var cli;
@@ -38,7 +38,7 @@ exports.group = {
 
   config: {
     setUp: function (done) {
-      this.sinon.stub(shjs, "cat")
+      this.sinon.stub(fsUtils, "readFile")
         .withArgs(sinon.match(/file\.js$/))
           .returns("var a = function () {}; a();")
         .withArgs(sinon.match(/file1\.json$/))
@@ -76,14 +76,14 @@ exports.group = {
           }
         }));
 
-      this.sinon.stub(shjs, "test")
-        .withArgs("-e", sinon.match(/file\.js$/)).returns(true)
-        .withArgs("-e", sinon.match(/file1\.json$/)).returns(true)
-        .withArgs("-e", sinon.match(/file2\.json$/)).returns(true)
-        .withArgs("-e", sinon.match(/file3\.json$/)).returns(false)
-        .withArgs("-e", sinon.match(/file4\.json$/)).returns(true)
-        .withArgs("-e", sinon.match(/file5\.json$/)).returns(true)
-        .withArgs("-e", sinon.match(/file6\.json$/)).returns(true);
+      this.sinon.stub(fsUtils, "exists")
+        .withArgs(sinon.match(/file\.js$/)).returns(true)
+        .withArgs(sinon.match(/file1\.json$/)).returns(true)
+        .withArgs(sinon.match(/file2\.json$/)).returns(true)
+        .withArgs(sinon.match(/file3\.json$/)).returns(false)
+        .withArgs(sinon.match(/file4\.json$/)).returns(true)
+        .withArgs(sinon.match(/file5\.json$/)).returns(true)
+        .withArgs(sinon.match(/file6\.json$/)).returns(true);
 
       var _cli = require("cli");
       this.out = this.sinon.stub(_cli, "error");
@@ -179,16 +179,16 @@ exports.group = {
   },
 
   testPrereq: function (test) {
-    this.sinon.stub(shjs, "cat")
+    this.sinon.stub(fsUtils, "readFile")
       .withArgs(sinon.match(/file\.js$/)).returns("a();")
       .withArgs(sinon.match(/prereq.js$/)).returns("var a = 1;")
       .withArgs(sinon.match(/config.json$/))
         .returns("{\"undef\":true,\"prereq\":[\"prereq.js\", \"prereq2.js\"]}");
 
-    this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/file\.js$/)).returns(true)
-      .withArgs("-e", sinon.match(/prereq.js$/)).returns(true)
-      .withArgs("-e", sinon.match(/config.json$/)).returns(true);
+    this.sinon.stub(fsUtils, "exists")
+      .withArgs(sinon.match(/file\.js$/)).returns(true)
+      .withArgs(sinon.match(/prereq.js$/)).returns(true)
+      .withArgs(sinon.match(/config.json$/)).returns(true);
 
     cli.exit.withArgs(0).returns(true)
       .withArgs(2).throws("ProcessExit");
@@ -197,23 +197,23 @@ exports.group = {
       "node", "jshint", "file.js", "--config", "config.json"
     ]);
 
-    shjs.cat.restore();
-    shjs.test.restore();
+    fsUtils.readFile.restore();
+    fsUtils.exists.restore();
 
     test.done();
   },
 
   // CLI prereqs
   testPrereqCLIOption: function (test) {
-    this.sinon.stub(shjs, "cat")
+    this.sinon.stub(fsUtils, "readFile")
       .withArgs(sinon.match(/file\.js$/)).returns("a();")
       .withArgs(sinon.match(/prereq.js$/)).returns("var a = 1;")
       .withArgs(sinon.match(/config.json$/)).returns("{\"undef\":true}");
 
-    this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/file\.js$/)).returns(true)
-      .withArgs("-e", sinon.match(/prereq.js$/)).returns(true)
-      .withArgs("-e", sinon.match(/config.json$/)).returns(true);
+    this.sinon.stub(fsUtils, "exists")
+      .withArgs(sinon.match(/file\.js$/)).returns(true)
+      .withArgs(sinon.match(/prereq.js$/)).returns(true)
+      .withArgs(sinon.match(/config.json$/)).returns(true);
 
     cli.exit.restore();
     this.sinon.stub(cli, "exit")
@@ -226,26 +226,26 @@ exports.group = {
       "--prereq", "prereq.js  , prereq2.js"
     ]);
 
-    shjs.cat.restore();
-    shjs.test.restore();
+    fsUtils.readFile.restore();
+    fsUtils.exists.restore();
 
     test.done();
   },
 
   // CLI prereqs should get merged with config prereqs
   testPrereqBothConfigAndCLIOption: function (test) {
-    this.sinon.stub(shjs, "cat")
+    this.sinon.stub(fsUtils, "readFile")
       .withArgs(sinon.match(/file\.js$/)).returns("a(); b();")
       .withArgs(sinon.match(/prereq.js$/)).returns("var a = 1;")
       .withArgs(sinon.match(/prereq2.js$/)).returns("var b = 2;")
       .withArgs(sinon.match(/config.json$/))
         .returns("{\"undef\":true,\"prereq\":[\"prereq.js\"]}");
 
-    this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/file\.js$/)).returns(true)
-      .withArgs("-e", sinon.match(/prereq.js$/)).returns(true)
-      .withArgs("-e", sinon.match(/prereq2.js$/)).returns(true)
-      .withArgs("-e", sinon.match(/config.json$/)).returns(true);
+    this.sinon.stub(fsUtils, "exists")
+      .withArgs(sinon.match(/file\.js$/)).returns(true)
+      .withArgs(sinon.match(/prereq.js$/)).returns(true)
+      .withArgs(sinon.match(/prereq2.js$/)).returns(true)
+      .withArgs(sinon.match(/config.json$/)).returns(true);
 
     cli.exit.restore();
     this.sinon.stub(cli, "exit")
@@ -258,8 +258,8 @@ exports.group = {
       "--prereq", "prereq2.js,prereq3.js"
     ]);
 
-    shjs.cat.restore();
-    shjs.test.restore();
+    fsUtils.readFile.restore();
+    fsUtils.exists.restore();
 
     test.done();
   },
@@ -279,16 +279,16 @@ exports.group = {
 
     this.sinon.stub(process, "cwd").returns(dir);
     this.sinon.stub(rep, "reporter");
-    this.sinon.stub(shjs, "cat")
+    this.sinon.stub(fsUtils, "readFile")
       .withArgs(sinon.match(/foo\.js$/)).returns("a()")
       .withArgs(sinon.match(/bar\.js$/)).returns("a()")
       .withArgs(sinon.match(/config\.json$/))
         .returns(JSON.stringify(config));
 
-    this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/foo\.js$/)).returns(true)
-      .withArgs("-e", sinon.match(/bar\.js$/)).returns(true)
-      .withArgs("-e", sinon.match(/config\.json$/)).returns(true);
+    this.sinon.stub(fsUtils, "exists")
+      .withArgs(sinon.match(/foo\.js$/)).returns(true)
+      .withArgs(sinon.match(/bar\.js$/)).returns(true)
+      .withArgs(sinon.match(/config\.json$/)).returns(true);
 
     cli.exit.withArgs(0).returns(true)
       .withArgs(1).throws("ProcessExit");
@@ -324,16 +324,16 @@ exports.group = {
 
     this.sinon.stub(process, "cwd").returns(dir);
     this.sinon.stub(rep, "reporter");
-    this.sinon.stub(shjs, "cat")
+    this.sinon.stub(fsUtils, "readFile")
       .withArgs(sinon.match(/foo\.js$/)).returns("a()")
       .withArgs(sinon.match(/bar\.js$/)).returns("a()")
       .withArgs(sinon.match(/config\.json$/))
         .returns(JSON.stringify(config));
 
-    this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/foo\.js$/)).returns(true)
-      .withArgs("-e", sinon.match(/bar\.js$/)).returns(true)
-      .withArgs("-e", sinon.match(/config\.json$/)).returns(true);
+    this.sinon.stub(fsUtils, "exists")
+      .withArgs(sinon.match(/foo\.js$/)).returns(true)
+      .withArgs(sinon.match(/bar\.js$/)).returns(true)
+      .withArgs(sinon.match(/config\.json$/)).returns(true);
 
     cli.exit.withArgs(0).returns(true)
       .withArgs(1).throws("ProcessExit");
@@ -369,16 +369,16 @@ exports.group = {
 
     this.sinon.stub(process, "cwd").returns(dir);
     this.sinon.stub(rep, "reporter");
-    this.sinon.stub(shjs, "cat")
+    this.sinon.stub(fsUtils, "readFile")
       .withArgs(sinon.match(/foo\.js$/)).returns("a()")
       .withArgs(sinon.match(/bar\.js$/)).returns("a()")
       .withArgs(sinon.match(/config\.json$/))
         .returns(JSON.stringify(config));
 
-    this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/foo\.js$/)).returns(true)
-      .withArgs("-e", sinon.match(/bar\.js$/)).returns(true)
-      .withArgs("-e", sinon.match(/config\.json$/)).returns(true);
+    this.sinon.stub(fsUtils, "exists")
+      .withArgs(sinon.match(/foo\.js$/)).returns(true)
+      .withArgs(sinon.match(/bar\.js$/)).returns(true)
+      .withArgs(sinon.match(/config\.json$/)).returns(true);
 
     cli.exit.withArgs(0).returns(true)
       .withArgs(1).throws("ProcessExit");
@@ -426,10 +426,10 @@ exports.group = {
     // Test successful attempt.
     run.restore();
     this.sinon.stub(rep, "reporter");
-    this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/file\.js$/)).returns(true);
+    this.sinon.stub(fsUtils, "exists")
+      .withArgs(sinon.match(/file\.js$/)).returns(true);
 
-    this.sinon.stub(shjs, "cat")
+    this.sinon.stub(fsUtils, "readFile")
       .withArgs(sinon.match(/file\.js$/)).returns("func()");
 
     try {
@@ -514,20 +514,20 @@ exports.group = {
     this.sinon.stub(process, "cwd").returns(__dirname);
     var localNpm = path.normalize(__dirname + "/package.json");
     var localRc = path.normalize(__dirname + "/.jshintrc");
-    var testStub = this.sinon.stub(shjs, "test");
-    var catStub = this.sinon.stub(shjs, "cat");
+    var existsStub = this.sinon.stub(fsUtils, "exists");
+    var readFileStub = this.sinon.stub(fsUtils, "readFile");
 
     // stub rc file
-    testStub.withArgs("-e", localRc).returns(true);
-    catStub.withArgs(localRc).returns('{"evil": true}');
+    existsStub.withArgs(localRc).returns(true);
+    readFileStub.withArgs(localRc).returns('{"evil": true}');
 
     // stub npm file
-    testStub.withArgs("-e", localNpm).returns(true);
-    catStub.withArgs(localNpm).returns('{'); // malformed package.json
+    existsStub.withArgs(localNpm).returns(true);
+    readFileStub.withArgs(localNpm).returns('{'); // malformed package.json
 
     // stub src file
-    testStub.withArgs("-e", sinon.match(/file\.js$/)).returns(true);
-    catStub.withArgs(sinon.match(/file\.js$/)).returns("eval('a=2');");
+    existsStub.withArgs(sinon.match(/file\.js$/)).returns(true);
+    readFileStub.withArgs(sinon.match(/file\.js$/)).returns("eval('a=2');");
 
     cli.interpret([
       "node", "jshint", "file.js"
@@ -540,16 +540,16 @@ exports.group = {
   testRcFile: function (test) {
     this.sinon.stub(process, "cwd").returns(__dirname);
     var localRc = path.normalize(__dirname + "/.jshintrc");
-    var testStub = this.sinon.stub(shjs, "test");
-    var catStub = this.sinon.stub(shjs, "cat");
+    var existsStub = this.sinon.stub(fsUtils, "exists");
+    var readFileStub = this.sinon.stub(fsUtils, "readFile");
 
     // stub rc file
-    testStub.withArgs("-e", localRc).returns(true);
-    catStub.withArgs(localRc).returns('{"evil": true}');
+    existsStub.withArgs(localRc).returns(true);
+    readFileStub.withArgs(localRc).returns('{"evil": true}');
 
     // stub src file
-    testStub.withArgs("-e", sinon.match(/file\.js$/)).returns(true);
-    catStub.withArgs(sinon.match(/file\.js$/)).returns("eval('a=2');");
+    existsStub.withArgs(sinon.match(/file\.js$/)).returns(true);
+    readFileStub.withArgs(sinon.match(/file\.js$/)).returns("eval('a=2');");
 
     cli.interpret([
       "node", "jshint", "file.js"
@@ -562,19 +562,19 @@ exports.group = {
   testHomeRcFile: function (test) {
     var home = process.env.HOME || process.env.HOMEPATH;
     var homeRc = path.join(home, ".jshintrc");
-    var testStub = this.sinon.stub(shjs, "test");
-    var catStub = this.sinon.stub(shjs, "cat");
+    var existsStub = this.sinon.stub(fsUtils, "exists");
+    var readFileStub = this.sinon.stub(fsUtils, "readFile");
 
     // stub home directory
-    testStub.withArgs("-e", home).returns(true);
+    existsStub.withArgs(home).returns(true);
 
     // stub rc file
-    testStub.withArgs("-e", homeRc).returns(true);
-    catStub.withArgs(homeRc).returns('{"evil": true}');
+    existsStub.withArgs(homeRc).returns(true);
+    readFileStub.withArgs(homeRc).returns('{"evil": true}');
 
     // stub src file (in root where we are unlikely to find a .jshintrc)
-    testStub.withArgs("-e", sinon.match(/\/file\.js$/)).returns(true);
-    catStub.withArgs(sinon.match(/\/file\.js$/)).returns("eval('a=2');");
+    existsStub.withArgs(sinon.match(/\/file\.js$/)).returns(true);
+    readFileStub.withArgs(sinon.match(/\/file\.js$/)).returns("eval('a=2');");
 
     cli.interpret([
       "node", "jshint", "/file.js"
@@ -595,16 +595,16 @@ exports.group = {
 
     this.sinon.stub(process, "cwd").returns(__dirname);
     var localRc = path.normalize(__dirname + "/.jshintrc");
-    var testStub = this.sinon.stub(shjs, "test");
-    var catStub = this.sinon.stub(shjs, "cat");
+    var existsStub = this.sinon.stub(fsUtils, "exists");
+    var readFileStub = this.sinon.stub(fsUtils, "readFile");
 
     // stub rc file
-    testStub.withArgs("-e", localRc).returns(true);
-    catStub.withArgs(localRc).returns('{"evil": true}');
+    existsStub.withArgs(localRc).returns(true);
+    readFileStub.withArgs(localRc).returns('{"evil": true}');
 
     // stub src file
-    testStub.withArgs("-e", sinon.match(/file\.js$/)).returns(true);
-    catStub.withArgs(sinon.match(/file\.js$/)).returns("eval('a=2');");
+    existsStub.withArgs(sinon.match(/file\.js$/)).returns(true);
+    readFileStub.withArgs(sinon.match(/file\.js$/)).returns("eval('a=2');");
 
     cli.interpret([
       "node", "jshint", "file.js"
@@ -626,16 +626,16 @@ exports.group = {
     var cliDir = path.join(srcDir, "cli/");
     this.sinon.stub(process, "cwd").returns(cliDir);
 
-    var testStub = this.sinon.stub(shjs, "test");
-    var catStub = this.sinon.stub(shjs, "cat");
+    var existsStub = this.sinon.stub(fsUtils, "exists");
+    var readFileStub = this.sinon.stub(fsUtils, "readFile");
 
     // stub rc file
-    testStub.withArgs("-e", parentRc).returns(true);
-    catStub.withArgs(parentRc).returns('{"evil": true}');
+    existsStub.withArgs(parentRc).returns(true);
+    readFileStub.withArgs(parentRc).returns('{"evil": true}');
 
     // stub src file
-    testStub.withArgs("-e", sinon.match(/file\.js$/)).returns(true);
-    catStub.withArgs(sinon.match(/file\.js$/)).returns("eval('a=2');");
+    existsStub.withArgs(sinon.match(/file\.js$/)).returns(true);
+    readFileStub.withArgs(sinon.match(/file\.js$/)).returns("eval('a=2');");
 
     cli.interpret([
       "node", "jshint", "file.js"
@@ -650,16 +650,16 @@ exports.group = {
     this.sinon.stub(process, "cwd").returns(process.env.HOME || process.env.HOMEPATH);
     var projectRc = path.normalize(__dirname + "/.jshintrc");
     var srcFile = __dirname + "/sub/file.js";
-    var testStub = this.sinon.stub(shjs, "test");
-    var catStub = this.sinon.stub(shjs, "cat");
+    var existsStub = this.sinon.stub(fsUtils, "exists");
+    var readFileStub = this.sinon.stub(fsUtils, "readFile");
 
     // stub rc file
-    testStub.withArgs("-e", projectRc).returns(true);
-    catStub.withArgs(projectRc).returns('{"evil": true}');
+    existsStub.withArgs(projectRc).returns(true);
+    readFileStub.withArgs(projectRc).returns('{"evil": true}');
 
     // stub src file
-    testStub.withArgs("-e", srcFile).returns(true);
-    catStub.withArgs(srcFile).returns("eval('a=2');");
+    existsStub.withArgs(srcFile).returns(true);
+    readFileStub.withArgs(srcFile).returns("eval('a=2');");
 
     cli.interpret([
       "node", "jshint", srcFile
@@ -685,19 +685,20 @@ exports.group = {
     run.restore();
     process.cwd.returns(__dirname + "/../");
 
-    this.sinon.stub(shjs, "cat")
+    this.sinon.stub(fsUtils, "readFile")
       .withArgs(sinon.match(/file.js$/)).returns("console.log('Hello');")
       .withArgs(sinon.match(/\.jshintignore$/)).returns("examples");
 
-    test.equal(shjs.cat.args.length, 0);
+    test.equal(fsUtils.readFile.args.length, 0);
 
     test.done();
   },
 
   testIgnoresWithSpecialChars: function (test) {
     this.sinon.stub(process, "cwd").returns(path.resolve(__dirname, "special++chars"));
-    this.sinon.stub(shjs, "test").withArgs(sinon.match(/-[ed]/), ".").returns(true);
-    this.sinon.stub(shjs, "ls").withArgs(".").returns([]);
+    this.sinon.stub(fsUtils, "exists").withArgs(".").returns(true);
+    this.sinon.stub(fsUtils, "isDirectory").withArgs(".").returns(true);
+    this.sinon.stub(fsUtils, "readDirectory").withArgs(".").returns([]);
     test.doesNotThrow(function() {
       cli.interpret(["node", "jshint", ".", "--exclude=exclude1.js"]);
     });
@@ -724,12 +725,12 @@ exports.group = {
     var dir = __dirname + "/../examples/";
     this.sinon.stub(process, "cwd").returns(dir);
 
-    this.sinon.stub(shjs, "cat")
+    this.sinon.stub(fsUtils, "readFile")
       .withArgs(sinon.match(/file\.js$/)).returns("This is not Javascript.")
       .withArgs(sinon.match(/\.jshintignore$/)).returns("**/ignored-dir/**");
-    this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/file\.js$/)).returns(true)
-      .withArgs("-e", sinon.match(/\.jshintignore$/)).returns(true);
+    this.sinon.stub(fsUtils, "exists")
+      .withArgs(sinon.match(/file\.js$/)).returns(true)
+      .withArgs(sinon.match(/\.jshintignore$/)).returns(true);
 
     cli.interpret([
       "node", "jshint", "ignored-dir/.dot-prefixed/file.js",
@@ -757,11 +758,11 @@ exports.group = {
     run.restore();
     process.cwd.returns(__dirname + "/../");
 
-    this.sinon.stub(shjs, "cat")
+    this.sinon.stub(fsUtils, "readFile")
       .withArgs(sinon.match(/file.js$/)).returns("console.log('Hello');")
       .withArgs(sinon.match(/\.jshintignore$/)).returns("examples");
 
-    test.equal(shjs.cat.args.length, 0);
+    test.equal(fsUtils.readFile.args.length, 0);
 
     test.done();
   },
@@ -788,10 +789,11 @@ exports.group = {
 
     gather.returns([]);
 
-    this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/.*/)).returns(true);
+    this.sinon.stub(fsUtils, "exists")
+      .withArgs(sinon.match(/.*/)).returns(true);
+    this.sinon.stub(fsUtils, "isDirectory");
 
-    this.sinon.stub(shjs, "cat")
+    this.sinon.stub(fsUtils, "readFile")
       .withArgs(sinon.match(/file2?\.js$/)).returns("console.log('Hello');")
       .withArgs(sinon.match(/ignore[\/\\]file\d\.js$/)).returns("console.log('Hello, ignore me');")
       .withArgs(sinon.match(/ignore[\/\\]dir[\/\\]file\d\.js$/)).returns("print('Ignore me');")
@@ -813,16 +815,16 @@ exports.group = {
     test.equal(args.args[5], path.join("ignore", "dir", "file1.js"));
     test.equal(args.ignores, path.resolve(path.join("ignore", "**")));
 
-    shjs.cat.restore();
+    fsUtils.readFile.restore();
 
-    shjs.test.withArgs("-d", sinon.match(/src$/)).returns(true)
-      .withArgs("-d", sinon.match(/src[\/\\]lib$/)).returns(true);
+    fsUtils.isDirectory.withArgs(sinon.match(/src$/)).returns(true)
+      .withArgs(sinon.match(/src[\/\\]lib$/)).returns(true);
 
-    this.sinon.stub(shjs, "ls")
+    this.sinon.stub(fsUtils, "readDirectory")
       .withArgs(sinon.match(/src$/)).returns(["lib", "file4.js"])
       .withArgs(sinon.match(/src[\/\\]lib$/)).returns(["file5.js"]);
 
-    this.sinon.stub(shjs, "cat")
+    this.sinon.stub(fsUtils, "readFile")
       .withArgs(sinon.match(/file2?\.js$/)).returns("console.log('Hello');")
       .withArgs(sinon.match(/file3\.json$/)).returns("{}")
       .withArgs(sinon.match(/src[\/\\]file4\.js$/)).returns("print('Hello');")
@@ -842,7 +844,7 @@ exports.group = {
     test.equal(args.args[3], "src");
     test.equal(args.ignores, false);
 
-    shjs.cat
+    fsUtils.readFile
       .withArgs(sinon.match(/reporter\.js$/)).returns("console.log('Hello');");
 
     cli.interpret([
@@ -859,8 +861,8 @@ exports.group = {
   },
 
   testGatherOptionalParameters: function (test) {
-    this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/file.js$/)).returns(true);
+    this.sinon.stub(fsUtils, "exists")
+      .withArgs(sinon.match(/file.js$/)).returns(true);
 
     var files = cli.gather({
       args: ["file.js"]
@@ -884,14 +886,15 @@ exports.group = {
       [ /node_script$/, "console.log('Hello, ignore me');" ]
     ];
 
-    var testStub = this.sinon.stub(shjs, "test");
+    var existsStub = this.sinon.stub(fsUtils, "exists");
+    var isDirectoryStub = this.sinon.stub(fsUtils, "isDirectory");
     demoFiles.forEach(function (file) {
-      testStub = testStub.withArgs("-e", sinon.match(file[0])).returns(true);
+      existsStub = existsStub.withArgs(sinon.match(file[0])).returns(true);
     });
 
-    var catStub = this.sinon.stub(shjs, "cat");
+    var readFileStub = this.sinon.stub(fsUtils, "readFile");
     demoFiles.forEach(function (file) {
-      catStub = catStub.withArgs(sinon.match(file[0])).returns(file[1]);
+      readFileStub = readFileStub.withArgs(sinon.match(file[0])).returns(file[1]);
     });
 
     files = cli.gather({
@@ -904,7 +907,7 @@ exports.group = {
       extensions: ""
     });
 
-    test.equal(shjs.cat.args.length, 0);
+    test.equal(fsUtils.readFile.args.length, 0);
     test.equal(files.length, 3);
     test.equal(files[0], "file.js");
     test.equal(files[1], "file2.js");
@@ -918,21 +921,23 @@ exports.group = {
     ];
 
     demoFiles.forEach(function (file) {
-      testStub = testStub.withArgs("-e", sinon.match(file[0])).returns(true);
+      existsStub = existsStub.withArgs(sinon.match(file[0])).returns(true);
     });
 
-    testStub = testStub
-      .withArgs("-e", sinon.match(/src$/)).returns(true)
-      .withArgs("-e", sinon.match(/src[\/\\]lib$/)).returns(true)
-      .withArgs("-d", sinon.match(/src$/)).returns(true)
-      .withArgs("-d", sinon.match(/src[\/\\]lib$/)).returns(true);
+    existsStub = existsStub
+      .withArgs(sinon.match(/src$/)).returns(true)
+      .withArgs(sinon.match(/src[\/\\]lib$/)).returns(true);
 
-    this.sinon.stub(shjs, "ls")
+    isDirectoryStub
+      .withArgs(sinon.match(/src$/)).returns(true)
+      .withArgs(sinon.match(/src[\/\\]lib$/)).returns(true);
+
+    this.sinon.stub(fsUtils, "readDirectory")
       .withArgs(sinon.match(/src$/)).returns(["lib", "file4.js"])
       .withArgs(sinon.match(/src[\/\\]lib$/)).returns(["file5.js"]);
 
     demoFiles.forEach(function (file) {
-      catStub = catStub.withArgs(sinon.match(file[0])).returns(file[1]);
+      readFileStub = readFileStub.withArgs(sinon.match(file[0])).returns(file[1]);
     });
 
     cli.interpret([
@@ -945,7 +950,7 @@ exports.group = {
       ignores: []
     });
 
-    test.equal(shjs.cat.args.length, 5);
+    test.equal(fsUtils.readFile.args.length, 5);
     test.equal(files.length, 5);
     test.equal(files[0], "file.js");
     test.equal(files[1], "file2.js");
@@ -953,13 +958,14 @@ exports.group = {
     test.equal(files[3], path.join("src", "lib", "file5.js"));
     test.equal(files[4], path.join("src", "file4.js"));
 
-    shjs.test.restore();
-    shjs.ls.restore();
-    shjs.cat.restore();
+    fsUtils.exists.restore();
+    fsUtils.isDirectory.restore();
+    fsUtils.readDirectory.restore();
+    fsUtils.readFile.restore();
     process.cwd.restore();
 
     this.sinon.stub(process, "cwd").returns(__dirname + "/../");
-    this.sinon.stub(shjs, "cat")
+    this.sinon.stub(fsUtils, "readFile")
       .withArgs(sinon.match(/reporter\.js$/)).returns("console.log('Hello');");
 
     files = cli.gather({
@@ -968,7 +974,7 @@ exports.group = {
       ignores: []
     });
 
-    test.equal(shjs.cat.args.length, 0);
+    test.equal(fsUtils.readFile.args.length, 0);
     test.equal(files.length, 1);
     test.equal(files[0], path.join("examples", "reporter.js"));
 
@@ -981,10 +987,10 @@ exports.group = {
     this.sinon.stub(rep, "reporter");
     this.sinon.stub(process, "cwd").returns(dir);
 
-    this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/(pass\.js|fail\.js)$/)).returns(true);
+    this.sinon.stub(fsUtils, "exists")
+      .withArgs(sinon.match(/(pass\.js|fail\.js)$/)).returns(true);
 
-    this.sinon.stub(shjs, "cat")
+    this.sinon.stub(fsUtils, "readFile")
       .withArgs(sinon.match(/pass\.js$/)).returns("function test() { return 0; }")
       .withArgs(sinon.match(/fail\.js$/)).returns("console.log('Hello')");
 
@@ -1082,11 +1088,11 @@ exports.extract = {
       "</html>"
     ].join("\n");
 
-    this.sinon.stub(shjs, "cat")
+    this.sinon.stub(fsUtils, "readFile")
       .withArgs(sinon.match(/indent\.html$/)).returns(html);
 
-    this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/indent\.html$/)).returns(true);
+    this.sinon.stub(fsUtils, "exists")
+      .withArgs(sinon.match(/indent\.html$/)).returns(true);
 
     cli.interpret([
       "node", "jshint", "indent.html", "--extract", "always", "--reporter=reporter.js"
@@ -1128,11 +1134,11 @@ exports.extract = {
       "</html>"
     ].join("\n");
 
-    this.sinon.stub(shjs, "cat")
+    this.sinon.stub(fsUtils, "readFile")
       .withArgs(sinon.match(/indent\.html$/)).returns(html);
 
-    this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/indent\.html$/)).returns(true);
+    this.sinon.stub(fsUtils, "exists")
+      .withArgs(sinon.match(/indent\.html$/)).returns(true);
 
     cli.interpret([
       "node", "jshint", "indent.html", "--extract", "always", "--reporter=reporter.js"
@@ -1168,11 +1174,11 @@ exports.extract = {
       "</script>"
     ].join("\n");
 
-    this.sinon.stub(shjs, "cat")
+    this.sinon.stub(fsUtils, "readFile")
       .withArgs(sinon.match(/firstLine\.html$/)).returns(html);
 
-    this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/firstLine\.html$/)).returns(true);
+    this.sinon.stub(fsUtils, "exists")
+      .withArgs(sinon.match(/firstLine\.html$/)).returns(true);
 
     cli.interpret([
       "node", "jshint", "firstLine.html", "--extract", "always", "--reporter=reporter.js"
@@ -1216,11 +1222,11 @@ exports.extract = {
     "</script>"
     ].join("\n");
 
-    this.sinon.stub(shjs, "cat")
+    this.sinon.stub(fsUtils, "readFile")
       .withArgs(sinon.match(/sameLine\.html$/)).returns(html);
 
-    this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/sameLine\.html$/)).returns(true);
+    this.sinon.stub(fsUtils, "exists")
+      .withArgs(sinon.match(/sameLine\.html$/)).returns(true);
 
     cli.interpret([
       "node", "jshint", "sameLine.html", "--extract", "always", "--reporter=reporter.js"
@@ -1262,13 +1268,13 @@ exports.extract = {
       "</script>",
     ].join("\n");
 
-    this.sinon.stub(shjs, "cat")
+    this.sinon.stub(fsUtils, "readFile")
       .withArgs(sinon.match(/indent\.html$/)).returns(html)
       .withArgs(sinon.match(/another\.html$/)).returns("\n\n<script>a && a();</script>");
 
-    this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/indent\.html$/)).returns(true)
-      .withArgs("-e", sinon.match(/another\.html$/)).returns(true);
+    this.sinon.stub(fsUtils, "exists")
+      .withArgs(sinon.match(/indent\.html$/)).returns(true)
+      .withArgs(sinon.match(/another\.html$/)).returns(true);
 
     cli.interpret([
       "node", "jshint", "indent.html", "another.html", "--extract", "auto", "--reporter=reporter.js"
@@ -1325,11 +1331,11 @@ exports.useStdin = {
 
     var jshintrc = JSON.stringify({ undef: true });
 
-    this.sinon.stub(shjs, "cat")
+    this.sinon.stub(fsUtils, "readFile")
       .withArgs(sinon.match(/[\/\\]fake[\/\\]\.jshintrc$/)).returns(jshintrc);
 
-    this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/fake[\/\\]\.jshintrc$/)).returns(true);
+    this.sinon.stub(fsUtils, "exists")
+      .withArgs(sinon.match(/fake[\/\\]\.jshintrc$/)).returns(true);
 
     cli.interpret([
       "node", "jshint", "--filename", "fake/fakescript.js", "--reporter=reporter.js", "-"
@@ -1407,12 +1413,12 @@ exports.useStdin = {
       }
     });
 
-    this.sinon.stub(shjs, "cat")
+    this.sinon.stub(fsUtils, "readFile")
       .withArgs(sinon.match(/\.jshintrc$/)).returns(jshintrc);
 
-    this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/fake[\/\\]\.jshintrc$/)).returns(true)
-      .withArgs("-e", sinon.match(/\.jshintrc$/)).returns(true);
+    this.sinon.stub(fsUtils, "exists")
+      .withArgs(sinon.match(/fake[\/\\]\.jshintrc$/)).returns(true)
+      .withArgs(sinon.match(/\.jshintrc$/)).returns(true);
 
     cli.interpret([
       "node", "jshint", "--filename", "fake/fakescript.js", "--reporter=reporter.js", "-"
@@ -1454,11 +1460,11 @@ exports.useStdin = {
     this.sinon.stub(process, "cwd").returns(dir);
     this.sinon.stub(process.stdout, "write");
 
-    this.sinon.stub(shjs, "cat")
+    this.sinon.stub(fsUtils, "readFile")
       .withArgs(sinon.match(/\.jshintignore$/)).returns("ignore-me.js");
 
-    this.sinon.stub(shjs, "test")
-      .withArgs("-e", sinon.match(/\.jshintignore$/)).returns(true);
+    this.sinon.stub(fsUtils, "exists")
+      .withArgs(sinon.match(/\.jshintignore$/)).returns(true);
 
     cli.interpret(["node", "jshint", "--filename", "do-not-ignore-me.js", "-"]);
 
@@ -1495,12 +1501,12 @@ exports.useStdin = {
 
       this.sinon.stub(process, "cwd").returns(dir);
       this.sinon.stub(this.rep, "reporter");
-      this.sinon.stub(shjs, "cat")
+      this.sinon.stub(fsUtils, "readFile")
         .withArgs(sinon.match(/config\.json$/))
           .returns(JSON.stringify(config));
 
-      this.sinon.stub(shjs, "test")
-        .withArgs("-e", sinon.match(/config\.json$/)).returns(true);
+      this.sinon.stub(fsUtils, "exists")
+        .withArgs(sinon.match(/config\.json$/)).returns(true);
 
       cli.exit.withArgs(0).returns(true)
         .withArgs(1).throws("ProcessExit");
@@ -1550,12 +1556,12 @@ exports.useStdin = {
 
       this.sinon.stub(process, "cwd").returns(dir);
       this.sinon.stub(this.rep, "reporter");
-      this.sinon.stub(shjs, "cat")
+      this.sinon.stub(fsUtils, "readFile")
         .withArgs(sinon.match(/config\.json$/))
           .returns(JSON.stringify(config));
 
-      this.sinon.stub(shjs, "test")
-        .withArgs("-e", sinon.match(/config\.json$/)).returns(true);
+      this.sinon.stub(fsUtils, "exists")
+        .withArgs(sinon.match(/config\.json$/)).returns(true);
 
       cli.exit.withArgs(0).returns(true)
         .withArgs(1).throws("ProcessExit");
@@ -1605,12 +1611,12 @@ exports.useStdin = {
 
       this.sinon.stub(process, "cwd").returns(dir);
       this.sinon.stub(this.rep, "reporter");
-      this.sinon.stub(shjs, "cat")
+      this.sinon.stub(fsUtils, "readFile")
         .withArgs(sinon.match(/config\.json$/))
           .returns(JSON.stringify(config));
 
-      this.sinon.stub(shjs, "test")
-        .withArgs("-e", sinon.match(/config\.json$/)).returns(true);
+      this.sinon.stub(fsUtils, "exists")
+        .withArgs(sinon.match(/config\.json$/)).returns(true);
 
       cli.exit.withArgs(0).returns(true)
         .withArgs(1).throws("ProcessExit");
@@ -1660,14 +1666,14 @@ exports.useStdin = {
 
       this.sinon.stub(process, "cwd").returns(dir);
       this.sinon.stub(this.rep, "reporter");
-      this.sinon.stub(shjs, "cat")
+      this.sinon.stub(fsUtils, "readFile")
         .withArgs(sinon.match(/foo\.js$/)).returns("a()")
         .withArgs(sinon.match(/config\.json$/))
           .returns(JSON.stringify(config));
 
-      this.sinon.stub(shjs, "test")
-        .withArgs("-e", sinon.match(/config\.json$/)).returns(true)
-        .withArgs("-e", sinon.match(/foo\.js$/)).returns(true);
+      this.sinon.stub(fsUtils, "exists")
+        .withArgs(sinon.match(/config\.json$/)).returns(true)
+        .withArgs(sinon.match(/foo\.js$/)).returns(true);
 
       cli.exit.withArgs(0).returns(true)
         .withArgs(1).throws("ProcessExit");

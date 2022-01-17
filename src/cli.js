@@ -3,13 +3,13 @@
 var _                 = require("lodash");
 var cli               = require("cli");
 var path              = require("path");
-var shjs              = require("shelljs");
 var minimatch         = require("minimatch");
 var htmlparser        = require("htmlparser2");
 var exit              = require("exit");
 var stripJsonComments = require("strip-json-comments");
 var JSHINT            = require("./jshint.js").JSHINT;
 var defReporter       = require("./reporters/default").reporter;
+var fsUtils           = require("./fs-utils");
 
 var OPTIONS = {
   "config": ["c", "Custom configuration file", "string", false ],
@@ -89,7 +89,7 @@ function findConfig(file) {
   else if (envs) {
     home = path.normalize(path.join(envs, ".jshintrc"));
 
-    if (shjs.test("-e", home))
+    if (fsUtils.exists(home))
       return home;
   }
 
@@ -108,7 +108,7 @@ function getHomeDir() {
 
   while (paths.length) {
     homePath = paths.shift();
-    if (homePath && shjs.test("-e", homePath)) {
+    if (fsUtils.exists(homePath)) {
       return homePath;
     }
   }
@@ -177,7 +177,7 @@ function findFile(name, cwd) {
 
   var parent = path.resolve(cwd, "../");
 
-  if (shjs.test("-e", filename)) {
+  if (fsUtils.exists(filename)) {
     findFileResults[filename] = filename;
     return filename;
   }
@@ -203,7 +203,7 @@ function loadIgnores(params) {
     return [];
   }
 
-  var lines = (file ? shjs.cat(file) : "").split("\n");
+  var lines = (file ? fsUtils.readFile(file) : "").split("\n");
   var exclude = params.exclude || "";
   lines.unshift.apply(lines, exclude.split(","));
 
@@ -237,7 +237,7 @@ function isIgnored(fp, patterns) {
       return true;
     }
 
-    if (shjs.test("-d", fp) && ip.match(/^[^\/\\]*[\/\\]?$/) &&
+    if (fsUtils.isDirectory(fp) && ip.match(/^[^\/\\]*[\/\\]?$/) &&
       fp.match(new RegExp("^" + ip + ".*"))) {
       return true;
     }
@@ -419,15 +419,15 @@ function collect(fp, files, ignores, ext) {
     return;
   }
 
-  if (!shjs.test("-e", fp)) {
+  if (!fsUtils.exists(fp)) {
     cli.error("Can't open " + fp);
     return;
   }
 
-  if (shjs.test("-d", fp)) {
-    shjs.ls(fp).forEach(function(item) {
+  if (fsUtils.isDirectory(fp)) {
+    fsUtils.readDirectory(fp).forEach(function(item) {
       var itempath = path.join(fp, item);
-      if (shjs.test("-d", itempath) || item.match(ext)) {
+      if (fsUtils.isDirectory(itempath) || item.match(ext)) {
         collect(itempath, files, ignores, ext);
       }
     });
@@ -458,8 +458,8 @@ function lint(code, results, config, data, file) {
   if (config.prereq) {
     config.prereq.forEach(function(fp) {
       fp = path.join(config.dirname, fp);
-      if (shjs.test("-e", fp))
-        buffer.push(shjs.cat(fp));
+      if (fsUtils.exists(fp))
+        buffer.push(fsUtils.readFile(fp));
     });
     delete config.prereq;
   }
@@ -529,13 +529,13 @@ var exports = {
       return {};
     }
 
-    if (!shjs.test("-e", fp)) {
+    if (!fsUtils.exists(fp)) {
       cli.error("Can't find config file: " + fp);
       exports.exit(1);
     }
 
     try {
-      var config = JSON.parse(stripJsonComments(shjs.cat(fp)));
+      var config = JSON.parse(stripJsonComments(fsUtils.readFile(fp)));
       config.dirname = path.dirname(fp);
 
       if (config['extends']) {
@@ -653,7 +653,7 @@ var exports = {
       var errors = [];
 
       try {
-        code = shjs.cat(file);
+        code = fsUtils.readFile(file);
       } catch (err) {
         cli.error("Can't open " + file);
         exports.exit(1);
