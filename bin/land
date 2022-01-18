@@ -2,9 +2,9 @@
 
 "use strict";
 
+var child_process = require("child_process");
 var url   = "https://github.com/jshint/jshint/pull/" + process.argv[2] + ".patch";
 var https = require("https");
-var shjs  = require("shelljs");
 var opts  = require("url").parse(url);
 var msg   = process.argv[3];
 
@@ -27,7 +27,7 @@ function succ(res) {
     data = data[1].replace(/^From\:\s/, "");
     data = data.replace(/"/g, "");
 
-    shjs.exec("git commit -s --author=\"" + data + "\" --message=\"" + msg + "\"");
+    child_process.execSync("git commit -s --author=\"" + data + "\" --message=\"" + msg + "\"");
   });
 }
 
