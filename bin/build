@@ -1,16 +1,15 @@
 #!/usr/bin/env node
-/*jshint shelljs:true */
 
 "use strict";
 
+var fs         = require("fs");
 var path       = require("path");
 var build      = require("../scripts/build");
-require("shelljs/make");
 
 var distDir    = path.join(__dirname, "../dist");
 
-if (!test("-e", distDir))
-  mkdir(distDir);
+if (!fs.existsSync(distDir))
+  fs.mkdirSync(distDir);
 
 build("web", function(err, version, src) {
   if (err) {
@@ -18,7 +17,7 @@ build("web", function(err, version, src) {
     process.exit(1);
   }
 
-  src.to(distDir + "/jshint.js");
+  fs.writeFileSync(distDir + "/jshint.js", src, "utf8");
   console.log("Built: " + version + " (web)");
 });
 
@@ -31,8 +30,8 @@ build("rhino", function(err, version, src) {
   }
 
   dest  = distDir + "/jshint-rhino.js";
-  chmod("+x", dest);
 
-  src.to(dest);
+  fs.writeFileSync(dest, src, "utf8");
+  fs.chmodSync(dest, "0775");
   console.log("Built: " + version + " (Rhino)");
 });
