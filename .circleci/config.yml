@@ -1,0 +1,102 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine.
+# See: https://circleci.com/docs/2.0/configuration-reference
+version: 2.1
+
+jobs:
+  # This configuration caches the contents of the `node_modules` aggressively
+  # because not all npm dependencies can be successfully installed in all
+  # supported releases of Node.js (e.g. `puppeteer` and `cli-table`) and
+  # because older releases of Node.js do not support the latest version of the
+  # `package-lock.json` file.
+  install:
+    docker:
+      - image: node:10-stretch
+    steps:
+      - checkout
+      - run:
+          name: install packages
+          command: npm ci
+      - save_cache:
+          key: node-deps-v2-{{ .Branch }}-{{checksum "package-lock.json"}}
+          paths:
+            - node_modules
+  test-with-latest-nodejs:
+    parameters:
+      npm-run-script:
+        type: string
+    docker:
+      - image: node:10-stretch
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - node-deps-v2-{{ .Branch }}-{{checksum "package-lock.json"}}
+      - when:
+          condition:
+            equal: [<< parameters.npm-run-script >>, test-262]
+          steps:
+            - run: git submodule sync
+            - run: git submodule update --init
+      - run:
+          name: run tests
+          command: npm run << parameters.npm-run-script >>
+
+  test-with-legacy-nodejs:
+    parameters:
+      nodejs_version:
+        type: string
+    docker:
+      - image: node:<< parameters.nodejs_version >>
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - node-deps-v2-{{ .Branch }}-{{checksum "package-lock.json"}}
+      - run:
+          name: run tests
+          command: npm run test-node
+
+workflows:
+  orb-free-workflow:
+    jobs:
+      - install
+      - test-with-latest-nodejs:
+          name: Unit tests in latest release of Node.js
+          requires: [install]
+          npm-run-script: test-node
+      - test-with-latest-nodejs:
+          name: Test262
+          requires: [install]
+          npm-run-script: test-262
+      - test-with-latest-nodejs:
+          name: Static analysis of source code
+          requires: [install]
+          npm-run-script: pretest
+      - test-with-latest-nodejs:
+          name: Unit tests in a web browser
+          requires: [install]
+          npm-run-script: test-browser
+      - test-with-latest-nodejs:
+          name: Tests for jshint.com website
+          requires: [install]
+          npm-run-script: test-website
+      - test-with-legacy-nodejs:
+          name: Unit tests in Node.js version 0.10
+          requires: [install]
+          nodejs_version: '0.10'
+      - test-with-legacy-nodejs:
+          name: Unit tests in Node.js version 0.12
+          requires: [install]
+          nodejs_version: 0.12.0
+      - test-with-legacy-nodejs:
+          name: Unit tests in Node.js version 4.0
+          requires: [install]
+          nodejs_version: 4.0.0
+      - test-with-legacy-nodejs:
+          name: Unit tests in Node.js version 6.0
+          requires: [install]
+          nodejs_version: 6.0.0
+      - test-with-legacy-nodejs:
+          name: Unit tests in Node.js version 8.0
+          requires: [install]
+          nodejs_version: 8.0.0
