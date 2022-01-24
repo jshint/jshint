@@ -1,3 +1,10 @@
+<a name="2.13.4"></a>
+## [2.13.4](https://github.com/jshint/jshint/compare/2.13.3...v2.13.4) (2022-01-24)
+
+### Bug Fixes
+
+* Remove shelljs ([eb4609a](https://github.com/jshint/jshint/commit/eb4609a))
+
 <a name="2.13.3"></a>
 ## [2.13.3](https://github.com/jshint/jshint/compare/2.13.2...v2.13.3) (2022-01-05)
 
