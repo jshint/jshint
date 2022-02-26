@@ -12,7 +12,7 @@
 [![Coverage Status](https://img.shields.io/coveralls/jshint/jshint.svg?style=flat)](https://coveralls.io/r/jshint/jshint?branch=master)
 
 JSHint is a community-driven tool that detects errors and potential problems in
-JavaScript code. Since JSHint is so flexible, you can easily adjust it in 
+JavaScript code. Since JSHint is so flexible, you can easily adjust it in
 the environment you expect your code to execute. JSHint is publicly available
 and will always stay this way.
 
@@ -22,7 +22,7 @@ The project aims to help JavaScript developers write complex programs
 without worrying about typos and language gotchas.
 
 Any code base eventually becomes huge at some point, so simple mistakes — that
-would not show themselves when written — can become show stoppers and add 
+would not show themselves when written — can become show stoppers and add
 extra hours of debugging. So, static code analysis tools come into play
 and help developers spot such problems. JSHint scans a program written in
 JavaScript and reports about commonly made mistakes and potential bugs. The
