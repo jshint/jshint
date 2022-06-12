@@ -8268,7 +8268,53 @@ exports.unreachable = {
       .test(src);
 
     test.done();
-  }
+  },
+  'async function': function (test) {
+    var src = [
+      "(function() {",
+      "  return f(4);",
+      "  async function f(p) {",
+      "    return p + 1;",
+      "  }",
+      "}());"
+    ];
+
+    TestRun(test)
+      .test(src, { esversion: 8, latedef: 'nofunc' });
+
+    test.done();
+  },
+  "async identifier": function (test) {
+    var src = [
+      "(function() {",
+      "  return f(4);",
+      "  async();",
+      "}());"
+    ];
+
+    TestRun(test)
+      .addError(3, 3, "Unreachable 'async' after 'return'.")
+      .test(src, { esversion: 8, latedef: "nofunc" });
+
+    test.done();
+  },
+   "async asi": function (test) {
+    var src = [
+      "(function() {",
+      "  return f(4);",
+      "  async",
+      "  function f(p) {",
+      "    return p + 1;",
+      "  }",
+      "}());"
+    ];
+
+    TestRun(test)
+      .addError(3, 3, "Unreachable 'async' after 'return'.")
+      .test(src, { esversion: 8, latedef: "nofunc", asi: true, expr: true });
+
+    test.done();
+  },
 };
 
 exports["test for 'break' in switch case + curly braces"] = function (test) {

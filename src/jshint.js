@@ -1850,8 +1850,9 @@ var JSHINT = (function() {
       if (t.reach) {
         return;
       }
+
       if (t.id !== "(endline)") {
-        if (t.id === "function") {
+        if (isFunction(t, i)) {
           if (state.option.latedef === true) {
             warning("W026", t);
           }
@@ -1860,6 +1861,16 @@ var JSHINT = (function() {
 
         warning("W027", t, t.value, controlToken.value);
         break;
+      }
+    }
+
+    function isFunction(t, i) {
+      if (t.id === "function") {
+        return true;
+      }
+      if (t.id === "async") {
+        t = peek(i);
+        return t.id === "function";
       }
     }
   }
