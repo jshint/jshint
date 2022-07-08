@@ -1,3 +1,10 @@
+<a name="2.13.5"></a>
+## [2.13.5](https://github.com/jshint/jshint/compare/2.13.4...v2.13.5) (2022-07-08)
+
+### Bug Fixes
+
+* Tolerate late definition of async function (#3618) ([5c256a2](https://github.com/jshint/jshint/commit/5c256a2))
+
 <a name="2.13.4"></a>
 ## [2.13.4](https://github.com/jshint/jshint/compare/2.13.3...v2.13.4) (2022-01-24)
 
