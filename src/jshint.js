@@ -4313,7 +4313,7 @@ var JSHINT = (function() {
             id = identifier(context);
           } else {
             expr = expression(context, 10);
-            error("E030", expr, expr.value);
+            error("E030", expr, expr && expr.value);
           }
         } else {
           id = identifier(context);
