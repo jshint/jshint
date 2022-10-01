@@ -28,6 +28,11 @@ issue report should have the following information:
 - Description of expected behavior
 - Description of actual behavior
 
+Please avoid using screenshots to demonstrate the problem. Describing your
+problem in plain text (and using the "code" Markdown formatting where
+appropriate) will make your report more accessible to more people and easier to
+find via search engines.
+
 ## Feature Requests
 
 If there is some new functionality that you think would improve JSHint, we'd
