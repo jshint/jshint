@@ -16,7 +16,7 @@ JavaScript code. Since JSHint is so flexible, you can easily adjust it in
 the environment you expect your code to execute. JSHint is publicly available
 and will always stay this way.
 
-## Our goal
+##  Our goal
 
 The project aims to help JavaScript developers write complex programs
 without worrying about typos and language gotchas.
