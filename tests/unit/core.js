@@ -1165,8 +1165,8 @@ exports.testES6ModulesNamedExportsAffectUnused = function (test) {
   ];
 
   TestRun(test)
-    .addError(19, 14, "const 'c1u' is initialized to 'undefined'.")
-    .addError(19, 19, "const 'c2u' is initialized to 'undefined'.")
+    .addError(19, 14, "Missing initializer for constant 'c1u'.")
+    .addError(19, 19, "Missing initializer for constant 'c2u'.")
     .test(src1, {
       esnext: true,
       unused: true
@@ -2565,7 +2565,7 @@ exports.constWithoutVar = function(test) {
 
 exports.constWithoutInit = function(test) {
   TestRun(test, "single binding")
-    .addError(1, 6, "const 'x' is initialized to 'undefined'.")
+    .addError(1, 6, "Missing initializer for constant 'x'.")
     .test([
       "for (const x; ;) {",
       "  void x;",
@@ -2573,7 +2573,7 @@ exports.constWithoutInit = function(test) {
     ], { esversion: 6 });
 
   TestRun(test, "multiple bindings")
-    .addError(1, 6, "const 'y' is initialized to 'undefined'.")
+    .addError(1, 6, "Missing initializer for constant 'y'.")
     .test([
       "for (const y, z; ;) {",
       "  void (y, z);",

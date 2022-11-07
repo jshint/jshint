@@ -2488,11 +2488,11 @@ exports.esnext = function (test) {
   ];
 
   TestRun(test)
-    .addError(21, 7, "const 'immutable4' is initialized to 'undefined'.")
+    .addError(21, 7, "Missing initializer for constant 'immutable4'.")
     .test(src, { esnext: true });
 
   TestRun(test)
-    .addError(21, 7, "const 'immutable4' is initialized to 'undefined'.")
+    .addError(21, 7, "Missing initializer for constant 'immutable4'.")
     .test(src, { moz: true });
 
   TestRun(test)
