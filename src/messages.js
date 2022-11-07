@@ -21,7 +21,7 @@ var errors = {
 
   // Constants
   E011: "'{a}' has already been declared.",
-  E012: "const '{a}' is initialized to 'undefined'.",
+  E012: "Missing initializer for constant '{a}'.",
   E013: "Attempting to override '{a}' which is a constant.",
 
   // Regular expressions
