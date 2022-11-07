@@ -847,15 +847,20 @@ exports.testUndefinedAssignment = function (test) {
 
   TestRun(test)
     .addError(1, 5, "It's not necessary to initialize 'x' to 'undefined'.")
-    .addError(2, 7, "It's not necessary to initialize 'y' to 'undefined'.")
     .addError(3, 5, "It's not necessary to initialize 'z' to 'undefined'.")
     .addError(4, 9, "It's not necessary to initialize 'a' to 'undefined'.")
-    .addError(6, 9, "It's not necessary to initialize 'c' to 'undefined'.")
     .addError(7, 7, "It's not necessary to initialize 'd' to 'undefined'.")
     .addError(9, 9, "It's not necessary to initialize 'f' to 'undefined'.")
-    .addError(10, 11, "It's not necessary to initialize 'g' to 'undefined'.")
     .addError(11, 9, "It's not necessary to initialize 'h' to 'undefined'.")
     .test(src, {esnext: true});
+
+  TestRun(test)
+    .addError(1, 8, "It's not necessary to initialize 'x' to 'undefined'.")
+    .addError(2, 8, "It's not necessary to initialize 'y' to 'undefined'.")
+    .test([
+      "const {x = undefined} = {};",
+      "const [y = undefined] = [];",
+    ], {esversion: 6});
 
   test.done();
 };
