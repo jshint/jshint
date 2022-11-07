@@ -4499,7 +4499,7 @@ var JSHINT = (function() {
         var id = state.tokens.prev;
         value = expression(context, 10);
         if (value) {
-          if (value.identifier && value.value === "undefined") {
+          if (!isConst && value.identifier && value.value === "undefined") {
             warning("W080", id, id.value);
           }
           if (!lone) {
