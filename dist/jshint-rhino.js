@@ -1,6 +1,6 @@
 #!/usr/bin/env rhino
 var window = {};
-/*! 2.13.5 */
+/*! 2.13.6 */
 var JSHINT;
 if (typeof window === 'undefined') window = {};
 (function () {
@@ -21035,7 +21035,7 @@ var errors = {
 
   // Constants
   E011: "'{a}' has already been declared.",
-  E012: "const '{a}' is initialized to 'undefined'.",
+  E012: "Missing initializer for constant '{a}'.",
   E013: "Attempting to override '{a}' which is a constant.",
 
   // Regular expressions
@@ -29869,7 +29869,7 @@ var JSHINT = (function() {
         var id = state.tokens.prev;
         value = expression(context, 10);
         if (value) {
-          if (value.identifier && value.value === "undefined") {
+          if (!isConst && value.identifier && value.value === "undefined") {
             warning("W080", id, id.value);
           }
           if (!lone) {

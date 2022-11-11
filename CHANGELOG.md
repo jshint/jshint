@@ -1,3 +1,11 @@
+<a name="2.13.6"></a>
+## [2.13.6](https://github.com/jshint/jshint/compare/2.13.5...v2.13.6) (2022-11-11)
+
+### Bug Fixes
+
+* Allow initializing const bindings to undef ([fedaf6f](https://github.com/jshint/jshint/commit/fedaf6f))
+* Correct error message ([03b1a06](https://github.com/jshint/jshint/commit/03b1a06))
+
 <a name="2.13.5"></a>
 ## [2.13.5](https://github.com/jshint/jshint/compare/2.13.4...v2.13.5) (2022-07-08)
 
