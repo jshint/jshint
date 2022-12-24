@@ -153,7 +153,7 @@ function loadReporter(fp) {
 
 // Storage for memoized results from find file
 // Should prevent lots of directory traversal &
-// lookups when liniting an entire project
+// lookups when linting an entire project
 var findFileResults = {};
 
 /**

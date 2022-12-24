@@ -43,7 +43,7 @@ var scopeManager = require("./scope-manager.js");
 var prodParams   = require("./prod-params.js");
 
 // We need this module here because environments such as IE and Rhino
-// don't necessarilly expose the 'console' API and browserify uses
+// don't necessarily expose the 'console' API and browserify uses
 // it to log things. It's a sad state of affair, really.
 var console = require("console-browserify");
 
@@ -6130,7 +6130,7 @@ var JSHINT = (function() {
   function computedPropertyName(context) {
     advance("[");
 
-    // Explicitly reclassify token as a delimeter to prevent its later
+    // Explicitly reclassify token as a delimiter to prevent its later
     // interpretation as an "infix" operator.
     state.tokens.curr.delim = true;
     state.tokens.curr.lbp = 0;
