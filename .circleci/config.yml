@@ -10,7 +10,7 @@ jobs:
   # `package-lock.json` file.
   install:
     docker:
-      - image: node:10-stretch
+      - image: node:16-stretch
     steps:
       - checkout
       - run:
@@ -25,7 +25,7 @@ jobs:
       npm-run-script:
         type: string
     docker:
-      - image: node:10-stretch
+      - image: node:16-stretch
     steps:
       - checkout
       - restore_cache:
