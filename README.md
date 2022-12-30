@@ -12,7 +12,7 @@
 [![Coverage Status](https://img.shields.io/coveralls/jshint/jshint.svg?style=flat)](https://coveralls.io/r/jshint/jshint?branch=master)
 
 JSHint is a community-driven tool that detects errors and potential problems in
-JavaScript code. Since JSHint is so flexible, you can easily adjust it in 
+JavaScript code. Since JSHint is so flexible, you can easily adjust it in
 the environment you expect your code to execute. JSHint is publicly available
 and will always stay this way.
 
@@ -22,7 +22,7 @@ The project aims to help JavaScript developers write complex programs
 without worrying about typos and language gotchas.
 
 Any code base eventually becomes huge at some point, so simple mistakes — that
-would not show themselves when written — can become show stoppers and add 
+would not show themselves when written — can become show stoppers and add
 extra hours of debugging. So, static code analysis tools come into play
 and help developers spot such problems. JSHint scans a program written in
 JavaScript and reports about commonly made mistakes and potential bugs. The
@@ -83,6 +83,44 @@ Engineers from these companies and projects use JSHint:
 * [Spotify](https://www.spotify.com)
 
 And many more!
+
+## Using JSHint
+
+### Containers
+
+JSHint provides an official Container that can be used to run JSHint. To build
+a container using docker for example:
+
+```console
+$ docker build --file 'Containerfile' --rm --tag 'jshint:latest' .
+```
+
+Running the container is then as trivial as:
+
+```console
+$ docker run --rm --interactive --tty jshint:latest --help
+```
+
+To lint entire directories, a
+[docker volume mount](https://docs.docker.com/storage/volumes/) is needed,
+as otherwise the container does not have access to the code. In the following
+example the `pwd` utility is used, but other ways are of course possible.
+
+```console
+<path_to_lint> $ docker run --rm --interactive --tty --volume "$(pwd):$(pwd)" --workdir "$(pwd)" jshint:latest "$(pwd)"
+```
+
+To lint something quickly using stdin, `jshint` needs to be told to take its
+input from stdin via the `-` marker. The following example also shows how to
+pass additional options to the container:
+
+```console
+$ docker run --rm --interactive jshint:latest --show-non-errors - < file.js
+```
+
+> __Note:__ It is very common to see the `--tty` (the `t` in `-it`) flag for
+> interactive containers. However when using stdin, this is not correct.
+
 
 ## License
 
