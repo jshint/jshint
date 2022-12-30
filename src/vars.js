@@ -625,7 +625,6 @@ exports.shelljs = {
 
 exports.typed = {
   ArrayBuffer         : false,
-  ArrayBufferView     : false,
   DataView            : false,
   Float32Array        : false,
   Float64Array        : false,
