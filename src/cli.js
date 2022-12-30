@@ -145,7 +145,7 @@ function loadNpmConfig(file) {
  */
 function loadReporter(fp) {
   try {
-    return require(fp).reporter;
+    return require(require.resolve(fp)).reporter;
   } catch (err) {
     return null;
   }
@@ -732,15 +732,12 @@ var exports = {
     case options["show-non-errors"]:
       options.reporter = "./reporters/non_error.js";
       break;
-
-    // Custom reporter
-    case options.reporter !== undefined:
-      options.reporter = path.resolve(process.cwd(), options.reporter);
     }
 
     var reporter;
     if (options.reporter) {
-      reporter = loadReporter(options.reporter);
+      reporter = loadReporter(options.reporter) ||
+        loadReporter(path.resolve(process.cwd(), options.reporter));
 
       if (reporter === null) {
         cli.error("Can't load reporter file: " + options.reporter);
