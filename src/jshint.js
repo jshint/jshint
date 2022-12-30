@@ -3469,13 +3469,13 @@ var JSHINT = (function() {
   }
 
   prefix("[", function(context) {
-    var blocktype = lookupBlockType();
-    if (blocktype.isCompArray) {
+    var blocktype = lookupBlockType(true);
+    if (blocktype === "array comprehension") {
       if (!state.option.esnext && !state.inMoz()) {
         warning("W118", state.tokens.curr, "array comprehension");
       }
       return comprehensiveArrayExpression(context);
-    } else if (blocktype.isDestAssign) {
+    } else if (blocktype === "destructuring pattern") {
       this.destructAssign = destructuringPattern(context, {
           openingParsed: true,
           assignment: true
@@ -4069,8 +4069,7 @@ var JSHINT = (function() {
         }
       }
 
-      var blocktype = lookupBlockType();
-      if (blocktype.isDestAssign) {
+      if (lookupBlockType(true) === "destructuring pattern") {
         this.destructAssign = destructuringPattern(context, {
             openingParsed: true,
             assignment: true
@@ -5990,17 +5989,20 @@ var JSHINT = (function() {
   FutureReservedWord("transient");
   FutureReservedWord("volatile");
 
-  // this function is used to determine whether a squarebracket or a curlybracket
-  // expression is a comprehension array, destructuring assignment or a json value.
-
-  var lookupBlockType = function() {
+  /**
+   * Determine whether a bracket or brace denotes a Mozilla comprehension
+   * array, a destructuring pattern, a property reference, a JSON-serializable
+   * literal value, or a non-JSON-serializable literal value.
+   *
+   * @param {bool} parsedOpening Whether the opening delimiter has already been
+   *                             parsed.
+   */
+  var lookupBlockType = function(parsedOpening) {
     var pn, pn1, prev;
     var i = -1;
-    var bracketStack = 0;
-    var ret = {};
-    if (checkPunctuators(state.tokens.curr, ["[", "{"])) {
-      bracketStack += 1;
-    }
+    var bracketStack = parsedOpening ? 1 : 0;
+    var serializable = true;
+
     do {
       prev = i === -1 ? state.tokens.curr : pn;
       pn = i === -1 ? state.tokens.next : peek(i);
@@ -6013,25 +6015,21 @@ var JSHINT = (function() {
       }
       if (bracketStack === 1 && pn.identifier && pn.value === "for" &&
           !checkPunctuator(prev, ".")) {
-        ret.isCompArray = true;
-        ret.notJson = true;
-        break;
+        return "array comprehension";
       }
       if (bracketStack === 0 && checkPunctuators(pn, ["}", "]"])) {
         if (pn1.value === "=") {
-          ret.isDestAssign = true;
-          ret.notJson = true;
-          break;
+          return "destructuring pattern";
         } else if (pn1.value === ".") {
-          ret.notJson = true;
-          break;
+          return "property reference";
         }
       }
       if (checkPunctuator(pn, ";")) {
-        ret.notJson = true;
+        serializable = false;
       }
     } while (bracketStack > 0 && pn.id !== "(end)");
-    return ret;
+
+    return serializable ? "JSON serializable" : "not JSON serializable";
   };
 
   /**
@@ -6182,18 +6180,17 @@ var JSHINT = (function() {
     // if it has semicolons, it is a block, so go parse it as a block
     // or it's not a block, but there are assignments, check for undeclared variables
 
-    var block = lookupBlockType();
-    if (block.notJson) {
-      if (!state.inES6() && block.isDestAssign) {
+    var block = lookupBlockType(false);
+    if (block === "JSON serializable") {
+      state.option.laxbreak = true;
+      state.jsonMode = true;
+      jsonValue();
+    } else {
+      if (!state.inES6() && block === "destructuring pattern") {
         /* istanbul ignore next */
         warning("W104", state.tokens.curr, "destructuring assignment", "6");
       }
       statements(context);
-    // otherwise parse json value
-    } else {
-      state.option.laxbreak = true;
-      state.jsonMode = true;
-      jsonValue();
     }
   }
 
