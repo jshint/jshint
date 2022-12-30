@@ -669,6 +669,28 @@ exports.group = {
     test.done();
   },
 
+  testEtcRcLookup: function (test) {
+    this.sinon.stub(process, "cwd").returns(__dirname);
+    var etcRc = "/etc/.jshintrc";
+    var testStub = this.sinon.stub(shjs, "test");
+    var catStub = this.sinon.stub(shjs, "cat");
+
+    // stub rc file
+    testStub.withArgs("-e", etcRc).returns(true);
+    catStub.withArgs(etcRc).returns('{"evil": true}');
+
+    // stub src file
+    testStub.withArgs("-e", sinon.match(/file\.js$/)).returns(true);
+    catStub.withArgs(sinon.match(/file\.js$/)).returns("eval('a=2');");
+
+    cli.interpret([
+      "node", "jshint", "file.js"
+    ]);
+    test.equal(cli.exit.args[0][0], 0); // eval allowed = rc file found
+
+    test.done();
+  },
+
   testIgnores: function (test) {
     var run = this.sinon.stub(cli, "run");
     var dir = __dirname + "/../examples/";
