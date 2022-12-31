@@ -5,7 +5,6 @@ var cli               = require("cli");
 var path              = require("path");
 var minimatch         = require("minimatch");
 var htmlparser        = require("htmlparser2");
-var exit              = require("exit");
 var stripJsonComments = require("strip-json-comments");
 var JSHINT            = require("./jshint.js").JSHINT;
 var defReporter       = require("./reporters/default").reporter;
@@ -509,7 +508,7 @@ function lint(code, results, config, data, file) {
 
 var exports = {
   extract: extract,
-  exit: exit,
+  exit: process.exit,
 
   /**
    * Returns a configuration file or nothing, if it can't be found.
