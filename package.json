@@ -51,8 +51,8 @@
   "devDependencies": {
     "async": "~2.1.2",
     "browserify": "9.x",
-    "conventional-changelog": "0.4.x",
-    "conventional-github-releaser": "0.4.x",
+    "conventional-changelog": "3.1.x",
+    "conventional-github-releaser": "3.1.x",
     "coveralls": "2.11.x",
     "istanbul": "0.3.x",
     "jscs": "1.11.x",
