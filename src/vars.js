@@ -526,7 +526,28 @@ exports.node = {
   setImmediate   : true, // v0.9.1+
   clearImmediate : true, // v0.9.1+
   URL            : true, // v10.0.0+
-  URLSearchParams: true  // v10.0.0+
+  URLSearchParams: true, // v10.0.0+
+  TextDecoder    : true, // v11.0.0+
+  TextEncoder    : true, // v11.0.0+
+  AbortController: true, // v15.4.0+
+  Event          : true, // v15.4.0+
+  EventTarget    : true, // v15.4.0+
+  atob           : true, // v16.0.0+
+  btoa           : true, // v16.0.0+
+  structuredClone: true, // v17.0.0+
+  Blob           : true, // v18.0.0+
+  CompressionStream: true, // v18.0.0+
+  DecompressionStream: true, // v18.0.0+
+  FormData       : true, // v18.0.0+
+  Headers        : true, // v18.0.0+
+  ReadableStream : true, // v18.0.0+
+  Request        : true, // v18.0.0+
+  Response       : true, // v18.0.0+
+  TransformStream: true, // v18.0.0+
+  WritableStream : true, // v18.0.0+
+  fetch          : true, // v18.0.0+
+  CustomEvent    : true, // v19.0.0+
+  crypto         : true  // v19.0.0+
 };
 
 exports.browserify = {
