@@ -2406,6 +2406,18 @@ var JSHINT = (function() {
 
     return that;
   });
+  assignop("??=", function(context, left, that) {
+    if (!state.inES11()) {
+      warning("W119", that, "nullish coalescing assignment", "11");
+    }
+    that.left = left;
+
+    checkLeftSideAssign(context, left, that, { allowDestructuring: true });
+
+    that.right = expression(context, 10);
+
+    return that;
+  }, 20);
 
   bitwiseassignop("&=");
   bitwiseassignop("|=");
@@ -4013,6 +4025,7 @@ var JSHINT = (function() {
     case "|=":
     case "^=":
     case "/=":
+    case "??=":
       if (!state.option.boss) {
         warning("W084", token);
       }

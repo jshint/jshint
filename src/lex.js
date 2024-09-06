@@ -298,6 +298,13 @@ Lexer.prototype = {
         };
       }
 
+      if (ch2 === "?" && ch3 === "=") {
+        return {
+          type: Token.Punctuator,
+          value: "??="
+        };
+      }
+
       return {
         type: Token.Punctuator,
         value: ch2 === "?" ? "??" : "?"
