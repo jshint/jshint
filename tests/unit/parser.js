@@ -10566,7 +10566,7 @@ exports.nullishCoalescing.operator.negative = function(test) {
 
 exports.nullishCoalescing.assignment = function(test) {
   TestRun(test, "requires esversion: 11")
-    .addError(1, 7, "'nullish coalescing assignment' is only available in ES11 (use 'esversion: 11').")
+    .addError(1, 3, "'nullish coalescing assignment' is only available in ES11 (use 'esversion: 11').")
     .test([
       "x ??= 0;"
     ], { esversion: 10, expr: true });
