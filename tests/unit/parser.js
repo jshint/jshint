@@ -10488,9 +10488,12 @@ exports.importMeta = function (test) {
   test.done();
 };
 
-exports.nullishCoalescing = {};
+exports.nullishCoalescing = {
+  operator: {},
+  assignment: {}
+};
 
-exports.nullishCoalescing.positive = function(test) {
+exports.nullishCoalescing.operator.positive = function(test) {
   TestRun(test, "requires esversion: 11")
     .addError(1, 3, "'nullish coalescing' is only available in ES11 (use 'esversion: 11').")
     .test([
@@ -10533,7 +10536,7 @@ exports.nullishCoalescing.positive = function(test) {
   test.done();
 };
 
-exports.nullishCoalescing.negative = function(test) {
+exports.nullishCoalescing.operator.negative = function(test) {
   TestRun(test, "precedence with logical OR")
     .addError(1, 8, "Unexpected '??'.")
     .test([
@@ -10556,6 +10559,53 @@ exports.nullishCoalescing.negative = function(test) {
     .addError(1, 8, "Unexpected '&&'.")
     .test([
       "0 ?? 0 && 0;"
+    ], { esversion: 11, expr: true });
+
+  test.done();
+};
+
+exports.nullishCoalescing.assignment = function(test) {
+  TestRun(test, "requires esversion: 11")
+    .addError(1, 3, "'nullish coalescing assignment' is only available in ES11 (use 'esversion: 11').")
+    .test([
+      "x ??= 0;"
+    ], { esversion: 10, expr: true });
+
+  TestRun(test, "Unexpected use of '??'.")
+    .addError(1, 3, "Bad assignment.")
+    .test([
+      "0 ??= 0;"
+    ], { esversion: 11, expr: true });
+
+  TestRun(test, "Unexpected use of '??'.")
+    .addError(1, 5, "Bad assignment.")
+    .test([
+      "x() ??= 0;",
+    ], { esversion: 11, expr: true });
+
+  TestRun(test, "Unexpected use of '??'.")
+    .addError(1, 7, "Bad assignment.")
+    .test([
+      "x.y() ??= 0;"
+    ], { esversion: 11, expr: true });
+
+  TestRun(test, "Unexpected use of '??'.")
+    .addError(1, 4, "Expected an identifier and instead saw ';'.")
+    .addError(1, 4, "Unexpected '(end)'.")
+    .addError(1, 4, "Expected an assignment or function call and instead saw an expression.")
+    .addError(1, 5, "Missing semicolon.")
+    .test("0??;", {esversion: 11});
+
+  TestRun(test, "covered")
+    .test([
+      "0 ?? (x.y ??= 0);",
+      "x.y ??= 0 * 0;",
+      "0 * (s.y ??= 0);",
+      "(x ??= 0) || 0;",
+      "0 ?? (x ??= 0);",
+      "0 && (x ??= 0);",
+      "(x ??= 0) ?? 0;",
+      "(x ??= 0) && 0;"
     ], { esversion: 11, expr: true });
 
   test.done();
@@ -10667,29 +10717,6 @@ exports.loneNew = function (test) {
     .addError(1, 4, "Expected an identifier and instead saw ';'.")
     .addError(1, 5, "Missing semicolon.")
     .test("new;");
-
-  test.done();
-};
-
-// gh-3560: "Logical nullish assignment (??=) throwing error"
-exports.loneNullishCoalescing = function (test) {
-  TestRun(test, "as reported")
-    .addError(2, 8, "Expected an identifier and instead saw '='.")
-    .addError(2, 10, "Unexpected '(number)'.")
-    .addError(2, 8, "Expected an assignment or function call and instead saw an expression.")
-    .addError(2, 9, "Missing semicolon.")
-    .addError(2, 10, "Expected an assignment or function call and instead saw an expression.")
-    .test([
-      "let a = [1,2];",
-      "a[0] ??= 0;"
-    ], {esversion: 11});
-
-  TestRun(test, "simplified")
-    .addError(1, 4, "Expected an identifier and instead saw ';'.")
-    .addError(1, 4, "Unexpected '(end)'.")
-    .addError(1, 4, "Expected an assignment or function call and instead saw an expression.")
-    .addError(1, 5, "Missing semicolon.")
-    .test("0??;", {esversion: 11});
 
   test.done();
 };
