@@ -245,7 +245,8 @@ var warnings = {
   W145: "Superfluous 'case' clause.",
   W146: "Unnecessary `await` expression.",
   W147: "Regular expressions should include the 'u' flag.",
-  W148: "Unnecessary RegExp 's' flag."
+  W148: "Unnecessary RegExp 's' flag.",
+  W149: "Undeclared variable in typeof check."
 };
 
 var info = {

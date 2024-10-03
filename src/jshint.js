@@ -2709,6 +2709,12 @@ var JSHINT = (function() {
       quit("E041", this);
     }
 
+    // Check if the identifier is not declared
+    if (p.identifier && !state.funct["(scope)"].has(p.value)) {
+      warning("W149", p, p.value);  // Issue warning for undeclared variable
+    }
+
+
     // The `typeof` operator accepts unresolvable references, so the operand
     // may be undefined.
     if (p.identifier) {
