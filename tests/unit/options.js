@@ -4729,5 +4729,24 @@ exports.regexpu = function (test) {
       "}());"
     ], { esversion: 6 });
 
-  test.done();
+
+
+    exports.browserGlobals = function (test) {
+    var TestRun = require("../helpers/testhelper").setup.testRun;
+    var JSHINT = require("../..").JSHINT;
+
+  TestRun(test, "should not warn on modern browser globals")
+    .test(
+      [
+        "customElements;",
+        "ResizeObserver;",
+        "AbortController;",
+        "DOMException;",
+        "crypto;",
+      ].join("\n"),
+      { browser: true }
+    );
+};
+
+test.done();
 };
