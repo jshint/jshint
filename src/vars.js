@@ -76,6 +76,8 @@ exports.ecmaIdentifiers = {
 // Global variables commonly provided by a web browser environment.
 
 exports.browser = {
+
+  AbortController      :false,
   Audio                : false,
   Blob                 : false,
   addEventListener     : false, // EventTarget
@@ -104,10 +106,13 @@ exports.browser = {
   close                : false,
   closed               : false,
   Comment              : false,
+  crypto               : false,
   CompositionEvent     : false,
   createImageBitmap    : false, // WindowOrWorkerGlobalScope
   CustomEvent          : false,
+  customElement        :false,
   DOMParser            : false,
+  DOMException         : false,
   defaultStatus        : false,
   dispatchEvent        : false, // EventTarget
   Document             : false,
@@ -227,6 +232,7 @@ exports.browser = {
   NodeFilter           : false,
   NodeList             : false,
   Notification         : false,
+  NetworkInformation   : false,
   navigator            : false,
   onbeforeunload       : true,
   onblur               : true,
@@ -245,6 +251,7 @@ exports.browser = {
   print                : false,
   queueMicrotask       : false, // WindowOrWorkerGlobalScope
   Range                : false,
+  ResizeObserver       : false,
   requestAnimationFrame : false,
   removeEventListener  : false, // EventTarget
   Request              : false,
