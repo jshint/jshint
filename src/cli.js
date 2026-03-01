@@ -99,16 +99,21 @@ function findConfig(file) {
 function getHomeDir() {
   var homePath = "";
   var environment = global.process.env;
+  var getPath = function(p1, p2) {
+    if (p1) {
+      return p2 ? path.resolve(p1, p2) : p1;
+    }
+  };
   var paths = [
-    environment.USERPROFILE,
-    environment.HOME,
-    environment.HOMEPATH,
-    environment.HOMEDRIVE + environment.HOMEPATH
+    getPath(environment.USERPROFILE),
+    getPath(environment.HOME),
+    getPath(environment.HOMEPATH),
+    getPath(environment.HOMEDRIVE, environment.HOMEPATH),
   ];
 
   while (paths.length) {
     homePath = paths.shift();
-    if (fsUtils.exists(homePath)) {
+    if (homePath && fsUtils.exists(homePath)) {
       return homePath;
     }
   }
