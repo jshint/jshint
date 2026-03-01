@@ -99,7 +99,7 @@ function findConfig(file) {
 function getHomeDir() {
   var homePath = "";
   var environment = global.process.env;
-  var getPath = function (p1, p2) {
+  var getPath = function(p1, p2) {
     if (p1) {
       return p2 ? path.resolve(p1, p2) : p1;
     }
