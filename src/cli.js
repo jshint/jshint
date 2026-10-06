@@ -1,6 +1,6 @@
 "use strict";
 
-var _                 = require("lodash");
+var utils             = require("./utils.js");
 var cli               = require("cli");
 var path              = require("path");
 var minimatch         = require("minimatch");
@@ -471,13 +471,13 @@ function lint(code, results, config, data, file) {
 
   if (config.overrides) {
     if (file) {
-      _.each(config.overrides, function(options, pattern) {
+      utils.each(config.overrides, function(options, pattern) {
         if (minimatch(path.normalize(file), pattern, { nocase: true, matchBase: true })) {
           if (options.globals) {
-            globals = _.extend(globals || {}, options.globals);
+            globals = utils.extend(globals || {}, options.globals);
             delete options.globals;
           }
-          _.extend(config, options);
+          utils.extend(config, options);
         }
       });
     }
@@ -540,8 +540,8 @@ var exports = {
 
       if (config['extends']) {
         var baseConfig = exports.loadConfig(path.resolve(config.dirname, config['extends']));
-        config = _.merge({}, baseConfig, config, function(a, b) {
-          if (_.isArray(a)) {
+        config = utils.mergeConfig({}, baseConfig, config, function(a, b) {
+          if (utils.isArray(a)) {
             return a.concat(b);
           }
         });

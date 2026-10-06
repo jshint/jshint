@@ -16,7 +16,7 @@
  * coverage is verified (i.e. Node.js).
  */
 
-var _      = require("lodash");
+var utils  = require("./utils.js");
 var events = require("events");
 
 // Used to denote membership in lookup tables (a primitive value such as `true`
@@ -71,7 +71,7 @@ var scopeManager = function(state, predefined, exported, declared) {
     emitter.emit("warning", {
       code: code,
       token: token,
-      data: _.slice(arguments, 2)
+      data: utils.sliceArgs(arguments, 2)
     });
   }
 
@@ -79,7 +79,7 @@ var scopeManager = function(state, predefined, exported, declared) {
     emitter.emit("warning", {
       code: code,
       token: token,
-      data: _.slice(arguments, 2)
+      data: utils.sliceArgs(arguments, 2)
     });
   }
 
@@ -269,7 +269,7 @@ var scopeManager = function(state, predefined, exported, declared) {
     },
 
     isPredefined: function(bindingName) {
-      return !this.has(bindingName) && _.has(_scopeStack[0]["(predefined)"], bindingName);
+      return !this.has(bindingName) && utils.has(_scopeStack[0]["(predefined)"], bindingName);
     },
 
     /**
@@ -481,7 +481,7 @@ var scopeManager = function(state, predefined, exported, declared) {
 
       _scopeStack.pop();
       if (isUnstackingFunctionBody) {
-        _currentFunctBody = _scopeStack[_.findLastIndex(_scopeStack, function(scope) {
+        _currentFunctBody = _scopeStack[utils.findLastIndex(_scopeStack, function(scope) {
           // if function or if global (which is at the bottom so it will only return true if we call back)
           return scope["(isFuncBody)"] || scope["(type)"] === "global";
         })];
@@ -516,7 +516,7 @@ var scopeManager = function(state, predefined, exported, declared) {
       }
 
       // The variable was declared in the current scope
-      if (_.has(_current["(bindings)"], bindingName)) {
+      if (utils.has(_current["(bindings)"], bindingName)) {
         _current["(bindings)"][bindingName].duplicated = true;
 
       // The variable was declared in an outer scope
@@ -532,7 +532,7 @@ var scopeManager = function(state, predefined, exported, declared) {
         _current["(params)"].push(bindingName);
       }
 
-      if (_.has(_current["(usages)"], bindingName)) {
+      if (utils.has(_current["(usages)"], bindingName)) {
         var usage = _current["(usages)"][bindingName];
         // if its in a sub function it is not necessarily an error, just latedef
         if (usage["(onlyUsedSubFunction)"]) {
@@ -605,7 +605,7 @@ var scopeManager = function(state, predefined, exported, declared) {
      */
     getImpliedGlobals: function() {
       // jshint proto: true
-      var values = _.values(impliedGlobals);
+      var values = utils.objectValues(impliedGlobals);
       var hasProto = false;
 
       // See comment, "A note on `__proto__`"
@@ -667,17 +667,17 @@ var scopeManager = function(state, predefined, exported, declared) {
      */
     addExported: function(bindingName) {
       var globalBindings = _scopeStack[0]["(bindings)"];
-      if (_.has(declared, bindingName)) {
+      if (utils.has(declared, bindingName)) {
         // remove the declared token, so we know it is used
         delete declared[bindingName];
-      } else if (_.has(globalBindings, bindingName)) {
+      } else if (utils.has(globalBindings, bindingName)) {
         globalBindings[bindingName]["(unused)"] = false;
       } else {
         for (var i = 1; i < _scopeStack.length; i++) {
           var scope = _scopeStack[i];
           // if `scope.(type)` is not defined, it is a block scope
           if (!scope["(type)"]) {
-            if (_.has(scope["(bindings)"], bindingName) &&
+            if (utils.has(scope["(bindings)"], bindingName) &&
                 !scope["(bindings)"][bindingName]["(blockscoped)"]) {
               scope["(bindings)"][bindingName]["(unused)"] = false;
               return;
@@ -748,7 +748,7 @@ var scopeManager = function(state, predefined, exported, declared) {
       var ishoisted = type === "function" || type === "generator function" ||
         type === "async function" || type === "import";
       var isexported    = (isblockscoped ? _current : _currentFunctBody)["(type)"] === "global" &&
-                          _.has(exported, bindingName);
+                          utils.has(exported, bindingName);
 
       // outer shadow check (inner is only on non-block scoped)
       _checkOuterShadow(bindingName, token);

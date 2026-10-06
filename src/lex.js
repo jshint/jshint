@@ -4,7 +4,7 @@
 
 "use strict";
 
-var _      = require("lodash");
+var utils  = require("./utils.js");
 var events = require("events");
 var reg    = require("./reg.js");
 var state  = require("./state.js").state;
@@ -1981,13 +1981,13 @@ Lexer.prototype = {
     var inputTrimmed = this.input.trim();
 
     var startsWith = function() {
-      return _.some(arguments, function(prefix) {
+      return utils.someArgs(arguments, function(prefix) {
         return inputTrimmed.indexOf(prefix) === 0;
       });
     };
 
     var endsWith = function() {
-      return _.some(arguments, function(suffix) {
+      return utils.someArgs(arguments, function(suffix) {
         return inputTrimmed.indexOf(suffix, inputTrimmed.length - suffix.length) !== -1;
       });
     };
@@ -2081,7 +2081,7 @@ Lexer.prototype = {
           this.prereg = true;
         }
 
-        if (_.has(state.syntax, value)) {
+        if (utils.has(state.syntax, value)) {
           obj = Object.create(state.syntax[value] || state.syntax["(error)"]);
         }
       }
