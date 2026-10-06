@@ -1,6 +1,6 @@
 "use strict";
 
-var _ = require("lodash");
+var utils = require("./utils.js");
 
 var errors = {
   // JSHint options
@@ -258,14 +258,14 @@ exports.errors = {};
 exports.warnings = {};
 exports.info = {};
 
-_.each(errors, function(desc, code) {
+utils.each(errors, function(desc, code) {
   exports.errors[code] = { code: code, desc: desc };
 });
 
-_.each(warnings, function(desc, code) {
+utils.each(warnings, function(desc, code) {
   exports.warnings[code] = { code: code, desc: desc };
 });
 
-_.each(info, function(desc, code) {
+utils.each(info, function(desc, code) {
   exports.info[code] = { code: code, desc: desc };
 });

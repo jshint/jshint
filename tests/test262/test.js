@@ -1,6 +1,5 @@
 "use strict";
 var JSHint = require("../../").JSHINT;
-var find = require("lodash").find;
 
 /**
  * JSHint "error" messages generally indicate a parsing failure and "warning"
@@ -35,7 +34,7 @@ var incorrectSeverity = {
 };
 
 function isFailure(errors) {
-  return errors && !!find(errors, function(msg) {
+  return errors && !!errors.find(function(msg) {
     if (msg.code[0] === "W") {
       return msg.code in incorrectSeverity;
     } else if (msg.code[0] === "I") {

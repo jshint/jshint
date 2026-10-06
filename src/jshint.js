@@ -30,7 +30,7 @@
 /*jshint quotmark:double */
 /*exported console */
 
-var _            = require("lodash");
+var utils        = require("./utils.js");
 var events       = require("events");
 var vars         = require("./vars.js");
 var messages     = require("./messages.js");
@@ -106,7 +106,7 @@ var JSHINT = (function() {
     }
 
     if (validNames.indexOf(name) === -1) {
-      if (t.type !== "jslint" && !_.has(options.removed, name)) {
+      if (t.type !== "jslint" && !utils.has(options.removed, name)) {
         error("E001", t, type, name);
         return false;
       }
@@ -194,7 +194,7 @@ var JSHINT = (function() {
 
   function combine(dest, src) {
     Object.keys(src).forEach(function(name) {
-      if (_.has(JSHINT.blacklist, name)) return;
+      if (utils.has(JSHINT.blacklist, name)) return;
       dest[name] = src[name];
     });
   }
@@ -382,8 +382,8 @@ var JSHINT = (function() {
   function removeIgnoredMessages() {
     var ignored = state.ignoredLines;
 
-    if (_.isEmpty(ignored)) return;
-    JSHINT.errors = _.reject(JSHINT.errors, function(err) { return ignored[err.line] });
+    if (utils.isEmpty(ignored)) return;
+    JSHINT.errors = utils.reject(JSHINT.errors, function(err) { return ignored[err.line] });
   }
 
   function warning(code, t, a, b, c, d) {
@@ -505,7 +505,7 @@ var JSHINT = (function() {
       combine(predefined, predef);
 
       for (var key in predef) {
-        if (_.has(predef, key)) {
+        if (utils.has(predef, key)) {
           declared[key] = directiveToken;
         }
       }
@@ -1485,7 +1485,7 @@ var JSHINT = (function() {
         return false;
       }
 
-      return !_.includes(values, left.value);
+      return !utils.includes(values, left.value);
     }
 
     return false;
@@ -2307,7 +2307,7 @@ var JSHINT = (function() {
     identifier: false,
     template: true,
   };
-  state.syntax["(template)"] = _.extend({
+  state.syntax["(template)"] = utils.extend({
     lbp: 155,
     type: "(template)",
     nud: doTemplateLiteral,
@@ -2315,20 +2315,20 @@ var JSHINT = (function() {
     noSubst: false
   }, baseTemplateSyntax);
 
-  state.syntax["(template middle)"] = _.extend({
+  state.syntax["(template middle)"] = utils.extend({
     lbp: 0,
     type: "(template middle)",
     noSubst: false
   }, baseTemplateSyntax);
 
-  state.syntax["(template tail)"] = _.extend({
+  state.syntax["(template tail)"] = utils.extend({
     lbp: 0,
     type: "(template tail)",
     tail: true,
     noSubst: false
   }, baseTemplateSyntax);
 
-  state.syntax["(no subst template)"] = _.extend({
+  state.syntax["(no subst template)"] = utils.extend({
     lbp: 155,
     type: "(template)",
     nud: doTemplateLiteral,
@@ -3440,7 +3440,7 @@ var JSHINT = (function() {
     advance("(");
     state.funct["(comparray)"].setState("define");
     res.left = expression(context, 130);
-    if (_.includes(["in", "of"], state.tokens.next.value)) {
+    if (utils.includes(["in", "of"], state.tokens.next.value)) {
       advance();
     } else {
       /* istanbul ignore next */
@@ -3621,7 +3621,7 @@ var JSHINT = (function() {
 
       pastRest = spreadrest("rest");
 
-      if (_.includes(["{", "["], state.tokens.next.id)) {
+      if (utils.includes(["{", "["], state.tokens.next.id)) {
         hasDestructuring = true;
         tokens = destructuringPattern(context);
         for (t in tokens) {
@@ -3729,14 +3729,14 @@ var JSHINT = (function() {
     };
 
     if (token) {
-      _.extend(funct, {
+      utils.extend(funct, {
         "(line)"     : token.line,
         "(character)": token.character,
         "(metrics)"  : createMetrics(token)
       });
     }
 
-    _.extend(funct, overwrites);
+    utils.extend(funct, overwrites);
 
     if (funct["(context)"]) {
       funct["(scope)"] = funct["(context)"]["(scope)"];
@@ -3962,7 +3962,7 @@ var JSHINT = (function() {
       },
 
       verifyMaxParametersPerFunction: function() {
-        if (_.isNumber(state.option.maxparams) &&
+        if (utils.isNumber(state.option.maxparams) &&
           this.arity > state.option.maxparams) {
           warning("W072", functionStartToken, this.arity);
         }
@@ -4411,7 +4411,7 @@ var JSHINT = (function() {
     if (!first)
       return;
 
-    _.zip(tokens, Array.isArray(first) ? first : [ first ]).forEach(function(val) {
+    utils.zip(tokens, Array.isArray(first) ? first : [ first ]).forEach(function(val) {
       var token = val[0];
       var value = val[1];
 
@@ -4445,7 +4445,7 @@ var JSHINT = (function() {
     statement.first = [];
     for (;;) {
       var names = [];
-      if (_.includes(["{", "["], state.tokens.next.value)) {
+      if (utils.includes(["{", "["], state.tokens.next.value)) {
         tokens = destructuringPattern(context);
         lone = false;
       } else {
@@ -4622,7 +4622,7 @@ var JSHINT = (function() {
     this.first = [];
     for (;;) {
       var names = [];
-      if (_.includes(["{", "["], state.tokens.next.value)) {
+      if (utils.includes(["{", "["], state.tokens.next.value)) {
         tokens = destructuringPattern(context);
         lone = false;
       } else {
@@ -4866,7 +4866,7 @@ var JSHINT = (function() {
 
       if (checkPunctuators(state.tokens.next, ["[", "{"])) {
         var tokens = destructuringPattern(context);
-        _.each(tokens, function(token) {
+        utils.each(tokens, function(token) {
           if (token.id) {
             state.funct["(scope)"].addParam(token.id, token.token, "exception");
           }
@@ -5230,7 +5230,7 @@ var JSHINT = (function() {
     }
 
     // if we're in a for (… in|of …) statement
-    if (_.includes(["in", "of"], nextop.value)) {
+    if (utils.includes(["in", "of"], nextop.value)) {
       if (nextop.value === "of") {
         bindingPower = 20;
 
@@ -6156,7 +6156,7 @@ var JSHINT = (function() {
    */
   function checkPunctuators(token, values) {
     if (token.type === "(punctuator)") {
-      return _.includes(values, token.value);
+      return utils.includes(values, token.value);
     }
     return false;
   }
@@ -6253,7 +6253,7 @@ var JSHINT = (function() {
           _current = _carrays[_carrays.length - 1];
         },
         setState: function(s) {
-          if (_.includes(["use", "define", "generate", "filter"], s))
+          if (utils.includes(["use", "define", "generate", "filter"], s))
             _current.mode = s;
         },
         check: function(v) {
@@ -6426,7 +6426,7 @@ var JSHINT = (function() {
     var x, reIgnoreStr, reIgnore;
     var optionKeys, newOptionObj, newIgnoredObj;
 
-    o = _.clone(o);
+    o = utils.clone(o);
     state.reset();
     newOptionObj = state.option;
     newIgnoredObj = state.ignored;
@@ -6616,13 +6616,13 @@ var JSHINT = (function() {
     // Check options
     var name;
     for (name in o) {
-      if (_.has(o, name)) {
+      if (utils.has(o, name)) {
         checkOption(name, true, state.tokens.curr);
       }
     }
     if (o) {
       for (name in o.unstable) {
-        if (_.has(o.unstable, name)) {
+        if (utils.has(o.unstable, name)) {
           checkOption(name, false, state.tokens.curr);
         }
       }
